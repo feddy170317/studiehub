@@ -31,8 +31,13 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  // Network-first for external resources
-  if (event.request.url.includes('youtube') || event.request.url.includes('http')) {
+  // Network-first for external/third-party resources
+  const isExternal = event.request.url.includes('youtube') ||
+                     event.request.url.includes('youtu.be') ||
+                     event.request.url.includes('cdn') ||
+                     !event.request.url.includes(self.location.origin);
+
+  if (isExternal) {
     return event.respondWith(
       fetch(event.request)
         .catch(() => caches.match(event.request))
