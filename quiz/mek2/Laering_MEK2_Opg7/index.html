@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MEK2 · Opgave 7 — Reklameskiltet der ville vælte</title>
+
+<!-- Fonts (lokale — offline) -->
+<link rel="stylesheet" href="assets/vendor/fonts/fonts.css">
+
+<!-- KaTeX (formel-rendering, lokal) -->
+<link rel="stylesheet" href="assets/vendor/katex/katex.min.css">
+<script defer src="assets/vendor/katex/katex.min.js"></script>
+<script defer src="assets/vendor/katex/auto-render.min.js"></script>
+
+<!-- GSAP (animation, lokal) -->
+<script src="assets/vendor/gsap/gsap.min.js"></script>
+<script src="assets/vendor/gsap/ScrollTrigger.min.js"></script>
+
+<link rel="stylesheet" href="assets/comic.css">
+</head>
+<body>
+
+<div id="progress"></div>
+
+<div id="mode-bar">
+  <div class="mode-btn" id="btn-showall" title="Skift mellem øve-mode (skjult facit) og se-mode">👁 SE-MODE</div>
+  <div class="mode-btn" id="btn-rehearsal" title="Øv din 12-minutters tavle-fremlæggelse">⏱ EKSAMEN 12 MIN</div>
+</div>
+
+<!-- ============================================================ COVER -->
+<section id="cover">
+  <div class="issue">MEK2 · KOMBINERET LAST · NR. 7</div>
+  <h1 class="bangers">REKLAMESKILTET<br>DER VILLE VÆLTE</h1>
+  <div class="sub bangers">Vind + vægt mod én hul stolpe — hvem vinder?</div>
+
+  <div class="figbox" style="margin-top:20px">
+    <!-- Scenarie: skilt på stolpe med vægt + vind, punkt H ved bunden -->
+    <svg viewBox="0 0 360 300" width="320" role="img" aria-label="Reklameskilt på hul stolpe med vind og vægt">
+      <!-- jord -->
+      <line x1="20" y1="270" x2="340" y2="270" stroke="#161412" stroke-width="5"/>
+      <g stroke="#161412" stroke-width="3">
+        <line x1="40" y1="270" x2="28" y2="284"/><line x1="80" y1="270" x2="68" y2="284"/>
+        <line x1="120" y1="270" x2="108" y2="284"/><line x1="300" y1="270" x2="288" y2="284"/>
+        <line x1="330" y1="270" x2="318" y2="284"/>
+      </g>
+      <!-- stolpe (hul rør) -->
+      <rect x="150" y="70" width="22" height="200" fill="#cdd6df" stroke="#161412" stroke-width="4"/>
+      <line x1="161" y1="70" x2="161" y2="270" stroke="#9aa7b3" stroke-width="2" stroke-dasharray="4 4"/>
+      <!-- udhæng-arm -->
+      <rect x="172" y="92" width="70" height="12" fill="#cdd6df" stroke="#161412" stroke-width="4"/>
+      <!-- skilt -->
+      <rect x="236" y="58" width="92" height="64" rx="6" fill="#ffd23f" stroke="#161412" stroke-width="4"/>
+      <text x="282" y="84" text-anchor="middle" font-family="Bangers" font-size="15" fill="#e63522">KØB</text>
+      <text x="282" y="104" text-anchor="middle" font-family="Bangers" font-size="15" fill="#2b6cb0">NU!</text>
+      <!-- vægt-pil (ned) -->
+      <g stroke="#e63522" stroke-width="4" fill="#e63522">
+        <line x1="282" y1="122" x2="282" y2="158"/>
+        <polygon points="282,168 274,150 290,150"/>
+      </g>
+      <text x="298" y="150" font-family="Bangers" font-size="14" fill="#e63522">36 kN</text>
+      <!-- vind-pil (vandret ind mod skilt) -->
+      <g stroke="#2b6cb0" stroke-width="4" fill="#2b6cb0">
+        <line x1="345" y1="90" x2="332" y2="90"/>
+        <polygon points="322,90 340,82 340,98"/>
+      </g>
+      <text x="300" y="44" font-family="Bangers" font-size="14" fill="#2b6cb0">VIND 12 kN</text>
+      <!-- arm-mål -->
+      <line x1="161" y1="50" x2="282" y2="50" stroke="#7048e8" stroke-width="2" stroke-dasharray="5 4"/>
+      <text x="210" y="44" text-anchor="middle" font-family="Bangers" font-size="13" fill="#7048e8">arm 0,9 m</text>
+      <!-- punkt H -->
+      <circle cx="172" cy="258" r="8" fill="#e63522" stroke="#161412" stroke-width="3"/>
+      <text x="190" y="263" font-family="Bangers" font-size="16" fill="#161412">H</text>
+    </svg>
+  </div>
+
+  <div class="specs">
+    <div class="spec" style="--tilt:-2deg">Skilt-vægt<b>36 kN</b></div>
+    <div class="spec" style="--tilt:1.5deg">Vindlast<b>12 kN</b></div>
+    <div class="spec" style="--tilt:-1deg">Stolpe Ø<b>375 / t12 mm</b></div>
+    <div class="spec" style="--tilt:2deg">Stål S<sub>y</sub><b>235 MPa</b></div>
+  </div>
+  <div class="scroll-hint">▼ SCROLL FOR AT STARTE ▼</div>
+</section>
+
+<!-- ============================================================ INTRO / lygtepæl -->
+<section class="page" data-step>
+  <span class="page-kicker">INTUITION</span>
+  <h2 class="page-title">Lygtepælen i blæsevejr</h2>
+  <div class="strip two">
+    <div class="panel reveal-on" style="--tilt:-1deg">
+      <div class="bubble">Stolpen er som en <b>lygtepæl med et skilt hængt ud til siden</b>. Tre ting belaster bunden — punkt&nbsp;H.</div>
+      <p class="why"><b>1. Vægten</b> trykker lige ned i stolpen → lille <b>aksialt tryk</b>.</p>
+      <p class="why"><b>2. Skiltet hænger 0,9 m ud</b> → vægten trækker stolpen skæv → <b>bøjning</b> (den store synder).</p>
+      <p class="why"><b>3. Vinden</b> rammer det excentriske skilt → <b>vrider</b> hele stolpen → <b>torsion</b>.</p>
+      <div class="bubble think">Vi samler alle træk/tryk i ét <span data-tex>\\sigma</span> og alle vrid/skub i ét <span data-tex>\\tau</span> — og transformerer.</div>
+    </div>
+    <div class="panel reveal-on" style="--tilt:1deg">
+      <div class="figbox">
+        <svg viewBox="0 0 240 260" width="230" role="img" aria-label="Tre laster på stolpen">
+          <rect x="105" y="30" width="22" height="200" fill="#cdd6df" stroke="#161412" stroke-width="4"/>
+          <circle cx="127" cy="218" r="8" fill="#e63522" stroke="#161412" stroke-width="3"/>
+          <text x="140" y="224" font-family="Bangers" font-size="15">H</text>
+          <!-- 1 aksial -->
+          <g stroke="#e63522" stroke-width="3.5" fill="#e63522">
+            <line x1="116" y1="22" x2="116" y2="52"/><polygon points="116,60 109,44 123,44"/>
+          </g>
+          <text x="10" y="40" font-family="Bangers" font-size="13" fill="#e63522">1 vægt → tryk</text>
+          <!-- 2 bøjning (buet pil) -->
+          <path d="M150 70 q40 40 6 96" fill="none" stroke="#2b6cb0" stroke-width="3.5"/>
+          <polygon points="156,166 142,156 162,150" fill="#2b6cb0"/>
+          <text x="150" y="60" font-family="Bangers" font-size="13" fill="#2b6cb0">2 bøjning</text>
+          <!-- 3 torsion (cirkel-pil top) -->
+          <path d="M96 30 a18 8 0 1 0 36 0" fill="none" stroke="#7048e8" stroke-width="3.5"/>
+          <polygon points="132,30 124,22 124,38" fill="#7048e8"/>
+          <text x="40" y="18" font-family="Bangers" font-size="13" fill="#7048e8">3 vind → torsion</text>
+        </svg>
+        <div class="figcap">Tre laster mødes i punkt H ved indspændingen.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ KAP 1 — normalspænding -->
+<section class="page" data-step data-cue="1">
+  <span class="page-kicker">KAPITEL 1 · DEL a</span>
+  <h2 class="page-title">Normalspændingen i H</h2>
+  <div class="strip">
+    <div class="panel reveal-on">
+      <div class="pnum">1</div>
+      <h3>Vægten gør TO ting</h3>
+      <p class="why"><b>Hvorfor:</b> Vægten trykker ned (lille aksial) <i>og</i> bøjer pga. armen på 0,9 m (stor bøjning). H ligger i yderfiber for bøjningen — så det er der, bøjespændingen er størst.</p>
+      <div class="formula" data-tex-block>\\sigma_F=\\dfrac{F_{\\text{vaegt}}}{A},\\qquad \\sigma_b=\\dfrac{M_z\\,(d_y/2)}{I},\\qquad M_z=0{,}9\\cdot F_{\\text{vaegt}}</div>
+
+      <p><b>Tværsnit (hul rør):</b></p>
+      <div class="formula" data-tex-block>A=\\pi\\Big[\\big(\\tfrac{375}{2}\\big)^2-\\big(\\tfrac{351}{2}\\big)^2\\Big]=1{,}368\\cdot10^4\\ \\text{mm}^2,\\quad I=\\tfrac{\\pi}{64}(375^4-351^4)=2{,}257\\cdot10^8\\ \\text{mm}^4</div>
+
+      <p class="dim">d<sub>i</sub> = 375 − 2·12 = 351 mm</p>
+
+      <p><b>Gæt først — hvad bliver de tre tal?</b></p>
+      <div class="reveal" data-answer>
+        <div class="cover"><span class="qm">?</span><span>Aksial · Bøjning · Sum — klik for facit</span></div>
+        <div class="answer">
+          <p>Aksial (tryk): <span class="res" data-tex>\\sigma_F=\\dfrac{-36\\cdot10^3}{1{,}368\\cdot10^4}=-2{,}63\\text{ MPa}</span></p>
+          <p>Bøjning (træk i H): <span class="res" data-tex>\\sigma_b=\\dfrac{32{,}4\\cdot10^6\\cdot187{,}5}{2{,}257\\cdot10^8}=+26{,}92\\text{ MPa}</span></p>
+          <p>Sum: <span class="res" data-tex>\\sigma_H=26{,}92-2{,}63=\\mathbf{24{,}29\\text{ MPa}}</span></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel reveal-on" style="--tilt:1deg">
+      <div class="burst b-blue"><span>BØJ!</span></div>
+      <div class="bubble">Bøjningen (27 MPa) <b>knuser</b> det rene vægttryk (2,6 MPa). <b>Det er ARMEN, der gør vægten farlig.</b></div>
+      <div class="figbox">
+        <svg viewBox="0 0 240 180" width="230" role="img" aria-label="Bøjespændings-fordeling over tværsnit">
+          <text x="120" y="16" text-anchor="middle" font-family="Bangers" font-size="13" fill="#2b6cb0">Bøjespænding over tværsnit</text>
+          <line x1="120" y1="30" x2="120" y2="160" stroke="#161412" stroke-width="2" stroke-dasharray="4 4"/>
+          <text x="126" y="100" font-family="Nunito" font-size="11" fill="#666">NA</text>
+          <!-- trekant træk (højre, +) -->
+          <polygon points="120,30 190,30 120,95" fill="#e6352233" stroke="#e63522" stroke-width="2.5"/>
+          <text x="160" y="26" font-family="Bangers" font-size="12" fill="#e63522">+ træk (H)</text>
+          <!-- trekant tryk (venstre, -) -->
+          <polygon points="120,95 50,160 120,160" fill="#2b6cb033" stroke="#2b6cb0" stroke-width="2.5"/>
+          <text x="56" y="174" font-family="Bangers" font-size="12" fill="#2b6cb0">− tryk</text>
+          <circle cx="190" cy="30" r="6" fill="#e63522" stroke="#161412" stroke-width="2"/>
+          <text x="198" y="35" font-family="Bangers" font-size="13">H</text>
+        </svg>
+        <div class="figcap">H sidder yderst i træk-siden ⇒ maksimal bøjespænding.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ KAP 2 — forskydning -->
+<section class="page" data-step data-cue="2">
+  <span class="page-kicker">KAPITEL 2 · DEL b</span>
+  <h2 class="page-title">Forskydningen i H</h2>
+  <div class="strip">
+    <div class="panel reveal-on">
+      <div class="pnum">2</div>
+      <h3>Vinden vrider stolpen</h3>
+      <p class="why"><b>Hvorfor:</b> Vinden rammer 0,9 m fra aksen og vrider ⇒ <b>torsion</b>. Den direkte tværkraft-forskydning er <b>nul netop i H</b> (yderste fiber i vindretningen, hvor Q = 0).</p>
+      <div class="formula" data-tex-block>\\tau_T=\\dfrac{T\\,(d_y/2)}{I_p},\\qquad T=0{,}9\\cdot F_{\\text{vind}},\\qquad I_p=\\tfrac{\\pi}{32}(d_y^4-d_i^4)</div>
+      <div class="formula" data-tex-block>T=0{,}9\\cdot12=10{,}8\\ \\text{kNm},\\qquad I_p=4{,}513\\cdot10^8\\ \\text{mm}^4</div>
+
+      <p><b>Hvad bliver τ i H?</b></p>
+      <div class="reveal" data-answer>
+        <div class="cover"><span class="qm">?</span><span>Klik for forskydnings-facit</span></div>
+        <div class="answer">
+          <p>Torsion: <span class="res" data-tex>\\tau_T=\\dfrac{10{,}8\\cdot10^6\\cdot187{,}5}{4{,}513\\cdot10^8}=4{,}49\\text{ MPa}</span></p>
+          <p>Direkte forskydning: <span class="res" data-tex>\\tau_V=0\\ (Q=0)</span></p>
+          <p>I alt: <span class="res" data-tex>\\tau_H=\\mathbf{4{,}49\\text{ MPa}}</span></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel reveal-on" style="--tilt:-1.5deg">
+      <div class="burst b-purple"><span>VRID!</span></div>
+      <div class="bubble think">Kun torsionen bidrager i H — den direkte forskydning forsvinder, fordi vi står <b>yderst</b>.</div>
+      <div class="figbox">
+        <svg viewBox="0 0 220 200" width="210" role="img" aria-label="Torsion vrider rørtværsnittet">
+          <ellipse cx="110" cy="60" rx="70" ry="24" fill="#cdd6df" stroke="#161412" stroke-width="3"/>
+          <ellipse cx="110" cy="60" rx="38" ry="12" fill="#fdf6e3" stroke="#161412" stroke-width="2.5"/>
+          <!-- vrid-pil -->
+          <path d="M40 60 a70 24 0 1 0 140 0" fill="none" stroke="#7048e8" stroke-width="4" stroke-dasharray="2 0"/>
+          <polygon points="180,60 168,48 172,72" fill="#7048e8"/>
+          <text x="110" y="36" text-anchor="middle" font-family="Bangers" font-size="13" fill="#7048e8">T = 10,8 kNm</text>
+          <!-- τ vokser lineært -->
+          <line x1="110" y1="120" x2="110" y2="180" stroke="#161412" stroke-width="2"/>
+          <line x1="110" y1="180" x2="190" y2="180" stroke="#161412" stroke-width="2"/>
+          <line x1="110" y1="180" x2="180" y2="135" stroke="#e63522" stroke-width="3"/>
+          <text x="120" y="132" font-family="Nunito" font-size="11" fill="#e63522">τ ∝ radius</text>
+          <text x="150" y="196" font-family="Nunito" font-size="11" fill="#666">yderst = max</text>
+        </svg>
+        <div class="figcap">τ vokser lineært med radius — størst i overfladen (H).</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ KAP 3 — hovedspændinger -->
+<section class="page" data-step data-cue="3">
+  <span class="page-kicker">KAPITEL 3 · DEL c</span>
+  <h2 class="page-title">Hovedspændinger — Mohrs cirkel</h2>
+  <div class="strip">
+    <div class="panel reveal-on">
+      <div class="pnum">3</div>
+      <h3>Saml det i ét spændingsbillede</h3>
+      <p class="why"><b>Hvorfor:</b> H har normalspænding i én retning + forskydning ⇒ helt standard Mohr-transformation (samme metode som opgave 1's punkt B).</p>
+      <div class="formula" data-tex-block>(\\sigma_x=0,\\ \\sigma_y=\\sigma_H=24{,}29,\\ \\tau_{xy}=4{,}49)\\ \\text{MPa}</div>
+      <div class="formula" data-tex-block>\\bar\\sigma=\\tfrac{\\sigma_x+\\sigma_y}{2},\\qquad R=\\sqrt{\\big(\\tfrac{\\sigma_y-\\sigma_x}{2}\\big)^2+\\tau_{xy}^2},\\qquad \\sigma_{1,2}=\\bar\\sigma\\pm R</div>
+
+      <p><b>Regn med — hvad bliver σ₁ og σ₂?</b></p>
+      <div class="reveal" data-answer>
+        <div class="cover"><span class="qm">?</span><span>Klik for hovedspændinger</span></div>
+        <div class="answer">
+          <p><span class="res" data-tex>\\bar\\sigma=12{,}15,\\quad R=\\sqrt{12{,}15^2+4{,}49^2}=12{,}95\\text{ MPa}</span></p>
+          <p><span class="res" data-tex>\\sigma_1=12{,}15+12{,}95=\\mathbf{25{,}09\\text{ MPa}}</span></p>
+          <p><span class="res" data-tex>\\sigma_2=12{,}15-12{,}95=\\mathbf{-0{,}80\\text{ MPa}}</span></p>
+          <p><span class="res" data-tex>\\tau_{\\max}=R=12{,}95,\\quad \\theta_{p1}=10{,}1^\\circ,\\ \\theta_{p2}=79{,}9^\\circ</span></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel reveal-on" style="--tilt:1deg">
+      <div class="bubble">Næsten al spændingen er <b>træk langs stolpen</b>; den lille forskydning skubber blot σ₁ lidt op og giver en lille negativ σ₂.</div>
+      <div class="figbox">
+        <!-- Mohrs cirkel: skala 4 px/MPa, origo ved x=60 -->
+        <svg viewBox="0 0 320 230" width="300" role="img" aria-label="Mohrs cirkel for spændingstilstanden i H">
+          <!-- akser -->
+          <line x1="20" y1="120" x2="300" y2="120" stroke="#161412" stroke-width="2"/>
+          <line x1="60" y1="20" x2="60" y2="210" stroke="#161412" stroke-width="2"/>
+          <text x="296" y="138" font-family="Nunito" font-size="11" fill="#666">σ</text>
+          <text x="44" y="28" font-family="Nunito" font-size="11" fill="#666">τ</text>
+          <!-- cirkel: center σ̄=12,15 → x=60+12,15·4=108,6 ; R=12,95→51,8 px -->
+          <circle cx="108.6" cy="120" r="51.8" fill="#2b6cb022" stroke="#2b6cb0" stroke-width="3"/>
+          <!-- centrum -->
+          <circle cx="108.6" cy="120" r="3" fill="#161412"/>
+          <text x="100" y="112" font-family="Nunito" font-size="10" fill="#666">σ̄=12,15</text>
+          <!-- σ1 = 25,09 → x=60+100,4=160,4 -->
+          <circle cx="160.4" cy="120" r="5" fill="#e63522" stroke="#161412" stroke-width="2"/>
+          <text x="150" y="142" font-family="Bangers" font-size="12" fill="#e63522">σ₁ 25,1</text>
+          <!-- σ2 = -0,80 → x=60-3,2=56,8 -->
+          <circle cx="56.8" cy="120" r="5" fill="#2b6cb0" stroke="#161412" stroke-width="2"/>
+          <text x="20" y="142" font-family="Bangers" font-size="12" fill="#2b6cb0">σ₂ −0,8</text>
+          <!-- τmax top: y=120-51,8=68,2 -->
+          <line x1="108.6" y1="120" x2="108.6" y2="68.2" stroke="#7048e8" stroke-width="2.5" stroke-dasharray="4 3"/>
+          <circle cx="108.6" cy="68.2" r="4" fill="#7048e8"/>
+          <text x="116" y="66" font-family="Bangers" font-size="12" fill="#7048e8">τmax 12,95</text>
+          <!-- udgangspunkt (σy,τ): x=60+24,29·4=157,2 ; y=120-4,49·4=102 -->
+          <circle cx="157.2" cy="102" r="4" fill="#161412"/>
+          <text x="160" y="98" font-family="Nunito" font-size="9" fill="#161412">(σy,τ)</text>
+        </svg>
+        <div class="figcap">Center σ̄, radius R. σ₁/σ₂ er skæringerne med σ-aksen.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ KAP 4 — Tresca -->
+<section class="page" data-step data-cue="4">
+  <span class="page-kicker">KAPITEL 4 · DEL d</span>
+  <h2 class="page-title">Sikkerhedsfaktoren (Tresca)</h2>
+  <div class="strip">
+    <div class="panel reveal-on">
+      <div class="pnum">4</div>
+      <h3>Hvor mange gange kan lasten øges?</h3>
+      <p class="why"><b>Hvorfor:</b> Tresca siger — materialet flyder når den <b>største forskydning</b> bliver for stor, og den afhænger af spændet σ₁−σ₃. I plan spænding er σ₃ = 0. n<sub>s</sub> fortæller, hvor mange gange lasten kan øges før flydning.</p>
+      <div class="formula" data-tex-block>n_s=\\dfrac{S_y}{\\sigma_1-\\sigma_3},\\qquad \\sigma_3=0\\ \\text{(plan spaending)}</div>
+      <p class="dim">Da σ₂ &lt; 0 er det største spænd σ₁ − σ₂.</p>
+
+      <p><b>Gæt sikkerhedsfaktoren før du klikker:</b></p>
+      <div class="reveal" data-answer>
+        <div class="cover"><span class="qm">?</span><span>Klik for n_s</span></div>
+        <div class="answer">
+          <p><span class="res" data-tex>n_s=\\dfrac{235}{25{,}09-(-0{,}80)}=\\dfrac{235}{25{,}90}=\\mathbf{9{,}07}</span></p>
+          <p>Stolpen kan bære ca. <b>9 gange lasten</b> før flydning — stor sikkerhed.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel reveal-on" style="--tilt:-1deg">
+      <div class="burst b-yellow"><span>SIKKERT!</span></div>
+      <div class="figbox">
+        <!-- speedometer-agtig "sikkerheds-gauge" -->
+        <svg viewBox="0 0 240 160" width="230" role="img" aria-label="Sikkerhedsfaktor-måler">
+          <path d="M30 140 A90 90 0 0 1 210 140" fill="none" stroke="#161412" stroke-width="4"/>
+          <path d="M30 140 A90 90 0 0 1 78 64" fill="none" stroke="#e63522" stroke-width="14"/>
+          <path d="M78 64 A90 90 0 0 1 150 50" fill="none" stroke="#ffd23f" stroke-width="14"/>
+          <path d="M150 50 A90 90 0 0 1 210 140" fill="none" stroke="#2f9e44" stroke-width="14"/>
+          <text x="40" y="156" font-family="Bangers" font-size="12" fill="#e63522">1</text>
+          <text x="115" y="40" text-anchor="middle" font-family="Bangers" font-size="12" fill="#caa800">3</text>
+          <text x="205" y="156" font-family="Bangers" font-size="12" fill="#2f9e44">10+</text>
+          <!-- nål mod ~9 (grøn zone, nær højre) -->
+          <line x1="120" y1="140" x2="195" y2="115" stroke="#161412" stroke-width="5"/>
+          <circle cx="120" cy="140" r="8" fill="#161412"/>
+          <text x="120" y="120" text-anchor="middle" font-family="Bangers" font-size="22" fill="#2f9e44">9,07</text>
+        </svg>
+        <div class="figcap">Designnorm er typisk 1,5–3. Her: ~9 ⇒ robust permanent konstruktion.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ TRAINEE-INDSIGT -->
+<section class="page" data-step>
+  <span class="page-kicker">TRAINEE-INDSIGT</span>
+  <h2 class="page-title">Det skal du HUSKE</h2>
+  <div class="takeaways">
+    <div class="takeaway reveal-on" style="--tilt:-1.5deg">
+      <h4>Armen er fjenden</h4>
+      <p>Det er ikke vægten i sig selv, men <b>armen (0,9 m)</b> der skaber bøjningen. Udhængte skilte og baldakiner er berygtede — lille vægt langt ude = stort moment.</p>
+    </div>
+    <div class="takeaway reveal-on" style="--tilt:1deg">
+      <h4>Vind giver torsion</h4>
+      <p>Når vinden rammer et <b>excentrisk</b> skilt, vrider den masten. Derfor sidder motorvejsskilte ofte på to ben eller har afstivning — for at optage torsionen.</p>
+    </div>
+    <div class="takeaway reveal-on" style="--tilt:-1deg">
+      <h4>n<sub>s</sub> = 9 er meget</h4>
+      <p>I praksis dimensioneres til ~1,5–3. Faktor 9 betyder overdimensionering <i>eller</i> at man har taget højde for ekstreme storme, is og udmattelse over årtier — typisk for permanente konstruktioner i det fri.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ SELVTEST -->
+<section class="page" data-step>
+  <span class="page-kicker">SELVTEST</span>
+  <h2 class="page-title">Test dig selv — vend kortene</h2>
+  <p class="dim">Klik på et kort for at vende det. Sig svaret højt <i>før</i> du vender.</p>
+  <div class="cards">
+    <div class="flip"><div class="flip-inner">
+      <span class="tag">τ_V</span>
+      <div class="flip-face flip-front"><div class="q">Hvorfor er τ<sub>V</sub> = 0 netop i punkt H?</div></div>
+      <div class="flip-face flip-back"><div class="a">H ligger yderst i tværkraftens retning, hvor areal­momentet Q = 0. Da τ<sub>V</sub> = VQ/(I·t) bliver den nul. Kun torsionen bidrager.</div></div>
+    </div></div>
+
+    <div class="flip"><div class="flip-inner">
+      <span class="tag">Armen</span>
+      <div class="flip-face flip-front"><div class="q">Hvad gør vægtens arm på 0,9 m så farlig?</div></div>
+      <div class="flip-face flip-back"><div class="a">Den skaber bøjemomentet M<sub>z</sub> = 0,9·F. Bøjningen (26,9 MPa) dominerer fuldstændigt over det rene aksialtryk (2,6 MPa).</div></div>
+    </div></div>
+
+    <div class="flip"><div class="flip-inner">
+      <span class="tag">Tresca</span>
+      <div class="flip-face flip-front"><div class="q">Hvad er Tresca-"spændet", og hvad er σ₃ her?</div></div>
+      <div class="flip-face flip-back"><div class="a">n<sub>s</sub> = S<sub>y</sub>/(σ₁ − σ₃). I plan spænding er σ₃ = 0. Da σ₂ &lt; 0 styrer spændet σ₁ − σ₂.</div></div>
+    </div></div>
+
+    <div class="flip"><div class="flip-inner">
+      <span class="tag">3 laster</span>
+      <div class="flip-face flip-front"><div class="q">Hvilke tre laster virker på stolpen?</div></div>
+      <div class="flip-face flip-back"><div class="a">Vægt → aksialt tryk · Vægt × arm → bøjning · Vind × arm → torsion. ("Vægt = tryk + bøjning, vind = torsion".)</div></div>
+    </div></div>
+
+    <div class="flip"><div class="flip-inner">
+      <span class="tag">Rør</span>
+      <div class="flip-face flip-front"><div class="q">I og I<sub>p</sub> for et hult rør?</div></div>
+      <div class="flip-face flip-back"><div class="a">I = (π/64)(d<sub>y</sub>⁴ − d<sub>i</sub>⁴) for bøjning; I<sub>p</sub> = (π/32)(d<sub>y</sub>⁴ − d<sub>i</sub>⁴) = 2I for torsion.</div></div>
+    </div></div>
+
+    <div class="flip"><div class="flip-inner">
+      <span class="tag">n_s</span>
+      <div class="flip-face flip-front"><div class="q">Hvad betyder n<sub>s</sub> = 9 fysisk?</div></div>
+      <div class="flip-face flip-back"><div class="a">Stolpen kan bære ca. 9 gange lasten før flydning. Meget højt — designnorm er typisk 1,5–3.</div></div>
+    </div></div>
+  </div>
+
+  <!-- storm-udfordring -->
+  <div class="challenge reveal-on">
+    <h3>⚡ STORM-UDFORDRING</h3>
+    <p>Vindlasten <b>fordobles til 24 kN</b> (storm). Genberegn τ<sub>T</sub>, hovedspændingerne og n<sub>s</sub>. Bøjningen er uændret — så hvor meget falder sikkerheden egentlig?</p>
+    <p class="dim">Regn det selv først. (Hint: τ fordobles direkte; σ<sub>H</sub> er uændret.)</p>
+    <div class="reveal" data-answer>
+      <div class="cover"><span class="qm">?</span><span>Klik for facit på storm-varianten</span></div>
+      <div class="answer">
+        <p><span class="res" data-tex>T=0{,}9\\cdot24=21{,}6\\text{ kNm}\\Rightarrow \\tau_T=2\\cdot4{,}49=8{,}98\\text{ MPa}</span></p>
+        <p><span class="res" data-tex>R=\\sqrt{12{,}15^2+8{,}98^2}=15{,}10\\Rightarrow \\sigma_1=27{,}25,\\ \\sigma_2=-2{,}96\\text{ MPa}</span></p>
+        <p><span class="res" data-tex>n_s=\\dfrac{235}{27{,}25-(-2{,}96)}=\\dfrac{235}{30{,}21}=\\mathbf{7{,}78}</span></p>
+        <p><b>Pointe:</b> τ fordobles, men da bøjningen dominerer σ, falder n<sub>s</sub> kun moderat (9,07 → 7,78).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- facit-tjek -->
+  <div class="panel reveal-on" style="margin-top:26px">
+    <h3>✓ Facit-tjek (Mathcad-verifiseret)</h3>
+    <p>σ<sub>H</sub> = 24,29 · τ = 4,49 · σ₁ = 25,09 · σ₂ = −0,80 · n<sub>s</sub> = 9,07 — matcher Mathcad-arket eksakt.</p>
+    <p class="dim">Enhedstjek: N·mm·mm/mm⁴ = MPa ✓ · Bøjning dominerer (26,9 ≫ 2,6) ✓</p>
+  </div>
+</section>
+
+<footer class="page">
+  MEK2 · Opgave 7 — Reklameskilt på hul stolpe · læringsdeck genereret fra <code>opg7.tex</code> (Besvarelse_MEK2_S26).<br>
+  Tryk <span class="kbd">R</span> for eksamens-rehearsal · <span class="kbd">S</span> for se-mode · <span class="kbd">←/→</span> spring mellem kapitler.
+</footer>
+
+<!-- ============================================================ REHEARSAL OVERLAY -->
+<div id="rehearsal-panel">
+  <div class="reh-wrap">
+    <div class="page-kicker">EKSAMENS-REHEARSAL · 12 MIN VED TAVLEN</div>
+    <div class="reh-timer" id="reh-timer">12:00</div>
+    <div class="reh-controls">
+      <div class="mode-btn" id="reh-start">▶ START</div>
+      <div class="mode-btn" id="reh-pause">⏸ PAUSE</div>
+      <div class="mode-btn" id="reh-reset">↺ NULSTIL</div>
+      <div class="mode-btn" id="reh-exit">✕ LUK</div>
+    </div>
+    <p class="dim" style="color:#bbb">Fortæl højt, som om eksaminator lytter. Følg de fire cues nedefra — det er din røde tråd.</p>
+
+    <div class="reh-cue"><span class="step-no">① Tre laster</span><br>
+      Sig: <b>"vægt = tryk + bøjning (arm), vind = torsion"</b>. Lygtepæl-billedet sælger det.</div>
+    <div class="reh-cue"><span class="step-no">② Saml σ og τ</span><br>
+      Alle normalbidrag i ét <b>σ<sub>H</sub></b> (24,29 MPa), alle forskydningsbidrag i ét <b>τ<sub>H</sub></b> (4,49 MPa). Nævn at <b>τ<sub>V</sub> = 0</b> i H.</div>
+    <div class="reh-cue"><span class="step-no">③ Mohr</span><br>
+      <b>σ₁, σ₂</b> af (0; σ<sub>H</sub>; τ) → 25,09 og −0,80 MPa. Samme metode som opgave 1's punkt B.</div>
+    <div class="reh-cue"><span class="step-no">④ Tresca</span><br>
+      <b>n<sub>s</sub> = S<sub>y</sub>/(σ₁ − σ₃)</b> med σ₃ = 0 → <b>9,07</b>. Forklar at n<sub>s</sub> er "hvor mange gange lasten kan øges".</div>
+    <div class="reh-close mode-btn" id="reh-exit2">✕ TILBAGE TIL COMIC</div>
+  </div>
+</div>
+
+<script src="assets/deck.js"></script>
+</body>
+</html>

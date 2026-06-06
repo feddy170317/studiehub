@@ -1,11 +1,73 @@
 // Studiehub — PWA katalog over undervisningsmateriale
-// Hash-routing, vanilla JS
+// Hash-routing, vanilla JS, offline-first
 
 let content = null;
+let isOnline = navigator.onLine;
+
+// Toast notifications
+function showToast(message, type = 'info') {
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transition = 'opacity 0.3s ease';
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
+// Offline detection
+function setupOfflineDetection() {
+  window.addEventListener('online', () => {
+    isOnline = true;
+    document.body.classList.remove('offline');
+    showToast('Du er online igen ✓', 'success');
+  });
+
+  window.addEventListener('offline', () => {
+    isOnline = false;
+    document.body.classList.add('offline');
+    showOfflineBanner();
+  });
+
+  if (!isOnline) {
+    document.body.classList.add('offline');
+    showOfflineBanner();
+  }
+}
+
+function showOfflineBanner() {
+  let banner = document.querySelector('.offline-banner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.className = 'offline-banner';
+    banner.textContent = '⚠ Offline — nogle funktioner er ikke tilgængelige';
+    document.body.insertBefore(banner, document.body.firstChild);
+  }
+}
 
 async function loadContent() {
-  const res = await fetch('content.json');
-  content = await res.json();
+  try {
+    const res = await fetch('content.json');
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: Kunne ikke hente materialekataloget`);
+    }
+    content = await res.json();
+  } catch (err) {
+    console.error('Error loading content:', err);
+    showToast(`Fejl: ${err.message}`, 'error');
+
+    // Try cache as fallback
+    const cached = await caches.match('content.json');
+    if (cached) {
+      content = await cached.json();
+      showToast('Bruger offline-version', 'info');
+    } else {
+      renderError(err.message);
+    }
+  }
 }
 
 function getHash() {
@@ -16,19 +78,42 @@ function navigate(hash) {
   window.location.hash = hash;
 }
 
+function renderError(message) {
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="view">
+      <div class="empty-state">
+        <span class="icon">⚠️</span>
+        <p><strong>Fejl ved indlæsning</strong></p>
+        <p>${message}</p>
+        <p style="margin-top: 1.5rem; font-size: 0.85rem;">
+          <button class="btn-back" onclick="location.reload()" style="background: var(--primary); color: white; padding: 0.75rem; width: 100%;">
+            Prøv igen
+          </button>
+        </p>
+      </div>
+    </div>
+  `;
+}
+
 function renderHome() {
   const app = document.getElementById('app');
+  if (!content || !content.educations || content.educations.length === 0) {
+    renderError('Ingen uddannelser fundet');
+    return;
+  }
+
   const edu = content.educations[0];
   app.innerHTML = `
     <div class="view">
       <h1>${edu.name}</h1>
       <p class="meta">${edu.institution}</p>
       <nav class="courses">
-        ${edu.semesters.map(sem => `
+        ${edu.semesters.length > 0 ? edu.semesters.map(sem => `
           <button class="btn-semester" onclick="navigate('edu/${edu.id}/sem${sem.number}')">
             Semester ${sem.number}
           </button>
-        `).join('')}
+        `).join('') : '<div class="empty-state"><p>Ingen semestre fundet</p></div>'}
       </nav>
     </div>
   `;
@@ -37,18 +122,27 @@ function renderHome() {
 function renderSemester(eduId, semNum) {
   const app = document.getElementById('app');
   const edu = content.educations.find(e => e.id === eduId);
+  if (!edu) {
+    renderError('Uddannelse ikke fundet');
+    return;
+  }
+
   const sem = edu.semesters.find(s => s.number === semNum);
+  if (!sem) {
+    renderError(`Semester ${semNum} ikke fundet`);
+    return;
+  }
 
   app.innerHTML = `
     <div class="view">
       <button class="btn-back" onclick="navigate('home')">← Tilbage</button>
       <h1>Semester ${sem.number}</h1>
       <nav class="courses">
-        ${sem.courses.map(c => `
+        ${sem.courses && sem.courses.length > 0 ? sem.courses.map(c => `
           <button class="btn-course" onclick="navigate('edu/${eduId}/sem${semNum}/${c.id}')">
             ${c.code}: ${c.name}
           </button>
-        `).join('')}
+        `).join('') : '<div class="empty-state"><p>📚 Ingen fag i dette semester endnu</p></div>'}
       </nav>
     </div>
   `;
@@ -57,20 +151,25 @@ function renderSemester(eduId, semNum) {
 function renderCourse(eduId, semNum, courseId) {
   const app = document.getElementById('app');
   const edu = content.educations.find(e => e.id === eduId);
-  const sem = edu.semesters.find(s => s.number === semNum);
-  const course = sem.courses.find(c => c.id === courseId);
+  const sem = edu && edu.semesters.find(s => s.number === semNum);
+  const course = sem && sem.courses.find(c => c.id === courseId);
+
+  if (!course) {
+    renderError('Fag ikke fundet');
+    return;
+  }
 
   app.innerHTML = `
     <div class="view">
       <button class="btn-back" onclick="navigate('edu/${eduId}/sem${semNum}')">← Tilbage</button>
       <h1>${course.code}: ${course.name}</h1>
-      <p class="meta">${course.description}</p>
+      <p class="meta">${course.description || 'Intet beskrivelse'}</p>
       <nav class="lessons">
-        ${course.lessons.map(l => `
+        ${course.lessons && course.lessons.length > 0 ? course.lessons.map(l => `
           <button class="btn-lesson" onclick="navigate('edu/${eduId}/sem${semNum}/${courseId}/${l.id}')">
             Lektion ${l.number}: ${l.title}
           </button>
-        `).join('')}
+        `).join('') : '<div class="empty-state"><p>📖 Ingen lektioner endnu</p></div>'}
       </nav>
     </div>
   `;
@@ -79,18 +178,25 @@ function renderCourse(eduId, semNum, courseId) {
 function renderLesson(eduId, semNum, courseId, lessonId) {
   const app = document.getElementById('app');
   const edu = content.educations.find(e => e.id === eduId);
-  const sem = edu.semesters.find(s => s.number === semNum);
-  const course = sem.courses.find(c => c.id === courseId);
-  const lesson = course.lessons.find(l => l.id === lessonId);
+  const sem = edu && edu.semesters.find(s => s.number === semNum);
+  const course = sem && sem.courses.find(c => c.id === courseId);
+  const lesson = course && course.lessons.find(l => l.id === lessonId);
+
+  if (!lesson) {
+    renderError('Lektion ikke fundet');
+    return;
+  }
 
   app.innerHTML = `
     <div class="view">
       <button class="btn-back" onclick="navigate('edu/${eduId}/sem${semNum}/${courseId}')">← Tilbage</button>
       <h1>Lektion ${lesson.number}: ${lesson.title}</h1>
-      <p class="meta">${lesson.summary}</p>
+      <p class="meta">${lesson.summary || ''}</p>
       <section class="materials">
         <h2>Materiale</h2>
-        ${lesson.materials.map(m => renderMaterial(m)).join('')}
+        ${lesson.materials && lesson.materials.length > 0
+          ? lesson.materials.map(m => renderMaterial(m)).join('')
+          : '<div class="empty-state" style="padding: 2rem 0;"><p>📚 Ingen materialer endnu</p></div>'}
       </section>
     </div>
   `;
@@ -157,6 +263,7 @@ function router() {
 
 window.addEventListener('hashchange', router);
 window.addEventListener('load', async () => {
+  setupOfflineDetection();
   await loadContent();
   router();
 });

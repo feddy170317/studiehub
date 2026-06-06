@@ -1,0 +1,350 @@
+/* ============================================================
+   MEK2 Opgave 7 — Comic-strip læringsdeck
+   Stil: tegneserie-bog. Ben-Day-prikker, blæk-rammer, talebobler,
+   action-bursts. Comic-rammen er dekorativ; diagrammerne indeni er
+   teknisk korrekte (inline SVG). Selvstændig — ingen build.
+   ============================================================ */
+
+:root{
+  --ink:        #161412;     /* blæk-sort */
+  --paper:      #fdf6e3;     /* avispapir-creme */
+  --paper2:     #f5ead0;
+  --red:        #e63522;     /* helte-rød */
+  --blue:       #2b6cb0;     /* dyb blå */
+  --blue-pop:   #4aa3df;
+  --yellow:     #ffd23f;     /* burst-gul */
+  --green:      #2f9e44;
+  --purple:     #7048e8;
+  --orange:     #f76707;
+  --pink:       #ff6fae;
+  --panel-bg:   #ffffff;
+  --shadow:     6px 6px 0 var(--ink);
+  --shadow-lg:  10px 10px 0 var(--ink);
+  --bd:         4px solid var(--ink);
+  --bd-thick:   6px solid var(--ink);
+}
+
+*{ box-sizing:border-box; }
+
+html{ scroll-behavior:smooth; }
+
+body{
+  margin:0;
+  font-family:'Nunito', 'Segoe UI', system-ui, sans-serif;
+  color:var(--ink);
+  background:var(--paper);
+  background-image:
+    radial-gradient(var(--ink) 1.1px, transparent 1.2px);
+  background-size:18px 18px;
+  background-attachment:fixed;
+  line-height:1.45;
+  overflow-x:hidden;
+}
+
+/* ---- comic-fonts m. fallback ---- */
+.bangers{ font-family:'Bangers','Anton','Impact',sans-serif; letter-spacing:1.5px; }
+.anton  { font-family:'Anton','Bangers','Impact',sans-serif; }
+
+/* ============================================================
+   PROGRESS / NAV
+   ============================================================ */
+#progress{
+  position:fixed; top:0; left:0; height:8px; width:0%;
+  background:var(--red); z-index:200;
+  border-bottom:2px solid var(--ink);
+  transition:width .15s ease-out;
+}
+
+#mode-bar{
+  position:fixed; top:14px; right:14px; z-index:210;
+  display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;
+}
+.mode-btn{
+  font-family:'Bangers','Impact',sans-serif; letter-spacing:1px;
+  font-size:.95rem; padding:7px 14px; cursor:pointer;
+  background:var(--yellow); color:var(--ink);
+  border:3px solid var(--ink); border-radius:8px;
+  box-shadow:3px 3px 0 var(--ink);
+  transition:transform .08s, box-shadow .08s, background .15s;
+  user-select:none;
+}
+.mode-btn:hover{ transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--ink); }
+.mode-btn:active{ transform:translate(2px,2px); box-shadow:1px 1px 0 var(--ink); }
+.mode-btn.on{ background:var(--green); color:#fff; }
+
+/* ============================================================
+   SECTION / PAGE
+   ============================================================ */
+.page{
+  max-width:1100px; margin:0 auto; padding:64px 22px 40px;
+}
+.page-title{
+  font-family:'Bangers','Impact',sans-serif; letter-spacing:2px;
+  font-size:clamp(2rem,5vw,3.4rem); line-height:1;
+  color:var(--ink); margin:0 0 6px;
+  text-shadow:3px 3px 0 var(--yellow), 6px 6px 0 var(--ink);
+  transform:rotate(-1.2deg);
+}
+.page-kicker{
+  display:inline-block; font-family:'Bangers',sans-serif; letter-spacing:1px;
+  background:var(--blue); color:#fff; padding:4px 14px; font-size:1.1rem;
+  border:3px solid var(--ink); border-radius:6px; box-shadow:3px 3px 0 var(--ink);
+  transform:rotate(-1deg); margin-bottom:14px;
+}
+
+/* ============================================================
+   PANEL (tegneserie-rude)
+   ============================================================ */
+.strip{
+  display:grid; gap:22px; margin-top:18px;
+}
+@media(min-width:760px){ .strip.two{ grid-template-columns:1fr 1fr; } }
+
+.panel{
+  position:relative; background:var(--panel-bg);
+  border:var(--bd-thick); border-radius:6px;
+  box-shadow:var(--shadow-lg);
+  padding:18px 18px 16px;
+  transform:rotate(var(--tilt,0deg));
+}
+.panel::before{ /* halftone hjørne */
+  content:""; position:absolute; top:0; right:0; width:70px; height:70px;
+  background-image:radial-gradient(var(--ink) 1.4px, transparent 1.5px);
+  background-size:8px 8px; opacity:.18;
+  border-bottom-left-radius:60px; pointer-events:none;
+}
+.panel .pnum{
+  position:absolute; top:-18px; left:-18px;
+  width:46px; height:46px; border-radius:50%;
+  background:var(--red); color:#fff; border:4px solid var(--ink);
+  display:grid; place-items:center; font-family:'Bangers',sans-serif;
+  font-size:1.5rem; box-shadow:3px 3px 0 var(--ink); z-index:3;
+}
+.panel h3{
+  font-family:'Bangers','Impact',sans-serif; letter-spacing:1px;
+  font-size:1.5rem; margin:.1em 0 .5em; color:var(--blue);
+}
+.panel p{ margin:.4em 0; }
+.panel .why{
+  background:var(--paper2); border-left:6px solid var(--yellow);
+  padding:10px 12px; border-radius:4px; font-style:italic;
+}
+.panel .why b{ font-style:normal; }
+
+/* ---- taleboble ---- */
+.bubble{
+  position:relative; background:#fff; border:4px solid var(--ink);
+  border-radius:22px; padding:14px 16px; margin:14px 0;
+  box-shadow:4px 4px 0 var(--ink); font-weight:700;
+}
+.bubble::after{
+  content:""; position:absolute; bottom:-22px; left:34px;
+  border-width:22px 16px 0 0; border-style:solid;
+  border-color:var(--ink) transparent transparent transparent;
+}
+.bubble::before{
+  content:""; position:absolute; bottom:-14px; left:38px;
+  border-width:16px 11px 0 0; border-style:solid;
+  border-color:#fff transparent transparent transparent; z-index:2;
+}
+.bubble.think{ border-radius:50%/40%; }
+
+/* ---- formel-kasse ---- */
+.formula{
+  background:#1c2733; color:#eef; border:4px solid var(--ink);
+  border-radius:6px; padding:12px 14px; margin:12px 0;
+  box-shadow:4px 4px 0 var(--ink); overflow-x:auto;
+}
+.formula .katex{ color:#eef; font-size:1.12em; }
+
+/* ============================================================
+   REVEAL (skjul facit / aktiv genkaldelse)
+   ============================================================ */
+.reveal{
+  position:relative; margin:12px 0;
+  border:4px dashed var(--ink); border-radius:8px;
+  background:repeating-linear-gradient(45deg,var(--yellow),var(--yellow) 14px,#ffdf6b 14px,#ffdf6b 28px);
+  min-height:64px; cursor:pointer; overflow:hidden;
+  transition:background .2s;
+}
+.reveal .cover{
+  position:absolute; inset:0; display:flex; gap:10px;
+  align-items:center; justify-content:center; text-align:center;
+  font-family:'Bangers',sans-serif; letter-spacing:1px; font-size:1.2rem;
+  color:var(--ink); padding:8px;
+}
+.reveal .cover .qm{
+  font-size:1.8rem; background:var(--red); color:#fff;
+  width:42px; height:42px; border-radius:50%; border:3px solid var(--ink);
+  display:grid; place-items:center; box-shadow:2px 2px 0 var(--ink);
+}
+.reveal .answer{
+  opacity:0; padding:14px 16px; background:#eafbea;
+  border-radius:5px; transition:opacity .35s;
+}
+.reveal.shown{ background:#eafbea; border-style:solid; border-color:var(--green); cursor:default; }
+.reveal.shown .cover{ display:none; }
+.reveal.shown .answer{ opacity:1; }
+.reveal .answer .res{
+  font-weight:800; color:var(--green);
+}
+/* "se-mode": vis alt */
+body.show-all .reveal{ background:#eafbea; border-style:solid; border-color:var(--green); }
+body.show-all .reveal .cover{ display:none; }
+body.show-all .reveal .answer{ opacity:1; }
+
+/* ============================================================
+   ACTION BURST (POW!-stjerne)
+   ============================================================ */
+.burst{
+  position:relative; display:inline-grid; place-items:center;
+  width:120px; height:120px; margin:6px auto; text-align:center;
+  font-family:'Bangers',sans-serif; font-size:1.5rem; color:#fff;
+  filter:drop-shadow(4px 4px 0 var(--ink));
+}
+.burst span{ position:relative; z-index:2; transform:rotate(-6deg);
+  text-shadow:2px 2px 0 var(--ink); padding:0 6px; }
+.burst::before{
+  content:""; position:absolute; inset:0; background:var(--red);
+  clip-path:polygon(50% 0,61% 22%,86% 14%,77% 38%,100% 50%,77% 62%,86% 86%,61% 78%,50% 100%,39% 78%,14% 86%,23% 62%,0 50%,23% 38%,14% 14%,39% 22%);
+}
+.burst.b-yellow::before{ background:var(--yellow); }
+.burst.b-yellow span{ color:var(--ink); text-shadow:1px 1px 0 #fff; }
+.burst.b-blue::before{ background:var(--blue); }
+.burst.b-purple::before{ background:var(--purple); }
+
+/* ============================================================
+   FIGUR / SVG
+   ============================================================ */
+.figbox{ text-align:center; margin:8px 0; }
+.figbox svg{ max-width:100%; height:auto; }
+.figcap{ font-size:.85rem; font-style:italic; color:#555; margin-top:4px; }
+
+/* ============================================================
+   COVER
+   ============================================================ */
+#cover{
+  min-height:100vh; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; text-align:center;
+  padding:40px 20px; position:relative;
+}
+#cover .issue{
+  font-family:'Bangers',sans-serif; letter-spacing:2px; font-size:1.1rem;
+  background:var(--ink); color:var(--yellow); padding:6px 16px;
+  border-radius:6px; transform:rotate(-2deg); margin-bottom:18px;
+}
+#cover h1{
+  font-family:'Bangers','Impact',sans-serif; letter-spacing:2px;
+  font-size:clamp(2.6rem,9vw,6rem); line-height:.92; margin:.1em 0;
+  color:var(--red);
+  text-shadow:4px 4px 0 var(--ink), 8px 8px 0 var(--yellow);
+  transform:rotate(-2deg);
+}
+#cover .sub{
+  font-family:'Bangers',sans-serif; letter-spacing:1px;
+  font-size:clamp(1.1rem,3vw,1.6rem); color:var(--blue);
+  margin-top:10px; transform:rotate(-1deg);
+}
+#cover .specs{
+  display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:26px;
+}
+.spec{
+  background:#fff; border:4px solid var(--ink); border-radius:8px;
+  padding:8px 14px; box-shadow:4px 4px 0 var(--ink); font-weight:800;
+  transform:rotate(var(--tilt,0deg));
+}
+.spec b{ display:block; font-family:'Bangers',sans-serif; color:var(--red); font-size:1.3rem; letter-spacing:1px; }
+.scroll-hint{
+  margin-top:34px; font-family:'Bangers',sans-serif; letter-spacing:1px;
+  font-size:1.1rem; color:var(--ink); animation:bob 1.3s ease-in-out infinite;
+}
+@keyframes bob{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(8px)} }
+
+/* ============================================================
+   INDSIGT / takeaways
+   ============================================================ */
+.takeaways{ display:grid; gap:18px; margin-top:18px; }
+@media(min-width:760px){ .takeaways{ grid-template-columns:repeat(3,1fr); } }
+.takeaway{
+  background:var(--blue); color:#fff; border:5px solid var(--ink);
+  border-radius:8px; padding:16px; box-shadow:var(--shadow);
+  transform:rotate(var(--tilt,0deg));
+}
+.takeaway h4{ font-family:'Bangers',sans-serif; letter-spacing:1px; font-size:1.3rem; margin:.2em 0 .4em; color:var(--yellow); }
+
+/* ============================================================
+   QUIZ / FLASHCARDS
+   ============================================================ */
+.cards{ display:grid; gap:18px; margin-top:18px; }
+@media(min-width:760px){ .cards{ grid-template-columns:1fr 1fr; } }
+.flip{
+  perspective:1200px; min-height:150px; cursor:pointer;
+}
+.flip-inner{
+  position:relative; width:100%; height:100%; min-height:150px;
+  transition:transform .5s; transform-style:preserve-3d;
+}
+.flip.flipped .flip-inner{ transform:rotateY(180deg); }
+.flip-face{
+  position:absolute; inset:0; backface-visibility:hidden;
+  border:5px solid var(--ink); border-radius:10px; padding:16px;
+  display:flex; align-items:center; justify-content:center; text-align:center;
+  box-shadow:var(--shadow);
+}
+.flip-front{ background:var(--yellow); }
+.flip-front .q{ font-family:'Bangers',sans-serif; font-size:1.2rem; letter-spacing:.5px; }
+.flip-back{ background:#eafbea; transform:rotateY(180deg); flex-direction:column; gap:8px; }
+.flip-back .a{ font-weight:800; }
+.flip .tag{
+  position:absolute; top:-14px; left:14px; font-family:'Bangers',sans-serif;
+  background:var(--red); color:#fff; padding:2px 10px; border:3px solid var(--ink);
+  border-radius:6px; font-size:.85rem; letter-spacing:1px;
+}
+
+/* storm-udfordring */
+.challenge{
+  background:#fff; border:5px solid var(--orange); border-radius:10px;
+  padding:18px; box-shadow:6px 6px 0 var(--orange); margin-top:24px;
+}
+.challenge h3{ font-family:'Bangers',sans-serif; color:var(--orange); font-size:1.6rem; letter-spacing:1px; margin-top:0; }
+
+/* ============================================================
+   REHEARSAL (eksamens-øvemode)
+   ============================================================ */
+#rehearsal-panel{
+  position:fixed; inset:0; z-index:500; display:none;
+  background:rgba(22,20,18,.96); color:#fff; padding:30px 20px;
+  overflow-y:auto;
+}
+#rehearsal-panel.open{ display:block; }
+.reh-wrap{ max-width:820px; margin:0 auto; text-align:center; }
+.reh-timer{
+  font-family:'Bangers',sans-serif; font-size:clamp(3rem,12vw,7rem);
+  letter-spacing:3px; color:var(--yellow); line-height:1;
+  text-shadow:4px 4px 0 var(--ink);
+}
+.reh-timer.warn{ color:var(--orange); }
+.reh-timer.over{ color:var(--red); animation:flash .6s steps(2) infinite; }
+@keyframes flash{ 50%{opacity:.4} }
+.reh-controls{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin:18px 0 26px; }
+.reh-cue{
+  background:#26201a; border:4px solid var(--yellow); border-radius:10px;
+  padding:18px 20px; text-align:left; margin:14px 0; box-shadow:6px 6px 0 #000;
+}
+.reh-cue .step-no{ font-family:'Bangers',sans-serif; color:var(--yellow); font-size:1.4rem; letter-spacing:1px; }
+.reh-cue b{ color:var(--yellow); }
+.reh-close{ margin-top:10px; }
+
+/* ============================================================
+   DIVERS
+   ============================================================ */
+.dim{ color:#666; font-size:.9rem; }
+.kbd{ font-family:monospace; background:#fff; border:2px solid var(--ink);
+  border-radius:4px; padding:1px 7px; box-shadow:2px 2px 0 var(--ink); font-weight:700; }
+footer.page{ text-align:center; color:#555; font-size:.85rem; padding-bottom:80px; }
+
+/* reduced motion */
+@media(prefers-reduced-motion:reduce){
+  *{ animation:none !important; transition:none !important; }
+  html{ scroll-behavior:auto; }
+}
