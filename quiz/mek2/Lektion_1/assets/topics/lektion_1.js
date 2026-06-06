@@ -2,7 +2,7 @@
    Kilde: HTML-læseguide (9 kernebegreber, 7 formler, 8 mnemoteknik).
    12 Q · 4 lette (1pt) / 5 middel (2pt) / 3 svære (3pt) */
 window.MEK2_L1 = window.MEK2_L1 || {};
-window.MEK2_L1['lektion_1'] = {
+window.MEK2_L1['L1_spaending_toejning'] = {
   intro: 'Spænding og tøjning er de fundamentale byggeklodser i materialemekanik. Normalspænding &sigma; måler kraft pr. areal vinkelret på tværsnit, mens normal tøjning &epsilon; måler relativ længdeændring. Hookes lov &sigma; = E&epsilon; forbinder dem ved små deformationer. Du lærer også forskydningsspænding &tau; i bolte, Poissons forhold &nu; for lateral kontraktion, og hvordan man beregner lejespænding.',
   analogi: '⚒ Kerneidé: spænding = kraft/areal, tøjning = deformation/oprindelig længde. Hookes lov er lineær og gælder før flydning. Centroiden er hvor kraftresultanten virker.',
   examQs: [
