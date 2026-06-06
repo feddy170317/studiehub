@@ -261,14 +261,12 @@ function router() {
   }
 }
 
-// Listen for Service Worker updates
+// Listen for Service Worker updates (silent, no toast)
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('message', event => {
     if (event.data.type === 'CONTENT_UPDATED') {
-      // Reload content silently in background
-      loadContent().then(() => {
-        showToast('✨ Nyt materiale tilgængeligt — genindlæs siden', 'info');
-      });
+      // Reload content silently in background (no notification)
+      loadContent().catch(err => console.log('Silent update failed:', err));
     }
   });
 
