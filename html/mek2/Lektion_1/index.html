@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MEK2 Lektion 1: Spænding og Tøjning</title>
+
+  <!-- MathJax for formelrendring -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    /* Dark engineering theme */
+    :root {
+      --bg-dark: #0a1a2b;
+      --card-bg: #1a2a3b;
+      --accent-cyan: #5ec8ff;
+      --accent-green: #00d984;
+      --accent-gold: #ffa500;
+      --accent-purple: #d984ff;
+      --text-light: #e0e0e0;
+      --border-subtle: #2a3a4b;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      line-height: 1.7;
+      font-size: 16px;
+    }
+
+    header {
+      padding: 3rem 2rem;
+      background: linear-gradient(135deg, var(--bg-dark), var(--card-bg));
+      border-bottom: 3px solid var(--accent-cyan);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(94, 200, 255, 0.1), transparent);
+      border-radius: 50%;
+    }
+
+    header h1 {
+      font-size: 2.8rem;
+      color: var(--accent-cyan);
+      margin-bottom: 0.5rem;
+      position: relative;
+      z-index: 1;
+      font-weight: 700;
+    }
+
+    header p {
+      font-size: 1.2rem;
+      color: var(--accent-gold);
+      position: relative;
+      z-index: 1;
+    }
+
+    .header-meta {
+      font-size: 0.9rem;
+      color: rgba(224, 224, 224, 0.6);
+      margin-top: 1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .intro-box {
+      background: var(--card-bg);
+      border-left: 4px solid var(--accent-gold);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border-radius: 6px;
+      line-height: 1.8;
+    }
+
+    .intro-box strong {
+      color: var(--accent-gold);
+    }
+
+    /* Section styling */
+    .section {
+      margin-bottom: 2rem;
+      background: var(--card-bg);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .section:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    .section-header {
+      padding: 1.5rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      font-size: 1.25rem;
+      user-select: none;
+      transition: background 0.2s ease;
+    }
+
+    .section-header:hover {
+      background: rgba(94, 200, 255, 0.05);
+    }
+
+    .section-header .toggle {
+      font-size: 1.5rem;
+      color: var(--accent-cyan);
+      transition: transform 0.3s ease;
+      display: inline-block;
+      width: 30px;
+      text-align: center;
+    }
+
+    .section.active .section-header .toggle {
+      transform: rotate(180deg);
+    }
+
+    /* Color-coded headers */
+    .section.learning-goals .section-header {
+      background: rgba(0, 217, 132, 0.1);
+      border-left: 4px solid var(--accent-green);
+    }
+
+    .section.core-concepts .section-header {
+      background: rgba(255, 165, 0, 0.1);
+      border-left: 4px solid var(--accent-gold);
+    }
+
+    .section.formulas .section-header {
+      background: rgba(94, 200, 255, 0.1);
+      border-left: 4px solid var(--accent-cyan);
+    }
+
+    .section.mnemonics .section-header {
+      background: rgba(217, 132, 255, 0.1);
+      border-left: 4px solid var(--accent-purple);
+    }
+
+    .section-header span:first-child {
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .section-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease;
+      opacity: 0;
+    }
+
+    .section.active .section-content {
+      max-height: none;
+      overflow-y: auto;
+      max-height: 80vh;
+      opacity: 1;
+      padding: 0 1.5rem 1.5rem 1.5rem;
+    }
+
+    /* Content grid for two-column layout */
+    .two-column {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: start;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .two-column {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+    }
+
+    /* Lists */
+    ul, ol {
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    li {
+      margin-bottom: 0.8rem;
+      line-height: 1.6;
+    }
+
+    li strong {
+      color: var(--accent-gold);
+    }
+
+    /* Images */
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      border: 2px solid var(--accent-cyan);
+      display: block;
+      margin: 1rem 0;
+      background: rgba(94, 200, 255, 0.05);
+      padding: 0.5rem;
+    }
+
+    img.placeholder {
+      background: linear-gradient(135deg, rgba(94, 200, 255, 0.1), rgba(255, 165, 0, 0.1));
+      min-height: 250px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(224, 224, 224, 0.4);
+      font-size: 0.9rem;
+    }
+
+    /* Formula boxes */
+    .formula-box {
+      background: linear-gradient(135deg, rgba(94, 200, 255, 0.08), rgba(94, 200, 255, 0.03));
+      padding: 1.5rem;
+      border-radius: 6px;
+      margin: 1.5rem 0;
+      border-left: 4px solid var(--accent-cyan);
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .formula-box strong {
+      color: var(--accent-cyan);
+      display: block;
+      margin-bottom: 0.8rem;
+      font-size: 1.05rem;
+    }
+
+    .formula-box .equation {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 1rem;
+      border-radius: 4px;
+      margin: 0.8rem 0;
+      font-size: 1.1rem;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+    }
+
+    .formula-box p {
+      color: rgba(224, 224, 224, 0.85);
+      font-size: 0.95rem;
+      margin: 0.5rem 0;
+      line-height: 1.5;
+    }
+
+    /* Concept cards */
+    .concept-card {
+      background: rgba(255, 165, 0, 0.05);
+      padding: 1.2rem;
+      border-radius: 6px;
+      margin-bottom: 1.2rem;
+      border-left: 3px solid var(--accent-gold);
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .concept-card strong {
+      color: var(--accent-gold);
+      font-size: 1.05rem;
+    }
+
+    .concept-card p {
+      margin-top: 0.5rem;
+      font-size: 0.95rem;
+      color: rgba(224, 224, 224, 0.9);
+    }
+
+    /* Mnemonics box */
+    .mnemonic-item {
+      background: rgba(217, 132, 255, 0.05);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 6px;
+      border-left: 3px solid var(--accent-purple);
+    }
+
+    .mnemonic-item strong {
+      color: var(--accent-purple);
+    }
+
+    .mnemonic-item em {
+      color: var(--accent-cyan);
+      font-style: italic;
+    }
+
+    /* Responsive heading in section-content */
+    .section-content h3 {
+      color: var(--accent-gold);
+      margin-top: 1.5rem;
+      margin-bottom: 0.8rem;
+      font-size: 1.3rem;
+    }
+
+    .section-content h4 {
+      color: var(--accent-cyan);
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+
+    /* Note boxes */
+    .note-box {
+      background: rgba(255, 165, 0, 0.08);
+      padding: 1rem;
+      border-radius: 6px;
+      border-left: 4px solid var(--accent-gold);
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+
+    .note-box p {
+      margin: 0.5rem 0;
+      color: rgba(224, 224, 224, 0.9);
+    }
+
+    /* Footer */
+    footer {
+      background: var(--card-bg);
+      border-top: 2px solid var(--border-subtle);
+      padding: 2rem;
+      text-align: center;
+      margin-top: 3rem;
+      font-size: 0.9rem;
+      color: rgba(224, 224, 224, 0.6);
+    }
+
+    footer a {
+      color: var(--accent-cyan);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    footer a:hover {
+      color: var(--accent-green);
+    }
+
+    /* Utility classes */
+    .mt-2 { margin-top: 1.5rem; }
+    .mb-2 { margin-bottom: 1.5rem; }
+
+    /* Mobile responsiveness */
+    @media (max-width: 640px) {
+      header h1 {
+        font-size: 1.8rem;
+      }
+
+      header p {
+        font-size: 1rem;
+      }
+
+      .container {
+        padding: 1rem;
+      }
+
+      .section-header {
+        font-size: 1.05rem;
+        padding: 1.2rem;
+      }
+
+      .formula-box {
+        padding: 1rem;
+      }
+    }
+
+    /* MathJax adjustment */
+    .MathJax {
+      color: var(--accent-cyan) !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <h1>⚙️ MEK2 — Lektion 1</h1>
+    <p>Spænding og Tøjning</p>
+    <div class="header-meta">
+      <strong>Goodno & Gere:</strong> Mechanics of Materials, kap. 1.4, 1.7, 1.8
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Introduction -->
+    <div class="intro-box">
+      <p>
+        <strong>Velkommen!</strong> I denne lektion lærer du de grundlæggende begreber for spænding og tøjning,
+        samt hvordan man beregner deformationer i materialer under belastning. Vi dykker ned i normal- og
+        forskydningsspændinger, Hookes lov, og praktiske anvendelser i boltesamlinger.
+      </p>
+    </div>
+
+    <!-- LEARNING GOALS -->
+    <div class="section learning-goals">
+      <div class="section-header">
+        <span>
+          <span style="font-size: 1.4rem;">🎯</span>
+          Læringsmål
+        </span>
+        <span class="toggle">+</span>
+      </div>
+      <div class="section-content">
+        <p style="margin-bottom: 1rem; color: rgba(224, 224, 224, 0.9);">
+          Efter denne lektion kan du:
+        </p>
+        <ul>
+          <li>Beregne normalspænding <strong>σ</strong> og normal tøjning <strong>ε</strong> fra kraft, areal og deformation</li>
+          <li>Identificere centroiden og forstå betydningen for uniform lastfordeling</li>
+          <li>Anvende Hookes lov <strong>σ = Eε</strong> inden for det lineære regime</li>
+          <li>Beregne lateral tøjning via Poissons forhold <strong>ν</strong></li>
+          <li>Beregne forskydningsspænding <strong>τ</strong> i bolte og samlinger</li>
+          <li>Skelne mellem single shear og double shear</li>
+          <li>Beregne lejespænding (bearing stress) <strong>σ_b</strong> fra projiceret areal</li>
+          <li>Anvende Hookes lov i forskydning: <strong>τ = Gγ</strong> med <strong>G = E/(2(1+ν))</strong></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- CORE CONCEPTS -->
+    <div class="section core-concepts">
+      <div class="section-header">
+        <span>
+          <span style="font-size: 1.4rem;">📚</span>
+          Kernebegreber
+        </span>
+        <span class="toggle">+</span>
+      </div>
+      <div class="section-content">
+        <p style="margin-bottom: 1.5rem; color: rgba(224, 224, 224, 0.9);">
+          <strong>Ni kernebegreber fra GG 1.4, 1.7, 1.8:</strong>
+        </p>
+
+        <div class="concept-card">
+          <strong>1. Normalspænding (σ)</strong>
+          <p>Kraft pr. areal: $$\sigma = \frac{P}{A}$$ [Pa]. Måler trykbelastning vinkelret på tværsnit. Hvis delen strekkes, kaldes det træk; hvis den presses sammen, tryk.</p>
+        </div>
+
+        <div class="concept-card">
+          <strong>2. Normal tøjning (ε)</strong>
+          <p>Relativ forlængelse: $$\varepsilon = \frac{\delta}{L}$$ [dimensionsløs]. Hvor δ er den absolutte længdeændring, og L er oprindelig længde. Positiv ved strækning, negativ ved sammentrykning.</p>
+        </div>
+
+        <div class="concept-card">
+          <strong>3. Youngs modul (E)</strong>
+          <p>[Pa] Stivhedskonstant i normalretning. Beskriver modstand mod elastisk deformation. For stål ~200 GPa, aluminium ~70 GPa. Større E = stivere materiale.</p>
+        </div>
+
+        <div class="concept-card">
+          <strong>4. Poissons forhold (ν)</strong>
+          <p>[dimensionsløs] Relation mellem lateral og aksial tøjning: $$\nu = -\frac{\varepsilon_{\text{lat}}}{\varepsilon_{\text{aks}}}$$. Typisk 0,2–0,35. Når materiale strekkes, bliver det smalere i siden.</p>
+        </div>
+
+        <div class="concept-card">
+          <strong>5. Centroide (x̄, ȳ)</strong>
+          <p>Geometrisk tyngdepunkt. Resultanten af uniform normalspænding ligger her. For aksial belastning gennem centroiden: rent træk/tryk uden bøjning.</p>
+        </div>
+
+        <div class="concept-card">
+          <strong>6. Forskydningsspænding (τ)</strong>
+          <p>Kraft pr. areal parallelt med overflade: $$\tau_{\text{aver}} = \frac{V}{A}$$ [Pa]. Karakteristisk for bolte og samlinger. Modsat normal stress, som virker vinkelret.</p>
+        </div>
+
+        <div class="concept-card">
+          <strong>7. Lejespænding (σ_b)</strong>
+          <p>Normalspænding fra lateral kontakt mellem bolt og hul: $$\sigma_b = \frac{F_b}{A_b}$$ [Pa]. Udregnes med <strong>projiceret areal</strong> $$A_b = t \cdot d_b$$, ikke cirkelareal!</p>
+        </div>
+
+        <div class="concept-card">
+          <strong>8. Forskydningstøjning (γ)</strong>
+          <p>[rad] Ændring i vinkel mellem vinkelrette planer. Positivt når vinklen mellem "positive" flader mindskes. Små vinkler: $$d = t \tan(\gamma) \approx t \gamma$$.</p>
+        </div>
+
+        <div class="concept-card">
+          <strong>9. Forskydningsmodul (G)</strong>
+          <p>[Pa] Stivhedskonstant i forskydning: $$G = \frac{E}{2(1+\nu)}$$. Relaterer τ og γ via Hookes lov: $$\tau = G\gamma$$. For stål ~80 GPa.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORMULAS -->
+    <div class="section formulas">
+      <div class="section-header">
+        <span>
+          <span style="font-size: 1.4rem;">∑</span>
+          Formler og Ligninger
+        </span>
+        <span class="toggle">+</span>
+      </div>
+      <div class="section-content">
+        <p style="margin-bottom: 1.5rem; color: rgba(224, 224, 224, 0.9);">
+          <strong>Alle ni ligninger fra GG 1.4, 1.7, 1.8:</strong>
+        </p>
+
+        <h4 style="color: var(--accent-cyan); margin-top: 0;">1. Normalspænding og -tøjning</h4>
+
+        <div class="formula-box">
+          <strong>Normalspænding (ligning 1-6):</strong>
+          <div class="equation">$$\sigma = \frac{P}{A} \text{ [Pa]}$$</div>
+          <p><strong>Hvor:</strong> P = kraft [N], A = tværsnitsareal [m²]</p>
+          <p style="color: rgba(224, 224, 224, 0.7); font-style: italic;">Måler trykkraft per enhedsareal vinkelret på tværsnit.</p>
+        </div>
+
+        <div class="formula-box">
+          <strong>Normal tøjning (ligning 1-7):</strong>
+          <div class="equation">$$\varepsilon = \frac{\delta}{L} \text{ [-]}$$</div>
+          <p><strong>Hvor:</strong> δ = forlængelse [m], L = oprindelig længde [m]</p>
+          <p style="color: rgba(224, 224, 224, 0.7); font-style: italic;">Dimensionsløs, måler relativ deformation.</p>
+        </div>
+
+        <div class="formula-box">
+          <strong>Centroide (ligning 1-9a,b):</strong>
+          <div class="equation">$$\bar{x} = \frac{\int x \, dA}{A}, \quad \bar{y} = \frac{\int y \, dA}{A}$$</div>
+          <p style="color: rgba(224, 224, 224, 0.7); font-style: italic;">Geometrisk tyngdepunkt. Resultanten af uniform stress ligger her.</p>
+        </div>
+
+        <h4 style="color: var(--accent-cyan); margin-top: 2rem;">2. Hookes Lov og Poissons Forhold</h4>
+
+        <div class="formula-box">
+          <strong>Hookes lov (ligning 1-12):</strong>
+          <div class="equation">$$\sigma = E \varepsilon$$</div>
+          <p><strong>Hvor:</strong> E = Youngs modul [Pa] (stål ~200 GPa, alu ~70 GPa)</p>
+          <p style="color: rgba(224, 224, 224, 0.7); font-style: italic;"><strong>VIGTIG:</strong> Gælder kun i det lineære regime før materialets flydning!</p>
+        </div>
+
+        <div class="formula-box">
+          <strong>Poissons forhold (ligning 1-13):</strong>
+          <div class="equation">$$\nu = -\frac{\varepsilon_{\text{lat}}}{\varepsilon_{\text{aks}}}$$</div>
+          <p><strong>Interval:</strong> −1 ≤ ν ≤ 0,5 (typisk ~0,2–0,35 for metaller)</p>
+          <p style="color: rgba(224, 224, 224, 0.7); font-style: italic;">Negativ fordi lateral tøjning er modsat aksialtøjning.</p>
+        </div>
+
+        <h4 style="color: var(--accent-cyan); margin-top: 2rem;">3. Forskydningsspænding, -tøjning & Modul</h4>
+
+        <div class="formula-box">
+          <strong>Lejespænding (ligning 1-15):</strong>
+          <div class="equation">$$\sigma_b = \frac{F_b}{A_b}, \quad A_b = t \cdot d_b$$</div>
+          <p><strong>Hvor:</strong> t = tykkelse [m], d_b = bolt-diameter [m]</p>
+          <p style="color: rgba(224, 224, 224, 0.7); font-style: italic;"><strong>VIGTIG:</strong> Brug <em>projiceret areal</em> (rektangel), ikke cirkelarea!</p>
+        </div>
+
+        <div class="formula-box">
+          <strong>Forskydningsspænding (ligning 1-16):</strong>
+          <div class="equation">$$\tau_{\text{aver}} = \frac{V}{A}$$</div>
+          <p><strong>Hvor:</strong> V = forskydningskraft [N], A = skjær-tværsnit [m²]</p>
+          <p style="color: rgba(224, 224, 224, 0.7); font-style: italic;">
+            For double shear (bolt belastet fra begge sider): $$V = P/2$$<br>
+            For single shear (bolt belastet fra én side): $$V = P$$
+          </p>
+        </div>
+
+        <div class="formula-box">
+          <strong>Tangentialspændinger (ligning 1-17):</strong>
+          <div class="equation">$$\tau_1 = \tau_2$$</div>
+          <p style="color: rgba(224, 224, 224, 0.7); font-style: italic;">Tangentialspændinger på modstående flader er ens (ligevægt).</p>
+        </div>
+
+        <div class="formula-box">
+          <strong>Hookes lov i forskydning (ligning 1-18):</strong>
+          <div class="equation">$$\tau = G \gamma$$</div>
+          <p><strong>Hvor:</strong> G = forskydningsmodul [Pa], γ = forskydningstøjning [rad]</p>
+          <p style="color: rgba(224, 224, 224, 0.7); font-style: italic;">Analog til $$\sigma = E \varepsilon$$ i normalretning.</p>
+        </div>
+
+        <div class="formula-box">
+          <strong>Forskydningsmodul (ligning 1-19):</strong>
+          <div class="equation">$$G = \frac{E}{2(1 + \nu)}$$</div>
+          <p style="color: rgba(224, 224, 224, 0.7); font-style: italic;">G kan beregnes fra E og Poissons forhold. For stål: G ≈ 80 GPa.</p>
+        </div>
+
+        <div class="note-box">
+          <p><strong>Vigtige noter:</strong></p>
+          <ul style="margin-left: 1.5rem; margin-top: 0.8rem;">
+            <li>Hookes lov (σ = Eε og τ = Gγ) gælder kun i det <strong>lineære regime</strong> før flydning.</li>
+            <li>Aksial last gennem centroide giver rent træk/tryk uden bøjningsmoment.</li>
+            <li>Lejespænding kan blive kritisk hvis tykkelsen t er lille.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- MNEMONICS & MEMORY AIDS -->
+    <div class="section mnemonics">
+      <div class="section-header">
+        <span>
+          <span style="font-size: 1.4rem;">💡</span>
+          Huskeord & Mnemoteknik
+        </span>
+        <span class="toggle">+</span>
+      </div>
+      <div class="section-content">
+        <p style="margin-bottom: 1.5rem; color: rgba(224, 224, 224, 0.9);">
+          Disse huske-tricks hjælper dig med at fastholde de vigtigste koncepter:
+        </p>
+
+        <div class="mnemonic-item">
+          <strong>σ og ε — "Stress & Strain"</strong><br>
+          <em>Spænding = kraft divideret areal, tøjning = længdeændring divideret oprindelig længde.</em>
+          <p style="margin-top: 0.5rem;">Begge er simple forhold — force/area og delta/length.</p>
+        </div>
+
+        <div class="mnemonic-item">
+          <strong>Centroiden — "Kraft gennem tyngdepunktet"</strong><br>
+          <em>Kraftresultanten ligger i centroiden — det geometriske tyngdepunkt.</em>
+          <p style="margin-top: 0.5rem;">Hvis lasten er ekscentrisk, får du bøjningsmoment.</p>
+        </div>
+
+        <div class="mnemonic-item">
+          <strong>Hookes lov lineær — "Lige linje = Lineær"</strong><br>
+          <em>$$\sigma = E\varepsilon$$ er lineær og gælder kun før flydning. Kontroller stress-strain-diagrammet!</em>
+          <p style="margin-top: 0.5rem;">Hvis kurven buer af, er du uden for det elastiske område.</p>
+        </div>
+
+        <div class="mnemonic-item">
+          <strong>Poissons forhold negativ — "Tynn → Smalere"</strong><br>
+          <em>$$\nu = -\frac{\varepsilon_{\text{lat}}}{\varepsilon_{\text{aks}}}$$ er negativ fordi når materiale strekkes aksielt (positivt $$\varepsilon_{\text{aks}}$$), bliver det smalere (negativt $$\varepsilon_{\text{lat}}$$).</em>
+          <p style="margin-top: 0.5rem;">Hvis du trækker i en elastik, bliver den tyndere.</p>
+        </div>
+
+        <div class="mnemonic-item">
+          <strong>Double vs. Single Shear — "Både sider vs. Én side"</strong><br>
+          <em>En bolt i en samling kan være i double shear (belastet fra begge sider, V = P/2) eller single shear (belastet fra én side, V = P).</em>
+          <p style="margin-top: 0.5rim;">Double shear = halve kraften per bolt-sektion.</p>
+        </div>
+
+        <div class="mnemonic-item">
+          <strong>Lejespænding — "Projektion, ikke cirkel!"</strong><br>
+          <em>Brug <strong>projiceret areal</strong> $$A_b = t \cdot d_b$$ (tykkelse gange bolt-diameter), ikke cirkelareal!</em>
+          <p style="margin-top: 0.5rem;">Kontaktfladen mellem bolt og plades hul er en rechtangel fra siden.</p>
+        </div>
+
+        <div class="mnemonic-item">
+          <strong>Forskydningsmodul — "G fra E og ν"</strong><br>
+          <em>$$G = \frac{E}{2(1+\nu)}$$ — G kan beregnes fra E og Poissons forhold. For stål typisk G ≈ 80 GPa.</em>
+          <p style="margin-top: 0.5rem;">En hurtig regel: G ≈ 0,4·E for stål.</p>
+        </div>
+
+        <div class="mnemonic-item">
+          <strong>Forskydningstøjning — "Radianer og små vinkler"</strong><br>
+          <em>γ måles i radianer. $$\gamma > 0$$ når vinklen mellem positive flader mindskes. Små vinkler: $$d = t \tan(\gamma) \approx t \gamma$$.</em>
+          <p style="margin-top: 0.5rem;">Hvis $$\gamma < 0{,}1$$ rad (~6°), kan du bruge $$\gamma \approx \tan(\gamma)$$.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>
+      <strong>MEK2 Lektion 1 — Interaktiv Læseguide</strong><br>
+      Baseret på: <em>Goodno, B. J., & Gere, J. M. (2020). Mechanics of Materials, SI ed., enhanced 9th ed.</em><br>
+      Kapitel 1.4, 1.7, 1.8
+    </p>
+    <p style="margin-top: 1rem; font-size: 0.85rem; color: rgba(224, 224, 224, 0.5);">
+      Genereret 2026 | VIA Horsens — Maskiningeniør, 2. semester
+    </p>
+  </footer>
+
+  <script>
+    // Collapse/expand functionality with smooth animations
+    document.querySelectorAll('.section-header').forEach(header => {
+      header.addEventListener('click', function() {
+        const section = this.closest('.section');
+        const content = this.nextElementSibling;
+
+        // Toggle active class
+        section.classList.toggle('active');
+
+        // Update toggle icon (+ to −)
+        const toggle = this.querySelector('.toggle');
+        toggle.textContent = section.classList.contains('active') ? '−' : '+';
+      });
+    });
+
+    // Expand first section by default
+    document.addEventListener('DOMContentLoaded', function() {
+      const firstSection = document.querySelector('.section');
+      if (firstSection) {
+        firstSection.classList.add('active');
+        firstSection.querySelector('.toggle').textContent = '−';
+      }
+    });
+
+    // Smooth scroll to top on page load
+    window.addEventListener('load', function() {
+      window.scrollTo(0, 0);
+    });
+  </script>
+</body>
+</html>
