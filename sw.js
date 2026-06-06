@@ -44,6 +44,31 @@ self.addEventListener('fetch', event => {
     );
   }
 
+  // Stale-while-revalidate for content.json (always up-to-date)
+  if (event.request.url.endsWith('content.json')) {
+    event.respondWith(
+      caches.match(event.request).then(cachedResponse => {
+        const fetchPromise = fetch(event.request).then(response => {
+          if (response && response.status === 200) {
+            const responseToCache = response.clone();
+            caches.open(CACHE_NAME).then(cache => {
+              cache.put(event.request, responseToCache);
+            });
+            // Notify all clients of update
+            self.clients.matchAll().then(clients => {
+              clients.forEach(client => {
+                client.postMessage({ type: 'CONTENT_UPDATED' });
+              });
+            });
+          }
+          return response;
+        }).catch(() => cachedResponse);
+        return cachedResponse || fetchPromise;
+      })
+    );
+    return;
+  }
+
   // Cache-first for app assets
   event.respondWith(
     caches.match(event.request).then(response => {

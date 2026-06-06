@@ -261,9 +261,35 @@ function router() {
   }
 }
 
+// Listen for Service Worker updates
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', event => {
+    if (event.data.type === 'CONTENT_UPDATED') {
+      // Reload content silently in background
+      loadContent().then(() => {
+        showToast('✨ Nyt materiale tilgængeligt — genindlæs siden', 'info');
+      });
+    }
+  });
+
+  navigator.serviceWorker.ready.then(registration => {
+    // Check for updates every 60 seconds
+    setInterval(() => {
+      registration.update();
+    }, 60000);
+  });
+}
+
 window.addEventListener('hashchange', router);
 window.addEventListener('load', async () => {
   setupOfflineDetection();
   await loadContent();
   router();
+
+  // Register Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(err => {
+      console.warn('Service Worker registration failed:', err);
+    });
+  }
 });
