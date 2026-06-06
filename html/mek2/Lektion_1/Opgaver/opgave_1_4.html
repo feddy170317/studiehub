@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MEK2 Opgave 1.4</title>
+
+  <!-- KaTeX for formelrendring (local) -->
+  <link rel="stylesheet" href="../assets/vendor/katex/katex.min.css">
+  <script defer src="../assets/vendor/katex/katex.min.js"></script>
+  <script defer src="../assets/vendor/katex/auto-render.min.js"></script>
+  <script defer>
+    document.addEventListener('DOMContentLoaded', function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false}
+        ],
+        throwOnError: false
+      });
+    });
+  </script>
+
+  <style>
+    /* Dark engineering theme */
+    :root {
+      --bg-dark: #0a1a2b;
+      --card-bg: #1a2a3b;
+      --accent-cyan: #5ec8ff;
+      --accent-green: #00d984;
+      --accent-gold: #ffa500;
+      --accent-purple: #d984ff;
+      --text-light: #e0e0e0;
+      --border-subtle: #2a3a4b;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      line-height: 1.7;
+      font-size: 16px;
+    }
+
+    header {
+      padding: 3rem 2rem;
+      background: linear-gradient(135deg, var(--bg-dark), var(--card-bg));
+      border-bottom: 3px solid var(--accent-cyan);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(94, 200, 255, 0.1), transparent);
+      border-radius: 50%;
+    }
+
+    header h1 {
+      font-size: 2.8rem;
+      color: var(--accent-cyan);
+      margin-bottom: 0.5rem;
+      position: relative;
+      z-index: 1;
+      font-weight: 700;
+    }
+
+    header p {
+      font-size: 1.2rem;
+      color: var(--accent-gold);
+      position: relative;
+      z-index: 1;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Section styling */
+    section {
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      border-left: 4px solid var(--accent-gold);
+    }
+
+    section.opgave-tekst {
+      border-left-color: var(--accent-green);
+    }
+
+    section.loesning {
+      border-left-color: var(--accent-gold);
+    }
+
+    section.svar {
+      border-left-color: var(--accent-cyan);
+    }
+
+    section h2, section h3 {
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+    }
+
+    section h2 {
+      color: var(--accent-cyan);
+    }
+
+    section h3 {
+      color: var(--accent-gold);
+      font-size: 1.2rem;
+      margin-top: 1.5rem;
+    }
+
+    .opgave-tekst h2 {
+      color: var(--accent-green);
+    }
+
+    .svar h3 {
+      color: var(--accent-cyan);
+    }
+
+    /* Step styling */
+    .step {
+      margin-bottom: 1.5rem;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .step-summary {
+      padding: 1rem 1.5rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 165, 0, 0.05);
+      border-left: 3px solid var(--accent-gold);
+      transition: background 0.2s ease;
+      user-select: none;
+    }
+
+    .step-summary:hover {
+      background: rgba(255, 165, 0, 0.1);
+    }
+
+    .step-summary strong {
+      color: var(--accent-gold);
+      font-size: 1.05rem;
+      flex-grow: 1;
+    }
+
+    .step-toggle {
+      font-size: 1.3rem;
+      color: var(--accent-gold);
+      transition: transform 0.3s ease;
+      display: inline-block;
+      width: 30px;
+      text-align: center;
+    }
+
+    .step.open .step-toggle {
+      transform: rotate(180deg);
+    }
+
+    .step-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+    }
+
+    .step.open .step-content {
+      max-height: 1000px;
+      padding: 1.5rem;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .step-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .step-grid.mobile {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .step-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .step-grid.mobile {
+        display: block;
+      }
+
+      .step-grid.desktop {
+        display: none;
+      }
+    }
+
+    .step-column {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 1rem;
+      border-radius: 4px;
+      border-left: 3px solid var(--accent-cyan);
+    }
+
+    .step-column strong {
+      display: block;
+      color: var(--accent-cyan);
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .step-column p {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: rgba(224, 224, 224, 0.9);
+    }
+
+    /* Formula boxes */
+    .formula-box {
+      background: linear-gradient(135deg, rgba(94, 200, 255, 0.08), rgba(94, 200, 255, 0.03));
+      padding: 1.5rem;
+      border-radius: 6px;
+      margin: 1.5rem 0;
+      border-left: 4px solid var(--accent-cyan);
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .formula-box strong {
+      color: var(--accent-cyan);
+      display: block;
+      margin-bottom: 0.8rem;
+      font-size: 1.05rem;
+    }
+
+    .equation {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 1rem;
+      border-radius: 4px;
+      margin: 0.8rem 0;
+      font-size: 1rem;
+      overflow-x: auto;
+    }
+
+    .svar-item {
+      background: rgba(94, 200, 255, 0.05);
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 6px;
+      border-left: 3px solid var(--accent-cyan);
+    }
+
+    .svar-item strong {
+      color: var(--accent-cyan);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Check table */
+    .check-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2rem;
+      font-size: 0.9rem;
+    }
+
+    .check-table th {
+      background: rgba(94, 200, 255, 0.1);
+      border-bottom: 2px solid var(--accent-cyan);
+      padding: 0.8rem;
+      text-align: left;
+      color: var(--accent-cyan);
+      font-weight: 600;
+    }
+
+    .check-table td {
+      padding: 0.8rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .check-table tr:hover {
+      background: rgba(94, 200, 255, 0.05);
+    }
+
+    /* Footer */
+    footer {
+      background: var(--card-bg);
+      border-top: 2px solid var(--border-subtle);
+      padding: 2rem;
+      text-align: center;
+      margin-top: 3rem;
+      font-size: 0.9rem;
+      color: rgba(224, 224, 224, 0.6);
+    }
+
+    footer a {
+      color: var(--accent-cyan);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    footer a:hover {
+      color: var(--accent-green);
+    }
+
+    /* Intro note */
+    .intro-note {
+      background: rgba(255, 165, 0, 0.08);
+      padding: 1rem;
+      border-radius: 6px;
+      border-left: 4px solid var(--accent-gold);
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    .intro-note strong {
+      color: var(--accent-gold);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Opgave 1.4</h1>
+    <p>Normal Stress og Strain i en Stålbar</p>
+  </header>
+
+  <div class="container">
+    <main>
+      <!-- Opgave tekst -->
+      <section class="opgave-tekst">
+        <h2>Opgavetekst</h2>
+        <p>En stålbar med længde $L = 2{,}0$ m og cirkulært tværsnit med diameter $d = 12$ mm undergår en aksial trækkraft $P = 18$ kN. Stålmaterialet har modulet for elasticitet $E = 210$ GPa.</p>
+
+        <div class="intro-note">
+          <strong>Spørgsmål:</strong>
+          <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+            <li><strong>a)</strong> Beregn normal stress $\sigma$ i baren.</li>
+            <li><strong>b)</strong> Beregn normal strain $\varepsilon$ i baren.</li>
+            <li><strong>c)</strong> Beregn den samlede forlængelse $\delta$ af baren.</li>
+          </ul>
+        </div>
+
+        <div class="intro-note" style="border-left-color: var(--accent-cyan); background: rgba(94, 200, 255, 0.08);">
+          <strong style="color: var(--accent-cyan);">Koncept:</strong>
+          <p>Normal stress og strain er grundlæggende begreber i materialemekanik. <em>Stress</em> er kraft pr. enhedsareal, mens <em>strain</em> er deformation pr. enhedslængde. Vi bruger Hookes lov ($\sigma = E\varepsilon$) til at linke dem sammen.</p>
+        </div>
+      </section>
+
+      <!-- Løsning (trin-for-trin) -->
+      <section class="loesning">
+        <h2>Løsning (Trin-for-trin)</h2>
+
+        <div class="step">
+          <div class="step-summary">
+            <strong>Trin 1: Beregn tværsnitsarealet $A$ for den cirkulære bar</strong>
+            <span class="step-toggle">▼</span>
+          </div>
+          <div class="step-content">
+            <div class="step-grid">
+              <div class="step-column">
+                <strong>Hvad gør vi</strong>
+                <p>Den cirkulære tværsnitsareal er $A = \pi d^2/4$. Dette er afgørende for at få rigtigt stress.</p>
+              </div>
+              <div class="step-column">
+                <strong>Hvorfor</strong>
+                <p>Stress afhænger af både kraft og areal. Et mindre areal giver større stress for samme kraft.</p>
+              </div>
+              <div class="step-column">
+                <strong>Beregning</strong>
+                <div class="equation">$$A = \frac{\pi (12 \text{ mm})^2}{4} = \frac{\pi \cdot 144}{4} = 113{,}10 \text{ mm}^2 = 1{,}1310 \times 10^{-4} \text{ m}^2$$</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-summary">
+            <strong>Trin 2: Beregn normal stress $\sigma = P/A$</strong>
+            <span class="step-toggle">▼</span>
+          </div>
+          <div class="step-content">
+            <div class="step-grid">
+              <div class="step-column">
+                <strong>Hvad gør vi</strong>
+                <p>Stress defineres som kraft delt på tværsnitsareal.</p>
+              </div>
+              <div class="step-column">
+                <strong>Hvorfor</strong>
+                <p>Jo mindre areal, desto større stress for samme kraft. Det er en intensiv størrelse.</p>
+              </div>
+              <div class="step-column">
+                <strong>Beregning</strong>
+                <div class="equation">$$\sigma = \frac{P}{A} = \frac{18{,}000 \text{ N}}{1{,}1310 \times 10^{-4} \text{ m}^2} = \boxed{159{,}1 \text{ MPa}}$$</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-summary">
+            <strong>Trin 3: Beregn strain fra Hookes lov $\varepsilon = \sigma/E$</strong>
+            <span class="step-toggle">▼</span>
+          </div>
+          <div class="step-content">
+            <div class="step-grid">
+              <div class="step-column">
+                <strong>Hvad gør vi</strong>
+                <p>Beregn strain ved at dividere stress med elasticitetsmodulet.</p>
+              </div>
+              <div class="step-column">
+                <strong>Hvorfor</strong>
+                <p>Hookes lov siger, at for lineært elastiske materialer er strain proportional med stress via $E$.</p>
+              </div>
+              <div class="step-column">
+                <strong>Beregning</strong>
+                <div class="equation">$$\varepsilon = \frac{\sigma}{E} = \frac{159{,}1 \times 10^6}{210 \times 10^9} = \boxed{7{,}577 \times 10^{-4}}$$</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-summary">
+            <strong>Trin 4: Beregn forlængelse $\delta = \varepsilon \cdot L$</strong>
+            <span class="step-toggle">▼</span>
+          </div>
+          <div class="step-content">
+            <div class="step-grid">
+              <div class="step-column">
+                <strong>Hvad gør vi</strong>
+                <p>Gang strain med den oprindelige længde.</p>
+              </div>
+              <div class="step-column">
+                <strong>Hvorfor</strong>
+                <p>Strain er per enhedslængde, så forlængelsen er strain ganget med længden.</p>
+              </div>
+              <div class="step-column">
+                <strong>Beregning</strong>
+                <div class="equation">$$\delta = \varepsilon \cdot L = 7{,}577 \times 10^{-4} \times 2{,}0 \text{ m} = \boxed{1{,}52 \text{ mm}}$$</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Svar -->
+      <section class="svar">
+        <h2>Endeligt Svar</h2>
+
+        <div class="svar-item">
+          <strong>a) Normal stress:</strong>
+          <div class="formula-box">
+            <p>Tværsnitsarealet:</p>
+            <div class="equation">$$A = \frac{\pi d^2}{4} = \frac{\pi (0{,}012)^2}{4} = 1{,}1310 \times 10^{-4} \text{ m}^2$$</div>
+            <p>Normal stress (Goodno og Gere, ligning 1-6):</p>
+            <div class="equation">$$\sigma = \frac{P}{A} = \frac{18{,}000}{1{,}1310 \times 10^{-4}} = \mathbf{159{,}1 \text{ MPa}}$$</div>
+          </div>
+        </div>
+
+        <div class="svar-item">
+          <strong>b) Normal strain:</strong>
+          <div class="formula-box">
+            <p>Med Hookes lov (ligning 1-12):</p>
+            <div class="equation">$$\varepsilon = \frac{\sigma}{E} = \frac{159{,}1 \times 10^6}{210 \times 10^9} = \mathbf{7{,}577 \times 10^{-4}}$$</div>
+            <p style="margin-top: 0.8rem;">Eller som procent: $\varepsilon = 0{,}07577\,\%$</p>
+          </div>
+        </div>
+
+        <div class="svar-item">
+          <strong>c) Forlængelse:</strong>
+          <div class="formula-box">
+            <div class="equation">$$\delta = \varepsilon L = 7{,}577 \times 10^{-4} \times 2{,}0 = \mathbf{1{,}52 \text{ mm}}$$</div>
+          </div>
+        </div>
+
+        <h3 style="margin-top: 2rem;">Tjekliste</h3>
+        <table class="check-table">
+          <thead>
+            <tr>
+              <th>Tjek</th>
+              <th>Status</th>
+              <th>Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Enheder konsistente</td>
+              <td style="color: var(--accent-green);">✓</td>
+              <td>MPa / GPa = dimensionløs strain; strain × m = mm</td>
+            </tr>
+            <tr>
+              <td>Goodno/Gere reference</td>
+              <td style="color: var(--accent-green);">✓</td>
+              <td>Ligninger 1-6 og 1-12; Tabel 1-2 for E-værdi</td>
+            </tr>
+            <tr>
+              <td>Størrelsesorden rimelig</td>
+              <td style="color: var(--accent-green);">✓</td>
+              <td>~0,16 GPa stress; svag forlængelse (1,5 mm på 2 m)</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    <p>MEK2 Lektion 1 | Opgave 1.4 | Spænding og Tøjning</p>
+    <p style="margin-top: 0.5rem;">Del denne side med dine medstuderende via et direkte link</p>
+  </footer>
+
+  <script>
+    // Step toggle functionality
+    document.querySelectorAll('.step-summary').forEach(summary => {
+      summary.addEventListener('click', function() {
+        const step = this.parentElement;
+        step.classList.toggle('open');
+      });
+    });
+
+    // Open first step by default
+    document.querySelector('.step')?.classList.add('open');
+  </script>
+</body>
+</html>

@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MEK2 Opgave 1.6</title>
+
+  <!-- KaTeX for formelrendring (local) -->
+  <link rel="stylesheet" href="../assets/vendor/katex/katex.min.css">
+  <script defer src="../assets/vendor/katex/katex.min.js"></script>
+  <script defer src="../assets/vendor/katex/auto-render.min.js"></script>
+  <script defer>
+    document.addEventListener('DOMContentLoaded', function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false}
+        ],
+        throwOnError: false
+      });
+    });
+  </script>
+
+  <style>
+    /* Dark engineering theme */
+    :root {
+      --bg-dark: #0a1a2b;
+      --card-bg: #1a2a3b;
+      --accent-cyan: #5ec8ff;
+      --accent-green: #00d984;
+      --accent-gold: #ffa500;
+      --accent-purple: #d984ff;
+      --text-light: #e0e0e0;
+      --border-subtle: #2a3a4b;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      line-height: 1.7;
+      font-size: 16px;
+    }
+
+    header {
+      padding: 3rem 2rem;
+      background: linear-gradient(135deg, var(--bg-dark), var(--card-bg));
+      border-bottom: 3px solid var(--accent-cyan);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(94, 200, 255, 0.1), transparent);
+      border-radius: 50%;
+    }
+
+    header h1 {
+      font-size: 2.8rem;
+      color: var(--accent-cyan);
+      margin-bottom: 0.5rem;
+      position: relative;
+      z-index: 1;
+      font-weight: 700;
+    }
+
+    header p {
+      font-size: 1.2rem;
+      color: var(--accent-gold);
+      position: relative;
+      z-index: 1;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Section styling */
+    section {
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      border-left: 4px solid var(--accent-gold);
+    }
+
+    section.opgave-tekst {
+      border-left-color: var(--accent-green);
+    }
+
+    section.loesning {
+      border-left-color: var(--accent-gold);
+    }
+
+    section.svar {
+      border-left-color: var(--accent-cyan);
+    }
+
+    section h2, section h3 {
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+    }
+
+    section h2 {
+      color: var(--accent-cyan);
+    }
+
+    section h3 {
+      color: var(--accent-gold);
+      font-size: 1.2rem;
+      margin-top: 1.5rem;
+    }
+
+    .opgave-tekst h2 {
+      color: var(--accent-green);
+    }
+
+    .svar h3 {
+      color: var(--accent-cyan);
+    }
+
+    /* Step styling */
+    .step {
+      margin-bottom: 1.5rem;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .step-summary {
+      padding: 1rem 1.5rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 165, 0, 0.05);
+      border-left: 3px solid var(--accent-gold);
+      transition: background 0.2s ease;
+      user-select: none;
+    }
+
+    .step-summary:hover {
+      background: rgba(255, 165, 0, 0.1);
+    }
+
+    .step-summary strong {
+      color: var(--accent-gold);
+      font-size: 1.05rem;
+      flex-grow: 1;
+    }
+
+    .step-toggle {
+      font-size: 1.3rem;
+      color: var(--accent-gold);
+      transition: transform 0.3s ease;
+      display: inline-block;
+      width: 30px;
+      text-align: center;
+    }
+
+    .step.open .step-toggle {
+      transform: rotate(180deg);
+    }
+
+    .step-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+    }
+
+    .step.open .step-content {
+      max-height: 1000px;
+      padding: 1.5rem;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .step-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .step-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .step-column {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 1rem;
+      border-radius: 4px;
+      border-left: 3px solid var(--accent-cyan);
+    }
+
+    .step-column strong {
+      display: block;
+      color: var(--accent-cyan);
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .step-column p {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: rgba(224, 224, 224, 0.9);
+    }
+
+    /* Formula boxes */
+    .formula-box {
+      background: linear-gradient(135deg, rgba(94, 200, 255, 0.08), rgba(94, 200, 255, 0.03));
+      padding: 1.5rem;
+      border-radius: 6px;
+      margin: 1.5rem 0;
+      border-left: 4px solid var(--accent-cyan);
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .formula-box strong {
+      color: var(--accent-cyan);
+      display: block;
+      margin-bottom: 0.8rem;
+      font-size: 1.05rem;
+    }
+
+    .equation {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 1rem;
+      border-radius: 4px;
+      margin: 0.8rem 0;
+      font-size: 1rem;
+      overflow-x: auto;
+    }
+
+    .svar-item {
+      background: rgba(94, 200, 255, 0.05);
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 6px;
+      border-left: 3px solid var(--accent-cyan);
+    }
+
+    .svar-item strong {
+      color: var(--accent-cyan);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Check table */
+    .check-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2rem;
+      font-size: 0.9rem;
+    }
+
+    .check-table th {
+      background: rgba(94, 200, 255, 0.1);
+      border-bottom: 2px solid var(--accent-cyan);
+      padding: 0.8rem;
+      text-align: left;
+      color: var(--accent-cyan);
+      font-weight: 600;
+    }
+
+    .check-table td {
+      padding: 0.8rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .check-table tr:hover {
+      background: rgba(94, 200, 255, 0.05);
+    }
+
+    /* Footer */
+    footer {
+      background: var(--card-bg);
+      border-top: 2px solid var(--border-subtle);
+      padding: 2rem;
+      text-align: center;
+      margin-top: 3rem;
+      font-size: 0.9rem;
+      color: rgba(224, 224, 224, 0.6);
+    }
+
+    footer a {
+      color: var(--accent-cyan);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    footer a:hover {
+      color: var(--accent-green);
+    }
+
+    /* Intro note */
+    .intro-note {
+      background: rgba(255, 165, 0, 0.08);
+      padding: 1rem;
+      border-radius: 6px;
+      border-left: 4px solid var(--accent-gold);
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    .intro-note strong {
+      color: var(--accent-gold);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Opgave 1.6</h1>
+    <p>Poissons Forhold og Lateral Kontraktion</p>
+  </header>
+
+  <div class="container">
+    <main>
+      <!-- Opgave tekst -->
+      <section class="opgave-tekst">
+        <h2>Opgavetekst</h2>
+        <p>En messingbar ($E = 105$ GPa, $\nu = 0{,}34$) med oprindeligt kvadratisk tværsnit side $b = 20$ mm gennemgår aksial trækkraft $P = 50$ kN over længden $L = 1{,}0$ m.</p>
+
+        <div class="intro-note">
+          <strong>Spørgsmål:</strong>
+          <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+            <li><strong>a)</strong> Beregn aksial strain $\varepsilon_x$.</li>
+            <li><strong>b)</strong> Beregn lateral strain $\varepsilon'$ ved hjælp af Poissons forhold.</li>
+            <li><strong>c)</strong> Beregn den nye sidedimension $b'$ efter belastning.</li>
+          </ul>
+        </div>
+
+        <div class="intro-note" style="border-left-color: var(--accent-cyan); background: rgba(94, 200, 255, 0.08);">
+          <strong style="color: var(--accent-cyan);">Koncept:</strong>
+          <p>Poissons forhold ($\nu$) beskriver, hvordan et materiale bliver smallere når det strækkes (eller bredere når det komprimeres). Når vi trækker i materialet, kontraktion i lateralretningen er proportional med extension i akialretningen via Poissons forhold: $\varepsilon' = -\nu\varepsilon$.</p>
+        </div>
+      </section>
+
+      <!-- Løsning (trin-for-trin) -->
+      <section class="loesning">
+        <h2>Løsning (Trin-for-trin)</h2>
+
+        <div class="step">
+          <div class="step-summary">
+            <strong>Trin 1: Beregn stress $\sigma$ og aksial strain $\varepsilon_x$</strong>
+            <span class="step-toggle">▼</span>
+          </div>
+          <div class="step-content">
+            <div class="step-grid">
+              <div class="step-column">
+                <strong>Hvad gør vi</strong>
+                <p>Standard procedure: tværsnitsareal, så stress, så strain via Hookes lov.</p>
+              </div>
+              <div class="step-column">
+                <strong>Hvorfor</strong>
+                <p>Stress og strain hænger sammen via Hookes lov. Vi skal finde strain først.</p>
+              </div>
+              <div class="step-column">
+                <strong>Beregning</strong>
+                <div class="equation">$$A = (0{,}020)^2 = 4{,}0 \times 10^{-4} \text{ m}^2$$</div>
+                <div class="equation">$$\sigma = \frac{50{,}000}{4{,}0 \times 10^{-4}} = 125 \text{ MPa}$$</div>
+                <div class="equation">$$\varepsilon_x = \frac{125}{105{,}000} = 1{,}190 \times 10^{-3}$$</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-summary">
+            <strong>Trin 2: Beregn lateral strain fra Poissons forhold $\varepsilon' = -\nu\varepsilon_x$</strong>
+            <span class="step-toggle">▼</span>
+          </div>
+          <div class="step-content">
+            <div class="step-grid">
+              <div class="step-column">
+                <strong>Hvad gør vi</strong>
+                <p>Gang Poissons forhold med aksial strain, med negativt tegn.</p>
+              </div>
+              <div class="step-column">
+                <strong>Hvorfor</strong>
+                <p>Negativt tegn indikerer at lateral strain er modsat aksial strain: under træk ($\varepsilon_x > 0$) kontraktion ($\varepsilon' < 0$).</p>
+              </div>
+              <div class="step-column">
+                <strong>Beregning</strong>
+                <div class="equation">$$\varepsilon' = -0{,}34 \times 1{,}190 \times 10^{-3} = -4{,}046 \times 10^{-4}$$</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-summary">
+            <strong>Trin 3: Find ny sidelængde $b' = b(1 + \varepsilon')$</strong>
+            <span class="step-toggle">▼</span>
+          </div>
+          <div class="step-content">
+            <div class="step-grid">
+              <div class="step-column">
+                <strong>Hvad gør vi</strong>
+                <p>Gang oprindelig side med $(1 +$ lateral strain$)$.</p>
+              </div>
+              <div class="step-column">
+                <strong>Hvorfor</strong>
+                <p>Strain defineres som $(b' - b)/b$, så $b' = b(1 + \varepsilon')$.</p>
+              </div>
+              <div class="step-column">
+                <strong>Beregning</strong>
+                <div class="equation">$$b' = 20 \text{ mm} \times (1 - 0{,}0004046) = 20 \times 0{,}99959 = 19{,}992 \text{ mm}$$</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-summary">
+            <strong>Trin 4: Beregn ændringen i sidelængde $\Delta b = b' - b$</strong>
+            <span class="step-toggle">▼</span>
+          </div>
+          <div class="step-content">
+            <div class="step-grid">
+              <div class="step-column">
+                <strong>Hvad gør vi</strong>
+                <p>Subtrahér oprindelig dimension fra ny dimension.</p>
+              </div>
+              <div class="step-column">
+                <strong>Hvorfor</strong>
+                <p>Ændringen viser hvor lidt lateral kontraktion der egentlig er.</p>
+              </div>
+              <div class="step-column">
+                <strong>Beregning</strong>
+                <div class="equation">$$\Delta b = 19{,}992 - 20{,}000 = -0{,}0081 \text{ mm} \approx -8{,}1 \text{ μm}$$</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Svar -->
+      <section class="svar">
+        <h2>Endeligt Svar</h2>
+
+        <div class="svar-item">
+          <strong>a) Aksial strain:</strong>
+          <div class="formula-box">
+            <p>Tværsnitsareal: $A = b^2 = (0{,}020 \text{ m})^2 = 4{,}0 \times 10^{-4}$ m$^2$</p>
+            <p>Stress:</p>
+            <div class="equation">$$\sigma = \frac{P}{A} = \frac{50{,}000 \text{ N}}{4{,}0 \times 10^{-4} \text{ m}^2} = 125 \text{ MPa}$$</div>
+            <p>Aksial strain (Hookes lov, eq. 1-12):</p>
+            <div class="equation">$$\varepsilon_x = \frac{\sigma}{E} = \frac{125 \text{ MPa}}{105 \text{ GPa}} = \frac{125 \times 10^6}{105 \times 10^9} = \mathbf{1{,}190 \times 10^{-3}}$$</div>
+          </div>
+        </div>
+
+        <div class="svar-item">
+          <strong>b) Lateral strain:</strong>
+          <div class="formula-box">
+            <p>Poissons forhold (eq. 1-14):</p>
+            <div class="equation">$$\varepsilon' = -\nu\varepsilon_x = -0{,}34 \times 1{,}190 \times 10^{-3} = \mathbf{-4{,}046 \times 10^{-4}}$$</div>
+            <p style="margin-top: 0.8rem;">Det negative tegn betyder lateral kontraktion.</p>
+          </div>
+        </div>
+
+        <div class="svar-item">
+          <strong>c) Ny sidedimension:</strong>
+          <div class="formula-box">
+            <div class="equation">$$b' = b(1 + \varepsilon') = 20 \text{ mm} \times (1 - 0{,}0004046) = 20 \times 0{,}99959 = \mathbf{19{,}992 \text{ mm}}$$</div>
+            <p style="margin-top: 0.8rem;">Ændring:</p>
+            <div class="equation">$$\Delta b = b' - b = -0{,}0081 \text{ mm} = -8{,}1 \text{ μm}$$</div>
+            <p style="margin-top: 0.8rem;"><strong>Observation:</strong> Selv under ret stor belastning er den laterale kontraktion meget lille (kun 8,1 micrometer på 20 mm side).</p>
+          </div>
+        </div>
+
+        <h3 style="margin-top: 2rem;">Tjekliste</h3>
+        <table class="check-table">
+          <thead>
+            <tr>
+              <th>Tjek</th>
+              <th>Status</th>
+              <th>Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Poissons forhold</td>
+              <td style="color: var(--accent-green);">✓</td>
+              <td>$\varepsilon' = -\nu\varepsilon_x$; negativt fortegn korrekt</td>
+            </tr>
+            <tr>
+              <td>Målestok</td>
+              <td style="color: var(--accent-green);">✓</td>
+              <td>Lateral kontraktion ~ 10 μm på 20 mm side (meget lille)</td>
+            </tr>
+            <tr>
+              <td>Messing værdi</td>
+              <td style="color: var(--accent-green);">✓</td>
+              <td>$E \approx 100$-$120$ GPa; $\nu \approx 0{,}33$-$0{,}34$ fra Tabel 1-2</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    <p>MEK2 Lektion 1 | Opgave 1.6 | Poissons Forhold</p>
+    <p style="margin-top: 0.5rem;">Del denne side med dine medstuderende via et direkte link</p>
+  </footer>
+
+  <script>
+    // Step toggle functionality
+    document.querySelectorAll('.step-summary').forEach(summary => {
+      summary.addEventListener('click', function() {
+        const step = this.parentElement;
+        step.classList.toggle('open');
+      });
+    });
+
+    // Open first step by default
+    document.querySelector('.step')?.classList.add('open');
+  </script>
+</body>
+</html>
