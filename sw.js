@@ -1,4 +1,6 @@
-const CACHE_NAME = 'studiehub-v1';
+// Auto-increment version: updated on each deploy
+const CACHE_VERSION = '20250606-001'; // Format: YYYYMMDD-NNN
+const CACHE_NAME = `studiehub-${CACHE_VERSION}`;
 const urlsToCache = [
   '/',
   '/index.html',
@@ -14,6 +16,7 @@ self.addEventListener('install', event => {
       return cache.addAll(urlsToCache);
     })
   );
+  // Immediately activate the new Service Worker
   self.skipWaiting();
 });
 
@@ -22,11 +25,15 @@ self.addEventListener('activate', event => {
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames
-          .filter(name => name !== CACHE_NAME)
-          .map(name => caches.delete(name))
+          .filter(name => !name.includes(CACHE_VERSION))
+          .map(name => {
+            console.log('Deleting old cache:', name);
+            return caches.delete(name);
+          })
       );
     })
   );
+  // Immediately claim all clients
   self.clients.claim();
 });
 
