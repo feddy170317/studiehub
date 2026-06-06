@@ -1,505 +1,285 @@
 <!DOCTYPE html>
 <html lang="da">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lektion 2: Aksial belastning - MEK 2</title>
-    <link rel="stylesheet" href="./assets/vendor/katex/katex.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MEK2 Lektion 2: Aksial belastning</title>
 
-        body {
-            background: #0a1a2b;
-            color: #e0e0e0;
-            font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
-            line-height: 1.6;
-            padding: 20px;
-        }
+  <!-- KaTeX for formelrendring (local) -->
+  <link rel="stylesheet" href="assets/vendor/katex/katex.min.css">
+  <script defer src="assets/vendor/katex/katex.min.js"></script>
+  <script defer src="assets/vendor/katex/auto-render.min.js"></script>
+  <script defer>
+    document.addEventListener('DOMContentLoaded', function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false}
+        ],
+        throwOnError: false
+      });
+    });
+  </script>
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+  <style>
+    /* Dark engineering theme */
+    :root {
+      --bg-dark: #0a1a2b;
+      --card-bg: #1a2a3b;
+      --accent-cyan: #5ec8ff;
+      --accent-green: #00d984;
+      --accent-gold: #ffa500;
+      --accent-purple: #d984ff;
+      --text-light: #e0e0e0;
+      --border-subtle: #2a3a4b;
+    }
 
-        header {
-            background: linear-gradient(135deg, #1a3a5b, #2a4a6b);
-            padding: 30px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            border-left: 6px solid #00d4ff;
-            box-shadow: 0 4px 6px rgba(0, 212, 255, 0.1);
-        }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            color: #00d4ff;
-        }
+    body {
+      font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      line-height: 1.7;
+      font-size: 16px;
+    }
 
-        .header-subtitle {
-            color: #b0c4de;
-            font-size: 1.1em;
-        }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
 
-        .reference {
-            margin-top: 15px;
-            font-size: 0.95em;
-            color: #7fa8d1;
-        }
+    h1 {
+      font-size: 2.5em;
+      color: var(--accent-cyan);
+      margin-bottom: 10px;
+      border-bottom: 3px solid var(--accent-cyan);
+      padding-bottom: 15px;
+    }
 
-        .content-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-            margin-bottom: 30px;
-        }
+    h2 {
+      font-size: 1.8em;
+      color: var(--accent-gold);
+      margin-top: 40px;
+      margin-bottom: 20px;
+    }
 
-        @media (max-width: 1024px) {
-            .content-grid {
-                grid-template-columns: 1fr;
-            }
-        }
+    .section {
+      background: var(--card-bg);
+      border-left: 4px solid var(--accent-cyan);
+      padding: 25px;
+      margin-bottom: 30px;
+      border-radius: 6px;
+    }
 
-        .section {
-            background: #1a2a3b;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-            border: 1px solid #2a3a4b;
-        }
+    .section h3 {
+      color: var(--accent-green);
+      font-size: 1.3em;
+      margin-bottom: 15px;
+    }
 
-        .section-header {
-            padding: 20px;
-            font-weight: 600;
-            font-size: 1.3em;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            user-select: none;
-            transition: all 0.2s ease;
-        }
+    .goal, .concept, .formula, .mnemonic {
+      background: rgba(94, 200, 255, 0.05);
+      border-left: 3px solid var(--accent-cyan);
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 4px;
+    }
 
-        .section-header:hover {
-            background: #2a3a4b;
-        }
+    .concept {
+      border-left-color: var(--accent-gold);
+      background: rgba(255, 165, 0, 0.05);
+    }
 
-        .section-header.green {
-            background: linear-gradient(135deg, #2d5a3d, #3a6d4b);
-            color: #00ff88;
-            border-bottom: 2px solid #00ff88;
-        }
+    .formula {
+      border-left-color: var(--accent-green);
+      background: rgba(0, 217, 132, 0.05);
+      font-family: 'Courier New', monospace;
+      font-size: 0.95em;
+    }
 
-        .section-header.orange {
-            background: linear-gradient(135deg, #5a3d2d, #6d4b3a);
-            color: #ffb84d;
-            border-bottom: 2px solid #ffb84d;
-        }
+    .mnemonic {
+      border-left-color: var(--accent-purple);
+      background: rgba(217, 132, 255, 0.05);
+    }
 
-        .section-header.cyan {
-            background: linear-gradient(135deg, #2d5a5a, #3a6d6d);
-            color: #00ffff;
-            border-bottom: 2px solid #00ffff;
-        }
+    .strong {
+      color: var(--accent-gold);
+      font-weight: 600;
+    }
 
-        .section-header.purple {
-            background: linear-gradient(135deg, #5a3d5a, #6d3a7d);
-            color: #da70d6;
-            border-bottom: 2px solid #da70d6;
-        }
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--border-subtle);
+      font-size: 0.9em;
+      margin-top: 60px;
+      border-top: 1px solid var(--border-subtle);
+    }
 
-        .toggle-icon {
-            font-size: 1.5em;
-            transition: transform 0.3s ease;
-        }
-
-        .section.collapsed .toggle-icon {
-            transform: rotate(-90deg);
-        }
-
-        .section-content {
-            padding: 20px;
-            max-height: 2000px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            background: #1a2a3b;
-        }
-
-        .section.collapsed .section-content {
-            max-height: 0;
-            padding: 0 20px;
-        }
-
-        .learning-goal {
-            background: #1f3a2f;
-            padding: 12px 16px;
-            margin: 10px 0;
-            border-left: 4px solid #00ff88;
-            border-radius: 4px;
-            line-height: 1.5;
-        }
-
-        .learning-goal strong {
-            color: #00ff88;
-        }
-
-        .concept {
-            background: #3a2f1f;
-            padding: 15px;
-            margin: 12px 0;
-            border-left: 4px solid #ffb84d;
-            border-radius: 4px;
-        }
-
-        .concept-term {
-            color: #ffb84d;
-            font-weight: 600;
-            font-size: 1.1em;
-            margin-bottom: 5px;
-        }
-
-        .concept-definition {
-            color: #d0d0d0;
-            line-height: 1.5;
-        }
-
-        .formula-box {
-            background: #1f3a3a;
-            padding: 16px;
-            margin: 15px 0;
-            border-left: 4px solid #00ffff;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            overflow-x: auto;
-        }
-
-        .formula-description {
-            color: #a0d0ff;
-            font-size: 0.95em;
-            margin-top: 8px;
-            font-family: 'Segoe UI', sans-serif;
-        }
-
-        .mnemonic {
-            background: #3a1f3a;
-            padding: 15px;
-            margin: 12px 0;
-            border-left: 4px solid #da70d6;
-            border-radius: 4px;
-        }
-
-        .mnemonic-title {
-            color: #da70d6;
-            font-weight: 600;
-            font-size: 1.1em;
-            margin-bottom: 5px;
-        }
-
-        .mnemonic-text {
-            color: #d0d0d0;
-            line-height: 1.5;
-        }
-
-        .katex {
-            color: #e0e0e0;
-        }
-
-        .katex-display {
-            background: rgba(0, 255, 255, 0.05);
-            padding: 12px;
-            border-radius: 4px;
-            margin: 10px 0;
-        }
-
-        footer {
-            text-align: center;
-            padding: 20px;
-            color: #7fa8d1;
-            font-size: 0.9em;
-            margin-top: 40px;
-            border-top: 1px solid #2a3a4b;
-        }
-
-        .expand-all-btn {
-            background: #2a4a6b;
-            color: #00d4ff;
-            border: 1px solid #00d4ff;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-bottom: 20px;
-            font-size: 1em;
-            transition: all 0.2s ease;
-        }
-
-        .expand-all-btn:hover {
-            background: #3a5a7b;
-            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-        }
-    </style>
+    .ref {
+      color: var(--accent-cyan);
+      font-size: 0.9em;
+      margin: 20px 0;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Lektion 2: Aksial belastning</h1>
-            <p class="header-subtitle">Fjedere, prismatiske stænger og spændingsanalyse på skrå snit</p>
-            <div class="reference">
-                <strong>Gere & Goodno reference:</strong> GG 2.1–2.6 (Axially Loaded Members)
-            </div>
-        </header>
+  <div class="container">
+    <h1>⚙️ Lektion 2: Aksial belastning</h1>
+    <p class="ref"><strong>Gere & Goodno (GG) 2.1–2.6</strong> | Læringsmål: Længdeændringer, multi-segment, statisk ubestemte systemer, spænding på skrå snit</p>
 
-        <button class="expand-all-btn" onclick="toggleAll()">Åbn alle ⊡</button>
-
-        <div class="content-grid">
-            <!-- LÆRINGSMÅL -->
-            <div class="section">
-                <div class="section-header green" onclick="toggleSection(this)">
-                    <span>Læringsmål</span>
-                    <span class="toggle-icon">▶</span>
-                </div>
-                <div class="section-content">
-                    <div class="learning-goal">
-                        <strong>1.</strong> Forstå fjederkonstant (k) og fleksibilitet (f) samt deres indbyrdes sammenhæng
-                    </div>
-                    <div class="learning-goal">
-                        <strong>2.</strong> Beregne længdeændringer i prismatiske stænger under aksial belastning
-                    </div>
-                    <div class="learning-goal">
-                        <strong>3.</strong> Håndtere multi-segment systemer ved at summere deldeformationer
-                    </div>
-                    <div class="learning-goal">
-                        <strong>4.</strong> Identificere og løse statisk ubestemte axiale problemer ved ligninger
-                    </div>
-                    <div class="learning-goal">
-                        <strong>5.</strong> Analysere spændinger på vilkårlige skrå snit under aksial belastning
-                    </div>
-                    <div class="learning-goal">
-                        <strong>6.</strong> Skelne mellem normalspænding ($\sigma_\theta$) og forskydningsspænding ($\tau_\theta$)
-                    </div>
-                    <div class="learning-goal">
-                        <strong>7.</strong> Bruge trigonometriske relationer til at finde maksimale spændinger
-                    </div>
-                    <div class="learning-goal">
-                        <strong>8.</strong> Anvende Mohr's cirkel (introduktion) til spændingsanalyse
-                    </div>
-                    <div class="learning-goal">
-                        <strong>9.</strong> Kombinere materialeparametre (E, A, L) i design af aksiale elementer
-                    </div>
-                    <div class="learning-goal">
-                        <strong>10.</strong> Løse praktiske problemstillinger fra maskinkonstruktion og byggeteknik
-                    </div>
-                </div>
-            </div>
-
-            <!-- KERNEBEGREBER -->
-            <div class="section">
-                <div class="section-header orange" onclick="toggleSection(this)">
-                    <span>Kernebegreber</span>
-                    <span class="toggle-icon">▶</span>
-                </div>
-                <div class="section-content">
-                    <div class="concept">
-                        <div class="concept-term">1. Stivhed (k)</div>
-                        <div class="concept-definition">Modstanden mod deformation. Høj stivhed betyder lille deformation under belastning. Enhed: N/m. Definieres som $k = EA/L$ for en prismatisk stang.</div>
-                    </div>
-                    <div class="concept">
-                        <div class="concept-term">2. Fleksibilitet (f)</div>
-                        <div class="concept-definition">Det reciprokale af stivhed: $f = 1/k = L/(EA)$. Måler hvor let materialet deformeres. Høj fleksibilitet = stor deformation.</div>
-                    </div>
-                    <div class="concept">
-                        <div class="concept-term">3. Prismatisk stang</div>
-                        <div class="concept-definition">En stang med konstant tværsnitsareal A og længde L. Materialet er homogent (samme E overalt). Grundlaget for lineære deformationsberegninger.</div>
-                    </div>
-                    <div class="concept">
-                        <div class="concept-term">4. Lineært elastisk materiale</div>
-                        <div class="concept-definition">Deformationen er proportional med kraft: $P \propto \delta$. Materialet vender tilbage til original form når belastning fjernes. Baseret på Hooke's lov.</div>
-                    </div>
-                    <div class="concept">
-                        <div class="concept-term">5. Længdeændring (Elongation)</div>
-                        <div class="concept-definition">Ændring i længde af stangen: $\delta = PL/(EA)$. Positiv elongation = stangen bliver længere. Formel er grundlaget for alle aksiale beregninger.</div>
-                    </div>
-                    <div class="concept">
-                        <div class="concept-term">6. Multi-segment system</div>
-                        <div class="concept-definition">Stang med forskellig diameter, materiale eller belastning i forskellige dele. Total elongation: $\delta_{total} = \sum \frac{L_i}{E_i A_i} N_i$</div>
-                    </div>
-                    <div class="concept">
-                        <div class="concept-term">7. Statisk ubestemt system</div>
-                        <div class="concept-definition">Antal ukendte kræfter > antal ligevægtsligninger. Kræver kompatibilitetsbetingelser (deformationsligninger) for løsning. Eksempel: stang fastgjort i begge ender.</div>
-                    </div>
-                    <div class="concept">
-                        <div class="concept-term">8. Normalspænding ($\sigma$)</div>
-                        <div class="concept-definition">Kraft pr. område vinkelret på snitflade: $\sigma = N/A$. Måles i Pa eller MPa. Positiv ved træk, negativ ved tryk.</div>
-                    </div>
-                    <div class="concept">
-                        <div class="concept-term">9. Forskydningsspænding ($\tau$)</div>
-                        <div class="concept-definition">Kraft pr. område parallel med snitflade. Under ren aksial belastning optræder den på skrå snit og beregnes som $\tau_\theta = -\sigma_x \cos\theta \sin\theta$</div>
-                    </div>
-                    <div class="concept">
-                        <div class="concept-term">10. Spænding på skrå snit</div>
-                        <div class="concept-definition">Når man skærer stangen i vinkel $\theta$ til akslen, ændres både normal- og forskydningsspænding. Vigtig for at forstå hvordan materialefejl opstår.</div>
-                    </div>
-                    <div class="concept">
-                        <div class="concept-term">11. Principal stress</div>
-                        <div class="concept-definition">De maksimale normal- og minimale normalspændinger i systemet. Under ren aksial belastning optræder max normal stress ved $\theta = 0°$ og max shear ved $\theta = 45°$.</div>
-                    </div>
-                    <div class="concept">
-                        <div class="concept-term">12. Temperatureffekter</div>
-                        <div class="concept-definition">Termiske deformationer kan være vigtige i statisk ubestemte systemer. Kan føre til indre spændinger selvom der ikke påføres ydre belastninger.</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- FORMLER -->
-        <div class="section">
-            <div class="section-header cyan" onclick="toggleSection(this)">
-                <span>Vigtige formler</span>
-                <span class="toggle-icon">▶</span>
-            </div>
-            <div class="section-content">
-                <div class="formula-box">
-                    $$P = k\delta \quad \text{eller} \quad \delta = f \cdot P$$
-                    <div class="formula-description">Fjederrelation. P er kraft, δ er deformation, k er stivhed, f er fleksibilitet.</div>
-                </div>
-
-                <div class="formula-box">
-                    $$k = \frac{EA}{L} \quad ; \quad f = \frac{L}{EA}$$
-                    <div class="formula-description">Stivhed og fleksibilitet for prismatisk stang. E er Youngs modul, A er tværsnitsareal, L er længde.</div>
-                </div>
-
-                <div class="formula-box">
-                    $$\delta = \frac{PL}{EA}$$
-                    <div class="formula-description">Længdeændring i prismatisk stang under kraft P. Denne formel er hjørnestenen i aksiallast.</div>
-                </div>
-
-                <div class="formula-box">
-                    $$\delta_{total} = \sum_{i=1}^{n} \frac{L_i}{E_i A_i} N_i$$
-                    <div class="formula-description">Multi-segment elongation. Summer elongationerne fra hver segment i statisk bestemt system.</div>
-                </div>
-
-                <div class="formula-box">
-                    $$\sigma_\theta = \sigma_x \cos^2\theta = \frac{\sigma_x}{2}(1 + \cos 2\theta)$$
-                    <div class="formula-description">Normalspænding på skrå snit i vinkel θ til akslen. Max når θ = 0° (sammenfaldende med akslen).</div>
-                </div>
-
-                <div class="formula-box">
-                    $$\tau_\theta = -\sigma_x \cos\theta \sin\theta = -\frac{\sigma_x}{2}\sin 2\theta$$
-                    <div class="formula-description">Forskydningsspænding på skrå snit. Max (i absolut værdi) når θ = 45° (uden fortegn: |τ|max = σx/2).</div>
-                </div>
-
-                <div class="formula-box">
-                    $$\sigma_x = \frac{N}{A}$$
-                    <div class="formula-description">Axial normalspænding. Kraft N delt på tværsnitsareal A.</div>
-                </div>
-
-                <div class="formula-box">
-                    $$\sum F = 0 \quad ; \quad \sum \delta = 0$$
-                    <div class="formula-description">Ligevægt + kompatibilitet. I statisk ubestemte systemer skal både kraft-balance OG deformations-kompatibilitet være opfyldt.</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- HUSKEORD / MNEMONICS -->
-        <div class="section">
-            <div class="section-header purple" onclick="toggleSection(this)">
-                <span>Huskeord & genveje</span>
-                <span class="toggle-icon">▶</span>
-            </div>
-            <div class="section-content">
-                <div class="mnemonic">
-                    <div class="mnemonic-title">📌 "K-Æ-F" regel</div>
-                    <div class="mnemonic-text">
-                        <strong>K</strong> = Kraft (P), <strong>Æ</strong> = Elongation (δ), <strong>F</strong> = Force (eller stivhedsformler).<br/>
-                        Mnemonic: Når du ser en opgave, spørg altid: "Hvad er K'rafterne? Hvad er Æ'ndringerne?"
-                    </div>
-                </div>
-
-                <div class="mnemonic">
-                    <div class="mnemonic-title">📌 "SUM først" regel</div>
-                    <div class="mnemonic-text">
-                        I multi-segment problemer: <strong>SUM elongationerne</strong> fra hver del før du løser det samlede system.<br/>
-                        $\delta = \sum \frac{L_i}{E_i A_i} N_i$ — ikke bare ét led!
-                    </div>
-                </div>
-
-                <div class="mnemonic">
-                    <div class="mnemonic-title">📌 "45° gives max shear"</div>
-                    <div class="mnemonic-text">
-                        Ved 45° drejet snit får du maksimal forskydningsspænding ($\tau_{max} = \sigma_x / 2$ i absolut værdi).<br/>
-                        Ved 0° (med aksen) får du max normal stress ($\sigma_{max} = \sigma_x$).
-                    </div>
-                </div>
-
-                <div class="mnemonic">
-                    <div class="mnemonic-title">📌 "Statisk ubestemt = +1 extra ligning"</div>
-                    <div class="mnemonic-text">
-                        Hvis antal ukendte kræfter > antal ligevægtsligninger, skal du tilføje en <strong>kompatibilitets-/deformationsligning</strong>.<br/>
-                        Eksempel: "begge ender fast" → totalelongation = 0.
-                    </div>
-                </div>
-
-                <div class="mnemonic">
-                    <div class="mnemonic-title">📌 "E-A over L"</div>
-                    <div class="mnemonic-text">
-                        Stivhed $k = EA/L$: stort E (stift materiale) og stort A (stort område) → høj stivhed.<br/>
-                        Lang stang (stor L) → lav stivhed. Denne rækkefølge skal sidde fast!
-                    </div>
-                </div>
-
-                <div class="mnemonic">
-                    <div class="mnemonic-title">📌 "cos² og cos·sin trigonometri"</div>
-                    <div class="mnemonic-text">
-                        Normalspænding bruger $\cos^2\theta$, forskydningsspænding bruger $\cos\theta\sin\theta$.<br/>
-                        Husk: $\sin 2\theta = 2\sin\theta\cos\theta$, så $\tau = -(\sigma_x/2)\sin 2\theta$.
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <footer>
-            <p>MEK 2 — Lektion 2: Aksial belastning | Genereret til Studiehub | Dark tema med KaTeX</p>
-            <p style="margin-top: 10px; font-size: 0.85em; color: #5a7a8d;">
-                References: Gere & Goodno, "Mechanics of Materials" 9th ed. | VIA Horsens, ingeniøruddannelse
-            </p>
-        </footer>
+    <!-- LÆRINGSMÅL -->
+    <div class="section">
+      <h3>📚 Læringsmål</h3>
+      <div class="goal">• Forstå fjederkonstant $k$ og fleksibilitet $f$ samt deres indbyrdes sammenhæng</div>
+      <div class="goal">• Beregne længdeændringer i prismatiske stænger under aksial belastning</div>
+      <div class="goal">• Håndtere multi-segment systemer ved at summere deldeformationer</div>
+      <div class="goal">• Identificere og løse statisk ubestemte axiale problemer</div>
+      <div class="goal">• Analysere spændinger på vilkårlige skrå snit under aksial belastning</div>
+      <div class="goal">• Skelne mellem normalspænding $\sigma_\theta$ og forskydningsspænding $\tau_\theta$</div>
     </div>
 
-    <script src="./assets/vendor/katex/katex.min.js"></script>
-    <script src="./assets/vendor/katex/auto-render.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            renderMathInElement(document.body, {
-                delimiters: [
-                    {left: '$$', right: '$$', display: true},
-                    {left: '$', right: '$', display: false}
-                ],
-                throwOnError: false
-            });
-        });
-    </script>
+    <!-- KERNEBEGREBER -->
+    <div class="section">
+      <h3>🔑 Kernebegreber</h3>
 
-    <script>
-        function toggleSection(header) {
-            const section = header.parentElement;
-            section.classList.toggle('collapsed');
-        }
+      <div class="concept">
+        <span class="strong">1. Stivhed (k)</span><br>
+        Modstanden mod deformation. Høj stivhed betyder lille deformation under belastning. Enhed: N/m. For prismatisk stang: $k = EA/L$
+      </div>
 
-        function toggleAll() {
-            const sections = document.querySelectorAll('.section');
-            const areAllExpanded = Array.from(sections).every(s => !s.classList.contains('collapsed'));
+      <div class="concept">
+        <span class="strong">2. Fleksibilitet (f)</span><br>
+        Det reciprokale af stivhed: $f = 1/k = L/(EA)$. Måler hvor let materialet deformeres. Høj fleksibilitet = stor deformation.
+      </div>
 
-            sections.forEach(section => {
-                if (areAllExpanded) {
-                    section.classList.add('collapsed');
-                } else {
-                    section.classList.remove('collapsed');
-                }
-            });
-        }
-    </script>
+      <div class="concept">
+        <span class="strong">3. Prismatisk stang</span><br>
+        En stang med konstant tværsnitsareal $A$ og længde $L$. Materialet er homogent (samme $E$ overalt). Grundlaget for lineære deformationsberegninger.
+      </div>
+
+      <div class="concept">
+        <span class="strong">4. Lineært elastisk materiale</span><br>
+        Deformationen er proportional med kraft: $P \propto \delta$. Baseret på Hooke's lov: $P = k \delta$.
+      </div>
+
+      <div class="concept">
+        <span class="strong">5. Længdeændring (Elongation)</span><br>
+        Ændring i længde af stangen: $\delta = \frac{PL}{EA}$. Positiv elongation = stangen bliver længere.
+      </div>
+
+      <div class="concept">
+        <span class="strong">6. Multi-segment system</span><br>
+        Stang med forskellig diameter, materiale eller belastning i forskellige dele. Total elongation: $\delta_{total} = \sum \frac{L_i}{E_i A_i} N_i$
+      </div>
+
+      <div class="concept">
+        <span class="strong">7. Statisk ubestemt system</span><br>
+        Antal ukendte kræfter > antal ligevægtsligninger. Kræver kompatibilitetsbetingelser for løsning. Eksempel: stang fastgjort i begge ender.
+      </div>
+
+      <div class="concept">
+        <span class="strong">8. Spænding på skrå snit</span><br>
+        Når man skærer stangen i vinkel $\theta$ til akslen, ændres både normal- og forskydningsspænding. Vigtig for at forstå materialefejl.
+      </div>
+    </div>
+
+    <!-- FORMLER -->
+    <div class="section">
+      <h3>📐 Vigtige formler</h3>
+
+      <div class="formula">
+        <strong>Lineær fjeder:</strong> $P = k\delta$ eller $\delta = fP$<br>
+        hvor $k$ er stivhed (N/m) og $f$ er fleksibilitet (m/N)
+      </div>
+
+      <div class="formula">
+        <strong>Stivhed og fleksibilitet (prismatisk stang):</strong><br>
+        $$k = \frac{EA}{L} \quad \text{og} \quad f = \frac{L}{EA}$$
+        hvor $E$ = Youngs modul, $A$ = tværsnitsareal, $L$ = længde
+      </div>
+
+      <div class="formula">
+        <strong>Længdeændring i prismatisk stang:</strong><br>
+        $$\delta = \frac{PL}{EA}$$
+        Denne formel er hjørnestenen i alle aksiale beregninger.
+      </div>
+
+      <div class="formula">
+        <strong>Multi-segment elongation:</strong><br>
+        $$\delta_{total} = \sum_{i=1}^{n} \frac{L_i}{E_i A_i} N_i$$
+        Summer elongationerne fra hver segment med forskellig $E$, $A$, eller $N$.
+      </div>
+
+      <div class="formula">
+        <strong>Normalspænding på skrå snit (vinkel $\theta$ fra akse):</strong><br>
+        $$\sigma_\theta = \sigma_x \cos^2\theta = \frac{\sigma_x}{2}(1 + \cos 2\theta)$$
+        Max normalspænding: $\sigma_{max} = \sigma_x$ ved $\theta = 0°$ (akse-aligned snit)
+      </div>
+
+      <div class="formula">
+        <strong>Forskydningsspænding på skrå snit:</strong><br>
+        $$\tau_\theta = -\sigma_x \cos\theta \sin\theta = -\frac{\sigma_x}{2}\sin 2\theta$$
+        Max shear stress: $\tau_{max} = \frac{\sigma_x}{2}$ ved $\theta = 45°$
+      </div>
+
+      <div class="formula">
+        <strong>Aksial normalspænding:</strong><br>
+        $$\sigma_x = \frac{N}{A}$$
+        hvor $N$ = aksial kraft, $A$ = tværsnitsareal
+      </div>
+
+      <div class="formula">
+        <strong>Statisk ubestemt — ligevægt + kompatibilitet:</strong><br>
+        $$\sum F = 0 \quad \text{(ligevægt)} \quad \text{og} \quad \sum \delta = 0 \quad \text{(kompatibilitet)}$$
+      </div>
+    </div>
+
+    <!-- HUSKEORD -->
+    <div class="section">
+      <h3>💡 Huskeord & genveje</h3>
+
+      <div class="mnemonic">
+        <strong>KÆF-princippet:</strong><br>
+        <strong>K</strong> = k-stivhed (EA/L) · <strong>Æ</strong> = elongation (PL/EA) · <strong>F</strong> = force/kraft (P)<br>
+        Jo længere ($L$) og mindre område ($A$), jo større forlængelse.
+      </div>
+
+      <div class="mnemonic">
+        <strong>Multi-segment: SUM først!</strong><br>
+        Når stangen har 2+ dele: Find kraft i hver del → beregn hver forlængelse → sum til total.
+      </div>
+
+      <div class="mnemonic">
+        <strong>Statisk ubestemt: 3 trin</strong><br>
+        1) Ligevægt: $\sum F = 0$ · 2) Kompatibilitet: $\sum \delta = 0$ (endeflytning) · 3) Løs systemet
+      </div>
+
+      <div class="mnemonic">
+        <strong>Skrå snit: 45° regel</strong><br>
+        Normal spænding max ved 0° (aksen), Shear stress max ved 45° ($\tau_{max} = \sigma_x/2$)
+      </div>
+
+      <div class="mnemonic">
+        <strong>Formel prioritering: L/(EA) først</strong><br>
+        Når du ser en forlængelse, husk: længde delt på (E gange område). Længde i tæller = større forlængelse.
+      </div>
+
+      <div class="mnemonic">
+        <strong>Reaktioner i fastgjort system</strong><br>
+        Stang med kraft $P$ mellem A og B (længder $a$ og $b$): $R_A = \frac{b \cdot P}{a+b}$, $R_B = \frac{a \cdot P}{a+b}$ (længere arm = mindre reaktion)
+      </div>
+    </div>
+
+    <footer>
+      MEK2 Lektion 2 · Aksial belastning (GG 2.1–2.6) | VIA Horsens maskiningeniør | Genereret til Studiehub
+    </footer>
+  </div>
 </body>
 </html>
