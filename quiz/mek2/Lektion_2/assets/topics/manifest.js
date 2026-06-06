@@ -14,5 +14,5 @@ window.QUIZ_GRADES = [
 ];
 
 window.MMT_MANIFEST = [
-  { id:'lektion_2_aksial_belastning', no:'L2', cat:'mek', emoji:'📏', title:'Aksial belastning (GG 2.1–2.6)', sub:'Længdeændringer, statisk ubestemte stænger, skrå snit.' }
+  { id:'L2_aksial_belastning', no:'L2', cat:'mek', emoji:'📏', title:'Aksial belastning (GG 2.1–2.6)', sub:'Længdeændringer, statisk ubestemte stænger, skrå snit.' }
 ];
