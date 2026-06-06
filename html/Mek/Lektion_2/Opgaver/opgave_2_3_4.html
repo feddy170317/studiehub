@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Opgave 2.3.4 - Multi-segment stang</title>
+  <link rel="stylesheet" href="../../../../assets/vendor/katex/katex.min.css">
+  <style>
+    body {
+      background: #0a1a2b;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+      margin: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .opgave {
+      background: #1a2a3b;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      border-left: 4px solid #00d4ff;
+    }
+    .opgave h2 {
+      color: #4dd0e1;
+      margin-top: 0;
+    }
+    .opgave-tekst {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: rgba(0, 212, 255, 0.05);
+      border-radius: 6px;
+      line-height: 1.6;
+    }
+    .given {
+      background: rgba(77, 208, 225, 0.1);
+      padding: 10px 15px;
+      border-radius: 6px;
+      margin: 10px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.95em;
+    }
+    .loesning {
+      margin-top: 20px;
+    }
+    .loesning h3 {
+      color: #4dd0e1;
+      margin-bottom: 15px;
+    }
+    details {
+      margin: 10px 0;
+    }
+    summary {
+      cursor: pointer;
+      padding: 12px;
+      background: #2a3a4b;
+      border-radius: 4px;
+      user-select: none;
+      color: #b3e5fc;
+      font-weight: 500;
+    }
+    summary:hover {
+      background: #3a4a5b;
+    }
+    .trin {
+      padding: 15px;
+      margin: 10px 0;
+      background: #0a1a2b;
+      border-radius: 6px;
+      border-left: 3px solid #00d4ff;
+    }
+    .hvad {
+      color: #4dd0e1;
+      font-weight: bold;
+      margin: 10px 0 5px 0;
+    }
+    .hvorfor {
+      color: #b3e5fc;
+      font-size: 0.95em;
+      margin: 5px 0 10px 0;
+      line-height: 1.5;
+    }
+    .beregning {
+      background: rgba(0, 212, 255, 0.1);
+      padding: 12px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      margin: 10px 0;
+      overflow-x: auto;
+    }
+    .svar {
+      background: #004d4d;
+      padding: 15px;
+      border-radius: 6px;
+      margin-top: 20px;
+      font-weight: bold;
+      color: #4dd0e1;
+      border-left: 4px solid #00d4ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <article class="opgave">
+      <h2>Opgave 2.3.4 - Sammensætning af flersegments stang</h2>
+      <section class="opgave-tekst">
+        <p>En stang består af to forskellige segmenter med forskelligt tværsnitsareal. Hele stangen er belastet med samme aksial kraft. Find den totale længdeændring.</p>
+        <div class="given">
+          <strong>Givet:</strong><br>
+          • Segment 1: L₁ = 250 mm, A₁ = 100 mm²<br>
+          • Segment 2: L₂ = 250 mm, A₂ = 200 mm²<br>
+          • Elasticitetsmodul (begge): E = 70 GPa<br>
+          • Aksial kraft: P = 10 kN
+        </div>
+      </section>
+
+      <section class="loesning">
+        <h3>Løsning (trin for trin)</h3>
+
+        <details open>
+          <summary>Trin 1: Beregn spændingen i segment 1</summary>
+          <div class="trin">
+            <div class="hvad">Hvad gør vi:</div>
+            <p class="hvorfor">Samme kraft går gennem begge segmenter (serie-forbindelse), men arealet er mindre i segment 1, så spændingen bliver større.</p>
+            <div class="beregning">
+              $$\sigma_1 = \frac{P}{A_1} = \frac{10000 \text{ N}}{100 \text{ mm}^2} = 100 \text{ MPa}$$
+            </div>
+          </div>
+        </details>
+
+        <details open>
+          <summary>Trin 2: Beregn spændingen i segment 2</summary>
+          <div class="trin">
+            <div class="hvad">Hvad gør vi:</div>
+            <p class="hvorfor">Segment 2 har større tværsnitsareal, så spændingen bliver mindre selvom kraften er identisk.</p>
+            <div class="beregning">
+              $$\sigma_2 = \frac{P}{A_2} = \frac{10000 \text{ N}}{200 \text{ mm}^2} = 50 \text{ MPa}$$
+            </div>
+          </div>
+        </details>
+
+        <details open>
+          <summary>Trin 3: Beregn længdeændringerne for hver segment</summary>
+          <div class="trin">
+            <div class="hvad">Hvad gør vi:</div>
+            <p class="hvorfor">Bruger Hookes lov for hver segment separat. Hver segment bidrager til den totale deformation.</p>
+            <div class="beregning">
+              <strong>Segment 1:</strong><br>
+              $$\delta_1 = \frac{P \cdot L_1}{A_1 \cdot E} = \frac{10000 \times 250}{100 \times 70000} = \frac{2500000}{7000000} = 0.357 \text{ mm}$$
+            </div>
+            <div class="beregning">
+              <strong>Segment 2:</strong><br>
+              $$\delta_2 = \frac{P \cdot L_2}{A_2 \cdot E} = \frac{10000 \times 250}{200 \times 70000} = \frac{2500000}{14000000} = 0.179 \text{ mm}$$
+            </div>
+          </div>
+        </details>
+
+        <details open>
+          <summary>Trin 4: Beregn den totale længdeændring</summary>
+          <div class="trin">
+            <div class="hvad">Hvad gør vi:</div>
+            <p class="hvorfor">Den totale deformation er summen af deformationerne i hver segment.</p>
+            <div class="beregning">
+              $$\delta_{total} = \delta_1 + \delta_2 = 0.357 + 0.179 = 0.536 \text{ mm}$$
+            </div>
+            <div class="beregning">
+              Alternativ formel:<br>
+              $$\delta_{total} = \sum \frac{P \cdot L_i}{A_i \cdot E}$$
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <section class="svar">
+        ✓ Svar: δ_total ≈ 0.594 mm (forlængelse)
+      </section>
+    </article>
+  </div>
+
+  <script defer src="../../../../assets/vendor/katex/katex.min.js"></script>
+  <script defer src="../../../../assets/vendor/katex/auto-render.min.js"></script>
+  <script defer>
+    document.addEventListener('DOMContentLoaded', function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false}
+        ],
+        throwOnError: false
+      });
+    });
+  </script>
+</body>
+</html>

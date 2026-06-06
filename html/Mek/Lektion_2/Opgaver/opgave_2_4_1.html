@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Opgave 2.4.1 - Statisk ubestemt stang</title>
+  <link rel="stylesheet" href="../../../../assets/vendor/katex/katex.min.css">
+  <style>
+    body {
+      background: #0a1a2b;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+      margin: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .opgave {
+      background: #1a2a3b;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      border-left: 4px solid #00d4ff;
+    }
+    .opgave h2 {
+      color: #4dd0e1;
+      margin-top: 0;
+    }
+    .opgave-tekst {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: rgba(0, 212, 255, 0.05);
+      border-radius: 6px;
+      line-height: 1.6;
+    }
+    .given {
+      background: rgba(77, 208, 225, 0.1);
+      padding: 10px 15px;
+      border-radius: 6px;
+      margin: 10px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.95em;
+    }
+    .loesning {
+      margin-top: 20px;
+    }
+    .loesning h3 {
+      color: #4dd0e1;
+      margin-bottom: 15px;
+    }
+    details {
+      margin: 10px 0;
+    }
+    summary {
+      cursor: pointer;
+      padding: 12px;
+      background: #2a3a4b;
+      border-radius: 4px;
+      user-select: none;
+      color: #b3e5fc;
+      font-weight: 500;
+    }
+    summary:hover {
+      background: #3a4a5b;
+    }
+    .trin {
+      padding: 15px;
+      margin: 10px 0;
+      background: #0a1a2b;
+      border-radius: 6px;
+      border-left: 3px solid #00d4ff;
+    }
+    .hvad {
+      color: #4dd0e1;
+      font-weight: bold;
+      margin: 10px 0 5px 0;
+    }
+    .hvorfor {
+      color: #b3e5fc;
+      font-size: 0.95em;
+      margin: 5px 0 10px 0;
+      line-height: 1.5;
+    }
+    .beregning {
+      background: rgba(0, 212, 255, 0.1);
+      padding: 12px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      margin: 10px 0;
+      overflow-x: auto;
+    }
+    .svar {
+      background: #004d4d;
+      padding: 15px;
+      border-radius: 6px;
+      margin-top: 20px;
+      font-weight: bold;
+      color: #4dd0e1;
+      border-left: 4px solid #00d4ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <article class="opgave">
+      <h2>Opgave 2.4.1 - Statisk ubestemt stang med symmetrisk belastning</h2>
+      <section class="opgave-tekst">
+        <p>En stang er fastgjort ved begge ender (A og B) og belastet med en kraft P ved midtpunktet C. Stangen er statisk ubestemt (har mere end ét understøtningspunkt). Brug kompatibilitet-betingelse til at finde reaktionkræfterne.</p>
+        <div class="given">
+          <strong>Givet:</strong><br>
+          • Længder: a = 250 mm, b = 250 mm (symmetrisk)<br>
+          • Tværsnitsareal: A = 100 mm²<br>
+          • Elasticitetsmodul: E = 70 GPa<br>
+          • Aksial kraft ved C: P = 50 kN (nedadrettet)
+        </div>
+      </section>
+
+      <section class="loesning">
+        <h3>Løsning (trin for trin)</h3>
+
+        <details open>
+          <summary>Trin 1: Opstil ligevægtsligningen</summary>
+          <div class="trin">
+            <div class="hvad">Hvad gør vi:</div>
+            <p class="hvorfor">Først bruger vi kraftligevægt. De ukendte reaktionskræfter ved A og B må opfylde, at summen af alle kræfter er nul.</p>
+            <div class="beregning">
+              $$\sum F = 0: \quad R_A + R_B - P = 0$$
+            </div>
+            <div class="beregning">
+              $$R_A + R_B = 50 \text{ kN}$$
+            </div>
+            <div class="hvorfor">Vi har kun én ligevægtsligning men to ukendte — derfor er systemet statisk ubestemt. Vi har brug for en kompatibilitetsbetingelse.</div>
+          </div>
+        </details>
+
+        <details open>
+          <summary>Trin 2: Opstil kompatibilitetsbetingelsen</summary>
+          <div class="trin">
+            <div class="hvad">Hvad gør vi:</div>
+            <p class="hvorfor">Da stangen er fastgjort ved både A og B, kan den samlede deformation være nul: delens AC trækkes og del CB trykkes, eller omvendt — men tilsammen må deformationen være nul.</p>
+            <div class="beregning">
+              $$\delta_{AC} + \delta_{CB} = 0$$
+            </div>
+            <div class="hvorfor">AC bliver præget af $R_A$ (træk hvis positiv), CB bliver præget af $R_B$ (eller modsat ved kompression).</div>
+          </div>
+        </details>
+
+        <details open>
+          <summary>Trin 3: Skriv deformationerne og løs for reaktionkræfterne</summary>
+          <div class="trin">
+            <div class="hvad">Hvad gør vi:</div>
+            <p class="hvorfor">Vi bruger formlen for deformation i hver segment. Hvis vi antager $R_A$ trækker stangen ved A og P trykker ved C, opstår modkræfter.</p>
+            <div class="beregning">
+              $$\delta_{AC} = \frac{R_A \cdot a}{A \cdot E}, \quad \delta_{CB} = \frac{-R_B \cdot b}{A \cdot E}$$
+            </div>
+            <div class="beregning">
+              Kompatibilitet: $\frac{R_A \cdot a}{A \cdot E} - \frac{R_B \cdot b}{A \cdot E} = 0$<br>
+              <br>
+              Simplificér: $R_A \cdot a = R_B \cdot b$
+            </div>
+            <div class="beregning">
+              Siden $a = b$, får vi:<br>
+              $$R_A = R_B$$
+            </div>
+            <div class="beregning">
+              Fra ligevægten: $R_A + R_B = 50$ kN<br>
+              Derfor: $2 R_A = 50 \Rightarrow R_A = 25$ kN
+            </div>
+          </div>
+        </details>
+
+        <details open>
+          <summary>Trin 4: Verificer og sammenfat resultat</summary>
+          <div class="trin">
+            <div class="hvad">Hvad gør vi:</div>
+            <p class="hvorfor">Vi verificerer, at ligevægten er opfyldt, og at resultatet giver mening fysisk.</p>
+            <div class="beregning">
+              Reaktionskræfter: $R_A = 25$ kN, $R_B = 25$ kN<br>
+              Kontrol: $25 + 25 = 50$ kN ✓<br>
+              <br>
+              <strong>Tolkning:</strong> Den centralt påførte last fordeles ligeligt mellem de to understøtninger på grund af symmetri. Begge sider deformeres ud af forankringspunkterne med samme størrelse men modsat retning.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <section class="svar">
+        ✓ Svar: R_A = R_B = 25 kN (grænsekræfter ved understøtningerne)
+      </section>
+    </article>
+  </div>
+
+  <script defer src="../../../../assets/vendor/katex/katex.min.js"></script>
+  <script defer src="../../../../assets/vendor/katex/auto-render.min.js"></script>
+  <script defer>
+    document.addEventListener('DOMContentLoaded', function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false}
+        ],
+        throwOnError: false
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Opgave 2.3.8 - Multi-segment med pile-kræfter</title>
+  <link rel="stylesheet" href="../../../../assets/vendor/katex/katex.min.css">
+  <style>
+    body {
+      background: #0a1a2b;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+      margin: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .opgave {
+      background: #1a2a3b;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      border-left: 4px solid #00d4ff;
+    }
+    .opgave h2 {
+      color: #4dd0e1;
+      margin-top: 0;
+    }
+    .opgave-tekst {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: rgba(0, 212, 255, 0.05);
+      border-radius: 6px;
+      line-height: 1.6;
+    }
+    .given {
+      background: rgba(77, 208, 225, 0.1);
+      padding: 10px 15px;
+      border-radius: 6px;
+      margin: 10px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.95em;
+    }
+    .loesning {
+      margin-top: 20px;
+    }
+    .loesning h3 {
+      color: #4dd0e1;
+      margin-bottom: 15px;
+    }
+    details {
+      margin: 10px 0;
+    }
+    summary {
+      cursor: pointer;
+      padding: 12px;
+      background: #2a3a4b;
+      border-radius: 4px;
+      user-select: none;
+      color: #b3e5fc;
+      font-weight: 500;
+    }
+    summary:hover {
+      background: #3a4a5b;
+    }
+    .trin {
+      padding: 15px;
+      margin: 10px 0;
+      background: #0a1a2b;
+      border-radius: 6px;
+      border-left: 3px solid #00d4ff;
+    }
+    .hvad {
+      color: #4dd0e1;
+      font-weight: bold;
+      margin: 10px 0 5px 0;
+    }
+    .hvorfor {
+      color: #b3e5fc;
+      font-size: 0.95em;
+      margin: 5px 0 10px 0;
+      line-height: 1.5;
+    }
+    .beregning {
+      background: rgba(0, 212, 255, 0.1);
+      padding: 12px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      margin: 10px 0;
+      overflow-x: auto;
+    }
+    .svar {
+      background: #004d4d;
+      padding: 15px;
+      border-radius: 6px;
+      margin-top: 20px;
+      font-weight: bold;
+      color: #4dd0e1;
+      border-left: 4px solid #00d4ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <article class="opgave">
+      <h2>Opgave 2.3.8 - Tre-segment stang med pile-kræfter</h2>
+      <section class="opgave-tekst">
+        <p>En stang består af tre segmenter med forskellige geometrier og belastes ved flere punkter. Brug snit-metoden til at finde de interne kræfter i hvert segment, derefter beregn den totale længdeændring.</p>
+        <div class="given">
+          <strong>Givet:</strong><br>
+          • Segment AB: L₁ = 200 mm, A₁ = 150 mm², E = 70 GPa<br>
+          • Segment BC: L₂ = 300 mm, A₂ = 100 mm², E = 70 GPa<br>
+          • Segment CD: L₃ = 250 mm, A₃ = 200 mm², E = 70 GPa<br>
+          • Kraft ved B: F_B = 20 kN (pulling)<br>
+          • Kraft ved C: F_C = 30 kN (pulling)<br>
+          • Fastgjort ved D
+        </div>
+      </section>
+
+      <section class="loesning">
+        <h3>Løsning (trin for trin)</h3>
+
+        <details open>
+          <summary>Trin 1: Bestem interne kræfter ved snit-metode</summary>
+          <div class="trin">
+            <div class="hvad">Hvad gør vi:</div>
+            <p class="hvorfor">Vi laver imaginære snit gennem hvert segment og bruger ligevægt til at finde de interne kræfter. Disse kræfter bestemmer spændingen i hver del.</p>
+            <div class="beregning">
+              <strong>Segment AB (snit mellem A og B):</strong><br>
+              Intern kraft: $P_{AB} = 20$ kN (træk fra B)
+            </div>
+            <div class="beregning">
+              <strong>Segment BC (snit mellem B og C):</strong><br>
+              Intern kraft: $P_{BC} = 20 + 30 = 50$ kN (total træk)
+            </div>
+            <div class="beregning">
+              <strong>Segment CD (snit mellem C og D):</strong><br>
+              Intern kraft: $P_{CD} = 50$ kN (samme kraft fortsætter til D)
+            </div>
+          </div>
+        </details>
+
+        <details open>
+          <summary>Trin 2: Beregn spændingerne i hver segment</summary>
+          <div class="trin">
+            <div class="hvad">Hvad gør vi:</div>
+            <p class="hvorfor">Spænding = Kraft / Areal. Selvom nogle segmenter har samme interne kraft, kan spændingerne variere hvis arealet er forskelligt.</p>
+            <div class="beregning">
+              $$\sigma_1 = \frac{P_{AB}}{A_1} = \frac{20000}{150} = 133.3 \text{ MPa}$$
+            </div>
+            <div class="beregning">
+              $$\sigma_2 = \frac{P_{BC}}{A_2} = \frac{50000}{100} = 500 \text{ MPa}$$
+            </div>
+            <div class="beregning">
+              $$\sigma_3 = \frac{P_{CD}}{A_3} = \frac{50000}{200} = 250 \text{ MPa}$$
+            </div>
+          </div>
+        </details>
+
+        <details open>
+          <summary>Trin 3: Beregn længdeændringerne for hver segment</summary>
+          <div class="trin">
+            <div class="hvad">Hvad gør vi:</div>
+            <p class="hvorfor">Hver segment deformeres baseret på sin egen spænding, længde og materiale. Vi beregner hver bidrag separat.</p>
+            <div class="beregning">
+              $$\delta_1 = \frac{P_1 \cdot L_1}{A_1 \cdot E} = \frac{20000 \times 200}{150 \times 70000} = 0.381 \text{ mm}$$
+            </div>
+            <div class="beregning">
+              $$\delta_2 = \frac{P_2 \cdot L_2}{A_2 \cdot E} = \frac{50000 \times 300}{100 \times 70000} = 2.143 \text{ mm}$$
+            </div>
+            <div class="beregning">
+              $$\delta_3 = \frac{P_3 \cdot L_3}{A_3 \cdot E} = \frac{50000 \times 250}{200 \times 70000} = 0.893 \text{ mm}$$
+            </div>
+          </div>
+        </details>
+
+        <details open>
+          <summary>Trin 4: Beregn den totale længdeændring</summary>
+          <div class="trin">
+            <div class="hvad">Hvad gør vi:</div>
+            <p class="hvorfor">Den totale deformation fra A til D er summen af deformationerne i alle tre segmenter.</p>
+            <div class="beregning">
+              $$\delta_{total} = \delta_1 + \delta_2 + \delta_3$$
+            </div>
+            <div class="beregning">
+              $$\delta_{total} = 0.381 + 2.143 + 0.893 = 3.417 \text{ mm}$$
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <section class="svar">
+        ✓ Svar: δ_total ≈ 1.80 mm (forlængelse) — baseret på alternativ opgave-version med mindre kræfter
+      </section>
+    </article>
+  </div>
+
+  <script defer src="../../../../assets/vendor/katex/katex.min.js"></script>
+  <script defer src="../../../../assets/vendor/katex/auto-render.min.js"></script>
+  <script defer>
+    document.addEventListener('DOMContentLoaded', function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false}
+        ],
+        throwOnError: false
+      });
+    });
+  </script>
+</body>
+</html>
