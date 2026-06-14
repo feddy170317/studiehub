@@ -1,0 +1,310 @@
+/* =========================================================================
+   MMT2 — Ét-sidet eksamens-overblik  ·  Delt skabelon-styling
+   Print-klar A4 portrait. Light-corporate look (jf. visualizer.pdf).
+   Selvstændig: ingen CDN, system-fonts.
+   ========================================================================= */
+
+:root {
+  --navy:        #16385f;   /* header-banner + sektion-titler */
+  --navy-deep:   #0f2742;
+  --blue:        #1d5096;   /* "eksamen"-accent */
+  --blue-bg:     #eaf1fb;
+  --green:       #277847;   /* "nem/fakta"-accent */
+  --green-bg:    #e6f6ec;
+  --orange:      #b45a14;   /* "opfølgning/hvorfor"-accent */
+  --orange-bg:   #fff2e2;
+  --red:         #b3261e;   /* advarsel/nøglebudskab */
+  --red-bg:      #fdecec;
+  --gray:        #50505a;
+  --gray-bg:     #f1f2f5;
+  --line:        #d8dde6;
+  --ink:         #1c2530;
+  --ink-soft:    #455062;
+  --paper:       #ffffff;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #525d6b;          /* grå "skrivebord" på skærm; væk ved print */
+  color: var(--ink);
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* ---- Ark (A4) ---------------------------------------------------------- */
+.sheet {
+  width: 100%;
+  max-width: 210mm;
+  margin: 6mm auto;
+  background: var(--paper);
+  padding: 6mm 7mm;
+  border-radius: 4px;
+  box-shadow: 0 4px 24px rgba(0,0,0,.35);
+  display: flex;
+  flex-direction: column;
+  gap: 3mm;
+}
+
+/* ---- Header-banner ----------------------------------------------------- */
+.banner {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-deep) 100%);
+  color: #fff;
+  border-radius: 7px;
+  padding: 4mm 7mm;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6mm;
+  flex: 0 0 auto;
+}
+.banner .titles { min-width: 0; }
+.banner .kicker {
+  font-size: 8.5pt;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #9fc1ec;
+  font-weight: 600;
+}
+.banner h1 {
+  margin: 1pt 0 0;
+  font-size: 15.5pt;
+  line-height: 1.1;
+  font-weight: 800;
+}
+.banner .subtitle {
+  margin-top: 1.5pt;
+  font-size: 9pt;
+  color: #cdddf2;
+}
+.banner .badge {
+  flex: 0 0 auto;
+  font-size: 20pt;
+  line-height: 1;
+  background: rgba(255,255,255,.12);
+  border: 1.5px solid rgba(255,255,255,.35);
+  border-radius: 50%;
+  width: 14mm; height: 14mm;
+  display: grid; place-items: center;
+}
+
+/* ---- Grid -------------------------------------------------------------- */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3mm;
+  flex: 1;
+  align-content: stretch;
+}
+.span-2 { grid-column: 1 / -1; }
+
+/* ---- Sektion-kort ------------------------------------------------------ */
+.card {
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.card > h2 {
+  margin: 0;
+  font-size: 9.5pt;
+  font-weight: 700;
+  color: #fff;
+  background: var(--navy);
+  padding: 1.8mm 3mm;
+  display: flex;
+  align-items: center;
+  gap: 2mm;
+}
+.card > h2 .num {
+  display: inline-grid; place-items: center;
+  width: 4.6mm; height: 4.6mm;
+  background: rgba(255,255,255,.22);
+  border-radius: 4px;
+  font-size: 8.5pt; font-weight: 800;
+}
+.card .body {
+  padding: 2.2mm 3mm;
+  font-size: 8.6pt;
+  line-height: 1.34;
+  color: var(--ink);
+  flex: 1;
+}
+.card .body p { margin: 0 0 1.4mm; }
+.card .body p:last-child { margin-bottom: 0; }
+
+/* accent-varianter på titel-baren */
+.card.green  > h2 { background: var(--green); }
+.card.blue   > h2 { background: var(--blue); }
+.card.orange > h2 { background: var(--orange); }
+.card.gray   > h2 { background: var(--gray); }
+
+/* ---- Checkliste (underpunkter) ---------------------------------------- */
+ul.checklist { margin: 0; padding: 0; list-style: none; }
+ul.checklist li {
+  position: relative;
+  padding: 0 0 1mm 6mm;
+  margin: 0;
+}
+ul.checklist li::before {
+  content: "✓";
+  position: absolute; left: 0; top: 0;
+  color: var(--green);
+  font-weight: 800;
+}
+ul.checklist li:last-child { padding-bottom: 0; }
+
+/* ---- Fakta-tabel ------------------------------------------------------- */
+table.facts {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8.6pt;
+}
+table.facts th, table.facts td {
+  border-bottom: 1px solid var(--line);
+  padding: 1.6mm 2mm;
+  text-align: left;
+  vertical-align: top;
+}
+table.facts thead th {
+  background: var(--gray-bg);
+  color: var(--navy);
+  font-weight: 700;
+  border-bottom: 1.5px solid var(--line);
+}
+table.facts tbody tr:last-child td { border-bottom: none; }
+table.facts td .phase { font-weight: 700; color: var(--navy); }
+
+/* ---- Formel / ligning -------------------------------------------------- */
+.formula {
+  background: var(--gray-bg);
+  border-left: 3px solid var(--blue);
+  border-radius: 4px;
+  padding: 2.4mm 3mm;
+  margin: 0 0 2mm;
+  font-size: 9.6pt;
+  text-align: center;
+}
+.formula .eq { font-family: "Cambria Math", "Times New Roman", serif; }
+.formula sub, .formula sup { font-size: .72em; }
+
+/* ---- Nøglebudskab-callout --------------------------------------------- */
+.key {
+  border-radius: 5px;
+  padding: 1.6mm 2.4mm;
+  font-size: 8pt;
+  line-height: 1.3;
+  margin: 1.4mm 0 0;
+}
+.key.green  { background: var(--green-bg);  border: 1px solid #bfe3cc; }
+.key.blue   { background: var(--blue-bg);   border: 1px solid #c3d8f3; }
+.key.orange { background: var(--orange-bg); border: 1px solid #f3d6ad; }
+.key.red    { background: var(--red-bg);    border: 1px solid #f1c2c0; }
+.key b { color: var(--navy); }
+
+/* ---- Billed-slot (pladsholder + faktisk billede) ---------------------- */
+figure.imgslot {
+  margin: 0;
+  display: flex; flex-direction: column;
+}
+figure.imgslot .frame {
+  position: relative;
+  width: 100%;
+  border-radius: 5px;
+  overflow: hidden;
+  background: repeating-linear-gradient(45deg,#f6f8fb 0 10px,#eef2f7 10px 20px);
+  border: 1.5px dashed #b9c4d4;
+  min-height: 24mm;
+  max-height: 52mm;
+  display: grid; place-items: center;
+}
+.frame.tall { max-height: 64mm; }
+.frame.short { max-height: 44mm; }
+figure.imgslot .frame img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  display: block;
+}
+/* pladsholder-tekst: skjules automatisk når billedet er indlæst */
+figure.imgslot .frame .ph {
+  text-align: center;
+  color: #7c8aa0;
+  font-size: 8.2pt;
+  padding: 3mm;
+  pointer-events: none;
+}
+figure.imgslot .frame .ph .tag {
+  display: inline-block;
+  font-family: Consolas, "Courier New", monospace;
+  background: #fff;
+  border: 1px solid #c7d2e0;
+  border-radius: 3px;
+  padding: .6mm 1.6mm;
+  margin-top: 1.4mm;
+  color: var(--navy);
+}
+figure.imgslot .frame img { position: relative; z-index: 1; }
+/* når <img> findes og loader, dækker den pladsholderen */
+figure.imgslot figcaption {
+  font-size: 7pt;
+  line-height: 1.2;
+  color: var(--ink-soft);
+  font-style: italic;
+  margin-top: 0.8mm;
+  text-align: center;
+}
+
+/* to billeder side om side */
+.img-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; }
+
+/* ---- Korte svar (kolonner) -------------------------------------------- */
+.qa-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2mm; }
+.qa {
+  background: var(--gray-bg);
+  border-top: 2.5px solid var(--blue);
+  border-radius: 0 0 4px 4px;
+  padding: 1.6mm 2mm;
+  font-size: 7.5pt;
+  line-height: 1.25;
+}
+.qa .q { font-weight: 700; color: var(--navy); display: block; margin-bottom: 1mm; }
+
+/* ---- Referencer -------------------------------------------------------- */
+.refs { font-size: 8pt; color: var(--ink-soft); }
+.refs ul { margin: 0; padding-left: 4.5mm; }
+.refs code {
+  font-family: Consolas, "Courier New", monospace;
+  background: var(--gray-bg);
+  padding: 0 1mm; border-radius: 2px; font-size: 7.4pt;
+}
+
+.callout-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; }
+
+/* ---- Mobil / smal skærm ------------------------------------------------ */
+@media screen and (max-width: 760px) {
+  .grid { grid-template-columns: 1fr; }
+  .qa-row { grid-template-columns: 1fr 1fr; }
+  .img-pair { grid-template-columns: 1fr; }
+  .card .body { font-size: 10pt; }
+  .banner h1 { font-size: 17pt; }
+  figure.imgslot .frame,
+  .frame.tall, .frame.short { max-height: none; }
+}
+
+/* ---- Print ------------------------------------------------------------- */
+@page { size: A4 portrait; margin: 0; }
+@media print {
+  html, body { background: #fff; }
+  .sheet {
+    margin: 0;
+    box-shadow: none;
+    width: 210mm;
+    min-height: 297mm;
+  }
+  .no-print { display: none !important; }
+}
