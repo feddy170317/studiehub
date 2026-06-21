@@ -14,21 +14,24 @@
     gsap.registerPlugin(ScrollTrigger);
   }
 
-  // ---- 1. REVEAL ANIMATIONS ----
-  document.querySelectorAll('.snap-section').forEach((section) => {
+  // ---- 1. REVEAL ANIMATIONS (IntersectionObserver) ----
+  // VIGTIGT: <body> er scroll-containeren (scroll-snap), så GSAP ScrollTrigger
+  // — der lytter på window-scroll — fyrede IKKE på slide 2+ → indholdet forblev
+  // usynligt (opacity:0) indtil et resize (F11) tvang en refresh. IntersectionObserver
+  // observerer faktisk synlighed i viewporten og virker uanset hvilken container der scroller.
+  function showReveal(section) {
     const items = section.querySelectorAll('.reveal');
-    if (!items.length || !window.gsap) return;
-    gsap.to(items, {
-      opacity: 1, y: 0, duration: 0.9, stagger: 0.12, ease: 'power3.out',
-      scrollTrigger: { trigger: section, start: 'top 75%', toggleActions: 'play none none reverse' },
-    });
-  });
-  // Fallback hvis GSAP ikke loader: vis alt
-  if (!window.gsap) {
-    document.querySelectorAll('.reveal').forEach((el) => {
-      el.style.opacity = 1; el.style.transform = 'none';
-    });
+    if (!items.length) return;
+    if (window.gsap) {
+      gsap.to(items, { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: 'power3.out', overwrite: 'auto' });
+    } else {
+      items.forEach((el) => { el.style.opacity = 1; el.style.transform = 'none'; });
+    }
   }
+  const revealIO = new IntersectionObserver((entries) => {
+    entries.forEach((e) => { if (e.isIntersecting) { showReveal(e.target); revealIO.unobserve(e.target); } });
+  }, { threshold: 0.2 });
+  document.querySelectorAll('.snap-section').forEach((s) => revealIO.observe(s));
 
   // ---- 1b. COUNTUP — animerede tal på [data-count] ----
   function initCountUp(el) {
@@ -48,11 +51,10 @@
     el.textContent = prefix + target.toFixed(decimals).replace('.', ',') + suffix;
     el.dataset.counted = '1';
   }
-  document.querySelectorAll('[data-count]').forEach((el) => {
-    if (window.ScrollTrigger) {
-      ScrollTrigger.create({ trigger: el, start: 'top 85%', once: true, onEnter: () => initCountUp(el) });
-    } else { initCountUp(el); }
-  });
+  const countIO = new IntersectionObserver((entries) => {
+    entries.forEach((e) => { if (e.isIntersecting) { initCountUp(e.target); countIO.unobserve(e.target); } });
+  }, { threshold: 0.4 });
+  document.querySelectorAll('[data-count]').forEach((el) => countIO.observe(el));
 
   // ---- 2. DOT NAV ----
   const dots = document.querySelectorAll('#dot-nav .dot');
@@ -147,13 +149,12 @@
     if (e.key === 'Escape' && modelModal && !modelModal.hidden) closeModel();
   });
 
-  // ---- 4. HERO PARALLAX ----
+  // ---- 4. HERO PARALLAX (body er scroll-containeren, ikke window) ----
   const heroBg = document.querySelector('.hero-bg');
-  if (heroBg && window.gsap && window.ScrollTrigger) {
-    gsap.to(heroBg, {
-      y: 180, ease: 'none',
-      scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true },
-    });
+  if (heroBg) {
+    document.body.addEventListener('scroll', () => {
+      heroBg.style.transform = 'translateY(' + (document.body.scrollTop * 0.25) + 'px) scale(1.05)';
+    }, { passive: true });
   }
 
   // ---- 5. KBD-HINT fade ----
