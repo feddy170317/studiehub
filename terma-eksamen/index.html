@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terma Procesventilation — Eksamenspræsentation</title>
+<link rel="stylesheet" href="assets/css/styles.css">
+
+<!-- Alle biblioteker hentes LOKALT (assets/vendor/) → virker 100% offline -->
+<script src="assets/vendor/gsap.min.js"></script>
+<script src="assets/vendor/ScrollTrigger.min.js"></script>
+<script src="assets/vendor/countUp.umd.js"></script>
+<script src="assets/vendor/chart.umd.min.js"></script>
+<!-- De interaktive 3D-scener loades nu i iframes (assets/microscope-arm.html),
+     som selv henter Three.js lokalt — derfor ingen three/scene-scripts her. -->
+</head>
+<body>
+
+<!-- ============ SIDE NAV (8 dots) ============ -->
+<nav id="dot-nav" aria-label="Sektioner">
+  <a href="#s1" data-label="Forside" class="dot active"></a>
+  <a href="#s2" data-label="Problemet" class="dot"></a>
+  <a href="#s3" data-label="Krav & koncepter" class="dot"></a>
+  <a href="#s4" data-label="Løsningen" class="dot"></a>
+  <a href="#s5" data-label="Validering" class="dot"></a>
+  <a href="#s6" data-label="Materiale & pris" class="dot"></a>
+  <a href="#s7" data-label="Business case" class="dot"></a>
+  <a href="#s8" data-label="Tak / Q&A" class="dot"></a>
+</nav>
+
+<!-- ============ TOP-BAR ============ -->
+<header class="top-bar">
+  <div class="brand">TERMA <span class="accent">·</span> PROCESVENTILATION</div>
+  <div class="meta">VIA Horsens · Maskiningeniør · 2. semester · 2026</div>
+</header>
+
+<main id="deck">
+
+<!-- ====================== 1 — HERO ====================== -->
+<section id="s1" class="snap-section hero">
+  <div class="hero-bg" style="background-image:url('assets/images/renderinger/render_01.png');"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="kicker reveal">Procesventilation til Leica A60 · EMS-afdelingen hos Terma A/S</div>
+    <h1 class="display reveal">UDSUGNINGS&shy;STYRET<br><span class="accent">ARMRØR</span></h1>
+    <p class="lede reveal">Armens egen profil bliver luftkanalen. Loddedampen fanges <em>ved kilden</em> —
+      uden at spærre operatørens synsfelt, og uden at gå på kompromis med ESD.</p>
+    <div class="scroll-hint reveal">SCROLL ↓ &nbsp;·&nbsp; PILE-TASTER / MELLEMRUM</div>
+  </div>
+</section>
+
+<!-- ====================== 2 — PROBLEMET (3D-scene #1) ====================== -->
+<section id="s2" class="snap-section">
+  <div class="container wide">
+    <div class="kicker reveal">01 / PROBLEMET</div>
+    <h2 class="section-title reveal">LODDEDAMPEN ENDER<br>I OPERATØRENS LUFTVEJE.</h2>
+    <div class="scene-layout">
+      <div class="embed-stage reveal">
+        <span class="scene-badge is-problem">Løs slange på bordet</span>
+        <iframe class="model-embed" src="assets/microscope-arm.html#floor&embed"
+                title="3D-scene: løs bordslange" loading="lazy"></iframe>
+        <button class="embed-fs" data-model-src="assets/microscope-arm.html#floor" title="Åbn interaktiv fuldskærm">⛶ Interaktiv</button>
+      </div>
+      <div class="scene-copy reveal">
+        <figure class="real-foto photo-smoke" data-mode="rise" data-emit="0.45,0.82" data-target="0.62,0.30">
+          <div class="ps-stage">
+            <img src="assets/images/foto_setup_real.jpg"
+                 alt="Operatør ved mikroskop med løs udsugningsslange på bordet"
+                 onerror="this.closest('figure').style.display='none'">
+            <canvas class="ps-canvas"></canvas>
+          </div>
+          <figcaption>Virkeligheden hos Terma: den løse slange ligger <em>bag printet</em> — dampen stiger op mod ansigtet.</figcaption>
+        </figure>
+        <p class="big-statement">Operatøren sidder bøjet ind over mikroskopet. En <strong>løs
+          udsugningsslange</strong> ligger på bordet — men fanger kun en del af dampen.</p>
+        <ul class="scene-points">
+          <li><span class="mark">↑</span> Loddedampen har <strong>opdrift</strong> og stiger lodret op — direkte mod ansigtet.</li>
+          <li><span class="mark">⊘</span> Slangen er <strong>forkert placeret / for langt væk</strong>, så meget slipper forbi.</li>
+          <li><span class="mark">!</span> Kolofonium-damp → erhvervsastma (jf. <strong>HSE</strong>, <strong>BfA</strong>): eksponering og <strong>sygefravær</strong>.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== 3 — KRAV & KONCEPTER ====================== -->
+<section id="s3" class="snap-section">
+  <div class="container wide">
+    <div class="kicker reveal">02 / KRAV &amp; KONCEPTER</div>
+    <h2 class="section-title reveal">FEM SMART-MÅL → ÉT KONCEPT.</h2>
+    <p class="sub reveal">Defineret med Terma — målbare, accepterede, tids- og budgetbundne. Fire idéer, seks beslutningsmatricer, samme svar.</p>
+    <div class="kpi-row reveal">
+      <div class="kpi">
+        <div class="kpi-num"><span data-count="0.5" data-decimals="1">0</span><span class="unit">m/s</span></div>
+        <div class="kpi-label">Indfangningshastighed<span class="small">AT A.1.1, ved kilden</span></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-num">&lt;<span data-count="170">0</span><span class="unit">V</span></div>
+        <div class="kpi-label">ESD-grænse<span class="small">IPC-A-610 Klasse 0</span></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-num">≤<span data-count="3">0</span><span class="unit">dB(A)</span></div>
+        <div class="kpi-label">Støjstigning<span class="small">over baseline</span></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-num"><span data-count="3.753" data-decimals="3">0</span><span class="unit">kg</span></div>
+        <div class="kpi-label">Mikroskophoved<span class="small">Leica — afvejet</span></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-num">SF <span data-count="5.0" data-decimals="1">0</span></div>
+        <div class="kpi-label">Sikkerhedsfaktor<span class="small">krav: ≥ 2,0</span></div>
+      </div>
+    </div>
+    <div class="concept-grid reveal" style="margin-top:40px">
+      <figure class="concept">
+        <img src="assets/images/koncepter/koncept_1.png" alt="Koncept 1">
+        <figcaption>KONCEPT 1<br><span class="small">Front-tragt på arm</span></figcaption>
+      </figure>
+      <figure class="concept">
+        <img src="assets/images/koncepter/koncept_2.png" alt="Koncept 2">
+        <figcaption>KONCEPT 2<br><span class="small">Bordmonteret bag-tragt</span></figcaption>
+      </figure>
+      <figure class="concept">
+        <img src="assets/images/koncepter/koncept_3.png" alt="Koncept 3">
+        <figcaption>KONCEPT 3<br><span class="small">Stive sidefører</span></figcaption>
+      </figure>
+      <figure class="concept winner">
+        <img src="assets/images/koncepter/koncept_4.png" alt="Koncept 4 — valgt">
+        <figcaption>KONCEPT 4 <span class="accent">★ VALGT</span><br><span class="small">Armen ER kanalen</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== 4 — LØSNINGEN (3D-scene #2 + toggle) ====================== -->
+<section id="s4" class="snap-section">
+  <div class="container wide">
+    <div class="kicker reveal">03 / LØSNINGEN</div>
+    <h2 class="section-title reveal">ARMRØRET FANGER<br>DAMPEN VED KILDEN.</h2>
+    <div class="scene-layout">
+      <div class="embed-stage reveal">
+        <span class="scene-badge is-solution">Integreret i mikroskoparm</span>
+        <iframe class="model-embed" src="assets/microscope-arm.html#arm&embed"
+                title="3D-scene: indbygget armudsugning" loading="lazy"></iframe>
+        <button class="embed-fs" data-model-src="assets/microscope-arm.html#arm" title="Åbn interaktiv fuldskærm">⛶ Interaktiv</button>
+      </div>
+      <div class="scene-copy reveal">
+        <figure class="real-foto photo-smoke" data-mode="extract" data-emit="0.52,0.95" data-target="0.52,0.46">
+          <div class="ps-stage">
+            <img src="assets/images/foto_prototype_duct.jpg"
+                 alt="3D-printet udsugningskanal klemt på Leica M60-objektivet"
+                 onerror="this.closest('figure').style.display='none'">
+            <canvas class="ps-canvas"></canvas>
+          </div>
+          <figcaption>Prototypen: den sorte 3D-printede kanal er spændt fast om objektivet og suger dampen lige op i flex-slangen.</figcaption>
+        </figure>
+        <p class="big-statement">Udsugningen er <strong>indbygget i mikroskoparmen</strong> lige ved
+          objektivet. Dampen suges op gennem armen og ud i en ekstern kanal.</p>
+        <ul class="scene-points" style="margin-top:22px">
+          <li><span class="mark">→</span> Indsuget sidder <strong>ved kilden</strong> — dampen fanges, før opdriften tager fat.</li>
+          <li><span class="mark">◷</span> Intet løst på bordet at flytte — <strong>frit synsfelt</strong> bevares.</li>
+          <li><span class="mark">✓</span> Dampen suges <strong>op gennem armen</strong> og ud i den eksterne kanal.</li>
+        </ul>
+        <p class="small" style="margin-top:14px">Tryk <strong>⛶ Interaktiv</strong> for at åbne modellen i fuld skærm — drej leddene og slå udsugningen til/fra.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== 5 — TEKNISK VALIDERING ====================== -->
+<section id="s5" class="snap-section dark-section">
+  <div class="container wide">
+    <div class="kicker reveal">04 / VALIDERING</div>
+    <h2 class="section-title reveal">VI BEREGNEDE DET — OG TRAK DEN I STYKKER.</h2>
+    <p class="sub reveal">CFD (Autodesk) · analytisk bjælkebøjning · destruktiv last-test af prototypen.</p>
+    <div class="split-grid reveal">
+      <figure class="split">
+        <img src="assets/images/figurer/cfd_arm.png" alt="CFD af armkanaler">
+        <figcaption><strong>CFD — armkanaler</strong><br>Strømningsregime i armrørets profil</figcaption>
+      </figure>
+      <figure class="split">
+        <img src="assets/images/figurer/fea_styrke.png" alt="Spændingsanalyse">
+        <figcaption><strong>Spændingsanalyse</strong><br>σ<sub>max</sub> ≈ 10,1 MPa · SF ≈ 5,0</figcaption>
+      </figure>
+    </div>
+    <div class="data-row reveal" style="margin-bottom:40px">
+      <div class="datum"><span class="datum-num"><span data-count="10.1" data-decimals="1">0</span></span><span class="datum-unit">MPa</span><span class="datum-label">Cantilever-spænding</span></div>
+      <div class="datum"><span class="datum-num"><span data-count="287">0</span></span><span class="datum-unit">N</span><span class="datum-label">Belastning inkl. arm</span></div>
+      <div class="datum"><span class="datum-num"><span data-count="75">0</span></span><span class="datum-unit">mm</span><span class="datum-label">Tyngdepunkt forbi yderpunkt</span></div>
+      <div class="datum"><span class="datum-num"><span data-count="5.0" data-decimals="1">0</span></span><span class="datum-unit">SF</span><span class="datum-label">Sikkerhedsfaktor</span></div>
+    </div>
+    <div class="test-result reveal">
+      <div class="big-stat"><span class="datum-num accent" data-count="312">0</span><span class="datum-unit">N</span></div>
+      <div class="stat-text">målt brudlast i destruktiv test — overstiger driftslasten med faktor &gt; 2.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== 6 — MATERIALE & ENHEDSPRIS ====================== -->
+<section id="s6" class="snap-section">
+  <div class="container">
+    <div class="kicker reveal">05 / MATERIALE &amp; ENHEDSPRIS</div>
+    <h2 class="section-title reveal">ESD-PETG — OG FAKTOR <span class="accent giant">150×</span> BILLIGERE.</h2>
+    <p class="sub reveal">Vægtet beslutningsmatrice mod AES, ASA og PA-GF. Materialeomkostning for sugehoved, ekskl. ventilator.</p>
+    <div class="material-grid reveal">
+      <div class="material accent-border">
+        <div class="mat-name">ESD-PETG</div>
+        <div class="mat-stat"><span data-count="127">0</span> V</div>
+        <div class="mat-label">målt overfladespænding<span class="small">krav &lt; 170 V — Klasse 0 ✓</span></div>
+      </div>
+      <div class="material">
+        <div class="mat-name">Overflade-Rs</div>
+        <div class="mat-stat">10<sup>7</sup> Ω</div>
+        <div class="mat-label">statisk-dissipativt område<span class="small">halvårlig re-måling anbefalet</span></div>
+      </div>
+      <div class="material">
+        <div class="mat-name">Genanvendelig</div>
+        <div class="mat-stat">100%</div>
+        <div class="mat-label">PETG kan recycles<span class="small">in-house FDM-print</span></div>
+      </div>
+    </div>
+    <div class="price-row reveal">
+      <div class="price-card">
+        <div class="price-label">Dette projekt</div>
+        <div class="price-num accent"><span data-count="19.54" data-decimals="2">0</span></div>
+        <div class="price-unit">DKK / enhed</div>
+      </div>
+      <div class="price-divider">vs.</div>
+      <div class="price-card">
+        <div class="price-label">Kommercielt alternativ</div>
+        <div class="price-num">~<span data-count="3000">0</span></div>
+        <div class="price-unit">DKK / enhed</div>
+      </div>
+    </div>
+    <p class="footnote reveal">FDM 3D-print, in-house. Kan opskaleres til alle stationer uden setup-omkostning.</p>
+  </div>
+</section>
+
+<!-- ====================== 7 — BUSINESS CASE (interaktiv finans) ====================== -->
+<section id="s7" class="snap-section">
+  <div class="container wide">
+    <div class="kicker reveal">06 / BUSINESS CASE</div>
+    <h2 class="section-title reveal">DET STÆRKESTE ARGUMENT<br>ER IKKE STYKPRISEN.</h2>
+    <div class="finans-layout reveal">
+
+      <div class="finans-controls">
+        <h3>Justér forudsætningerne</h3>
+        <div class="slider-row">
+          <label>EMS-operatører <span class="val" data-out="operators">12</span></label>
+          <input type="range" id="f-operators" min="1" max="60" step="1" value="12">
+        </div>
+        <div class="slider-row">
+          <label>Sygedage / operatør / år <span class="val" data-out="sickdays">7,0</span></label>
+          <input type="range" id="f-sickdays" min="0" max="20" step="0.5" value="7">
+        </div>
+        <div class="slider-row">
+          <label>Andel damp-/luftvejsrelateret <span class="val" data-out="share">25 %</span></label>
+          <input type="range" id="f-share" min="0" max="100" step="5" value="25">
+        </div>
+        <div class="slider-row">
+          <label>Reduktion m. armrør <span class="val" data-out="reduction">60 %</span></label>
+          <input type="range" id="f-reduction" min="0" max="100" step="5" value="60">
+        </div>
+        <div class="slider-row">
+          <label>Arbejdsgiver-omkostning / sygedag <span class="val" data-out="daycost">2.800 kr.</span></label>
+          <input type="range" id="f-daycost" min="1000" max="5000" step="100" value="2800">
+        </div>
+        <div class="assumptions">
+          <strong>ESTIMAT — verificér med Terma.</strong><br>
+          Sygedags-omkostning og fraværsandel er modelantagelser fra offentlige danske
+          nøgletal. Enhedspris-besparelse = (3.000 − 19,54) kr. × antal enheder (1 pr. operatør).
+        </div>
+      </div>
+
+      <div class="finans-results">
+        <div class="headline-savings">
+          <div class="save-card">
+            <div class="save-num" id="save-unit">0 <span class="unit">kr.</span></div>
+            <div class="save-label">Engangs: produktion vs. indkøb</div>
+          </div>
+          <div class="save-card health">
+            <div class="save-num" id="save-health">0 <span class="unit">kr./år</span></div>
+            <div class="save-label">Reduceret sygefravær / år</div>
+          </div>
+          <div class="save-card total">
+            <div class="save-num" id="save-total">0 <span class="unit">kr.</span></div>
+            <div class="save-label">Samlet 1. år</div>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <h4>Sygefravær: nu vs. med armrør (dage/år)</h4>
+          <div class="chart-canvas-box"><canvas id="chart-sick"></canvas></div>
+        </div>
+        <div class="chart-wrap">
+          <h4>Akkumuleret økonomi over 5 år (kr.)</h4>
+          <div class="chart-canvas-box"><canvas id="chart-cum"></canvas></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ====================== 8 — KONKLUSION + NÆSTE SKRIDT + TAK ====================== -->
+<section id="s8" class="snap-section dark-section">
+  <div class="container">
+    <div class="kicker reveal">07 / KONKLUSION</div>
+    <h2 class="section-title reveal">DAMPEN FANGES VED KILDEN<br>— UDEN AT SPÆRRE SYNSFELTET.</h2>
+    <div class="closing-grid reveal">
+      <div>
+        <h3>Impact for Terma</h3>
+        <ul class="impact-list">
+          <li><span class="bullet">→</span> <strong>Arbejdsmiljø:</strong> reduceret eksponering for kolofonium-damp i EMS.</li>
+          <li><span class="bullet">→</span> <strong>Produktivitet:</strong> frit synsfelt — ingen tab af præcision.</li>
+          <li><span class="bullet">→</span> <strong>Opskalérbar:</strong> in-house print, ingen leverandørbinding.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Næste skridt</h3>
+        <ul class="next-list">
+          <li><span class="num">1</span> <div><strong>Rev. 2:</strong> rundede indvendige hjørner → mindre støj.</div></li>
+          <li><span class="num">2</span> <div><strong>Hot-wire-måling:</strong> kvantitativ verifikation af AT A.1.1.</div></li>
+          <li><span class="num">3</span> <div><strong>Cyklisk last-test:</strong> validér sikkerhedsfaktor over tid.</div></li>
+        </ul>
+      </div>
+    </div>
+    <div class="center-block">
+      <h2 class="display reveal" style="font-size:clamp(40px,6vw,90px)">TAK<span class="accent">.</span> &nbsp;SPØRGSMÅL?</h2>
+      <div class="footer-meta reveal">
+        Frederik · Maskiningeniør Trainee · VIA Horsens<br>
+        <span class="small">Procesventilation til Leica-mikroskop · i samarbejde med Terma A/S · 2026</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============ 3D CAD-MODEL MODAL (embedder assets/microscope-arm.html) ============ -->
+<div class="model-backdrop" id="model-backdrop" hidden></div>
+<div class="model-modal" id="model-modal" hidden role="dialog" aria-label="3D CAD-model">
+  <button class="model-close" id="close-model" aria-label="Luk">×</button>
+  <iframe id="model-frame" title="3D CAD-model af mikroskoparm" loading="lazy"></iframe>
+</div>
+
+<!-- ============ KEYBOARD HINT ============ -->
+<div class="kbd-hint" id="kbd-hint">
+  <kbd>↑</kbd><kbd>↓</kbd> sektion &nbsp;·&nbsp; <kbd>Space</kbd> næste &nbsp;·&nbsp; <kbd>F</kbd> fuldskærm
+</div>
+
+<!-- ============ SCRIPTS ============ -->
+<script src="assets/js/main.js"></script>
+<script src="assets/js/finans.js"></script>
+<script src="assets/js/photosmoke.js"></script>
+
+</body>
+</html>

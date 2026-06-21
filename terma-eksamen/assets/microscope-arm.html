@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Articulated Microscope Arm — Interactive Model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --graphite:#15181d;
+    --panel:#1c2127;
+    --panel-2:#21272f;
+    --line:#303741;
+    --steel:#4a525c;
+    --brass:#c8a24a;
+    --brass-lt:#e3c074;
+    --ink:#e8eaed;
+    --muted:#8b929c;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{
+    background:var(--graphite);
+    color:var(--ink);
+    font-family:"Space Grotesk",system-ui,sans-serif;
+    overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  #stage{position:fixed;inset:0;}
+  canvas{display:block;touch-action:none;}
+
+  /* ---- Title block (top-left) ---- */
+  .titlebar{
+    position:fixed;top:0;left:0;padding:20px 22px;
+    pointer-events:none;z-index:5;max-width:70vw;
+  }
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--brass);margin-bottom:6px;
+  }
+  .titlebar h1{
+    font-weight:600;font-size:clamp(18px,2.4vw,26px);
+    line-height:1.05;letter-spacing:-.01em;
+  }
+  .titlebar p{
+    margin-top:8px;color:var(--muted);font-size:13px;max-width:34ch;line-height:1.4;
+  }
+
+  /* ---- Telemetry HUD (the signature element) ---- */
+  .hud{
+    position:fixed;left:22px;bottom:22px;z-index:5;
+    background:rgba(28,33,39,.78);backdrop-filter:blur(8px);
+    border:1px solid var(--line);border-radius:10px;
+    padding:12px 14px;font-family:"IBM Plex Mono",monospace;
+    min-width:158px;
+  }
+  .hud .h-title{
+    font-size:10px;letter-spacing:.18em;color:var(--muted);
+    text-transform:uppercase;margin-bottom:8px;
+  }
+  .hud .row{display:flex;justify-content:space-between;gap:18px;font-size:12px;padding:2px 0;}
+  .hud .row .lbl{color:var(--muted);}
+  .hud .row .val{color:var(--brass-lt);font-weight:500;}
+
+  /* ---- Control panel ---- */
+  .controls{
+    position:fixed;right:18px;bottom:18px;z-index:6;width:288px;max-width:calc(100vw - 36px);
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:16px 16px 14px;
+    box-shadow:0 18px 40px rgba(0,0,0,.45);
+    max-height:calc(100vh - 36px);overflow-y:auto;
+  }
+  .controls .c-head{
+    display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;
+  }
+  .controls .c-head .k{
+    font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--brass);
+  }
+  .controls .c-head .hint{font-size:11px;color:var(--muted);}
+  .field{margin-bottom:13px;}
+  .field:last-of-type{margin-bottom:14px;}
+  .field label{
+    display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;color:var(--ink);
+  }
+  .field label .deg{font-family:"IBM Plex Mono",monospace;color:var(--muted);}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:3px;
+    background:linear-gradient(90deg,var(--steel),var(--line));outline:none;cursor:pointer;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;
+    background:var(--brass);border:2px solid #2a2017;cursor:grab;
+    box-shadow:0 1px 4px rgba(0,0,0,.5);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:18px;height:18px;border-radius:50%;background:var(--brass);
+    border:2px solid #2a2017;cursor:grab;
+  }
+  input[type=range]:focus-visible{box-shadow:0 0 0 3px rgba(200,162,74,.35);}
+  .btn-row{display:flex;gap:8px;}
+  button{
+    flex:1;font-family:"Space Grotesk",sans-serif;font-size:13px;font-weight:500;
+    color:var(--ink);background:var(--panel-2);border:1px solid var(--line);
+    border-radius:8px;padding:9px 10px;cursor:pointer;transition:border-color .15s,background .15s;
+  }
+  button:hover{border-color:var(--steel);background:#272d35;}
+  button:focus-visible{outline:none;border-color:var(--brass);}
+  button.primary{background:rgba(200,162,74,.14);border-color:rgba(200,162,74,.5);color:var(--brass-lt);}
+
+  .loading{
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+    background:var(--graphite);z-index:20;font-family:"IBM Plex Mono",monospace;
+    color:var(--muted);font-size:12px;letter-spacing:.1em;transition:opacity .4s;
+  }
+
+  @media (max-width:640px){
+    .controls{right:10px;left:10px;bottom:10px;width:auto;}
+    .hud{display:none;}
+    .titlebar{padding:14px 16px;max-width:100vw;}
+    .titlebar p{display:none;}
+  }
+  @media (prefers-reduced-motion:reduce){ *{transition:none !important;} }
+
+  /* INDLEJRET i slide (#embed): skjul den tunge UI, vis kun den rene 3D-scene */
+  body.embed .titlebar, body.embed .hud, body.embed .controls{ display:none !important; }
+</style>
+</head>
+<body>
+  <div id="stage"></div>
+
+  <div class="titlebar">
+    <div class="eyebrow">Project Exam · Interactive Model</div>
+    <h1>Cantilever Microscope Rig</h1>
+    <p>Bench-clamped two-link arm. Drag the canvas to orbit, scroll or pinch to zoom, and use the joint controls to reposition the scope.</p>
+  </div>
+
+  <div class="hud" id="hud">
+    <div class="h-title">Joint Telemetry</div>
+    <div class="row"><span class="lbl">Base</span><span class="val" id="t-base">0°</span></div>
+    <div class="row"><span class="lbl">Shoulder</span><span class="val" id="t-shoulder">0°</span></div>
+    <div class="row"><span class="lbl">Elbow</span><span class="val" id="t-elbow">0°</span></div>
+    <div class="row"><span class="lbl">Head</span><span class="val" id="t-head">0°</span></div>
+    <div class="row"><span class="lbl">Arm capture</span><span class="val" id="t-capture-arm" style="color:#6fbf73;">OFF</span></div>
+    <div class="row"><span class="lbl">Floor capture</span><span class="val" id="t-capture-floor" style="color:#6fbf73;">OFF</span></div>
+    <div class="row"><span class="lbl">Tube → smoke</span><span class="val" id="t-floordist">0.00 / 0.50</span></div>
+  </div>
+
+  <div class="controls">
+    <div class="c-head"><span class="k">Joint Controls</span><span class="hint">forward kinematics</span></div>
+    <div class="field">
+      <label>Base rotation <span class="deg" id="d-base">0°</span></label>
+      <input type="range" id="s-base" min="-180" max="180" value="-25" step="1">
+    </div>
+    <div class="field">
+      <label>Shoulder <span class="deg" id="d-shoulder">0°</span></label>
+      <input type="range" id="s-shoulder" min="-70" max="35" value="-30" step="1">
+    </div>
+    <div class="field">
+      <label>Elbow <span class="deg" id="d-elbow">0°</span></label>
+      <input type="range" id="s-elbow" min="-10" max="120" value="70" step="1">
+    </div>
+    <div class="field">
+      <label>Head tilt <span class="deg" id="d-head">0°</span></label>
+      <input type="range" id="s-head" min="-45" max="45" value="0" step="1">
+    </div>
+    <div class="field">
+      <label>Smoke volume <span class="deg" id="d-smoke">90</span></label>
+      <input type="range" id="s-smoke" min="20" max="150" value="90" step="5">
+    </div>
+    <div class="field">
+      <label>Floor tube distance <span class="deg" id="d-floordist">0.38</span></label>
+      <input type="range" id="s-floordist" min="0.1" max="1.2" value="0.38" step="0.01">
+    </div>
+    <div class="field">
+      <label>Floor tube angle <span class="deg" id="d-floorangle">350°</span></label>
+      <input type="range" id="s-floorangle" min="0" max="360" value="350" step="1">
+    </div>
+    <div class="field">
+      <label>Extraction systems</label>
+      <div class="btn-row">
+        <button id="toggle-arm" class="primary">Arm: ON</button>
+        <button id="toggle-floor">Floor tube: OFF</button>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button id="reset-arm">Reset pose</button>
+      <button id="reset-view" class="primary">Reset view</button>
+    </div>
+  </div>
+
+  <div class="loading" id="loading">BUILDING SCENE…</div>
+
+<script>
+// ---- surface any runtime error onto the loading panel instead of hanging ----
+function showErr(msg){
+  var l=document.getElementById('loading'); if(!l) return;
+  l.style.opacity=1; l.style.flexDirection='column';
+  l.innerHTML='<div style="color:#e3c074;letter-spacing:.12em;margin-bottom:10px;">SCENE ERROR</div>'+
+    '<div style="max-width:82vw;text-align:center;color:#8b929c;font-size:11px;line-height:1.6;">'+String(msg)+'</div>';
+}
+window.addEventListener('error', function(e){ showErr(e.message||e); });
+
+// ---- resilient three.js loader: tries several sources ----
+var CDNS=[
+  'vendor/three.min.js',                                                  // LOKAL → virker offline + file://
+  'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
+  'https://unpkg.com/three@0.128.0/build/three.min.js',
+  'https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js'
+];
+function loadThree(i){
+  if(i>=CDNS.length){
+    showErr('Could not load the 3D library from any source. This preview is blocking external scripts — use the Download button and open the file in a normal browser tab, where it will run.');
+    return;
+  }
+  var s=document.createElement('script');
+  s.src=CDNS[i];
+  s.onload=function(){ if(typeof THREE!=='undefined'){ try{ boot(); }catch(err){ showErr(err.message||err); } } else { loadThree(i+1); } };
+  s.onerror=function(){ loadThree(i+1); };
+  document.head.appendChild(s);
+}
+loadThree(0);
+
+function boot(){
+const D2R = Math.PI/180;
+
+// ---------- Renderer / scene / camera ----------
+const container = document.getElementById('stage');
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputEncoding = THREE.sRGBEncoding;
+container.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x15181d);
+scene.fog = new THREE.Fog(0x15181d, 16, 34);
+
+const camera = new THREE.PerspectiveCamera(42, window.innerWidth/window.innerHeight, 0.1, 100);
+
+// ---------- Lights ----------
+scene.add(new THREE.HemisphereLight(0xbcc6d4, 0x202329, 0.65));
+const key = new THREE.DirectionalLight(0xfff2dd, 1.15);
+key.position.set(6, 11, 5);
+key.castShadow = true;
+key.shadow.mapSize.set(2048,2048);
+key.shadow.camera.near = 1; key.shadow.camera.far = 40;
+key.shadow.camera.left=-10; key.shadow.camera.right=10;
+key.shadow.camera.top=10; key.shadow.camera.bottom=-10;
+key.shadow.bias = -0.0004;
+scene.add(key);
+const fill = new THREE.DirectionalLight(0x6f7d92, 0.4);
+fill.position.set(-7, 4, -6);
+scene.add(fill);
+
+// ---------- Materials ----------
+const matBench   = new THREE.MeshStandardMaterial({color:0x2a2f37, roughness:0.85, metalness:0.1});
+const matLeg     = new THREE.MeshStandardMaterial({color:0x191d22, roughness:0.6, metalness:0.5});
+const matSteel   = new THREE.MeshStandardMaterial({color:0x4a525c, roughness:0.45, metalness:0.85});
+const matDark    = new THREE.MeshStandardMaterial({color:0x2f353d, roughness:0.5, metalness:0.7});
+const matBrass   = new THREE.MeshStandardMaterial({color:0xc8a24a, roughness:0.3, metalness:0.95});
+const matGlass   = new THREE.MeshStandardMaterial({color:0x101418, roughness:0.15, metalness:0.2});
+const matSlide   = new THREE.MeshStandardMaterial({color:0xb9d4d8, roughness:0.1, metalness:0.0, transparent:true, opacity:0.55});
+
+function cyl(rt, rb, h, mat, seg=32){ const m=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,seg), mat); m.castShadow=true; m.receiveShadow=true; return m; }
+function box(w,h,d, mat){ const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d), mat); m.castShadow=true; m.receiveShadow=true; return m; }
+function torus(r, t, mat){ const m=new THREE.Mesh(new THREE.TorusGeometry(r,t,12,28), mat); m.castShadow=true; return m; }
+
+// ---------- Bench ----------
+const bench = new THREE.Group();
+const top = box(9, 0.35, 6, matBench); top.position.y = 0; bench.add(top);
+[[-4,-2.6],[4,-2.6],[-4,2.6],[4,2.6]].forEach(([x,z])=>{
+  const leg = box(0.4,4,0.4, matLeg); leg.position.set(x,-2.1,z); bench.add(leg);
+});
+// glass slide on the bench under the scope
+const slide = box(0.9,0.04,0.35, matSlide); slide.position.set(0.2,0.19,0); bench.add(slide);
+bench.position.y = 0;
+scene.add(bench);
+
+// ---------- Mount / clamp on bench edge ----------
+const mount = new THREE.Group();
+const clamp = box(0.7,0.5,1.0, matDark); clamp.position.set(-3.4,0.42,1.9); mount.add(clamp);
+const post = cyl(0.16,0.18,2.1, matSteel); post.position.set(-3.4,1.4,1.9); mount.add(post);
+scene.add(mount);
+
+// ---------- Articulated arm (forward kinematics chain) ----------
+// armBase (yaw) -> shoulder (pitch) -> link1 -> elbow (pitch) -> link2 -> wrist (head tilt) -> microscope
+const L1 = 2.2, L2 = 1.9;
+
+const armBase = new THREE.Group();
+armBase.position.set(-3.4, 2.35, 1.9);        // top of post
+scene.add(armBase);
+
+// little shoulder hub
+const hub = cyl(0.22,0.22,0.5, matSteel); hub.rotation.z=Math.PI/2; armBase.add(hub);
+
+const shoulder = new THREE.Group();
+armBase.add(shoulder);
+
+const link1 = box(L1,0.28,0.34, matDark); link1.position.x = L1/2; shoulder.add(link1);
+const l1cap = cyl(0.17,0.17,0.4, matSteel); l1cap.rotation.z=Math.PI/2; shoulder.add(l1cap);
+
+const elbow = new THREE.Group();
+elbow.position.x = L1; shoulder.add(elbow);
+const elbowHub = cyl(0.17,0.17,0.42, matSteel); elbowHub.rotation.z=Math.PI/2; elbow.add(elbowHub);
+
+const link2 = box(L2,0.24,0.3, matDark); link2.position.x = L2/2; elbow.add(link2);
+
+const wrist = new THREE.Group();
+wrist.position.x = L2; elbow.add(wrist);
+const wristHub = cyl(0.15,0.15,0.36, matSteel); wristHub.rotation.z=Math.PI/2; wrist.add(wristHub);
+
+// ---------- Microscope head (hangs down from wrist) ----------
+const scope = new THREE.Group();
+wrist.add(scope);
+
+const arm = box(0.3,0.32,0.3, matSteel); arm.position.y=-0.18; scope.add(arm);            // bracket
+const bodyBox = box(0.34,0.58,0.34, matBrass); bodyBox.position.y=-0.5; scope.add(bodyBox); // square body, not a tube
+// angled eyepiece
+const eyepiece = cyl(0.1,0.12,0.32, matBrass); eyepiece.position.set(0,-0.28,0.2); eyepiece.rotation.x=0.6; scope.add(eyepiece);
+const eyeGlass = cyl(0.07,0.07,0.03, matGlass); eyeGlass.position.set(0,-0.14,0.32); eyeGlass.rotation.x=0.6; scope.add(eyeGlass);
+// focus knobs
+const knobL = torus(0.11,0.04, matSteel); knobL.position.set(0.19,-0.55,0); knobL.rotation.y=Math.PI/2; scope.add(knobL);
+const knobR = torus(0.11,0.04, matSteel); knobR.position.set(-0.19,-0.55,0); knobR.rotation.y=Math.PI/2; scope.add(knobR);
+// nosepiece + objectives
+const nose = box(0.3,0.14,0.3, matDark); nose.position.y=-0.86; scope.add(nose);
+[[-25,0.1],[10,0.11],[28,0.09]].forEach(([deg,len])=>{
+  const obj = cyl(0.045,0.06,len*2, matBrass);
+  const a = deg*D2R;
+  obj.position.set(Math.sin(a)*0.1, -0.98, Math.cos(a)*0.1 - 0.01);
+  scope.add(obj);
+});
+const objMain = cyl(0.04,0.05,0.18, matBrass); objMain.position.y=-1.01; scope.add(objMain);
+
+// ---------- Exhaust extraction ring + hose run (ring sits between chassis and nosepiece) ----------
+// Bright, distinctive safety-orange tubing so it reads clearly against the steel/brass rig.
+const matHose = new THREE.MeshStandardMaterial({color:0xff5a1f, emissive:0x661f00, emissiveIntensity:0.35, roughness:0.45, metalness:0.05});
+const HOSE_Z = 0.22; // constant side-offset used for every segment — every joint in this arm rotates about local Z,
+                      // and a pure-Z offset is unaffected by a Z rotation, so a hose built at this exact offset on
+                      // every segment lines up perfectly at every joint for ANY pose, with zero visible gaps.
+function hoseSeg(len, mat){ const m=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,len,16), mat||matHose); m.castShadow=true; return m; }
+function hoseCap(x,y,z,parent,mat){ const s=new THREE.Mesh(new THREE.SphereGeometry(0.045,12,12), mat||matHose); s.castShadow=true; s.position.set(x,y,z); parent.add(s); return s; }
+
+// the ring itself, around the tube right where the nosepiece meets the body
+const exRing = torus(0.2, 0.032, matSteel);
+exRing.rotation.x = Math.PI/2;
+exRing.position.y = -0.80;
+scope.add(exRing);
+
+// two stub ports on the ring — attachment points for the tubing (port A is live, port B is a capped spare)
+const portA = cyl(0.045,0.045,0.10, matSteel); portA.rotation.x = Math.PI/2; portA.position.set(0,-0.80,0.21); scope.add(portA);
+const portB = cyl(0.045,0.045,0.10, matSteel); portB.rotation.z = Math.PI/2; portB.position.set(0.27,-0.80,0); scope.add(portB);
+
+// hose run 1: from the live port, straight up the side of the body to the wrist pivot — exactly scope-local (0,0,HOSE_Z)
+const hoseScope = hoseSeg(0.80); hoseScope.position.set(0,-0.40,HOSE_Z); scope.add(hoseScope);
+hoseCap(0,-0.80,HOSE_Z,scope); hoseCap(0,0,HOSE_Z,scope);
+
+// hose run 2: along link2, elbow -> wrist. End point sits exactly at the wrist pivot (x=L2), matching hose run 1 above.
+const hoseLink2 = hoseSeg(L2); hoseLink2.rotation.z=Math.PI/2; hoseLink2.position.set(L2/2,0,HOSE_Z); elbow.add(hoseLink2);
+hoseCap(0,0,HOSE_Z,elbow); hoseCap(L2,0,HOSE_Z,elbow);
+
+// hose run 3: along link1, shoulder -> elbow. End point sits exactly at the elbow pivot (x=L1).
+const hoseLink1 = hoseSeg(L1); hoseLink1.rotation.z=Math.PI/2; hoseLink1.position.set(L1/2,0,HOSE_Z); shoulder.add(hoseLink1);
+hoseCap(0,0,HOSE_Z,shoulder); hoseCap(L1,0,HOSE_Z,shoulder);
+
+// flexible service loop at the base — absorbs the base's yaw rotation (the one joint not sharing the Z-axis above)
+const loopGroup = new THREE.Group(); loopGroup.position.set(0,0,HOSE_Z); armBase.add(loopGroup);
+for(let i=0;i<3;i++){ const c=torus(0.16,0.028,matHose); c.rotation.x=Math.PI/2; c.position.y = i*0.07; loopGroup.add(c); }
+hoseCap(0,0,HOSE_Z,armBase);
+
+// hose run 4: down the post to the exhaust manifold mounted at the bench
+const hosePost = hoseSeg(1.78); hosePost.position.set(-3.4+HOSE_Z*0.3,1.46,1.9+HOSE_Z); scene.add(hosePost);
+hoseCap(-3.4+HOSE_Z*0.3,2.35,1.9+HOSE_Z,scene); hoseCap(-3.4+HOSE_Z*0.3,0.57,1.9+HOSE_Z,scene);
+const exManifold = box(0.46,0.3,0.36, matDark); exManifold.position.set(-3.4+HOSE_Z*0.3,0.40,1.9+HOSE_Z); scene.add(exManifold);
+const exManifoldPort = cyl(0.05,0.05,0.16, matSteel); exManifoldPort.rotation.x=Math.PI/2; exManifoldPort.position.set(-3.4+HOSE_Z*0.3,0.40,1.9+HOSE_Z+0.18); scene.add(exManifoldPort);
+
+// invisible marker tracking the objective tip — used each frame to test proximity to the soldering station
+const scopeTip = new THREE.Object3D();
+scopeTip.position.set(0,-1.05,0);
+scope.add(scopeTip);
+
+// ---------- Soldering station — now centered on the table, at the plate placed earlier ----------
+const solderPos = new THREE.Vector3(0.2, 0.19, 0); // same spot as the glass slide/plate
+
+// ---------- Secondary exhaust system: a movable hose lying across the table (the "old" capture method) ----------
+const matHose2 = new THREE.MeshStandardMaterial({color:0x16c9d6, emissive:0x00474d, emissiveIntensity:0.35, roughness:0.5, metalness:0.05});
+function tubeBetween(p1,p2,mat,radius=0.045,parent=scene){
+  const dir = new THREE.Vector3().subVectors(p2,p1);
+  const len = dir.length();
+  const mid = new THREE.Vector3().addVectors(p1,p2).multiplyScalar(0.5);
+  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius,radius,len,12), mat);
+  mesh.position.copy(mid);
+  mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), dir.clone().normalize());
+  mesh.castShadow = true; mesh.receiveShadow = true;
+  parent.add(mesh);
+  return mesh;
+}
+const extractorAnchor = new THREE.Vector3(3.4, 0.21, 1.05); // fixed point where the old extractor box sits
+const floorNozzlePos = new THREE.Vector3(); // recomputed by rebuildFloorTube() from the sliders below
+const floorTubeGroup = new THREE.Group(); scene.add(floorTubeGroup);
+const floorNozzleMesh = cyl(0.1,0.045,0.12, matSteel); scene.add(floorNozzleMesh);
+let floorTubeDist = 0.38, floorTubeAngle = 350; // degrees — adjustable via the sliders, so placement can be dialed in exactly
+
+function rebuildFloorTube(){
+  while(floorTubeGroup.children.length) floorTubeGroup.remove(floorTubeGroup.children[0]);
+  const rad = floorTubeAngle * D2R;
+  floorNozzlePos.set(
+    solderPos.x + Math.cos(rad)*floorTubeDist,
+    0.21,
+    solderPos.z + Math.sin(rad)*floorTubeDist
+  );
+  const start = extractorAnchor;
+  const dir = new THREE.Vector3().subVectors(floorNozzlePos, start);
+  const perpLen = Math.min(0.7, dir.length()*0.3);
+  const perp = new THREE.Vector3(-dir.z,0,dir.x).normalize().multiplyScalar(perpLen);
+  const p0 = start.clone();
+  const p1 = start.clone().lerp(floorNozzlePos,0.35).add(perp);
+  const p2 = start.clone().lerp(floorNozzlePos,0.7).add(perp.clone().multiplyScalar(-0.6));
+  const p3 = floorNozzlePos.clone();
+  const pts = [p0,p1,p2,p3];
+  for(let i=0;i<pts.length-1;i++) tubeBetween(pts[i],pts[i+1],matHose2,0.045,floorTubeGroup);
+  pts.forEach(p=>hoseCap(p.x,p.y,p.z,floorTubeGroup,matHose2));
+  floorNozzleMesh.position.copy(floorNozzlePos); floorNozzleMesh.position.y += 0.04;
+
+  const dist = Math.hypot(floorNozzlePos.x-solderPos.x, floorNozzlePos.z-solderPos.z);
+  const dEl = document.getElementById('t-floordist');
+  dEl.textContent = dist.toFixed(2)+' ('+(dist<=FLOOR_TIER1?'100%':dist<=FLOOR_TIER2?'50%':'25%')+')';
+  dEl.style.color = dist <= FLOOR_TIER1 ? '#16c9d6' : (dist <= FLOOR_TIER2 ? '#c8a24a' : '#8b929c');
+}
+
+// the old standalone extractor unit at the far end of the table (this part stays fixed)
+const extractorBox = box(0.5,0.5,0.4, matDark); extractorBox.position.set(3.4,0.45,1.05); scene.add(extractorBox);
+const extractorFan = cyl(0.16,0.16,0.04, matSteel); extractorFan.rotation.x=Math.PI/2; extractorFan.position.set(3.4,0.45,1.27); scene.add(extractorFan);
+
+// ---------- Soldering iron resting on the plate ----------
+const solderGroup = new THREE.Group(); solderGroup.position.copy(solderPos); scene.add(solderGroup);
+const solderStand = box(0.16,0.05,0.16, matDark); solderStand.position.set(0,0.02,0); solderGroup.add(solderStand);
+const solderIron = cyl(0.025,0.04,0.5, matDark); solderIron.rotation.z = 1.0; solderIron.position.set(0.05,0.18,0); solderGroup.add(solderIron);
+const solderTip = new THREE.Mesh(new THREE.SphereGeometry(0.025,10,10), new THREE.MeshStandardMaterial({color:0xff8a3d, emissive:0xff5500, emissiveIntensity:1.1}));
+solderTip.position.set(0.30,0.05,0); solderGroup.add(solderTip);
+const solderGlow = new THREE.PointLight(0xff7a30, 0.6, 1.4); solderGlow.position.set(0.30,0.08,0); solderGroup.add(solderGlow);
+
+// smoke particle pool — simple soft-circle sprites; behavior switches between "rising" and "captured" each frame
+const smokeCanvas = document.createElement('canvas'); smokeCanvas.width = smokeCanvas.height = 64;
+const sctx = smokeCanvas.getContext('2d');
+const grad = sctx.createRadialGradient(32,32,0,32,32,32);
+grad.addColorStop(0,'rgba(225,225,225,0.85)'); grad.addColorStop(0.5,'rgba(200,200,200,0.4)'); grad.addColorStop(1,'rgba(200,200,200,0)');
+sctx.fillStyle = grad; sctx.fillRect(0,0,64,64);
+const smokeTex = new THREE.CanvasTexture(smokeCanvas);
+
+function respawnSmoke(p){
+  p.age = 0;
+  p.x = solderPos.x + (Math.random()-0.5)*0.05;
+  p.z = solderPos.z + (Math.random()-0.5)*0.05;
+  p.y = solderPos.y + 0.08;
+  p.spr.position.set(p.x,p.y,p.z);
+  p.spr.material.opacity = 0;
+}
+function initSmokeAt(p, age){
+  // fast-forwards a particle's normal rise physics by `age` seconds, so the initial plume looks continuous
+  // (evenly staggered) rather than a single patch of puffs all starting from nothing at once.
+  p.age = age;
+  p.x = solderPos.x + (Math.random()-0.5)*0.05 + p.dx*age;
+  p.z = solderPos.z + (Math.random()-0.5)*0.05 + p.dz*age;
+  p.y = solderPos.y + 0.08 + 0.56*age + 0.05*age*age*0.5;
+  p.spr.position.set(p.x,p.y,p.z);
+  const t = Math.min(1, age/p.life);
+  p.spr.material.opacity = t<0.18 ? (t/0.18)*0.5 : Math.max(0,0.5*(1-(t-0.18)/0.82));
+  p.spr.scale.setScalar(0.12+t*0.65);
+}
+
+const SMOKE_MAX = 150;       // full pool, pre-allocated
+let smokeActive = 90;        // currently visible/simulated count — adjustable via the Smoke volume slider
+const smoke = [];
+for(let i=0;i<SMOKE_MAX;i++){
+  const mat = new THREE.SpriteMaterial({map:smokeTex, transparent:true, depthWrite:false, opacity:0});
+  const spr = new THREE.Sprite(mat);
+  spr.scale.set(0.1,0.1,1);
+  scene.add(spr);
+  const life = 2.2+Math.random()*1.4;
+  const obj = {spr, age:0, life, dx:(Math.random()-0.5)*0.12, dz:(Math.random()-0.5)*0.12};
+  smoke.push(obj);
+  initSmokeAt(obj, (i/SMOKE_MAX)*life); // evenly stagger starting ages around the full life cycle
+}
+
+const CAPTURE_RADIUS = 1.65;   // arm system — increased 3x, still a hard capture radius
+const FLOOR_TIER1 = 0.5;       // 0 – 0.5  → 100% extraction
+const FLOOR_TIER2 = 1.0;       // 0.5 – 1.0 → 50% extraction
+                                // above 1.0 → 25% extraction (constant, no further falloff)
+function floorEfficiency(dist){
+  if(dist <= FLOOR_TIER1) return 1.0;
+  if(dist <= FLOOR_TIER2) return 0.5;
+  return 0.25;
+}
+let armEnabled = true, floorEnabled = false;
+
+const _tipVec = new THREE.Vector3();
+function updateSmoke(dt){
+  scopeTip.getWorldPosition(_tipVec);
+  let armAnyCaptured = false, floorAnyCaptured = false;
+
+  for(let idx=0; idx<smoke.length; idx++){
+    const p = smoke[idx];
+    if(idx >= smokeActive){ p.spr.material.opacity = 0; continue; }
+    p.age += dt;
+    const armDist = armEnabled ? Math.hypot(_tipVec.x-p.x, _tipVec.y-p.y, _tipVec.z-p.z) : Infinity;
+    const armOK = armDist < CAPTURE_RADIUS;
+    const floorDist = floorEnabled ? Math.hypot(floorNozzlePos.x-p.x, floorNozzlePos.y-p.y, floorNozzlePos.z-p.z) : Infinity;
+    const floorEff = floorEnabled ? floorEfficiency(floorDist) : 0;
+
+    if(armOK){
+      // arm inlet: full-strength capture, exactly as before — pulled in, shrinking and fading as it nears the inlet
+      armAnyCaptured = true;
+      p.x += (_tipVec.x-p.x)*Math.min(1,4.2*dt);
+      p.y += (_tipVec.y-p.y)*Math.min(1,4.2*dt);
+      p.z += (_tipVec.z-p.z)*Math.min(1,4.2*dt);
+      const d = Math.hypot(_tipVec.x-p.x,_tipVec.y-p.y,_tipVec.z-p.z);
+      p.spr.material.opacity = Math.max(0, Math.min(0.55, d*1.3));
+      p.spr.scale.setScalar(Math.max(0.04, 0.22*Math.min(1,d*2)));
+      p.spr.position.set(p.x,p.y,p.z);
+      if(d < 0.08) respawnSmoke(p);
+    } else if(floorEff > 0){
+      // floor tube: partial suction — pull strength is one of three fixed tiers (100% / 50% / 25%) based on distance.
+      // The uncaptured remainder keeps rising/drifting normally, so at lower tiers most smoke still escapes upward.
+      if(floorEff > 0.7) floorAnyCaptured = true;
+      const pull = Math.min(1,4.2*dt)*floorEff;
+      p.x += (floorNozzlePos.x-p.x)*pull + p.dx*dt*(1-floorEff);
+      p.z += (floorNozzlePos.z-p.z)*pull + p.dz*dt*(1-floorEff);
+      p.y += (floorNozzlePos.y-p.y)*pull + (0.56+p.age*0.1)*dt*(1-floorEff);
+      const d = Math.hypot(floorNozzlePos.x-p.x,floorNozzlePos.y-p.y,floorNozzlePos.z-p.z);
+      const t = p.age/p.life;
+      const riseOpacity = t<0.18 ? (t/0.18)*0.5 : Math.max(0,0.5*(1-(t-0.18)/0.82));
+      p.spr.material.opacity = floorEff*Math.max(0,Math.min(0.55,d*1.3)) + (1-floorEff)*riseOpacity;
+      p.spr.scale.setScalar(0.12 + t*0.65*(1-floorEff) + Math.max(0,0.22*Math.min(1,d*2))*floorEff);
+      p.spr.position.set(p.x,p.y,p.z);
+      if(d < 0.08 || p.age >= p.life) respawnSmoke(p);
+    } else {
+      // free rise + gentle drift + fade — fully uncaptured smoke
+      p.x += p.dx*dt; p.z += p.dz*dt; p.y += (0.56+p.age*0.1)*dt;
+      const t = p.age/p.life;
+      p.spr.material.opacity = t<0.18 ? (t/0.18)*0.5 : Math.max(0,0.5*(1-(t-0.18)/0.82));
+      p.spr.scale.setScalar(0.12 + t*0.65);
+      p.spr.position.set(p.x,p.y,p.z);
+      if(p.age >= p.life) respawnSmoke(p);
+    }
+  }
+
+  const armHud = document.getElementById('t-capture-arm');
+  armHud.textContent = armAnyCaptured ? 'ON' : 'OFF';
+  armHud.style.color = armAnyCaptured ? '#e3c074' : '#6fbf73';
+  const floorHud = document.getElementById('t-capture-floor');
+  floorHud.textContent = floorAnyCaptured ? 'ON' : 'OFF';
+  floorHud.style.color = floorAnyCaptured ? '#16c9d6' : '#6fbf73';
+}
+
+// ---------- ground shadow catcher (subtle, beneath legs) ----------
+const shadowPlane = new THREE.Mesh(
+  new THREE.PlaneGeometry(40,40),
+  new THREE.ShadowMaterial({opacity:0.35})
+);
+shadowPlane.rotation.x = -Math.PI/2;
+shadowPlane.position.y = -4.1;
+shadowPlane.receiveShadow = true;
+scene.add(shadowPlane);
+
+// ---------- Apply joint state ----------
+const state = {base:-25, shoulder:-30, elbow:70, head:0};
+function applyState(){
+  armBase.rotation.y = state.base * D2R;
+  shoulder.rotation.z = state.shoulder * D2R;
+  elbow.rotation.z = state.elbow * D2R;
+  wrist.rotation.z = state.head * D2R;
+  // telemetry + labels
+  for(const k of ['base','shoulder','elbow','head']){
+    const v = Math.round(state[k]) + '°';
+    document.getElementById('t-'+k).textContent = v;
+    document.getElementById('d-'+k).textContent = v;
+  }
+}
+
+// ---------- Custom orbit controls (mouse + touch) ----------
+const orbit = {target:new THREE.Vector3(-1.6,0.4,0.6), radius:13, theta:0.7, phi:1.15};
+const DEFAULT = {...orbit, target:orbit.target.clone()};
+function updateCamera(){
+  orbit.phi = Math.max(0.15, Math.min(Math.PI-0.15, orbit.phi));
+  orbit.radius = Math.max(5, Math.min(26, orbit.radius));
+  const x = orbit.target.x + orbit.radius*Math.sin(orbit.phi)*Math.sin(orbit.theta);
+  const y = orbit.target.y + orbit.radius*Math.cos(orbit.phi);
+  const z = orbit.target.z + orbit.radius*Math.sin(orbit.phi)*Math.cos(orbit.theta);
+  camera.position.set(x,y,z);
+  camera.lookAt(orbit.target);
+}
+let dragging=false, lastX=0, lastY=0, pinchDist=0;
+const el = renderer.domElement;
+el.addEventListener('pointerdown', e=>{ if(e.isPrimary){dragging=true; lastX=e.clientX; lastY=e.clientY; el.setPointerCapture(e.pointerId);} });
+el.addEventListener('pointermove', e=>{
+  if(!dragging) return;
+  orbit.theta -= (e.clientX-lastX)*0.006;
+  orbit.phi   -= (e.clientY-lastY)*0.006;
+  lastX=e.clientX; lastY=e.clientY; updateCamera();
+});
+el.addEventListener('pointerup', ()=>dragging=false);
+el.addEventListener('pointercancel', ()=>dragging=false);
+el.addEventListener('wheel', e=>{ e.preventDefault(); orbit.radius += e.deltaY*0.012; updateCamera(); }, {passive:false});
+// pinch zoom
+el.addEventListener('touchmove', e=>{
+  if(e.touches.length===2){
+    const dx=e.touches[0].clientX-e.touches[1].clientX, dy=e.touches[0].clientY-e.touches[1].clientY;
+    const d=Math.hypot(dx,dy);
+    if(pinchDist) { orbit.radius += (pinchDist-d)*0.03; updateCamera(); }
+    pinchDist=d; dragging=false;
+  }
+}, {passive:true});
+el.addEventListener('touchend', ()=>{ pinchDist=0; });
+
+// ---------- Wire up sliders ----------
+function bindSlider(id, key){
+  const s=document.getElementById('s-'+id);
+  s.addEventListener('input', ()=>{ state[key]=+s.value; applyState(); });
+}
+bindSlider('base','base'); bindSlider('shoulder','shoulder');
+bindSlider('elbow','elbow'); bindSlider('head','head');
+
+document.getElementById('s-smoke').addEventListener('input', (e)=>{
+  smokeActive = +e.target.value;
+  document.getElementById('d-smoke').textContent = smokeActive;
+});
+document.getElementById('s-floordist').addEventListener('input', (e)=>{
+  floorTubeDist = +e.target.value;
+  document.getElementById('d-floordist').textContent = floorTubeDist.toFixed(2);
+  rebuildFloorTube();
+});
+document.getElementById('s-floorangle').addEventListener('input', (e)=>{
+  floorTubeAngle = +e.target.value;
+  document.getElementById('d-floorangle').textContent = floorTubeAngle+'°';
+  rebuildFloorTube();
+});
+
+document.getElementById('toggle-arm').onclick = (e)=>{
+  armEnabled = !armEnabled;
+  e.target.textContent = 'Arm: ' + (armEnabled?'ON':'OFF');
+  e.target.classList.toggle('primary', armEnabled);
+};
+document.getElementById('toggle-floor').onclick = (e)=>{
+  floorEnabled = !floorEnabled;
+  e.target.textContent = 'Floor tube: ' + (floorEnabled?'ON':'OFF');
+  e.target.classList.toggle('primary', floorEnabled);
+};
+document.getElementById('reset-arm').onclick = ()=>{
+  const defs={base:-25,shoulder:-30,elbow:70,head:0};
+  for(const k in defs){ state[k]=defs[k]; document.getElementById('s-'+k).value=defs[k]; }
+  applyState();
+};
+document.getElementById('reset-view').onclick = ()=>{
+  orbit.target.copy(DEFAULT.target); orbit.radius=DEFAULT.radius;
+  orbit.theta=DEFAULT.theta; orbit.phi=DEFAULT.phi; updateCamera();
+};
+
+// ---------- Resize + render ----------
+window.addEventListener('resize', ()=>{
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+const clock = new THREE.Clock();
+let EMBED = false;
+function loop(){
+  requestAnimationFrame(loop);
+  const dt = Math.min(0.05, clock.getDelta());
+  if(EMBED && !dragging){ orbit.theta += dt*0.16; updateCamera(); }  // blid auto-rotation når indlejret
+  updateSmoke(dt);
+  renderer.render(scene,camera);
+}
+
+// ---- Indlejrings-tilstand fra URL-hash: #arm / #floor (+ #embed) ----
+// Slide 2 bruger #floor&embed (løs slange, dårlig dækning), slide 4 bruger #arm&embed.
+(function initFromHash(){
+  const h = (location.hash||'').toLowerCase();
+  if(h.indexOf('floor')>=0){
+    armEnabled=false; floorEnabled=true;
+    floorTubeDist=1.05;  // langt fra kilden → kun delvis indfangning (resten stiger op)
+    const sd=document.getElementById('s-floordist'); if(sd) sd.value=floorTubeDist;
+    const dd=document.getElementById('d-floordist'); if(dd) dd.textContent=floorTubeDist.toFixed(2);
+  } else if(h.indexOf('arm')>=0){
+    armEnabled=true; floorEnabled=false;
+  }
+  // synk knap-tekster med tilstanden
+  const ta=document.getElementById('toggle-arm'), tf=document.getElementById('toggle-floor');
+  if(ta){ ta.textContent='Arm: '+(armEnabled?'ON':'OFF'); ta.classList.toggle('primary',armEnabled); }
+  if(tf){ tf.textContent='Floor tube: '+(floorEnabled?'ON':'OFF'); tf.classList.toggle('primary',floorEnabled); }
+  if(h.indexOf('embed')>=0){ EMBED=true; document.body.classList.add('embed'); }
+})();
+
+applyState();
+updateCamera();
+rebuildFloorTube();
+loop();
+const loading=document.getElementById('loading');
+loading.style.opacity=0; setTimeout(()=>loading.remove(),420);
+} // end boot()
+</script>
+</body>
+</html>
