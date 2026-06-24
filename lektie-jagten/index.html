@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Lektie-Jagten — Trivial Pursuit til studier</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --panel2:#1c2330; --line:#2a3242;
+    --text:#e6edf3; --muted:#8b97a7; --accent:#58a6ff;
+    --good:#3fb950; --bad:#f85149;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%}
+  body{
+    background:radial-gradient(1200px 800px at 50% -10%,#16202e,#0d1117 60%);
+    color:var(--text);font-family:"Segoe UI",system-ui,-apple-system,sans-serif;
+    display:flex;flex-direction:column;min-height:100%;overflow-x:hidden;
+  }
+  header{
+    padding:10px 14px;display:flex;align-items:center;gap:10px;
+    border-bottom:1px solid var(--line);background:rgba(13,17,23,.7);backdrop-filter:blur(6px);
+    position:sticky;top:0;z-index:5;
+  }
+  header h1{font-size:16px;margin:0;font-weight:700;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  .stats{margin-left:auto;display:flex;gap:14px;font-size:12px;color:var(--muted)}
+  .stats b{color:var(--text);font-size:14px}
+
+  /* layout: bræt + sidebar */
+  main{flex:1;display:flex;gap:14px;padding:14px;align-items:stretch}
+  .board-wrap{flex:1;display:flex;flex-direction:column;gap:12px;min-width:0}
+  .canvas-box{
+    position:relative;flex:1;background:var(--panel);border:1px solid var(--line);
+    border-radius:18px;overflow:hidden;min-height:300px;
+    box-shadow:inset 0 0 60px rgba(0,0,0,.35);
+  }
+  canvas{display:block;width:100%;height:100%;touch-action:none}
+
+  .controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center}
+  .die{
+    width:62px;height:62px;border-radius:14px;background:#fff;color:#111;
+    display:grid;place-items:center;font-size:30px;font-weight:800;
+    box-shadow:0 6px 18px rgba(0,0,0,.4);user-select:none;
+    position:relative;
+  }
+  .pips{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);
+    width:48px;height:48px;gap:2px}
+  .pips i{display:block;border-radius:50%;background:#111;align-self:center;justify-self:center;
+    width:11px;height:11px;visibility:hidden}
+  .btn{
+    border:0;border-radius:12px;padding:14px 22px;font-size:16px;font-weight:700;
+    background:var(--accent);color:#04101f;cursor:pointer;box-shadow:0 4px 14px rgba(88,166,255,.35);
+    transition:transform .08s, filter .15s;
+  }
+  .btn:active{transform:translateY(2px)}
+  .btn:disabled{filter:grayscale(.6) brightness(.7);cursor:not-allowed;box-shadow:none}
+  .btn.ghost{background:var(--panel2);color:var(--text);border:1px solid var(--line);box-shadow:none}
+
+  /* sidebar — farvebaren brugeren bad om */
+  .sidebar{
+    width:96px;flex:none;background:var(--panel);border:1px solid var(--line);
+    border-radius:18px;padding:12px 10px;display:flex;flex-direction:column;gap:8px;
+  }
+  .sidebar h2{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);
+    margin:0 0 2px;text-align:center}
+  .segwrap{flex:1;display:flex;flex-direction:column;gap:6px}
+  .seg{
+    flex:1;border-radius:10px;background:#0c1119;border:1px solid var(--line);
+    position:relative;overflow:hidden;display:flex;align-items:flex-end;
+    min-height:26px;
+  }
+  .seg .fill{position:absolute;inset:0;transform:scaleY(0);transform-origin:bottom;
+    transition:transform .6s cubic-bezier(.2,.9,.2,1);opacity:.92}
+  .seg .lbl{position:relative;z-index:2;font-size:10px;font-weight:700;width:100%;text-align:center;
+    padding:3px 2px;line-height:1.1;text-shadow:0 1px 2px rgba(0,0,0,.7);
+    color:#fff;mix-blend-mode:normal}
+  .seg.done .lbl::after{content:" ✓"}
+
+  /* modal */
+  .overlay{position:fixed;inset:0;background:rgba(5,8,12,.78);backdrop-filter:blur(4px);
+    display:none;align-items:center;justify-content:center;z-index:20;padding:16px}
+  .overlay.show{display:flex}
+  .card{
+    width:100%;max-width:440px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:18px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.6);
+    animation:pop .25s ease;
+  }
+  @keyframes pop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+  .catpill{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;
+    padding:5px 11px;border-radius:999px;margin-bottom:12px}
+  .catpill .dot{width:11px;height:11px;border-radius:50%}
+  .q{font-size:18px;line-height:1.35;margin:0 0 16px;font-weight:600}
+  .opts{display:flex;flex-direction:column;gap:9px}
+  .opt{
+    text-align:left;border:1px solid var(--line);background:var(--panel);color:var(--text);
+    padding:13px 14px;border-radius:12px;font-size:15px;cursor:pointer;transition:.12s;
+  }
+  .opt:hover{border-color:var(--accent)}
+  .opt.correct{background:rgba(63,185,80,.18);border-color:var(--good)}
+  .opt.wrong{background:rgba(248,81,73,.18);border-color:var(--bad)}
+  .opt:disabled{cursor:default}
+  .feedback{margin-top:14px;font-size:14px;min-height:20px;font-weight:600}
+  .feedback.good{color:var(--good)} .feedback.bad{color:var(--bad)}
+  .card .btn{width:100%;margin-top:14px;display:none}
+
+  .win h2{font-size:26px;margin:0 0 6px}
+  .win p{color:var(--muted);margin:0 0 14px}
+  .placeholder-note{
+    font-size:11px;color:var(--muted);text-align:center;padding:6px 14px;border-top:1px solid var(--line)
+  }
+
+  /* mobil portræt: sidebar bliver vandret stribe under brættet */
+  @media (max-width:620px){
+    main{flex-direction:column;padding:10px;gap:10px}
+    .sidebar{width:auto;flex-direction:row;align-items:stretch}
+    .sidebar h2{display:none}
+    .segwrap{flex-direction:row}
+    .seg{flex-direction:column;justify-content:flex-end;min-height:46px}
+    .seg .fill{transform-origin:bottom}
+    .seg .lbl{font-size:9px;padding:4px 1px}
+    header h1{font-size:14px}
+    .stats{gap:10px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎯 Lektie-<span>Jagten</span></h1>
+  <div class="stats">
+    <div>Point<br><b id="score">0</b></div>
+    <div>Kast<br><b id="rolls">0</b></div>
+    <div>Streak<br><b id="streak">0</b></div>
+  </div>
+</header>
+
+<main>
+  <div class="board-wrap">
+    <div class="canvas-box"><canvas id="board"></canvas></div>
+    <div class="controls">
+      <div class="die" id="die"><div class="pips" id="pips">
+        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      </div></div>
+      <button class="btn" id="rollBtn">🎲 Kast terning</button>
+      <button class="btn ghost" id="resetBtn">↺ Nyt spil</button>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <h2>Samling</h2>
+    <div class="segwrap" id="segwrap"></div>
+  </aside>
+</main>
+
+<div class="placeholder-note" id="note">
+  📘 DYN 2 — 7 lektioner · 42 spørgsmål fra dine egne slides (Hibbeler 17/18/22). Udvid frit i <code>QUESTIONS</code> nederst i filen.
+</div>
+
+<!-- Spørgsmåls-modal -->
+<div class="overlay" id="qOverlay">
+  <div class="card">
+    <div class="catpill" id="qCat"><span class="dot"></span><span class="name"></span></div>
+    <p class="q" id="qText"></p>
+    <div class="opts" id="qOpts"></div>
+    <div class="feedback" id="qFeedback"></div>
+    <button class="btn" id="qNext">Videre →</button>
+  </div>
+</div>
+
+<!-- Vinder-modal -->
+<div class="overlay" id="winOverlay">
+  <div class="card win" style="text-align:center">
+    <h2>🏆 Alle lektioner samlet!</h2>
+    <p id="winSub"></p>
+    <button class="btn" id="winAgain" style="display:block">Spil igen</button>
+  </div>
+</div>
+
+<script>
+/* ======================================================================
+   POPULÉR HER — alt indhold er data-drevet.
+   - CATEGORIES: én pr. lektion (navn + farve). Brættet + sidebaren
+     genereres automatisk uanset antal (prøv 4, 8, 12...).
+   - QUESTIONS:  spørgsmål pr. kategori-id. Lige nu placeholders.
+     Format: { q:"...", options:[...], answer: <index på korrekt> }
+   ====================================================================== */
+const CATEGORIES = [
+  { id:"kinetik1", name:"Kinetik I",       color:"#e6194b" },  // rød
+  { id:"kinetik2", name:"Kinetik II",      color:"#f58231" },  // orange
+  { id:"energi1",  name:"Energi I",        color:"#3cb44b" },  // grøn
+  { id:"energi2",  name:"Energi II",       color:"#14b8a6" },  // teal
+  { id:"vib1",     name:"Vibrationer I",   color:"#4363d8" },  // blå
+  { id:"vib2",     name:"Vibrationer II",  color:"#8b5cf6" },  // violet
+  { id:"vib3",     name:"Vibrationer III", color:"#e040c0" },  // magenta
+];
+
+// DYN 2-spørgsmål hentet fra Frederiks egne slides (Hibbeler kap. 17, 18, 22).
+const QUESTIONS = {
+  kinetik1:[ // HI 17.1 — masse-inertimoment
+    { q:"Hvad er SI-enheden for masse-inertimomentet I?", options:["kg·m","kg·m²","N·m","kg/m²"], answer:1 },
+    { q:"Parallelakse-teoremet (flyttesætningen) lyder?", options:["I = I_G + m·d²","I = I_G − m·d²","I = I_G·d²","I = m·d² / I_G"], answer:0 },
+    { q:"Flyttesætningen I = I_G + m·d² gælder…?", options:["for vilkårlige akser","kun for parallelle akser, og kun ud fra I_G","kun for akser gennem G","kun for vinkelrette akser"], answer:1 },
+    { q:"Gyrationsradius k er defineret ved?", options:["I = m·k² ⇒ k = √(I/m)","k = I·m","k = I / m","I = ½·m·k²"], answer:0 },
+    { q:"For en given akseretning er I_G (om massemidtpunktet)…?", options:["det maksimale inertimoment","det minimale inertimoment","altid nul","uafhængigt af massen"], answer:1 },
+    { q:"Bidraget til I fra et masseelement afhænger af?", options:["kun massen","den vinkelrette afstand til aksen","hastigheden","retningen af bevægelsen"], answer:1 },
+  ],
+  kinetik2:[ // HI 17.2–4 — Newton for stift legeme
+    { q:"Kraftligningen for et stift legeme?", options:["ΣF = I_G·α","ΣF = m·a_G","ΣF = m·α","ΣF = ½·m·a_G"], answer:1 },
+    { q:"Momentligningen om massemidtpunktet G?", options:["ΣM_G = I_G·α","ΣM_G = m·a_G","ΣM_G = 0 (altid)","ΣM_G = I_G·ω"], answer:0 },
+    { q:"Generel momentligning om et vilkårligt punkt P?", options:["ΣM_P = I_G·α","ΣM_P = I_G·α + r_{G/P} × m·a_G","ΣM_P = r_{G/P} × m·a_G","ΣM_P = I_O·α"], answer:1 },
+    { q:"Ved REN translation forsimples momentligningen til?", options:["ΣM_G = I_G·α","ΣM_G = 0","ΣF = 0","α = ω"], answer:1 },
+    { q:"Med fast rotationsakse i O reduceres momentligningen til?", options:["ΣM_O = I_O·α","ΣM_O = m·a_G","ΣM_O = I_G·ω","ΣM_O = 0"], answer:0 },
+    { q:"Hvad udtrykker princippet \"sum i FLD = sum i KD\"?", options:["energi er bevaret","summen af kræfter/momenter på frit-legeme-diagrammet er lig summen på det kinetiske diagram","impulsen er nul","ω er konstant"], answer:1 },
+  ],
+  energi1:[ // HI 18.1–4 — kinetisk energi, arbejde, arbejdssætningen
+    { q:"Kinetisk energi for et stift legeme i plan bevægelse?", options:["T = ½·m·v_G²","T = ½·m·v_G² + ½·I_G·ω²","T = ½·I_G·ω²","T = m·v_G²"], answer:1 },
+    { q:"Kinetisk energi ved rotation om en fast akse (eller IC) i O?", options:["T = ½·I_O·ω²","T = ½·m·v_G²","T = I_O·ω","T = ½·I_O·ω"], answer:0 },
+    { q:"En konstant krafts arbejde ved retlinet forskydning s?", options:["U = F·s","U = F·s·cos θ","U = ½·F·s","U = F·s²"], answer:1 },
+    { q:"Tyngdekraftens (vægtens) arbejde med y-aksen opad?", options:["U_W = m·g·Δy","U_W = −m·g·Δy","U_W = ½·m·g·Δy","U_W = −m·g·y²"], answer:1 },
+    { q:"Arbejdssætningen forbinder situation 1 og 2 som?", options:["T₁ + ΣU₁₋₂ = T₂","T₁ = T₂","ΣU₁₋₂ = 0","T₂ − T₁ = ΣF"], answer:0 },
+    { q:"Hvilken kraft laver IKKE noget arbejde?", options:["tyngdekraften ved et lodret fald","en fjederkraft","normalkraften fra en stationær overflade","et påført kraftpar"], answer:2 },
+  ],
+  energi2:[ // HI 18.5 — potentiel/mekanisk energi
+    { q:"Gravitationel potentiel energi (y-akse op)?", options:["V_g = m·g·y_G","V_g = −m·g·y_G","V_g = ½·m·g·y_G","V_g = m·g·y_G²"], answer:0 },
+    { q:"Elastisk potentiel energi i en fjeder (s = 0 afslappet)?", options:["V_e = k·s","V_e = ½·k·s²","V_e = ½·k·s","V_e = k·s²"], answer:1 },
+    { q:"En konservativ krafts arbejde udtrykt ved potentiel energi?", options:["U₁₋₂ = ΔV","U₁₋₂ = −ΔV = −(V₂ − V₁)","U₁₋₂ = V₂ + V₁","U₁₋₂ = ½·ΔV"], answer:1 },
+    { q:"Energiligningen (arbejdssætning med potentiel energi)?", options:["T₁ + V₁ + ΣU_andre = T₂ + V₂","T₁ + V₁ = T₂","V₁ = V₂","T₁ = T₂ + V₂"], answer:0 },
+    { q:"Hvornår er den mekaniske energi E_mek = T + V bevaret?", options:["altid","når der hverken er friktion eller 'andet' påført arbejde","kun ved rotation","kun for partikler"], answer:1 },
+    { q:"En kraft hvis arbejde KUN afhænger af start- og slutposition kaldes?", options:["dissipativ","konservativ","normal","viskos"], answer:1 },
+  ],
+  vib1:[ // HI 22.1 — fri udæmpet svingning
+    { q:"Bevægelsesligningen for et udæmpet masse-fjeder-system?", options:["ẍ + ω_n²·x = 0","ẍ + c·ẋ = 0","ẍ = g","m·ẍ = k·x"], answer:0 },
+    { q:"Egen-(vinkel)frekvensen ω_n for et masse-fjeder-system?", options:["√(m/k)","√(k/m)","k/m","2π·k/m"], answer:1 },
+    { q:"Generel løsning til ẍ + ω_n²·x = 0?", options:["x = A·sin ω_n t + B·cos ω_n t","x = A·e^(ω_n t)","x = A·t + B","x = A·sin t"], answer:0 },
+    { q:"Sammenhæng mellem amplituden C og konstanterne A, B?", options:["C = A + B","C = √(A² + B²)","C = A·B","C = A² + B²"], answer:1 },
+    { q:"Perioden τ udtrykt ved egenfrekvensen ω_n?", options:["τ = ω_n / 2π","τ = 2π / ω_n","τ = 1 / ω_n","τ = 2π·ω_n"], answer:1 },
+    { q:"Egenfrekvensen for en matematisk pendul (små udsving, længde l)?", options:["ω_n = √(l/g)","ω_n = √(g/l)","ω_n = g/l","ω_n = √(m·g/l)"], answer:1 },
+  ],
+  vib2:[ // HI 22.2 — energimetoden
+    { q:"Hvad udnytter energimetoden til at udlede bevægelsesligningen?", options:["at impulsen er nul","at den mekaniske energi er konstant (dE_mek/dt = 0) uden friktion","at ΣF = 0","at ω er konstant"], answer:1 },
+    { q:"Mekanisk energi for et vandret masse-fjeder-system?", options:["E = ½·m·v²","E = ½·m·v² + ½·k·x²","E = ½·k·x²","E = m·g·x"], answer:1 },
+    { q:"Differentieres E = ½·m·ẋ² + ½·k·x² mht. tiden og sættes = 0, fås?", options:["m·ẍ + k·x = 0","m·ẍ = k·x","ẋ = 0","k·x = 0"], answer:0 },
+    { q:"For pendlen er E = ½·m·l²·θ̇² − m·g·l·cos θ. Må cos θ erstattes med 1 FØR differentiation?", options:["ja","nej","kun for store θ","ligegyldigt"], answer:1 },
+    { q:"Hvilken egenfrekvens giver energimetoden for masse-fjeder?", options:["√(g/l)","√(k/m)","√(m·g·d/I_O)","k/m"], answer:1 },
+    { q:"Hvad er fordelen ved energimetoden frem for Newton-metoden?", options:["man slipper for at opstille frit-legeme-diagram med alle kræfter","den medregner altid friktion","den kræver ingen masse","den virker kun for pendul"], answer:0 },
+  ],
+  vib3:[ // HI 22.4 — dæmpede svingninger
+    { q:"Bevægelsesligning for et masse-fjeder-dashpot-system?", options:["m·ẍ + c·ẋ + k·x = 0","m·ẍ + k·x = 0","m·ẍ = c·ẋ","c·ẋ + k·x = 0"], answer:0 },
+    { q:"En dashpot (støddæmper) udvikler en kraft der er?", options:["konstant","viskos dæmpning, proportional med hastigheden (∝ ẋ)","proportional med x","tør friktion"], answer:1 },
+    { q:"Den kritiske dæmpningskoefficient c_c?", options:["c_c = m·ω_n","c_c = 2·m·ω_n","c_c = ½·m·ω_n","c_c = 2·m / ω_n"], answer:1 },
+    { q:"Hvornår svinger systemet (underdæmpet)?", options:["c > c_c","c = c_c","c < c_c","c = 2·c_c"], answer:2 },
+    { q:"Ved KRITISK dæmpning (c = c_c) er løsningen?", options:["x = (A + B·t)·e^(−γt), ingen reelle svingninger","x = D·sin(ω_d t + φ)","x = A·e^(λ₁t) + B·e^(λ₂t)","konstant"], answer:0 },
+    { q:"Den dæmpede vinkelfrekvens ω_d?", options:["ω_d = √(ω_n² − (c/2m)²)","ω_d = ω_n","ω_d = √(k/m)","ω_d = c / 2m"], answer:0 },
+  ],
+};
+
+/* ====================== SPIL-MOTOR (rør sjældent) ====================== */
+const SPACES_PER_CAT = 3;           // antal felter pr. kategori rundt på brættet
+const AGAIN_EVERY = 5;              // hvert n'te felt = "kast igen"
+
+const cv = document.getElementById('board');
+const ctx = cv.getContext('2d');
+let W=0,H=0,DPR=1;
+
+// byg brættets felter
+let spaces = [];
+function buildSpaces(){
+  spaces = [];
+  const total = CATEGORIES.length * SPACES_PER_CAT;
+  for(let i=0;i<total;i++){
+    const cat = CATEGORIES[i % CATEGORIES.length];
+    const again = (i>0 && i % AGAIN_EVERY === 0);
+    spaces.push({ cat, again });
+  }
+}
+
+// state
+let tokenIndex = 0;
+let tokenPos = 0;          // float-position til animation
+let earned = new Set();
+let score = 0, rolls = 0, streak = 0;
+let busy = false;          // låser input under animation/spørgsmål
+let pendingCat = null;
+
+// geometri
+function layout(){
+  const box = cv.parentElement.getBoundingClientRect();
+  DPR = Math.min(window.devicePixelRatio||1, 2);
+  W = box.width; H = box.height;
+  cv.width = W*DPR; cv.height = H*DPR;
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+function spacePoint(i){
+  const n = spaces.length;
+  const t = (i/n)*Math.PI*2 - Math.PI/2;     // start i toppen
+  const cx=W/2, cy=H/2;
+  const rx = W*0.40, ry = H*0.40;
+  return { x: cx+Math.cos(t)*rx, y: cy+Math.sin(t)*ry, cx, cy };
+}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  const cx=W/2, cy=H/2;
+
+  // forbindelses-ring
+  ctx.beginPath();
+  for(let i=0;i<=spaces.length;i++){
+    const p=spacePoint(i%spaces.length);
+    i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);
+  }
+  ctx.closePath();
+  ctx.strokeStyle="rgba(255,255,255,.06)"; ctx.lineWidth=14; ctx.stroke();
+
+  // felter
+  const r = Math.max(10, Math.min(W,H)*0.045);
+  spaces.forEach((s,i)=>{
+    const p=spacePoint(i);
+    ctx.beginPath(); ctx.arc(p.x,p.y,r,0,Math.PI*2);
+    ctx.fillStyle = s.again ? "#2a3242" : s.cat.color;
+    ctx.fill();
+    ctx.lineWidth=2; ctx.strokeStyle="rgba(0,0,0,.35)"; ctx.stroke();
+    if(s.again){
+      ctx.fillStyle="#ffd21f"; ctx.font=`bold ${r}px Segoe UI`;
+      ctx.textAlign="center"; ctx.textBaseline="middle";
+      ctx.fillText("★",p.x,p.y+1);
+    }
+  });
+
+  // center-hjul (tærter der lyser op når man har dem)
+  const hubR = Math.min(W,H)*0.20;
+  CATEGORIES.forEach((c,i)=>{
+    const a0 = (i/CATEGORIES.length)*Math.PI*2 - Math.PI/2;
+    const a1 = ((i+1)/CATEGORIES.length)*Math.PI*2 - Math.PI/2;
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,hubR,a0,a1); ctx.closePath();
+    ctx.fillStyle = earned.has(c.id) ? c.color : "rgba(255,255,255,.06)";
+    ctx.fill();
+    ctx.strokeStyle="rgba(13,17,23,.8)"; ctx.lineWidth=2; ctx.stroke();
+  });
+  ctx.beginPath(); ctx.arc(cx,cy,hubR*0.42,0,Math.PI*2);
+  ctx.fillStyle="#0d1117"; ctx.fill();
+  ctx.fillStyle="#e6edf3"; ctx.font=`bold ${hubR*0.28}px Segoe UI`;
+  ctx.textAlign="center"; ctx.textBaseline="middle";
+  ctx.fillText(`${earned.size}/${CATEGORIES.length}`,cx,cy);
+
+  // brik (animeret position)
+  const ip = Math.floor(tokenPos);
+  const frac = tokenPos - ip;
+  const a = spacePoint(ip % spaces.length);
+  const b = spacePoint((ip+1) % spaces.length);
+  const tx = a.x+(b.x-a.x)*frac, ty=a.y+(b.y-a.y)*frac;
+  ctx.beginPath(); ctx.arc(tx,ty,r*0.75,0,Math.PI*2);
+  ctx.fillStyle="#fff"; ctx.fill();
+  ctx.lineWidth=3; ctx.strokeStyle="#04101f"; ctx.stroke();
+  ctx.beginPath(); ctx.arc(tx,ty,r*0.32,0,Math.PI*2);
+  ctx.fillStyle="#04101f"; ctx.fill();
+}
+
+/* ---- sidebar ---- */
+function buildSidebar(){
+  const wrap=document.getElementById('segwrap');
+  wrap.innerHTML="";
+  CATEGORIES.forEach(c=>{
+    const seg=document.createElement('div');
+    seg.className="seg"; seg.dataset.id=c.id;
+    seg.innerHTML=`<div class="fill" style="background:${c.color}"></div>
+                   <div class="lbl">${c.name}</div>`;
+    wrap.appendChild(seg);
+  });
+}
+function refreshSidebar(){
+  document.querySelectorAll('.seg').forEach(seg=>{
+    const got = earned.has(seg.dataset.id);
+    seg.classList.toggle('done',got);
+    seg.querySelector('.fill').style.transform = got?'scaleY(1)':'scaleY(0)';
+  });
+}
+
+/* ---- HUD ---- */
+function hud(){
+  document.getElementById('score').textContent=score;
+  document.getElementById('rolls').textContent=rolls;
+  document.getElementById('streak').textContent=streak;
+}
+
+/* ---- terning ---- */
+const PIP_MAP={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
+function showDie(n){
+  const pips=document.querySelectorAll('#pips i');
+  pips.forEach((p,i)=>p.style.visibility = PIP_MAP[n].includes(i)?'visible':'hidden');
+}
+
+/* ---- terningekast + bevægelse ---- */
+function roll(){
+  if(busy) return;
+  busy=true; setControls(false);
+  rolls++; hud();
+  // visuel rul
+  let ticks=0;
+  const spin=setInterval(()=>{ showDie(1+Math.floor(Math.random()*6)); if(++ticks>9){
+    clearInterval(spin);
+    const n=1+Math.floor(Math.random()*6);
+    showDie(n);
+    moveBy(n);
+  }},60);
+}
+
+function moveBy(n){
+  let steps=n;
+  const stepOnce=()=>{
+    const target=tokenPos+1;
+    const t0=performance.now(), dur=140;
+    const start=tokenPos;
+    const anim=(now)=>{
+      const k=Math.min(1,(now-t0)/dur);
+      tokenPos=start+(target-start)*k;
+      draw();
+      if(k<1){requestAnimationFrame(anim);}
+      else{
+        tokenPos=target % spaces.length;
+        tokenIndex=Math.round(tokenPos)%spaces.length;
+        draw();
+        if(--steps>0) requestAnimationFrame(()=>stepOnce());
+        else landed();
+      }
+    };
+    requestAnimationFrame(anim);
+  };
+  stepOnce();
+}
+
+function landed(){
+  const s=spaces[tokenIndex];
+  if(s.again){
+    score+=5; hud();
+    flashNote("★ Kast igen! (+5)");
+    busy=false; setControls(true);
+    return;
+  }
+  askQuestion(s.cat);
+}
+
+/* ---- spørgsmål ---- */
+function askQuestion(cat){
+  pendingCat=cat;
+  const pool=QUESTIONS[cat.id]||[];
+  if(!pool.length){ // ingen spørgsmål → giv den bare
+    grant(cat,true,0); busy=false; setControls(true); return;
+  }
+  const item=pool[Math.floor(Math.random()*pool.length)];
+  const ov=document.getElementById('qOverlay');
+  const pill=document.getElementById('qCat');
+  pill.querySelector('.dot').style.background=cat.color;
+  pill.querySelector('.name').textContent=cat.name + (earned.has(cat.id)?" (allerede samlet — bonus)":"");
+  document.getElementById('qText').textContent=item.q;
+  const opts=document.getElementById('qOpts'); opts.innerHTML="";
+  const fb=document.getElementById('qFeedback'); fb.textContent=""; fb.className="feedback";
+  const next=document.getElementById('qNext'); next.style.display="none";
+
+  item.options.forEach((txt,i)=>{
+    const b=document.createElement('button');
+    b.className="opt"; b.textContent=txt;
+    b.onclick=()=>answer(i,item,cat,opts,fb,next);
+    opts.appendChild(b);
+  });
+  ov.classList.add('show');
+}
+
+function answer(choice,item,cat,opts,fb,next){
+  [...opts.children].forEach((b,i)=>{
+    b.disabled=true;
+    if(i===item.answer) b.classList.add('correct');
+    if(i===choice && choice!==item.answer) b.classList.add('wrong');
+  });
+  const correct = choice===item.answer;
+  if(correct){
+    const first=!earned.has(cat.id);
+    streak++;
+    const pts = (first?20:10) + (streak-1)*2;
+    score+=pts;
+    fb.className="feedback good";
+    fb.textContent = first ? `Rigtigt! Du samlede ${cat.name} (+${pts})`
+                           : `Rigtigt! Bonus (+${pts})`;
+    grant(cat,true);
+  }else{
+    streak=0;
+    fb.className="feedback bad";
+    fb.textContent="Forkert — prøv at lande på farven igen.";
+  }
+  hud();
+  next.style.display="block";
+  next.onclick=()=>{
+    document.getElementById('qOverlay').classList.remove('show');
+    busy=false; setControls(true);
+    if(earned.size===CATEGORIES.length) win();
+  };
+}
+
+function grant(cat,correct){
+  if(correct){ earned.add(cat.id); refreshSidebar(); draw(); }
+}
+
+function win(){
+  document.getElementById('winSub').textContent=
+    `Du brugte ${rolls} kast og fik ${score} point. Stærkt!`;
+  document.getElementById('winOverlay').classList.add('show');
+}
+
+/* ---- diverse ---- */
+let noteTimer=null;
+function flashNote(msg){
+  const n=document.getElementById('note');
+  const orig=n.innerHTML;
+  n.innerHTML=msg;
+  clearTimeout(noteTimer);
+  noteTimer=setTimeout(()=>{n.innerHTML=orig;},1400);
+}
+function setControls(on){ document.getElementById('rollBtn').disabled=!on; }
+
+function reset(){
+  earned=new Set(); score=0; rolls=0; streak=0;
+  tokenIndex=0; tokenPos=0; busy=false; pendingCat=null;
+  buildSpaces(); buildSidebar(); refreshSidebar();
+  showDie(1); hud(); setControls(true); draw();
+  document.getElementById('winOverlay').classList.remove('show');
+  document.getElementById('qOverlay').classList.remove('show');
+}
+
+/* ---- init ---- */
+document.getElementById('rollBtn').onclick=roll;
+document.getElementById('resetBtn').onclick=reset;
+document.getElementById('winAgain').onclick=reset;
+window.addEventListener('resize',()=>{layout();draw();});
+
+buildSpaces();
+layout();
+reset();
+</script>
+</body>
+</html>
