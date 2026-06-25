@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>Robotarm — interaktiv 3D</title>
+<style>
+  :root{
+    --bg0:#0b0e13; --bg1:#121722; --panel:rgba(18,23,34,.86);
+    --line:#243049; --txt:#e8edf6; --muted:#8c9bb5;
+    --accent:#ff7a18; --accent2:#36c5ff;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden;background:var(--bg0);
+    color:var(--txt);font-family:"Segoe UI",system-ui,Arial,sans-serif}
+  #app{position:fixed;inset:0}
+  canvas{display:block}
+
+  /* ---- control panel ---- */
+  #panel{position:fixed;top:14px;right:14px;width:288px;max-width:calc(100vw - 28px);
+    background:var(--panel);backdrop-filter:blur(8px);border:1px solid var(--line);
+    border-radius:14px;padding:14px 14px 12px;z-index:10;
+    box-shadow:0 18px 50px rgba(0,0,0,.5)}
+  #panel h1{font-size:15px;margin:0 0 2px;letter-spacing:.3px}
+  #panel .sub{font-size:11px;color:var(--muted);margin:0 0 10px}
+  .mode-row{display:flex;gap:6px;margin:0 0 12px}
+  .mode-row button{flex:1;padding:8px 4px;border-radius:9px;border:1px solid var(--line);
+    background:#0e1320;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;
+    transition:.15s}
+  .mode-row button.active{background:var(--accent);border-color:var(--accent);color:#1a0f02}
+  .grp{margin-bottom:9px}
+  .grp.hidden{display:none}
+  .slabel{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);
+    margin-bottom:3px}
+  .slabel b{color:var(--txt);font-variant-numeric:tabular-nums;font-weight:600}
+  input[type=range]{-webkit-appearance:none;width:100%;height:5px;border-radius:5px;
+    background:#27324a;outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;
+    border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid #1a0f02}
+  input[type=range].ik::-webkit-slider-thumb{background:var(--accent2);border-color:#04212e}
+  .btns{display:flex;gap:6px;margin-top:11px}
+  .btns button{flex:1;padding:8px;border-radius:9px;border:1px solid var(--line);
+    background:#0e1320;color:var(--txt);font-size:12px;cursor:pointer}
+  .btns button:hover{border-color:var(--accent)}
+  .hint{font-size:10.5px;color:var(--muted);line-height:1.5;margin-top:10px;
+    border-top:1px solid var(--line);padding-top:9px}
+  .hint b{color:var(--accent2)}
+
+  #title{position:fixed;left:16px;top:14px;z-index:10}
+  #title h2{margin:0;font-size:15px;font-weight:700}
+  #title p{margin:2px 0 0;font-size:11px;color:var(--muted)}
+  #readout{position:fixed;left:16px;bottom:14px;z-index:10;font-size:11px;
+    color:var(--muted);font-variant-numeric:tabular-nums;
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:8px 11px;line-height:1.6}
+  #readout b{color:var(--txt)}
+  #status{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+    text-align:center;font-size:14px;color:var(--muted);padding:30px;z-index:20}
+  @media (max-width:640px){
+    #panel{top:auto;bottom:0;right:0;left:0;width:100%;max-width:100%;
+      border-radius:14px 14px 0 0;max-height:52vh;overflow:auto}
+    #readout{display:none}
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<div id="title">
+  <h2>🦾 Robotarm <span style="color:var(--accent)">KR-6</span></h2>
+  <p>6-akset arm · forward + invers kinematik</p>
+</div>
+
+<div id="panel">
+  <h1>Kontrol</h1>
+  <p class="sub">Træk i scenen for at rotere kameraet · scroll = zoom</p>
+  <div class="mode-row">
+    <button id="mJoint" class="active">Led-styring</button>
+    <button id="mIK">Mål-styring (IK)</button>
+  </div>
+
+  <div id="jointGroup"></div>
+
+  <div id="ikGroup" class="hidden">
+    <div class="grp">
+      <div class="slabel"><span>Mål X</span><b id="vTX">0.45</b></div>
+      <input class="ik" type="range" id="tx" min="-0.9" max="0.9" step="0.005" value="0.45">
+    </div>
+    <div class="grp">
+      <div class="slabel"><span>Mål Y (højde)</span><b id="vTY">0.70</b></div>
+      <input class="ik" type="range" id="ty" min="0.02" max="1.45" step="0.005" value="0.70">
+    </div>
+    <div class="grp">
+      <div class="slabel"><span>Mål Z</span><b id="vTZ">0.10</b></div>
+      <input class="ik" type="range" id="tz" min="-0.9" max="0.9" step="0.005" value="0.10">
+    </div>
+    <p style="font-size:10.5px;color:var(--muted);margin:2px 0 0">
+      …eller <b style="color:var(--accent2)">træk den blå kugle</b> direkte i scenen.</p>
+  </div>
+
+  <div class="grp" style="margin-top:11px">
+    <div class="slabel"><span>Griber</span><b id="vGrip">åben</b></div>
+    <input type="range" id="grip" min="0" max="1" step="0.01" value="1">
+  </div>
+
+  <div class="btns">
+    <button id="home">↺ Hjemposition</button>
+    <button id="wave">👋 Vink</button>
+  </div>
+  <div class="hint">
+    <b>Led-styring:</b> drej hvert led selv.<br>
+    <b>Mål-styring:</b> armen regner selv leddene ud så spidsen når kuglen.
+  </div>
+</div>
+
+<div id="readout">Spids: <b id="ee">–</b><br>Afstand til mål: <b id="err">–</b></div>
+<div id="status">Indlæser 3D-motor…</div>
+
+<script src="assets/vendor/three.min.js"></script>
+<script>
+"use strict";
+(function(){
+  var statusEl = document.getElementById('status');
+  function fail(msg){ statusEl.style.display='flex';
+    statusEl.innerHTML = '⚠️ '+msg; }
+  if(!window.THREE){ fail("Kunne ikke indlæse Three.js (assets/vendor/three.min.js mangler)."); return; }
+
+  try { boot(); } catch(e){ fail("Fejl ved opstart:<br>"+e.message); console.error(e); }
+
+  function boot(){
+    statusEl.style.display='none';
+    var app = document.getElementById('app');
+    var W = app.clientWidth, H = app.clientHeight;
+
+    // ---------- renderer / scene / camera ----------
+    var renderer = new THREE.WebGLRenderer({antialias:true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    renderer.setSize(W,H);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.setClearColor(0x0b0e13,1);
+    app.appendChild(renderer.domElement);
+
+    var scene = new THREE.Scene();
+    scene.fog = new THREE.Fog(0x0b0e13, 4, 11);
+
+    var camera = new THREE.PerspectiveCamera(45, W/H, 0.05, 100);
+
+    // ---------- custom orbit camera ----------
+    var camTarget = new THREE.Vector3(0,0.65,0);
+    var theta = Math.PI*0.25, phi = Math.PI*0.36, radius = 3.1;
+    function updateCam(){
+      phi = Math.max(0.12, Math.min(Math.PI*0.86, phi));
+      radius = Math.max(1.3, Math.min(8, radius));
+      camera.position.set(
+        camTarget.x + radius*Math.sin(phi)*Math.sin(theta),
+        camTarget.y + radius*Math.cos(phi),
+        camTarget.z + radius*Math.sin(phi)*Math.cos(theta));
+      camera.lookAt(camTarget);
+    }
+    updateCam();
+
+    // ---------- lights ----------
+    scene.add(new THREE.HemisphereLight(0x9fb4d8, 0x0a0d13, 0.85));
+    var key = new THREE.DirectionalLight(0xffffff, 1.05);
+    key.position.set(3,5,2); key.castShadow = true;
+    key.shadow.mapSize.set(2048,2048);
+    key.shadow.camera.near=0.5; key.shadow.camera.far=20;
+    key.shadow.camera.left=-3; key.shadow.camera.right=3;
+    key.shadow.camera.top=3; key.shadow.camera.bottom=-3;
+    scene.add(key);
+    var rim = new THREE.DirectionalLight(0x36c5ff, 0.4);
+    rim.position.set(-4,2,-3); scene.add(rim);
+
+    // ---------- floor ----------
+    var floor = new THREE.Mesh(
+      new THREE.CircleGeometry(4.2, 64),
+      new THREE.MeshStandardMaterial({color:0x141a26, roughness:.95, metalness:.1}));
+    floor.rotation.x = -Math.PI/2; floor.receiveShadow = true;
+    scene.add(floor);
+    var grid = new THREE.GridHelper(8, 32, 0x2a3550, 0x1a2236);
+    grid.material.opacity = .5; grid.material.transparent = true;
+    scene.add(grid);
+
+    // ---------- materials ----------
+    var matLink  = new THREE.MeshStandardMaterial({color:0xff7a18, roughness:.45, metalness:.35});
+    var matDark  = new THREE.MeshStandardMaterial({color:0x222a38, roughness:.5, metalness:.6});
+    var matJoint = new THREE.MeshStandardMaterial({color:0x33405a, roughness:.4, metalness:.7});
+    var matGrip  = new THREE.MeshStandardMaterial({color:0xcfd8e6, roughness:.35, metalness:.7});
+
+    function cyl(r1,r2,h,mat){
+      var m = new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,32), mat);
+      m.castShadow = m.receiveShadow = true; return m;
+    }
+    function box(w,h,d,mat){
+      var m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), mat);
+      m.castShadow = m.receiveShadow = true; return m;
+    }
+    function knuckle(r,mat){
+      var m = new THREE.Mesh(new THREE.SphereGeometry(r,24,18), mat);
+      m.castShadow = true; return m;
+    }
+
+    // ---------- build the kinematic chain ----------
+    // Each joint: a pivot Object3D placed at the top of the previous link.
+    // Links extend along local +Y. One DOF each ('x','y', or 'z').
+    var armRoot = new THREE.Group(); scene.add(armRoot);
+
+    // fixed pedestal
+    var base = cyl(0.26,0.30,0.12,matDark); base.position.y=0.06; armRoot.add(base);
+    var baseTop = cyl(0.22,0.22,0.06,matJoint); baseTop.position.y=0.15; armRoot.add(baseTop);
+
+    var joints = [];   // {pivot, axis, lo, hi, angle, home}
+    function addJoint(parent, x,y,z, axis, lo, hi, home){
+      var pivot = new THREE.Object3D();
+      pivot.position.set(x,y,z);
+      parent.add(pivot);
+      var j = {pivot:pivot, axis:axis, lo:lo, hi:hi, angle:home||0, home:home||0};
+      joints.push(j);
+      return pivot;
+    }
+    var D = Math.PI/180;
+
+    // J0 — base yaw (about Y)
+    var p0 = addJoint(armRoot, 0,0.18,0, 'y', -180*D,180*D, 0);
+    p0.add(knuckle(0.13,matJoint));
+    // shoulder offset block
+    var sh = box(0.20,0.16,0.22,matDark); sh.position.y=0.10; p0.add(sh);
+
+    // J1 — shoulder pitch (about X)
+    var p1 = addJoint(p0, 0,0.18,0, 'x', -120*D,120*D, 25*D);
+    p1.add(knuckle(0.115,matJoint));
+    var L1 = cyl(0.085,0.075,0.46,matLink); L1.position.y=0.23; p1.add(L1);
+
+    // J2 — elbow pitch (about X)
+    var p2 = addJoint(p1, 0,0.46,0, 'x', -150*D,150*D, -55*D);
+    p2.add(knuckle(0.1,matJoint));
+    var L2 = cyl(0.07,0.06,0.40,matLink); L2.position.y=0.20; p2.add(L2);
+
+    // J3 — wrist pitch (about X)
+    var p3 = addJoint(p2, 0,0.40,0, 'x', -150*D,150*D, -30*D);
+    p3.add(knuckle(0.08,matJoint));
+    var L3 = cyl(0.055,0.05,0.18,matLink); L3.position.y=0.09; p3.add(L3);
+
+    // J4 — wrist roll (about Y)
+    var p4 = addJoint(p3, 0,0.18,0, 'y', -180*D,180*D, 0);
+    var L4 = cyl(0.05,0.05,0.07,matDark); L4.position.y=0.035; p4.add(L4);
+
+    // J5 — wrist pitch (about X)
+    var p5 = addJoint(p4, 0,0.07,0, 'x', -120*D,120*D, 0);
+    p5.add(knuckle(0.06,matJoint));
+
+    // gripper base + two fingers
+    var gripBase = box(0.13,0.05,0.08,matDark); gripBase.position.y=0.04; p5.add(gripBase);
+    var fingerL = box(0.025,0.12,0.06,matGrip); fingerL.position.set(0.05,0.11,0); p5.add(fingerL);
+    var fingerR = box(0.025,0.12,0.06,matGrip); fingerR.position.set(-0.05,0.11,0); p5.add(fingerR);
+
+    // end-effector marker (between fingertips) — IK solves to this point
+    var ee = new THREE.Object3D(); ee.position.y=0.18; p5.add(ee);
+
+    function applyJoint(j){
+      j.angle = Math.max(j.lo, Math.min(j.hi, j.angle));
+      j.pivot.rotation[j.axis] = j.angle;
+    }
+    joints.forEach(applyJoint);
+
+    // ---------- IK target (draggable sphere) ----------
+    var target = new THREE.Mesh(
+      new THREE.SphereGeometry(0.045,24,18),
+      new THREE.MeshStandardMaterial({color:0x36c5ff, emissive:0x0a3b52, roughness:.3}));
+    target.position.set(0.45,0.70,0.10);
+    scene.add(target);
+    var targetRing = new THREE.Mesh(
+      new THREE.RingGeometry(0.07,0.085,32),
+      new THREE.MeshBasicMaterial({color:0x36c5ff, side:THREE.DoubleSide, transparent:true, opacity:.5}));
+    target.add(targetRing);
+    target.visible = false; // only in IK mode
+
+    // ---------- CCD inverse kinematics ----------
+    var v1=new THREE.Vector3(), v2=new THREE.Vector3(), axisW=new THREE.Vector3(),
+        pW=new THREE.Vector3(), eW=new THREE.Vector3(), q=new THREE.Quaternion();
+    function solveIK(targetPos, iters){
+      for(var it=0; it<iters; it++){
+        for(var i=joints.length-1; i>=0; i--){
+          var j = joints[i];
+          j.pivot.getWorldPosition(pW);
+          ee.getWorldPosition(eW);
+          // world-space rotation axis of this joint
+          axisW.set(j.axis==='x'?1:0, j.axis==='y'?1:0, j.axis==='z'?1:0);
+          j.pivot.getWorldQuaternion(q);
+          axisW.applyQuaternion(q).normalize();
+          // vectors pivot->ee and pivot->target, projected onto plane ⟂ axis
+          v1.subVectors(eW, pW); v1.addScaledVector(axisW, -v1.dot(axisW));
+          v2.subVectors(targetPos, pW); v2.addScaledVector(axisW, -v2.dot(axisW));
+          if(v1.lengthSq()<1e-8 || v2.lengthSq()<1e-8) continue;
+          v1.normalize(); v2.normalize();
+          var d = Math.max(-1,Math.min(1, v1.dot(v2)));
+          var ang = Math.acos(d);
+          if(ang<1e-4) continue;
+          // sign of rotation about axis
+          var sign = axisW.dot(v1.clone().cross(v2)) < 0 ? -1 : 1;
+          j.angle += sign*ang*0.6;          // damping for stability
+          applyJoint(j);
+          scene.updateMatrixWorld(true);
+        }
+      }
+    }
+
+    // ---------- UI ----------
+    var mode = 'joint';
+    var bJoint=document.getElementById('mJoint'), bIK=document.getElementById('mIK');
+    var jointGroup=document.getElementById('jointGroup'), ikGroup=document.getElementById('ikGroup');
+    function setMode(m){
+      mode=m;
+      bJoint.classList.toggle('active', m==='joint');
+      bIK.classList.toggle('active', m==='ik');
+      jointGroup.classList.toggle('hidden', m!=='joint');
+      ikGroup.classList.toggle('hidden', m!=='ik');
+      target.visible = (m==='ik');
+    }
+    bJoint.onclick=function(){ setMode('joint'); };
+    bIK.onclick=function(){ setMode('ik'); syncIKSlidersFromTarget(); };
+
+    // build joint sliders
+    var jSliders=[];
+    joints.forEach(function(j,i){
+      var wrap=document.createElement('div'); wrap.className='grp';
+      var lo=Math.round(j.lo/D), hi=Math.round(j.hi/D);
+      wrap.innerHTML='<div class="slabel"><span>Led '+(i+1)+'</span><b id="vj'+i+'">'+
+        Math.round(j.angle/D)+'°</b></div>'+
+        '<input type="range" id="j'+i+'" min="'+lo+'" max="'+hi+'" step="1" value="'+
+        Math.round(j.angle/D)+'">';
+      jointGroup.appendChild(wrap);
+      var s=wrap.querySelector('input'), lbl=wrap.querySelector('b');
+      s.addEventListener('input',function(){
+        j.angle = (+s.value)*D; applyJoint(j); lbl.textContent=s.value+'°';
+      });
+      jSliders.push({s:s,lbl:lbl});
+    });
+    function syncJointSliders(){
+      joints.forEach(function(j,i){
+        var deg=Math.round(j.angle/D);
+        jSliders[i].s.value=deg; jSliders[i].lbl.textContent=deg+'°';
+      });
+    }
+
+    var tx=document.getElementById('tx'), ty=document.getElementById('ty'), tz=document.getElementById('tz');
+    var vTX=document.getElementById('vTX'), vTY=document.getElementById('vTY'), vTZ=document.getElementById('vTZ');
+    function targetFromSliders(){
+      target.position.set(+tx.value,+ty.value,+tz.value);
+      vTX.textContent=(+tx.value).toFixed(2);
+      vTY.textContent=(+ty.value).toFixed(2);
+      vTZ.textContent=(+tz.value).toFixed(2);
+    }
+    [tx,ty,tz].forEach(function(s){ s.addEventListener('input',targetFromSliders); });
+    function syncIKSlidersFromTarget(){
+      tx.value=target.position.x.toFixed(3);
+      ty.value=target.position.y.toFixed(3);
+      tz.value=target.position.z.toFixed(3);
+      vTX.textContent=target.position.x.toFixed(2);
+      vTY.textContent=target.position.y.toFixed(2);
+      vTZ.textContent=target.position.z.toFixed(2);
+    }
+
+    var grip=document.getElementById('grip'), vGrip=document.getElementById('vGrip');
+    function applyGrip(){
+      var o=+grip.value; var x=0.018+o*0.045;
+      fingerL.position.x=x; fingerR.position.x=-x;
+      vGrip.textContent = o>0.66?'åben':o>0.2?'halv':'lukket';
+    }
+    grip.addEventListener('input',applyGrip); applyGrip();
+
+    document.getElementById('home').onclick=function(){
+      joints.forEach(function(j){ j.angle=j.home; applyJoint(j); });
+      syncJointSliders();
+    };
+    var waving=false, waveT=0;
+    document.getElementById('wave').onclick=function(){ waving=true; waveT=0; setMode('joint'); };
+
+    // ---------- pointer interaction (orbit + drag target) ----------
+    var ray=new THREE.Raycaster(), ndc=new THREE.Vector2();
+    var dragTarget=false, dragPlane=new THREE.Plane(), hit=new THREE.Vector3();
+    var down=false, lx=0, ly=0;
+    var el=renderer.domElement;
+    function setNDC(e){
+      var r=el.getBoundingClientRect();
+      ndc.x=((e.clientX-r.left)/r.width)*2-1;
+      ndc.y=-((e.clientY-r.top)/r.height)*2+1;
+    }
+    el.addEventListener('pointerdown',function(e){
+      el.setPointerCapture(e.pointerId); down=true; lx=e.clientX; ly=e.clientY;
+      if(mode==='ik'){
+        setNDC(e); ray.setFromCamera(ndc,camera);
+        if(ray.intersectObject(target,true).length){
+          dragTarget=true;
+          // drag plane through target, facing the camera
+          var n=camera.getWorldDirection(new THREE.Vector3()).negate();
+          dragPlane.setFromNormalAndCoplanarPoint(n, target.position);
+        }
+      }
+    });
+    el.addEventListener('pointermove',function(e){
+      if(!down) return;
+      if(dragTarget){
+        setNDC(e); ray.setFromCamera(ndc,camera);
+        if(ray.ray.intersectPlane(dragPlane,hit)){
+          hit.y=Math.max(0.02,hit.y);
+          target.position.copy(hit); syncIKSlidersFromTarget();
+        }
+      } else {
+        var dx=e.clientX-lx, dy=e.clientY-ly; lx=e.clientX; ly=e.clientY;
+        theta -= dx*0.006; phi -= dy*0.006; updateCam();
+      }
+    });
+    el.addEventListener('pointerup',function(e){ down=false; dragTarget=false; });
+    el.addEventListener('wheel',function(e){
+      e.preventDefault(); radius += e.deltaY*0.0016*radius; updateCam();
+    },{passive:false});
+
+    // ---------- resize ----------
+    window.addEventListener('resize',function(){
+      W=app.clientWidth; H=app.clientHeight;
+      camera.aspect=W/H; camera.updateProjectionMatrix(); renderer.setSize(W,H);
+    });
+
+    // ---------- readout ----------
+    var eeEl=document.getElementById('ee'), errEl=document.getElementById('err');
+    var eePos=new THREE.Vector3();
+
+    // ---------- animation loop ----------
+    targetFromSliders();
+    function tick(){
+      if(waving){
+        waveT+=0.05;
+        joints[0].angle=Math.sin(waveT)*0.5; applyJoint(joints[0]);
+        joints[1].angle=0.5; applyJoint(joints[1]);
+        joints[3].angle=Math.sin(waveT*2)*0.6-0.4; applyJoint(joints[3]);
+        if(waveT>Math.PI*4){ waving=false;
+          joints.forEach(function(j){ j.angle=j.home; applyJoint(j); }); }
+        syncJointSliders();
+      }
+      if(mode==='ik' && !waving){
+        solveIK(target.position, 6); syncJointSliders();
+      }
+      // readout
+      ee.getWorldPosition(eePos);
+      eeEl.textContent='X '+eePos.x.toFixed(2)+'  Y '+eePos.y.toFixed(2)+'  Z '+eePos.z.toFixed(2);
+      if(mode==='ik'){
+        var d=eePos.distanceTo(target.position);
+        errEl.textContent=(d*1000).toFixed(0)+' mm';
+        errEl.style.color = d<0.03?'#5fe08a':'#ffb35e';
+      } else { errEl.textContent='–'; errEl.style.color=''; }
+      targetRing.lookAt(camera.position);
+      renderer.render(scene,camera);
+      requestAnimationFrame(tick);
+    }
+    tick();
+  }
+})();
+</script>
+</body>
+</html>
