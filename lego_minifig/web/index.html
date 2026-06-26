@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <title>Minifigur — interaktiv 3D (stål)</title>
 <style>
-  :root{ --panel:rgba(16,21,32,.88); --line:#26324a; --txt:#eaf0fa; --muted:#8ea0bd;
-    --blue:#2156cf; --red:#cc2020; --yellow:#f7c70a; }
+  :root{ --panel:rgba(16,21,32,.88); --line:#26324a; --txt:#eaf0fa; --muted:#8ea0bd; --yellow:#f7c70a; }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%;overflow:hidden;background:#0a0d13;color:var(--txt);
     font-family:"Segoe UI",system-ui,Arial,sans-serif;-webkit-user-select:none;user-select:none}
@@ -39,34 +38,34 @@
   @media (max-width:640px){
     #panel{top:auto;bottom:0;right:0;left:0;width:100%;max-width:100%;border-radius:14px 14px 0 0;
       max-height:50vh;overflow:auto}
-    #readout{display:none}
-    #title h2{font-size:14px}
+    #readout{display:none} #title h2{font-size:14px}
   }
 </style>
 </head>
 <body>
 <div id="app"></div>
 <div id="title"><h2>🧱 Minifigur <span style="color:var(--yellow)">MF-01</span></h2>
-  <p>Stål · blå hat · rødt skjorte · hvide bukser</p></div>
+  <p>Stål · blå kasket · rødt skjorte · hvide bukser</p></div>
 
 <div id="panel">
   <h1>Posér figuren</h1>
   <div class="grp"><div class="slabel"><span>Hoved drej</span><b id="vHead">0°</b></div>
     <input type="range" id="head" min="-90" max="90" step="1" value="0"></div>
-  <div class="grp"><div class="slabel"><span>Arme</span><b id="vArm">0°</b></div>
-    <input type="range" id="arm" min="-110" max="110" step="1" value="0"></div>
+  <div class="grp"><div class="slabel"><span>Arme (frem/tilbage)</span><b id="vArm">0°</b></div>
+    <input type="range" id="arm" min="-120" max="120" step="1" value="0"></div>
   <div class="grp"><div class="slabel"><span>Ben (skridt)</span><b id="vLeg">0°</b></div>
-    <input type="range" id="leg" min="-45" max="45" step="1" value="0"></div>
+    <input type="range" id="leg" min="-60" max="60" step="1" value="0"></div>
   <div class="btns">
     <button id="walk">🚶 Gå</button>
     <button id="wave">👋 Vink</button>
     <button id="spin">🔄 Roter</button>
     <button id="reset">↺ Nulstil</button>
   </div>
-  <div class="hint">Træk i scenen for at dreje kameraet · knib/scroll = zoom.</div>
+  <div class="hint">Træk for at dreje kameraet · knib/scroll = zoom. Alle led roterer kun
+    om sideaksen, så arme og ben aldrig rammer kroppen.</div>
 </div>
 
-<div id="readout">Højde m. hat: <b>54,2 mm</b> · Masse (stål): <b>51,6 g</b></div>
+<div id="readout">Højde m. kasket: <b>~55 mm</b> · Materiale: <b>stål</b></div>
 <div id="status">Indlæser 3D…</div>
 
 <script src="assets/vendor/three.min.js"></script>
@@ -89,148 +88,216 @@
     renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.15;
     app.appendChild(renderer.domElement);
 
-    var scene=new THREE.Scene(); scene.fog=new THREE.Fog(0x0a0d13,160,420);
+    var scene=new THREE.Scene(); scene.fog=new THREE.Fog(0x0a0d13,170,440);
+    var camera=new THREE.PerspectiveCamera(42,W/H,0.5,1000);
 
-    // procedural environment map so the steel surfaces actually catch light
+    // procedural environment so steel catches light
     (function(){
       var c=document.createElement('canvas'); c.width=16; c.height=128;
       var g=c.getContext('2d'); var grd=g.createLinearGradient(0,0,0,128);
       grd.addColorStop(0,'#cfe0f5'); grd.addColorStop(0.5,'#7f93b3'); grd.addColorStop(1,'#10151f');
       g.fillStyle=grd; g.fillRect(0,0,16,128);
       var tex=new THREE.CanvasTexture(c); tex.mapping=THREE.EquirectangularReflectionMapping;
-      var pmrem=new THREE.PMREMGenerator(renderer);
-      scene.environment=pmrem.fromEquirectangular(tex).texture; tex.dispose();
+      var pm=new THREE.PMREMGenerator(renderer);
+      scene.environment=pm.fromEquirectangular(tex).texture; tex.dispose();
     })();
-    var camera=new THREE.PerspectiveCamera(42,W/H,0.5,1000);
 
     // orbit
-    var camT=new THREE.Vector3(0,26,0), theta=0.6, phi=1.25, rad=120;
-    function cam(){ phi=Math.max(0.18,Math.min(2.85,phi)); rad=Math.max(55,Math.min(300,rad));
+    var camT=new THREE.Vector3(0,26,0), theta=0.55, phi=1.3, rad=125;
+    function cam(){ phi=Math.max(0.18,Math.min(2.85,phi)); rad=Math.max(55,Math.min(320,rad));
       camera.position.set(camT.x+rad*Math.sin(phi)*Math.sin(theta),
         camT.y+rad*Math.cos(phi), camT.z+rad*Math.sin(phi)*Math.cos(theta));
       camera.lookAt(camT); } cam();
 
-    scene.add(new THREE.HemisphereLight(0xcfe0f5,0x1a2230,1.15));
-    var key=new THREE.DirectionalLight(0xffffff,1.6); key.position.set(60,110,50);
+    scene.add(new THREE.HemisphereLight(0xcfe0f5,0x1a2230,1.05));
+    var key=new THREE.DirectionalLight(0xffffff,1.5); key.position.set(55,120,60);
     key.castShadow=true; key.shadow.mapSize.set(2048,2048);
-    var sc=key.shadow.camera; sc.near=10; sc.far=400; sc.left=-90; sc.right=90; sc.top=120; sc.bottom=-40;
-    scene.add(key);
+    var s=key.shadow.camera; s.near=10;s.far=420;s.left=-90;s.right=90;s.top=130;s.bottom=-40; scene.add(key);
     var rim=new THREE.DirectionalLight(0x55a0ff,0.35); rim.position.set(-70,40,-60); scene.add(rim);
 
-    // floor
-    var floor=new THREE.Mesh(new THREE.CircleGeometry(160,64),
+    var floor=new THREE.Mesh(new THREE.CircleGeometry(170,64),
       new THREE.MeshStandardMaterial({color:0x131a26,roughness:.95,metalness:.1}));
     floor.rotation.x=-Math.PI/2; floor.receiveShadow=true; scene.add(floor);
-    var grid=new THREE.GridHelper(320,32,0x2a3550,0x18202e);
-    grid.material.opacity=.45; grid.material.transparent=true; scene.add(grid);
+    var grid=new THREE.GridHelper(340,34,0x2a3550,0x18202e);
+    grid.material.opacity=.4; grid.material.transparent=true; scene.add(grid);
 
-    // ---- materials: brushed steel base tints per part ----
-    function steel(hex){ return new THREE.MeshStandardMaterial({color:hex,metalness:.62,roughness:.4}); }
-    var mBlue=steel(0x2156cf), mYellow=steel(0xf7c70a), mRed=steel(0xcc2020), mWhite=steel(0xdfe3ea);
+    // ---- steel-tinted materials per part ----
+    function steel(hex,r){ return new THREE.MeshStandardMaterial({color:hex,metalness:.6,roughness:r||.42}); }
+    var mBlue=steel(0x1f54c8), mYellow=steel(0xf6c50c,.38), mRed=steel(0xc41f1f), mWhite=steel(0xe7eaf0,.5);
 
-    function add(parent,geo,mat,x,y,z){ var m=new THREE.Mesh(geo,mat);
-      m.position.set(x||0,y||0,z||0); m.castShadow=true; m.receiveShadow=true; parent.add(m); return m; }
-    // tapered square prism (radialSegments 4), flat faces to axes, custom depth scale
-    function prism(wBot,wTop,h,depthRatio){
-      var g=new THREE.CylinderGeometry(wTop/Math.SQRT2,wBot/Math.SQRT2,h,4,1);
-      g.rotateY(Math.PI/4); g.scale(1,1,depthRatio); return g;
+    function mesh(geo,mat,parent,x,y,z){ var m=new THREE.Mesh(geo,mat);
+      m.position.set(x||0,y||0,z||0); m.castShadow=true; m.receiveShadow=true; (parent||scene).add(m); return m; }
+
+    // rounded-rect helper for authentic LEGO silhouettes
+    function roundRectShape(w,h,r){
+      var s=new THREE.Shape(), x=-w/2,y=-h/2;
+      s.moveTo(x+r,y); s.lineTo(x+w-r,y); s.quadraticCurveTo(x+w,y,x+w,y+r);
+      s.lineTo(x+w,y+h-r); s.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+      s.lineTo(x+r,y+h); s.quadraticCurveTo(x,y+h,x,y+h-r);
+      s.lineTo(x,y+r); s.quadraticCurveTo(x,y,x+r,y); return s;
+    }
+    function slab(w,h,depth,r,bevel){
+      var g=new THREE.ExtrudeGeometry(roundRectShape(w,h,r),
+        {depth:depth,bevelEnabled:true,bevelThickness:bevel||0.6,bevelSize:bevel||0.6,bevelSegments:3,steps:1});
+      g.translate(0,0,-depth/2); return g;
     }
 
-    // ===== build the minifig as a posable hierarchy (mm, feet at y=0) =====
+    // ===================== build the minifigure =====================
+    // Y up, feet at y=0.  Torso bare half-width ~6.3; arms seated at x=±7.9 (just outside)
     var fig=new THREE.Group(); scene.add(fig);
+    var TORSO_HALF=6.3, ARM_X=7.9;
 
-    // hips
-    var hips=add(fig,new THREE.BoxGeometry(16.4,5.6,10.6),mWhite,0,13.6+2.8,0);
-    // legs (pivot at hip top so they swing about the hip)
+    // ---- legs (each pivots at its hip; swing about X only) ----
+    var Y_LEGTOP=17.0;
     function legPivot(side){
-      var p=new THREE.Group(); p.position.set(side*4.05,13.6,0); fig.add(p);
-      add(p,new THREE.BoxGeometry(7.7,13.6,10.6),mWhite,0,-13.6/2,0);
+      var p=new THREE.Group(); p.position.set(side*3.4,Y_LEGTOP,0); fig.add(p);
+      // leg block with a forward foot
+      var leg=mesh(slab(6.6,17.0,10.2,1.4),mWhite,p,0,-17.0/2,0);
+      // small foot lip at front bottom
+      mesh(slab(6.6,3.0,3.0,0.8),mWhite,p,0,-17.0+1.5,10.2/2+1.5-0.2);
       return p;
     }
     var legR=legPivot(1), legL=legPivot(-1);
+    // thin centre gap line between legs (visual)
+    mesh(new THREE.BoxGeometry(0.5,16.5,10.4),steel(0x9aa0ad,.6),fig,0,Y_LEGTOP-8.4,0);
 
-    // torso
-    var torsoY=13.6+5.6;
-    var torso=add(fig,prism(16.4,11.0,17.0,0.65),mRed,0,torsoY+17/2,0);
+    // ---- hips / pelvis ----
+    var Y_HIP=17.0, Y_HIPTOP=23.0;
+    mesh(slab(14.2,6.0,10.6,1.6),mWhite,fig,0,(Y_HIP+Y_HIPTOP)/2,0);
 
-    // shoulders / arms (pivot at shoulder)
-    function armPivot(side){
-      var p=new THREE.Group(); p.position.set(side*7.6,torsoY+17-3.5,0); fig.add(p);
-      p.rotation.z=side*-0.12;                 // slight outward rest angle
-      var a=add(p,new THREE.CylinderGeometry(2.3,2.0,12.5,20),mRed,0,-12.5/2,0.6);
-      a.rotation.x=0.18;
-      // hand = clutch ring (torus)
-      var h=new THREE.Mesh(new THREE.TorusGeometry(2.4,1.0,12,24),mYellow);
-      h.position.set(0,-12.2,2.6); h.rotation.x=Math.PI/2; h.castShadow=true; p.add(h);
-      return p;
+    // ---- torso: authentic front silhouette, extruded with bevel ----
+    var Y_TORSO=23.0, TORSO_H=18.0, Y_TORSOTOP=Y_TORSO+TORSO_H;  // 41
+    (function(){
+      var sh=new THREE.Shape();
+      // half profile (right side), from bottom centre up and mirrored
+      var pts=[[0,0],[6.3,0],[6.5,1.6],[5.9,4],[5.4,11],[6.4,14.5],[5.6,16.6],[3.0,18],[0,18]];
+      sh.moveTo(pts[0][0],pts[0][1]);
+      for(var i=1;i<pts.length;i++) sh.lineTo(pts[i][0],pts[i][1]);
+      for(var j=pts.length-2;j>=0;j--) sh.lineTo(-pts[j][0],pts[j][1]); // mirror left
+      var g=new THREE.ExtrudeGeometry(sh,{depth:10.2,bevelEnabled:true,
+        bevelThickness:1.0,bevelSize:1.0,bevelSegments:4,steps:1});
+      g.translate(0,0,-10.2/2);
+      mesh(g,mRed,fig,0,Y_TORSO,0);
+    })();
+    // shoulder sockets (short cylinders, axis X) where arms attach
+    function socket(side){ var m=mesh(new THREE.CylinderGeometry(2.4,2.4,2.2,20),mRed,fig,
+      side*6.6,Y_TORSOTOP-3.0,1.0); m.rotation.z=Math.PI/2; return m; }
+    socket(1); socket(-1);
+
+    // ---- neck + head + stud ----
+    var Y_NECK=Y_TORSOTOP;                       // 41
+    mesh(new THREE.CylinderGeometry(2.6,2.6,1.4,20),mYellow,fig,0,Y_NECK+0.7,0);
+    var Y_HEAD=Y_NECK+1.4;                        // 42.4
+    var HEAD_H=9.6, HEAD_R=4.8;
+    var headPivot=new THREE.Group(); headPivot.position.set(0,Y_HEAD,0); fig.add(headPivot);
+    // head cylinder with slightly domed top
+    mesh(new THREE.CylinderGeometry(HEAD_R,HEAD_R,HEAD_H-1.4,32),mYellow,headPivot,0,(HEAD_H-1.4)/2,0);
+    var domeTop=mesh(new THREE.SphereGeometry(HEAD_R,32,16,0,Math.PI*2,0,Math.PI/2),mYellow,headPivot,0,HEAD_H-1.4,0);
+    domeTop.scale.y=0.45;
+    mesh(new THREE.CylinderGeometry(2.4,2.4,1.6,24),mYellow,headPivot,0,HEAD_H+0.3,0); // stud
+    // simple face (eyes + smile) so it reads as a minifig head
+    var faceMat=new THREE.MeshStandardMaterial({color:0x161616,metalness:.2,roughness:.5});
+    function eye(x){ mesh(new THREE.CylinderGeometry(0.55,0.55,0.4,12),faceMat,headPivot,x,5.0,HEAD_R-0.15).rotation.x=Math.PI/2; }
+    eye(-1.7); eye(1.7);
+    var smile=mesh(new THREE.TorusGeometry(1.7,0.28,8,20,Math.PI),faceMat,headPivot,0,4.0,HEAD_R-0.15);
+    smile.rotation.x=Math.PI; smile.position.z=HEAD_R-0.15;
+
+    // ---- baseball cap (crown + forward bill), on the head, child of headPivot so it turns with head ----
+    var cap=new THREE.Group(); cap.position.set(0,HEAD_H-2.2,0); headPivot.add(cap);
+    var crown=mesh(new THREE.SphereGeometry(5.2,32,18,0,Math.PI*2,0,Math.PI/2),mBlue,cap,0,0,0);
+    crown.scale.y=0.78;
+    mesh(new THREE.CylinderGeometry(5.2,5.2,1.4,32),mBlue,cap,0,-0.7,0); // crown band
+    // top button
+    mesh(new THREE.SphereGeometry(0.7,12,8),mBlue,cap,0,5.2*0.78,0);
+    // bill: flat half-disc projecting forward (+z), tilted slightly down
+    var bill=mesh(new THREE.CylinderGeometry(5.6,5.6,0.9,28,1,false,0,Math.PI),mBlue,cap,0,-0.9,2.6);
+    bill.rotation.y=-Math.PI/2;     // round part forward (+z), flat edge to the back
+    bill.rotation.x=0.16;           // slight downward droop
+    bill.scale.set(1.0,1,1.15);
+
+    // ---- arms: bent LEGO arm, pivot at shoulder, ALL motion about X (no body collision) ----
+    function buildArm(side){
+      var p=new THREE.Group(); p.position.set(side*ARM_X,Y_TORSOTOP-2.6,1.0); fig.add(p);
+      // shoulder cap (cylinder, axis X) — spins in place
+      var cap0=mesh(new THREE.CylinderGeometry(2.3,2.3,2.4,20),mRed,p,0,0,0); cap0.rotation.z=Math.PI/2;
+      // upper arm down
+      mesh(new THREE.CylinderGeometry(1.9,1.8,6.5,20),mRed,p,0,-3.6,0.2);
+      // elbow
+      mesh(new THREE.SphereGeometry(1.9,16,12),mRed,p,0,-7.0,0.6);
+      // forearm: subgroup angled forward (the characteristic bend)
+      var fore=new THREE.Group(); fore.position.set(0,-7.0,0.6); p.add(fore);
+      fore.rotation.x=0.5;          // bend forward
+      mesh(new THREE.CylinderGeometry(1.8,1.7,6.2,20),mRed,fore,0,-3.1,0);
+      // hand = C-clip (open ring) at forearm end
+      var hand=new THREE.Group(); hand.position.set(0,-6.4,0); fore.add(hand);
+      var clip=mesh(new THREE.TorusGeometry(2.0,0.85,12,22,Math.PI*1.5),mYellow,hand,0,0,0);
+      clip.rotation.y=Math.PI/2; clip.rotation.x=Math.PI*0.25;
+      return {pivot:p, fore:fore};
     }
-    var armR=armPivot(1), armL=armPivot(-1);
+    var armR=buildArm(1), armL=buildArm(-1);
 
-    // neck + head + hat (head pivot so it can turn)
-    var neck=add(fig,new THREE.CylinderGeometry(2.0,2.0,1.6,20),mYellow,0,torsoY+17+0.8,0);
-    var headPivot=new THREE.Group(); headPivot.position.set(0,torsoY+17+1.6,0); fig.add(headPivot);
-    add(headPivot,new THREE.CylinderGeometry(4.8,4.8,9.0,28),mYellow,0,9.0/2,0);
-    add(headPivot,new THREE.CylinderGeometry(2.4,2.4,1.8,24),mYellow,0,9.0+0.9,0); // stud
-    // hat: crown (sphere-capped cylinder) + brim
-    var hat=new THREE.Group(); hat.position.set(0,9.0-1.0,0); headPivot.add(hat);
-    add(hat,new THREE.CylinderGeometry(5.7,5.7,5.4,28),mBlue,0,5.4/2,0);
-    var dome=add(hat,new THREE.SphereGeometry(5.7,28,18,0,Math.PI*2,0,Math.PI/2),mBlue,0,5.4,0);
-    add(hat,new THREE.CylinderGeometry(6.8,6.8,1.4,28),mBlue,0,0.2,0); // brim
-
-    // ===== pose control =====
+    // ===================== posing (collision-free) =====================
+    var REST_FORE=0.5;
     var pose={head:0,arm:0,leg:0};
     function applyPose(){
       headPivot.rotation.y = pose.head*Math.PI/180;
-      armR.rotation.x =  pose.arm*Math.PI/180;
-      armL.rotation.x = -pose.arm*Math.PI/180;
+      armR.pivot.rotation.x =  pose.arm*Math.PI/180;   // forward/back swing about X
+      armL.pivot.rotation.x = -pose.arm*Math.PI/180;
+      armR.pivot.rotation.z = 0; armL.pivot.rotation.z = 0;
+      armR.fore.rotation.x = REST_FORE; armL.fore.rotation.x = REST_FORE;
       legR.rotation.x =  pose.leg*Math.PI/180;
       legL.rotation.x = -pose.leg*Math.PI/180;
     }
     applyPose();
 
-    function bind(id,key,lbl,unit){
-      var s=document.getElementById(id), b=document.getElementById(lbl);
-      s.addEventListener('input',function(){ pose[key]=+s.value; b.textContent=s.value+'°'; applyPose(); });
-      return s;
-    }
+    function bind(id,key,lbl){ var sl=document.getElementById(id), b=document.getElementById(lbl);
+      sl.addEventListener('input',function(){ stopAnims(); pose[key]=+sl.value; b.textContent=sl.value+'°'; applyPose(); });
+      return sl; }
     var sHead=bind('head','head','vHead'), sArm=bind('arm','arm','vArm'), sLeg=bind('leg','leg','vLeg');
     function setSliders(){ sHead.value=pose.head; sArm.value=pose.arm; sLeg.value=pose.leg;
       vHead.textContent=Math.round(pose.head)+'°'; vArm.textContent=Math.round(pose.arm)+'°';
       vLeg.textContent=Math.round(pose.leg)+'°'; }
 
     var walking=false, waving=false, spinning=false, t=0;
-    function toggle(btn,fn){ var el=document.getElementById(btn); el.onclick=function(){ fn(el); }; return el; }
-    toggle('walk',function(el){ walking=!walking; waving=false; el.classList.toggle('on',walking);
-      document.getElementById('wave').classList.remove('on'); });
-    toggle('wave',function(el){ waving=!waving; walking=false; el.classList.toggle('on',waving);
-      document.getElementById('walk').classList.remove('on'); });
-    toggle('spin',function(el){ spinning=!spinning; el.classList.toggle('on',spinning); });
-    toggle('reset',function(){ walking=waving=false; pose={head:0,arm:0,leg:0}; applyPose(); setSliders();
+    function stopAnims(){ walking=waving=false;
       document.getElementById('walk').classList.remove('on');
-      document.getElementById('wave').classList.remove('on'); });
+      document.getElementById('wave').classList.remove('on'); }
+    document.getElementById('walk').onclick=function(){ var on=!walking; stopAnims(); walking=on;
+      this.classList.toggle('on',walking); };
+    document.getElementById('wave').onclick=function(){ var on=!waving; stopAnims(); waving=on;
+      this.classList.toggle('on',waving); };
+    document.getElementById('spin').onclick=function(){ spinning=!spinning; this.classList.toggle('on',spinning); };
+    document.getElementById('reset').onclick=function(){ stopAnims(); pose={head:0,arm:0,leg:0}; applyPose(); setSliders(); };
 
-    // ===== pointer orbit =====
+    // pointer orbit
     var down=false,lx=0,ly=0,el=renderer.domElement;
     el.addEventListener('pointerdown',function(e){ el.setPointerCapture(e.pointerId); down=true; lx=e.clientX; ly=e.clientY; });
     el.addEventListener('pointermove',function(e){ if(!down)return;
       theta-=(e.clientX-lx)*0.006; phi-=(e.clientY-ly)*0.006; lx=e.clientX; ly=e.clientY; cam(); });
     el.addEventListener('pointerup',function(){ down=false; });
     el.addEventListener('wheel',function(e){ e.preventDefault(); rad+=e.deltaY*0.0016*rad; cam(); },{passive:false});
-    // pinch zoom
     var pinch=0;
     el.addEventListener('touchmove',function(e){ if(e.touches.length===2){ e.preventDefault();
       var dx=e.touches[0].clientX-e.touches[1].clientX, dy=e.touches[0].clientY-e.touches[1].clientY;
       var d=Math.hypot(dx,dy); if(pinch){ rad+=(pinch-d)*0.4; cam(); } pinch=d; } },{passive:false});
     el.addEventListener('touchend',function(){ pinch=0; });
-
     window.addEventListener('resize',function(){ W=app.clientWidth; H=app.clientHeight;
       camera.aspect=W/H; camera.updateProjectionMatrix(); renderer.setSize(W,H); });
 
     function tick(){
       t+=0.05;
-      if(walking){ pose.leg=Math.sin(t*2)*32; pose.arm=-Math.sin(t*2)*30; applyPose(); setSliders(); }
-      if(waving){ pose.arm=0; armR.rotation.x=0; armR.rotation.z=-2.2+Math.sin(t*4)*0.25;
-        setSliders(); } else { armR.rotation.z=-0.12; }
+      if(walking){ pose.leg=Math.sin(t*2)*38; pose.arm=-Math.sin(t*2)*32; applyPose(); setSliders(); }
+      if(waving){
+        // independent wave pose (ignore sliders). Right arm raises OUT to its own
+        // side via +Z rotation: tip direction = (sinθ,-cosθ) so x stays ≥0 for θ∈(0,π)
+        // → the arm never crosses the centreline / body. Left arm + legs rest.
+        headPivot.rotation.y = pose.head*Math.PI/180;
+        armL.pivot.rotation.x=0; armL.pivot.rotation.z=0; armL.fore.rotation.x=REST_FORE;
+        legR.rotation.x=0; legL.rotation.x=0;
+        armR.pivot.rotation.x=0;
+        armR.pivot.rotation.z = 2.3;                  // up & out to the figure's right
+        armR.fore.rotation.x = REST_FORE + 0.5 + Math.sin(t*5)*0.45;
+      }
       if(spinning){ theta+=0.006; cam(); }
       renderer.render(scene,camera);
       requestAnimationFrame(tick);
