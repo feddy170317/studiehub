@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MF-01-001 — Minifigur, stål · Teknisk tegning</title>
+<style>
+  :root{ --ink:#111; --line:#222; --thin:#666; --dim:#1456b0; --gdt:#0a7d4d; --paper:#fff; }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#5c6470;font-family:"Segoe UI",system-ui,Arial,sans-serif;color:var(--ink)}
+  .toolbar{position:sticky;top:0;z-index:50;background:#1b2230;color:#eef;padding:9px 14px;
+    display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .toolbar h1{font-size:14px;margin:0;font-weight:700}
+  .toolbar .sp{flex:1}
+  .toolbar button,.toolbar a{background:#2f72ff;color:#fff;border:0;border-radius:8px;
+    padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none}
+  .toolbar a.ghost{background:#33405a}
+  .wrap{padding:18px;display:flex;justify-content:center}
+  /* A3 landscape sheet @ ~3.0 px/mm */
+  .sheet{background:var(--paper);width:1260px;min-height:891px;box-shadow:0 12px 40px rgba(0,0,0,.45);
+    position:relative;padding:0}
+  .frame{position:absolute;inset:10px;border:2px solid var(--line)}
+  .frame::after{content:"";position:absolute;inset:6px;border:1px solid var(--thin)}
+  svg{display:block}
+  text{font-family:"Segoe UI",Arial,sans-serif}
+  .dimtxt{fill:var(--dim);font-size:9px}
+  .dimln{stroke:var(--dim);stroke-width:.7}
+  .extln{stroke:var(--dim);stroke-width:.5}
+  .obj{fill:#eef2f8;stroke:var(--line);stroke-width:1.1}
+  .objc{fill:#e3ebf6;stroke:var(--line);stroke-width:1.1}
+  .center{stroke:#b03030;stroke-width:.5;stroke-dasharray:7 2 1 2}
+  .hidden{stroke:#888;stroke-width:.7;stroke-dasharray:4 2;fill:none}
+  .vlabel{font-size:11px;font-weight:700;fill:#222;letter-spacing:.5px}
+  .note{font-size:10px;fill:#222}
+  .gdtbox{fill:#fff;stroke:var(--gdt);stroke-width:.8}
+  .gdttxt{fill:var(--gdt);font-size:9px;font-weight:700}
+  .lead{stroke:var(--gdt);stroke-width:.7;fill:none}
+  /* bottom block */
+  .block{position:absolute;left:16px;right:16px;bottom:16px;display:flex;gap:10px;align-items:stretch}
+  table{border-collapse:collapse;font-size:11px;background:#fff}
+  th,td{border:1px solid #333;padding:3px 7px;text-align:left}
+  th{background:#eef;font-weight:700}
+  .tblbox{flex:1}
+  .tblbox h3{margin:0 0 4px;font-size:11px;letter-spacing:.4px}
+  .titleblk{width:430px;border:2px solid #222}
+  .titleblk table{width:100%}
+  .titleblk td{font-size:11px}
+  .titleblk .k{background:#f3f5fa;color:#444;font-size:9px;text-transform:uppercase;letter-spacing:.3px;width:84px}
+  .titleblk .big{font-size:15px;font-weight:800}
+  .notes{font-size:10px;line-height:1.5;color:#222}
+  @media print{
+    @page{ size:A3 landscape; margin:6mm; }
+    html,body{background:#fff}
+    .toolbar{display:none}
+    .wrap{padding:0}
+    .sheet{box-shadow:none;width:100%;min-height:0}
+  }
+  @media (max-width:680px){ .wrap{padding:6px}
+    .sheet{width:1260px;transform-origin:top left} }
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <h1>🛠️ MF-01-001 · Minifigur (stål) — teknisk tegning</h1>
+  <span class="sp"></span>
+  <a class="ghost" href="../web/index.html">↩ 3D-model</a>
+  <button onclick="window.print()">🖨️ Gem som PDF / Print (A3)</button>
+</div>
+
+<div class="wrap">
+  <div class="sheet">
+    <div class="frame"></div>
+    <svg id="dwg" viewBox="0 0 1260 700" width="1260" height="700"></svg>
+
+    <div class="block">
+      <div class="tblbox">
+        <h3>MÅL- OG TOLERANCESKEMA</h3>
+        <table id="toltab"></table>
+        <p class="notes" id="gennotes"></p>
+      </div>
+      <div class="titleblk">
+        <table id="titleblk"></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+// ---------- exact dimensions from the CAD model (mm) ----------
+var D = {
+  overall_h:54.2, overall_w:34.33, depth:13.6, mass_g:51.6, vol:6578.6,
+  legs_h:13.6, hips_h:5.6, torso_h:17.0, neck_h:1.6, head_h:9.0, stud_h:1.8, hat_h:11.4,
+  hips_w:16.4, torso_bot_w:16.4, torso_top_w:11.0, torso_depth:10.6,
+  leg_w:7.7, leg_gap:0.8, head_d:9.6, stud_d:4.8, neck_d:4.0, brim_d:13.6,
+  hand_od:5.6, hand_bore:4.8,
+  z_legtop:13.6, z_hiptop:19.2, z_torsotop:36.2, z_necktop:37.8,
+  z_headtop:46.8, z_studtop:48.6, z_hattop:54.2, z_hatbot:42.8
+};
+
+var SVGNS="http://www.w3.org/2000/svg";
+var svg=document.getElementById("dwg");
+function E(tag,attrs,parent){var e=document.createElementNS(SVGNS,tag);
+  for(var k in attrs)e.setAttribute(k,attrs[k]); (parent||svg).appendChild(e); return e;}
+function line(x1,y1,x2,y2,cls,p){return E("line",{x1:x1,y1:y1,x2:x2,y2:y2,class:cls||""},p);}
+function txt(x,y,s,cls,anchor,rot,p){var t=E("text",{x:x,y:y,class:cls||"",
+  "text-anchor":anchor||"middle"},p); if(rot)t.setAttribute("transform","rotate("+rot+" "+x+" "+y+")");
+  t.textContent=s; return t;}
+
+// arrow marker for dimension lines
+(function(){var defs=E("defs",{});
+  var m=E("marker",{id:"arr",markerWidth:9,markerHeight:9,refX:8,refY:3,orient:"auto",markerUnits:"userSpaceOnUse"},defs);
+  E("path",{d:"M0,0 L8,3 L0,6 z",fill:"#1456b0"},m);
+  var m2=E("marker",{id:"arrS",markerWidth:7,markerHeight:7,refX:6,refY:2.5,orient:"auto",markerUnits:"userSpaceOnUse"},defs);
+  E("path",{d:"M0,0 L6,2.5 L0,5 z",fill:"#1456b0"},m2);})();
+
+function dimLine(x1,y1,x2,y2){ // double-arrow dim line
+  var l=line(x1,y1,x2,y2,"dimln"); l.setAttribute("marker-start","url(#arr)");
+  l.setAttribute("marker-end","url(#arr)"); }
+
+var S=3.0;            // drawing scale 3 px/mm on screen ≈ 2:1 on A3 print
+// ---- FRONT VIEW ----
+var FCX=240, FBASE=300;          // feet baseline
+function FX(x){return FCX + x*S;} function FY(z){return FBASE - z*S;}
+var gF=E("g",{});
+function rectZ(x0,x1,z0,z1,cls){E("rect",{x:FX(Math.min(x0,x1)),y:FY(z1),
+  width:Math.abs(x1-x0)*S,height:(z1-z0)*S,class:cls||"obj"},gF);}
+// legs
+rectZ(0.4,8.1,0,D.z_legtop); rectZ(-8.1,-0.4,0,D.z_legtop);
+line(FX(0),FY(0),FX(0),FY(D.z_legtop),"obj",gF); // leg split visual
+// hips
+rectZ(-8.2,8.2,D.z_legtop,D.z_hiptop,"objc");
+// torso trapezoid
+E("path",{d:"M"+FX(-8.2)+","+FY(D.z_hiptop)+" L"+FX(8.2)+","+FY(D.z_hiptop)+
+  " L"+FX(5.5)+","+FY(D.z_torsotop)+" L"+FX(-5.5)+","+FY(D.z_torsotop)+" Z",class:"obj"},gF);
+// arms (angled bars) + hands (rings)
+function arm(side){var sx=side*7.0, sz=D.z_torsotop-1, hx=side*14.36, hz=24.4;
+  E("path",{d:"M"+FX(sx-side*1.0)+","+FY(sz)+" L"+FX(sx+side*1.0)+","+FY(sz)+
+    " L"+FX(hx+side*1.6)+","+FY(hz)+" L"+FX(hx-side*1.6)+","+FY(hz)+" Z",class:"obj"},gF);
+  E("circle",{cx:FX(hx),cy:FY(hz-2.8),r:D.hand_od/2*S,class:"objc"},gF);
+  E("circle",{cx:FX(hx),cy:FY(hz-2.8),r:D.hand_bore/2*S,class:"hidden"},gF);}
+arm(1); arm(-1);
+// neck
+rectZ(-2.0,2.0,D.z_torsotop,D.z_necktop,"objc");
+// head (rounded top)
+E("path",{d:"M"+FX(-4.8)+","+FY(D.z_necktop)+" L"+FX(-4.8)+","+FY(D.z_headtop-2)+
+  " Q"+FX(-4.8)+","+FY(D.z_headtop)+" "+FX(-2.8)+","+FY(D.z_headtop)+
+  " L"+FX(2.8)+","+FY(D.z_headtop)+" Q"+FX(4.8)+","+FY(D.z_headtop)+" "+FX(4.8)+","+FY(D.z_headtop-2)+
+  " L"+FX(4.8)+","+FY(D.z_necktop)+" Z",class:"obj"},gF);
+// stud
+rectZ(-2.4,2.4,D.z_headtop,D.z_studtop,"objc");
+// hat: brim + dome
+rectZ(-6.8,6.8,D.z_hatbot,D.z_hatbot+1.4,"obj");
+E("path",{d:"M"+FX(-5.7)+","+FY(D.z_hatbot+1.4)+" L"+FX(-5.7)+","+FY(48.5)+
+  " A"+(5.7*S)+","+(5.7*S)+" 0 0 1 "+FX(5.7)+","+FY(48.5)+" L"+FX(5.7)+","+FY(D.z_hatbot+1.4)+" Z",class:"obj"},gF);
+// centerline
+line(FX(0),FY(-2),FX(0),FY(56),"center",gF);
+txt(FCX,FY(60),"SET FORFRA (hovedview)","vlabel");
+
+// ---- FRONT dimensions ----
+function vdim(xp, z0, z1, label){ // vertical dim at paper-x xp
+  var y0=FY(z0), y1=FY(z1);
+  line(xp,y0,xp+0,y0,"extln"); // (placeholder)
+  dimLine(xp,y0,xp,y1);
+  txt(xp+4, (y0+y1)/2, label, "dimtxt","start",-90);
+}
+function ext(zx0,z,xp){ line(FX(zx0),FY(z),xp,FY(z),"extln"); }
+// right-side height chain
+var xc1=FX(9)+18;
+ext(8.1,0,xc1); ext(8.2,D.z_legtop,xc1); vdim(xc1,0,D.z_legtop,"13,6");
+ext(8.2,D.z_legtop,xc1); ext(8.2,D.z_hiptop,xc1); vdim(xc1,D.z_legtop,D.z_hiptop,"5,6");
+ext(8.2,D.z_hiptop,xc1); ext(5.5,D.z_torsotop,xc1); vdim(xc1,D.z_hiptop,D.z_torsotop,"17,0");
+ext(4.8,D.z_necktop,xc1); ext(4.8,D.z_headtop,xc1); vdim(xc1,D.z_necktop,D.z_headtop,"9,0");
+var xc2=xc1+26;
+ext(8.1,0,xc2); ext(2.4,D.z_studtop,xc2); vdim(xc2,0,D.z_studtop,"48,6");
+var xc3=xc2+24;
+ext(8.1,0,xc3); ext(6.8,D.z_hattop,xc3); vdim(xc3,0,D.z_hattop,"54,2");
+// bottom widths
+function hdim(z, x0,x1, label, yoff){var y=FY(z)+ (yoff||26);
+  line(FX(x0),FY(z),FX(x0),y,"extln"); line(FX(x1),FY(z),FX(x1),y,"extln");
+  dimLine(FX(x0),y,FX(x1),y); txt((FX(x0)+FX(x1))/2,y-3,label,"dimtxt");}
+hdim(0,-8.1,8.1,"16,4",24);
+hdim(0,-14.36,14.36,"34,33 (armspænd)",44);
+// leaders: Ø heads
+function dia(x,z,label,dx,dy){var px=FX(x),py=FY(z);
+  line(px,py,px+dx,py+dy,"dimln"); txt(px+dx+ (dx>0?3:-3),py+dy+3,label,"dimtxt",dx>0?"start":"end");}
+dia(0,D.z_headtop-4.5,"Ø9,6", -40,-8);   // head dia
+dia(0,D.z_necktop-0.8,"Ø4,0", -52,6);    // neck dia
+
+// ---- GD&T datum + frames on front ----
+function gdt(x,y,sym,tol,dat){var w=(dat?54:36); var g=E("g",{});
+  E("rect",{x:x,y:y,width:14,height:13,class:"gdtbox"},g);
+  txt(x+7,y+10,sym,"gdttxt");
+  E("rect",{x:x+14,y:y,width:24,height:13,class:"gdtbox"},g);
+  txt(x+26,y+10,tol,"gdttxt");
+  if(dat){E("rect",{x:x+38,y:y,width:14,height:13,class:"gdtbox"},g); txt(x+45,y+10,dat,"gdttxt");}
+  return g;}
+function datum(x,y,letter){E("rect",{x:x-7,y:y,width:14,height:13,class:"gdtbox"});
+  txt(x,y+10,letter,"gdttxt"); line(x,y+13,x,y+20,"lead"); E("path",{d:"M"+(x-4)+","+(y+26)+" L"+(x+4)+","+(y+26)+" L"+x+","+(y+20)+" Z",class:"gdtbox"});}
+// datum A on the base plane (left of centre to avoid the width dims)
+datum(FX(-9),280,"A");
+// coaxiality of stud to A
+var fr=gdt(FX(2.4)+60,FY(D.z_studtop)-30,"◎","0,1","A");
+line(FX(2.4)+60,FY(D.z_studtop)-24,FX(2.4),FY(D.z_studtop-0.9),"lead");
+// perpendicularity of base to A
+gdt(FX(8.1)+8,FY(0)-6,"⟂","0,1","A");
+
+svg.appendChild(gF);
+
+// ---- RIGHT SIDE VIEW ----
+var SCX=470;
+function SX(d){return SCX + d*S;} // depth axis
+var gS=E("g",{});
+function srect(d0,d1,z0,z1,cls){E("rect",{x:SX(Math.min(d0,d1)),y:FY(z1),
+  width:Math.abs(d1-d0)*S,height:(z1-z0)*S,class:cls||"obj"},gS);}
+srect(-5.3,5.3,0,D.z_legtop);          // legs depth
+srect(-5.3,5.3,D.z_legtop,D.z_hiptop,"objc");
+srect(-5.3,4.3,D.z_hiptop,D.z_torsotop);// torso depth taper-ish
+srect(-2,2,D.z_torsotop,D.z_necktop,"objc");
+E("circle",{cx:SX(0),cy:FY(D.z_necktop+4.5),r:4.8*S,class:"obj"},gS); // head profile
+srect(-2.4,2.4,D.z_headtop,D.z_studtop,"objc");
+srect(-6.8,6.8,D.z_hatbot,D.z_hatbot+1.4); // brim
+E("path",{d:"M"+SX(-5.7)+","+FY(D.z_hatbot+1.4)+" L"+SX(-5.7)+","+FY(48.5)+
+  " A"+(5.7*S)+","+(5.7*S)+" 0 0 1 "+SX(5.7)+","+FY(48.5)+" L"+SX(5.7)+","+FY(D.z_hatbot+1.4)+" Z",class:"obj"},gS);
+line(SX(0),FY(-2),SX(0),FY(56),"center",gS);
+txt(SCX,FY(-12),"SET FRA HØJRE","vlabel");
+// depth dim
+line(SX(-5.3),FY(D.z_hiptop),SX(-5.3),FY(D.z_hiptop)+24,"extln");
+line(SX(5.3),FY(D.z_hiptop),SX(5.3),FY(D.z_hiptop)+24,"extln");
+dimLine(SX(-5.3),FY(D.z_hiptop)+22,SX(5.3),FY(D.z_hiptop)+22);
+txt(SX(0),FY(D.z_hiptop)+19,"10,6","dimtxt");
+svg.appendChild(gS);
+
+// ---- TOP VIEW ----
+var TCX=240, TCY=470;
+var gT=E("g",{});
+function circ(r,cls){E("circle",{cx:TCX,cy:TCY,r:r*S,class:cls||"obj"},gT);}
+circ(D.brim_d/2,"obj"); circ(5.7,"objc"); circ(D.head_d/2,"hidden"); circ(D.stud_d/2,"objc");
+line(TCX-26,TCY,TCX+26,TCY,"center",gT); line(TCX,TCY-26,TCX,TCY+26,"center",gT);
+txt(TCX,TCY-22*S/3-30,"SET OVENFRA","vlabel");
+// Ø dims on top
+function topdia(r,label,ang,len){var a=ang*Math.PI/180;
+  var x1=TCX+Math.cos(a)*r*S, y1=TCY+Math.sin(a)*r*S;
+  var x2=TCX+Math.cos(a)*(r*S+len), y2=TCY+Math.sin(a)*(r*S+len);
+  line(x1,y1,x2,y2,"dimln"); txt(x2+ (Math.cos(a)>0?3:-3),y2,label,"dimtxt",Math.cos(a)>0?"start":"end");}
+topdia(D.brim_d/2,"Ø13,6",-35,30);
+topdia(D.stud_d/2,"Ø4,8 (klembund)",30,46);
+svg.appendChild(gT);
+
+// ---- ISO IMAGE ----
+E("image",{href:"iso.png","xlink:href":"iso.png",x:640,y:40,width:330,height:250,
+  preserveAspectRatio:"xMidYMid meet"},svg);
+txt(805,30,"ISOMETRISK (reference)","vlabel");
+E("rect",{x:640,y:40,width:330,height:250,fill:"none",stroke:"#bbb","stroke-width":.6},svg);
+
+// ---- DETAIL A: stud ----
+var dx0=1010, dy0=70, DS=12;            // 8:1-ish detail
+var gD=E("g",{});
+txt(dx0+70,dy0-12,"DETALJE A — KLEMBUND","vlabel");
+txt(dx0+70,dy0-1,"skala 8:1","note");
+E("circle",{cx:dx0+70,cy:dy0+70,r:0,fill:"none"},gD);
+E("rect",{x:dx0+70-D.stud_d/2*DS,y:dy0+30,width:D.stud_d*DS,height:D.stud_h*DS+10,class:"objc"},gD);
+line(dx0+70,dy0+20,dx0+70,dy0+30+D.stud_h*DS+22,"center",gD);
+// dim Ø4.8 with tol
+line(dx0+70-D.stud_d/2*DS,dy0+30,dx0+70-D.stud_d/2*DS-26,dy0+30,"extln",gD);
+line(dx0+70+D.stud_d/2*DS,dy0+30,dx0+70+D.stud_d/2*DS+26,dy0+30,"extln",gD);
+dimLine(dx0+70-D.stud_d/2*DS-22,dy0+22,dx0+70+D.stud_d/2*DS+22,dy0+22);
+txt(dx0+70,dy0+18,"Ø4,80 ⁻⁰⋅⁰⁵ / ₀","dimtxt");
+gdt(dx0+150,dy0+60,"◎","0,1","A");
+txt(dx0+70,dy0+30+D.stud_h*DS+34,"presspasning i Ø4,8 H-hul","note");
+svg.appendChild(gD);
+
+// ====== TABLES ======
+var tol=[
+ ["Reference","Nominel","Tolerance","Pasform / note"],
+ ["Tap (klembund) Ø","4,80","−0,05 / 0  (≈ h9)","Presspasning i Ø4,8 H-hul"],
+ ["Håndbøsning Ø","4,80","+0,06 / +0,02 (≈ H9)","Spillerum — modtager tap"],
+ ["Hals Ø","4,00","−0,04 / 0","Samling i hoved"],
+ ["Hoved Ø","9,60","±0,10","—"],
+ ["Skygge-/bremme Ø","13,60","±0,20","—"],
+ ["Total højde","54,20","ISO 2768-m","Inkl. hat"],
+ ["Skuldebredde","11,00","±0,20","Torso top"],
+];
+var tt=document.getElementById("toltab");
+tol.forEach(function(r,i){var tr=document.createElement("tr");
+  r.forEach(function(c){var cell=document.createElement(i?"td":"th");cell.textContent=c;tr.appendChild(cell);});
+  tt.appendChild(tr);});
+document.getElementById("gennotes").innerHTML =
+  "Generelle toleranser: <b>ISO 2768-mK</b> (lineære + vinkel, middel) · GD&T efter ISO 1101 · "+
+  "Datum <b>A</b> = figurens lodrette akse. Afgrat alle skarpe kanter 0,2×45°. "+
+  "Overflade <b>Ra 1,6 µm</b> hvis ikke andet er angivet.";
+
+// title block
+var tb=[
+ ["k","Titel","big","MINIFIGUR — ståludgave"],
+ ["k","Tegningsnr.","","MF-01-001"],["k","Rev.","","A"],
+ ["k","Materiale","","Stål S235JR (EN 10025-2)"],
+ ["k","Masse","","51,6 g  (ρ = 7,85 g/cm³)"],
+ ["k","Volumen","","6 578,6 mm³"],
+ ["k","Målestok","","2:1"],["k","Enhed","","mm"],
+ ["k","Projektion","proj","1. vinkel"],
+ ["k","Generel tol.","","ISO 2768-mK"],
+ ["k","Overflade","","Ra 1,6 µm"],
+ ["k","Tegnet af","","Frederik R."],["k","Dato","","2026-06-26"],
+ ["k","Format","","A3"],
+];
+var tbl=document.getElementById("titleblk");
+// build as 2-col rows, but Titel spans
+function row(k,v,cls){var tr=document.createElement("tr");
+  var a=document.createElement("td");a.className="k";a.textContent=k;
+  var b=document.createElement("td");b.textContent=v;if(cls)b.className=cls;
+  tr.appendChild(a);tr.appendChild(b);tbl.appendChild(tr);}
+row("Titel","MINIFIGUR — ståludgave","big");
+row("Tegningsnr. / Rev.","MF-01-001  ·  A");
+row("Materiale","Stål S235JR (EN 10025-2)");
+row("Masse / Volumen","51,6 g  ·  6 578,6 mm³  (ρ=7,85)");
+row("Målestok / Enhed","2:1  ·  mm");
+row("Generel tolerance","ISO 2768-mK  (GD&T: ISO 1101)");
+row("Overflade","Ra 1,6 µm · afgrat 0,2×45°");
+row("Projektion","1. vinkel (europæisk)");
+row("Tegnet af / Dato","Frederik R.  ·  2026-06-26");
+row("Format","A3 · ark 1/1");
+// 1st-angle projection symbol drawn into the last cell area (small svg)
+var sym=document.createElementNS(SVGNS,"svg");
+sym.setAttribute("viewBox","0 0 90 34");sym.setAttribute("width","120");sym.setAttribute("height","40");
+var ss='<g fill="none" stroke="#222" stroke-width="1">'+
+ '<circle cx="20" cy="17" r="11"/><circle cx="20" cy="17" r="5"/>'+
+ '<path d="M44 7 L70 12 L70 22 L44 27 Z"/>'+
+ '<line x1="56" y1="9.5" x2="56" y2="24.5" stroke-dasharray="3 2"/></g>';
+sym.innerHTML=ss;
+var trS=document.createElement("tr");var tdS=document.createElement("td");tdS.colSpan=2;
+tdS.style.textAlign="center";tdS.appendChild(sym);tbl.appendChild(trS);trS.appendChild(tdS);
+</script>
+</body>
+</html>

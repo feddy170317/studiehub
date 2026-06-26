@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Minifigur — interaktiv 3D (stål)</title>
+<style>
+  :root{ --panel:rgba(16,21,32,.88); --line:#26324a; --txt:#eaf0fa; --muted:#8ea0bd;
+    --blue:#2156cf; --red:#cc2020; --yellow:#f7c70a; }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden;background:#0a0d13;color:var(--txt);
+    font-family:"Segoe UI",system-ui,Arial,sans-serif;-webkit-user-select:none;user-select:none}
+  #app{position:fixed;inset:0}
+  canvas{display:block;touch-action:none}
+  #title{position:fixed;left:14px;top:12px;z-index:10}
+  #title h2{margin:0;font-size:15px;font-weight:800}
+  #title p{margin:2px 0 0;font-size:11px;color:var(--muted)}
+  #panel{position:fixed;top:12px;right:12px;width:250px;max-width:calc(100vw - 24px);
+    background:var(--panel);backdrop-filter:blur(8px);border:1px solid var(--line);
+    border-radius:14px;padding:13px;z-index:10;box-shadow:0 16px 44px rgba(0,0,0,.5)}
+  #panel h1{font-size:14px;margin:0 0 9px}
+  .grp{margin-bottom:8px}
+  .slabel{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:3px}
+  .slabel b{color:var(--txt);font-variant-numeric:tabular-nums}
+  input[type=range]{-webkit-appearance:none;width:100%;height:5px;border-radius:5px;background:#28324a;outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+    background:var(--yellow);cursor:pointer;border:2px solid #2a2402}
+  .btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .btns button{flex:1 1 46%;padding:9px 4px;border-radius:9px;border:1px solid var(--line);
+    background:#0e1422;color:var(--txt);font-size:12px;font-weight:600;cursor:pointer}
+  .btns button:hover{border-color:var(--yellow)}
+  .btns button.on{background:var(--yellow);color:#241f02;border-color:var(--yellow)}
+  .hint{font-size:10.5px;color:var(--muted);line-height:1.5;margin-top:9px;border-top:1px solid var(--line);padding-top:8px}
+  #readout{position:fixed;left:14px;bottom:12px;z-index:10;font-size:11px;color:var(--muted);
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:7px 10px;line-height:1.5}
+  #readout b{color:var(--txt)}
+  #status{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;
+    color:var(--muted);padding:30px;z-index:20}
+  @media (max-width:640px){
+    #panel{top:auto;bottom:0;right:0;left:0;width:100%;max-width:100%;border-radius:14px 14px 0 0;
+      max-height:50vh;overflow:auto}
+    #readout{display:none}
+    #title h2{font-size:14px}
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="title"><h2>🧱 Minifigur <span style="color:var(--yellow)">MF-01</span></h2>
+  <p>Stål · blå hat · rødt skjorte · hvide bukser</p></div>
+
+<div id="panel">
+  <h1>Posér figuren</h1>
+  <div class="grp"><div class="slabel"><span>Hoved drej</span><b id="vHead">0°</b></div>
+    <input type="range" id="head" min="-90" max="90" step="1" value="0"></div>
+  <div class="grp"><div class="slabel"><span>Arme</span><b id="vArm">0°</b></div>
+    <input type="range" id="arm" min="-110" max="110" step="1" value="0"></div>
+  <div class="grp"><div class="slabel"><span>Ben (skridt)</span><b id="vLeg">0°</b></div>
+    <input type="range" id="leg" min="-45" max="45" step="1" value="0"></div>
+  <div class="btns">
+    <button id="walk">🚶 Gå</button>
+    <button id="wave">👋 Vink</button>
+    <button id="spin">🔄 Roter</button>
+    <button id="reset">↺ Nulstil</button>
+  </div>
+  <div class="hint">Træk i scenen for at dreje kameraet · knib/scroll = zoom.</div>
+</div>
+
+<div id="readout">Højde m. hat: <b>54,2 mm</b> · Masse (stål): <b>51,6 g</b></div>
+<div id="status">Indlæser 3D…</div>
+
+<script src="assets/vendor/three.min.js"></script>
+<script>
+"use strict";
+(function(){
+  var st=document.getElementById('status');
+  function fail(m){ st.style.display='flex'; st.innerHTML='⚠️ '+m; }
+  if(!window.THREE){ fail("Kunne ikke indlæse Three.js (assets/vendor/three.min.js)."); return; }
+  try{ boot(); }catch(e){ fail("Fejl: "+e.message); console.error(e); }
+
+  function boot(){
+    st.style.display='none';
+    var app=document.getElementById('app'), W=app.clientWidth, H=app.clientHeight;
+    var renderer=new THREE.WebGLRenderer({antialias:true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    renderer.setSize(W,H); renderer.shadowMap.enabled=true;
+    renderer.shadowMap.type=THREE.PCFSoftShadowMap; renderer.setClearColor(0x0a0d13,1);
+    renderer.outputEncoding=THREE.sRGBEncoding;
+    renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.15;
+    app.appendChild(renderer.domElement);
+
+    var scene=new THREE.Scene(); scene.fog=new THREE.Fog(0x0a0d13,160,420);
+
+    // procedural environment map so the steel surfaces actually catch light
+    (function(){
+      var c=document.createElement('canvas'); c.width=16; c.height=128;
+      var g=c.getContext('2d'); var grd=g.createLinearGradient(0,0,0,128);
+      grd.addColorStop(0,'#cfe0f5'); grd.addColorStop(0.5,'#7f93b3'); grd.addColorStop(1,'#10151f');
+      g.fillStyle=grd; g.fillRect(0,0,16,128);
+      var tex=new THREE.CanvasTexture(c); tex.mapping=THREE.EquirectangularReflectionMapping;
+      var pmrem=new THREE.PMREMGenerator(renderer);
+      scene.environment=pmrem.fromEquirectangular(tex).texture; tex.dispose();
+    })();
+    var camera=new THREE.PerspectiveCamera(42,W/H,0.5,1000);
+
+    // orbit
+    var camT=new THREE.Vector3(0,26,0), theta=0.6, phi=1.25, rad=120;
+    function cam(){ phi=Math.max(0.18,Math.min(2.85,phi)); rad=Math.max(55,Math.min(300,rad));
+      camera.position.set(camT.x+rad*Math.sin(phi)*Math.sin(theta),
+        camT.y+rad*Math.cos(phi), camT.z+rad*Math.sin(phi)*Math.cos(theta));
+      camera.lookAt(camT); } cam();
+
+    scene.add(new THREE.HemisphereLight(0xcfe0f5,0x1a2230,1.15));
+    var key=new THREE.DirectionalLight(0xffffff,1.6); key.position.set(60,110,50);
+    key.castShadow=true; key.shadow.mapSize.set(2048,2048);
+    var sc=key.shadow.camera; sc.near=10; sc.far=400; sc.left=-90; sc.right=90; sc.top=120; sc.bottom=-40;
+    scene.add(key);
+    var rim=new THREE.DirectionalLight(0x55a0ff,0.35); rim.position.set(-70,40,-60); scene.add(rim);
+
+    // floor
+    var floor=new THREE.Mesh(new THREE.CircleGeometry(160,64),
+      new THREE.MeshStandardMaterial({color:0x131a26,roughness:.95,metalness:.1}));
+    floor.rotation.x=-Math.PI/2; floor.receiveShadow=true; scene.add(floor);
+    var grid=new THREE.GridHelper(320,32,0x2a3550,0x18202e);
+    grid.material.opacity=.45; grid.material.transparent=true; scene.add(grid);
+
+    // ---- materials: brushed steel base tints per part ----
+    function steel(hex){ return new THREE.MeshStandardMaterial({color:hex,metalness:.62,roughness:.4}); }
+    var mBlue=steel(0x2156cf), mYellow=steel(0xf7c70a), mRed=steel(0xcc2020), mWhite=steel(0xdfe3ea);
+
+    function add(parent,geo,mat,x,y,z){ var m=new THREE.Mesh(geo,mat);
+      m.position.set(x||0,y||0,z||0); m.castShadow=true; m.receiveShadow=true; parent.add(m); return m; }
+    // tapered square prism (radialSegments 4), flat faces to axes, custom depth scale
+    function prism(wBot,wTop,h,depthRatio){
+      var g=new THREE.CylinderGeometry(wTop/Math.SQRT2,wBot/Math.SQRT2,h,4,1);
+      g.rotateY(Math.PI/4); g.scale(1,1,depthRatio); return g;
+    }
+
+    // ===== build the minifig as a posable hierarchy (mm, feet at y=0) =====
+    var fig=new THREE.Group(); scene.add(fig);
+
+    // hips
+    var hips=add(fig,new THREE.BoxGeometry(16.4,5.6,10.6),mWhite,0,13.6+2.8,0);
+    // legs (pivot at hip top so they swing about the hip)
+    function legPivot(side){
+      var p=new THREE.Group(); p.position.set(side*4.05,13.6,0); fig.add(p);
+      add(p,new THREE.BoxGeometry(7.7,13.6,10.6),mWhite,0,-13.6/2,0);
+      return p;
+    }
+    var legR=legPivot(1), legL=legPivot(-1);
+
+    // torso
+    var torsoY=13.6+5.6;
+    var torso=add(fig,prism(16.4,11.0,17.0,0.65),mRed,0,torsoY+17/2,0);
+
+    // shoulders / arms (pivot at shoulder)
+    function armPivot(side){
+      var p=new THREE.Group(); p.position.set(side*7.6,torsoY+17-3.5,0); fig.add(p);
+      p.rotation.z=side*-0.12;                 // slight outward rest angle
+      var a=add(p,new THREE.CylinderGeometry(2.3,2.0,12.5,20),mRed,0,-12.5/2,0.6);
+      a.rotation.x=0.18;
+      // hand = clutch ring (torus)
+      var h=new THREE.Mesh(new THREE.TorusGeometry(2.4,1.0,12,24),mYellow);
+      h.position.set(0,-12.2,2.6); h.rotation.x=Math.PI/2; h.castShadow=true; p.add(h);
+      return p;
+    }
+    var armR=armPivot(1), armL=armPivot(-1);
+
+    // neck + head + hat (head pivot so it can turn)
+    var neck=add(fig,new THREE.CylinderGeometry(2.0,2.0,1.6,20),mYellow,0,torsoY+17+0.8,0);
+    var headPivot=new THREE.Group(); headPivot.position.set(0,torsoY+17+1.6,0); fig.add(headPivot);
+    add(headPivot,new THREE.CylinderGeometry(4.8,4.8,9.0,28),mYellow,0,9.0/2,0);
+    add(headPivot,new THREE.CylinderGeometry(2.4,2.4,1.8,24),mYellow,0,9.0+0.9,0); // stud
+    // hat: crown (sphere-capped cylinder) + brim
+    var hat=new THREE.Group(); hat.position.set(0,9.0-1.0,0); headPivot.add(hat);
+    add(hat,new THREE.CylinderGeometry(5.7,5.7,5.4,28),mBlue,0,5.4/2,0);
+    var dome=add(hat,new THREE.SphereGeometry(5.7,28,18,0,Math.PI*2,0,Math.PI/2),mBlue,0,5.4,0);
+    add(hat,new THREE.CylinderGeometry(6.8,6.8,1.4,28),mBlue,0,0.2,0); // brim
+
+    // ===== pose control =====
+    var pose={head:0,arm:0,leg:0};
+    function applyPose(){
+      headPivot.rotation.y = pose.head*Math.PI/180;
+      armR.rotation.x =  pose.arm*Math.PI/180;
+      armL.rotation.x = -pose.arm*Math.PI/180;
+      legR.rotation.x =  pose.leg*Math.PI/180;
+      legL.rotation.x = -pose.leg*Math.PI/180;
+    }
+    applyPose();
+
+    function bind(id,key,lbl,unit){
+      var s=document.getElementById(id), b=document.getElementById(lbl);
+      s.addEventListener('input',function(){ pose[key]=+s.value; b.textContent=s.value+'°'; applyPose(); });
+      return s;
+    }
+    var sHead=bind('head','head','vHead'), sArm=bind('arm','arm','vArm'), sLeg=bind('leg','leg','vLeg');
+    function setSliders(){ sHead.value=pose.head; sArm.value=pose.arm; sLeg.value=pose.leg;
+      vHead.textContent=Math.round(pose.head)+'°'; vArm.textContent=Math.round(pose.arm)+'°';
+      vLeg.textContent=Math.round(pose.leg)+'°'; }
+
+    var walking=false, waving=false, spinning=false, t=0;
+    function toggle(btn,fn){ var el=document.getElementById(btn); el.onclick=function(){ fn(el); }; return el; }
+    toggle('walk',function(el){ walking=!walking; waving=false; el.classList.toggle('on',walking);
+      document.getElementById('wave').classList.remove('on'); });
+    toggle('wave',function(el){ waving=!waving; walking=false; el.classList.toggle('on',waving);
+      document.getElementById('walk').classList.remove('on'); });
+    toggle('spin',function(el){ spinning=!spinning; el.classList.toggle('on',spinning); });
+    toggle('reset',function(){ walking=waving=false; pose={head:0,arm:0,leg:0}; applyPose(); setSliders();
+      document.getElementById('walk').classList.remove('on');
+      document.getElementById('wave').classList.remove('on'); });
+
+    // ===== pointer orbit =====
+    var down=false,lx=0,ly=0,el=renderer.domElement;
+    el.addEventListener('pointerdown',function(e){ el.setPointerCapture(e.pointerId); down=true; lx=e.clientX; ly=e.clientY; });
+    el.addEventListener('pointermove',function(e){ if(!down)return;
+      theta-=(e.clientX-lx)*0.006; phi-=(e.clientY-ly)*0.006; lx=e.clientX; ly=e.clientY; cam(); });
+    el.addEventListener('pointerup',function(){ down=false; });
+    el.addEventListener('wheel',function(e){ e.preventDefault(); rad+=e.deltaY*0.0016*rad; cam(); },{passive:false});
+    // pinch zoom
+    var pinch=0;
+    el.addEventListener('touchmove',function(e){ if(e.touches.length===2){ e.preventDefault();
+      var dx=e.touches[0].clientX-e.touches[1].clientX, dy=e.touches[0].clientY-e.touches[1].clientY;
+      var d=Math.hypot(dx,dy); if(pinch){ rad+=(pinch-d)*0.4; cam(); } pinch=d; } },{passive:false});
+    el.addEventListener('touchend',function(){ pinch=0; });
+
+    window.addEventListener('resize',function(){ W=app.clientWidth; H=app.clientHeight;
+      camera.aspect=W/H; camera.updateProjectionMatrix(); renderer.setSize(W,H); });
+
+    function tick(){
+      t+=0.05;
+      if(walking){ pose.leg=Math.sin(t*2)*32; pose.arm=-Math.sin(t*2)*30; applyPose(); setSliders(); }
+      if(waving){ pose.arm=0; armR.rotation.x=0; armR.rotation.z=-2.2+Math.sin(t*4)*0.25;
+        setSliders(); } else { armR.rotation.z=-0.12; }
+      if(spinning){ theta+=0.006; cam(); }
+      renderer.render(scene,camera);
+      requestAnimationFrame(tick);
+    }
+    tick();
+  }
+})();
+</script>
+</body>
+</html>
