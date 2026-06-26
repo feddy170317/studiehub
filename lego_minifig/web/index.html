@@ -215,29 +215,37 @@
     bill.rotation.x=0.16;           // slight downward droop
     bill.scale.set(1.0,1,1.15);
 
-    // ---- arms: bent LEGO arm, pivot at shoulder, ALL motion about X (no body collision) ----
+    // ---- arms: authentic LEGO arm.  p swings about X (collision-free); inside p a
+    //      fixed outward-leaning upper arm + a forearm that bends FORWARD (+Z, toward
+    //      the face) ending in a forward-facing C-clip hand. +Z = front (face/bill).
     function buildArm(side){
-      var p=new THREE.Group(); p.position.set(side*ARM_X,Y_TORSOTOP-2.6,1.0); fig.add(p);
-      // shoulder cap (cylinder, axis X) — spins in place
-      var cap0=mesh(new THREE.CylinderGeometry(2.3,2.3,2.4,20),mRed,p,0,0,0); cap0.rotation.z=Math.PI/2;
-      // upper arm down
-      mesh(new THREE.CylinderGeometry(1.9,1.8,6.5,20),mRed,p,0,-3.6,0.2);
-      // elbow
-      mesh(new THREE.SphereGeometry(1.9,16,12),mRed,p,0,-7.0,0.6);
-      // forearm: subgroup angled forward (the characteristic bend)
-      var fore=new THREE.Group(); fore.position.set(0,-7.0,0.6); p.add(fore);
-      fore.rotation.x=0.5;          // bend forward
-      mesh(new THREE.CylinderGeometry(1.8,1.7,6.2,20),mRed,fore,0,-3.1,0);
-      // hand = C-clip (open ring) at forearm end
-      var hand=new THREE.Group(); hand.position.set(0,-6.4,0); fore.add(hand);
-      var clip=mesh(new THREE.TorusGeometry(2.0,0.85,12,22,Math.PI*1.5),mYellow,hand,0,0,0);
-      clip.rotation.y=Math.PI/2; clip.rotation.x=Math.PI*0.25;
+      var p=new THREE.Group(); p.position.set(side*ARM_X,Y_TORSOTOP-2.4,0.6); fig.add(p);
+      // rounded shoulder cap + horizontal hinge peg
+      mesh(new THREE.SphereGeometry(2.5,18,14),mRed,p,0,0.2,0);
+      var peg=mesh(new THREE.CylinderGeometry(1.5,1.5,3.0,16),mRed,p,side*0.4,0.2,0); peg.rotation.z=Math.PI/2;
+      // upper arm leans outward (fixed) — increasing |x| keeps it clear of the body
+      var upper=new THREE.Group(); p.add(upper);
+      upper.rotation.z = side*-0.20;
+      mesh(new THREE.CylinderGeometry(1.95,1.8,6.0,20),mRed,upper,0,-3.2,0.1);
+      mesh(new THREE.SphereGeometry(1.85,16,12),mRed,upper,0,-6.2,0.2);   // elbow
+      // forearm bends FORWARD toward the face (negative X-rotation) + slightly inward
+      var fore=new THREE.Group(); fore.position.set(0,-6.2,0.2); upper.add(fore);
+      fore.rotation.x = REST_FORE;        // forward bend (negative)
+      fore.rotation.z = side*0.14;        // slight inward
+      mesh(new THREE.CylinderGeometry(1.8,1.65,5.8,20),mRed,fore,0,-2.9,0);
+      // wrist + C-clip hand, tipped up so the C opening faces forward (to grip)
+      var hand=new THREE.Group(); hand.position.set(0,-5.9,0); fore.add(hand);
+      hand.rotation.x = 0.9;              // cock the wrist up/forward
+      var clip=mesh(new THREE.TorusGeometry(1.95,0.72,14,24,Math.PI*1.5),mYellow,hand,0,0,0.6);
+      clip.rotation.x = Math.PI/2;        // ring lies in X-Z plane, bore vertical (grips a bar)
+      clip.rotation.z = side*0.0;
+      mesh(new THREE.CylinderGeometry(1.0,1.0,1.4,12),mYellow,hand,0,0.4,0); // wrist stub
       return {pivot:p, fore:fore};
     }
     var armR=buildArm(1), armL=buildArm(-1);
 
     // ===================== posing (collision-free) =====================
-    var REST_FORE=0.5;
+    var REST_FORE=-0.7;   // negative = forearm bends FORWARD toward the face (+Z)
     var pose={head:0,arm:0,leg:0};
     function applyPose(){
       headPivot.rotation.y = pose.head*Math.PI/180;
