@@ -115,6 +115,12 @@ function renderHome() {
           </button>
         `).join('') : '<div class="empty-state"><p>Ingen semestre fundet</p></div>'}
       </nav>
+      <h2 style="margin-top:2rem">Andre værktøjer</h2>
+      <nav class="courses">
+        <a class="btn-course" style="display:block;text-decoration:none" href="klinisk-dansk/index.html">
+          🫀 Klinisk Dansk — Sygeplejesprog (DA/EN)
+        </a>
+      </nav>
     </div>
   `;
 }

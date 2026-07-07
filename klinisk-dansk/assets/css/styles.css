@@ -1,0 +1,210 @@
+/* ============================================================
+   KLINISK DANSK — clinical theme (calm, high-contrast, print-ish)
+   Pure CSS, no external fonts required (system stack).
+   ============================================================ */
+:root{
+  --bg:#eef2f6;          /* soft clinical grey-blue */
+  --panel:#ffffff;
+  --ink:#12222e;         /* near-black slate */
+  --muted:#5a6b78;
+  --line:#d7e0e8;
+  --brand:#0e7c86;       /* teal — calm medical accent */
+  --brand-d:#0b5f67;
+  --brand-l:#e3f3f4;
+  --da:#0e7c86;          /* Danish = brand */
+  --en:#7a5cc0;          /* English gloss = soft violet */
+  --en-bg:#f0ecfa;
+  --good:#0f8a4d;
+  --good-bg:#e6f6ee;
+  --bad:#c0392b;
+  --bad-bg:#fbecea;
+  --gold:#c78a1a;
+  --let:#0f8a4d; --mid:#c78a1a; --svaer:#c0392b;
+  --shadow:0 1px 3px rgba(18,34,46,.08),0 6px 20px rgba(18,34,46,.06);
+  --radius:14px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--brand-d)}
+.wrap{max-width:940px;margin:0 auto;padding:0 18px 90px}
+
+/* ---------- top bar / progress ---------- */
+.topbar{
+  position:sticky;top:0;z-index:40;background:rgba(238,242,246,.92);
+  backdrop-filter:saturate(1.2) blur(6px);border-bottom:1px solid var(--line);
+}
+.topbar .row{max-width:940px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:10px 18px}
+.brandmark{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.2px}
+.brandmark .pulse{color:var(--brand)}
+.topbar .spacer{flex:1}
+.homebtn,.pill-link{
+  border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;
+  padding:7px 13px;border-radius:999px;font-weight:600;font-size:14px;text-decoration:none;
+}
+.homebtn:hover,.pill-link:hover{border-color:var(--brand);color:var(--brand-d)}
+.score-chip{font-weight:800;color:var(--brand-d);background:var(--brand-l);
+  border:1px solid #cfe9eb;border-radius:999px;padding:6px 12px;font-size:14px}
+.progress{height:3px;background:var(--brand);width:0;transition:width .2s}
+
+/* ---------- hero ---------- */
+.hero{padding:34px 0 8px;text-align:center}
+.hero .kicker{color:var(--brand-d);font-weight:800;letter-spacing:2px;font-size:12px;text-transform:uppercase}
+.hero h1{font-size:34px;line-height:1.1;margin:.35em 0 .2em}
+.hero p{color:var(--muted);max-width:640px;margin:.3em auto 0}
+
+/* ---------- day cards (hub) ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;margin-top:22px}
+.card{
+  position:relative;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:18px 16px 16px;box-shadow:var(--shadow);cursor:pointer;transition:.16s;text-decoration:none;color:inherit;display:block;
+}
+.card:hover{transform:translateY(-3px);border-color:var(--brand)}
+.card.locked{opacity:.6;cursor:default}
+.card.locked:hover{transform:none;border-color:var(--line)}
+.card .no{position:absolute;top:12px;right:14px;font-weight:800;color:var(--line);font-size:26px}
+.card .emoji{font-size:30px}
+.card h3{margin:6px 0 2px;font-size:18px}
+.card .sub{color:var(--muted);font-size:14px;min-height:38px}
+.card .tag{display:inline-block;margin-top:10px;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;
+  background:var(--brand-l);color:var(--brand-d)}
+.card .tag.soon{background:#eef1f4;color:var(--muted)}
+.best{display:inline-block;margin-top:10px;margin-left:6px;font-size:12px;font-weight:700;color:var(--gold)}
+
+/* ---------- stage nav (tabs) ---------- */
+.stagenav{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 18px;position:sticky;top:47px;z-index:30;
+  background:rgba(238,242,246,.92);backdrop-filter:blur(6px);padding:8px 0}
+.stagenav button{
+  border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 15px;font-weight:700;
+  cursor:pointer;font-size:14px;color:var(--muted);display:flex;align-items:center;gap:7px}
+.stagenav button .n{width:20px;height:20px;border-radius:50%;background:#eef1f4;color:var(--muted);
+  display:grid;place-items:center;font-size:12px}
+.stagenav button.active{border-color:var(--brand);color:var(--brand-d);background:var(--brand-l)}
+.stagenav button.active .n{background:var(--brand);color:#fff}
+
+.stage{display:none;animation:fade .25s}
+.stage.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:20px;box-shadow:var(--shadow);margin-bottom:16px}
+.stagehead{display:flex;align-items:baseline;gap:12px;margin:6px 0 14px}
+.stagehead h2{margin:0;font-size:24px}
+.stagehead .en{color:var(--en);font-weight:600;font-size:15px}
+.lead{color:var(--muted);margin:0 0 16px}
+
+/* ---------- vocabulary group + flashcards ---------- */
+.grouptabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.grouptabs button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 13px;
+  font-weight:700;font-size:13px;cursor:pointer;color:var(--muted)}
+.grouptabs button.active{border-color:var(--brand);color:#fff;background:var(--brand)}
+.cardgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.flip{perspective:1100px;cursor:pointer;min-height:150px}
+.flip-in{position:relative;width:100%;height:100%;min-height:150px;transition:transform .5s;transform-style:preserve-3d}
+.flip.flipped .flip-in{transform:rotateY(180deg)}
+.flface{position:absolute;inset:0;backface-visibility:hidden;border:1px solid var(--line);border-radius:12px;
+  padding:16px;display:flex;flex-direction:column;justify-content:center;background:#fff;box-shadow:var(--shadow)}
+.ffront{border-top:4px solid var(--da)}
+.ffront .word{font-size:19px;font-weight:800;color:var(--da)}
+.ffront .pos{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+.ffront .fliphint{margin-top:auto;font-size:12px;color:var(--muted)}
+.fback{transform:rotateY(180deg);background:var(--en-bg);border-top:4px solid var(--en)}
+.fback .en{font-size:17px;font-weight:800;color:var(--en)}
+.fback .koll{font-size:13px;color:var(--brand-d);margin-top:6px;font-weight:600}
+.fback .eks{font-size:13px;color:var(--ink);margin-top:8px}
+.fback .eks .t{color:var(--muted)}
+
+/* ---------- documentation good/bad ---------- */
+.docpair{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:14px;background:#fff}
+.docpair .bad,.docpair .good{padding:14px 16px}
+.docpair .bad{background:var(--bad-bg);border-left:4px solid var(--bad)}
+.docpair .good{background:var(--good-bg);border-left:4px solid var(--good)}
+.docpair .lbl{font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.docpair .bad .lbl{color:var(--bad)}
+.docpair .good .lbl{color:var(--good)}
+.docpair .why{border-top:1px dashed var(--line);padding:12px 16px;color:var(--muted);font-size:14px;display:none}
+.docpair.open .why{display:block}
+.docpair .toggle{width:100%;text-align:left;border:0;border-top:1px solid var(--line);background:#fafcfd;
+  padding:9px 16px;font-weight:700;color:var(--brand-d);cursor:pointer;font-size:14px}
+.rulelist{list-style:none;padding:0;margin:0 0 8px}
+.rulelist li{padding:9px 0 9px 30px;position:relative;border-bottom:1px solid var(--line)}
+.rulelist li:before{content:"✓";position:absolute;left:4px;top:9px;color:var(--good);font-weight:800}
+.rulelist li:last-child{border-bottom:0}
+.rulelist .en{display:block;color:var(--en);font-size:13px;margin-top:2px}
+
+/* ---------- patient note + exercises ---------- */
+.notebox{background:#fbfdfe;border:1px solid var(--line);border-left:4px solid var(--brand);
+  border-radius:10px;padding:16px 18px;font-size:15px}
+.notebox .note-en{color:var(--muted);font-size:13.5px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);display:none}
+.notebox.show-en .note-en{display:block}
+.minibtn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 12px;font-weight:700;
+  font-size:13px;cursor:pointer;color:var(--brand-d);margin-top:12px}
+.minibtn:hover{border-color:var(--brand)}
+.ex{border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px;background:#fff}
+.ex .type{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--brand-d);
+  background:var(--brand-l);display:inline-block;padding:3px 9px;border-radius:999px}
+.ex .q{font-weight:600;margin:10px 0}
+.ex textarea{width:100%;min-height:64px;border:1px solid var(--line);border-radius:8px;padding:10px;
+  font:inherit;resize:vertical}
+.ex .row{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
+.ex .facit{display:none;margin-top:12px;padding:12px;border-radius:8px;background:var(--good-bg);
+  border-left:4px solid var(--good);font-size:14px}
+.ex .facit .fl{font-weight:800;color:var(--good);text-transform:uppercase;font-size:11px;letter-spacing:1px}
+.ex .hint{display:none;margin-top:10px;color:var(--muted);font-size:14px;font-style:italic}
+.ex.reveal .facit{display:block}
+.ex.hinted .hint{display:block}
+
+/* ---------- quiz ---------- */
+.qprog{display:flex;align-items:center;gap:12px;margin:6px 0 16px}
+.qprog .lab{font-size:13px;color:var(--muted);font-weight:700;white-space:nowrap}
+.qprog .bar{flex:1;height:8px;background:#e2e9ef;border-radius:99px;overflow:hidden}
+.qprog .bar i{display:block;height:100%;background:var(--brand);width:0;transition:width .3s}
+.mc-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.mc-top .qn{font-weight:800;color:var(--muted)}
+.lvl{font-weight:800;font-size:12px;padding:4px 10px;border-radius:999px;color:#fff}
+.lvl.let{background:var(--let)} .lvl.mid{background:var(--mid)} .lvl.sv{background:var(--svaer)}
+.qtext{font-size:18px;font-weight:600;margin-bottom:14px}
+.opt{width:100%;text-align:left;border:1px solid var(--line);background:#fff;border-radius:10px;
+  padding:12px 14px;margin-bottom:9px;cursor:pointer;display:flex;align-items:center;gap:12px;font:inherit;transition:.12s}
+.opt:hover:not(:disabled){border-color:var(--brand);background:var(--brand-l)}
+.opt .lett{width:26px;height:26px;border-radius:7px;background:#eef1f4;display:grid;place-items:center;font-weight:800;flex:none}
+.opt .txt{flex:1}
+.opt .mark{font-weight:800;font-size:18px}
+.opt.correct{border-color:var(--good);background:var(--good-bg)} .opt.correct .lett{background:var(--good);color:#fff}
+.opt.correct .mark{color:var(--good)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-bg)} .opt.wrong .lett{background:var(--bad);color:#fff}
+.opt.wrong .mark{color:var(--bad)}
+.why{display:none;margin-top:6px;padding:14px;border-radius:10px;background:#f4f8fa;border-left:4px solid var(--brand)}
+.why.show{display:block}
+.why.miss{border-left-color:var(--bad);background:var(--bad-bg)}
+.why .wtag{font-weight:800}
+.why .pts{color:var(--gold);font-weight:800;margin-left:10px}
+.combo{position:fixed;right:16px;bottom:16px;background:var(--brand);color:#fff;font-weight:800;
+  padding:10px 16px;border-radius:999px;box-shadow:var(--shadow);opacity:0;transform:translateY(10px);transition:.2s;z-index:50}
+.combo.on{opacity:1;transform:none}
+.combo.bump{animation:bump .3s}
+@keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
+.bigbtn{border:0;background:var(--brand);color:#fff;font-weight:800;padding:12px 22px;border-radius:10px;
+  cursor:pointer;font-size:15px}
+.bigbtn:hover{background:var(--brand-d)}
+.bigbtn.alt{background:#fff;color:var(--brand-d);border:1px solid var(--line)}
+.results{text-align:center;padding:12px}
+.results .big{font-size:52px;font-weight:900;color:var(--brand-d);line-height:1}
+.results .stars{font-size:24px;color:var(--gold);margin:6px 0}
+.results .grade{font-size:26px;font-weight:900}
+.results .detail{color:var(--muted);margin-top:4px}
+.results .row{display:flex;gap:12px;justify-content:center;margin-top:20px;flex-wrap:wrap}
+.dim{color:var(--muted)}
+
+.footer{text-align:center;color:var(--muted);font-size:13px;margin-top:40px;padding-top:20px;border-top:1px solid var(--line)}
+
+@media(max-width:560px){
+  .hero h1{font-size:27px}
+  .stagenav{top:47px}
+  .stagenav button{padding:7px 11px;font-size:13px}
+  .cardgrid,.grid{grid-template-columns:1fr}
+}

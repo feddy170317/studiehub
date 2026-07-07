@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Klinisk Dansk — Sygepleje­sprog</title>
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="row">
+    <span class="brandmark"><span class="pulse">🫀</span> Klinisk Dansk</span>
+    <span class="spacer"></span>
+    <span class="dim" style="font-size:13px">Sygeplejesprog · niveau B2–C1</span>
+  </div>
+  <div class="progress" id="progress"></div>
+</div>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="kicker">Dansk for sundhedspersonale · Bilingual DA / EN</div>
+    <h1>Lær det kliniske fagsprog — én dag ad gangen</h1>
+    <p>Korte daglige lektioner (15–20 min) organiseret efter kropssystem. Hver dag: ordforråd
+       med flip-kort, dokumentationssprog (objektivt vs. vurderende), en rigtig patientnotat-øvelse
+       og en scoret quiz.</p>
+  </div>
+
+  <div class="grid" id="dayGrid"></div>
+
+  <div class="footer">
+    Klinisk Dansk · v1 — Dag 1 (Kredsløb &amp; blodtryk). Flere dage følger.<br>
+    Åbn direkte i browseren (dobbeltklik) — virker helt offline.
+  </div>
+</div>
+
+<!-- Data: alle dage registreres i window.KD_DAYS -->
+<script src="assets/data/dag1_kredsloeb.js"></script>
+<script src="assets/data/dag2_respiration.js"></script>
+<script src="assets/data/dag3_smerte_neuro.js"></script>
+<script src="assets/data/dag4_medicin.js"></script>
+<script>
+(function(){
+  'use strict';
+  // Manifest: hvilke dage findes (bygget + planlagte). Byggede dage har data i KD_DAYS.
+  var MANIFEST = [
+    { slug:'dag1', file:'dag1.html', title:'Kredsløb & blodtryk',  sub:'Puls, BT, saturation, brystsmerter, perifer cirkulation.', emoji:'🫀' },
+    { slug:'dag2', file:'dag2.html', title:'Respiration & saturation', sub:'Dyspnø, atmosfærisk luft vs. ilt, rallen, hoste, ekspektorat.', emoji:'🫁' },
+    { slug:'dag3', file:'dag3.html', title:'Smerte & neuro',        sub:'Skarp/dump/murrende smerte, bevidsthed, svimmelhed, hovedpine.', emoji:'🧠' },
+    { slug:'dag4', file:'dag4.html', title:'Medicin & ordination',  sub:'Ordination vs. administration, dosis, veje, p.n., bivirkninger.', emoji:'💊' }
+  ];
+  var LS='kd_best_v1::';
+  function getBest(slug){ try{ return JSON.parse(localStorage.getItem(LS+slug)); }catch(e){ return null; } }
+
+  var grid=document.getElementById('dayGrid');
+  grid.innerHTML = MANIFEST.map(function(m,i){
+    var built = !!(window.KD_DAYS && window.KD_DAYS[m.slug]) && m.file;
+    var best = built ? getBest(m.slug) : null;
+    var tag = built
+      ? '<span class="tag">4 øvelser · 15–20 min</span>' + (best?'<span class="best">🏆 '+best.pct+'%</span>':'')
+      : '<span class="tag soon">Kommer snart</span>';
+    var inner =
+      '<span class="no">'+(i+1)+'</span>'+
+      '<div class="emoji">'+m.emoji+'</div>'+
+      '<h3>Dag '+(i+1)+' — '+m.title+'</h3>'+
+      '<div class="sub">'+m.sub+'</div>'+
+      tag;
+    return built
+      ? '<a class="card" href="'+m.file+'">'+inner+'</a>'
+      : '<div class="card locked">'+inner+'</div>';
+  }).join('');
+})();
+</script>
+</body>
+</html>
