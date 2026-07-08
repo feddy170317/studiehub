@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>QuizLive — Deltag</title>
+  <link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+
+<!-- Firebase-ikke-sat-op banner -->
+<div id="firebase-banner">
+  <h2>QuizLive</h2>
+  <p>Firebase er ikke sat op endnu — se <code>SETUP.md</code></p>
+  <p style="font-size:0.9rem; color:#6b7280;">Åbn <strong>SETUP.md</strong> og følg trin 1–4 for at tilslutte din Firebase Realtime Database.</p>
+</div>
+
+<!-- Skærm 1: Deltag -->
+<div id="screen-join" class="screen active">
+  <div class="brand">Quiz<span>Live</span></div>
+  <div class="card mt16">
+    <label for="input-pin">Spil-PIN</label>
+    <input
+      id="input-pin"
+      class="pin-input"
+      type="text"
+      inputmode="numeric"
+      pattern="[0-9]*"
+      maxlength="6"
+      placeholder="000000"
+      autocomplete="off"
+    >
+    <label for="input-name">Dit navn</label>
+    <input
+      id="input-name"
+      type="text"
+      maxlength="15"
+      placeholder="Dit navn"
+      autocomplete="off"
+    >
+    <div id="join-error" style="color:#f87171; font-weight:700; margin-bottom:12px; min-height:20px;"></div>
+    <button id="btn-join" class="btn btn-primary">Deltag</button>
+  </div>
+</div>
+
+<!-- Skærm 2: Lobby (venter) -->
+<div id="screen-lobby" class="screen">
+  <div class="brand">Quiz<span>Live</span></div>
+  <div class="card mt16 text-center">
+    <div style="font-size:3rem; margin-bottom:8px;">🎉</div>
+    <div class="text-big" id="lobby-greeting">Du er med!</div>
+    <div class="waiting-msg mt16">Kig op på skærmen — spillet starter snart...</div>
+  </div>
+</div>
+
+<!-- Skærm 3: Spørgsmål (svarknapper) -->
+<div id="screen-question" class="screen" style="padding: 12px 8px;">
+  <div id="q-timer-wrap" class="timer-wrap w100" style="max-width:600px; margin-bottom:8px;">
+    <div id="q-timer-bar" class="timer-bar" style="width:100%;"></div>
+  </div>
+  <div id="answer-grid" class="answer-grid">
+    <button class="answer-btn a" data-choice="0" aria-label="Svar A">
+      <span class="shape">▲</span>
+    </button>
+    <button class="answer-btn b" data-choice="1" aria-label="Svar B">
+      <span class="shape">◆</span>
+    </button>
+    <button class="answer-btn c" data-choice="2" aria-label="Svar C">
+      <span class="shape">●</span>
+    </button>
+    <button class="answer-btn d" data-choice="3" aria-label="Svar D">
+      <span class="shape">■</span>
+    </button>
+  </div>
+  <div id="answered-msg" class="waiting-msg mt8" style="display:none;">
+    Svar sendt! ✔ Vent på resultatet...
+  </div>
+</div>
+
+<!-- Skærm 4: Resultat (rigtigt/forkert) -->
+<div id="screen-reveal" class="screen">
+  <div id="feedback-box" class="feedback-box correct mb16">RIGTIGT! +100</div>
+  <div class="card text-center">
+    <div class="text-muted" style="font-size:0.9rem; text-transform:uppercase; letter-spacing:1px;">Din totalscore</div>
+    <div class="text-giant" id="reveal-score">0</div>
+    <div class="text-muted mt8" id="reveal-placement">Du er nr. ? af ?</div>
+  </div>
+  <div class="waiting-msg mt16">Venter på næste spørgsmål...</div>
+</div>
+
+<!-- Skærm 5: Podiet -->
+<div id="screen-podium" class="screen">
+  <div class="brand">Quiz<span>Live</span></div>
+  <div class="card mt16 text-center">
+    <div class="text-big mb8">Spillet er slut! 🏆</div>
+    <div class="text-muted mb16" id="podium-placement-text"></div>
+    <div class="text-giant" id="podium-score">0</div>
+    <div class="text-muted mt8">point</div>
+  </div>
+  <div id="confetti-area"></div>
+</div>
+
+<!-- Scripts -->
+<script src="assets/firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="assets/player.js"></script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuizLive — Host</title>
+  <link rel="stylesheet" href="assets/app.css">
+  <style>
+    /* Host-specifikke layout-tweaks */
+    body { overflow: hidden; }
+    #screen-setup, #screen-lobby-host,
+    #screen-q, #screen-reveal-host,
+    #screen-score, #screen-podium-host {
+      padding: 20px 32px;
+      justify-content: flex-start;
+      min-height: 100vh;
+      overflow-y: auto;
+    }
+    #screen-q { justify-content: center; }
+
+    .host-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 1200px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #2d1b69;
+      margin-bottom: 16px;
+    }
+    .host-center { width: 100%; max-width: 1000px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    #score-bars-wrap { width: 100%; max-width: 700px; display: flex; flex-direction: column; gap: 10px; }
+    .score-row { position: relative; overflow: hidden; }
+    .score-bar-fill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      background: rgba(168,85,247,0.18);
+      border-radius: var(--radius-sm);
+      transition: width 0.8s cubic-bezier(0.22,1,0.36,1);
+      pointer-events: none;
+    }
+    .podium-row {
+      display: flex; align-items: center; gap: 14px;
+      background: var(--bg-card);
+      border-radius: var(--radius-sm);
+      padding: 10px 16px;
+      width: 100%; max-width: 600px;
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.5s, transform 0.5s;
+    }
+    .podium-row.show { opacity: 1; transform: translateY(0); }
+    .podium-row .medal { font-size: 1.6rem; width: 36px; text-align: center; }
+    .podium-row .p-name { flex: 1; font-weight: 800; font-size: 1.05rem; }
+    .podium-row .p-pts { font-weight: 800; color: var(--accent-glow); font-size: 1.1rem; }
+  </style>
+</head>
+<body>
+
+<!-- Firebase-ikke-sat-op banner -->
+<div id="firebase-banner">
+  <h2>QuizLive</h2>
+  <p>Firebase er ikke sat op endnu — se <code>SETUP.md</code></p>
+  <p style="font-size:0.9rem; color:#6b7280;">Åbn <strong>SETUP.md</strong> og følg trin 1–4 for at tilslutte din Firebase Realtime Database.</p>
+</div>
+
+<!-- Skærm 1: Setup -->
+<div id="screen-setup" class="screen active">
+  <div style="width:100%; max-width:520px; margin: 0 auto; padding-top:40px;">
+    <div class="brand text-center">Quiz<span>Live</span></div>
+    <div class="card mt24">
+      <label for="sel-quiz">Vælg quiz</label>
+      <select id="sel-quiz"></select>
+
+      <label for="sel-timer">Tid per spørgsmål</label>
+      <select id="sel-timer">
+        <option value="10">10 sekunder</option>
+        <option value="15">15 sekunder</option>
+        <option value="20" selected>20 sekunder</option>
+        <option value="30">30 sekunder</option>
+      </select>
+
+      <button id="btn-create" class="btn btn-primary">Opret spil</button>
+    </div>
+  </div>
+</div>
+
+<!-- Skærm 2: Lobby (host) -->
+<div id="screen-lobby-host" class="screen">
+  <div class="host-center">
+    <div class="brand">Quiz<span>Live</span></div>
+    <div class="q-meta">Del denne kode med spillerne</div>
+    <div class="pin-display" id="host-pin">000000</div>
+    <div class="join-url" id="host-url"></div>
+    <div id="qr-container"><div id="qr-code"></div></div>
+    <div class="card w100 text-center" style="max-width:640px;">
+      <div class="q-meta" id="player-count-label">0 spillere</div>
+      <div class="player-chips mt8" id="player-list"></div>
+    </div>
+    <button id="btn-start" class="btn btn-primary" style="max-width:320px;" disabled>
+      Start spillet
+    </button>
+  </div>
+</div>
+
+<!-- Skærm 3: Spørgsmål (host) -->
+<div id="screen-q" class="screen">
+  <div class="host-center">
+    <div class="host-topbar">
+      <div class="q-meta" id="q-progress">Spørgsmål 1/8</div>
+      <div class="timer-number" id="timer-display">20</div>
+      <div class="answer-count" id="q-answer-count">0/0 har svaret</div>
+    </div>
+    <div class="timer-wrap w100">
+      <div id="host-timer-bar" class="timer-bar" style="width:100%;"></div>
+    </div>
+    <div class="q-text" id="q-text">Spørgsmål...</div>
+    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; justify-content:center;">
+      <span id="q-level-badge" class="level-badge level-let">Nem</span>
+    </div>
+    <div class="option-cards w100" id="q-options"></div>
+  </div>
+</div>
+
+<!-- Skærm 4: Reveal (host) -->
+<div id="screen-reveal-host" class="screen">
+  <div class="host-center">
+    <div class="q-text" id="reveal-q-text" style="margin-bottom:12px;"></div>
+    <div class="option-cards w100" id="reveal-options"></div>
+    <div class="bar-chart" id="reveal-chart"></div>
+    <div class="why-box" id="reveal-why"></div>
+    <div style="display:flex; gap:12px; margin-top:16px;">
+      <button id="btn-next" class="btn btn-primary">Næste →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Skærm 5: Scoreboard (mellem spørgsmål) -->
+<div id="screen-score" class="screen">
+  <div class="host-center">
+    <div class="brand" style="font-size:2rem; margin-bottom:8px;">Stillingen</div>
+    <div id="score-bars-wrap"></div>
+    <div style="display:flex; gap:12px; margin-top:20px;">
+      <button id="btn-next-q" class="btn btn-primary">Næste spørgsmål →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Skærm 6: Podiet (host) -->
+<div id="screen-podium-host" class="screen">
+  <div class="host-center">
+    <div class="brand mb16">Spillet er slut! 🏆</div>
+    <div id="podium-host-list" style="width:100%; max-width:600px; display:flex; flex-direction:column; gap:10px;"></div>
+    <button id="btn-end" class="btn btn-danger mt24" style="max-width:320px;">
+      Afslut &amp; slet spil
+    </button>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="assets/firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="quizzes/manifest.js"></script>
+<script src="quizzes/demo.js"></script>
+<script src="assets/vendor/qrcode.min.js"></script>
+<script src="assets/host.js"></script>
+</body>
+</html>
