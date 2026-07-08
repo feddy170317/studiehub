@@ -210,6 +210,7 @@ function renderLesson(eduId, semNum, courseId, lessonId) {
 
 function renderMaterial(material) {
   const iconMap = {
+    flashcards: '🃏',
     quiz: '📝',
     video: '▶',
     podcast: '🎙',
