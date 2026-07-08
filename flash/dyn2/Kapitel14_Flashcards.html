@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="da"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Kapitel 14: Kinetik: Arbejde og Energi</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<style>
+  :root{--bg:#0f1b2d;--card:#16263d;--acc:#2E86C1;--gold:#f1c40f;--txt:#e8eef5;--dim:#9fb3c8;--good:#2ecc71}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:linear-gradient(160deg,#0f1b2d,#0a1220);color:var(--txt);min-height:100vh}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 16px 50px}
+  header{text-align:center;margin-bottom:14px}
+  h1{font-size:1.2rem;margin:.2em 0;color:#fff}
+  .sub{color:var(--dim);font-size:.85rem}
+  .modes{display:flex;gap:8px;justify-content:center;margin:14px 0}
+  .modes button{flex:1;max-width:180px;padding:9px 6px;border:1.5px solid #26405f;border-radius:9px;background:#0f1e33;color:var(--dim);font-size:.82rem;font-weight:600;cursor:pointer}
+  .modes button.on{border-color:var(--acc);color:#fff;background:#16324f}
+  .counter{text-align:center;color:var(--dim);font-size:.85rem;margin-bottom:10px}
+  .scene{perspective:1200px}
+  .card{position:relative;width:100%;min-height:280px;cursor:pointer;transition:transform .5s;transform-style:preserve-3d}
+  .card.flip{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+        background:var(--card);border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.35);
+        display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px;text-align:center}
+  .back{transform:rotateY(180deg)}
+  .lbl{position:absolute;top:14px;left:18px;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--acc);font-weight:700}
+  .content{font-size:1.5rem;line-height:1.4}
+  .name{font-size:1.5rem;font-weight:600;color:#fff}
+  .note{margin-top:14px;color:var(--dim);font-size:.95rem;font-style:italic}
+  .hint{position:absolute;bottom:14px;width:100%;left:0;text-align:center;color:#5b7089;font-size:.75rem}
+  .nav{display:flex;gap:10px;margin-top:18px}
+  .nav button{flex:1;padding:12px;border:0;border-radius:10px;background:#16324f;color:#fff;font-size:.95rem;font-weight:600;cursor:pointer}
+  .nav .flip{background:var(--acc)}
+  .row2{display:flex;gap:10px;margin-top:10px;justify-content:center}
+  .row2 button{padding:9px 16px;border:1.5px solid #26405f;border-radius:9px;background:#0f1e33;color:var(--dim);font-size:.85rem;cursor:pointer}
+  .katex{color:#eaf2fb}
+  .done{color:var(--good)}
+</style></head><body><div class="wrap">
+  <header><h1>🃏 Kapitel 14: Kinetik: Arbejde og Energi</h1><div class="sub">Engineering Mechanics: Dynamics (Hibbeler) · Flashcards</div></header>
+  <div class="modes">
+    <button id="m-nf" onclick="setMode('nf')">Navn → Formel</button>
+    <button id="m-fn" onclick="setMode('fn')">Formel → Navn</button>
+    <button id="m-mix" onclick="setMode('mix')">Bland</button>
+  </div>
+  <div class="counter">Kort <b id="idx">1</b> / <span id="tot">0</span></div>
+  <div class="scene"><div class="card" id="card" onclick="flip()">
+    <div class="face front"><span class="lbl" id="lf">Navn</span><div id="front"></div><div class="hint">klik / mellemrum for at vende</div></div>
+    <div class="face back"><span class="lbl" id="lb">Formel</span><div id="back"></div><div class="hint">← forrige · næste →</div></div>
+  </div></div>
+  <div class="nav">
+    <button onclick="prev()">← Forrige</button>
+    <button class="flip" onclick="flip()">Vend</button>
+    <button onclick="next()">Næste →</button>
+  </div>
+  <div class="row2">
+    <button onclick="shuffleCards()">🔀 Bland kort</button>
+    <button onclick="reset()">↺ Forfra</button>
+  </div>
+</div>
+<script>
+const CARDS=[{"n": "Kinetisk energi", "f": "T=\\tfrac12 mv^2", "note": ""}, {"n": "Princip om arbejde og energi", "f": "T_1+\\textstyle\\sum U_{1\\text{-}2}=T_2", "note": ""}, {"n": "Effekt", "f": "P=\\mathbf{F}\\cdot\\mathbf{v}", "note": ""}, {"n": "Energibevarelse", "f": "T_1+V_1=T_2+V_2", "note": ""}];
+let mode='nf', order=[], dir=[], i=0, flipped=false;
+const $=id=>document.getElementById(id);
+function fmt(l){ try{ if(typeof katex!=='undefined') return katex.renderToString(l,{throwOnError:false,displayMode:true}); }catch(e){} return '<code>'+l+'</code>'; }
+function buildOrder(){ order=CARDS.map((_,k)=>k); dir=CARDS.map(()=> mode==='mix' ? (Math.random()<0.5?'nf':'fn') : mode); }
+function setMode(m){ mode=m; ['nf','fn','mix'].forEach(x=>$('m-'+x).classList.toggle('on',x===m)); buildOrder(); i=0; render(); }
+function curDir(){ return dir[i]; }
+function render(){
+  flipped=false; $('card').classList.remove('flip');
+  $('idx').textContent=i+1; $('tot').textContent=CARDS.length;
+  const c=CARDS[order[i]]; const d=curDir();
+  const nameHTML='<div class="name">'+c.n+'</div>'+(c.note?'<div class="note">'+c.note+'</div>':'');
+  const formHTML='<div class="content">'+fmt(c.f)+'</div>';
+  if(d==='nf'){ $('lf').textContent='Navn'; $('lb').textContent='Formel'; $('front').innerHTML=nameHTML; $('back').innerHTML=formHTML; }
+  else { $('lf').textContent='Formel'; $('lb').textContent='Navn'; $('front').innerHTML=formHTML; $('back').innerHTML=nameHTML; }
+}
+function flip(){ flipped=!flipped; $('card').classList.toggle('flip',flipped); }
+function next(){ i=(i+1)%CARDS.length; render(); }
+function prev(){ i=(i-1+CARDS.length)%CARDS.length; render(); }
+function shuffleCards(){ for(let k=order.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[order[k],order[j]]=[order[j],order[k]];[dir[k],dir[j]]=[dir[j],dir[k]];} i=0; render(); }
+function reset(){ buildOrder(); i=0; render(); }
+document.addEventListener('keydown',e=>{ if(e.code==='Space'){e.preventDefault();flip();} else if(e.key==='ArrowRight')next(); else if(e.key==='ArrowLeft')prev(); });
+window.addEventListener('load',()=>{ setMode('nf'); });
+</script></body></html>
