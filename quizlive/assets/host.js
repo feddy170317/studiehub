@@ -460,6 +460,7 @@
       }
       players.sort(function (a, b) { return b.score - a.score; });
       var maxScore = players.length ? players[0].score : 1;
+      var ranks = computeRanks(players);
 
       var wrap = document.getElementById('score-bars-wrap');
       wrap.innerHTML = '';
@@ -471,7 +472,7 @@
         var barPct = maxScore > 0 ? (p.score / maxScore) * 100 : 0;
         row.innerHTML =
           '<div class="score-bar-fill" style="width:' + barPct + '%;"></div>' +
-          '<div class="rank">' + (i + 1) + '</div>' +
+          '<div class="rank">' + ranks[i] + '</div>' +
           '<div class="name">' + escHtml(p.name) + '</div>' +
           '<div class="pts">' + p.score + ' pt</div>';
         wrap.appendChild(row);
@@ -503,6 +504,7 @@
         });
       }
       players.sort(function (a, b) { return b.score - a.score; });
+      var ranks = computeRanks(players);
 
       var medals = ['🥇', '🥈', '🥉'];
       var list = document.getElementById('podium-host-list');
@@ -511,8 +513,9 @@
       players.forEach(function (p, i) {
         var row = document.createElement('div');
         row.className = 'podium-row';
+        // Medalje efter RANG, ikke listeposition — delt score = samme medalje
         row.innerHTML =
-          '<div class="medal">' + (medals[i] || (i + 1) + '.') + '</div>' +
+          '<div class="medal">' + (medals[ranks[i] - 1] || ranks[i] + '.') + '</div>' +
           '<div class="p-name">' + escHtml(p.name) + '</div>' +
           '<div class="p-pts">' + p.score + ' pt</div>';
         list.appendChild(row);
@@ -535,6 +538,19 @@
       showScreen('screen-setup');
     });
   });
+
+  /* --- Competition-ranking: delt score = delt placering (1, 1, 3, ...) --- */
+  function computeRanks(sortedPlayers) {
+    var ranks = [];
+    sortedPlayers.forEach(function (p, i) {
+      if (i > 0 && p.score === sortedPlayers[i - 1].score) {
+        ranks.push(ranks[i - 1]);
+      } else {
+        ranks.push(i + 1);
+      }
+    });
+    return ranks;
+  }
 
   /* --- HTML-escape hjælper --- */
   function escHtml(str) {
