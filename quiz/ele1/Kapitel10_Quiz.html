@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="da"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz — Kapitel 10</title>
+<style>
+  :root{--bg:#0f1b2d;--card:#16263d;--acc:#2E86C1;--good:#2ecc71;--bad:#e74c3c;--txt:#e8eef5;--dim:#9fb3c8;--gold:#f1c40f}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:linear-gradient(160deg,#0f1b2d,#0a1220);color:var(--txt);min-height:100vh}
+  .wrap{max-width:720px;margin:0 auto;padding:24px 18px 60px}
+  header{text-align:center;margin-bottom:18px}
+  h1{font-size:1.3rem;margin:.2em 0;color:#fff}
+  .sub{color:var(--dim);font-size:.9rem}
+  .hud{display:flex;justify-content:space-between;align-items:center;background:var(--card);border-radius:12px;padding:10px 16px;margin-bottom:16px;font-size:.9rem}
+  .hud b{color:var(--gold);font-size:1.1rem}.combo{color:var(--acc)}
+  .bar{height:6px;background:#0a1220;border-radius:4px;overflow:hidden;margin-bottom:18px}
+  .bar>div{height:100%;background:var(--acc);width:0;transition:width .3s}
+  .card{background:var(--card);border-radius:14px;padding:22px;box-shadow:0 6px 20px rgba(0,0,0,.3)}
+  .tag{display:inline-block;font-size:.72rem;padding:2px 9px;border-radius:20px;margin-bottom:10px;font-weight:600}
+  .let{background:#1e4620;color:#8ef0a0}.mid{background:#4a3a17;color:#f4d47a}.svaer{background:#4a1e1e;color:#f4a0a0}
+  .q{font-size:1.08rem;line-height:1.5;margin-bottom:16px}
+  .opts{display:grid;gap:10px}
+  .opt{background:#0f1e33;border:1.5px solid #26405f;border-radius:10px;padding:12px 14px;cursor:pointer;text-align:left;color:var(--txt);font-size:.98rem;transition:.15s}
+  .opt:hover{border-color:var(--acc)}.opt.correct{border-color:var(--good);background:#123020}
+  .opt.wrong{border-color:var(--bad);background:#301616}.opt:disabled{cursor:default}
+  .exp{margin-top:16px;padding:12px 14px;border-radius:10px;background:#0f1e33;font-size:.9rem;line-height:1.5;display:none}
+  .exp .ref{color:var(--gold);font-weight:600}
+  .next{margin-top:16px;width:100%;padding:13px;border:0;border-radius:10px;background:var(--acc);color:#fff;font-size:1rem;font-weight:600;cursor:pointer;display:none}
+  .end{text-align:center}.end .score{font-size:2.6rem;color:var(--gold);font-weight:700}
+  .grade{font-size:1.3rem;margin:8px 0}
+  .retry{margin-top:18px;padding:12px 26px;border:0;border-radius:10px;background:var(--acc);color:#fff;font-weight:600;cursor:pointer;font-size:1rem}
+</style></head><body><div class="wrap">
+  <header><h1>Kapitel 10 — Felteffekttransistorer (FET)</h1><div class="sub">Fundamentals of Electrical Engineering (Rizzoni) · Test dig selv</div></header>
+  <div class="hud"><span>Spg. <b id="qnum">1</b>/<span id="qtot">10</span></span>
+    <span class="combo">Combo ×<span id="combo">1</span></span>
+    <span>Score <b id="score">0</b></span></div>
+  <div class="bar"><div id="prog"></div></div>
+  <div id="stage"></div></div>
+<script>
+const QUIZ = [{"d": "let", "q": "En MOSFET styres af:", "o": ["Gate-spændingen", "Gate-strømmen", "Drain-modstanden", "Source-effekten"], "a": 0, "e": "V_GS styrer I_D (spændingsstyret). <span class='ref'>[s. 516]</span>"}, {"d": "let", "q": "En MOSFET's tre ben er:", "o": ["Gate, drain, source", "Basis, kollektor, emitter", "Anode, katode, gate", "Plus, minus, gate"], "a": 0, "e": "G, D, S. <span class='ref'>[s. 516]</span>"}, {"d": "mid", "q": "En enhancement-NMOS leder når:", "o": ["V_GS > V_T", "V_GS < V_T", "V_DS = 0", "V_GS = 0"], "a": 0, "e": "Tærsklen V_T skal overskrides. <span class='ref'>[s. 516]</span>"}, {"d": "svaer", "q": "Mætningsstrømmen i en NMOS er:", "o": ["½k(V_GS−V_T)²", "k(V_GS−V_T)", "½k·V_DS", "k/V_GS"], "a": 0, "e": "Kvadratisk i overspændingen. <span class='ref'>[s. 528]</span>"}, {"d": "mid", "q": "I <b>triode</b>-området er MOSFET'en:", "o": ["Styret modstand", "Konstant strømkilde", "En afbrydelse", "En diode"], "a": 0, "e": "Ved lille V_DS: I_D ~ V_DS. <span class='ref'>[s. 523]</span>"}, {"d": "let", "q": "I <b>cutoff</b> (V_GS<V_T) er I_D:", "o": ["Nul", "Maksimum", "β·I_B", "Uendelig"], "a": 0, "e": "Ingen kanal → I_D = 0. <span class='ref'>[s. 523]</span>"}, {"d": "mid", "q": "Fordelen ved <b>CMOS</b> er:", "o": ["Lavt statisk forbrug", "Højere spænding", "Analog forstærkning", "Ingen tærskel"], "a": 0, "e": "Trækker kun strøm ved skift. <span class='ref'>[s. 534]</span>"}, {"d": "svaer", "q": "FET har sammenlignet med BJT:", "o": ["Høj indgangsimpedans", "Lav indgangsimpedans", "Stor styrestrøm", "Ingen tærskel"], "a": 0, "e": "Isoleret gate → høj impedans. <span class='ref'>[s. 516]</span>"}, {"d": "mid", "q": "CMOS består af:", "o": ["NMOS + PMOS", "To NMOS", "NMOS + diode", "BJT + MOSFET"], "a": 0, "e": "Complementary MOS. <span class='ref'>[s. 534]</span>"}, {"d": "let", "q": "Som kontakt skifter MOSFET'en mellem:", "o": ["Cutoff og triode", "To mætninger", "Aktiv og cutoff", "To trioder"], "a": 0, "e": "Off = cutoff, on = triode. <span class='ref'>[s. 534]</span>"}];
+// --- bland svarmulighedernes rækkefølge (position af korrekt svar randomiseres) ---
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+QUIZ.forEach(it=>{
+  const packed = it.o.map((t,idx)=>({t, c: idx===it.a}));
+  shuffle(packed);
+  it.o = packed.map(p=>p.t);
+  it.a = packed.findIndex(p=>p.c);
+});
+const PTS={let:100,mid:150,svaer:200};
+let i=0,score=0,combo=1,best=1;
+const $=id=>document.getElementById(id);
+$('qtot').textContent=QUIZ.length;
+function render(){
+  const it=QUIZ[i];$('qnum').textContent=i+1;$('prog').style.width=(i/QUIZ.length*100)+'%';
+  const dn={let:'LET · 100p',mid:'MIDDEL · 150p',svaer:'SVÆR · 200p'}[it.d];
+  let h=`<div class="card"><span class="tag ${it.d}">${dn}</span><div class="q">${it.q}</div><div class="opts">`;
+  it.o.forEach((o,k)=>h+=`<button class="opt" onclick="answer(${k})">${o}</button>`);
+  h+=`</div><div class="exp" id="exp">${it.e}</div><button class="next" id="next" onclick="next()">${i<QUIZ.length-1?'Næste →':'Se resultat →'}</button></div>`;
+  $('stage').innerHTML=h;
+}
+function answer(k){
+  const it=QUIZ[i];const btns=document.querySelectorAll('.opt');
+  btns.forEach((b,j)=>{b.disabled=true;if(j===it.a)b.classList.add('correct');});
+  if(k===it.a){btns[k].classList.add('correct');score+=PTS[it.d]*combo;combo++;if(combo>best)best=combo;}
+  else{btns[k].classList.add('wrong');combo=1;}
+  $('score').textContent=score;$('combo').textContent=combo;
+  $('exp').style.display='block';$('next').style.display='block';
+}
+function next(){i++;if(i<QUIZ.length)render();else end();}
+function end(){
+  $('prog').style.width='100%';
+  const maxS=(function(){let s=0,c=1;for(const q of QUIZ){s+=PTS[q.d]*c;c++;}return s;})();
+  const ratio=score/maxS;let g;
+  if(ratio>=.85)g='🏆 Fremragende!';else if(ratio>=.6)g='👍 Godt gået';else if(ratio>=.35)g='📚 Ikke dårligt';else g='🔁 Læs kapitlet igen';
+  $('stage').innerHTML=`<div class="card end"><div class="grade">${g}</div><div class="score">${score}</div><div class="sub">point · længste combo ×${best}</div><button class="retry" onclick="location.reload()">Prøv igen</button></div>`;
+}
+render();
+</script></body></html>

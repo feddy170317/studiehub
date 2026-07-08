@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="da"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz — Kapitel 6</title>
+<style>
+  :root{--bg:#0f1b2d;--card:#16263d;--acc:#2E86C1;--good:#2ecc71;--bad:#e74c3c;--txt:#e8eef5;--dim:#9fb3c8;--gold:#f1c40f}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:linear-gradient(160deg,#0f1b2d,#0a1220);color:var(--txt);min-height:100vh}
+  .wrap{max-width:720px;margin:0 auto;padding:24px 18px 60px}
+  header{text-align:center;margin-bottom:18px}
+  h1{font-size:1.3rem;margin:.2em 0;color:#fff}
+  .sub{color:var(--dim);font-size:.9rem}
+  .hud{display:flex;justify-content:space-between;align-items:center;background:var(--card);border-radius:12px;padding:10px 16px;margin-bottom:16px;font-size:.9rem}
+  .hud b{color:var(--gold);font-size:1.1rem}.combo{color:var(--acc)}
+  .bar{height:6px;background:#0a1220;border-radius:4px;overflow:hidden;margin-bottom:18px}
+  .bar>div{height:100%;background:var(--acc);width:0;transition:width .3s}
+  .card{background:var(--card);border-radius:14px;padding:22px;box-shadow:0 6px 20px rgba(0,0,0,.3)}
+  .tag{display:inline-block;font-size:.72rem;padding:2px 9px;border-radius:20px;margin-bottom:10px;font-weight:600}
+  .let{background:#1e4620;color:#8ef0a0}.mid{background:#4a3a17;color:#f4d47a}.svaer{background:#4a1e1e;color:#f4a0a0}
+  .q{font-size:1.08rem;line-height:1.5;margin-bottom:16px}
+  .opts{display:grid;gap:10px}
+  .opt{background:#0f1e33;border:1.5px solid #26405f;border-radius:10px;padding:12px 14px;cursor:pointer;text-align:left;color:var(--txt);font-size:.98rem;transition:.15s}
+  .opt:hover{border-color:var(--acc)}.opt.correct{border-color:var(--good);background:#123020}
+  .opt.wrong{border-color:var(--bad);background:#301616}.opt:disabled{cursor:default}
+  .exp{margin-top:16px;padding:12px 14px;border-radius:10px;background:#0f1e33;font-size:.9rem;line-height:1.5;display:none}
+  .exp .ref{color:var(--gold);font-weight:600}
+  .next{margin-top:16px;width:100%;padding:13px;border:0;border-radius:10px;background:var(--acc);color:#fff;font-size:1rem;font-weight:600;cursor:pointer;display:none}
+  .end{text-align:center}.end .score{font-size:2.6rem;color:var(--gold);font-weight:700}
+  .grade{font-size:1.3rem;margin:8px 0}
+  .retry{margin-top:18px;padding:12px 26px;border:0;border-radius:10px;background:var(--acc);color:#fff;font-weight:600;cursor:pointer;font-size:1rem}
+</style></head><body><div class="wrap">
+  <header><h1>Kapitel 6 — AC Effekt</h1><div class="sub">Fundamentals of Electrical Engineering (Rizzoni) · Test dig selv</div></header>
+  <div class="hud"><span>Spg. <b id="qnum">1</b>/<span id="qtot">10</span></span>
+    <span class="combo">Combo ×<span id="combo">1</span></span>
+    <span>Score <b id="score">0</b></span></div>
+  <div class="bar"><div id="prog"></div></div>
+  <div id="stage"></div></div>
+<script>
+const QUIZ = [{"d": "let", "q": "RMS-værdien af en sinus (amplitude V_m):", "o": ["V_m/√2", "V_m·√2", "V_m/2", "V_m"], "a": 0, "e": "V_rms = V_m/√2 ≈ 0,707 V_m. <span class='ref'>[s. 305]</span>"}, {"d": "mid", "q": "Middeleffekten i AC er:", "o": ["V_rms·I_rms·cosθ", "V_rms·I_rms", "V_m·I_m", "V_rms·I_rms·sinθ"], "a": 0, "e": "P = V_rms I_rms cosθ. <span class='ref'>[s. 304]</span>"}, {"d": "mid", "q": "<b>Effektfaktoren</b> er:", "o": ["cos θ", "sin θ", "tan θ", "θ²"], "a": 0, "e": "pf = cos θ. <span class='ref'>[s. 318]</span>"}, {"d": "svaer", "q": "I S = P + jQ er Q:", "o": ["Reaktiv effekt (VAR)", "Aktiv effekt (W)", "Tilsyneladende (VA)", "Effektfaktoren"], "a": 0, "e": "Q = V_rms I_rms sinθ. <span class='ref'>[s. 311]</span>"}, {"d": "let", "q": "For en ideel transformer:", "o": ["V₁/V₂ = N₁/N₂", "V₁·V₂ = N₁·N₂", "V₁/V₂ = N₂/N₁", "V₁ = V₂"], "a": 0, "e": "Spændingsforhold = viklingsforhold. <span class='ref'>[s. 329]</span>"}, {"d": "mid", "q": "En op-transformer (N₂>N₁) giver:", "o": ["Højere V, lavere I", "Lavere V, højere I", "Samme spænding", "Højere V og I"], "a": 0, "e": "V op, I ned (effekt bevares). <span class='ref'>[s. 330]</span>"}, {"d": "svaer", "q": "I stjerne (Y) er linjespændingen:", "o": ["V_linje = √3·V_fase", "V_linje = V_fase", "V_linje = 3·V_fase", "V_linje = V_fase/√3"], "a": 0, "e": "V_linje = √3 V_fase. <span class='ref'>[s. 339]</span>"}, {"d": "mid", "q": "El transmitteres ved <b>høj spænding</b> for at:", "o": ["Mindske I²R-tab", "Øge strømmen", "Øge effekten", "Øge frekvensen"], "a": 0, "e": "Høj V → lav I → mindre tab. <span class='ref'>[s. 348]</span>"}, {"d": "svaer", "q": "Effektfaktorkorrektion sker typisk med:", "o": ["En parallelkondensator", "En seriemodstand", "En ekstra spole", "En diode"], "a": 0, "e": "Kondensatoren sænker Q og strømmen. <span class='ref'>[s. 318]</span>"}, {"d": "let", "q": "Hvilken effekt udfører arbejde?", "o": ["Aktiv effekt P", "Reaktiv effekt Q", "Tilsyneladende S", "Ingen af dem"], "a": 0, "e": "Kun P (W) omsættes til arbejde. <span class='ref'>[s. 311]</span>"}];
+// --- bland svarmulighedernes rækkefølge (position af korrekt svar randomiseres) ---
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+QUIZ.forEach(it=>{
+  const packed = it.o.map((t,idx)=>({t, c: idx===it.a}));
+  shuffle(packed);
+  it.o = packed.map(p=>p.t);
+  it.a = packed.findIndex(p=>p.c);
+});
+const PTS={let:100,mid:150,svaer:200};
+let i=0,score=0,combo=1,best=1;
+const $=id=>document.getElementById(id);
+$('qtot').textContent=QUIZ.length;
+function render(){
+  const it=QUIZ[i];$('qnum').textContent=i+1;$('prog').style.width=(i/QUIZ.length*100)+'%';
+  const dn={let:'LET · 100p',mid:'MIDDEL · 150p',svaer:'SVÆR · 200p'}[it.d];
+  let h=`<div class="card"><span class="tag ${it.d}">${dn}</span><div class="q">${it.q}</div><div class="opts">`;
+  it.o.forEach((o,k)=>h+=`<button class="opt" onclick="answer(${k})">${o}</button>`);
+  h+=`</div><div class="exp" id="exp">${it.e}</div><button class="next" id="next" onclick="next()">${i<QUIZ.length-1?'Næste →':'Se resultat →'}</button></div>`;
+  $('stage').innerHTML=h;
+}
+function answer(k){
+  const it=QUIZ[i];const btns=document.querySelectorAll('.opt');
+  btns.forEach((b,j)=>{b.disabled=true;if(j===it.a)b.classList.add('correct');});
+  if(k===it.a){btns[k].classList.add('correct');score+=PTS[it.d]*combo;combo++;if(combo>best)best=combo;}
+  else{btns[k].classList.add('wrong');combo=1;}
+  $('score').textContent=score;$('combo').textContent=combo;
+  $('exp').style.display='block';$('next').style.display='block';
+}
+function next(){i++;if(i<QUIZ.length)render();else end();}
+function end(){
+  $('prog').style.width='100%';
+  const maxS=(function(){let s=0,c=1;for(const q of QUIZ){s+=PTS[q.d]*c;c++;}return s;})();
+  const ratio=score/maxS;let g;
+  if(ratio>=.85)g='🏆 Fremragende!';else if(ratio>=.6)g='👍 Godt gået';else if(ratio>=.35)g='📚 Ikke dårligt';else g='🔁 Læs kapitlet igen';
+  $('stage').innerHTML=`<div class="card end"><div class="grade">${g}</div><div class="score">${score}</div><div class="sub">point · længste combo ×${best}</div><button class="retry" onclick="location.reload()">Prøv igen</button></div>`;
+}
+render();
+</script></body></html>
