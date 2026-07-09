@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuizLive — Quiz-editor</title>
+  <link rel="stylesheet" href="assets/app.css">
+  <style>
+    /* Editor-specifikke layout-tweaks */
+    body { overflow-y: auto; }
+
+    /* --- Topbar --- */
+    #editor-topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg-dark);
+      border-bottom: 2px solid #2d1b69;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    #editor-topbar .brand-small {
+      font-family: 'Bangers', cursive;
+      font-size: 1.5rem;
+      color: var(--accent-glow);
+      letter-spacing: 2px;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+    #editor-topbar .brand-small span { color: #fff; }
+    #inp-quiz-title {
+      flex: 2;
+      min-width: 160px;
+      margin-bottom: 0;
+      font-size: 1rem;
+      padding: 10px 14px;
+    }
+    #inp-author {
+      flex: 1;
+      min-width: 120px;
+      margin-bottom: 0;
+      font-size: 1rem;
+      padding: 10px 14px;
+    }
+    #btn-save-quiz {
+      white-space: nowrap;
+      padding: 10px 20px;
+      font-size: 1rem;
+      width: auto;
+    }
+    #topbar-error {
+      width: 100%;
+      color: #f87171;
+      font-size: 0.88rem;
+      font-weight: 700;
+      min-height: 18px;
+      padding-left: 4px;
+    }
+
+    /* --- Slide-canvas --- */
+    #editor-main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 40px;
+      min-height: calc(100vh - 80px);
+    }
+
+    .slide-canvas {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 28px 28px 20px;
+      width: 100%;
+      max-width: 800px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+      border: 2px solid #2d1b69;
+    }
+
+    /* Spørgsmål-textarea */
+    #inp-question {
+      width: 100%;
+      min-height: 90px;
+      padding: 14px 16px;
+      border: 2px solid #3b1d8a;
+      border-radius: var(--radius-sm);
+      background: var(--bg-dark);
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      outline: none;
+      resize: vertical;
+      transition: border-color 0.2s;
+      margin-bottom: 20px;
+      line-height: 1.4;
+      user-select: text;
+    }
+    #inp-question:focus { border-color: var(--accent); }
+    #inp-question.invalid { border-color: #f87171; }
+
+    /* Svarmuligheds-rækker */
+    .option-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .option-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .option-shape-btn {
+      flex-shrink: 0;
+      width: 46px;
+      height: 46px;
+      border-radius: var(--radius-sm);
+      border: 3px solid transparent;
+      font-size: 1.4rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+      background: transparent;
+      color: #fff;
+      position: relative;
+    }
+    .option-shape-btn:active { transform: scale(0.93); }
+    .option-shape-btn.opt-a { background: var(--col-a); }
+    .option-shape-btn.opt-b { background: var(--col-b); }
+    .option-shape-btn.opt-c { background: var(--col-c); color: #1a1040; }
+    .option-shape-btn.opt-d { background: var(--col-d); }
+    .option-shape-btn.correct-marked {
+      border-color: #4ade80;
+      box-shadow: 0 0 0 3px rgba(74,222,128,0.35);
+    }
+    .option-shape-btn .correct-tick {
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      font-size: 0.75rem;
+      background: #4ade80;
+      color: #1a1040;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+    }
+    .option-shape-btn.correct-marked .correct-tick { display: flex; }
+
+    .option-inp {
+      flex: 1;
+      margin-bottom: 0;
+      font-size: 1rem;
+      padding: 10px 14px;
+      user-select: text;
+    }
+    .option-inp.invalid { border-color: #f87171; }
+
+    /* Valgmuligheder for niveau + forklaring */
+    .slide-meta {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+    .slide-meta label { margin-bottom: 4px; }
+    .meta-field { flex: 1; min-width: 140px; }
+    #inp-level {
+      margin-bottom: 0;
+    }
+    #inp-why {
+      width: 100%;
+      min-height: 60px;
+      padding: 10px 14px;
+      border: 2px solid #3b1d8a;
+      border-radius: var(--radius-sm);
+      background: var(--bg-dark);
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      outline: none;
+      resize: vertical;
+      transition: border-color 0.2s;
+      line-height: 1.4;
+      user-select: text;
+    }
+    #inp-why:focus { border-color: var(--accent); }
+
+    /* --- Slide-navigation --- */
+    .slide-nav {
+      width: 100%;
+      max-width: 800px;
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+    }
+    .slide-nav-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    #slide-label {
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--text-muted);
+      min-width: 100px;
+      text-align: center;
+    }
+    .btn-slide-nav {
+      padding: 10px 18px;
+      font-size: 0.95rem;
+      width: auto;
+    }
+    #btn-new-slide {
+      background: linear-gradient(135deg, #059669, #047857);
+      color: #fff;
+    }
+    #btn-new-slide:hover:not(:disabled) {
+      box-shadow: 0 4px 18px rgba(5,150,105,0.45);
+    }
+    #btn-delete-slide {
+      background: linear-gradient(135deg, #be123c, #9f1239);
+      color: #fff;
+    }
+
+    /* Thumbnail-strip */
+    .slide-dots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      max-width: 800px;
+    }
+    .slide-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: #2d1b69;
+      border: 2px solid transparent;
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      transition: background 0.15s, border-color 0.15s;
+      position: relative;
+    }
+    .slide-dot:hover { background: #3b1d8a; color: #fff; }
+    .slide-dot.active-dot {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent-glow);
+    }
+    .slide-dot .dot-warn {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      width: 10px;
+      height: 10px;
+      background: #f87171;
+      border-radius: 50%;
+      display: none;
+    }
+    .slide-dot.incomplete .dot-warn { display: block; }
+
+    /* --- Gemte quizzer-panel --- */
+    #library-panel {
+      width: 100%;
+      max-width: 800px;
+      margin-top: 32px;
+    }
+    #library-toggle {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--accent-glow);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 0;
+      user-select: none;
+      width: 100%;
+    }
+    #library-toggle:hover { color: #fff; }
+    #library-toggle .toggle-arrow { transition: transform 0.2s; display: inline-block; }
+    #library-toggle.open .toggle-arrow { transform: rotate(90deg); }
+    #library-content {
+      display: none;
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      border: 1px solid #2d1b69;
+      margin-top: 8px;
+    }
+    #library-content.open { display: block; }
+    #library-status {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+    }
+    .author-group { margin-bottom: 16px; }
+    .author-group-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      font-weight: 700;
+      margin-bottom: 8px;
+      border-bottom: 1px solid #2d1b69;
+      padding-bottom: 6px;
+    }
+    .quiz-library-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid #2d1b6950;
+      flex-wrap: wrap;
+    }
+    .quiz-library-row:last-child { border-bottom: none; }
+    .quiz-lib-title { flex: 1; font-weight: 700; font-size: 0.98rem; }
+    .quiz-lib-meta { color: var(--text-muted); font-size: 0.82rem; white-space: nowrap; }
+    .btn-lib-edit {
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      width: auto;
+      background: #2d1b69;
+      color: var(--text-muted);
+      border: 2px solid #4c1d95;
+    }
+    .btn-lib-edit:hover { background: #3b1d8a; color: #fff; }
+    .btn-lib-delete {
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      width: auto;
+      background: #3b0a1a;
+      color: #f87171;
+      border: 2px solid #7f1d1d;
+    }
+    .btn-lib-delete:hover { background: #5a1020; color: #fff; }
+
+    /* --- Toast --- */
+    #editor-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #15803d;
+      color: #fff;
+      padding: 14px 24px;
+      border-radius: var(--radius-sm);
+      font-weight: 800;
+      font-size: 1rem;
+      z-index: 9999;
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.35s;
+      opacity: 0;
+      white-space: nowrap;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    #editor-toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    #editor-toast.toast-error { background: #be123c; }
+
+    /* Ny quiz-knap i library */
+    #btn-new-quiz {
+      margin-top: 12px;
+      width: auto;
+      padding: 10px 20px;
+      font-size: 0.95rem;
+      background: linear-gradient(135deg, var(--accent), #7c3aed);
+      color: #fff;
+    }
+
+    /* Hjælpetekst om genvej */
+    .shortcut-hint {
+      font-size: 0.78rem;
+      color: #6b52a8;
+      text-align: right;
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Firebase-ikke-sat-op banner -->
+<div id="firebase-banner">
+  <h2>QuizLive</h2>
+  <p>Firebase er ikke sat op endnu — se <code>SETUP.md</code></p>
+  <p style="font-size:0.9rem; color:#6b7280;">Åbn <strong>SETUP.md</strong> og følg trin 1–4 for at tilslutte din Firebase Realtime Database.</p>
+</div>
+
+<!-- === Topbar === -->
+<div id="editor-topbar">
+  <a href="host.html" class="brand-small">Quiz<span>Live</span></a>
+  <input id="inp-quiz-title" type="text" placeholder="Quizzens navn" autocomplete="off">
+  <input id="inp-author"     type="text" placeholder="Dit navn"     autocomplete="off">
+  <button id="btn-save-quiz" class="btn btn-primary">💾 Gem quiz</button>
+  <div id="topbar-error"></div>
+</div>
+
+<!-- === Hoved-indhold === -->
+<div id="editor-main">
+
+  <!-- Slide-canvas -->
+  <div class="slide-canvas" id="slide-canvas">
+    <label for="inp-question">Spørgsmål</label>
+    <textarea id="inp-question" placeholder="Skriv dit spørgsmål her..."></textarea>
+
+    <!-- Svarmuligheder -->
+    <label>Svarmuligheder <span style="color:#6b52a8; font-size:0.8rem; text-transform:none;">(klik på formen for at markere korrekt svar)</span></label>
+    <div class="option-rows">
+      <div class="option-row">
+        <button class="option-shape-btn opt-a" data-opt="0" aria-label="Markér A som korrekt">
+          ▲<span class="correct-tick">✓</span>
+        </button>
+        <input class="option-inp" id="inp-opt-0" type="text" placeholder="Svarmulighed A" autocomplete="off">
+      </div>
+      <div class="option-row">
+        <button class="option-shape-btn opt-b" data-opt="1" aria-label="Markér B som korrekt">
+          ◆<span class="correct-tick">✓</span>
+        </button>
+        <input class="option-inp" id="inp-opt-1" type="text" placeholder="Svarmulighed B" autocomplete="off">
+      </div>
+      <div class="option-row">
+        <button class="option-shape-btn opt-c" data-opt="2" aria-label="Markér C som korrekt">
+          ●<span class="correct-tick">✓</span>
+        </button>
+        <input class="option-inp" id="inp-opt-2" type="text" placeholder="Svarmulighed C" autocomplete="off">
+      </div>
+      <div class="option-row">
+        <button class="option-shape-btn opt-d" data-opt="3" aria-label="Markér D som korrekt">
+          ■<span class="correct-tick">✓</span>
+        </button>
+        <input class="option-inp" id="inp-opt-3" type="text" placeholder="Svarmulighed D" autocomplete="off">
+      </div>
+    </div>
+
+    <!-- Niveau + forklaring -->
+    <div class="slide-meta">
+      <div class="meta-field">
+        <label for="inp-level">Sværhedsgrad</label>
+        <select id="inp-level">
+          <option value="let">Let (100 pt)</option>
+          <option value="middel" selected>Middel (150 pt)</option>
+          <option value="svaer">Svær (200 pt)</option>
+        </select>
+      </div>
+      <div class="meta-field" style="flex:2;">
+        <label for="inp-why">Forklaring (vises efter afsløringen)</label>
+        <textarea id="inp-why" placeholder="Valgfri forklaring til det korrekte svar..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide-navigation -->
+  <div class="slide-nav">
+    <div class="slide-nav-row">
+      <button id="btn-prev-slide" class="btn btn-secondary btn-slide-nav">◀ Forrige</button>
+      <span id="slide-label">Slide 1 af 1</span>
+      <button id="btn-next-slide" class="btn btn-secondary btn-slide-nav">Næste ▶</button>
+      <button id="btn-new-slide"    class="btn btn-slide-nav">+ Ny slide</button>
+      <button id="btn-delete-slide" class="btn btn-slide-nav">🗑 Slet slide</button>
+    </div>
+    <p class="shortcut-hint">Genvej: Ctrl+Enter = ny slide</p>
+    <!-- Thumbnail-dot strip -->
+    <div class="slide-dots" id="slide-dots"></div>
+  </div>
+
+  <!-- Gemte quizzer -->
+  <div id="library-panel">
+    <button id="library-toggle" class="btn" type="button">
+      <span class="toggle-arrow">▶</span>
+      📚 Gemte quizzer
+    </button>
+    <div id="library-content">
+      <div id="library-status">Indlæser quizzer...</div>
+      <div id="library-list"></div>
+      <button id="btn-new-quiz" class="btn btn-primary" type="button">➕ Ny quiz</button>
+    </div>
+  </div>
+
+</div><!-- #editor-main -->
+
+<!-- Toast-besked -->
+<div id="editor-toast"></div>
+
+<!-- Scripts -->
+<script src="assets/firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="assets/editor.js"></script>
+</body>
+</html>

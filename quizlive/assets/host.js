@@ -78,15 +78,58 @@
     }
   });
 
-  /* --- Quiz-manifest i setup-dropdown --- */
+  /* --- Quiz-manifest + DB-quizzer i setup-dropdown --- */
+  var dbQuizzesMap = {}; // id -> quiz-objekt fra DB
+
   (function populateQuizList() {
     var sel = document.getElementById('sel-quiz');
-    if (!window.QUIZ_MANIFEST) return;
-    window.QUIZ_MANIFEST.forEach(function (qm) {
-      var opt = document.createElement('option');
-      opt.value = qm.id;
-      opt.textContent = qm.title + ' (' + qm.count + ' spørgsmål)';
-      sel.appendChild(opt);
+
+    /* Indbyggede quizzer fra manifest */
+    if (window.QUIZ_MANIFEST && window.QUIZ_MANIFEST.length > 0) {
+      var grpBuiltin = document.createElement('optgroup');
+      grpBuiltin.label = 'Indbygget';
+      window.QUIZ_MANIFEST.forEach(function (qm) {
+        var opt = document.createElement('option');
+        opt.value = qm.id;
+        opt.textContent = qm.title + ' (' + qm.count + ' spørgsmål)';
+        grpBuiltin.appendChild(opt);
+      });
+      sel.appendChild(grpBuiltin);
+    }
+
+    /* Hent DB-quizzer én gang */
+    db.ref('quizzes').once('value').then(function (snap) {
+      if (!snap.exists()) return;
+
+      /* Saml pr. forfatter */
+      var byAuthor = {};
+      snap.forEach(function (child) {
+        var q = child.val();
+        q._id = child.key;
+        dbQuizzesMap[child.key] = q;
+        var author = (q.author || 'Ukendt').trim();
+        if (!byAuthor[author]) byAuthor[author] = [];
+        byAuthor[author].push({ id: child.key, quiz: q });
+      });
+
+      /* Sorter forfattere alfabetisk og tilføj optgroups */
+      var authors = Object.keys(byAuthor).sort(function (a, b) {
+        return a.toLowerCase().localeCompare(b.toLowerCase(), 'da');
+      });
+      authors.forEach(function (author) {
+        var grp = document.createElement('optgroup');
+        grp.label = author;
+        byAuthor[author].forEach(function (item) {
+          var qCnt = Array.isArray(item.quiz.questions) ? item.quiz.questions.length : 0;
+          var opt = document.createElement('option');
+          opt.value = 'db:' + item.id;
+          opt.textContent = item.quiz.title + ' (' + qCnt + ' spørgsmål)';
+          grp.appendChild(opt);
+        });
+        sel.appendChild(grp);
+      });
+    }).catch(function () {
+      /* Hvis DB-hentning fejler, kør videre kun med built-in quizzer */
     });
   })();
 
@@ -97,16 +140,26 @@
 
   /* --- Opret spil --- */
   document.getElementById('btn-create').addEventListener('click', function () {
-    var quizId = document.getElementById('sel-quiz').value;
+    var selValue = document.getElementById('sel-quiz').value;
     var timerSec = parseInt(document.getElementById('sel-timer').value, 10);
 
-    if (!quizId) {
+    if (!selValue) {
       alert('Vælg en quiz først.');
       return;
     }
 
-    // Hent quiz-data
-    var quiz = window.QUIZZES && window.QUIZZES[quizId];
+    // Hent quiz-data — enten fra DB eller fra window.QUIZZES
+    var quiz;
+    var quizId;
+    if (selValue.indexOf('db:') === 0) {
+      var dbId = selValue.slice(3);
+      quiz     = dbQuizzesMap[dbId];
+      quizId   = dbId;
+    } else {
+      quizId = selValue;
+      quiz   = window.QUIZZES && window.QUIZZES[quizId];
+    }
+
     if (!quiz) {
       alert('Quiz-data ikke fundet. Tjek at quizzen er loadet korrekt.');
       return;

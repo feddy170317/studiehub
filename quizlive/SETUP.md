@@ -81,19 +81,36 @@ Når du er færdig med at teste, bør du sætte følgende regler i Firebase Cons
 ```json
 {
   "rules": {
-    "games": {
-      ".read": true,
-      ".write": true
-    },
-    "$other": {
-      ".read": false,
-      ".write": false
-    }
+    "games":   { ".read": true, ".write": true },
+    "quizzes": { ".read": true, ".write": true },
+    "$other":  { ".read": false, ".write": false }
   }
 }
 ```
 
-Dette begrænser adgang til kun `/games`-noden.
+Dette begrænser adgang til kun `/games`- og `/quizzes`-noderne.  
+`/quizzes` bruges af quiz-editoren til at gemme og hente quiz-data.
+
+---
+
+## Quiz-editoren
+
+QuizLive indeholder en indbygget quiz-editor, som giver alle med linket mulighed for at oprette og redigere quizzer direkte i browseren.
+
+**Åbn editoren:**
+- Klik på **"✏️ Åbn quiz-editoren"** på host-opsætningssiden (`host.html`)
+- Eller åbn `editor.html` direkte
+
+**Funktioner:**
+- Opret quizzer med op til ubegrænset antal slides
+- Angiv spørgsmål, 4 svarmuligheder og markér det korrekte svar
+- Vælg sværhedsgrad: Let (100 pt), Middel (150 pt) eller Svær (200 pt)
+- Tilføj valgfri forklaring til det korrekte svar
+- Gem quizzer til databasen — de er straks tilgængelige i host-dropdown
+- Redigér eller slet eksisterende quizzer fra "📚 Gemte quizzer"-panelet
+
+**Adgang:**  
+Alle med linket til `editor.html` kan oprette og redigere quizzer. Der er ingen login-beskyttelse — brug firewall/adgangskodebeskyttelse på serverniveau hvis du vil begrænse adgangen.
 
 ---
 
