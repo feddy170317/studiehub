@@ -204,6 +204,10 @@ hvis/når fremmede moduler skal kunne opdateres uden at overskrive lokale juster
 
 ## 9. Parkeret (bevidst — ikke glemt)
 
+> **Se PLATFORM_VISION.md** (14/7-2026) for den fulde v3-plan: organisations-model
+> (multi-tenant), roller, org-valutaer/wallets, abonnementer, sikkerhed/GDPR og svarene
+> på de 12 produktspørgsmål. Punkterne herunder er dækket dér i større detalje.
+
 - **Rigtig auth** (e-mail/password, roller) — kræves før fremmede familier. PIN rækker til v1.
 - **Sikkerhed/anti-snyd:** databasen er åben; fint til familie, uholdbart til fremmede.
 - **Skoler/klasser:** lærer-admin, hold, GDPR, godkendelse i skala (25 elever).
