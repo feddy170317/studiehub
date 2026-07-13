@@ -86,6 +86,36 @@
     legendary: { name: 'Legendarisk', color: '#7fe7ff' }
   };
 
+  // ---------- Style-butik (avatar-kosmetik, købes for guld/💠) ----------
+  var COSMETICS = [
+    { id: 'bg_hav',        slot: 'bg',    name: 'Hav-tema',           icon: '🌊', cls: 'bg-hav',        gold: 60 },
+    { id: 'bg_skov',       slot: 'bg',    name: 'Skov-tema',          icon: '🌲', cls: 'bg-skov',       gold: 60 },
+    { id: 'bg_solnedgang', slot: 'bg',    name: 'Solnedgangs-tema',   icon: '🌅', cls: 'bg-solnedgang', gold: 80 },
+    { id: 'bg_galakse',    slot: 'bg',    name: 'Galakse-tema',       icon: '🌌', cls: 'bg-galakse',    gold: 150 },
+    { id: 'frame_flamme',  slot: 'frame', name: 'Flamme-ring',        icon: '🔥', cls: 'frame-flamme',  gold: 120 },
+    { id: 'frame_regnbue', slot: 'frame', name: 'Regnbue-ring',       icon: '🌈', cls: 'frame-regnbue', gold: 150 },
+    { id: 'frame_stjerne', slot: 'frame', name: 'Stjerne-ring',       icon: '✨', cls: 'frame-stjerne', gold: 200 },
+    { id: 'frame_krystal', slot: 'frame', name: 'Krystal-ring',       icon: '💠', cls: 'frame-krystal', coin: 30 },
+    { id: 'title_flittig', slot: 'title', name: 'Titel: den Flittige',      icon: '📜', text: 'den Flittige',      gold: 80 },
+    { id: 'title_quest',   slot: 'title', name: 'Titel: Questmesteren',     icon: '📜', text: 'Questmesteren',     gold: 120 },
+    { id: 'title_legende', slot: 'title', name: 'Titel: den Legendariske',  icon: '📜', text: 'den Legendariske',  coin: 40 }
+  ];
+  // Klistermærke-album (tilfældige drops fra godkendte quests, max 1/dag)
+  var STICKERS = [
+    { id: 'st_enhjorning', name: 'Enhjørningen', icon: '🦄' },
+    { id: 'st_drage',      name: 'Dragen',       icon: '🐉' },
+    { id: 'st_fe',         name: 'Feen',         icon: '🧚' },
+    { id: 'st_havfrue',    name: 'Havfruen',     icon: '🧜‍♀️' },
+    { id: 'st_orn',        name: 'Ørnen',        icon: '🦅' },
+    { id: 'st_ulv',        name: 'Ulven',        icon: '🐺' },
+    { id: 'st_ugle',       name: 'Uglen',        icon: '🦉' },
+    { id: 'st_skildpadde', name: 'Skildpadden',  icon: '🐢' },
+    { id: 'st_raev',       name: 'Ræven',        icon: '🦊' },
+    { id: 'st_delfin',     name: 'Delfinen',     icon: '🐬' },
+    { id: 'st_sommerfugl', name: 'Sommerfuglen', icon: '🦋' },
+    { id: 'st_stjerne',    name: 'Ønskestjernen', icon: '🌟' }
+  ];
+
   // ---------- Modul-motor ----------
   // Samler alle aktiverede moduler til ét indholds-katalog.
   function windowState(mod) {
@@ -138,7 +168,7 @@
   //           events: [{earnedTs, questKey, module, skills[]}], totalXp }
   function computeState(ledgerObj, opts) {
     opts = opts || {};
-    var st = { xp: {}, gold: 0, coin: 0, badges: {}, events: [], totalXp: 0, unseen: [] };
+    var st = { xp: {}, gold: 0, coin: 0, badges: {}, cosmetics: {}, stickers: {}, events: [], totalXp: 0, unseen: [] };
     var evMap = {};
     Object.keys(ledgerObj || {}).forEach(function (id) {
       var e = ledgerObj[id];
@@ -156,6 +186,8 @@
       } else if (e.type === 'gold') st.gold += (e.amount || 0);
       else if (e.type === 'coin') st.coin += (e.amount || 0);
       else if (e.type === 'badge') st.badges[id] = e;
+      else if (e.type === 'cosmetic') st.cosmetics[e.item] = e;
+      else if (e.type === 'sticker') st.stickers[e.item] = e;
     });
     st.events = Object.keys(evMap).map(function (k) { return evMap[k]; })
       .sort(function (a, b) { return a.earnedTs - b.earnedTs; });
@@ -246,6 +278,12 @@
       else if (r.type === 'milestone') earned = skillLevelOf(content, state, r.skill).level >= (r.level || 1);
       if (earned) out.push({ key: b.key, badge: b });
     });
+    // Klistermærke-albummet fuldt → legendarisk badge
+    if (!state.badges['b_core__album'] && STICKERS.every(function (s) { return state.stickers[s.id]; })) {
+      out.push({ key: 'b_core__album', badge: {
+        id: 'album', name: 'Klistermærke-mesteren', icon: '📔', rarity: 'legendary', module: 'core'
+      } });
+    }
     content.streaks.forEach(function (s) {
       var st = computeStreak(s, state);
       (s.milestones || []).forEach(function (m) {
@@ -407,6 +445,7 @@
     dateKey: dateKey, isoWeekKey: isoWeekKey, monthKey: monthKey,
     periodKeyFor: periodKeyFor, DAY_NAMES: DAY_NAMES, DAY_SHORT: DAY_SHORT,
     levelFromXp: levelFromXp, heroLevel: heroLevel, heroTier: heroTier, RARITY: RARITY,
+    COSMETICS: COSMETICS, STICKERS: STICKERS,
     windowState: windowState, assemble: assemble, childrenOf: childrenOf, mainSkills: mainSkills,
     computeState: computeState, skillXpOf: skillXpOf, skillLevelOf: skillLevelOf,
     computeStreak: computeStreak, pendingBadges: pendingBadges,

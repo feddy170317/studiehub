@@ -113,8 +113,10 @@
     renderQuests();
     renderSkills();
     renderBadgeWall();
+    renderStickers();
     renderStreaks();
     renderShop();
+    renderStyleShop();
     renderLog();
     maybeShowChest();
   }
@@ -134,15 +136,28 @@
   }
 
   // ═══════════ HEADER ═══════════
+  function cosmeticById(id) {
+    return HQ.COSMETICS.filter(function (c) { return c.id === id; })[0] || null;
+  }
+  function equippedIn(slot) {
+    var kid = st.kids[st.kidId] || {};
+    var id = (kid.equipped || {})[slot];
+    if (!id || !st.state.cosmetics[id]) return null;   // skal både være valgt OG ejet
+    return cosmeticById(id);
+  }
+
   function renderHeader() {
     var kid = st.kids[st.kidId];
     if (!kid) return;
     var hero = HQ.heroLevel(st.state.totalXp);
     var tier = HQ.heroTier(hero.level);
+    var frame = equippedIn('frame'), bg = equippedIn('bg'), title = equippedIn('title');
     var av = $('#avatar-btn');
     av.textContent = kid.avatar || '🦸‍♀️';
-    av.className = 'avatar-ring ' + tier.cls;
-    $('#hero-name').textContent = kid.name;
+    av.className = 'avatar-ring ' + tier.cls + (frame ? ' ' + frame.cls : '');
+    var bar = av.closest('.hero-bar');
+    bar.className = 'card hero-bar' + (bg ? ' ' + bg.cls : '');
+    $('#hero-name').textContent = kid.name + (title ? ' ' + title.text : '');
     $('#hero-sub').textContent = tier.icon + ' ' + tier.name + '-helt · Level ' + hero.level;
     $('#hero-xp-fill').style.width = hero.pct + '%';
     $('#hero-xp-label').textContent = hero.into + ' / ' + hero.need + ' XP til level ' + (hero.level + 1);
@@ -383,6 +398,8 @@
     var groups = {}, order = [];
     entries.forEach(function (e) {
       if (e.type === 'badge') { cards.push({ kind: 'badge', e: e }); return; }
+      if (e.type === 'sticker') { cards.push({ kind: 'sticker', e: e }); return; }
+      if (e.type === 'cosmetic') return;
       var gk = e.questKey ? e.questKey + '|' + (e.earnedTs || e.ts) : 'misc|' + e._id;
       if (!groups[gk]) { groups[gk] = { name: e.name || '', icon: e.icon || '✨', xp: [], gold: 0, coin: 0 }; order.push(gk); }
       if (e.type === 'xp') groups[gk].xp.push({ skill: e.skill, amount: e.amount || 0 });
@@ -399,7 +416,10 @@
       if (b > a) cards.push({ kind: 'levelup', name: st.content.skills[sid].name, icon: st.content.skills[sid].icon, level: b });
     });
     var ha = HQ.heroLevel(pre.totalXp).level, hb = HQ.heroLevel(post.totalXp).level;
-    if (hb > ha) cards.push({ kind: 'hero', level: hb, tier: HQ.heroTier(hb) });
+    if (hb > ha) cards.push({
+      kind: 'hero', level: hb, tier: HQ.heroTier(hb),
+      newTier: HQ.heroTier(hb).name !== HQ.heroTier(ha).name
+    });
 
     var i = 0;
     function show() {
@@ -432,6 +452,12 @@
           '<div class="r-sub" style="font-weight:800;color:' + rar.color + '">' + esc(c.e.name) + ' · ' + rar.name + '</div>';
         HQ.chime('badge');
         HQ.confetti({ count: 110 });
+      } else if (c.kind === 'sticker') {
+        inner = '<div class="r-ico" style="font-size:3.6rem">' + esc(c.e.icon || '🌟') + '</div>' +
+          '<div class="r-big">SJÆLDENT FUND!</div>' +
+          '<div class="r-sub">Klistermærket <b>' + esc(c.e.name) + '</b> lå gemt i kisten!<br>Se dit album under Skills 📔</div>';
+        HQ.chime('badge');
+        HQ.confetti({ count: 120 });
       } else if (c.kind === 'levelup') {
         inner = '<div class="r-ico">' + esc(c.icon || '⭐') + '</div>' +
           '<div class="r-big">LEVEL ' + c.level + '!</div>' +
@@ -439,11 +465,23 @@
         HQ.chime('levelup');
         HQ.confetti({ count: 130 });
       } else {
-        inner = '<div class="r-ico">' + c.tier.icon + '</div>' +
-          '<div class="r-big">HELTELEVEL ' + c.level + '!</div>' +
-          '<div class="r-sub">Du er nu en ' + c.tier.name + '-helt!</div>';
+        // EVOLVE-FEJRING: helten udvikler sig (heltelevel/tier-skift)
+        var kid = st.kids[st.kidId] || {};
+        var frame = equippedIn('frame');
+        var last0 = i === cards.length - 1;
+        ov.innerHTML =
+          '<div class="evolve-wrap"><div class="evolve-rays"></div>' +
+          '<div class="evolve-avatar' + (frame ? ' ' + frame.cls : '') + '" style="border-color:' + (c.tier.cls === 'tier-diamond' ? '#7fe7ff' : c.tier.cls === 'tier-gold' ? '#ffd54f' : c.tier.cls === 'tier-silver' ? '#c9d3e0' : '#b0764a') + '">' + esc(kid.avatar || '🦸‍♀️') + '</div></div>' +
+          '<div class="evolve-title">DIN HELT UDVIKLER SIG!</div>' +
+          '<div class="evolve-sub">' + c.tier.icon + ' Heltelevel <b>' + c.level + '</b> — ' + c.tier.name + '-helt' +
+          (c.newTier ? '<br>✨ NY RANG: din ring er nu af ' + c.tier.name.toLowerCase() + '!' : '') + '</div>' +
+          '<button class="btn gold" style="margin-top:26px">' + (last0 ? 'Færdig ✨' : 'Næste →') + '</button>' +
+          '<div class="chest-progress">' + (i + 1) + ' / ' + cards.length + '</div>';
         HQ.chime('levelup');
-        HQ.confetti({ count: 170 });
+        HQ.confetti({ count: 200 });
+        setTimeout(function () { HQ.chime('badge'); }, 900);
+        ov.querySelector('.btn').addEventListener('click', function () { i++; show(); }, { once: true });
+        return;
       }
       var last = i === cards.length - 1;
       ov.innerHTML = '<div class="reveal-card' + (c.kind === 'badge' && c.e.rarity === 'legendary' ? ' r-legendary' : '') + '">' + inner + '</div>' +
@@ -496,6 +534,72 @@
     HQ.toast('🎁 Købt! En voksen skal nu levere den 😄');
     HQ.confetti({ count: 70 });
   });
+
+  // ═══════════ STYLE-BUTIK (avatar-kosmetik for guld/💠) ═══════════
+  function renderStyleShop() {
+    var box = $('#style-grid');
+    if (!box || !st.kidId) return;
+    var kid = st.kids[st.kidId] || {};
+    box.innerHTML = HQ.COSMETICS.map(function (c) {
+      var owned = !!st.state.cosmetics[c.id];
+      var inUse = owned && (kid.equipped || {})[c.slot] === c.id;
+      var priceTxt = c.gold ? '🪙 ' + c.gold : '💠 ' + c.coin;
+      var afford = c.gold ? st.state.gold >= c.gold : st.state.coin >= c.coin;
+      var btn;
+      if (!owned) btn = '<button class="btn gold small" data-buy-style="' + c.id + '"' + (afford ? '' : ' disabled') + '>' + priceTxt + '</button>';
+      else if (inUse) btn = '<button class="btn small inuse" data-equip="' + c.id + '">Brugt ✔</button>';
+      else btn = '<button class="btn small" data-equip="' + c.id + '">Brug</button>';
+      return '<div class="shop-item style-item">' +
+        '<div class="s-ico">' + esc(c.icon) + '</div>' +
+        '<div class="s-title">' + esc(c.name) + '</div>' +
+        (owned ? '<div class="s-owned">✓ Ejet</div>' : '') +
+        btn + '</div>';
+    }).join('');
+  }
+
+  document.addEventListener('click', function (e) {
+    var bs = e.target.closest('[data-buy-style]');
+    if (bs) {
+      var c = cosmeticById(bs.getAttribute('data-buy-style'));
+      if (!c || st.state.cosmetics[c.id]) return;
+      var canPay = c.gold ? st.state.gold >= c.gold : st.state.coin >= c.coin;
+      if (!canPay) { HQ.toast(c.gold ? 'Ikke nok guld endnu 🪙' : 'Kræver event-mønter 💠 — de kommer fra særlige challenges'); return; }
+      if (!confirm('Køb "' + c.name + '" for ' + (c.gold ? c.gold + ' guld' : c.coin + ' 💠') + '?')) return;
+      var lRef = HQ.ref('ledger/' + st.kidId);
+      lRef.push({ ts: Date.now(), type: 'cosmetic', item: c.id, slot: c.slot, name: c.name, icon: c.icon, source: 'purchase', unseen: false });
+      lRef.push({ ts: Date.now(), type: c.gold ? 'gold' : 'coin', amount: -(c.gold || c.coin), name: 'Køb: ' + c.name, icon: c.icon, source: 'purchase', unseen: false });
+      HQ.ref('kids/' + st.kidId + '/equipped/' + c.slot).set(c.id);
+      HQ.chime('coin');
+      HQ.confetti({ count: 60 });
+      HQ.toast('🎨 ' + c.name + ' er dit — og taget i brug!');
+      return;
+    }
+    var eq = e.target.closest('[data-equip]');
+    if (eq) {
+      var c2 = cosmeticById(eq.getAttribute('data-equip'));
+      if (!c2 || !st.state.cosmetics[c2.id]) return;
+      var kid = st.kids[st.kidId] || {};
+      var cur = (kid.equipped || {})[c2.slot];
+      HQ.ref('kids/' + st.kidId + '/equipped/' + c2.slot).set(cur === c2.id ? null : c2.id);
+      HQ.chime('pop');
+    }
+  });
+
+  // ═══════════ KLISTERMÆRKE-ALBUM ═══════════
+  function renderStickers() {
+    var box = $('#sticker-album');
+    if (!box) return;
+    var owned = 0;
+    box.innerHTML = HQ.STICKERS.map(function (s) {
+      var has = !!st.state.stickers[s.id];
+      if (has) owned++;
+      return '<div class="sticker ' + (has ? 'owned' : 'missing') + '">' +
+        (has ? '<span>' + esc(s.icon) + '</span><span class="st-name">' + esc(s.name) + '</span>'
+             : '<span class="st-q">?</span>') +
+      '</div>';
+    }).join('');
+    $('#sticker-count').textContent = owned + ' / ' + HQ.STICKERS.length;
+  }
 
   function renderPurchases() {
     var box = $('#my-purchases');

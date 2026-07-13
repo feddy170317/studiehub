@@ -191,9 +191,33 @@
       if (r.gold) lRef.push(Object.assign({}, base, { type: 'gold', amount: r.gold }));
       if (r.eventCoin || r.coin) lRef.push(Object.assign({}, base, { type: 'coin', amount: r.eventCoin || r.coin }));
     });
+    rollBonusDrop(kidId, lRef, now);
     cRef.update({ status: 'approved', approvedTs: now });
     HQ.toast('✅ Godkendt — ' + rewardSummary(c.rewards));
   });
+
+  // Variabel belønning (jf. INSPIRATION.md §3): 25 % chance for et sjældent fund
+  // ved godkendelse — men max ét pr. dag, og det kan ALDRIG købes.
+  function rollBonusDrop(kidId, lRef, now) {
+    if (Math.random() >= 0.25) return;
+    var ledger = st.ledgers[kidId] || {};
+    var today = HQ.dateKey();
+    var owned = {}, droppedToday = false;
+    Object.keys(ledger).forEach(function (id) {
+      var e = ledger[id];
+      if (!e) return;
+      if (e.type === 'sticker') owned[e.item] = true;
+      if (e.source === 'drop' && HQ.dateKey(new Date(e.ts)) === today) droppedToday = true;
+    });
+    if (droppedToday) return;
+    var missing = HQ.STICKERS.filter(function (s) { return !owned[s.id]; });
+    if (missing.length) {
+      var pick = missing[Math.floor(Math.random() * missing.length)];
+      lRef.push({ ts: now, type: 'sticker', item: pick.id, name: pick.name, icon: pick.icon, source: 'drop', by: 'auto', unseen: true });
+    } else {
+      lRef.push({ ts: now, type: 'gold', amount: 15, name: 'Sjældent fund: en pose guld!', icon: '💰', source: 'drop', by: 'auto', unseen: true });
+    }
+  }
 
   // ═══════════ KØB ═══════════
   function pendingPurchases() {
