@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>HelteQuest — Admin 🛡️</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🛡️</text></svg>">
+<link rel="stylesheet" href="assets/fonts/fonts.css">
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+
+<!-- ═══════════ FØRSTE OPSÆTNING ═══════════ -->
+<div id="screen-setup" class="login-screen" style="display:none">
+  <div class="login-logo">🛡️</div>
+  <h1 class="login-title" style="font-size:2.4rem">Velkommen til HelteQuest</h1>
+  <p class="login-sub">Lad os sætte familien op — det tager ét minut</p>
+  <div class="card" style="max-width:420px;width:100%;text-align:left">
+    <label>Voksen-PIN (4 cifre — til denne admin-side)</label>
+    <input id="setup-admin-pin" type="tel" maxlength="4" placeholder="F.eks. 1717">
+    <label>Barnets navn</label>
+    <input id="setup-kid-name" placeholder="F.eks. Alma">
+    <label>Barnets avatar (emoji)</label>
+    <input id="setup-kid-avatar" value="🦸‍♀️" maxlength="4">
+    <label>Barnets PIN (4 cifre — til at logge ind i spillet)</label>
+    <input id="setup-kid-pin" type="tel" maxlength="4" placeholder="F.eks. 2019">
+    <label>Start-moduler (kan altid ændres senere)</label>
+    <div id="setup-modules"></div>
+    <div style="margin-top:18px">
+      <button id="setup-go" class="btn gold" style="width:100%">🚀 Opret eventyret</button>
+    </div>
+    <p style="color:var(--muted);font-size:0.8rem;margin-top:12px">
+      Modulerne indeholder færdigheder, quests, badges og streaks — alt kan redigeres bagefter. Der oprettes også en lille butik.
+    </p>
+  </div>
+</div>
+
+<!-- ═══════════ LOGIN ═══════════ -->
+<div id="screen-pin" class="login-screen" style="display:none">
+  <div class="login-logo">🛡️</div>
+  <h1 class="login-title" style="font-size:2.2rem">Admin</h1>
+  <p class="login-sub">Tast voksen-PIN</p>
+  <div id="pin-pad"></div>
+</div>
+
+<!-- ═══════════ ADMIN-APP ═══════════ -->
+<div id="screen-app" style="display:none">
+  <div class="wrap wrap-wide">
+    <div class="card" style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:2rem">🛡️</span>
+      <div style="flex:1">
+        <h1 style="font-size:1.6rem">HelteQuest Admin</h1>
+        <div style="color:var(--muted);font-size:0.82rem">Godkend quests, opret opgaver og styr butikken</div>
+      </div>
+      <a class="btn ghost small" href="index.html">Spiller-app →</a>
+      <button id="logout-btn" class="btn ghost small">Log ud</button>
+    </div>
+    <div id="fb-banner" class="banner-warn"></div>
+
+    <!-- Godkendelser -->
+    <div id="page-approve" class="page active">
+      <h2 class="section-title">✅ Quests til godkendelse</h2>
+      <div class="card" id="pending-completions"><div class="empty">Ingenting venter 🎉</div></div>
+      <h2 class="section-title">🎁 Køb til levering</h2>
+      <div class="card" id="pending-purchases"><div class="empty">Ingen ventende køb</div></div>
+    </div>
+
+    <!-- Moduler -->
+    <div id="page-modules" class="page">
+      <h2 class="section-title">📦 Moduler <small>skills, quests, badges og streaks</small></h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn small" id="import-module">📥 Importér modul (JSON)</button>
+        <input type="file" id="import-file" accept=".json,application/json" style="display:none">
+      </div>
+      <div id="module-list" style="margin-top:12px"><div class="card empty">Ingen moduler installeret</div></div>
+    </div>
+
+    <!-- Butik -->
+    <div id="page-shop" class="page">
+      <h2 class="section-title">🏪 Belønningsbutik</h2>
+      <button class="btn small" id="add-item">＋ Ny belønning</button>
+      <div class="card" id="shop-list" style="margin-top:12px"><div class="empty">Butikken er tom</div></div>
+    </div>
+
+    <!-- Børn -->
+    <div id="page-kids" class="page">
+      <h2 class="section-title">🧒 Helte</h2>
+      <button class="btn small" id="add-kid">＋ Ny helt</button>
+      <div id="kid-list" style="margin-top:12px"></div>
+    </div>
+
+    <!-- Log -->
+    <div id="page-log" class="page">
+      <h2 class="section-title">📜 Aktivitet</h2>
+      <div class="card" id="activity-log"><div class="empty">Ingen aktivitet endnu</div></div>
+    </div>
+  </div>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-page="approve"><span class="ico">✅</span>Godkend</button>
+    <button class="tab-btn" data-page="modules"><span class="ico">📦</span>Moduler</button>
+    <button class="tab-btn" data-page="shop"><span class="ico">🏪</span>Butik</button>
+    <button class="tab-btn" data-page="kids"><span class="ico">🧒</span>Helte</button>
+    <button class="tab-btn" data-page="log"><span class="ico">📜</span>Log</button>
+  </nav>
+</div>
+
+<script src="assets/firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="modules/dansk.js"></script>
+<script src="modules/matematik.js"></script>
+<script src="modules/hjemmet.js"></script>
+<script src="assets/core.js"></script>
+<script src="assets/admin.js"></script>
+</body>
+</html>
