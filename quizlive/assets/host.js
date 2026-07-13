@@ -101,29 +101,54 @@
     db.ref('quizzes').once('value').then(function (snap) {
       if (!snap.exists()) return;
 
-      /* Saml pr. forfatter */
-      var byAuthor = {};
+      /* Saml pr. "semester · fag" (fallback: forfatter) */
+      function groupLabel(q) {
+        var sem = (q.semester || '').trim();
+        var course = (q.course || '').trim();
+        if (sem && course) return sem + ' · ' + course;
+        if (sem) return sem;
+        if (course) return course;
+        return 'Ukategoriseret — af ' + (q.author || 'ukendt').trim();
+      }
+
+      var byGroup = {};
       snap.forEach(function (child) {
         var q = child.val();
         q._id = child.key;
         dbQuizzesMap[child.key] = q;
-        var author = (q.author || 'Ukendt').trim();
-        if (!byAuthor[author]) byAuthor[author] = [];
-        byAuthor[author].push({ id: child.key, quiz: q });
+        var key = groupLabel(q);
+        if (!byGroup[key]) byGroup[key] = [];
+        byGroup[key].push({ id: child.key, quiz: q });
       });
 
-      /* Sorter forfattere alfabetisk og tilføj optgroups */
-      var authors = Object.keys(byAuthor).sort(function (a, b) {
+      /* Sortér: semestre numerisk først, Ukategoriseret sidst */
+      var groupKeys = Object.keys(byGroup).sort(function (a, b) {
+        var ma = a.match(/^(\d+)\. semester/);
+        var mb = b.match(/^(\d+)\. semester/);
+        if (ma && mb) {
+          var d = parseInt(ma[1], 10) - parseInt(mb[1], 10);
+          if (d !== 0) return d;
+          return a.toLowerCase().localeCompare(b.toLowerCase(), 'da');
+        }
+        if (ma) return -1;
+        if (mb) return 1;
+        var ua = a.indexOf('Ukategoriseret') === 0;
+        var ub = b.indexOf('Ukategoriseret') === 0;
+        if (ua !== ub) return ua ? 1 : -1;
         return a.toLowerCase().localeCompare(b.toLowerCase(), 'da');
       });
-      authors.forEach(function (author) {
+
+      groupKeys.forEach(function (gKey) {
         var grp = document.createElement('optgroup');
-        grp.label = author;
-        byAuthor[author].forEach(function (item) {
+        grp.label = gKey;
+        byGroup[gKey].sort(function (x, y) {
+          return (x.quiz.title || '').toLowerCase().localeCompare((y.quiz.title || '').toLowerCase(), 'da');
+        });
+        byGroup[gKey].forEach(function (item) {
           var qCnt = Array.isArray(item.quiz.questions) ? item.quiz.questions.length : 0;
           var opt = document.createElement('option');
           opt.value = 'db:' + item.id;
-          opt.textContent = item.quiz.title + ' (' + qCnt + ' spørgsmål)';
+          opt.textContent = item.quiz.title + ' (' + qCnt + ' spørgsmål · ' + (item.quiz.author || 'ukendt') + ')';
           grp.appendChild(opt);
         });
         sel.appendChild(grp);

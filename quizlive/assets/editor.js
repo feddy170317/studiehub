@@ -55,6 +55,9 @@
      ================================================================ */
   var inpTitle        = document.getElementById('inp-quiz-title');
   var inpAuthor       = document.getElementById('inp-author');
+  var inpSemester     = document.getElementById('inp-semester');
+  var inpCourse       = document.getElementById('inp-course');
+  var courseDatalist  = document.getElementById('course-suggestions');
   var btnSave         = document.getElementById('btn-save-quiz');
   var topbarError     = document.getElementById('topbar-error');
   var inpQuestion     = document.getElementById('inp-question');
@@ -83,16 +86,29 @@
   /* ================================================================
      localStorage: forfatter-navn
      ================================================================ */
-  var LS_AUTHOR = 'quizlive_author';
+  var LS_AUTHOR   = 'quizlive_author';
+  var LS_SEMESTER = 'quizlive_semester';
+  var LS_COURSE   = 'quizlive_course';
 
   (function prefillAuthor() {
-    var saved = '';
-    try { saved = localStorage.getItem(LS_AUTHOR) || ''; } catch (e) {}
-    if (saved) inpAuthor.value = saved;
+    try {
+      var a = localStorage.getItem(LS_AUTHOR)   || '';
+      var s = localStorage.getItem(LS_SEMESTER) || '';
+      var c = localStorage.getItem(LS_COURSE)   || '';
+      if (a) inpAuthor.value = a;
+      if (s) inpSemester.value = s;
+      if (c) inpCourse.value = c;
+    } catch (e) {}
   })();
 
   inpAuthor.addEventListener('change', function () {
     try { localStorage.setItem(LS_AUTHOR, inpAuthor.value.trim()); } catch (e) {}
+  });
+  inpSemester.addEventListener('change', function () {
+    try { localStorage.setItem(LS_SEMESTER, inpSemester.value); } catch (e) {}
+  });
+  inpCourse.addEventListener('change', function () {
+    try { localStorage.setItem(LS_COURSE, inpCourse.value.trim()); } catch (e) {}
   });
 
   /* ================================================================
@@ -290,8 +306,14 @@
       return;
     }
 
-    /* 4. Gem forfatter-navn */
-    try { localStorage.setItem(LS_AUTHOR, author); } catch (e) {}
+    /* 4. Gem forfatter/semester/fag til næste gang */
+    var semester = inpSemester.value;
+    var course   = inpCourse.value.trim();
+    try {
+      localStorage.setItem(LS_AUTHOR, author);
+      localStorage.setItem(LS_SEMESTER, semester);
+      localStorage.setItem(LS_COURSE, course);
+    } catch (e) {}
 
     /* 5. Byg quiz-objekt */
     var questions = slides.map(function (s) {
@@ -309,26 +331,25 @@
     btnSave.disabled = true;
     btnSave.textContent = 'Gemmer...';
 
+    var payload = {
+      title:     title,
+      author:    author,
+      updatedAt: ServerValue.TIMESTAMP,
+      questions: questions
+    };
+    if (semester) payload.semester = semester;
+    if (course)   payload.course   = course;
+
     if (editingQuizId) {
       /* Redigér eksisterende */
-      db.ref('quizzes/' + editingQuizId).set({
-        title:       title,
-        author:      author,
-        createdAt:   editingCreatedAt || ServerValue.TIMESTAMP,
-        updatedAt:   ServerValue.TIMESTAMP,
-        questions:   questions
-      }).then(function () {
+      payload.createdAt = editingCreatedAt || ServerValue.TIMESTAMP;
+      db.ref('quizzes/' + editingQuizId).set(payload).then(function () {
         onSaveSuccess(title);
       }).catch(onSaveError);
     } else {
       /* Ny quiz */
-      db.ref('quizzes').push({
-        title:     title,
-        author:    author,
-        createdAt: ServerValue.TIMESTAMP,
-        updatedAt: ServerValue.TIMESTAMP,
-        questions: questions
-      }).then(function (ref) {
+      payload.createdAt = ServerValue.TIMESTAMP;
+      db.ref('quizzes').push(payload).then(function (ref) {
         editingQuizId = ref.key;
         onSaveSuccess(title);
       }).catch(onSaveError);
@@ -400,29 +421,30 @@
     }
     libraryStatus.textContent = '';
 
-    /* Gruppér efter forfatter (sorter alfabetisk) */
-    var byAuthor = {};
+    /* Gruppér efter semester · fag (fallback: forfatter) */
+    var byGroup = {};
     ids.forEach(function (id) {
       var q = dbQuizzes[id];
-      var a = (q.author || 'Ukendt').trim();
-      if (!byAuthor[a]) byAuthor[a] = [];
-      byAuthor[a].push({ id: id, quiz: q });
+      var key = groupLabel(q);
+      if (!byGroup[key]) byGroup[key] = [];
+      byGroup[key].push({ id: id, quiz: q });
     });
 
-    var authors = Object.keys(byAuthor).sort(function (a, b) {
-      return a.toLowerCase().localeCompare(b.toLowerCase(), 'da');
-    });
+    var groupKeys = Object.keys(byGroup).sort(compareGroupLabels);
 
-    authors.forEach(function (author) {
+    /* Opdatér fag-forslag (datalist) med kendte fag */
+    refreshCourseSuggestions();
+
+    groupKeys.forEach(function (gKey) {
       var group = document.createElement('div');
       group.className = 'author-group';
 
       var label = document.createElement('div');
       label.className = 'author-group-label';
-      label.textContent = author;
+      label.textContent = gKey;
       group.appendChild(label);
 
-      byAuthor[author].forEach(function (item) {
+      byGroup[gKey].forEach(function (item) {
         var qObj  = item.quiz;
         var qId   = item.id;
         var qCnt  = Array.isArray(qObj.questions) ? qObj.questions.length : 0;
@@ -437,7 +459,7 @@
 
         var metaDiv = document.createElement('div');
         metaDiv.className = 'quiz-lib-meta';
-        metaDiv.textContent = qCnt + ' spørgsmål' + (date ? ' · ' + date : '');
+        metaDiv.textContent = qCnt + ' spørgsmål · af ' + (qObj.author || 'ukendt') + (date ? ' · ' + date : '');
 
         var btnEdit = document.createElement('button');
         btnEdit.className = 'btn btn-lib-edit';
@@ -463,6 +485,49 @@
     });
   }
 
+  /* Gruppelabel: "3. semester · ELE 1" — fallback til forfatter */
+  function groupLabel(q) {
+    var sem = (q.semester || '').trim();
+    var course = (q.course || '').trim();
+    if (sem && course) return sem + ' · ' + course;
+    if (sem) return sem;
+    if (course) return course;
+    return 'Ukategoriseret — af ' + (q.author || 'ukendt').trim();
+  }
+
+  /* Sortér: semestre numerisk først, "Ukategoriseret" til sidst */
+  function compareGroupLabels(a, b) {
+    var ma = a.match(/^(\d+)\. semester/);
+    var mb = b.match(/^(\d+)\. semester/);
+    if (ma && mb) {
+      var d = parseInt(ma[1], 10) - parseInt(mb[1], 10);
+      if (d !== 0) return d;
+      return a.toLowerCase().localeCompare(b.toLowerCase(), 'da');
+    }
+    if (ma) return -1;
+    if (mb) return 1;
+    var ua = a.indexOf('Ukategoriseret') === 0;
+    var ub = b.indexOf('Ukategoriseret') === 0;
+    if (ua !== ub) return ua ? 1 : -1;
+    return a.toLowerCase().localeCompare(b.toLowerCase(), 'da');
+  }
+
+  /* Fyld datalist med kendte fag fra eksisterende quizzer */
+  function refreshCourseSuggestions() {
+    if (!courseDatalist) return;
+    var seen = {};
+    courseDatalist.innerHTML = '';
+    Object.keys(dbQuizzes).forEach(function (id) {
+      var c = (dbQuizzes[id].course || '').trim();
+      if (c && !seen[c]) {
+        seen[c] = true;
+        var opt = document.createElement('option');
+        opt.value = c;
+        courseDatalist.appendChild(opt);
+      }
+    });
+  }
+
   /* Formatér timestamp (ms) til "dd/mm/yyyy" */
   function formatDate(ts) {
     try {
@@ -477,8 +542,10 @@
     if (!qObj) return;
 
     /* Sæt felter */
-    inpTitle.value  = qObj.title  || '';
-    inpAuthor.value = qObj.author || '';
+    inpTitle.value    = qObj.title    || '';
+    inpAuthor.value   = qObj.author   || '';
+    inpSemester.value = qObj.semester || '';
+    inpCourse.value   = qObj.course   || '';
     editingQuizId   = id;
     editingCreatedAt = qObj.createdAt || null;
 
@@ -581,5 +648,6 @@
   loadSlide(0);
   renderDots();
   renderNavButtons();
+  loadLibrary(); /* fylder også fag-forslag (datalist) fra start */
 
 }());
