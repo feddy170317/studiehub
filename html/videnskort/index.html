@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Videnskort — Studiehub</title>
+<style>
+  :root {
+    --primary: #6366f1;
+    --accent: #ec4899;
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --text: #f1f5f9;
+    --text-muted: #94a3b8;
+    --border: #334155;
+    --c-fag: #6366f1;
+    --c-lektion: #38bdf8;
+    --c-begreb: #34d399;
+    --c-ekstern: #64748b;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  }
+  header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+    display: flex; align-items: center; gap: .8rem; flex-wrap: wrap;
+    padding: .6rem 1rem;
+    background: rgba(15, 23, 42, .88); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+  header a.tilbage {
+    color: var(--text-muted); text-decoration: none; font-size: .85rem;
+    white-space: nowrap;
+  }
+  header a.tilbage:hover { color: var(--text); }
+  header h1 { font-size: 1rem; font-weight: 600; white-space: nowrap; }
+  header h1 span { color: var(--text-muted); font-weight: 400; }
+  #soeg {
+    flex: 1 1 140px; min-width: 120px; max-width: 320px;
+    background: var(--surface); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: .4rem .7rem; font-size: .85rem; outline: none;
+  }
+  #soeg:focus { border-color: var(--primary); }
+  button.knap {
+    background: var(--surface); color: var(--text-muted);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: .4rem .7rem; font-size: .8rem; cursor: pointer;
+  }
+  button.knap:hover { color: var(--text); border-color: var(--primary); }
+  #legende {
+    position: fixed; left: 1rem; bottom: 1rem; z-index: 15;
+    background: rgba(30, 41, 59, .9); border: 1px solid var(--border);
+    border-radius: 10px; padding: .6rem .8rem; font-size: .75rem;
+    color: var(--text-muted); line-height: 1.7;
+  }
+  #legende .prik {
+    display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+    margin-right: .45rem; vertical-align: baseline;
+  }
+  #legende .streg {
+    display: inline-block; width: 18px; height: 0;
+    border-top: 2px dashed #f59e0b; margin-right: .35rem; vertical-align: middle;
+  }
+  canvas { display: block; touch-action: none; cursor: grab; }
+  canvas.traekker { cursor: grabbing; }
+  #panel {
+    position: fixed; top: 0; right: 0; bottom: 0; z-index: 25;
+    width: min(360px, 92vw);
+    background: var(--surface); border-left: 1px solid var(--border);
+    transform: translateX(105%); transition: transform .25s ease;
+    display: flex; flex-direction: column;
+    box-shadow: -12px 0 32px rgba(0,0,0,.35);
+  }
+  #panel.aaben { transform: translateX(0); }
+  #panel .hoved {
+    padding: 1rem 1.2rem .8rem; border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; gap: .6rem;
+  }
+  #panel .hoved .badge {
+    font-size: .65rem; text-transform: uppercase; letter-spacing: .06em;
+    padding: .15rem .5rem; border-radius: 99px; font-weight: 600;
+    flex-shrink: 0; margin-top: .2rem;
+  }
+  #panel .hoved h2 { font-size: 1.05rem; line-height: 1.3; flex: 1; }
+  #panel .hoved button {
+    background: none; border: none; color: var(--text-muted);
+    font-size: 1.3rem; cursor: pointer; line-height: 1;
+  }
+  #panel .krop { padding: 1rem 1.2rem; overflow-y: auto; flex: 1; }
+  #panel .krop p.resume { font-size: .88rem; line-height: 1.55; color: var(--text); }
+  #panel .krop .meta { font-size: .78rem; color: var(--text-muted); margin-top: .4rem; }
+  #panel h3 {
+    font-size: .72rem; text-transform: uppercase; letter-spacing: .07em;
+    color: var(--text-muted); margin: 1.1rem 0 .45rem;
+  }
+  #panel a.mat {
+    display: flex; align-items: center; gap: .55rem;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+    padding: .5rem .7rem; margin-bottom: .4rem;
+    color: var(--text); text-decoration: none; font-size: .84rem;
+  }
+  #panel a.mat:hover { border-color: var(--primary); }
+  #panel .relnode {
+    display: flex; align-items: center; gap: .5rem; width: 100%;
+    background: none; border: none; text-align: left;
+    padding: .3rem .2rem; color: var(--text); font-size: .84rem;
+    cursor: pointer; border-radius: 6px;
+  }
+  #panel .relnode:hover { background: rgba(99, 102, 241, .12); }
+  #panel .relnode .prik {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  #tooltip {
+    position: fixed; z-index: 30; pointer-events: none; display: none;
+    background: rgba(15, 23, 42, .95); border: 1px solid var(--border);
+    border-radius: 8px; padding: .45rem .65rem; max-width: 260px;
+    font-size: .78rem; line-height: 1.4; color: var(--text);
+  }
+  #tooltip .t-navn { font-weight: 600; }
+  #tooltip .t-resume { color: var(--text-muted); margin-top: .15rem; }
+  @media (max-width: 640px) {
+    #legende { display: none; }
+    #panel {
+      top: auto; left: 0; width: 100%; max-height: 55vh;
+      border-left: none; border-top: 1px solid var(--border);
+      transform: translateY(105%);
+    }
+    #panel.aaben { transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+<header>
+  <a class="tilbage" href="../../index.html">← Studiehub</a>
+  <h1>🕸️ Videnskort <span id="statistik"></span></h1>
+  <input id="soeg" type="search" placeholder="Søg begreb, lektion, fag…" autocomplete="off">
+  <button class="knap" id="nulstil">Nulstil</button>
+</header>
+
+<canvas id="kort"></canvas>
+
+<div id="legende">
+  <div><span class="prik" style="background:#6366f1"></span>Fag</div>
+  <div><span class="prik" style="background:#38bdf8"></span>Lektion / kapitel</div>
+  <div><span class="prik" style="background:#34d399"></span>Begreb</div>
+  <div><span class="prik" style="background:#64748b"></span>Andet fag (forudsætning)</div>
+  <div><span class="streg"></span>bygger på →</div>
+</div>
+
+<aside id="panel">
+  <div class="hoved">
+    <span class="badge" id="p-badge"></span>
+    <h2 id="p-titel"></h2>
+    <button id="p-luk" aria-label="Luk">×</button>
+  </div>
+  <div class="krop" id="p-krop"></div>
+</aside>
+
+<div id="tooltip"></div>
+
+<script src="graph_data.js"></script>
+<script>
+(function () {
+  'use strict';
+  var DATA = window.VIDENSKORT;
+  if (!DATA) { document.body.innerHTML = '<p style="padding:2rem">graph_data.js mangler — kør tools/byg_videnskort.py</p>'; return; }
+
+  var FARVER = { fag: '#6366f1', lektion: '#38bdf8', begreb: '#34d399', ekstern: '#64748b' };
+  var RADIUS = { fag: 26, lektion: 14, begreb: 8, ekstern: 16 };
+  var TYPENAVN = { fag: 'Fag', lektion: 'Lektion', begreb: 'Begreb', ekstern: 'Andet fag' };
+  var MAT_IKON = { overblik: '📖', flashcards: '🃏', quiz: '📝' };
+  var MAT_NAVN = { overblik: 'Overblik & formler (PDF)', flashcards: 'Flashcards', quiz: 'Quiz' };
+  var ROD = '../../'; // fra html/videnskort/ til Studiehub-roden
+
+  var noder = DATA.noder.map(function (n) { return Object.assign({ x: 0, y: 0, vx: 0, vy: 0 }, n); });
+  var nodeAf = {};
+  noder.forEach(function (n) { nodeAf[n.id] = n; });
+  var kanter = DATA.kanter.map(function (k) {
+    return { s: nodeAf[k.source], t: nodeAf[k.target], type: k.type };
+  });
+  var naboer = {};
+  noder.forEach(function (n) { naboer[n.id] = []; });
+  kanter.forEach(function (k) {
+    naboer[k.s.id].push({ node: k.t, type: k.type, retning: 'ud' });
+    naboer[k.t.id].push({ node: k.s, type: k.type, retning: 'ind' });
+  });
+
+  document.getElementById('statistik').textContent =
+    '— ' + noder.length + ' noder · ' + kanter.length + ' relationer';
+
+  // --- startpositioner: fag i centrum, lektioner i ring, begreber udenom ---
+  var lektioner = noder.filter(function (n) { return n.type === 'lektion'; });
+  lektioner.sort(function (a, b) { return (a.nummer || 0) - (b.nummer || 0); });
+  lektioner.forEach(function (l, i) {
+    var v = (i / lektioner.length) * 2 * Math.PI - Math.PI / 2;
+    l.x = Math.cos(v) * 260; l.y = Math.sin(v) * 260;
+    l._vinkel = v;
+  });
+  noder.forEach(function (n) {
+    if (n.type === 'fag') { n.x = 0; n.y = 0; }
+    else if (n.type === 'ekstern') {
+      n.x = (Math.random() - 0.5) * 100; n.y = -620 + (Math.random() - 0.5) * 80;
+    } else if (n.type === 'begreb') {
+      var lek = (naboer[n.id] || []).map(function (r) { return r.node; })
+        .filter(function (m) { return m.type === 'lektion'; })[0];
+      if (lek) {
+        n.x = lek.x * 1.55 + (Math.random() - 0.5) * 90;
+        n.y = lek.y * 1.55 + (Math.random() - 0.5) * 90;
+      } else { n.x = (Math.random() - 0.5) * 700; n.y = (Math.random() - 0.5) * 700; }
+    }
+  });
+
+  // --- fysik ---
+  var FJEDER = { del_af: { l: 260, k: 0.05 }, daekkes_i: { l: 130, k: 0.04 }, bygger_paa: { l: 200, k: 0.012 } };
+  var alpha = 1;
+  function tikFysik() {
+    var i, j, n, m, dx, dy, d2, d, f;
+    for (i = 0; i < noder.length; i++) {
+      n = noder[i];
+      for (j = i + 1; j < noder.length; j++) {
+        m = noder[j];
+        dx = n.x - m.x; dy = n.y - m.y;
+        d2 = dx * dx + dy * dy + 0.01;
+        if (d2 > 160000) continue;
+        f = 2600 / d2 * alpha;
+        d = Math.sqrt(d2);
+        dx /= d; dy /= d;
+        n.vx += dx * f; n.vy += dy * f;
+        m.vx -= dx * f; m.vy -= dy * f;
+      }
+      n.vx -= n.x * 0.0012 * alpha;
+      n.vy -= n.y * 0.0012 * alpha;
+    }
+    kanter.forEach(function (k) {
+      var fj = FJEDER[k.type] || FJEDER.bygger_paa;
+      var dx = k.t.x - k.s.x, dy = k.t.y - k.s.y;
+      var d = Math.sqrt(dx * dx + dy * dy) || 1;
+      var f = (d - fj.l) * fj.k * alpha;
+      dx /= d; dy /= d;
+      k.s.vx += dx * f; k.s.vy += dy * f;
+      k.t.vx -= dx * f; k.t.vy -= dy * f;
+    });
+    noder.forEach(function (n) {
+      if (n._laast) { n.vx = 0; n.vy = 0; return; }
+      n.vx *= 0.85; n.vy *= 0.85;
+      n.x += n.vx; n.y += n.vy;
+    });
+    if (alpha > 0.02) alpha *= 0.995;
+  }
+  for (var varm = 0; varm < 200; varm++) tikFysik();
+
+  // --- canvas & kamera ---
+  var canvas = document.getElementById('kort');
+  var ctx = canvas.getContext('2d');
+  var kam = { x: 0, y: 0, skala: 1 };
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  function tilpasStoerrelse() {
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = window.innerHeight * dpr;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+  }
+  window.addEventListener('resize', tilpasStoerrelse);
+  tilpasStoerrelse();
+
+  function tilSkaerm(p) {
+    return {
+      x: (p.x - kam.x) * kam.skala + window.innerWidth / 2,
+      y: (p.y - kam.y) * kam.skala + window.innerHeight / 2
+    };
+  }
+  function tilVerden(sx, sy) {
+    return {
+      x: (sx - window.innerWidth / 2) / kam.skala + kam.x,
+      y: (sy - window.innerHeight / 2) / kam.skala + kam.y
+    };
+  }
+
+  var valgt = null, hover = null, soegRamt = null;
+
+  function fremhaevet(n) {
+    if (soegRamt) return soegRamt.has(n.id);
+    if (!valgt) return true;
+    if (n === valgt) return true;
+    return naboer[valgt.id].some(function (r) { return r.node === n; });
+  }
+
+  function tegn() {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+    kanter.forEach(function (k) {
+      var a = tilSkaerm(k.s), b = tilSkaerm(k.t);
+      var aktiv = valgt && (k.s === valgt || k.t === valgt);
+      var dæmpet = (valgt || soegRamt) && !aktiv;
+      ctx.globalAlpha = dæmpet ? 0.06 : (aktiv ? 0.9 : 0.3);
+      if (k.type === 'bygger_paa') {
+        ctx.strokeStyle = '#f59e0b'; ctx.setLineDash([5, 4]);
+      } else if (k.type === 'del_af') {
+        ctx.strokeStyle = '#6366f1'; ctx.setLineDash([]);
+      } else {
+        ctx.strokeStyle = '#34d399'; ctx.setLineDash([]);
+      }
+      ctx.lineWidth = aktiv ? 1.8 : 1;
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+      ctx.setLineDash([]);
+      if (k.type === 'bygger_paa' && kam.skala > 0.45) {
+        var mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+        var vink = Math.atan2(b.y - a.y, b.x - a.x);
+        ctx.fillStyle = '#f59e0b';
+        ctx.beginPath();
+        ctx.moveTo(mx + Math.cos(vink) * 5, my + Math.sin(vink) * 5);
+        ctx.lineTo(mx + Math.cos(vink + 2.5) * 5, my + Math.sin(vink + 2.5) * 5);
+        ctx.lineTo(mx + Math.cos(vink - 2.5) * 5, my + Math.sin(vink - 2.5) * 5);
+        ctx.fill();
+      }
+    });
+
+    noder.forEach(function (n) {
+      var p = tilSkaerm(n);
+      var r = RADIUS[n.type] * Math.max(kam.skala, 0.55);
+      var frem = fremhaevet(n);
+      ctx.globalAlpha = frem ? 1 : 0.13;
+      ctx.fillStyle = FARVER[n.type];
+      ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, 2 * Math.PI); ctx.fill();
+      if (n === valgt || n === hover) {
+        ctx.strokeStyle = '#f1f5f9'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(p.x, p.y, r + 3, 0, 2 * Math.PI); ctx.stroke();
+      }
+      var visLabel = n.type === 'fag' || n.type === 'ekstern' || n.type === 'lektion'
+        ? true : (kam.skala > 0.75 || n === valgt || n === hover || (soegRamt && soegRamt.has(n.id)));
+      if (visLabel && frem) {
+        var fs = n.type === 'fag' ? 15 : (n.type === 'begreb' ? 11 : 12);
+        ctx.font = (n.type === 'fag' ? '700 ' : '500 ') + fs + 'px system-ui, sans-serif';
+        ctx.fillStyle = frem ? '#f1f5f9' : '#94a3b8';
+        ctx.textAlign = 'center';
+        var label = n.type === 'lektion' ? 'L' + n.nummer + ': ' + n.navn : n.navn;
+        if (label.length > 34) label = label.slice(0, 32) + '…';
+        ctx.fillText(label, p.x, p.y + r + fs + 2);
+      }
+    });
+    ctx.globalAlpha = 1;
+  }
+
+  function loekke() {
+    if (alpha > 0.02) tikFysik();
+    tegn();
+    requestAnimationFrame(loekke);
+  }
+  requestAnimationFrame(loekke);
+
+  // --- hit-test ---
+  function nodeVed(sx, sy) {
+    for (var i = noder.length - 1; i >= 0; i--) {
+      var p = tilSkaerm(noder[i]);
+      var r = RADIUS[noder[i].type] * Math.max(kam.skala, 0.55) + 6;
+      var dx = sx - p.x, dy = sy - p.y;
+      if (dx * dx + dy * dy < r * r) return noder[i];
+    }
+    return null;
+  }
+
+  // --- panel ---
+  var panel = document.getElementById('panel');
+  function prik(farve) { return '<span class="prik" style="background:' + farve + '"></span>'; }
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function visPanel(n) {
+    valgt = n; alpha = Math.max(alpha, 0.05);
+    var badge = document.getElementById('p-badge');
+    badge.textContent = TYPENAVN[n.type];
+    badge.style.background = FARVER[n.type] + '33';
+    badge.style.color = FARVER[n.type];
+    document.getElementById('p-titel').textContent =
+      (n.type === 'lektion' ? 'L' + n.nummer + ' · ' : '') + n.navn;
+
+    var html = '<p class="resume">' + esc(n.resume || '') + '</p>';
+    if (n.kapitel) html += '<p class="meta">' + esc(n.kapitel) + '</p>';
+    if (n.sti) html += '<p class="meta">📁 ' + esc(n.sti) + '</p>';
+
+    if (n.type === 'lektion' && n.materialer) {
+      var matHtml = '';
+      Object.keys(n.materialer).forEach(function (t) {
+        matHtml += '<a class="mat" href="' + ROD + esc(n.materialer[t]) + '" target="_blank">' +
+          (MAT_IKON[t] || '📌') + ' ' + (MAT_NAVN[t] || esc(t)) + '</a>';
+      });
+      if (matHtml) html += '<h3>Materialer</h3>' + matHtml;
+    }
+
+    var grupper = { daekkes_i: [], bygger_paa_ud: [], bygger_paa_ind: [], del_af: [] };
+    (naboer[n.id] || []).forEach(function (r) {
+      if (r.type === 'bygger_paa') grupper[r.retning === 'ud' ? 'bygger_paa_ud' : 'bygger_paa_ind'].push(r.node);
+      else if (grupper[r.type]) grupper[r.type].push(r.node);
+    });
+    function relListe(titel, liste) {
+      if (!liste.length) return '';
+      var h = '<h3>' + titel + ' (' + liste.length + ')</h3>';
+      liste.forEach(function (m) {
+        h += '<button class="relnode" data-id="' + esc(m.id) + '">' +
+          prik(FARVER[m.type]) + esc(m.type === 'lektion' ? 'L' + m.nummer + ': ' + m.navn : m.navn) + '</button>';
+      });
+      return h;
+    }
+    if (n.type === 'begreb') {
+      html += relListe('Dækkes i', grupper.daekkes_i.filter(function (m) { return m.type === 'lektion'; }));
+      html += relListe('Bygger på', grupper.bygger_paa_ud);
+      html += relListe('Bruges videre af', grupper.bygger_paa_ind);
+    } else if (n.type === 'lektion') {
+      html += relListe('Begreber i lektionen', grupper.daekkes_i);
+    } else {
+      html += relListe('Lektioner', grupper.del_af.filter(function (m) { return m.type === 'lektion'; }));
+      html += relListe('Bygger på', grupper.bygger_paa_ud);
+      html += relListe('Forudsætning for', grupper.bygger_paa_ind);
+    }
+    var krop = document.getElementById('p-krop');
+    krop.innerHTML = html;
+    krop.scrollTop = 0;
+    krop.querySelectorAll('.relnode').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var m = nodeAf[b.getAttribute('data-id')];
+        if (m) { centrerPaa(m); visPanel(m); }
+      });
+    });
+    panel.classList.add('aaben');
+  }
+  function lukPanel() { panel.classList.remove('aaben'); valgt = null; }
+  document.getElementById('p-luk').addEventListener('click', lukPanel);
+
+  function centrerPaa(n) {
+    kam.x = n.x; kam.y = n.y;
+    if (kam.skala < 0.9) kam.skala = 0.9;
+  }
+
+  // --- mus ---
+  var traek = null; // {type:'node'|'pan', node, startX, startY, flyttet}
+  canvas.addEventListener('mousedown', function (e) {
+    var n = nodeVed(e.clientX, e.clientY);
+    traek = { node: n, type: n ? 'node' : 'pan', sx: e.clientX, sy: e.clientY, flyttet: false };
+    if (n) { n._laast = true; }
+    canvas.classList.add('traekker');
+  });
+  window.addEventListener('mousemove', function (e) {
+    var tt = document.getElementById('tooltip');
+    if (traek) {
+      var dx = e.clientX - traek.sx, dy = e.clientY - traek.sy;
+      if (Math.abs(dx) + Math.abs(dy) > 4) traek.flyttet = true;
+      if (traek.type === 'node') {
+        var w = tilVerden(e.clientX, e.clientY);
+        traek.node.x = w.x; traek.node.y = w.y;
+        alpha = Math.max(alpha, 0.1);
+      } else {
+        kam.x -= dx / kam.skala; kam.y -= dy / kam.skala;
+        traek.sx = e.clientX; traek.sy = e.clientY;
+      }
+      tt.style.display = 'none';
+      return;
+    }
+    hover = nodeVed(e.clientX, e.clientY);
+    if (hover) {
+      tt.innerHTML = '<div class="t-navn">' + esc(hover.navn) + '</div>' +
+        (hover.resume ? '<div class="t-resume">' + esc(hover.resume) + '</div>' : '');
+      tt.style.display = 'block';
+      tt.style.left = Math.min(e.clientX + 14, window.innerWidth - 280) + 'px';
+      tt.style.top = (e.clientY + 14) + 'px';
+      canvas.style.cursor = 'pointer';
+    } else {
+      tt.style.display = 'none';
+      canvas.style.cursor = 'grab';
+    }
+  });
+  window.addEventListener('mouseup', function (e) {
+    if (traek) {
+      if (traek.type === 'node') {
+        traek.node._laast = false;
+        if (!traek.flyttet) visPanel(traek.node);
+      } else if (!traek.flyttet && !nodeVed(e.clientX, e.clientY)) {
+        lukPanel(); soegRamt = null; document.getElementById('soeg').value = '';
+      }
+    }
+    traek = null;
+    canvas.classList.remove('traekker');
+  });
+  canvas.addEventListener('wheel', function (e) {
+    e.preventDefault();
+    var foer = tilVerden(e.clientX, e.clientY);
+    kam.skala *= e.deltaY < 0 ? 1.12 : 0.89;
+    kam.skala = Math.min(Math.max(kam.skala, 0.18), 4);
+    var efter = tilVerden(e.clientX, e.clientY);
+    kam.x += foer.x - efter.x; kam.y += foer.y - efter.y;
+  }, { passive: false });
+
+  // --- touch ---
+  var pinch = null;
+  canvas.addEventListener('touchstart', function (e) {
+    if (e.touches.length === 1) {
+      var t = e.touches[0];
+      var n = nodeVed(t.clientX, t.clientY);
+      traek = { node: n, type: n ? 'node' : 'pan', sx: t.clientX, sy: t.clientY, flyttet: false };
+      if (n) n._laast = true;
+    } else if (e.touches.length === 2) {
+      if (traek && traek.node) traek.node._laast = false;
+      traek = null;
+      var dx = e.touches[0].clientX - e.touches[1].clientX;
+      var dy = e.touches[0].clientY - e.touches[1].clientY;
+      pinch = { d: Math.sqrt(dx * dx + dy * dy), skala: kam.skala };
+    }
+  }, { passive: true });
+  canvas.addEventListener('touchmove', function (e) {
+    e.preventDefault();
+    if (pinch && e.touches.length === 2) {
+      var dx = e.touches[0].clientX - e.touches[1].clientX;
+      var dy = e.touches[0].clientY - e.touches[1].clientY;
+      var d = Math.sqrt(dx * dx + dy * dy);
+      kam.skala = Math.min(Math.max(pinch.skala * d / pinch.d, 0.18), 4);
+      return;
+    }
+    if (traek && e.touches.length === 1) {
+      var t = e.touches[0];
+      var ddx = t.clientX - traek.sx, ddy = t.clientY - traek.sy;
+      if (Math.abs(ddx) + Math.abs(ddy) > 6) traek.flyttet = true;
+      if (traek.type === 'node') {
+        var w = tilVerden(t.clientX, t.clientY);
+        traek.node.x = w.x; traek.node.y = w.y;
+        alpha = Math.max(alpha, 0.1);
+      } else {
+        kam.x -= ddx / kam.skala; kam.y -= ddy / kam.skala;
+        traek.sx = t.clientX; traek.sy = t.clientY;
+      }
+    }
+  }, { passive: false });
+  canvas.addEventListener('touchend', function (e) {
+    if (e.touches.length === 0) {
+      if (traek) {
+        if (traek.node) {
+          traek.node._laast = false;
+          if (!traek.flyttet) visPanel(traek.node);
+        } else if (!traek.flyttet) { lukPanel(); }
+      }
+      traek = null; pinch = null;
+    }
+  });
+
+  // --- søgning ---
+  var soeg = document.getElementById('soeg');
+  soeg.addEventListener('input', function () {
+    var q = soeg.value.trim().toLowerCase();
+    if (!q) { soegRamt = null; return; }
+    soegRamt = new Set();
+    noder.forEach(function (n) {
+      if (n.navn.toLowerCase().indexOf(q) !== -1 ||
+          (n.resume || '').toLowerCase().indexOf(q) !== -1) soegRamt.add(n.id);
+    });
+  });
+  soeg.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && soegRamt && soegRamt.size) {
+      var foerste = noder.filter(function (n) { return soegRamt.has(n.id); })[0];
+      centrerPaa(foerste); visPanel(foerste);
+    }
+    if (e.key === 'Escape') { soeg.value = ''; soegRamt = null; soeg.blur(); }
+  });
+
+  document.getElementById('nulstil').addEventListener('click', function () {
+    kam.x = 0; kam.y = 0; kam.skala = 1;
+    lukPanel(); soegRamt = null; soeg.value = '';
+    alpha = Math.max(alpha, 0.3);
+  });
+})();
+</script>
+</body>
+</html>
