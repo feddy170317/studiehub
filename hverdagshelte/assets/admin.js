@@ -1,4 +1,4 @@
-/* HelteQuest — admin-app v2 (moduler, ledger-godkendelse, import/eksport) */
+/* HverdagsHelte — admin-app v2 (moduler, ledger-godkendelse, import/eksport) */
 (function () {
   'use strict';
   var $ = HQ.$, esc = HQ.esc;
@@ -18,17 +18,123 @@
     return;
   }
 
-  // ═══════════ OPSTART ═══════════
-  HQ.ref('config').once('value').then(function (snap) {
-    st.config = snap.val();
-    if (!st.config || !st.config.adminPin) {
-      renderSetupModules();
-      $('#screen-setup').style.display = 'flex';
-    } else if (localStorage.getItem('hq_admin') === '1') {
-      enterApp();
+  // ═══════════ OPSTART v3: auth → organisation → app ═══════════
+  var authMode = 'login';
+  function showScreen(id) {
+    ['screen-auth', 'screen-onboard', 'screen-setup', 'screen-app'].forEach(function (s) {
+      var el = $('#' + s);
+      if (el) el.style.display = s === id ? (s === 'screen-app' ? 'block' : 'flex') : 'none';
+    });
+  }
+
+  HQ.auth().onAuthStateChanged(function (user) {
+    if (!user) { showScreen('screen-auth'); return; }
+    resolveOrg(user);
+  });
+
+  function resolveOrg(user) {
+    HQ.raw('hq/users/' + user.uid + '/orgs').once('value').then(function (snap) {
+      var orgs = snap.val() || {};
+      var orgId = Object.keys(orgs)[0];
+      if (!orgId) {
+        // Ny konto → onboarding (+ tilbud om at flytte legacy-data ind)
+        HQ.raw('liferpg').once('value').then(function (leg) {
+          var legacy = leg.val();
+          $('#onboard-migrate').style.display = (legacy && legacy.kids && !legacy._migratedTo) ? 'block' : 'none';
+          showScreen('screen-onboard');
+        }).catch(function () { showScreen('screen-onboard'); });
+        return;
+      }
+      HQ.setOrg(orgId);
+      HQ.ref('meta').once('value').then(function (m) {
+        var meta = m.val() || {};
+        $('#org-title').textContent = meta.name || 'HverdagsHelte';
+        $('#org-sub').textContent = (user.email || '') + ' · Godkend quests, opret opgaver og styr butikken';
+        return HQ.ref('kids').once('value');
+      }).then(function (k) {
+        if (!k.val()) { renderSetupModules(); showScreen('screen-setup'); }
+        else { showScreen('screen-app'); enterApp(); }
+      });
+    });
+  }
+
+  // --- Auth-skærmens handlers ---
+  function setAuthMode(mode) {
+    authMode = mode;
+    $('#auth-tab-login').className = 'btn small' + (mode === 'login' ? '' : ' ghost');
+    $('#auth-tab-signup').className = 'btn small' + (mode === 'signup' ? '' : ' ghost');
+    $('#auth-name-row').style.display = mode === 'signup' ? 'block' : 'none';
+    $('#auth-go').textContent = mode === 'login' ? 'Log ind' : 'Opret konto';
+  }
+  $('#auth-tab-login').addEventListener('click', function () { setAuthMode('login'); });
+  $('#auth-tab-signup').addEventListener('click', function () { setAuthMode('signup'); });
+
+  $('#auth-go').addEventListener('click', function () {
+    var email = $('#auth-email').value.trim();
+    var pass = $('#auth-pass').value;
+    if (!email || !pass) return HQ.toast('Udfyld e-mail og kodeord');
+    var btn = this;
+    btn.disabled = true;
+    var done = function () { btn.disabled = false; };
+    if (authMode === 'signup') {
+      var name = $('#auth-name').value.trim();
+      if (!name) { done(); return HQ.toast('Skriv dit navn'); }
+      HQ.auth().createUserWithEmailAndPassword(email, pass).then(function (cred) {
+        return HQ.raw('hq/users/' + cred.user.uid).update({ email: email, name: name, createdAt: Date.now() });
+      }).then(done).catch(function (e) { done(); HQ.toast('❌ ' + HQ.authErrorText(e)); });
     } else {
-      showPinLogin();
+      HQ.auth().signInWithEmailAndPassword(email, pass)
+        .then(done).catch(function (e) { done(); HQ.toast('❌ ' + HQ.authErrorText(e)); });
     }
+  });
+
+  $('#auth-forgot').addEventListener('click', function () {
+    var email = $('#auth-email').value.trim();
+    if (!email) return HQ.toast('Skriv din e-mail i feltet først');
+    HQ.auth().sendPasswordResetEmail(email).then(function () {
+      HQ.toast('📧 Nulstillings-link sendt til ' + email);
+    }).catch(function (e) { HQ.toast('❌ ' + HQ.authErrorText(e)); });
+  });
+
+  // --- Onboarding: opret familie (organisation) + evt. migrering ---
+  $('#onboard-go').addEventListener('click', function () {
+    var name = $('#onboard-name').value.trim();
+    if (!name) return HQ.toast('Giv familien et navn');
+    var user = HQ.auth().currentUser;
+    if (!user) return;
+    var btn = this;
+    btn.disabled = true;
+    var orgRef = HQ.raw('hq/orgs').push();
+    var org = {
+      meta: { name: name, type: 'family', createdAt: Date.now(), ownerUid: user.uid },
+      members: {}
+    };
+    org.members[user.uid] = { role: 'owner', name: user.email || '' };
+    orgRef.set(org).then(function () {
+      return HQ.raw('hq/users/' + user.uid + '/orgs/' + orgRef.key).set('owner');
+    }).then(function () {
+      var doMigrate = $('#onboard-migrate').style.display !== 'none' && $('#onboard-migrate-check').checked;
+      if (!doMigrate) return null;
+      return HQ.raw('liferpg').once('value').then(function (leg) {
+        var legacy = leg.val() || {};
+        var upd = {};
+        ['kids', 'modules', 'completions', 'ledger', 'shop', 'purchases'].forEach(function (n) {
+          if (legacy[n]) upd[n] = legacy[n];
+        });
+        if (!Object.keys(upd).length) return null;
+        return orgRef.update(upd).then(function () {
+          return HQ.raw('liferpg/_migratedTo').set(orgRef.key);
+        });
+      });
+    }).then(function () {
+      HQ.setOrg(orgRef.key);
+      HQ.audit('org-oprettet', name);
+      HQ.confetti({ count: 120 });
+      resolveOrg(user);
+    }).catch(function (e) {
+      btn.disabled = false;
+      HQ.toast('❌ Kunne ikke oprette: ' + (e.message || e));
+    });
   });
 
   function renderSetupModules() {
@@ -40,16 +146,14 @@
   }
 
   $('#setup-go').addEventListener('click', function () {
-    var adminPin = $('#setup-admin-pin').value.trim();
     var kidName = $('#setup-kid-name').value.trim();
     var kidAvatar = $('#setup-kid-avatar').value.trim() || '🦸‍♀️';
     var kidPin = $('#setup-kid-pin').value.trim();
-    if (!/^\d{4}$/.test(adminPin)) return HQ.toast('Voksen-PIN skal være 4 cifre');
     if (!kidName) return HQ.toast('Skriv barnets navn');
     if (!/^\d{4}$/.test(kidPin)) return HQ.toast('Barnets PIN skal være 4 cifre');
 
     var seed = {
-      config: { adminPin: adminPin, created: Date.now() },
+      config: { created: Date.now() },
       shop: {
         s_skaerm: { title: '30 min ekstra skærmtid', icon: '📱', cost: 50, active: true },
         s_mad: { title: 'Vælg aftensmad', desc: 'Du bestemmer menuen', icon: '🍕', cost: 80, active: true },
@@ -66,30 +170,15 @@
       return HQ.ref('kids').push(kid);
     }).then(function () {
       st.config = seed.config;
-      localStorage.setItem('hq_admin', '1');
-      $('#screen-setup').style.display = 'none';
+      HQ.audit('helt-oprettet', kidName);
       HQ.confetti({ count: 120 });
+      showScreen('screen-app');
       enterApp();
     }).catch(function (e) { HQ.toast('Kunne ikke gemme: ' + e.message); });
   });
 
-  function showPinLogin() {
-    $('#screen-pin').style.display = 'flex';
-    var ctl = HQ.pinPad($('#pin-pad'), {
-      length: 4, autoSubmit: true,
-      onSubmit: function (pin) {
-        if (String(st.config.adminPin) === pin) {
-          localStorage.setItem('hq_admin', '1');
-          $('#screen-pin').style.display = 'none';
-          enterApp();
-        } else { ctl.shake(); HQ.toast('Forkert PIN'); }
-      }
-    });
-  }
-
   $('#logout-btn').addEventListener('click', function () {
-    localStorage.removeItem('hq_admin');
-    location.reload();
+    HQ.auth().signOut().then(function () { location.reload(); });
   });
 
   // ═══════════ APP ═══════════
@@ -177,6 +266,7 @@
       var note = prompt('Besked til ' + ((st.kids[kidId] || {}).name || 'barnet') + ':', 'Prøv lige igen 🙂');
       if (note === null) return;
       cRef.update({ status: 'rejected', note: note });
+      HQ.audit('quest-afvist', ((st.kids[kidId] || {}).name || kidId) + ': ' + c.taskTitle);
       return;
     }
     // Godkend → posteringer i kontobogen (ledger er sandheden)
@@ -193,6 +283,7 @@
     });
     rollBonusDrop(kidId, lRef, now);
     cRef.update({ status: 'approved', approvedTs: now });
+    HQ.audit('quest-godkendt', ((st.kids[kidId] || {}).name || kidId) + ': ' + c.taskTitle + ' (' + rewardSummary(c.rewards) + ')');
     HQ.toast('✅ Godkendt — ' + rewardSummary(c.rewards));
   });
 
@@ -251,6 +342,7 @@
     if (!p || p.status !== 'pending') return;
     if (dl) {
       HQ.ref('purchases/' + id).update({ status: 'delivered', deliveredTs: Date.now() });
+      HQ.audit('koeb-leveret', p.title + ' (🪙 ' + p.cost + ')');
       HQ.toast('🎁 Markeret som leveret');
     } else {
       if (!confirm('Annullér købet og giv ' + p.cost + ' guld tilbage?')) return;
@@ -259,6 +351,7 @@
         ts: Date.now(), type: 'gold', amount: p.cost, name: 'Guld retur: ' + (p.title || ''),
         icon: '↩️', source: 'undo', by: 'admin', unseen: true
       });
+      HQ.audit('koeb-annulleret', p.title + ' (🪙 ' + p.cost + ' retur)');
     }
   });
 
@@ -377,6 +470,7 @@
     if (del) {
       var mid3 = del.getAttribute('data-del-mod');
       if (confirm('Afinstallér "' + (st.modules[mid3] || {}).name + '"?\n\nBørnenes XP, badges og fremgang BEVARES (kontobogen husker alt) — kun quests og skills-visning forsvinder.')) {
+        HQ.audit('modul-fjernet', (st.modules[mid3] || {}).name || mid3);
         HQ.ref('modules/' + mid3).remove();
       }
     }
@@ -388,7 +482,7 @@
     var blob = new Blob([JSON.stringify(m, null, 2)], { type: 'application/json' });
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'heltequest-modul-' + mid + '.json';
+    a.download = 'hverdagshelte-modul-' + mid + '.json';
     a.click();
     setTimeout(function () { URL.revokeObjectURL(a.href); }, 5000);
     HQ.toast('📤 ' + (m.name || mid) + ' eksporteret');
@@ -403,11 +497,13 @@
     reader.onload = function () {
       var m;
       try { m = JSON.parse(reader.result); } catch (e) { return HQ.toast('❌ Ikke gyldig JSON'); }
-      if (!m || m.format !== 'heltequest-module@1') return HQ.toast('❌ Ikke et HelteQuest-modul (format-feltet mangler)');
+      var okFormats = ['hverdagshelte-module@1', 'heltequest-module@1']; // gammelt format-id accepteres stadig
+      if (!m || okFormats.indexOf(m.format) < 0) return HQ.toast('❌ Ikke et HverdagsHelte-modul (format-feltet mangler)');
       if (!m.id || !/^[a-z0-9-]+$/.test(m.id)) return HQ.toast('❌ Modulet mangler et gyldigt id (små bogstaver/tal/bindestreg)');
       var exists = !!st.modules[m.id];
       if (exists && !confirm('"' + m.name + '" er allerede installeret. Overskriv med den nye version? (Fremgang bevares)')) return;
       HQ.ref('modules/' + m.id).set(Object.assign({}, m, { installedAt: Date.now(), enabled: true }));
+      HQ.audit('modul-installeret', m.name || m.id);
       HQ.toast('📥 ' + (m.name || m.id) + ' installeret');
     };
     reader.readAsText(f);
@@ -644,6 +740,7 @@
         var base = { ts: Date.now(), name: note, icon: '⚖️', source: 'adjust', by: 'admin' };
         if (dg) lRef.push(Object.assign({}, base, { type: 'gold', amount: dg, unseen: dg > 0 }));
         if (dx && skill) lRef.push(Object.assign({}, base, { type: 'xp', amount: dx, skill: skill, unseen: dx > 0 }));
+        HQ.audit('justering', k.name + ': ' + (dg ? dg + ' guld ' : '') + (dx ? dx + ' XP ' + skill : '') + ' — ' + note);
         HQ.toast('⚖️ Bogført');
       }
     );

@@ -1,4 +1,4 @@
-# HelteQuest — Inspiration fra andre gamification-apps (research 13/7-2026)
+# HverdagsHelte — Inspiration fra andre gamification-apps (research 13/7-2026)
 
 *Udgangspunkt: Reddit-tråden [r/gamification: List of resources for gamified self-improvement](https://www.reddit.com/r/gamification/comments/shs3qi/) + web-research af de nævnte apps og deres mekanikker.*
 
@@ -6,7 +6,7 @@
 
 ## 1. Hvad de bedste apps gør
 
-### Habitica (RPG-klassikeren — nærmeste slægtning til HelteQuest)
+### Habitica (RPG-klassikeren — nærmeste slægtning til HverdagsHelte)
 - Pixel-avatar, XP + guld + **udstyr** man køber for guld (sværd, rustning — visuel fremgang)
 - **Tilfældige drops**: quests giver af og til æg og "hatching potions" → kæledyr → fodres → ridedyr. Samle-mani.
 - **Quest-linjer med boss-kampe**: gennemførte opgaver giver skade på bossen; historie binder quests sammen
@@ -28,7 +28,7 @@
 - Forskning (SMU): gamificerede systemer øger opgave-gennemførsel op til 90 % hos børn 6–12
 - ⚠️ **"Reward fatigue"**: forældre rapporterer at nyheden slides op, og børn begynder at spørge "hvad får jeg for det?" — modtræk er ROTATION af indhold (vores event-moduler!) og at fremgang afspejler ægte mestring
 
-## 2. Overført til HelteQuest — prioriteret
+## 2. Overført til HverdagsHelte — prioriteret
 
 | # | Mekanik | Inspiration | Vurdering |
 |---|---|---|---|
@@ -36,7 +36,7 @@
 | 2 | **Avatar-butik: style-ting for guld/💠** (datterens ønske) | Habitica-udstyr | ✅ BYGGET 13/7 |
 | 3 | **Tilfældige bonus-drops i kisten** (klistermærker, max 1/dag) | Habitica-drops | ✅ BYGGET 13/7 |
 | 4 | **Klistermærke-album** (samle 12 → legendarisk badge) | FamilyMeritTracker | ✅ BYGGET 13/7 |
-| 5 | **Kæledyr der vokser med heltelevel** | Finch/Joon | 🎯 Næste store byggesten — æg klækkes ved level 3, vokser i stadier, evolution ved tier-skift |
+| 5 | **Kæledyr der vokser med heltelevel** | Finch/Joon | ✅ BYGGET 14/7 — æg findes lvl 2, klækker lvl 3 (vælg drage/enhjørning/ugle), udvikler sig lvl 6/10/20, navngivning + dagligt nus |
 | 6 | **Boss-quests** (ugens boss: stort projekt = boss m. HP, godkendte quests giver skade) | Habitica | 💡 Kan bygges som modul-udvidelse af formatet |
 | 7 | **Streak-skjold** (optjen 1 fridag pr. 7-dages streak) | Duolingo freeze | 💡 Lille, evidens-stærk |
 | 8 | **Dobbelt-XP-weekend** (admin-knap) | Duolingo boosts | 💡 Trivielt at bygge |

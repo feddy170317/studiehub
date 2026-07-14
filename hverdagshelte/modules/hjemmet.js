@@ -1,9 +1,9 @@
-/* HelteQuest-modul: Hjemmet — pligter kategoriseret efter DOMÆNE (værelse, køkken, tøj,
+/* HverdagsHelte-modul: Hjemmet — pligter kategoriseret efter DOMÆNE (værelse, køkken, tøj,
    affald, planter/dyr), ikke efter alder. Alderen styrer hvilke quests admin slår til.
    Quests herunder er sat til ca. 9 år (6–8- og 9–11-års-listerne). */
 window.HQ_BUNDLED = window.HQ_BUNDLED || [];
 window.HQ_BUNDLED.push({
-  "format": "heltequest-module@1",
+  "format": "hverdagshelte-module@1",
   "id": "hjemmet",
   "name": "Hjemmet 🏠",
   "version": 1,

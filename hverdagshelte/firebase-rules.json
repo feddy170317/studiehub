@@ -1,0 +1,25 @@
+{
+  "rules": {
+    "liferpg": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "hq": {
+      "users": {
+        "$uid": {
+          ".read": "auth != null && auth.uid === $uid",
+          ".write": "auth != null && auth.uid === $uid"
+        }
+      },
+      "orgs": {
+        "$org": {
+          ".read": "auth != null && data.child('members').child(auth.uid).exists()",
+          ".write": "auth != null && (data.child('members').child(auth.uid).child('role').val() === 'owner' || data.child('members').child(auth.uid).child('role').val() === 'manager' || (!data.exists() && newData.child('members').child(auth.uid).child('role').val() === 'owner'))"
+        }
+      }
+    },
+    "games": { ".read": true, ".write": true },
+    "quizzes": { ".read": true, ".write": true },
+    "$other": { ".read": false, ".write": false }
+  }
+}

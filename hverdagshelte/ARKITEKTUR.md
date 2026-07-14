@@ -1,4 +1,4 @@
-# HelteQuest v2 — Arkitektur: Core Engine + Moduler
+# HverdagsHelte v2 — Arkitektur: Core Engine + Moduler
 
 *Besluttet 11. juli 2026 gennem interview med Frederik (3 runder). Dette dokument er byggeplanen —
 ændringer her skal besluttes, ikke bare ske.*
@@ -7,7 +7,7 @@
 
 ## 1. Vision og principper
 
-**HelteQuest er en tom motor.** Al indhold — skills, quests, badges, streak-regler, kosmetik —
+**HverdagsHelte er en tom motor.** Al indhold — skills, quests, badges, streak-regler, kosmetik —
 leveres af **moduler** (åbne JSON-datapakker). Selv familiens eget grundindhold ("Ryd op på
 værelset") er bare et modul, som admin bygger i den indbyggede editor.
 
@@ -67,7 +67,7 @@ Modul ─┬─ Skills (2 lag: hovedskill → subskills)
 
 ```json
 {
-  "format": "heltequest-module@1",
+  "format": "hverdagshelte-module@1",
   "id": "sodhed-august",
   "name": "August: Sødhedsmåneden 💖",
   "version": 1,

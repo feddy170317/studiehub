@@ -1,4 +1,4 @@
-/* HelteQuest — spiller-app v2 (modul-drevet, ledger som sandhed, skattekiste) */
+/* HverdagsHelte — spiller-app v2 (modul-drevet, ledger som sandhed, skattekiste) */
 (function () {
   'use strict';
   var $ = HQ.$, esc = HQ.esc;
@@ -19,12 +19,53 @@
     return;
   }
 
-  // ═══════════ LOGIN ═══════════
-  HQ.ref('kids').on('value', function (snap) {
-    st.kids = snap.val() || {};
-    if (!st.kidId) renderProfiles();
-    else renderHeader();
+  // ═══════════ FAMILIE-LOGIN (v3: auth → org → heltevalg) ═══════════
+  HQ.auth().onAuthStateChanged(function (user) {
+    if (!user) {
+      $('#screen-auth').style.display = 'flex';
+      $('#screen-login').style.display = 'none';
+      return;
+    }
+    HQ.raw('hq/users/' + user.uid + '/orgs').once('value').then(function (snap) {
+      var orgId = Object.keys(snap.val() || {})[0];
+      if (!orgId) {
+        $('#auth-hint').textContent = 'Kontoen har ingen familie endnu — opret den i admin-appen først.';
+        $('#screen-auth').style.display = 'flex';
+        return;
+      }
+      HQ.setOrg(orgId);
+      startPlayer();
+    });
   });
+
+  $('#auth-go').addEventListener('click', function () {
+    var email = $('#auth-email').value.trim();
+    var pass = $('#auth-pass').value;
+    if (!email || !pass) return HQ.toast('Udfyld e-mail og kodeord');
+    var btn = this;
+    btn.disabled = true;
+    HQ.auth().signInWithEmailAndPassword(email, pass).catch(function (e) {
+      btn.disabled = false;
+      HQ.toast('❌ ' + HQ.authErrorText(e));
+    });
+  });
+
+  function startPlayer() {
+    $('#screen-auth').style.display = 'none';
+    if (!st.kidId) $('#screen-login').style.display = 'flex';
+    HQ.ref('kids').on('value', function (snap) {
+      st.kids = snap.val() || {};
+      if (!st.kidId) renderProfiles();
+      else { renderHeader(); renderPet(); renderStyleShop(); }
+    });
+    var saved = localStorage.getItem('hq_kid');
+    if (saved) {
+      HQ.ref('kids').once('value').then(function (snap) {
+        var kids = snap.val() || {};
+        if (kids[saved] && !st.kidId) enterApp(saved);
+      });
+    }
+  }
 
   function renderProfiles() {
     var box = $('#profiles');
@@ -67,14 +108,6 @@
     $('#screen-login').style.display = 'flex';
   });
 
-  var saved = localStorage.getItem('hq_kid');
-  if (saved) {
-    HQ.ref('kids').once('value').then(function (snap) {
-      var kids = snap.val() || {};
-      if (kids[saved] && !st.kidId) enterApp(saved);
-    });
-  }
-
   // ═══════════ APP-START ═══════════
   function enterApp(kidId) {
     st.kidId = kidId;
@@ -114,12 +147,83 @@
     renderSkills();
     renderBadgeWall();
     renderStickers();
+    renderPet();
     renderStreaks();
     renderShop();
     renderStyleShop();
     renderLog();
     maybeShowChest();
   }
+
+  // ═══════════ KÆLEDYR ═══════════
+  function renderPet() {
+    var box = $('#pet-card');
+    if (!box) return;
+    var kid = st.kids[st.kidId];
+    if (!kid) return;
+    var hero = HQ.heroLevel(st.state.totalXp);
+    if (kid.pet && kid.pet.type) {
+      var pv = HQ.petView(kid.pet, hero.level);
+      if (!pv) { box.innerHTML = ''; return; }
+      var patted = kid.pet.patTs && HQ.dateKey(new Date(kid.pet.patTs)) === HQ.dateKey();
+      var nextTxt = pv.next
+        ? 'Udvikler sig ved heltelevel ' + pv.next.level + ' (' + pv.next.label + ')'
+        : 'Fuldt udviklet — en legende! ✨';
+      box.innerHTML = '<h2 class="section-title">🐾 Dit kæledyr</h2>' +
+        '<div class="card" style="display:flex;gap:14px;align-items:center;position:relative" id="pet-box">' +
+          '<div class="pet-card-face ' + pv.stage.cls + '"><span class="pet-face-emoji">' + esc(pv.emoji) + '</span></div>' +
+          '<div style="flex:1;min-width:0">' +
+            '<b style="font-size:1.1rem">' + esc(pv.name) + '</b>' +
+            '<div style="color:var(--muted);font-size:0.82rem">' + esc(pv.typeName) + ' · ' + esc(pv.stage.label) + '</div>' +
+            '<div style="color:var(--muted);font-size:0.78rem;margin-top:4px">' + nextTxt + '</div>' +
+            '<div class="q-chips" style="margin-top:8px">' +
+              '<button class="btn small green" id="pet-pat"' + (patted ? ' disabled' : '') + '>' + (patted ? '❤️ Nusset i dag' : '🤗 Nus ' + esc(pv.name)) + '</button>' +
+              '<button class="btn small ghost" id="pet-rename">✏️ Navn</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+    } else if (kid.pet && kid.pet.stage === 'egg') {
+      box.innerHTML = '<h2 class="section-title">🐾 Dit kæledyr</h2>' +
+        '<div class="card" style="display:flex;gap:14px;align-items:center">' +
+          '<div class="pet-card-face"><span class="pet-face-emoji egg-wobble" style="font-size:2.2rem">🥚</span></div>' +
+          '<div><b>Et mystisk æg…</b><div style="color:var(--muted);font-size:0.82rem">Det klækker når du når heltelevel ' + HQ.PET_HATCH_LEVEL + '. Bliv ved med at klare quests!</div></div>' +
+        '</div>';
+    } else {
+      box.innerHTML = '';
+    }
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('#pet-pat')) {
+      var kid = st.kids[st.kidId];
+      if (!kid || !kid.pet) return;
+      HQ.ref('kids/' + st.kidId + '/pet/patTs').set(Date.now());
+      HQ.chime('pop');
+      var boxEl = $('#pet-box');
+      for (var i = 0; i < 6; i++) {
+        var h = document.createElement('span');
+        h.className = 'heart-float';
+        h.textContent = ['❤️', '💖', '💕'][i % 3];
+        h.style.left = (20 + Math.random() * 60) + '%';
+        h.style.top = '40%';
+        h.style.animationDelay = (i * 0.12) + 's';
+        boxEl.appendChild(h);
+        setTimeout(function (el) { return function () { el.remove(); }; }(h), 1500 + i * 120);
+      }
+      return;
+    }
+    if (e.target.closest('#pet-rename')) {
+      var kid2 = st.kids[st.kidId];
+      if (!kid2 || !kid2.pet || !kid2.pet.type) return;
+      var name = prompt('Hvad skal dit kæledyr hedde?', kid2.pet.name || '');
+      if (name === null) return;
+      name = name.trim().slice(0, 20);
+      if (name) {
+        HQ.ref('kids/' + st.kidId + '/pet/name').set(name);
+        HQ.toast('💛 ' + name + '!');
+      }
+    }
+  });
 
   function awardBadges() {
     var pend = HQ.pendingBadges(st.content, st.state);
@@ -153,7 +257,14 @@
     var tier = HQ.heroTier(hero.level);
     var frame = equippedIn('frame'), bg = equippedIn('bg'), title = equippedIn('title');
     var av = $('#avatar-btn');
-    av.textContent = kid.avatar || '🦸‍♀️';
+    var petHtml = '';
+    if (kid.pet && kid.pet.type) {
+      var pv = HQ.petView(kid.pet, hero.level);
+      if (pv) petHtml = '<span class="pet-bubble">' + esc(pv.emoji) + '</span>';
+    } else if (kid.pet && kid.pet.stage === 'egg') {
+      petHtml = '<span class="pet-bubble"><span class="egg-wobble">🥚</span></span>';
+    }
+    av.innerHTML = esc(kid.avatar || '🦸‍♀️') + petHtml;
     av.className = 'avatar-ring ' + tier.cls + (frame ? ' ' + frame.cls : '');
     var bar = av.closest('.hero-bar');
     bar.className = 'card hero-bar' + (bg ? ' ' + bg.cls : '');
@@ -421,6 +532,22 @@
       newTier: HQ.heroTier(hb).name !== HQ.heroTier(ha).name
     });
 
+    // Kæledyrs-øjeblikke: æg → klækning → evolution
+    var kidNow = st.kids[st.kidId] || {};
+    if (!kidNow.pet && hb >= HQ.PET_EGG_LEVEL) {
+      cards.push({ kind: 'egg', hatchesNow: hb >= HQ.PET_HATCH_LEVEL });
+    }
+    if ((kidNow.pet && kidNow.pet.stage === 'egg' && hb >= HQ.PET_HATCH_LEVEL) ||
+        (!kidNow.pet && hb >= HQ.PET_HATCH_LEVEL)) {
+      cards.push({ kind: 'hatch' });
+    }
+    if (kidNow.pet && kidNow.pet.type) {
+      var stA = HQ.petStageFor(ha), stB = HQ.petStageFor(hb);
+      if (stB > stA && stA >= 0) {
+        cards.push({ kind: 'petEvolve', pet: kidNow.pet, stageIdx: stB });
+      }
+    }
+
     var i = 0;
     function show() {
       if (i >= cards.length) {
@@ -464,6 +591,67 @@
           '<div class="r-sub">' + esc(c.name) + ' steg i level!</div>';
         HQ.chime('levelup');
         HQ.confetti({ count: 130 });
+      } else if (c.kind === 'egg') {
+        // Ægget skrives til profilen i det øjeblik det vises
+        HQ.ref('kids/' + st.kidId + '/pet').set({ stage: 'egg', foundTs: Date.now() });
+        inner = '<div class="r-ico" style="font-size:3.6rem"><span class="egg-wobble" style="display:inline-block">🥚</span></div>' +
+          '<div class="r-big">DU HAR FUNDET ET ÆG!</div>' +
+          '<div class="r-sub">' + (c.hatchesNow ? 'Og det er allerede ved at klække…!' :
+            'Pas godt på det — det klækker når du når heltelevel ' + HQ.PET_HATCH_LEVEL) + '</div>';
+        HQ.chime('badge');
+        HQ.confetti({ count: 90 });
+      } else if (c.kind === 'hatch') {
+        // Særligt kort: valget ER knappen — barnet vælger sit kæledyr
+        ov.innerHTML = '<div class="reveal-card">' +
+          '<div class="r-ico" style="font-size:3.6rem">✨🥚✨</div>' +
+          '<div class="r-big">ÆGGET KLÆKKER!</div>' +
+          '<div class="r-sub">Hvem gemmer sig derinde? Vælg dit kæledyr:</div>' +
+          '<div class="hatch-choices">' +
+          Object.keys(HQ.PETS).map(function (pid) {
+            var p = HQ.PETS[pid];
+            return '<button class="hatch-choice" data-hatch="' + pid + '">' +
+              '<span class="hc-emoji">' + p.emojis[0] + '</span>' + esc(p.name) + '</button>';
+          }).join('') +
+          '</div></div>' +
+          '<div class="chest-progress">' + (i + 1) + ' / ' + cards.length + '</div>';
+        HQ.chime('levelup');
+        HQ.confetti({ count: 150 });
+        ov.addEventListener('click', function onHatch(e2) {
+          var b = e2.target.closest('[data-hatch]');
+          if (!b) return;
+          ov.removeEventListener('click', onHatch);
+          var type = b.getAttribute('data-hatch');
+          HQ.ref('kids/' + st.kidId + '/pet').set({ type: type, hatchedTs: Date.now() });
+          HQ.chime('badge');
+          HQ.confetti({ count: 140 });
+          // Velkomst-kort lige efter valget, så det store øjeblik får lov at lande
+          cards.splice(i + 1, 0, { kind: 'petWelcome', type: type });
+          i++; show();
+        });
+        return;
+      } else if (c.kind === 'petWelcome') {
+        var wdef = HQ.PETS[c.type] || {};
+        inner = '<div class="r-ico" style="font-size:3.6rem">' + esc((wdef.emojis || ['🐾'])[0]) + '</div>' +
+          '<div class="r-big">VELKOMMEN, LILLE ' + esc((wdef.name || 'VEN').toUpperCase()) + '!</div>' +
+          '<div class="r-sub">Din nye ven vokser når DU vokser.<br>Giv den et navn under Skills 📔</div>';
+        HQ.chime('badge');
+        HQ.confetti({ count: 100 });
+      } else if (c.kind === 'petEvolve') {
+        var pdef = HQ.PETS[c.pet.type] || {};
+        var stg = HQ.PET_STAGES[c.stageIdx];
+        var last2 = i === cards.length - 1;
+        ov.innerHTML =
+          '<div class="evolve-wrap"><div class="evolve-rays"></div>' +
+          '<div class="evolve-avatar">' + esc((pdef.emojis || ['🐾'])[c.stageIdx]) + '</div></div>' +
+          '<div class="evolve-title">' + esc((c.pet.name || pdef.name || 'Dit kæledyr').toUpperCase()) + ' UDVIKLER SIG!</div>' +
+          '<div class="evolve-sub">✨ Nu: <b>' + esc(stg.label) + '</b></div>' +
+          '<button class="btn gold" style="margin-top:26px">' + (last2 ? 'Færdig ✨' : 'Næste →') + '</button>' +
+          '<div class="chest-progress">' + (i + 1) + ' / ' + cards.length + '</div>';
+        HQ.chime('levelup');
+        HQ.confetti({ count: 180 });
+        setTimeout(function () { HQ.chime('badge'); }, 900);
+        ov.querySelector('.btn').addEventListener('click', function () { i++; show(); }, { once: true });
+        return;
       } else {
         // EVOLVE-FEJRING: helten udvikler sig (heltelevel/tier-skift)
         var kid = st.kids[st.kidId] || {};

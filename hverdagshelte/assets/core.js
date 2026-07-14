@@ -1,4 +1,4 @@
-/* HelteQuest — kerne v2: Firebase, modul-motor, ledger, streaks, badges, spilmatematik.
+/* HverdagsHelte — kerne v2: Firebase, modul-motor, ledger, streaks, badges, spilmatematik.
    Se ARKITEKTUR.md — kontobogen (ledger) er sandheden, moduler er data. */
 (function () {
   'use strict';
@@ -19,10 +19,48 @@
       return null;
     }
   }
+
+  // ---------- v3: Auth + organisationer ----------
+  // Alt familie-data bor under hq/orgs/{orgId}. HQ.ref() er org-scoped,
+  // HQ.raw() er absolut (hq/users, legacy liferpg til migrering m.m.).
+  var currentOrgId = null;
+  function auth() {
+    initFirebase();
+    return firebase.auth ? firebase.auth() : null;
+  }
+  function setOrg(orgId) { currentOrgId = orgId; }
+  function getOrg() { return currentOrgId; }
+  function raw(path) {
+    var d = initFirebase();
+    return d ? d.ref(path) : null;
+  }
   function ref(path) {
     var d = initFirebase();
-    return d ? d.ref(ROOT + (path ? '/' + path : '')) : null;
+    if (!d) return null;
+    if (!currentOrgId) throw new Error('HQ.ref kaldt før organisation er valgt');
+    return d.ref('hq/orgs/' + currentOrgId + (path ? '/' + path : ''));
   }
+  // Dansk oversættelse af de mest almindelige auth-fejl
+  function authErrorText(e) {
+    var code = (e && e.code) || '';
+    if (code.indexOf('invalid-email') >= 0) return 'Ugyldig e-mailadresse';
+    if (code.indexOf('email-already-in-use') >= 0) return 'Der findes allerede en konto med den e-mail — log ind i stedet';
+    if (code.indexOf('weak-password') >= 0) return 'Kodeordet skal være mindst 6 tegn';
+    if (code.indexOf('wrong-password') >= 0 || code.indexOf('invalid-credential') >= 0 || code.indexOf('invalid-login-credentials') >= 0) return 'Forkert e-mail eller kodeord';
+    if (code.indexOf('user-not-found') >= 0) return 'Ingen konto med den e-mail — opret en først';
+    if (code.indexOf('too-many-requests') >= 0) return 'For mange forsøg — vent lidt og prøv igen';
+    if (code.indexOf('network') >= 0) return 'Netværksfejl — tjek internettet';
+    if (code.indexOf('configuration-not-found') >= 0 || code.indexOf('operation-not-allowed') >= 0) return 'Login er ikke aktiveret i Firebase endnu (se SETUP.md trin V3)';
+    return 'Der gik noget galt (' + code + ')';
+  }
+  // Audit-log: hvem gjorde hvad hvornår (jf. PLATFORM_VISION §1.7)
+  function audit(action, detail) {
+    try {
+      var u = auth() && auth().currentUser;
+      ref('audit').push({ ts: Date.now(), uid: u ? u.uid : '?', email: u ? (u.email || 'enhed') : '?', action: action, detail: detail || '' });
+    } catch (e) { /* audit må aldrig vælte en handling */ }
+  }
+
   // RTDB-nøgler må ikke indeholde . # $ / [ ]
   function safeKey(s) { return String(s).replace(/[.#$/\[\]]/g, '_'); }
 
@@ -100,6 +138,38 @@
     { id: 'title_quest',   slot: 'title', name: 'Titel: Questmesteren',     icon: '📜', text: 'Questmesteren',     gold: 120 },
     { id: 'title_legende', slot: 'title', name: 'Titel: den Legendariske',  icon: '📜', text: 'den Legendariske',  coin: 40 }
   ];
+  // ---------- Kæledyr (Finch/Joon-mekanikken: vokser af barnets fremgang) ----------
+  // Æg findes ved heltelevel 2, klækker ved 3, udvikler sig ved 6/10/20.
+  var PET_STAGES = [
+    { minLevel: 3,  label: 'Baby',        cls: 'pet-baby' },
+    { minLevel: 6,  label: 'Junior',      cls: 'pet-junior' },
+    { minLevel: 10, label: 'Voksen',      cls: 'pet-voksen' },
+    { minLevel: 20, label: 'Legendarisk', cls: 'pet-legend' }
+  ];
+  var PETS = {
+    drage:       { name: 'Drage',      emojis: ['🐲', '🐲', '🐉', '🐉'] },
+    enhjoerning: { name: 'Enhjørning', emojis: ['🐴', '🦄', '🦄', '🦄'] },
+    ugle:        { name: 'Ugle',       emojis: ['🐣', '🦉', '🦉', '🦉'] }
+  };
+  var PET_EGG_LEVEL = 2, PET_HATCH_LEVEL = 3;
+  // Returnerer stadie-index (0-3) for et klækket kæledyr, eller -1 hvis under klække-level
+  function petStageFor(heroLvl) {
+    var idx = -1;
+    PET_STAGES.forEach(function (s, i) { if (heroLvl >= s.minLevel) idx = i; });
+    return idx;
+  }
+  function petView(pet, heroLvl) {
+    if (!pet || !pet.type || !PETS[pet.type]) return null;
+    var idx = Math.max(0, petStageFor(heroLvl));
+    var def = PETS[pet.type];
+    var next = PET_STAGES[idx + 1] || null;
+    return {
+      emoji: def.emojis[idx], typeName: def.name, name: pet.name || def.name,
+      stage: PET_STAGES[idx], stageIdx: idx,
+      next: next ? { label: next.label, level: next.minLevel } : null
+    };
+  }
+
   // Klistermærke-album (tilfældige drops fra godkendte quests, max 1/dag)
   var STICKERS = [
     { id: 'st_enhjorning', name: 'Enhjørningen', icon: '🦄' },
@@ -441,11 +511,14 @@
   }
 
   window.HQ = {
-    ROOT: ROOT, initFirebase: initFirebase, ref: ref, safeKey: safeKey,
+    ROOT: ROOT, initFirebase: initFirebase, ref: ref, raw: raw, safeKey: safeKey,
+    auth: auth, setOrg: setOrg, getOrg: getOrg, authErrorText: authErrorText, audit: audit,
     dateKey: dateKey, isoWeekKey: isoWeekKey, monthKey: monthKey,
     periodKeyFor: periodKeyFor, DAY_NAMES: DAY_NAMES, DAY_SHORT: DAY_SHORT,
     levelFromXp: levelFromXp, heroLevel: heroLevel, heroTier: heroTier, RARITY: RARITY,
     COSMETICS: COSMETICS, STICKERS: STICKERS,
+    PETS: PETS, PET_STAGES: PET_STAGES, PET_EGG_LEVEL: PET_EGG_LEVEL, PET_HATCH_LEVEL: PET_HATCH_LEVEL,
+    petStageFor: petStageFor, petView: petView,
     windowState: windowState, assemble: assemble, childrenOf: childrenOf, mainSkills: mainSkills,
     computeState: computeState, skillXpOf: skillXpOf, skillLevelOf: skillLevelOf,
     computeStreak: computeStreak, pendingBadges: pendingBadges,

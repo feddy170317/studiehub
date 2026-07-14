@@ -1,9 +1,9 @@
-/* HelteQuest-modul: Dansk — de fire officielle sprogområder.
+/* HverdagsHelte-modul: Dansk — de fire officielle sprogområder.
    Bundlet som .js så det virker ved file:// (samme mønster som QuizLive-quizzer).
-   Selve indholdet er ren JSON i heltequest-module@1-formatet. */
+   Selve indholdet er ren JSON i hverdagshelte-module@1-formatet. */
 window.HQ_BUNDLED = window.HQ_BUNDLED || [];
 window.HQ_BUNDLED.push({
-  "format": "heltequest-module@1",
+  "format": "hverdagshelte-module@1",
   "id": "dansk",
   "name": "Dansk 📖",
   "version": 1,

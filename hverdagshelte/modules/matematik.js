@@ -1,9 +1,9 @@
-/* HelteQuest-modul: Matematik — subskills efter webmatematik.dk's emneopdeling (0.–9. kl.).
+/* HverdagsHelte-modul: Matematik — subskills efter webmatematik.dk's emneopdeling (0.–9. kl.).
    Quests er sat til start-3.-klasse; de avancerede (brøker, algebra, statistik) ligger klar
    som inaktive og slås til efterhånden som klassetrinnet stiger. */
 window.HQ_BUNDLED = window.HQ_BUNDLED || [];
 window.HQ_BUNDLED.push({
-  "format": "heltequest-module@1",
+  "format": "hverdagshelte-module@1",
   "id": "matematik",
   "name": "Matematik 🔢",
   "version": 1,

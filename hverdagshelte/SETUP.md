@@ -1,4 +1,27 @@
-# HelteQuest ⚔️ — Opsætning og drift
+# HverdagsHelte ⚔️ — Opsætning og drift
+
+---
+
+## ⚠️ V3-OPGRADERING (rigtige konti + familier) — Frederiks checkliste
+
+V3-koden (Sprint 1: auth + organisationer) er bygget men IKKE deployet endnu.
+Før den kan testes og gå live, skal du gøre 3 ting i
+[Firebase Console](https://console.firebase.google.com) → projekt **via-quiz**:
+
+1. **Aktivér Authentication:** venstre menu → *Build* → *Authentication* → **Get started**
+   → fanen *Sign-in method* → vælg **Email/Password** → slå **Enable** til → *Save*.
+2. **Indsæt nye database-regler:** *Build* → *Realtime Database* → fanen *Rules* →
+   erstat alt med indholdet af `firebase-rules.json` (ligger i denne mappe) → *Publish*.
+   Reglerne lukker den åbne database: kun familiens medlemmer kan se familiens data.
+   (QuizLive's `/games` og `/quizzes` forbliver åbne, så quizzerne stadig virker.)
+3. **Sig til Claude** at det er gjort → fuld E2E-test køres → migrering af jeres
+   eksisterende data (helte, XP, badges) sker automatisk første gang du opretter din
+   konto og familie i den nye admin — intet går tabt. Derefter deploy.
+
+**OBS:** Indtil deploy kører den gamle version uændret på GitHub Pages — jeres daglige
+brug påvirkes ikke af noget i denne checkliste.
+
+---
 
 RPG-app til børn: dagens/ugens quests → forældre-godkendelse → XP + guld → levels og rigtige belønninger fra butikken.
 
@@ -24,7 +47,7 @@ Alt kan redigeres bagefter i admin — quests, priser, streak-mål, PIN-koder.
 ## Moduler (v2)
 
 Alt indhold — færdigheder, quests, badges, streaks — kommer fra **moduler** (JSON-datapakker,
-format: `heltequest-module@1`, se ARKITEKTUR.md §4). I admin → **Moduler** kan du:
+format: `hverdagshelte-module@1`, se ARKITEKTUR.md §4). I admin → **Moduler** kan du:
 - Folde et modul ud og redigere quests (XP/guld/dage/aktiv), skill-navne og streak-mål
 - Slå quests fra/til efter klassetrin (fx brøker og ligninger ligger klar som inaktive)
 - **📤 Eksportere** et modul som JSON-fil (del den på GitHub) og **📥 importere** andres
@@ -71,7 +94,7 @@ Regler), skal `liferpg`-noden med:
 
 ## GitHub Pages (anbefalet til barnets telefon/tablet)
 
-1. Upload `HelteQuest/`-mappen til et GitHub-repo (eller som undermappe i et eksisterende Pages-repo)
+1. Upload `HverdagsHelte/`-mappen til et GitHub-repo (eller som undermappe i et eksisterende Pages-repo)
 2. Barnet åbner `https://<brugernavn>.github.io/<repo>/` og tilføjer den til hjemmeskærmen
 3. Du åbner `.../admin.html` på din telefon
 

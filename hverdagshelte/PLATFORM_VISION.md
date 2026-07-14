@@ -1,4 +1,4 @@
-# HelteQuest — Platform-vision (v3+)
+# HverdagsHelte — Platform-vision (v3+)
 
 *Destilleret fra arkitektur-feedback modtaget 14/7-2026 (Frederiks bror). Dette er IKKE
 byggeplanen for nu — det er kortet over hvor vi skal hen, og de beslutninger der skal
@@ -55,7 +55,7 @@ ARKITEKTUR.md §8: testfasen kommer før alt her.*
 | Copy-on-write på standardmoduler (§6) | 🟡 Bevidst afvigelse: far redigerer DB-kopien direkte, fordi han er ENESTE forfatter. Genindføres når moduler kommer udefra |
 | Organisation_id på al data (§2) | 🔜 Hele `/liferpg`-noden ER én organisation; multi-tenant kræver rigtig backend + auth |
 | Rigtig auth, roller, superadmin-portal (§1,3,10) | 🔜 v3 — PIN'er rækker til familien |
-| Abonnement/TestFlight/native apps (§11) | 🔜 v3 — OBS: HelteQuest er webapp/PWA i dag; TestFlight er kun relevant hvis vi går native/wrapper. PWA-på-hjemmeskærm dækker beta-behovet gratis og uden Apples 15-30 % |
+| Abonnement/TestFlight/native apps (§11) | 🔜 v3 — OBS: HverdagsHelte er webapp/PWA i dag; TestFlight er kun relevant hvis vi går native/wrapper. PWA-på-hjemmeskærm dækker beta-behovet gratis og uden Apples 15-30 % |
 | Org-specifikke valutaer/wallets (§5) | 🔜 v3 — datamodellen (ledger m. currency-felt) gør det let at eftermontere |
 
 ## 3. De 12 produktspørgsmål (§16) — svar pr. 14/7-2026
