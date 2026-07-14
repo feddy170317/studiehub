@@ -248,7 +248,9 @@
       if (e.type === 'xp') {
         st.xp[e.skill] = (st.xp[e.skill] || 0) + (e.amount || 0);
         st.totalXp += (e.amount || 0);
-        if (e.questKey) {
+        // Fortrudte posteringer (undone) tæller ikke som gennemførelser
+        // ift. streaks og tæller-badges — kun saldoen påvirkes (via modposten).
+        if (e.questKey && !e.undone && e.source !== 'undo') {
           var k = e.questKey + '|' + (e.earnedTs || e.ts);
           if (!evMap[k]) evMap[k] = { earnedTs: e.earnedTs || e.ts, questKey: e.questKey, module: e.module || '', skills: [] };
           evMap[k].skills.push(e.skill);
@@ -468,6 +470,60 @@
     })();
   }
 
+  // ---------- Emoji-vælger (til ikon-felter i admin) ----------
+  // Brug HQ.iconField(id, value) i modal-HTML — knappen ved siden af feltet åbner
+  // vælgeren via den delegerede handler herunder. Fritekst i feltet virker stadig.
+  var EMOJI_SETS = [
+    ['Ting & symboler', '⭐🌟✨🎯🏆🏅🎖️👑💎🔑🗝️🛡️⚔️🪄🎁📦🧸🎈🎀💰🪙💠📱💻🎮🎧📚📖📓✏️🖍️📐🧮🔔⏰🗓️📌'],
+    ['Dyr', '🐲🐉🦄🦉🦊🐱🐶🐼🐨🐸🦋🐢🐬🐺🦅🐴🐣🐰🐯🦁🐧🐳🦕🐝'],
+    ['Aktivitet & sport', '⚽🏀🎾🏓🏸🥅⛳🏊🚴🏃🤸🧗⛷️🛹🥋🎳🎣🏹🛼🤿'],
+    ['Mad & køkken', '🍕🍔🌮🥗🍎🍌🍓🥕🥦🍞🧀🥚🍪🧁🍰🍿🥤🍽️🥄👩‍🍳'],
+    ['Hjem & pligter', '🏠🛏️🧹🧺🧽🫧🌀🗑️♻️🪴🌱🌻🚿🧼🪥🛒🔧🪛🧰🎒'],
+    ['Natur & vejr', '🌈☀️🌙🔥💧❄️🌊🌲🌳🍀🌍⛰️🏕️🌅🌌'],
+    ['Følelser & sjov', '💖❤️😄🤗🎉🥳🎊🎭🎨🎵🎸🎤🎬🧩🪁🎪🦸🦸‍♀️🧙🧚']
+  ];
+  function segmentEmojis(str) {
+    if (window.Intl && Intl.Segmenter) {
+      var seg = new Intl.Segmenter('da', { granularity: 'grapheme' });
+      return Array.from(seg.segment(str)).map(function (s) { return s.segment; });
+    }
+    return Array.from(str); // fallback: kan splitte ZWJ-emojis, men virker
+  }
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('.emoji-open');
+    if (!btn) return;
+    var input = document.getElementById(btn.getAttribute('data-for'));
+    if (!input) return;
+    var bg = document.createElement('div');
+    bg.className = 'modal-bg';
+    bg.style.zIndex = '86';
+    bg.innerHTML = '<div class="modal" style="max-width:420px"><h2>Vælg ikon</h2>' +
+      EMOJI_SETS.map(function (set) {
+        return '<div class="mod-section-label">' + set[0] + '</div>' +
+          '<div style="display:grid;grid-template-columns:repeat(8,1fr);gap:4px">' +
+          segmentEmojis(set[1]).map(function (em) {
+            return '<button type="button" class="icon-btn" style="width:100%;height:40px;font-size:1.25rem;border:none" data-em="' + em + '">' + em + '</button>';
+          }).join('') + '</div>';
+      }).join('') +
+      '<div class="modal-actions"><button class="btn ghost small" data-close>Luk (eller skriv selv i feltet)</button></div></div>';
+    document.body.appendChild(bg);
+    bg.addEventListener('click', function (e2) {
+      if (e2.target === bg || e2.target.closest('[data-close]')) { bg.remove(); return; }
+      var em = e2.target.closest('[data-em]');
+      if (em) {
+        input.value = em.getAttribute('data-em');
+        btn.textContent = input.value;
+        bg.remove();
+      }
+    });
+  });
+  function iconField(id, value, placeholder) {
+    var v = esc(value || '');
+    return '<div style="display:flex;gap:6px;align-items:center">' +
+      '<input id="' + id + '" value="' + v + '" maxlength="8"' + (placeholder ? ' placeholder="' + esc(placeholder) + '"' : '') + ' style="flex:1">' +
+      '<button type="button" class="icon-btn emoji-open" data-for="' + id + '" title="Vælg ikon">' + (v || '😀') + '</button></div>';
+  }
+
   // ---------- PIN-tastatur ----------
   function pinPad(container, opts) {
     opts = opts || {};
@@ -524,6 +580,6 @@
     computeStreak: computeStreak, pendingBadges: pendingBadges,
     soundOn: soundOn, toggleSound: toggleSound, chime: chime,
     $: $, $all: $all, esc: esc, fmtTs: fmtTs, rewardChips: rewardChips,
-    toast: toast, confetti: confetti, pinPad: pinPad
+    toast: toast, confetti: confetti, pinPad: pinPad, iconField: iconField
   };
 })();

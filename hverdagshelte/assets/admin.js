@@ -190,6 +190,7 @@
     sub('ledger', function (v) { st.ledgers = v || {}; renderKids(); });
     sub('shop', function (v) { st.shop = v || {}; renderShopList(); });
     sub('purchases', function (v) { st.purchases = v || {}; renderPurchases(); renderLog(); });
+    sub('audit', function (v) { st.audit = v || {}; renderLog(); });
   }
   function sub(path, fn) {
     HQ.ref(path).on('value', function (snap) { fn(snap.val()); }, function (err) {
@@ -523,7 +524,7 @@
       '<h2>' + (isNew ? 'Ny quest' : 'Redigér quest') + '</h2>' +
       '<label>Titel</label><input id="m-title" value="' + esc(q.title || '') + '">' +
       '<label>Beskrivelse (valgfri)</label><input id="m-desc" value="' + esc(q.desc || '') + '">' +
-      '<div class="row2"><div><label>Ikon (emoji)</label><input id="m-icon" value="' + esc(q.icon || '') + '" maxlength="4"></div>' +
+      '<div class="row2"><div><label>Ikon</label>' + HQ.iconField('m-icon', q.icon) + '</div>' +
       '<div><label>Type</label><select id="m-type">' +
         '<option value="daily"' + (q.type === 'daily' ? ' selected' : '') + '>Daglig</option>' +
         '<option value="weekly"' + (q.type === 'weekly' ? ' selected' : '') + '>Ugentlig</option>' +
@@ -569,7 +570,7 @@
       '<h2>Redigér færdighed</h2>' +
       '<p style="color:var(--muted);font-size:0.8rem">Id\'et (' + esc(s.id) + ') kan ikke ændres — XP er bogført på det.</p>' +
       '<label>Navn</label><input id="m-sname" value="' + esc(s.name || '') + '">' +
-      '<div class="row2"><div><label>Ikon (emoji)</label><input id="m-sicon" value="' + esc(s.icon || '') + '" maxlength="4"></div>' +
+      '<div class="row2"><div><label>Ikon</label>' + HQ.iconField('m-sicon', s.icon) + '</div>' +
       '<div><label>Farve</label><input id="m-scolor" type="color" value="' + esc(s.color || '#9c6bff') + '" style="height:44px;padding:4px"></div></div>',
       function (bg) {
         var name = $('#m-sname', bg).value.trim();
@@ -646,7 +647,7 @@
       '<h2>' + (id ? 'Redigér belønning' : 'Ny belønning') + '</h2>' +
       '<label>Titel</label><input id="m-ititle" value="' + esc(it.title || '') + '">' +
       '<label>Beskrivelse (valgfri)</label><input id="m-idesc" value="' + esc(it.desc || '') + '">' +
-      '<div class="row2"><div><label>Ikon (emoji)</label><input id="m-iicon" value="' + esc(it.icon || '') + '" maxlength="4"></div>' +
+      '<div class="row2"><div><label>Ikon</label>' + HQ.iconField('m-iicon', it.icon || '🎁') + '</div>' +
       '<div><label>Pris (guld)</label><input id="m-icost" type="number" value="' + (it.cost || 0) + '"></div></div>' +
       '<label style="display:flex;align-items:center;gap:8px;margin-top:14px"><input type="checkbox" id="m-iactive" style="width:auto"' + (it.active !== false ? ' checked' : '') + '> Aktiv</label>',
       function (bg) {
@@ -679,7 +680,9 @@
     var box = $('#kid-list');
     var ids = Object.keys(st.kids);
     if (!ids.length) { box.innerHTML = '<div class="card empty">Ingen helte endnu — opret den første!</div>'; return; }
-    box.innerHTML = ids.map(function (id) {
+    var active = ids.filter(function (id) { return !st.kids[id].archived; });
+    var archived = ids.filter(function (id) { return st.kids[id].archived; });
+    var html = active.map(function (id) {
       var k = st.kids[id];
       var ks = HQ.computeState(st.ledgers[id] || {});
       var hero = HQ.heroLevel(ks.totalXp);
@@ -699,16 +702,193 @@
         '<div style="display:flex;flex-direction:column;gap:6px">' +
         '<button class="icon-btn" data-edit-kid="' + id + '">✏️</button>' +
         '<button class="icon-btn" data-adjust-kid="' + id + '" title="Justér XP/guld">⚖️</button>' +
+        '<button class="icon-btn" data-ledger-kid="' + id + '" title="Kontobog (fortryd posteringer)">📜</button>' +
+        '<button class="icon-btn" data-danger-kid="' + id + '" title="Deaktivér eller slet">🗑️</button>' +
         '</div></div></div>';
     }).join('');
+    if (!active.length) html += '<div class="card empty">Ingen aktive helte</div>';
+    if (archived.length) {
+      html += '<h2 class="section-title">🗄️ Arkiverede helte</h2><div class="card">' +
+        archived.map(function (id) {
+          var k = st.kids[id];
+          return '<div class="admin-row inactive" style="opacity:0.7">' +
+            '<span style="font-size:1.4rem">' + esc(k.avatar || '🧒') + '</span>' +
+            '<div class="a-main"><div class="a-title">' + esc(k.name) + '</div>' +
+            '<div class="a-sub">Deaktiveret — al fremgang er bevaret</div></div>' +
+            '<button class="btn small green" data-restore-kid="' + id + '">Gendan</button>' +
+            '<button class="icon-btn" data-danger-kid="' + id + '" title="Slet permanent">🗑️</button>' +
+            '</div>';
+        }).join('') + '</div>';
+    }
+    box.innerHTML = html;
   }
+
+  // Deaktivér / slet permanent
+  function dangerModal(id) {
+    var k = st.kids[id];
+    if (!k) return;
+    var bg = document.createElement('div');
+    bg.className = 'modal-bg';
+    bg.innerHTML = '<div class="modal"><h2>🗑️ ' + esc(k.name) + '</h2>' +
+      '<p style="color:var(--muted);font-size:0.9rem;margin-top:6px">Hvad skal der ske?</p>' +
+      (!k.archived ? '<button class="btn small" data-act="archive" style="width:100%;margin-top:14px">🗄️ Deaktivér (skjul fra spillet — XP, badges og alt andet bevares)</button>' : '') +
+      '<button class="btn red small" data-act="delete" style="width:100%;margin-top:10px">💀 Slet PERMANENT (helt + kontobog + historik forsvinder for altid)</button>' +
+      '<div class="modal-actions"><button class="btn ghost small" data-close>Annullér</button></div></div>';
+    document.body.appendChild(bg);
+    bg.addEventListener('click', function (e) {
+      if (e.target === bg || e.target.closest('[data-close]')) { bg.remove(); return; }
+      var act = e.target.closest('[data-act]');
+      if (!act) return;
+      if (act.getAttribute('data-act') === 'archive') {
+        HQ.ref('kids/' + id + '/archived').set(true);
+        HQ.audit('helt-deaktiveret', k.name);
+        HQ.toast('🗄️ ' + k.name + ' er deaktiveret');
+        bg.remove();
+      } else {
+        var typed = prompt('Skriv heltens navn (' + k.name + ') for at bekræfte PERMANENT sletning:');
+        if (typed === null) return;
+        if (typed.trim() !== k.name) { HQ.toast('Navnet matchede ikke — intet slettet'); return; }
+        HQ.audit('helt-slettet', k.name);
+        var upd = {};
+        upd['kids/' + id] = null;
+        upd['completions/' + id] = null;
+        upd['ledger/' + id] = null;
+        HQ.ref().update(upd).then(function () {
+          HQ.toast('💀 ' + k.name + ' er slettet permanent');
+        });
+        bg.remove();
+      }
+    });
+  }
+  document.addEventListener('click', function (e) {
+    var dk = e.target.closest('[data-danger-kid]');
+    if (dk) return dangerModal(dk.getAttribute('data-danger-kid'));
+    var rk = e.target.closest('[data-restore-kid]');
+    if (rk) {
+      var id = rk.getAttribute('data-restore-kid');
+      HQ.ref('kids/' + id + '/archived').set(null);
+      HQ.audit('helt-gendannet', (st.kids[id] || {}).name || id);
+      HQ.toast('✅ Gendannet');
+    }
+  });
+
+  // ═══════════ KONTOBOG (fortryd posteringer) ═══════════
+  var TYPE_LABEL = { xp: 'XP', gold: '🪙', coin: '💠', badge: '🏅 Badge', cosmetic: '🎨 Style', sticker: '📔 Mærke' };
+  function canUndo(e) { return (e.type === 'xp' || e.type === 'gold' || e.type === 'coin') && e.source !== 'undo' && !e.undone; }
+
+  function undoEntry(kidId, entryId, e) {
+    var mp = {
+      ts: Date.now(), type: e.type, amount: -(e.amount || 0),
+      name: 'Fortrudt: ' + (e.name || ''), icon: '↩️',
+      source: 'undo', undoOf: entryId, by: 'admin', unseen: false
+    };
+    if (e.skill) mp.skill = e.skill;
+    HQ.ref('ledger/' + kidId).push(mp);
+    HQ.ref('ledger/' + kidId + '/' + entryId + '/undone').set(true);
+  }
+
+  function ledgerModal(kidId) {
+    var k = st.kids[kidId];
+    if (!k) return;
+    var bg = document.createElement('div');
+    bg.className = 'modal-bg';
+    bg.innerHTML = '<div class="modal" style="max-width:560px"><h2>📜 Kontobog: ' + esc(k.name) + '</h2>' +
+      '<p style="color:var(--muted);font-size:0.82rem;margin:4px 0 10px">Fortryd skriver en modpostering — intet slettes, alt kan følges. Korrektioner fejres ikke i skattekisten.</p>' +
+      '<div id="lm-list"></div>' +
+      '<div class="modal-actions">' +
+      '<button class="btn red small" id="lm-undo-selected" disabled>↩️ Fortryd valgte (0)</button>' +
+      '<button class="btn ghost small" data-close>Luk</button></div></div>';
+    document.body.appendChild(bg);
+
+    function renderList() {
+      var ledger = st.ledgers[kidId] || {};
+      var ids = Object.keys(ledger).sort(function (a, b) { return (ledger[b].ts || 0) - (ledger[a].ts || 0); }).slice(0, 150);
+      var list = $('#lm-list', bg);
+      if (!ids.length) { list.innerHTML = '<div class="empty">Kontobogen er tom</div>'; return; }
+      list.innerHTML = ids.map(function (id) {
+        var e = ledger[id];
+        var desc;
+        if (e.type === 'xp') desc = (e.amount > 0 ? '+' : '') + e.amount + ' XP ' + esc(skillName(e.skill));
+        else if (e.type === 'gold') desc = (e.amount > 0 ? '+' : '') + e.amount + ' 🪙';
+        else if (e.type === 'coin') desc = (e.amount > 0 ? '+' : '') + e.amount + ' 💠';
+        else desc = TYPE_LABEL[e.type] || e.type;
+        var act;
+        if (canUndo(e)) {
+          act = '<input type="checkbox" class="lm-check" data-id="' + id + '" style="width:auto"> ' +
+            '<button class="btn red small" data-undo-entry="' + id + '" style="padding:5px 10px;font-size:0.75rem">↩️</button>';
+        } else if ((e.type === 'badge' || e.type === 'cosmetic' || e.type === 'sticker') && e.source !== 'undo') {
+          act = '<button class="btn red small" data-remove-entry="' + id + '" style="padding:5px 10px;font-size:0.75rem">Fjern</button>';
+        } else {
+          act = '<span class="chip">' + (e.undone ? 'fortrudt' : e.source === 'undo' ? 'modpost' : '—') + '</span>';
+        }
+        return '<div class="admin-row' + (e.undone ? ' inactive' : '') + '">' +
+          '<span style="font-size:1.2rem">' + esc(e.icon || '•') + '</span>' +
+          '<div class="a-main"><div class="a-title" style="font-size:0.88rem">' + desc + '</div>' +
+          '<div class="a-sub">' + esc(e.name || '') + ' · ' + esc(e.source || '') + ' · ' + HQ.fmtTs(e.ts) + '</div></div>' +
+          '<div style="display:flex;gap:6px;align-items:center;flex:0 0 auto">' + act + '</div></div>';
+      }).join('');
+      updateBulkBtn();
+    }
+    function updateBulkBtn() {
+      var n = HQ.$all('.lm-check:checked', bg).length;
+      var btn = $('#lm-undo-selected', bg);
+      btn.disabled = n === 0;
+      btn.textContent = '↩️ Fortryd valgte (' + n + ')';
+    }
+
+    bg.addEventListener('change', function (e2) {
+      if (e2.target.closest('.lm-check')) updateBulkBtn();
+    });
+    bg.addEventListener('click', function (e2) {
+      if (e2.target === bg || e2.target.closest('[data-close]')) { bg.remove(); return; }
+      var ledger = st.ledgers[kidId] || {};
+      var ue = e2.target.closest('[data-undo-entry]');
+      if (ue) {
+        var id1 = ue.getAttribute('data-undo-entry');
+        if (ledger[id1] && canUndo(ledger[id1])) {
+          undoEntry(kidId, id1, ledger[id1]);
+          HQ.audit('postering-fortrudt', k.name + ': ' + (ledger[id1].name || '') + ' (' + ledger[id1].amount + ' ' + ledger[id1].type + ')');
+          HQ.toast('↩️ Fortrudt');
+          setTimeout(renderList, 500);
+        }
+        return;
+      }
+      var re = e2.target.closest('[data-remove-entry]');
+      if (re) {
+        var id2 = re.getAttribute('data-remove-entry');
+        var entry = ledger[id2];
+        if (entry && confirm('Fjern "' + (entry.name || entry.type) + '"? (Badges gen-optjenes automatisk hvis betingelsen stadig er opfyldt)')) {
+          HQ.ref('ledger/' + kidId + '/' + id2).remove();
+          HQ.audit('postering-fjernet', k.name + ': ' + (entry.name || entry.type));
+          setTimeout(renderList, 500);
+        }
+        return;
+      }
+      if (e2.target.closest('#lm-undo-selected')) {
+        var checks = HQ.$all('.lm-check:checked', bg);
+        var count = 0;
+        checks.forEach(function (cb) {
+          var id3 = cb.getAttribute('data-id');
+          if (ledger[id3] && canUndo(ledger[id3])) { undoEntry(kidId, id3, ledger[id3]); count++; }
+        });
+        HQ.audit('posteringer-fortrudt-bulk', k.name + ': ' + count + ' posteringer');
+        HQ.toast('↩️ ' + count + ' posteringer fortrudt');
+        setTimeout(renderList, 700);
+      }
+    });
+    renderList();
+  }
+  document.addEventListener('click', function (e) {
+    var lk = e.target.closest('[data-ledger-kid]');
+    if (lk) ledgerModal(lk.getAttribute('data-ledger-kid'));
+  });
 
   function kidModal(id) {
     var k = id ? st.kids[id] : { avatar: '🦸‍♀️' };
     openModal(
       '<h2>' + (id ? 'Redigér helt' : 'Ny helt') + '</h2>' +
       '<label>Navn</label><input id="m-kname" value="' + esc(k.name || '') + '">' +
-      '<div class="row2"><div><label>Avatar (emoji)</label><input id="m-kavatar" value="' + esc(k.avatar || '🦸‍♀️') + '" maxlength="4"></div>' +
+      '<div class="row2"><div><label>Avatar</label>' + HQ.iconField('m-kavatar', k.avatar || '🦸‍♀️') + '</div>' +
       '<div><label>PIN (4 cifre)</label><input id="m-kpin" type="tel" maxlength="4" value="' + esc(k.pin || '') + '"></div></div>',
       function (bg) {
         var name = $('#m-kname', bg).value.trim();
@@ -753,7 +933,7 @@
     if (ad) adjustModal(ad.getAttribute('data-adjust-kid'));
   });
 
-  // ═══════════ LOG ═══════════
+  // ═══════════ LOG (aktivitet + audit + fortryd godkendelse) ═══════════
   function renderLog() {
     var box = $('#activity-log');
     var rows = [];
@@ -767,7 +947,10 @@
             ts: c.approvedTs || c.ts,
             ico: STATUS[c.status] || '❔',
             html: '<b>' + esc(kidName) + '</b>: ' + esc(c.taskTitle) +
-              (c.status === 'approved' ? ' · ' + rewardSummary(c.rewards) : c.status === 'rejected' ? ' (afvist)' : ' (venter)')
+              (c.status === 'approved' ? ' · ' + rewardSummary(c.rewards) : c.status === 'rejected' ? ' (afvist)' : ' (venter)'),
+            act: c.status === 'approved'
+              ? '<button class="btn red small" data-undo-approval="' + kidId + '|' + pk + '|' + qk + '" style="padding:5px 10px;font-size:0.72rem" title="Fortryd — XP/guld trækkes tilbage og questen åbnes igen">↩️ Fortryd</button>'
+              : ''
           });
         });
       });
@@ -777,13 +960,44 @@
       var kidName = (st.kids[p.kidId] || {}).name || '?';
       rows.push({ ts: p.ts, ico: '🛒', html: '<b>' + esc(kidName) + '</b> købte ' + esc(p.title) + ' · 🪙 ' + p.cost + ' (' + p.status + ')' });
     });
+    Object.keys(st.audit || {}).forEach(function (id) {
+      var a = st.audit[id];
+      rows.push({ ts: a.ts, ico: '🛡️', html: '<span style="color:var(--muted)">' + esc(a.email || 'admin') + ':</span> ' + esc(a.action) + (a.detail ? ' — ' + esc(a.detail) : '') });
+    });
     if (!rows.length) { box.innerHTML = '<div class="empty">Ingen aktivitet endnu</div>'; return; }
     rows.sort(function (a, b) { return b.ts - a.ts; });
-    box.innerHTML = rows.slice(0, 60).map(function (r) {
+    box.innerHTML = rows.slice(0, 80).map(function (r) {
       return '<div class="log-row"><span class="log-ico">' + r.ico + '</span>' +
-        '<div class="log-main">' + r.html + '<div class="log-time">' + HQ.fmtTs(r.ts) + '</div></div></div>';
+        '<div class="log-main">' + r.html + '<div class="log-time">' + HQ.fmtTs(r.ts) + '</div></div>' +
+        (r.act ? '<div style="flex:0 0 auto">' + r.act + '</div>' : '') +
+      '</div>';
     }).join('');
   }
+
+  // Fortryd en godkendelse: modposteringer + originaler markeres + quest genåbnes
+  document.addEventListener('click', function (e) {
+    var ua = e.target.closest('[data-undo-approval]');
+    if (!ua) return;
+    var parts = ua.getAttribute('data-undo-approval').split('|');
+    var kidId = parts[0], pk = parts[1], qk = parts[2];
+    var c = ((st.completions[kidId] || {})[pk] || {})[qk];
+    if (!c || c.status !== 'approved') return;
+    var kidName = (st.kids[kidId] || {}).name || '?';
+    if (!confirm('Fortryd godkendelsen af "' + c.taskTitle + '" for ' + kidName + '?\n\nXP/guld trækkes tilbage (som modpostering), og questen bliver tilgængelig igen i samme periode.')) return;
+
+    var ledger = st.ledgers[kidId] || {};
+    var count = 0;
+    Object.keys(ledger).forEach(function (id) {
+      var en = ledger[id];
+      if (en && en.questKey === (c.questKey || qk) && en.earnedTs === c.ts && en.source === 'quest' && !en.undone) {
+        undoEntry(kidId, id, en);
+        count++;
+      }
+    });
+    HQ.ref('completions/' + kidId + '/' + pk + '/' + qk).remove();
+    HQ.audit('godkendelse-fortrudt', kidName + ': ' + c.taskTitle + ' (' + count + ' posteringer tilbageført)');
+    HQ.toast('↩️ Fortrudt — questen er åben igen');
+  });
 
   // ═══════════ TABS ═══════════
   document.querySelector('.tabs').addEventListener('click', function (e) {

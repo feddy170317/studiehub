@@ -62,14 +62,14 @@
     if (saved) {
       HQ.ref('kids').once('value').then(function (snap) {
         var kids = snap.val() || {};
-        if (kids[saved] && !st.kidId) enterApp(saved);
+        if (kids[saved] && !kids[saved].archived && !st.kidId) enterApp(saved);
       });
     }
   }
 
   function renderProfiles() {
     var box = $('#profiles');
-    var ids = Object.keys(st.kids);
+    var ids = Object.keys(st.kids).filter(function (id) { return !st.kids[id].archived; });
     if (!ids.length) {
       box.innerHTML = '<div class="empty">Ingen helte endnu.<br>Bed en voksen om at oprette dig i admin-appen 🙂</div>';
       return;
