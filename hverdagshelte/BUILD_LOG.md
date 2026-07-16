@@ -17,10 +17,25 @@
 | 16/7 | **Fase B LIVE**: Modul-tildeling pr. helt (assignedTo), "＋ Nyt modul" + "＋ Ny færdighed" i UI, multi-skill-rewards i quest-editor |
 | 16/7 | **Fase C LIVE**: Klassetrin (grade 0-9) på helte, modul-meta `category`/`grades`, anbefalings-dialog ved ny helt/trin-skift, grade-filtreret installation (quests udenfor trinnet = inaktive), 6 nye moduler (Engelsk, Natur & Teknologi, Fitness m. 10-km multi-skill-quest, Økonomi, Kreativitet, Digital dannelse) → 9 bundlede i alt, wizard grupperet pr. kategori. E2E: e2e_faseC.py grøn + faseB-regression grøn |
 | 16/7 | **Fase D LIVE**: Opslagstavlen — `jobs/{id}` m. poster-fritekst (admin opretter på fx farfars vegne), løn = guld OG/ELLER rigtige penge (realNote, afregnes udenfor appen); spiller tager job via transaction (først-til-mølle — race-testet), meld færdig/giv tilbage; admin godkender (ledger→kiste; kun-realNote → 'job'-posteringstype), afviser m. besked, genåbner; audit på alt. E2E: e2e_faseD.py grøn (9 trin) — **HELE DEN GODKENDTE 4-FASE-PLAN ER FÆRDIG** |
+| 16/7 | **Fase E1 LIVE**: Folder-overblik på quest-siden — quests grupperes pr. modul i sammenklappelige foldere (lukkede som standard, husket i localStorage `hq_folders`), fremdrift i hovedet ("2/6 i dag · 0/4 i ugen") + rød mangler-badge/grøn ✔, "🎯 Kun det jeg mangler"-filter (`hq_only_missing`), indsendte quests regnes som klarede og nedtones. ALLE gamle E2E-suiter opdateret til folder-selektorer (aabn folder → #quest-folders). E2E: e2e_faseE1.py grøn + faseB/C-regression grøn |
 
-## Udestående (næste prioriteter fra manglelisten)
+## Udestående (besluttet 16/7 — næste fase)
 
-- Badge-fremskridts-visning (tryk på badge → progress), månedlig
+- **FASE E2 — Curriculum-indhold + quiz-motor** (Frederiks valg via 2 spørgsmål: quiz-quests
+  i appen ✓, folder-UX først ✓): (1) quest-banker pr. TRINFORLØB — IKKE pr. klassetrin;
+  Fælles Mål arbejder i bånd (engelsk: efter 4./7./9. kl., dansk: 1-2/3-4/5-6/7-9,
+  matematik: 1-3/4-6/7-9) og skills skal bestå på tværs af trin så XP aldrig nulstilles.
+  Eksisterende quest-`grades`-mekanik genbruges — det er INDHOLD der mangler (~10 quests
+  pr. bånd pr. fag, forankret i Fælles Måls kompetencemål; kilder: emu.dk faghæfter,
+  uvm.dk PDF'er, retsinformation.dk/eli/lta/2020/1217). (2) Re-tilpasning ved klasseskift:
+  grade-filtrering sker i dag KUN ved installation — tilføj "Opdatér til N. klasse" på
+  installerede moduler når heltens grade ændres (kendt hul). (3) Ny quest-type `quiz`:
+  MC-spørgsmål som data i modul-JSON (runtime-shuffle af svar-positioner!); barnet tager
+  quizzen i appen, score følger med completion ("Quiz: 10/12"), forældre-godkendelse
+  bevares. Start: engelsk + matematik bånd 1.-3. + 4.-6.
+- Frederiks 3. emne fra 16/7-beskeden blev KLIPPET AF ("the next thing we need to do is…")
+  — spørg ham hvad det var.
+- Derefter: badge-fremskridts-visning (tryk på badge → progress), månedlig
   quest-type, event-modul "Sødheds-august" + event-motor-huller (nedtælling, event-badge-regel,
   modul-kosmetik), PWA-manifest, streak-skjold, dobbelt-XP-weekend, boss-quests.
 

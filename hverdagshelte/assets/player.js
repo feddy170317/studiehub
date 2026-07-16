@@ -295,12 +295,66 @@
     return (st.completions[periodKey(type)] || {})[questKey] || null;
   }
 
+  // Fase E1: quests grupperes i foldere pr. modul, så listen kan overskues.
+  // Åbne/lukkede foldere + "kun det jeg mangler" huskes pr. enhed.
+  var openFolders = {};
+  try { openFolders = JSON.parse(localStorage.getItem('hq_folders') || '{}'); } catch (e) { openFolders = {}; }
+  function onlyMissing() { return localStorage.getItem('hq_only_missing') === '1'; }
+  // "Klaret" fra barnets synsvinkel: indsendt (venter) eller godkendt = intet mere at gøre
+  function questHandled(type, q) {
+    var c = getCompletion(type, q.key);
+    return !!(c && (c.status === 'pending' || c.status === 'approved'));
+  }
+
   function renderQuests() {
     if (!st.kidId) return;
     var d = new Date();
     $('#today-label').textContent = HQ.DAY_NAMES[d.getDay()] + ' ' + d.getDate() + '/' + (d.getMonth() + 1);
-    $('#daily-quests').innerHTML = questListHtml('daily');
-    $('#weekly-quests').innerHTML = questListHtml('weekly');
+
+    var byMod = {};
+    ['daily', 'weekly'].forEach(function (type) {
+      questsFor(type).forEach(function (q) {
+        var g = byMod[q.module] = byMod[q.module] || { daily: [], weekly: [] };
+        g[type].push(q);
+      });
+    });
+    var mids = Object.keys(st.content.modules).filter(function (mid) {
+      var g = byMod[mid];
+      return g && (g.daily.length + g.weekly.length) > 0;
+    });
+    var missing = onlyMissing();
+    var html = mids.map(function (mid) {
+      var g = byMod[mid];
+      var dDone = g.daily.filter(function (q) { return questHandled('daily', q); }).length;
+      var wDone = g.weekly.filter(function (q) { return questHandled('weekly', q); }).length;
+      var total = g.daily.length + g.weekly.length;
+      var done = dDone + wDone;
+      var allDone = done === total;
+      if (missing && allDone) return '';
+      var open = !!openFolders[mid];
+      var progress = [];
+      if (g.daily.length) progress.push(dDone + '/' + g.daily.length + ' i dag');
+      if (g.weekly.length) progress.push(wDone + '/' + g.weekly.length + ' i ugen');
+      var body = '';
+      if (open) {
+        body = '<div class="folder-body">' +
+          folderList('I dag', 'daily', g.daily, missing) +
+          folderList('Denne uge', 'weekly', g.weekly, missing) +
+        '</div>';
+      }
+      return '<div class="quest-folder' + (allDone ? ' all-done' : '') + '">' +
+        '<button class="folder-head" data-folder="' + esc(mid) + '">' +
+          '<span class="f-chev">' + (open ? '📂' : '📁') + '</span>' +
+          '<span class="f-name">' + esc((st.content.modules[mid] || {}).name || mid) + '</span>' +
+          '<span class="f-progress">' + progress.join(' · ') + '</span>' +
+          (allDone ? '<span class="f-check">✔</span>' : '<span class="f-todo">' + (total - done) + '</span>') +
+        '</button>' + body +
+      '</div>';
+    }).join('');
+    $('#quest-folders').innerHTML = html || '<div class="card empty">Ingen quests ' + (missing ? 'tilbage — alt er klaret! 🎉' : 'endnu 🎈') + '</div>';
+    var mBtn = $('#only-missing');
+    if (mBtn) mBtn.textContent = missing ? '👀 Vis alle' : '🎯 Kun det jeg mangler';
+
     var onceHtml = questListHtml('once', true);
     $('#once-section').style.display = onceHtml ? 'block' : 'none';
     $('#once-quests').innerHTML = onceHtml;
@@ -308,8 +362,61 @@
     updateQuestBadge();
   }
 
+  // Liste inde i en folder: det der mangler øverst, klarede nederst (nedtonet)
+  function folderList(label, type, list, hideDone) {
+    if (!list.length) return '';
+    var undone = list.filter(function (q) { return !questHandled(type, q); });
+    var doneL = hideDone ? [] : list.filter(function (q) { return questHandled(type, q); });
+    if (!undone.length && !doneL.length) return '';
+    return '<div class="folder-sub">' + esc(label) + '</div>' +
+      undone.concat(doneL).map(function (q) { return questCardHtml(q, type); }).join('');
+  }
+
+  document.addEventListener('click', function (e) {
+    var fh = e.target.closest('.folder-head');
+    if (fh) {
+      var mid = fh.getAttribute('data-folder');
+      openFolders[mid] = !openFolders[mid];
+      try { localStorage.setItem('hq_folders', JSON.stringify(openFolders)); } catch (e2) { }
+      renderQuests();
+      return;
+    }
+    if (e.target.closest('#only-missing')) {
+      localStorage.setItem('hq_only_missing', onlyMissing() ? '0' : '1');
+      renderQuests();
+    }
+  });
+
   function skillName(id) { var s = st.content.skills[id]; return s ? s.name : id; }
   function skillIcon(id) { var s = st.content.skills[id]; return s ? (s.icon || '⭐') : '⭐'; }
+
+  function questCardHtml(q, type) {
+    var c = getCompletion(type, q.key);
+    var mainSkill = (q.rewards || []).filter(function (r) { return r.skill; })[0];
+    var act;
+    if (!c || c.status === 'rejected') {
+      act = '<button class="btn green small" data-complete="' + q.key + '" data-type="' + type + '">Færdig!</button>';
+    } else if (c.status === 'pending') {
+      act = '<div class="status pending">⏳ Venter på godkendelse</div>';
+    } else {
+      act = '<div class="status approved">✅ Godkendt!</div>';
+    }
+    var rejectNote = (c && c.status === 'rejected')
+      ? '<div class="q-desc" style="color:var(--red);margin-top:4px">💬 ' + esc(c.note || 'Prøv igen!') + '</div>' : '';
+    return '<div class="quest' + (c && (c.status === 'approved' || c.status === 'pending') ? ' done' : '') + '">' +
+      '<div class="q-ico">' + esc(q.icon || (mainSkill ? skillIcon(mainSkill.skill) : '⭐')) + '</div>' +
+      '<div class="q-main">' +
+        '<div class="q-title">' + esc(q.title) + '</div>' +
+        (q.desc ? '<div class="q-desc">' + esc(q.desc) + '</div>' : '') +
+        rejectNote +
+        '<div class="q-chips">' +
+          (mainSkill ? '<span class="chip">' + esc(skillIcon(mainSkill.skill)) + ' ' + esc(skillName(mainSkill.skill)) + '</span>' : '') +
+          HQ.rewardChips(q.rewards) +
+        '</div>' +
+      '</div>' +
+      '<div class="q-act">' + act + '</div>' +
+    '</div>';
+  }
 
   function questListHtml(type, hideEmpty) {
     var list = questsFor(type);
@@ -318,33 +425,7 @@
       return !(c && c.status === 'approved');
     });
     if (!list.length) return hideEmpty ? '' : '<div class="card empty">Ingen quests her ' + (type === 'daily' ? 'i dag' : 'i denne uge') + ' 🎈</div>';
-    return list.map(function (q) {
-      var c = getCompletion(type, q.key);
-      var mainSkill = (q.rewards || []).filter(function (r) { return r.skill; })[0];
-      var act;
-      if (!c || c.status === 'rejected') {
-        act = '<button class="btn green small" data-complete="' + q.key + '" data-type="' + type + '">Færdig!</button>';
-      } else if (c.status === 'pending') {
-        act = '<div class="status pending">⏳ Venter på godkendelse</div>';
-      } else {
-        act = '<div class="status approved">✅ Godkendt!</div>';
-      }
-      var rejectNote = (c && c.status === 'rejected')
-        ? '<div class="q-desc" style="color:var(--red);margin-top:4px">💬 ' + esc(c.note || 'Prøv igen!') + '</div>' : '';
-      return '<div class="quest' + (c && c.status === 'approved' ? ' done' : '') + '">' +
-        '<div class="q-ico">' + esc(q.icon || (mainSkill ? skillIcon(mainSkill.skill) : '⭐')) + '</div>' +
-        '<div class="q-main">' +
-          '<div class="q-title">' + esc(q.title) + '</div>' +
-          (q.desc ? '<div class="q-desc">' + esc(q.desc) + '</div>' : '') +
-          rejectNote +
-          '<div class="q-chips">' +
-            (mainSkill ? '<span class="chip">' + esc(skillIcon(mainSkill.skill)) + ' ' + esc(skillName(mainSkill.skill)) + '</span>' : '') +
-            HQ.rewardChips(q.rewards) +
-          '</div>' +
-        '</div>' +
-        '<div class="q-act">' + act + '</div>' +
-      '</div>';
-    }).join('');
+    return list.map(function (q) { return questCardHtml(q, type); }).join('');
   }
 
   function updateQuestBadge() {
