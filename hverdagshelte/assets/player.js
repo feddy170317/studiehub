@@ -6,7 +6,7 @@
   var st = {
     kidId: null, kids: {}, modules: {}, content: HQ.assemble({}),
     ledger: {}, state: HQ.computeState({}),
-    completions: {}, shop: {}, purchases: {}
+    completions: {}, shop: {}, purchases: {}, jobs: {}
   };
   var AVATARS = ['🦸‍♀️','🦸‍♂️','🧙‍♀️','🧝‍♀️','🧜‍♀️','🦄','🐱','🐶','🦊','🐼','🐨','🐸','🦋','🌟','🔥','🌈','👑','🎀','⚡','🍀','🐯','🦁','🐰','🐧'];
   var awardedGuard = {};
@@ -121,6 +121,7 @@
     sub('ledger/' + kidId, function (v) { st.ledger = v || {}; recompute(); });
     sub('completions/' + kidId, function (v) { st.completions = v || {}; renderQuests(); renderLog(); });
     sub('shop', function (v) { st.shop = v || {}; renderShop(); });
+    sub('jobs', function (v) { st.jobs = v || {}; renderJobs(); });
     sub('purchases', function (v) {
       var all = v || {}, mine = {};
       Object.keys(all).forEach(function (id) { if (all[id].kidId === kidId) mine[id] = all[id]; });
@@ -395,6 +396,89 @@
     });
   });
 
+  // ═══════════ OPSLAGSTAVLEN (fase D: jobs fra familien, fx farfar) ═══════════
+  function jobRewardChips(j) {
+    var r = j.reward || {};
+    var bits = '';
+    if (r.gold) bits += '<span class="chip gold">+' + r.gold + ' 🪙</span>';
+    if (r.realNote) bits += '<span class="chip">💵 ' + esc(r.realNote) + '</span>';
+    return bits;
+  }
+  function renderJobs() {
+    var box = $('#jobs-list');
+    if (!box || !st.kidId) return;
+    // Kun aktive opslag vises for barnet — udførte/lukkede lever videre i admin
+    var ids = Object.keys(st.jobs).filter(function (id) {
+      var j = st.jobs[id];
+      return j && (j.status === 'open' || j.status === 'taken' || j.status === 'submitted');
+    }).sort(function (a, b) { return (st.jobs[b].ts || 0) - (st.jobs[a].ts || 0); });
+    $('#jobs-section').style.display = ids.length ? 'block' : 'none';
+    if (!ids.length) { box.innerHTML = ''; return; }
+    box.innerHTML = ids.map(function (id) {
+      var j = st.jobs[id];
+      var mine = j.takenBy === st.kidId;
+      var takerName = (st.kids[j.takenBy] || {}).name || 'en anden helt';
+      var act, note = '';
+      if (j.status === 'open') {
+        act = '<button class="btn green small" data-take-job="' + id + '">Tag jobbet!</button>';
+      } else if (j.status === 'taken' && mine) {
+        act = '<button class="btn green small" data-submit-job="' + id + '">✅ Meld færdig</button>' +
+          '<button class="btn ghost small" data-return-job="' + id + '" style="margin-top:6px">😞 Giv tilbage</button>';
+        if (j.note) note = '<div class="q-desc" style="color:var(--red);margin-top:4px">💬 ' + esc(j.note) + '</div>';
+      } else if (j.status === 'submitted' && mine) {
+        act = '<div class="status pending">⏳ Venter på godkendelse</div>';
+      } else {
+        act = '<div class="status pending">💪 Taget af ' + esc(takerName) + '</div>';
+      }
+      return '<div class="quest' + (mine ? '' : (j.status !== 'open' ? ' done' : '')) + '">' +
+        '<div class="q-ico">' + esc(j.icon || '📌') + '</div>' +
+        '<div class="q-main">' +
+          '<div class="q-title">' + esc(j.title) + '</div>' +
+          (j.desc ? '<div class="q-desc">' + esc(j.desc) + '</div>' : '') +
+          note +
+          '<div class="q-chips"><span class="chip">📌 ' + esc(j.poster || 'Familien') + '</span>' + jobRewardChips(j) + '</div>' +
+        '</div>' +
+        '<div class="q-act" style="display:flex;flex-direction:column;align-items:flex-end">' + act + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  document.addEventListener('click', function (e) {
+    var tk = e.target.closest('[data-take-job]');
+    if (tk) {
+      var id = tk.getAttribute('data-take-job');
+      tk.disabled = true;
+      // Først-til-mølle: transaction gør låsen race-sikker på serveren
+      HQ.ref('jobs/' + id).transaction(function (j) {
+        if (!j || j.status !== 'open') return; // abort — en anden var først
+        return Object.assign({}, j, { status: 'taken', takenBy: st.kidId, takenTs: Date.now() });
+      }, function (err, committed) {
+        if (committed) { HQ.chime('pop'); HQ.toast('💪 Jobbet er dit — gå i gang!'); }
+        else HQ.toast('Øv — en anden helt nåede det først 🙈');
+      });
+      return;
+    }
+    var sj = e.target.closest('[data-submit-job]');
+    if (sj) {
+      var id2 = sj.getAttribute('data-submit-job');
+      var j2 = st.jobs[id2];
+      if (!j2 || j2.status !== 'taken' || j2.takenBy !== st.kidId) return;
+      HQ.ref('jobs/' + id2).update({ status: 'submitted', submittedTs: Date.now(), note: null });
+      HQ.chime('pop');
+      HQ.toast('🚀 Meldt færdig — en voksen kigger på det!');
+      return;
+    }
+    var rj = e.target.closest('[data-return-job]');
+    if (rj) {
+      var id3 = rj.getAttribute('data-return-job');
+      var j3 = st.jobs[id3];
+      if (!j3 || j3.status !== 'taken' || j3.takenBy !== st.kidId) return;
+      if (!confirm('Giv jobbet tilbage til opslagstavlen?')) return;
+      HQ.ref('jobs/' + id3).update({ status: 'open', takenBy: null, takenTs: null, note: null });
+      HQ.toast('Jobbet er tilbage på tavlen 🙂');
+    }
+  });
+
   // ═══════════ STREAKS ═══════════
   function renderStreaks() {
     var box = $('#streak-strip');
@@ -516,6 +600,7 @@
       if (e.type === 'xp') groups[gk].xp.push({ skill: e.skill, amount: e.amount || 0 });
       if (e.type === 'gold') groups[gk].gold += (e.amount || 0);
       if (e.type === 'coin') groups[gk].coin += (e.amount || 0);
+      if (e.realNote) groups[gk].real = e.realNote; // job-løn i rigtige penge (fase D)
     });
     var badgeCards = cards;
     cards = order.map(function (gk) { return { kind: 'quest', g: groups[gk] }; }).concat(badgeCards);
@@ -566,6 +651,8 @@
         });
         if (c.g.gold) lines.push('+' + c.g.gold + ' 🪙 guld');
         if (c.g.coin) lines.push('+' + c.g.coin + ' 💠');
+        if (c.g.real) lines.push('💵 ' + esc(c.g.real) + ' — rigtig løn!');
+        if (!lines.length) lines.push('Godt klaret!');
         inner = '<div class="r-ico">' + esc(c.g.icon) + '</div>' +
           '<div class="r-big">' + lines[0] + '</div>' +
           (lines.length > 1 ? '<div class="r-sub">' + lines.slice(1).join(' · ') + '</div>' : '') +
@@ -814,6 +901,7 @@
       else if (e.type === 'gold' && e.amount < 0) rows.push({ ts: e.ts, ico: '🛒', html: esc(e.name || 'Køb') + ' · ' + e.amount + ' 🪙' });
       else if (e.type === 'gold') rows.push({ ts: e.ts, ico: '🪙', html: '+' + e.amount + ' guld — ' + esc(e.name || '') });
       else if (e.type === 'coin') rows.push({ ts: e.ts, ico: '💠', html: '+' + e.amount + ' 💠 — ' + esc(e.name || '') });
+      else if (e.type === 'job') rows.push({ ts: e.ts, ico: '📌', html: esc(e.name || 'Job udført') + (e.realNote ? ' · 💵 ' + esc(e.realNote) : '') });
     });
     Object.keys(st.completions).forEach(function (pk) {
       Object.keys(st.completions[pk]).forEach(function (qk) {

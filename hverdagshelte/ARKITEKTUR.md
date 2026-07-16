@@ -202,6 +202,7 @@ konfetti) består. Databasen er tom lige nu, så omstruktureringen er gratis —
 | **4. Event-moduler + kosmetik** | Tidsvinduer + teaser-banner + event-mønter (💠) virker; kosmetik-slots og -butik mangler | 🟡 delvist |
 | **5. Poler + testfase** | Frederiks store test med rigtige brugere; feedback → beslut næste skridt (auth, skoler, venner) | |
 | **C. Klassetrin + bibliotek** | `grade` på helten, `category`/`grades` i modul-formatet, anbefalings-dialog ved helte-oprettelse/trin-skift, alders-tags på quests, 6 nye moduler (Engelsk, Natur & Teknologi, Fitness, Økonomi, Kreativitet, Digital dannelse) → 9 bundlede i alt | ✅ 16/7-2026 |
+| **D. Opslagstavlen** | `jobs/{id}` (title/desc/icon/poster-fritekst/reward {gold?, realNote?}/status open→taken→submitted→done); spiller: "Tag jobbet!" via transaction (først-til-mølle), meld færdig / giv tilbage; admin: opret på andres vegne (fx farfar), godkend (ledger→kiste, realNote-påmindelse), afvis m. besked, genåbn; audit på alt | ✅ 16/7-2026 |
 
 **Afvigelse fra §4/§5:** `overrides/`-noden er droppet i v2.0 — admin redigerer modulets DB-kopi
 direkte (han er eneste forfatter), og eksporten indeholder dermed rettelserne. Genindføres

@@ -5,7 +5,7 @@
 
   var st = {
     config: null, kids: {}, modules: {}, content: HQ.assemble({}),
-    completions: {}, ledgers: {}, shop: {}, purchases: {},
+    completions: {}, ledgers: {}, shop: {}, purchases: {}, jobs: {},
     openModule: null
   };
   var TYPE_NAMES = { daily: 'Daglig', weekly: 'Ugentlig', once: 'Særlig (engangs)' };
@@ -217,6 +217,7 @@
     sub('shop', function (v) { st.shop = v || {}; renderShopList(); });
     sub('purchases', function (v) { st.purchases = v || {}; renderPurchases(); renderLog(); });
     sub('audit', function (v) { st.audit = v || {}; renderLog(); });
+    sub('jobs', function (v) { st.jobs = v || {}; renderJobList(); renderPendingJobs(); });
   }
   function sub(path, fn) {
     HQ.ref(path).on('value', function (snap) { fn(snap.val()); }, function (err) {
@@ -267,7 +268,7 @@
         '<button class="btn red small" data-reject="' + r.kidId + '|' + r.pk + '|' + r.qk + '">Afvis</button>' +
         '</div></div>';
     }).join('');
-    updateBadge(rows.length + pendingPurchases().length);
+    updateBadge(rows.length + pendingPurchases().length + pendingJobs().length);
   }
 
   function updateBadge(n) {
@@ -357,7 +358,7 @@
         '<button class="btn red small" data-refund="' + id + '">Annullér</button>' +
         '</div></div>';
     }).join('');
-    updateBadge(pendingList().length + ids.length);
+    updateBadge(pendingList().length + ids.length + pendingJobs().length);
   }
 
   document.addEventListener('click', function (e) {
@@ -379,6 +380,163 @@
         icon: '↩️', source: 'undo', by: 'admin', unseen: true
       });
       HQ.audit('koeb-annulleret', p.title + ' (🪙 ' + p.cost + ' retur)');
+    }
+  });
+
+  // ═══════════ OPSLAGSTAVLEN (fase D: jobs fra familien, fx farfar) ═══════════
+  // jobs/{id}: title, desc, icon, poster (fritekst — admin opretter på andres vegne),
+  // reward {gold?, realNote?}, status open→taken→submitted→done, takenBy, ts.
+  // Rigtige penge afregnes UDENFOR appen — realNote er kun en påmindelse.
+  function pendingJobs() {
+    return Object.keys(st.jobs).filter(function (id) { return st.jobs[id].status === 'submitted'; });
+  }
+  function jobRewardText(j) {
+    var r = j.reward || {};
+    var bits = [];
+    if (r.gold) bits.push('🪙 ' + r.gold);
+    if (r.realNote) bits.push('💵 ' + r.realNote);
+    return bits.join(' + ') || '—';
+  }
+  var JOB_STATUS = {
+    open: '🟢 Åbent', taken: '💪 Taget', submitted: '⏳ Meldt færdig', done: '✅ Udført', failed: '❌ Ikke udført'
+  };
+
+  function renderPendingJobs() {
+    var box = $('#pending-jobs');
+    var ids = pendingJobs().sort(function (a, b) { return (st.jobs[a].submittedTs || 0) - (st.jobs[b].submittedTs || 0); });
+    if (!ids.length) { box.innerHTML = '<div class="empty">Ingen jobs venter</div>'; }
+    else box.innerHTML = ids.map(function (id) {
+      var j = st.jobs[id];
+      var kid = st.kids[j.takenBy] || {};
+      return '<div class="admin-row">' +
+        '<span style="font-size:1.5rem">' + esc(j.icon || '📌') + '</span>' +
+        '<div class="a-main"><div class="a-title">' + esc(j.title) + '</div>' +
+        '<div class="a-sub">' + esc(kid.name || '?') + ' · ' + esc(j.poster || 'Familien') + ' · ' + esc(jobRewardText(j)) + ' · ' + HQ.fmtTs(j.submittedTs) + '</div></div>' +
+        '<div class="approve-actions">' +
+        '<button class="btn green small" data-job-approve="' + id + '">Godkend</button>' +
+        '<button class="btn red small" data-job-reject="' + id + '">Afvis</button>' +
+        '</div></div>';
+    }).join('');
+    updateBadge(pendingList().length + pendingPurchases().length + ids.length);
+  }
+
+  function renderJobList() {
+    var box = $('#job-list');
+    if (!box) return;
+    var ids = Object.keys(st.jobs).sort(function (a, b) { return (st.jobs[b].ts || 0) - (st.jobs[a].ts || 0); });
+    if (!ids.length) { box.innerHTML = '<div class="empty">Ingen opslag endnu — opret det første (fx fra farfar)</div>'; return; }
+    box.innerHTML = ids.map(function (id) {
+      var j = st.jobs[id];
+      var kidName = j.takenBy ? ((st.kids[j.takenBy] || {}).name || '?') : '';
+      var statusTxt = (JOB_STATUS[j.status] || j.status) + (kidName ? ' af ' + kidName : '');
+      var btns = '';
+      if (j.status === 'open') btns += '<button class="icon-btn" data-edit-job="' + id + '" title="Redigér">✏️</button>';
+      if (j.status !== 'open') btns += '<button class="btn small ghost" data-reopen-job="' + id + '" title="Sæt opslaget åbent igen" style="padding:5px 10px;font-size:0.72rem">↩️ Genåbn</button>';
+      btns += '<button class="icon-btn" data-del-job="' + id + '" title="Slet opslag">🗑️</button>';
+      return '<div class="admin-row' + (j.status === 'done' || j.status === 'failed' ? ' inactive' : '') + '">' +
+        '<span style="font-size:1.4rem">' + esc(j.icon || '📌') + '</span>' +
+        '<div class="a-main"><div class="a-title">' + esc(j.title) + '</div>' +
+        '<div class="a-sub">' + esc(j.poster || 'Familien') + ' · ' + esc(jobRewardText(j)) + ' · ' + statusTxt + '</div></div>' +
+        btns + '</div>';
+    }).join('');
+  }
+
+  function jobModal(id) {
+    var j = id ? st.jobs[id] : { icon: '📌', reward: {} };
+    if (!j) return;
+    var r = j.reward || {};
+    openModal(
+      '<h2>' + (id ? 'Redigér opslag' : '＋ Nyt opslag') + '</h2>' +
+      '<p style="color:var(--muted);font-size:0.82rem">Et job fra familien — du opretter det på vegne af fx farfar. Først til at tage jobbet får det. Rigtige penge afregnes udenfor appen.</p>' +
+      '<label>Titel</label><input id="m-jtitle" value="' + esc(j.title || '') + '" placeholder="F.eks. Riv blade sammen i haven">' +
+      '<label>Beskrivelse (valgfri)</label><input id="m-jdesc" value="' + esc(j.desc || '') + '">' +
+      '<div class="row2"><div><label>Ikon</label>' + HQ.iconField('m-jicon', j.icon || '📌') + '</div>' +
+      '<div><label>Opslået af</label><input id="m-jposter" value="' + esc(j.poster || '') + '" placeholder="F.eks. Farfar"></div></div>' +
+      '<div class="row2"><div><label>Løn i guld 🪙 (0 = ingen)</label><input id="m-jgold" type="number" value="' + (r.gold || 0) + '"></div>' +
+      '<div><label>Rigtig løn (valgfri)</label><input id="m-jreal" value="' + esc(r.realNote || '') + '" placeholder="F.eks. 50 kr."></div></div>',
+      function (bg) {
+        var title = $('#m-jtitle', bg).value.trim();
+        if (!title) { HQ.toast('Titel mangler'); return false; }
+        var gold = parseInt($('#m-jgold', bg).value, 10) || 0;
+        var real = $('#m-jreal', bg).value.trim();
+        if (!gold && !real) { HQ.toast('Angiv en løn — guld, rigtige penge eller begge'); return false; }
+        var reward = {};
+        if (gold) reward.gold = gold;
+        if (real) reward.realNote = real;
+        var data = {
+          title: title, desc: $('#m-jdesc', bg).value.trim(),
+          icon: $('#m-jicon', bg).value.trim() || '📌',
+          poster: $('#m-jposter', bg).value.trim() || 'Familien',
+          reward: reward
+        };
+        if (id) {
+          HQ.ref('jobs/' + id).update(data);
+          HQ.audit('job-redigeret', title);
+        } else {
+          HQ.ref('jobs').push(Object.assign({ status: 'open', ts: Date.now() }, data));
+          HQ.audit('job-oprettet', title + ' (' + data.poster + ' · ' + jobRewardText({ reward: reward }) + ')');
+          HQ.toast('📌 Opslaget hænger nu på tavlen');
+        }
+      }
+    );
+  }
+
+  $('#add-job').addEventListener('click', function () { jobModal(null); });
+  document.addEventListener('click', function (e) {
+    var ej = e.target.closest('[data-edit-job]');
+    if (ej) return jobModal(ej.getAttribute('data-edit-job'));
+    var dj = e.target.closest('[data-del-job]');
+    if (dj) {
+      var idD = dj.getAttribute('data-del-job');
+      var jD = st.jobs[idD];
+      if (jD && confirm('Slet opslaget "' + jD.title + '"?')) {
+        HQ.ref('jobs/' + idD).remove();
+        HQ.audit('job-slettet', jD.title);
+      }
+      return;
+    }
+    var ro = e.target.closest('[data-reopen-job]');
+    if (ro) {
+      var idR = ro.getAttribute('data-reopen-job');
+      var jR = st.jobs[idR];
+      if (!jR) return;
+      if (!confirm('Sæt "' + jR.title + '" åbent på tavlen igen?')) return;
+      HQ.ref('jobs/' + idR).update({ status: 'open', takenBy: null, takenTs: null, submittedTs: null, doneTs: null, note: null });
+      HQ.audit('job-genaabnet', jR.title);
+      HQ.toast('↩️ Opslaget er åbent igen');
+      return;
+    }
+    var ja = e.target.closest('[data-job-approve]');
+    if (ja) {
+      var idA = ja.getAttribute('data-job-approve');
+      var jA = st.jobs[idA];
+      if (!jA || jA.status !== 'submitted') return;
+      var kidA = st.kids[jA.takenBy] || {};
+      var rA = jA.reward || {};
+      // Belønning via kisten som alt andet: guld-postering; kun-rigtige-penge → 'job'-postering
+      var entry = {
+        ts: Date.now(), name: 'Job: ' + (jA.title || ''), icon: jA.icon || '📌',
+        source: 'job', jobId: idA, by: 'admin', unseen: true
+      };
+      if (rA.realNote) entry.realNote = rA.realNote;
+      if (rA.gold) { entry.type = 'gold'; entry.amount = rA.gold; }
+      else entry.type = 'job';
+      HQ.ref('ledger/' + jA.takenBy).push(entry);
+      HQ.ref('jobs/' + idA).update({ status: 'done', doneTs: Date.now() });
+      HQ.audit('job-godkendt', (kidA.name || '?') + ': ' + jA.title + ' (' + jobRewardText(jA) + ')');
+      HQ.toast(rA.realNote ? '✅ Godkendt — husk den rigtige løn: ' + rA.realNote : '✅ Godkendt — ' + jobRewardText(jA));
+      return;
+    }
+    var jr = e.target.closest('[data-job-reject]');
+    if (jr) {
+      var idJ = jr.getAttribute('data-job-reject');
+      var jJ = st.jobs[idJ];
+      if (!jJ || jJ.status !== 'submitted') return;
+      var kidJ = st.kids[jJ.takenBy] || {};
+      var noteJ = prompt('Besked til ' + (kidJ.name || 'helten') + ':', 'Prøv lige igen 🙂');
+      if (noteJ === null) return;
+      HQ.ref('jobs/' + idJ).update({ status: 'taken', note: noteJ, submittedTs: null });
+      HQ.audit('job-afvist', (kidJ.name || '?') + ': ' + jJ.title);
     }
   });
 

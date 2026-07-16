@@ -16,13 +16,11 @@
 | 16/7 | **Fase A LIVE**: Fortryd godkendelse (quest genåbnes), kontobogs-modal m. fortryd/bulk, deaktivér/gendan/slet-helt, emoji-ikonvælger, audit i loggen |
 | 16/7 | **Fase B LIVE**: Modul-tildeling pr. helt (assignedTo), "＋ Nyt modul" + "＋ Ny færdighed" i UI, multi-skill-rewards i quest-editor |
 | 16/7 | **Fase C LIVE**: Klassetrin (grade 0-9) på helte, modul-meta `category`/`grades`, anbefalings-dialog ved ny helt/trin-skift, grade-filtreret installation (quests udenfor trinnet = inaktive), 6 nye moduler (Engelsk, Natur & Teknologi, Fitness m. 10-km multi-skill-quest, Økonomi, Kreativitet, Digital dannelse) → 9 bundlede i alt, wizard grupperet pr. kategori. E2E: e2e_faseC.py grøn + faseB-regression grøn |
+| 16/7 | **Fase D LIVE**: Opslagstavlen — `jobs/{id}` m. poster-fritekst (admin opretter på fx farfars vegne), løn = guld OG/ELLER rigtige penge (realNote, afregnes udenfor appen); spiller tager job via transaction (først-til-mølle — race-testet), meld færdig/giv tilbage; admin godkender (ledger→kiste; kun-realNote → 'job'-posteringstype), afviser m. besked, genåbner; audit på alt. E2E: e2e_faseD.py grøn (9 trin) — **HELE DEN GODKENDTE 4-FASE-PLAN ER FÆRDIG** |
 
-## Udestående (fra godkendt plan — byg i næste session)
+## Udestående (næste prioriteter fra manglelisten)
 
-- **FASE D — Opslagstavlen**: jobs-node (open→taken→submitted→done/failed), poster =
-  fritekst ("Farfar", admin opretter på andres vegne), løn = guld OG/ELLER rigtige-penge-
-  fritekst, først-til-mølle via transaction, godkendelse i admin. Plan-filens §D.
-- Derefter (manglelisten): badge-fremskridts-visning (tryk på badge → progress), månedlig
+- Badge-fremskridts-visning (tryk på badge → progress), månedlig
   quest-type, event-modul "Sødheds-august" + event-motor-huller (nedtælling, event-badge-regel,
   modul-kosmetik), PWA-manifest, streak-skjold, dobbelt-XP-weekend, boss-quests.
 
