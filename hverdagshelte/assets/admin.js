@@ -640,7 +640,38 @@
         (open ? moduleBody(mid, m) : '') +
       '</div>';
     }).join('');
+    renderBundledLibrary();
   }
+
+  // 📚 Bibliotek: bundlede moduler der IKKE er installeret — installér direkte herfra
+  function renderBundledLibrary() {
+    var sec = $('#bundled-section'), box = $('#bundled-list');
+    if (!sec || !box) return;
+    var missing = (window.HQ_BUNDLED || []).map(function (m, i) { return { m: m, i: i }; })
+      .filter(function (e) { return !st.modules[e.m.id]; });
+    sec.style.display = missing.length ? 'block' : 'none';
+    box.innerHTML = missing.map(function (e) {
+      var cat = (HQ.CATEGORY_NAMES[e.m.category] || e.m.category || '') + (e.m.grades ? ' ' + gradesText(e.m.grades) : '');
+      return '<div class="admin-row">' +
+        '<span style="font-size:1.4rem">📦</span>' +
+        '<div class="a-main"><div class="a-title">' + esc(e.m.name) + '</div>' +
+        '<div class="a-sub">' + esc(cat) + ' · ' + esc(e.m.description || '') + '</div></div>' +
+        '<button class="btn small green" data-install-bundled="' + e.i + '">Installér</button>' +
+        '</div>';
+    }).join('');
+  }
+  document.addEventListener('click', function (e) {
+    var ib = e.target.closest('[data-install-bundled]');
+    if (!ib) return;
+    var m = (window.HQ_BUNDLED || [])[parseInt(ib.getAttribute('data-install-bundled'), 10)];
+    if (!m || st.modules[m.id]) return;
+    st.openModule = m.id; // FØR set(): lokale lyttere affyres synkront
+    HQ.ref('modules/' + m.id).set(installModuleData(m, null));
+    // Tænd de quests der passer de aktive heltes klassetrin
+    retuneModule(m.id, false);
+    HQ.audit('modul-installeret', (m.name || m.id) + ' (fra biblioteket)');
+    HQ.toast('📥 ' + (m.name || m.id) + ' installeret');
+  });
 
   function moduleBody(mid, m) {
     var quests = (m.quests || []).map(function (q, i) {

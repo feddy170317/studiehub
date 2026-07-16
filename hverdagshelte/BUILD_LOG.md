@@ -21,12 +21,12 @@
 | 16/7 | **Fase E2 LIVE**: Quiz-quests + curriculum pr. trinforløb — quest-felt `quiz {draw, pass, questions[{q, answers}]}` (answers[0] = facit i data, runtime-shuffle i UI); quiz-overlay i spiller-appen m. ét spørgsmål ad gangen, feedback, resultat; bestået → completion m. `quizScore` som admin ser ("🧠 Quiz: 10/10"); ikke bestået → prøv igen frit. Re-tilpasning ved klasseskift: `retuneModule` (union af tildelte heltes trin) via sektion i anbefalings-dialogen. Quest-editor bevarer nu quiz/grades-felter (var en data-tabs-bug). E2E: e2e_faseE2.py grøn + E1/C-regression |
 | 16/7 | **Fase E2.1 LIVE (Frederiks omvalg)**: Bånd-quizzer erstattet af **ét quiz-sæt pr. klassetrin** (Excel Study Guides-modellen, ingen overlap): matematik 0.-9. kl. (10 quizzer á 12 spm., grades [n,n], stigende sværhedsgrad efter dansk pensum-progression), engelsk 3.-9. kl. (7 quizzer). Skills forbliver fælles på tværs af trin (XP nulstilles aldrig). + **⬆️ Opdatér-knap** på modul-kort når bundled version > installeret: henter nyt indhold, bevarer assignedTo/enabled, re-tilpasser quests til de tildelte heltes klassetrin — løser hvordan eksisterende familier får nye quiz-banker. E2E: e2e_faseE2.py omskrevet + grøn (inkl. v1→v4-opdaterings-flow) + C-regression |
 
+| 17/7 | **Fase E3 LIVE**: Quizzer i ALLE skolefag/årgange — dansk 0.-9. kl. (10 quizzer: bogstaver→stavning→ordklasser→grammatik→sprogbilleder→argumentation→komma→eksamensniveau), engelsk udvidet til 1.-9. kl. (modul-grades nu [1,9]; +quiz-eng-1/2: farver/tal/dyr, familie/krop/mad), natur & teknologi 1.-6. kl. (6 quizzer). I alt **35 quiz-banker (420 spørgsmål)** på tværs af 4 skolefag. + **📚 Bibliotek-sektion** på Moduler-fanen: bundlede moduler der ikke er installeret kan installeres direkte (installModuleData + retuneModule efter → årgangs-quests tændes efter heltenes klassetrin). E2E: e2e_faseE3.py grøn + E2-regression |
+
 ## Udestående
 
 - Frederiks 3. emne fra 16/7-beskeden blev KLIPPET AF ("the next thing we need to do is…")
   — spørg ham hvad det var.
-- Flere quiz-banker: dansk (stavning/læsning pr. bånd), matematik 7.-9. (ligninger/statistik),
-  engelsk 8.-9.; natur/teknologi-quiz.
 - Derefter: badge-fremskridts-visning (tryk på badge → progress), månedlig
   quest-type, event-modul "Sødheds-august" + event-motor-huller (nedtælling, event-badge-regel,
   modul-kosmetik), PWA-manifest, streak-skjold, dobbelt-XP-weekend, boss-quests.

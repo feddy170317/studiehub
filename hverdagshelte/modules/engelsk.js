@@ -5,11 +5,11 @@ window.HQ_BUNDLED.push({
   "format": "hverdagshelte-module@1",
   "id": "engelsk",
   "name": "Engelsk 🇬🇧",
-  "version": 3,
+  "version": 4,
   "author": "Frederik",
   "category": "skole",
-  "grades": [3, 9],
-  "description": "De fire engelsk-områder: ordforråd, lytteforståelse, mundtligt engelsk og læsning. Quests passer fra 3. klasse — de sværere slås til efter klassetrin.",
+  "grades": [1, 9],
+  "description": "De fire engelsk-områder: ordforråd, lytteforståelse, mundtligt engelsk og læsning. Engelsk starter i 1. klasse — quizzer og quests følger klassetrinnet.",
 
   "skills": [
     { "id": "engelsk", "name": "Engelsk", "icon": "🇬🇧", "color": "#5c7cfa" },
@@ -36,6 +36,42 @@ window.HQ_BUNDLED.push({
       "type": "weekly", "active": false, "grades": [6, 9], "rewards": [{ "skill": "engelsk.tale", "xp": 40 }, { "gold": 15 }] },
     { "id": "billedbog", "title": "Læs en let engelsk bog eller billedbog", "desc": "3.–4. klasse: læs højt og fortæl hvad den handlede om", "icon": "📚",
       "type": "weekly", "grades": [3, 4], "rewards": [{ "skill": "engelsk.laesning", "xp": 20 }, { "gold": 5 }] },
+
+    { "id": "quiz-eng-1", "title": "Quiz: Engelsk 1. klasse", "desc": "Farver, tal og dyr", "icon": "🧠",
+      "type": "weekly", "active": false, "grades": [1, 1],
+      "quiz": { "draw": 10, "pass": 8, "questions": [
+        { "q": "Hvad betyder 'cat'?", "answers": ["Kat", "Hund", "Ko", "Gris"] },
+        { "q": "Hvad er 'one' på dansk?", "answers": ["1", "2", "10", "0"] },
+        { "q": "Hvad betyder 'blue'?", "answers": ["Blå", "Rød", "Grøn", "Gul"] },
+        { "q": "Hvad betyder 'fish'?", "answers": ["Fisk", "Fugl", "Frø", "Flue"] },
+        { "q": "Hvad er 'two' på dansk?", "answers": ["2", "3", "1", "5"] },
+        { "q": "Hvad betyder 'yellow'?", "answers": ["Gul", "Grøn", "Sort", "Hvid"] },
+        { "q": "Hvad betyder 'cow'?", "answers": ["Ko", "Kat", "Kanin", "Krage"] },
+        { "q": "Hvad er 'five' på dansk?", "answers": ["5", "4", "6", "2"] },
+        { "q": "Hvad betyder 'black'?", "answers": ["Sort", "Hvid", "Brun", "Grå"] },
+        { "q": "Hvad betyder 'horse'?", "answers": ["Hest", "Hund", "Høne", "Hval"] },
+        { "q": "Hvad er 'ten' på dansk?", "answers": ["10", "1", "5", "8"] },
+        { "q": "Hvad betyder 'white'?", "answers": ["Hvid", "Sort", "Blå", "Lilla"] }
+      ] },
+      "rewards": [{ "skill": "engelsk.ordforraad", "xp": 20 }, { "gold": 5 }] },
+
+    { "id": "quiz-eng-2", "title": "Quiz: Engelsk 2. klasse", "desc": "Familie, krop og mad", "icon": "🧠",
+      "type": "weekly", "active": false, "grades": [2, 2],
+      "quiz": { "draw": 10, "pass": 8, "questions": [
+        { "q": "Hvad betyder 'mother'?", "answers": ["Mor", "Far", "Søster", "Mormor"] },
+        { "q": "Hvad betyder 'hand'?", "answers": ["Hånd", "Hoved", "Hår", "Hæl"] },
+        { "q": "Hvad betyder 'bread'?", "answers": ["Brød", "Smør", "Ost", "Mælk"] },
+        { "q": "Hvad betyder 'father'?", "answers": ["Far", "Farfar", "Bror", "Onkel"] },
+        { "q": "Hvad betyder 'eyes'?", "answers": ["Øjne", "Ører", "Arme", "Ben"] },
+        { "q": "Hvad betyder 'cheese'?", "answers": ["Ost", "Kød", "Æg", "Is"] },
+        { "q": "Hvad betyder 'sister'?", "answers": ["Søster", "Bror", "Mor", "Tante"] },
+        { "q": "Hvad betyder 'foot'?", "answers": ["Fod", "Finger", "Fjer", "Pande"] },
+        { "q": "Hvad betyder 'egg'?", "answers": ["Æg", "Mel", "Sukker", "Salt"] },
+        { "q": "Hvad betyder 'brother'?", "answers": ["Bror", "Ven", "Fætter", "Far"] },
+        { "q": "Hvad betyder 'nose'?", "answers": ["Næse", "Mund", "Kind", "Hage"] },
+        { "q": "Hvad betyder 'ice cream'?", "answers": ["Is", "Kage", "Slik", "Saft"] }
+      ] },
+      "rewards": [{ "skill": "engelsk.ordforraad", "xp": 20 }, { "gold": 5 }] },
 
     { "id": "quiz-eng-3", "title": "Quiz: Engelsk 3. klasse", "desc": "De første engelske ord", "icon": "🧠",
       "type": "weekly", "active": false, "grades": [3, 3],
