@@ -25,8 +25,17 @@
 
 | 17/7 | **Fase E4 LIVE — ALLE folkeskolens fag**: 12 nye moduler fra Fælles Mål-bekendtgørelsen (retsinformation.dk/eli/lta/2020/1217): Historie 3.-9. (7 årgangs-quizzer: vikingetid→kold krig), Geografi/Biologi/Fysik-kemi 7.-9. (3 quizzer hver), Samfundsfag 8.-9. (2), Tysk 5.-9. (5) + praksisfag UDEN MC-quizzer (bevidst — de skal LAVES): Kristendomskundskab 1.-9., Idræt 0.-9., Musik 1.-6., Billedkunst 1.-6., Håndværk & Design 4.-7., Madkundskab 4.-7. **Total: 21 moduler, 58 quizzer, 650 spørgsmål.** Ny tests/validate_modules.js (indholds-validator: skill-refs, quiz-integritet, dubletter — kør ALTID efter indholdsændringer). E2E: E3+E1-regression grøn |
 
+| 17/7 | **Fase F BYGGET — Super admin (venter på Frederiks 3 konsol-trin)**: `hq/superadmins/{uid}`-node uden .write-regel (kan KUN tildeles i Firebase-konsollen — ingen kan ophøje sig selv); regler giver superadmin læs/skriv på alle orgs + hq/users; superadmin.html-panel (familie-liste m. søgning, medlemmer m. 📧 nulstillingsmail, helte m. 🔑 PIN-reset, audit-visning, 💀 GDPR-slet m. navne-bekræftelse + oprydning af medlems-referencer); admin.html?org=<id> = support-tilstand (kun superadmin, banner + audit 'support-adgang'); resolveOrg robust mod døde org-referencer. Kodeord kan ALDRIG ses/sættes (Firebase hasher) — support = nulstillingsmail. E2E: e2e_faseF.py (afvisnings-stier) grøn + faseB-regression |
+
 ## Udestående
 
+- **FASE F AKTIVERING (Frederiks 3 konsol-trin):** (1) Opret master-konto i admin.html
+  (Opret konto, fx frederikr93+master@gmail.com — stop ved onboarding, opret INGEN familie);
+  (2) Firebase Console → Authentication → Users → kopiér kontoens UID → Realtime Database →
+  data-fanen → hq → tilføj barn `superadmins` → barn `<UID>` = `true` (boolean);
+  (3) Realtime Database → Rules → indsæt hele firebase-rules.json → Publish.
+  Derefter: åbn superadmin.html og log ind med master-kontoen. VIGTIGT: master-kontoen må
+  ALDRIG logges ind på børnenes enheder — brug den almindelige forældre-konto til familien.
 - Frederiks 3. emne fra 16/7-beskeden blev KLIPPET AF ("the next thing we need to do is…")
   — spørg ham hvad det var.
 - Fransk-modul (klon af tysk.js-skabelonen) hvis skolen har fransk som 2. fremmedsprog.

@@ -33,6 +33,38 @@
   });
 
   function resolveOrg(user) {
+    // Fase F: support-tilstand — ?org=<id> virker KUN for super admins (server-håndhævet)
+    var sup = location.search.match(/[?&]org=([\w-]+)/);
+    if (sup) {
+      HQ.raw('hq/superadmins/' + user.uid).once('value').then(function (s) {
+        if (s.val() === true) enterSupportMode(user, sup[1]);
+        else { history.replaceState(null, '', location.pathname); resolveNormal(user); }
+      }).catch(function () { history.replaceState(null, '', location.pathname); resolveNormal(user); });
+      return;
+    }
+    resolveNormal(user);
+  }
+
+  function enterSupportMode(user, orgId) {
+    HQ.setOrg(orgId);
+    HQ.ref('meta').once('value').then(function (m) {
+      var meta = m.val() || {};
+      $('#org-title').textContent = '🛡️ ' + (meta.name || orgId);
+      $('#org-sub').textContent = 'SUPPORT-TILSTAND — du arbejder i en anden families data som super admin';
+      var b = $('#fb-banner');
+      b.style.display = 'block';
+      b.textContent = '👑 Support-tilstand: alle ændringer logges i familiens aktivitetslog.';
+      HQ.audit('support-adgang', user.email || user.uid);
+      showScreen('screen-app');
+      enterApp();
+    }).catch(function () {
+      HQ.toast('❌ Familien findes ikke (eller adgang afvist)');
+      history.replaceState(null, '', location.pathname);
+      resolveNormal(user);
+    });
+  }
+
+  function resolveNormal(user) {
     HQ.raw('hq/users/' + user.uid + '/orgs').once('value').then(function (snap) {
       var orgs = snap.val() || {};
       var orgId = Object.keys(orgs)[0];
@@ -54,6 +86,11 @@
       }).then(function (k) {
         if (!k.val()) { renderSetupModules(); showScreen('screen-setup'); }
         else { showScreen('screen-app'); enterApp(); }
+      }).catch(function () {
+        // Org-referencen peger på en slettet/utilgængelig familie → ryd op og start forfra
+        HQ.raw('hq/users/' + user.uid + '/orgs/' + orgId).remove();
+        HQ.setOrg(null);
+        showScreen('screen-onboard');
       });
     });
   }

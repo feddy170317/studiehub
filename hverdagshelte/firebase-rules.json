@@ -5,13 +5,23 @@
       ".write": "auth != null"
     },
     "hq": {
+      "superadmins": {
+        ".read": "auth != null && root.child('hq/superadmins').child(auth.uid).val() === true",
+        "$uid": {
+          ".read": "auth != null && auth.uid === $uid"
+        }
+      },
       "users": {
+        ".read": "auth != null && root.child('hq/superadmins').child(auth.uid).val() === true",
+        ".write": "auth != null && root.child('hq/superadmins').child(auth.uid).val() === true",
         "$uid": {
           ".read": "auth != null && auth.uid === $uid",
           ".write": "auth != null && auth.uid === $uid"
         }
       },
       "orgs": {
+        ".read": "auth != null && root.child('hq/superadmins').child(auth.uid).val() === true",
+        ".write": "auth != null && root.child('hq/superadmins').child(auth.uid).val() === true",
         "$org": {
           ".read": "auth != null && data.child('members').child(auth.uid).exists()",
           ".write": "auth != null && (data.child('members').child(auth.uid).child('role').val() === 'owner' || data.child('members').child(auth.uid).child('role').val() === 'manager' || (!data.exists() && newData.child('members').child(auth.uid).child('role').val() === 'owner'))"
