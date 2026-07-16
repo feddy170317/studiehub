@@ -5,7 +5,7 @@ window.HQ_BUNDLED.push({
   "format": "hverdagshelte-module@1",
   "id": "engelsk",
   "name": "Engelsk 🇬🇧",
-  "version": 2,
+  "version": 3,
   "author": "Frederik",
   "category": "skole",
   "grades": [3, 9],
@@ -37,8 +37,8 @@ window.HQ_BUNDLED.push({
     { "id": "billedbog", "title": "Læs en let engelsk bog eller billedbog", "desc": "3.–4. klasse: læs højt og fortæl hvad den handlede om", "icon": "📚",
       "type": "weekly", "grades": [3, 4], "rewards": [{ "skill": "engelsk.laesning", "xp": 20 }, { "gold": 5 }] },
 
-    { "id": "quiz-ord-basis", "title": "Quiz: Engelske ord (basis)", "desc": "Hvad betyder ordene? 10 spørgsmål", "icon": "🧠",
-      "type": "weekly", "grades": [3, 4],
+    { "id": "quiz-eng-3", "title": "Quiz: Engelsk 3. klasse", "desc": "De første engelske ord", "icon": "🧠",
+      "type": "weekly", "active": false, "grades": [3, 3],
       "quiz": { "draw": 10, "pass": 8, "questions": [
         { "q": "Hvad betyder 'dog'?", "answers": ["Hund", "Kat", "Hest", "Fugl"] },
         { "q": "Hvad betyder 'house'?", "answers": ["Hus", "Have", "Hytte", "Havn"] },
@@ -55,12 +55,29 @@ window.HQ_BUNDLED.push({
       ] },
       "rewards": [{ "skill": "engelsk.ordforraad", "xp": 25 }, { "gold": 5 }] },
 
-    { "id": "quiz-ord-oevet", "title": "Quiz: Engelske ord (øvet)", "desc": "5.–7. klasse: sværere gloser", "icon": "🧠",
-      "type": "weekly", "active": false, "grades": [5, 7],
+    { "id": "quiz-eng-4", "title": "Quiz: Engelsk 4. klasse", "desc": "Hverdagsord, dage og udsagnsord", "icon": "🧠",
+      "type": "weekly", "active": false, "grades": [4, 4],
+      "quiz": { "draw": 10, "pass": 8, "questions": [
+        { "q": "Hvad betyder 'family'?", "answers": ["Familie", "Ferie", "Fabrik", "Fest"] },
+        { "q": "Hvad betyder 'breakfast'?", "answers": ["Morgenmad", "Frokost", "Aftensmad", "Kage"] },
+        { "q": "Hvad er 'eleven' på dansk?", "answers": ["11", "12", "7", "1"] },
+        { "q": "Hvad betyder 'winter'?", "answers": ["Vinter", "Vind", "Sommer", "Vante"] },
+        { "q": "Hvad betyder 'to run'?", "answers": ["At løbe", "At gå", "At hoppe", "At råbe"] },
+        { "q": "Hvad betyder 'happy'?", "answers": ["Glad", "Sur", "Træt", "Bange"] },
+        { "q": "Hvad betyder 'door'?", "answers": ["Dør", "Vindue", "Gulv", "Væg"] },
+        { "q": "Hvad betyder 'Monday'?", "answers": ["Mandag", "Måned", "Morgen", "Måne"] },
+        { "q": "Hvad betyder 'to eat'?", "answers": ["At spise", "At drikke", "At sove", "At lege"] },
+        { "q": "Hvad betyder 'little'?", "answers": ["Lille", "Stor", "Lang", "Let"] },
+        { "q": "Hvad betyder 'rain'?", "answers": ["Regn", "Sne", "Sol", "Storm"] },
+        { "q": "Hvad betyder 'friend'?", "answers": ["Ven", "Fjende", "Familie", "Fremmed"] }
+      ] },
+      "rewards": [{ "skill": "engelsk.ordforraad", "xp": 25 }, { "gold": 5 }] },
+
+    { "id": "quiz-eng-5", "title": "Quiz: Engelsk 5. klasse", "desc": "Sværere gloser fra hverdagen", "icon": "🧠",
+      "type": "weekly", "active": false, "grades": [5, 5],
       "quiz": { "draw": 10, "pass": 8, "questions": [
         { "q": "Hvad betyder 'weather'?", "answers": ["Vejret", "Verden", "Vandet", "Vejen"] },
         { "q": "Hvad betyder 'yesterday'?", "answers": ["I går", "I morgen", "I dag", "I aften"] },
-        { "q": "Hvad betyder 'breakfast'?", "answers": ["Morgenmad", "Frokost", "Aftensmad", "Madpakke"] },
         { "q": "Hvad betyder 'neighbour'?", "answers": ["Nabo", "Fætter", "Gæst", "Kollega"] },
         { "q": "Hvad betyder 'kitchen'?", "answers": ["Køkken", "Kælder", "Killing", "Kuffert"] },
         { "q": "Hvad betyder 'always'?", "answers": ["Altid", "Aldrig", "Allerede", "Alligevel"] },
@@ -69,13 +86,32 @@ window.HQ_BUNDLED.push({
         { "q": "Hvad betyder 'clothes'?", "answers": ["Tøj", "Sko", "Klude", "Knapper"] },
         { "q": "Hvad betyder 'angry'?", "answers": ["Vred", "Glad", "Bange", "Træt"] },
         { "q": "Hvad betyder 'to remember'?", "answers": ["At huske", "At glemme", "At gætte", "At håbe"] },
-        { "q": "Hvad betyder 'expensive'?", "answers": ["Dyr", "Billig", "Gammel", "Flot"] }
+        { "q": "Hvad betyder 'expensive'?", "answers": ["Dyr", "Billig", "Gammel", "Flot"] },
+        { "q": "Hvad betyder 'beautiful'?", "answers": ["Smuk", "Sjov", "Stor", "Sur"] }
       ] },
-      "rewards": [{ "skill": "engelsk.ordforraad", "xp": 35 }, { "gold": 10 }] },
+      "rewards": [{ "skill": "engelsk.ordforraad", "xp": 30 }, { "gold": 5 }] },
 
-    { "id": "quiz-saetning", "title": "Quiz: Byg sætningen", "desc": "5.–9. klasse: vælg ordet der passer i sætningen", "icon": "🧠",
-      "type": "weekly", "active": false, "grades": [5, 9],
-      "quiz": { "draw": 10, "pass": 7, "questions": [
+    { "id": "quiz-eng-6", "title": "Quiz: Engelsk 6. klasse", "desc": "Ord og enkel grammatik", "icon": "🧠",
+      "type": "weekly", "active": false, "grades": [6, 6],
+      "quiz": { "draw": 10, "pass": 8, "questions": [
+        { "q": "She ___ a teacher.", "answers": ["is", "are", "am", "be"] },
+        { "q": "I ___ two brothers.", "answers": ["have", "has", "am", "is"] },
+        { "q": "Hvad betyder 'tomorrow'?", "answers": ["I morgen", "I går", "I dag", "I aften"] },
+        { "q": "They ___ football right now.", "answers": ["are playing", "plays", "is playing", "player"] },
+        { "q": "Hvad betyder 'dangerous'?", "answers": ["Farlig", "Dejlig", "Doven", "Dyster"] },
+        { "q": "___ she like pizza?", "answers": ["Does", "Do", "Is", "Have"] },
+        { "q": "Hvad betyder 'to borrow'?", "answers": ["At låne", "At købe", "At bygge", "At bære"] },
+        { "q": "We went to London last ___.", "answers": ["year", "years", "yearly", "ago"] },
+        { "q": "Hvad betyder 'proud'?", "answers": ["Stolt", "Pralende", "Stærk", "Stille"] },
+        { "q": "He can ___ very fast.", "answers": ["run", "runs", "running", "ran"] },
+        { "q": "Hvad betyder 'to choose'?", "answers": ["At vælge", "At jage", "At tygge", "At snyde"] },
+        { "q": "There isn't ___ milk left.", "answers": ["any", "some", "no", "many"] }
+      ] },
+      "rewards": [{ "skill": "engelsk.laesning", "xp": 30 }, { "gold": 5 }] },
+
+    { "id": "quiz-eng-7", "title": "Quiz: Engelsk 7. klasse", "desc": "Byg sætningen — grammatik i praksis", "icon": "🧠",
+      "type": "weekly", "active": false, "grades": [7, 7],
+      "quiz": { "draw": 10, "pass": 8, "questions": [
         { "q": "I ___ football every Saturday.", "answers": ["play", "plays", "playing", "played"] },
         { "q": "She ___ to school by bus.", "answers": ["goes", "go", "going", "gone"] },
         { "q": "Yesterday we ___ a great film.", "answers": ["watched", "watch", "watches", "watching"] },
@@ -89,7 +125,43 @@ window.HQ_BUNDLED.push({
         { "q": "She didn't ___ her homework.", "answers": ["do", "did", "does", "done"] },
         { "q": "___ old are you?", "answers": ["How", "What", "Who", "Where"] }
       ] },
-      "rewards": [{ "skill": "engelsk.laesning", "xp": 35 }, { "gold": 10 }] }
+      "rewards": [{ "skill": "engelsk.laesning", "xp": 35 }, { "gold": 10 }] },
+
+    { "id": "quiz-eng-8", "title": "Quiz: Engelsk 8. klasse", "desc": "Avanceret grammatik og gloser", "icon": "🧠",
+      "type": "weekly", "active": false, "grades": [8, 8],
+      "quiz": { "draw": 10, "pass": 8, "questions": [
+        { "q": "If it rains, we ___ inside.", "answers": ["will stay", "would stay", "stayed", "staying"] },
+        { "q": "Hvad betyder 'to improve'?", "answers": ["At forbedre", "At bevise", "At importere", "At imponere"] },
+        { "q": "The book ___ by millions of people.", "answers": ["was read", "was reading", "readed", "did read"] },
+        { "q": "Hvad betyder 'although'?", "answers": ["Selvom", "Altid", "Allerede", "Sammen"] },
+        { "q": "She has lived here ___ five years.", "answers": ["for", "since", "in", "at"] },
+        { "q": "Hvad betyder 'responsible'?", "answers": ["Ansvarlig", "Respektfuld", "Fornuftig", "Mulig"] },
+        { "q": "I wish I ___ taller.", "answers": ["were", "am", "will be", "is"] },
+        { "q": "Hvad betyder 'to achieve'?", "answers": ["At opnå", "At tro", "At ankomme", "At undgå"] },
+        { "q": "He asked me where I ___.", "answers": ["lived", "live", "do live", "living"] },
+        { "q": "Hvad betyder 'suddenly'?", "answers": ["Pludselig", "Sikkert", "Sjældent", "Særligt"] },
+        { "q": "This is the house ___ I grew up.", "answers": ["where", "which", "who", "what"] },
+        { "q": "Hvad betyder 'however'?", "answers": ["Men alligevel", "Hvordan", "For evigt", "Uanset hvad"] }
+      ] },
+      "rewards": [{ "skill": "engelsk.laesning", "xp": 25 }, { "skill": "engelsk.ordforraad", "xp": 15 }, { "gold": 10 }] },
+
+    { "id": "quiz-eng-9", "title": "Quiz: Engelsk 9. klasse", "desc": "Eksamensniveau: svær grammatik og ordforråd", "icon": "🧠",
+      "type": "weekly", "active": false, "grades": [9, 9],
+      "quiz": { "draw": 10, "pass": 8, "questions": [
+        { "q": "By next year, I ___ my exams.", "answers": ["will have finished", "will finishing", "finished", "have finish"] },
+        { "q": "Hvad betyder 'to persuade'?", "answers": ["At overtale", "At forfølge", "At udholde", "At foregive"] },
+        { "q": "Neither of them ___ the answer.", "answers": ["knows", "know", "knowing", "are knowing"] },
+        { "q": "Hvad betyder 'inevitable'?", "answers": ["Uundgåelig", "Utrolig", "Usynlig", "Ufattelig"] },
+        { "q": "The essay must ___ by Friday.", "answers": ["be handed in", "hand in", "be handing in", "have hand in"] },
+        { "q": "Hvad betyder 'to emphasize'?", "answers": ["At understrege", "At undskylde", "At misunde", "At erstatte"] },
+        { "q": "Hardly ___ arrived when it started to rain.", "answers": ["had we", "we had", "did we", "we have"] },
+        { "q": "Hvad betyder 'reluctant'?", "answers": ["Modvillig", "Afslappet", "Pålidelig", "Genert"] },
+        { "q": "I'd rather you ___ smoke in here.", "answers": ["didn't", "don't", "won't", "not"] },
+        { "q": "Hvad betyder 'to accomplish'?", "answers": ["At fuldføre", "At følge med", "At acceptere", "At samle"] },
+        { "q": "___ the weather, the match went ahead.", "answers": ["Despite", "Although", "However", "Because"] },
+        { "q": "Hvad betyder 'thorough'?", "answers": ["Grundig", "Gennemsigtig", "Tørstig", "Hårdfør"] }
+      ] },
+      "rewards": [{ "skill": "engelsk.laesning", "xp": 30 }, { "skill": "engelsk.ordforraad", "xp": 20 }, { "gold": 10 }] }
   ],
 
   "badges": [

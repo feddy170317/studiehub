@@ -608,12 +608,18 @@
     return Object.keys(st.kids).filter(function (id) { return !st.kids[id].archived; });
   }
 
+  function bundledById(id) {
+    return (window.HQ_BUNDLED || []).filter(function (b) { return b.id === id; })[0] || null;
+  }
+
   function renderModules() {
     var box = $('#module-list');
     var ids = Object.keys(st.modules).sort();
     if (!ids.length) { box.innerHTML = '<div class="card empty">Ingen moduler installeret — importér et, eller nulstil databasen for at få setup-guiden</div>'; return; }
     box.innerHTML = ids.map(function (mid) {
       var m = st.modules[mid];
+      var bun = bundledById(mid);
+      var canUpdate = bun && (bun.version || 1) > (m.version || 1);
       var ws = HQ.windowState(m);
       var winTxt = m.window && m.window.from ? ' · 📅 ' + m.window.from + (m.window.to ? ' → ' + m.window.to : '') +
         (ws === 'before' ? ' (kommer)' : ws === 'after' ? ' (udløbet)' : '') : '';
@@ -626,6 +632,7 @@
           '<span style="font-size:1.6rem">' + (open ? '📂' : '📦') + '</span>' +
           '<div style="flex:1"><div class="m-name">' + esc(m.name || mid) + ' <span style="color:var(--muted);font-weight:400;font-size:0.75rem">v' + (m.version || 1) + '</span></div>' +
           '<div class="m-sub">' + counts + winTxt + '</div></div>' +
+          (canUpdate ? '<button class="btn small gold" data-update-mod="' + mid + '" title="Nyt indhold i v' + (bun.version || 1) + '" style="padding:6px 10px;font-size:0.72rem">⬆️ v' + (bun.version || 1) + '</button>' : '') +
           '<button class="icon-btn" data-export-mod="' + mid + '" title="Eksportér JSON">📤</button>' +
           '<button class="icon-btn" data-enable-mod="' + mid + '" title="Slå til/fra">' + (m.enabled === false ? '▶️' : '⏸️') + '</button>' +
           '<button class="icon-btn" data-del-mod="' + mid + '" title="Afinstallér">🗑️</button>' +
@@ -722,6 +729,23 @@
       var mid = tg.getAttribute('data-toggle-mod');
       st.openModule = st.openModule === mid ? null : mid;
       renderModules();
+      return;
+    }
+    var um = e.target.closest('[data-update-mod]');
+    if (um) {
+      var midU = um.getAttribute('data-update-mod');
+      var bun = bundledById(midU), cur = st.modules[midU];
+      if (!bun || !cur) return;
+      if (!confirm('Opdatér "' + (cur.name || midU) + '" til version ' + (bun.version || 1) + '?\n\nNyt indhold hentes ind (lokale rettelser i modulets quests/skills overskrives) — børnenes XP, badges og fremgang bevares.')) return;
+      var data = installModuleData(bun, null);
+      if (cur.assignedTo) data.assignedTo = cur.assignedTo;
+      if (cur.enabled === false) data.enabled = false;
+      st.openModule = midU; // FØR set(): lokale lyttere affyres synkront
+      HQ.ref('modules/' + midU).set(data);
+      // Aktivér de quests der passer de tildelte heltes klassetrin
+      retuneModule(midU, false);
+      HQ.audit('modul-opdateret', (bun.name || midU) + ' → v' + (bun.version || 1));
+      HQ.toast('⬆️ ' + (bun.name || midU) + ' opdateret');
       return;
     }
     var ex = e.target.closest('[data-export-mod]');

@@ -128,8 +128,13 @@ Modul ─┬─ Skills (2 lag: hovedskill → subskills)
   fra banken, `pass` = antal rigtige for at bestå (default 70 %). Barnet tager quizzen i
   appen; bestået → gennemførelse indsendes m. `quizScore {correct, total}` som forælderen
   ser ved godkendelse ("🧠 Quiz: 10/12") — godkend-før-XP-princippet bevares. Ikke bestået →
-  prøv igen frit (mestring, aldrig straf). Indholdet forankres i Fælles Måls TRINFORLØB
-  (engelsk: efter 4./7./9. kl., matematik: 1.-3./4.-6./7.-9.) — aldrig 10 separate niveauer.
+  prøv igen frit (mestring, aldrig straf). **Quiz-indhold er pr. KLASSETRIN** (Frederiks
+  valg 16/7, Excel Study Guides-modellen): ét quiz-sæt pr. årgang m. `grades [n,n]`, ingen
+  overlap — men SKILLS deles altid på tværs af trin, så XP/levels aldrig nulstilles.
+- **Modul-opdatering:** når et bundlet modul har højere `version` end den installerede
+  kopi, viser modul-kortet en ⬆️-knap: henter det nye indhold, bevarer assignedTo/enabled,
+  re-tilpasser quests til de tildelte heltes klassetrin. Lokale quest-rettelser overskrives
+  (fremgang bevares via kontobogen).
 - Badge-`rule`-typer: `counter` (N quests i et scope), `streak` (streak-regel når milepæl),
   `milestone` (skill når level), `event` (fuldført event-modulets mål), `manual` (admin tildeler).
   `secret: true` = vises først når den opnås. `exclusive: true` = kan kun fås i vinduet.
