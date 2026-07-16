@@ -42,7 +42,11 @@
   git add/commit/push i Studiehub → verificér med curl på Pages-URL (~30-60 s).
 - **Test**: `python HverdagsHelte\tests\e2e_<fase>.py` — opretter/sletter egne konti+orgs.
   Regler: fravælg ALTID migrerings-checkboxen; PIN-klik m. 150 ms pauser; kiste-klik force=True;
-  prompts håndteres m. dialog-handler; INGEN emoji i print (cp1252).
+  prompts håndteres m. dialog-handler; INGEN emoji i print (cp1252); `.mod-section-label`
+  CSS-uppercaser → innerText-asserts skal matche STORE BOGSTAVER.
+- **Indholds-validator**: `node HverdagsHelte\tests\validate_modules.js` — kør ALTID efter
+  ændringer i modules/ (skill-referencer, quiz-integritet, dublet-ids/svar). Quiz-konvention:
+  answers[0] = facit, positioner shuffles i UI, svarlængder balanceres.
 - **Faldgruber**: RTDB-nøgler tåler ikke `.` (HQ.safeKey); Firebase affyrer lyttere SYNKRONT
   ved lokal skrivning (sæt UI-state FØR set()); RTDB stripper tomme arrays; org-scoped
   HQ.ref() kaster før setOrg().
