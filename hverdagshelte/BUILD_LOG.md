@@ -15,14 +15,10 @@
 | 16/7 | **Udbygningsplan godkendt** (plan-fil): A korrektion → B personlige moduler → C klassetrin+bibliotek → D opslagstavle |
 | 16/7 | **Fase A LIVE**: Fortryd godkendelse (quest genåbnes), kontobogs-modal m. fortryd/bulk, deaktivér/gendan/slet-helt, emoji-ikonvælger, audit i loggen |
 | 16/7 | **Fase B LIVE**: Modul-tildeling pr. helt (assignedTo), "＋ Nyt modul" + "＋ Ny færdighed" i UI, multi-skill-rewards i quest-editor |
+| 16/7 | **Fase C LIVE**: Klassetrin (grade 0-9) på helte, modul-meta `category`/`grades`, anbefalings-dialog ved ny helt/trin-skift, grade-filtreret installation (quests udenfor trinnet = inaktive), 6 nye moduler (Engelsk, Natur & Teknologi, Fitness m. 10-km multi-skill-quest, Økonomi, Kreativitet, Digital dannelse) → 9 bundlede i alt, wizard grupperet pr. kategori. E2E: e2e_faseC.py grøn + faseB-regression grøn |
 
 ## Udestående (fra godkendt plan — byg i næste session)
 
-- **FASE C — Klassetrin & modul-bibliotek** (plan-filens §C, alle beslutninger truffet):
-  grade-felt (0.-9. kl.) på helt + wizard; modul-meta `category`/`grades`; "Anbefalet til
-  N. klasse"-dialog (forvalgt, aldrig tvang); alders-tag på Hjemmet-quests; 6 nye
-  bundlede moduler: Engelsk, Natur & Teknologi, Fitness & Bevægelse (m. 10-km multi-skill-
-  questen), Lommepenge & Økonomi, Kreativitet, Digital dannelse. Wizard grupperes pr. kategori.
 - **FASE D — Opslagstavlen**: jobs-node (open→taken→submitted→done/failed), poster =
   fritekst ("Farfar", admin opretter på andres vegne), løn = guld OG/ELLER rigtige-penge-
   fritekst, først-til-mølle via transaction, godkendelse i admin. Plan-filens §D.
