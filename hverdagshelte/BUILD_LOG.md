@@ -23,10 +23,14 @@
 
 | 17/7 | **Fase E3 LIVE**: Quizzer i ALLE skolefag/årgange — dansk 0.-9. kl. (10 quizzer: bogstaver→stavning→ordklasser→grammatik→sprogbilleder→argumentation→komma→eksamensniveau), engelsk udvidet til 1.-9. kl. (modul-grades nu [1,9]; +quiz-eng-1/2: farver/tal/dyr, familie/krop/mad), natur & teknologi 1.-6. kl. (6 quizzer). I alt **35 quiz-banker (420 spørgsmål)** på tværs af 4 skolefag. + **📚 Bibliotek-sektion** på Moduler-fanen: bundlede moduler der ikke er installeret kan installeres direkte (installModuleData + retuneModule efter → årgangs-quests tændes efter heltenes klassetrin). E2E: e2e_faseE3.py grøn + E2-regression |
 
+| 17/7 | **Fase E4 LIVE — ALLE folkeskolens fag**: 12 nye moduler fra Fælles Mål-bekendtgørelsen (retsinformation.dk/eli/lta/2020/1217): Historie 3.-9. (7 årgangs-quizzer: vikingetid→kold krig), Geografi/Biologi/Fysik-kemi 7.-9. (3 quizzer hver), Samfundsfag 8.-9. (2), Tysk 5.-9. (5) + praksisfag UDEN MC-quizzer (bevidst — de skal LAVES): Kristendomskundskab 1.-9., Idræt 0.-9., Musik 1.-6., Billedkunst 1.-6., Håndværk & Design 4.-7., Madkundskab 4.-7. **Total: 21 moduler, 58 quizzer, 650 spørgsmål.** Ny tests/validate_modules.js (indholds-validator: skill-refs, quiz-integritet, dubletter — kør ALTID efter indholdsændringer). E2E: E3+E1-regression grøn |
+
 ## Udestående
 
 - Frederiks 3. emne fra 16/7-beskeden blev KLIPPET AF ("the next thing we need to do is…")
   — spørg ham hvad det var.
+- Fransk-modul (klon af tysk.js-skabelonen) hvis skolen har fransk som 2. fremmedsprog.
+- Evt. quizzer til kristendom (3.-9.) + de obligatoriske emner (færdselslære, sundhed, uddannelse & job).
 - Derefter: badge-fremskridts-visning (tryk på badge → progress), månedlig
   quest-type, event-modul "Sødheds-august" + event-motor-huller (nedtælling, event-badge-regel,
   modul-kosmetik), PWA-manifest, streak-skjold, dobbelt-XP-weekend, boss-quests.
