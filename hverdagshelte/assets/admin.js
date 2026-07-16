@@ -262,7 +262,9 @@
       return '<div class="admin-row">' +
         '<span style="font-size:1.5rem">' + esc(kid.avatar || '🧒') + '</span>' +
         '<div class="a-main"><div class="a-title">' + esc(r.c.taskTitle) + '</div>' +
-        '<div class="a-sub">' + esc(kid.name || '?') + ' · ' + rewardSummary(r.c.rewards) + ' · ' + HQ.fmtTs(r.c.ts) + '</div></div>' +
+        '<div class="a-sub">' + esc(kid.name || '?') +
+        (r.c.quizScore ? ' · 🧠 Quiz: ' + r.c.quizScore.correct + '/' + r.c.quizScore.total : '') +
+        ' · ' + rewardSummary(r.c.rewards) + ' · ' + HQ.fmtTs(r.c.ts) + '</div></div>' +
         '<div class="approve-actions">' +
         '<button class="btn green small" data-approve="' + r.kidId + '|' + r.pk + '|' + r.qk + '">Godkend</button>' +
         '<button class="btn red small" data-reject="' + r.kidId + '|' + r.pk + '|' + r.qk + '">Afvis</button>' +
@@ -640,7 +642,10 @@
       return '<div class="admin-row' + (q.active === false ? ' inactive' : '') + '">' +
         '<span style="font-size:1.3rem">' + esc(q.icon || '⭐') + '</span>' +
         '<div class="a-main"><div class="a-title">' + esc(q.title) + '</div>' +
-        '<div class="a-sub">' + (TYPE_NAMES[q.type] || q.type) + days + ' · ' + rewardSummary(q.rewards) + '</div></div>' +
+        '<div class="a-sub">' + (TYPE_NAMES[q.type] || q.type) + days +
+        (q.quiz ? ' · 🧠 ' + (q.quiz.questions || []).length + ' spørgsmål' : '') +
+        (q.grades ? ' · 🎓 ' + gradesText(q.grades) : '') +
+        ' · ' + rewardSummary(q.rewards) + '</div></div>' +
         '<button class="icon-btn" data-edit-quest="' + mid + '|' + i + '">✏️</button>' +
         '<button class="icon-btn" data-del-quest="' + mid + '|' + i + '">🗑️</button>' +
         '</div>';
@@ -861,6 +866,9 @@
           days: selDays.length ? selDays : [1, 2, 3, 4, 5, 6, 0],
           rewards: rewards
         };
+        // Felter editoren ikke kender (quiz-banker, alders-tags) må ikke gå tabt
+        if (q.quiz) data.quiz = q.quiz;
+        if (q.grades) data.grades = q.grades;
         var arr = (m.quests || []).slice();
         if (isNew) arr.push(data); else arr[idx] = data;
         HQ.ref('modules/' + mid + '/quests').set(arr);
@@ -1273,9 +1281,34 @@
     );
   }
 
-  // ═══════════ ANBEFALEDE MODULER (fase C3) ═══════════
+  // ═══════════ ANBEFALEDE MODULER (fase C3) + RE-TILPASNING (fase E2) ═══════════
+  // Re-tilpasning: quests med alders-tag slås til/fra i INSTALLEREDE moduler når et
+  // klassetrin ændres. Deles et modul af flere helte, bruges UNIONEN af deres trin —
+  // en quest er aktiv hvis den passer bare ét af de tildelte børns klassetrin.
+  function assignedGrades(m) {
+    return activeKidIds().filter(function (id) { return isAssignedTo(m, id); })
+      .map(function (id) { return st.kids[id].grade; })
+      .filter(function (g) { return g != null; });
+  }
+  // dry=true: tæl kun hvor mange quests der ville skifte aktiv-tilstand
+  function retuneModule(mid, dry) {
+    var m = st.modules[mid];
+    if (!m) return 0;
+    var grades = assignedGrades(m);
+    if (!grades.length) return 0;
+    var changed = 0;
+    var arr = (m.quests || []).map(function (q) {
+      if (!q || !q.grades) return q;
+      var fits = grades.some(function (g) { return HQ.gradeFits(q.grades, g); });
+      if ((q.active !== false) !== fits) changed++;
+      return Object.assign({}, q, { active: fits });
+    });
+    if (changed && !dry) HQ.ref('modules/' + mid + '/quests').set(arr);
+    return changed;
+  }
+
   // Viser bundlede moduler der passer klassetrinnet og endnu ikke er aktive for
-  // helten. Forvalgte checkbokse, forælderen fravælger frit — ALDRIG tvang.
+  // helten + re-tilpasning af installerede. Forvalgt, forælderen fravælger frit — ALDRIG tvang.
   function recommendModal(kidId, grade) {
     var kid = st.kids[kidId];
     if (!kid) return;
@@ -1286,7 +1319,17 @@
       if (inst && isAssignedTo(inst, kidId)) return; // allerede aktiv for helten
       items.push({ m: m, idx: i, action: inst ? 'assign' : 'install' });
     });
-    if (!items.length) return; // intet nyt at anbefale — vis ingen tom dialog
+    // Installerede moduler hvor det nye klassetrin ændrer hvilke quests der er aktive
+    var retunes = [];
+    if (grade != null) {
+      Object.keys(st.modules).forEach(function (mid) {
+        var m = st.modules[mid];
+        if (!isAssignedTo(m, kidId)) return;
+        var n = retuneModule(mid, true);
+        if (n) retunes.push({ mid: mid, name: m.name || mid, count: n });
+      });
+    }
+    if (!items.length && !retunes.length) return; // intet at foreslå — ingen tom dialog
     var byCat = {};
     items.forEach(function (it) {
       var cat = it.m.category || 'fritid';
@@ -1303,6 +1346,15 @@
             '<br><span style="color:var(--muted);font-size:0.76rem">' + esc(it.m.description || '') + '</span></span></label>';
         }).join('');
     }).join('');
+    if (retunes.length) {
+      listHtml += '<div class="mod-section-label">🔄 Tilpas installerede moduler</div>' +
+        '<p style="color:var(--muted);font-size:0.78rem;margin:2px 0 6px">Opgaver med alders-mærke slås til/fra så de passer klassetrinnet (deles modulet af flere helte, tælles alles trin med).</p>' +
+        retunes.map(function (r) {
+          return '<label style="display:flex;align-items:center;gap:8px;margin:6px 0;font-size:0.9rem">' +
+            '<input type="checkbox" checked class="rec-mod" data-action="retune" data-mid="' + esc(r.mid) + '" style="width:auto"> ' +
+            esc(r.name) + ' <span style="color:var(--muted);font-size:0.75rem">(' + r.count + ' opgave' + (r.count > 1 ? 'r' : '') + ' ændres)</span></label>';
+        }).join('');
+    }
     var bg = document.createElement('div');
     bg.className = 'modal-bg';
     bg.innerHTML = '<div class="modal" style="max-width:520px">' +
@@ -1318,6 +1370,13 @@
       var others = activeKidIds().filter(function (x) { return x !== kidId; });
       var count = 0;
       HQ.$all('.rec-mod:checked', bg).forEach(function (cb) {
+        if (cb.getAttribute('data-action') === 'retune') {
+          var midR = cb.getAttribute('data-mid');
+          var nR = retuneModule(midR, false);
+          if (nR) HQ.audit('modul-tilpasset', (st.modules[midR] || {}).name + ' → ' + HQ.gradeLabel(grade) + ' (' + nR + ' opgaver)');
+          count++;
+          return;
+        }
         var m = (window.HQ_BUNDLED || [])[parseInt(cb.getAttribute('data-idx'), 10)];
         if (!m) return;
         if (cb.getAttribute('data-action') === 'install') {

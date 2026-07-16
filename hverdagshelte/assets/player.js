@@ -395,7 +395,9 @@
     var mainSkill = (q.rewards || []).filter(function (r) { return r.skill; })[0];
     var act;
     if (!c || c.status === 'rejected') {
-      act = '<button class="btn green small" data-complete="' + q.key + '" data-type="' + type + '">Færdig!</button>';
+      act = q.quiz
+        ? '<button class="btn small" data-quiz="' + q.key + '" data-type="' + type + '">🧠 Tag quizzen!</button>'
+        : '<button class="btn green small" data-complete="' + q.key + '" data-type="' + type + '">Færdig!</button>';
     } else if (c.status === 'pending') {
       act = '<div class="status pending">⏳ Venter på godkendelse</div>';
     } else {
@@ -476,6 +478,92 @@
       HQ.toast('🚀 Sendt til godkendelse — flot klaret!');
     });
   });
+
+  // ═══════════ QUIZ-QUESTS (fase E2: øvelser i appen) ═══════════
+  // Konvention i modul-formatet: answers[0] er ALTID det rigtige svar i data —
+  // positionerne shuffles ved runtime, så pladsen aldrig afslører svaret.
+  function shuffleArr(a) {
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  document.addEventListener('click', function (e) {
+    var qb = e.target.closest('[data-quiz]');
+    if (!qb) return;
+    var q = st.content.quests.filter(function (x) { return x.key === qb.getAttribute('data-quiz'); })[0];
+    if (q && q.quiz) openQuiz(q, qb.getAttribute('data-type'));
+  });
+
+  function openQuiz(q, type) {
+    var bank = (q.quiz.questions || []).slice();
+    if (!bank.length) return;
+    var qs = shuffleArr(bank).slice(0, q.quiz.draw || bank.length);
+    var pass = Math.min(q.quiz.pass || Math.ceil(qs.length * 0.7), qs.length);
+    var i = 0, correct = 0, locked = false;
+    var ov = document.createElement('div');
+    ov.className = 'quiz-overlay';
+    document.body.appendChild(ov);
+
+    function showQ() {
+      if (i >= qs.length) return showResult();
+      var item = qs[i];
+      var idx = shuffleArr(item.answers.map(function (_, n) { return n; }));
+      ov.innerHTML = '<div class="quiz-card">' +
+        '<div class="quiz-top">' + esc(q.title) + ' · ' + (i + 1) + ' / ' + qs.length + '</div>' +
+        '<div class="quiz-q">' + esc(item.q) + '</div>' +
+        '<div class="quiz-answers">' + idx.map(function (n) {
+          return '<button class="quiz-answer" data-qa="' + n + '">' + esc(item.answers[n]) + '</button>';
+        }).join('') + '</div>' +
+        '<button class="btn ghost small quiz-quit" data-quit>Stop quizzen</button></div>';
+      locked = false;
+    }
+
+    function showResult() {
+      var passed = correct >= pass;
+      if (passed) {
+        // Bestået → indsendes som almindelig gennemførelse m. score til forælderen
+        HQ.ref('completions/' + st.kidId + '/' + periodKey(type) + '/' + q.key).set({
+          status: 'pending', ts: Date.now(),
+          module: q.module, questId: q.id, questKey: q.key,
+          taskTitle: q.title || '', icon: q.icon || '🧠', type: type,
+          rewards: q.rewards || [],
+          quizScore: { correct: correct, total: qs.length }
+        });
+        HQ.chime('badge');
+        HQ.confetti({ count: 110 });
+      }
+      ov.innerHTML = '<div class="quiz-card">' +
+        '<div style="font-size:3rem">' + (passed ? '🎉' : '💪') + '</div>' +
+        '<div class="quiz-q">' + correct + ' / ' + qs.length + ' rigtige</div>' +
+        (passed
+          ? '<div class="quiz-sub">Bestået! Sendt til godkendelse hos en voksen 🚀</div>' +
+            '<button class="btn gold" data-quit>Sejt! ✨</button>'
+          : '<div class="quiz-sub">Du skal have ' + pass + ' rigtige for at bestå. Øv lidt og prøv igen — du kan godt! 💛</div>' +
+            '<div style="display:flex;gap:8px;justify-content:center"><button class="btn" data-retry>Prøv igen</button>' +
+            '<button class="btn ghost" data-quit>Luk</button></div>') +
+        '</div>';
+    }
+
+    ov.addEventListener('click', function (e2) {
+      if (e2.target.closest('[data-quit]')) { ov.remove(); return; }
+      if (e2.target.closest('[data-retry]')) { i = 0; correct = 0; shuffleArr(qs); showQ(); return; }
+      var ab = e2.target.closest('.quiz-answer');
+      if (!ab || locked) return;
+      locked = true;
+      var right = ab.getAttribute('data-qa') === '0';
+      if (right) { correct++; ab.classList.add('right'); HQ.chime('pop'); }
+      else {
+        ab.classList.add('wrong');
+        var rb = ov.querySelector('.quiz-answer[data-qa="0"]');
+        if (rb) rb.classList.add('right');
+      }
+      setTimeout(function () { i++; showQ(); }, right ? 550 : 1300);
+    });
+    showQ();
+  }
 
   // ═══════════ OPSLAGSTAVLEN (fase D: jobs fra familien, fx farfar) ═══════════
   function jobRewardChips(j) {

@@ -119,6 +119,17 @@ Modul ─┬─ Skills (2 lag: hovedskill → subskills)
   det anbefales; på en **quest** styrer det om questen installeres aktiv eller inaktiv
   for barnets klassetrin (kun ved installation — admin kan altid slå til/fra bagefter).
   Mangler feltet = passer alle. Anbefaling er ALDRIG tvang (jf. PLATFORM_VISION §1.8).
+  Ved KLASSESKIFT tilbydes re-tilpasning af installerede moduler; deles et modul af flere
+  helte bruges unionen af deres klassetrin (quest aktiv hvis den passer bare ét barn).
+- **Quiz-quests (fase E2, valgfrit felt):** `"quiz": { "draw": 10, "pass": 8, "questions":
+  [{ "q": "7 × 8 = ?", "answers": ["56", "54", "64", "48"] }] }` — **answers[0] er ALTID det
+  rigtige svar i data**; positionerne shuffles ved runtime så pladsen aldrig afslører svaret
+  (og svarlængder skal holdes balancerede). `draw` = antal spørgsmål der trækkes tilfældigt
+  fra banken, `pass` = antal rigtige for at bestå (default 70 %). Barnet tager quizzen i
+  appen; bestået → gennemførelse indsendes m. `quizScore {correct, total}` som forælderen
+  ser ved godkendelse ("🧠 Quiz: 10/12") — godkend-før-XP-princippet bevares. Ikke bestået →
+  prøv igen frit (mestring, aldrig straf). Indholdet forankres i Fælles Måls TRINFORLØB
+  (engelsk: efter 4./7./9. kl., matematik: 1.-3./4.-6./7.-9.) — aldrig 10 separate niveauer.
 - Badge-`rule`-typer: `counter` (N quests i et scope), `streak` (streak-regel når milepæl),
   `milestone` (skill når level), `event` (fuldført event-modulets mål), `manual` (admin tildeler).
   `secret: true` = vises først når den opnås. `exclusive: true` = kan kun fås i vinduet.
@@ -203,6 +214,8 @@ konfetti) består. Databasen er tom lige nu, så omstruktureringen er gratis —
 | **5. Poler + testfase** | Frederiks store test med rigtige brugere; feedback → beslut næste skridt (auth, skoler, venner) | |
 | **C. Klassetrin + bibliotek** | `grade` på helten, `category`/`grades` i modul-formatet, anbefalings-dialog ved helte-oprettelse/trin-skift, alders-tags på quests, 6 nye moduler (Engelsk, Natur & Teknologi, Fitness, Økonomi, Kreativitet, Digital dannelse) → 9 bundlede i alt | ✅ 16/7-2026 |
 | **D. Opslagstavlen** | `jobs/{id}` (title/desc/icon/poster-fritekst/reward {gold?, realNote?}/status open→taken→submitted→done); spiller: "Tag jobbet!" via transaction (først-til-mølle), meld færdig / giv tilbage; admin: opret på andres vegne (fx farfar), godkend (ledger→kiste, realNote-påmindelse), afvis m. besked, genåbn; audit på alt | ✅ 16/7-2026 |
+| **E1. Folder-overblik** | Quest-siden grupperet pr. modul i sammenklappelige foldere m. fremdrift i hovedet + "kun det jeg mangler"-filter | ✅ 16/7-2026 |
+| **E2. Curriculum + quiz-motor** | Quest-type `quiz` (MC i modul-JSON, runtime-shuffle, score → godkendelse), quest-banker pr. trinforløb (matematik: plus/minus 0.-3., tabeller 2.-6., brøk/procent 4.-6.; engelsk: gloser basis 3.-4./øvet 5.-7., grammatik 5.-9.), re-tilpasning af installerede moduler ved klasseskift (union af tildelte heltes trin), editor bevarer quiz/grades-felter | ✅ 16/7-2026 |
 
 **Afvigelse fra §4/§5:** `overrides/`-noden er droppet i v2.0 — admin redigerer modulets DB-kopi
 direkte (han er eneste forfatter), og eksporten indeholder dermed rettelserne. Genindføres
