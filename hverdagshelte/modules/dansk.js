@@ -6,8 +6,10 @@ window.HQ_BUNDLED.push({
   "format": "hverdagshelte-module@1",
   "id": "dansk",
   "name": "Dansk 📖",
-  "version": 1,
+  "version": 2,
   "author": "Frederik",
+  "category": "skole",
+  "grades": [0, 9],
   "description": "Bygget over de fire grundlæggende sprogområder: læseforståelse, skriftlig fremstilling, mundtlig kommunikation og lytteforståelse. Passer 2.–9. klasse — slå quests til/fra efter klassetrin.",
 
   "skills": [
@@ -30,9 +32,9 @@ window.HQ_BUNDLED.push({
     { "id": "historie", "title": "Skriv en lille historie (en halv side)", "desc": "Fri fantasi! Læs den højt for en voksen bagefter", "icon": "🏰",
       "type": "weekly", "rewards": [{ "skill": "dansk.skrivning", "xp": 40 }, { "gold": 10 }] },
     { "id": "anmeldelse", "title": "Skriv en anmeldelse af en bog eller film", "desc": "4.–9. klasse: hvad var godt, hvad var skidt, og hvorfor?", "icon": "⭐",
-      "type": "weekly", "active": false, "rewards": [{ "skill": "dansk.skrivning", "xp": 40 }, { "gold": 15 }] },
+      "type": "weekly", "active": false, "grades": [4, 9], "rewards": [{ "skill": "dansk.skrivning", "xp": 40 }, { "gold": 15 }] },
     { "id": "oplaeg", "title": "Hold et lille oplæg for familien", "desc": "5.–9. klasse: 5 minutter om et emne du selv vælger", "icon": "🎤",
-      "type": "weekly", "active": false, "rewards": [{ "skill": "dansk.mundtlig", "xp": 50 }, { "gold": 15 }] }
+      "type": "weekly", "active": false, "grades": [5, 9], "rewards": [{ "skill": "dansk.mundtlig", "xp": 50 }, { "gold": 15 }] }
   ],
 
   "badges": [

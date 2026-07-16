@@ -6,8 +6,10 @@ window.HQ_BUNDLED.push({
   "format": "hverdagshelte-module@1",
   "id": "matematik",
   "name": "Matematik 🔢",
-  "version": 1,
+  "version": 2,
   "author": "Frederik",
+  "category": "skole",
+  "grades": [0, 9],
   "description": "Subskills dækker hele grundskolen (jf. webmatematik.dk): talforståelse, de fire regnearter, brøker/procent, geometri, måling, algebra, statistik og problemregning. Slå quests til/fra efter klassetrin.",
 
   "skills": [
@@ -25,7 +27,7 @@ window.HQ_BUNDLED.push({
 
   "quests": [
     { "id": "tabel10", "title": "Øv gangetabeller i 10 minutter", "desc": "På papir, med kort eller på nettet", "icon": "✖️",
-      "type": "daily", "days": [1, 2, 3, 4, 5], "rewards": [{ "skill": "matematik.gangedivision", "xp": 20 }] },
+      "type": "daily", "days": [1, 2, 3, 4, 5], "grades": [1, 9], "rewards": [{ "skill": "matematik.gangedivision", "xp": 20 }] },
     { "id": "plusside", "title": "Én side plus- og minusstykker", "desc": "", "icon": "➕",
       "type": "daily", "days": [1, 2, 3, 4, 5], "rewards": [{ "skill": "matematik.plusminus", "xp": 20 }] },
     { "id": "klokken", "title": "Læs klokken når en voksen spørger", "desc": "Både hel, halv og kvart", "icon": "⏰",
@@ -37,11 +39,11 @@ window.HQ_BUNDLED.push({
     { "id": "lommepenge", "title": "Tæl dine penge og læg et lille budget", "desc": "Hvor meget har du? Hvad sparer du op til?", "icon": "🪙",
       "type": "weekly", "rewards": [{ "skill": "matematik.maaling", "xp": 25 }, { "gold": 10 }] },
     { "id": "brokside", "title": "Én side brøker eller procent", "desc": "4.–9. klasse", "icon": "🍕",
-      "type": "daily", "days": [1, 2, 3, 4, 5], "active": false, "rewards": [{ "skill": "matematik.broker", "xp": 25 }] },
+      "type": "daily", "days": [1, 2, 3, 4, 5], "active": false, "grades": [4, 9], "rewards": [{ "skill": "matematik.broker", "xp": 25 }] },
     { "id": "ligninger", "title": "Løs ligninger på webmatematik.dk", "desc": "7.–9. klasse: webmatematik.dk/lektioner/7-9-klasse", "icon": "🧮",
-      "type": "weekly", "active": false, "rewards": [{ "skill": "matematik.algebra", "xp": 40 }, { "gold": 15 }] },
+      "type": "weekly", "active": false, "grades": [7, 9], "rewards": [{ "skill": "matematik.algebra", "xp": 40 }, { "gold": 15 }] },
     { "id": "statistik", "title": "Lav en lille undersøgelse derhjemme", "desc": "6.–9. klasse: saml data, lav et diagram, fortæl hvad det viser", "icon": "📊",
-      "type": "weekly", "active": false, "rewards": [{ "skill": "matematik.statistik", "xp": 40 }, { "gold": 15 }] }
+      "type": "weekly", "active": false, "grades": [6, 9], "rewards": [{ "skill": "matematik.statistik", "xp": 40 }, { "gold": 15 }] }
   ],
 
   "badges": [

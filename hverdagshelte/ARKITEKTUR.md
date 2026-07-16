@@ -113,6 +113,12 @@ Modul ─┬─ Skills (2 lag: hovedskill → subskills)
 **Regler for formatet:**
 - `rewards` er en liste → én quest kan give XP til flere skills + guld + event-mønter
   (10 km løb → udholdenhed *og* viljestyrke).
+- **Klassetrin & kategori (fase C, valgfrie felter — gamle moduler virker uændret):**
+  `category: "skole" | "hjem" | "fritid"` grupperer modulet i setup-wizard og
+  anbefalings-dialog. `grades: [min, max]` (klassetrin 0–9) på **modulet** styrer hvornår
+  det anbefales; på en **quest** styrer det om questen installeres aktiv eller inaktiv
+  for barnets klassetrin (kun ved installation — admin kan altid slå til/fra bagefter).
+  Mangler feltet = passer alle. Anbefaling er ALDRIG tvang (jf. PLATFORM_VISION §1.8).
 - Badge-`rule`-typer: `counter` (N quests i et scope), `streak` (streak-regel når milepæl),
   `milestone` (skill når level), `event` (fuldført event-modulets mål), `manual` (admin tildeler).
   `secret: true` = vises først når den opnås. `exclusive: true` = kan kun fås i vinduet.
@@ -191,10 +197,11 @@ konfetti) består. Databasen er tom lige nu, så omstruktureringen er gratis —
 | Fase | Indhold | Status |
 |---|---|---|
 | **1. Ledger + modul-motor** | Ledger-skrivning ved godkendelse, saldi fra ledger, modul-format v1, import/eksport af JSON, 3 start-moduler (Dansk, Matematik, Hjemmet) | ✅ 13/7-2026 |
-| **2. Modul-editor** | Editor-lite i admin: quests (opret/redigér/slet m. XP/guld/mønt/dage), skills (navn/ikon/farve), streak-mål — direkte i modulets DB-kopi; eksport indeholder rettelserne. Badge-editor + nyt-modul-fra-bunden mangler | 🟡 delvist |
+| **2. Modul-editor** | Editor-lite i admin: quests (opret/redigér/slet m. XP/guld/mønt/dage, multi-skill-rewards), skills (opret/redigér), streak-mål, nyt-modul-fra-bunden — direkte i modulets DB-kopi; eksport indeholder rettelserne. Badge-editor mangler | 🟡 delvist |
 | **3. Badges + streaks + kiste** | Badge-evaluering (counter/milestone/streak-milepæle, secret, rarity), streak-motor m. admin-justerbart mål, skattekiste m. WebAudio-lyd, trofæ-væg m. låste previews | ✅ 13/7-2026 |
 | **4. Event-moduler + kosmetik** | Tidsvinduer + teaser-banner + event-mønter (💠) virker; kosmetik-slots og -butik mangler | 🟡 delvist |
 | **5. Poler + testfase** | Frederiks store test med rigtige brugere; feedback → beslut næste skridt (auth, skoler, venner) | |
+| **C. Klassetrin + bibliotek** | `grade` på helten, `category`/`grades` i modul-formatet, anbefalings-dialog ved helte-oprettelse/trin-skift, alders-tags på quests, 6 nye moduler (Engelsk, Natur & Teknologi, Fitness, Økonomi, Kreativitet, Digital dannelse) → 9 bundlede i alt | ✅ 16/7-2026 |
 
 **Afvigelse fra §4/§5:** `overrides/`-noden er droppet i v2.0 — admin redigerer modulets DB-kopi
 direkte (han er eneste forfatter), og eksporten indeholder dermed rettelserne. Genindføres

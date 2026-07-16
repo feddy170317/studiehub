@@ -137,18 +137,43 @@
     });
   });
 
+  function setupGrade() {
+    var v = $('#setup-kid-grade').value;
+    return v === '' ? null : parseInt(v, 10);
+  }
+  // Wizard: bundlede moduler grupperet pr. kategori, forvalgt efter klassetrin.
+  // Moduler udenfor trinnet vises stadig (aldrig tvang — kun anbefaling).
   function renderSetupModules() {
     var box = $('#setup-modules');
-    box.innerHTML = (window.HQ_BUNDLED || []).map(function (m, i) {
-      return '<label style="display:flex;align-items:center;gap:8px;margin:6px 0;font-size:0.9rem;color:var(--text)">' +
-        '<input type="checkbox" checked data-mod-idx="' + i + '" style="width:auto"> ' + esc(m.name) + '</label>';
-    }).join('') || '<p style="color:var(--muted)">Ingen bundlede moduler fundet</p>';
+    var grade = setupGrade();
+    var mods = window.HQ_BUNDLED || [];
+    if (!mods.length) { box.innerHTML = '<p style="color:var(--muted)">Ingen bundlede moduler fundet</p>'; return; }
+    var byCat = {};
+    mods.forEach(function (m, i) {
+      var cat = m.category || 'fritid';
+      (byCat[cat] = byCat[cat] || []).push({ m: m, i: i });
+    });
+    box.innerHTML = ['skole', 'hjem', 'fritid'].filter(function (c) { return byCat[c]; }).map(function (cat) {
+      return '<div class="mod-section-label">' + (HQ.CATEGORY_NAMES[cat] || cat) + '</div>' +
+        byCat[cat].map(function (e) {
+          var fits = HQ.gradeFits(e.m.grades, grade);
+          var hint = gradesText(e.m.grades);
+          return '<label style="display:flex;align-items:center;gap:8px;margin:6px 0;font-size:0.9rem;color:var(--text);opacity:' + (fits ? '1' : '0.55') + '">' +
+            '<input type="checkbox"' + (fits ? ' checked' : '') + ' data-mod-idx="' + e.i + '" style="width:auto"> ' + esc(e.m.name) +
+            (hint ? ' <span style="color:var(--muted);font-size:0.75rem">(' + hint + ')</span>' : '') + '</label>';
+        }).join('');
+    }).join('');
   }
+
+  // Klassetrin-dropdown i wizarden + genberegn forvalget når trinnet ændres
+  $('#setup-kid-grade').innerHTML = gradeOptions(null);
+  $('#setup-kid-grade').addEventListener('change', renderSetupModules);
 
   $('#setup-go').addEventListener('click', function () {
     var kidName = $('#setup-kid-name').value.trim();
     var kidAvatar = $('#setup-kid-avatar').value.trim() || '🦸‍♀️';
     var kidPin = $('#setup-kid-pin').value.trim();
+    var kidGrade = setupGrade();
     if (!kidName) return HQ.toast('Skriv barnets navn');
     if (!/^\d{4}$/.test(kidPin)) return HQ.toast('Barnets PIN skal være 4 cifre');
 
@@ -163,9 +188,10 @@
     };
     HQ.$all('#setup-modules input:checked').forEach(function (cb) {
       var m = (window.HQ_BUNDLED || [])[parseInt(cb.getAttribute('data-mod-idx'), 10)];
-      if (m) seed.modules[m.id] = Object.assign({}, m, { installedAt: Date.now(), enabled: true });
+      if (m) seed.modules[m.id] = installModuleData(m, kidGrade);
     });
     var kid = { name: kidName, avatar: kidAvatar, pin: kidPin, created: Date.now() };
+    if (kidGrade != null) kid.grade = kidGrade;
     HQ.ref().update(seed).then(function () {
       return HQ.ref('kids').push(kid);
     }).then(function () {
@@ -382,6 +408,31 @@
     }).join('');
   }
 
+  // ═══════════ KLASSETRIN (fase C) ═══════════
+  // OBS: 0. klasse er et gyldigt trin — test altid med != null, aldrig truthy.
+  function gradeOptions(selected) {
+    var html = '<option value=""' + (selected == null ? ' selected' : '') + '>Intet klassetrin</option>';
+    for (var g = 0; g <= 9; g++) {
+      html += '<option value="' + g + '"' + (selected === g ? ' selected' : '') + '>' + g + '. klasse</option>';
+    }
+    return html;
+  }
+  function gradesText(grades) {
+    if (!grades || !grades.length) return '';
+    return grades[0] + '.–' + (grades[1] != null ? grades[1] : 9) + '. kl.';
+  }
+  // Installations-kopi af et bundlet modul: quests med grades-felt slås til/fra
+  // efter barnets klassetrin. Uden klassetrin røres quest-defaults ikke.
+  function installModuleData(m, grade) {
+    var copy = JSON.parse(JSON.stringify(m));
+    if (grade != null) {
+      (copy.quests || []).forEach(function (q) {
+        if (q.grades) q.active = HQ.gradeFits(q.grades, grade);
+      });
+    }
+    return Object.assign(copy, { installedAt: Date.now(), enabled: true });
+  }
+
   // ═══════════ MODULER ═══════════
   // Tildeling: assignedTo mangler/'all' = alle helte; ellers {heroId: true}
   function isAssignedTo(m, kidId) {
@@ -406,7 +457,8 @@
       var ws = HQ.windowState(m);
       var winTxt = m.window && m.window.from ? ' · 📅 ' + m.window.from + (m.window.to ? ' → ' + m.window.to : '') +
         (ws === 'before' ? ' (kommer)' : ws === 'after' ? ' (udløbet)' : '') : '';
-      var counts = (m.skills || []).length + ' skills · ' + (m.quests || []).length + ' quests · ' +
+      var catTxt = m.category ? (HQ.CATEGORY_NAMES[m.category] || m.category) + (m.grades ? ' ' + gradesText(m.grades) : '') + ' · ' : '';
+      var counts = catTxt + (m.skills || []).length + ' skills · ' + (m.quests || []).length + ' quests · ' +
         (m.badges || []).length + ' badges · ' + (m.streaks || []).length + ' streaks · 👥 ' + esc(assignedNames(m));
       var open = st.openModule === mid;
       return '<div class="card' + (m.enabled === false ? ' inactive' : '') + '">' +
@@ -811,6 +863,7 @@
         '<div style="display:flex;gap:12px;align-items:center">' +
         '<div class="avatar-ring ' + tier.cls + '" style="width:58px;height:58px;font-size:1.8rem">' + esc(k.avatar || '🧒') + '</div>' +
         '<div style="flex:1"><b style="font-size:1.1rem">' + esc(k.name) + '</b>' +
+        (k.grade != null ? ' <span class="chip">🎓 ' + k.grade + '. kl.</span>' : '') +
         '<div style="color:var(--muted);font-size:0.8rem">' + tier.icon + ' Level ' + hero.level + ' · ' + ks.totalXp + ' XP · 🪙 ' + ks.gold +
         (ks.coin ? ' · 💠 ' + ks.coin : '') + ' · 🏅 ' + nBadges + ' · PIN: ' + esc(k.pin) + '</div>' +
         '<div class="q-chips" style="margin-top:6px">' + skillsHtml + '</div></div>' +
@@ -1015,15 +1068,22 @@
       '<label>Navn</label><input id="m-kname" value="' + esc(k.name || '') + '">' +
       '<div class="row2"><div><label>Avatar</label>' + HQ.iconField('m-kavatar', k.avatar || '🦸‍♀️') + '</div>' +
       '<div><label>PIN (4 cifre)</label><input id="m-kpin" type="tel" maxlength="4" value="' + esc(k.pin || '') + '"></div></div>' +
+      '<label>Klassetrin (bruges kun til at anbefale moduler og opgaver)</label>' +
+      '<select id="m-kgrade">' + gradeOptions(k.grade != null ? k.grade : null) + '</select>' +
       moduleBoxes,
       function (bg) {
         var name = $('#m-kname', bg).value.trim();
         var pin = $('#m-kpin', bg).value.trim();
         if (!name) { HQ.toast('Navn mangler'); return false; }
         if (!/^\d{4}$/.test(pin)) { HQ.toast('PIN skal være 4 cifre'); return false; }
-        var data = { name: name, avatar: $('#m-kavatar', bg).value.trim() || '🦸‍♀️', pin: pin };
+        var gv = $('#m-kgrade', bg).value;
+        var grade = gv === '' ? null : parseInt(gv, 10);
+        var oldGrade = k.grade != null ? k.grade : null;
+        var data = { name: name, avatar: $('#m-kavatar', bg).value.trim() || '🦸‍♀️', pin: pin, grade: grade };
         if (id) {
           HQ.ref('kids/' + id).update(data);
+          // Nyt klassetrin → tilbyd de moduler der nu er relevante (aldrig tvang)
+          if (grade !== oldGrade && grade != null) setTimeout(function () { recommendModal(id, grade); }, 300);
           // Modul-tildeling fra heltens vinkel
           HQ.$all('.km-mod', bg).forEach(function (cb) {
             var mid = cb.getAttribute('data-mid');
@@ -1044,10 +1104,84 @@
             HQ.audit('modul-tildeling', mid + (cb.checked ? ' +' : ' −') + name);
           });
         }
-        else HQ.ref('kids').push(Object.assign({ created: Date.now() }, data));
+        else {
+          var kref = HQ.ref('kids').push(Object.assign({ created: Date.now() }, data));
+          HQ.audit('helt-oprettet', name + (grade != null ? ' (' + grade + '. kl.)' : ''));
+          // Ny helt → anbefal moduler til klassetrinnet (st.kids er allerede
+          // opdateret — Firebase affyrer lokale lyttere synkront ved push)
+          setTimeout(function () { recommendModal(kref.key, grade); }, 300);
+        }
       }
     );
   }
+
+  // ═══════════ ANBEFALEDE MODULER (fase C3) ═══════════
+  // Viser bundlede moduler der passer klassetrinnet og endnu ikke er aktive for
+  // helten. Forvalgte checkbokse, forælderen fravælger frit — ALDRIG tvang.
+  function recommendModal(kidId, grade) {
+    var kid = st.kids[kidId];
+    if (!kid) return;
+    var items = [];
+    (window.HQ_BUNDLED || []).forEach(function (m, i) {
+      if (!HQ.gradeFits(m.grades, grade)) return;
+      var inst = st.modules[m.id];
+      if (inst && isAssignedTo(inst, kidId)) return; // allerede aktiv for helten
+      items.push({ m: m, idx: i, action: inst ? 'assign' : 'install' });
+    });
+    if (!items.length) return; // intet nyt at anbefale — vis ingen tom dialog
+    var byCat = {};
+    items.forEach(function (it) {
+      var cat = it.m.category || 'fritid';
+      (byCat[cat] = byCat[cat] || []).push(it);
+    });
+    var listHtml = ['skole', 'hjem', 'fritid'].filter(function (c) { return byCat[c]; }).map(function (cat) {
+      return '<div class="mod-section-label">' + (HQ.CATEGORY_NAMES[cat] || cat) + '</div>' +
+        byCat[cat].map(function (it) {
+          var hint = gradesText(it.m.grades);
+          return '<label style="display:flex;align-items:flex-start;gap:8px;margin:7px 0;font-size:0.9rem">' +
+            '<input type="checkbox" checked class="rec-mod" data-idx="' + it.idx + '" data-action="' + it.action + '" style="width:auto;margin-top:3px">' +
+            '<span>' + esc(it.m.name) + (hint ? ' <span style="color:var(--muted);font-size:0.75rem">(' + hint + ')</span>' : '') +
+            (it.action === 'assign' ? ' <span class="chip">allerede installeret — tildeles</span>' : '') +
+            '<br><span style="color:var(--muted);font-size:0.76rem">' + esc(it.m.description || '') + '</span></span></label>';
+        }).join('');
+    }).join('');
+    var bg = document.createElement('div');
+    bg.className = 'modal-bg';
+    bg.innerHTML = '<div class="modal" style="max-width:520px">' +
+      '<h2>✨ Anbefalet til ' + esc(kid.name) + (grade != null ? ' — ' + HQ.gradeLabel(grade) : '') + '</h2>' +
+      '<p style="color:var(--muted);font-size:0.82rem;margin:4px 0 8px">Fravælg frit — alt kan ændres senere under Moduler. Opgaver udenfor klassetrinnet installeres som inaktive.</p>' +
+      listHtml +
+      '<div class="modal-actions"><button class="btn ghost small" data-close>Spring over</button>' +
+      '<button class="btn small" id="rec-go">Tilføj valgte</button></div></div>';
+    document.body.appendChild(bg);
+    bg.addEventListener('click', function (e) {
+      if (e.target === bg || e.target.closest('[data-close]')) { bg.remove(); return; }
+      if (!e.target.closest('#rec-go')) return;
+      var others = activeKidIds().filter(function (x) { return x !== kidId; });
+      var count = 0;
+      HQ.$all('.rec-mod:checked', bg).forEach(function (cb) {
+        var m = (window.HQ_BUNDLED || [])[parseInt(cb.getAttribute('data-idx'), 10)];
+        if (!m) return;
+        if (cb.getAttribute('data-action') === 'install') {
+          var data = installModuleData(m, grade);
+          // Er der andre helte, tildeles modulet kun denne — ellers alle
+          if (others.length) data.assignedTo = mkAssign(kidId);
+          HQ.ref('modules/' + m.id).set(data);
+          HQ.audit('modul-installeret', m.name + ' → ' + kid.name + (grade != null ? ' (' + grade + '. kl.)' : ''));
+        } else {
+          var inst = st.modules[m.id];
+          if (inst && inst.assignedTo && inst.assignedTo !== 'all') {
+            HQ.ref('modules/' + m.id + '/assignedTo/' + kidId).set(true);
+            HQ.audit('modul-tildeling', m.id + ' +' + kid.name);
+          }
+        }
+        count++;
+      });
+      if (count) HQ.toast('✨ ' + count + ' modul' + (count > 1 ? 'er' : '') + ' tilføjet til ' + kid.name);
+      bg.remove();
+    });
+  }
+  function mkAssign(kidId) { var o = {}; o[kidId] = true; return o; }
   function adjustModal(id) {
     var k = st.kids[id];
     var ks = HQ.computeState(st.ledgers[id] || {});

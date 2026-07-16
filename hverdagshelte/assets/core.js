@@ -187,6 +187,15 @@
   ];
 
   // ---------- Modul-motor ----------
+  // Klassetrin & kategorier (fase C): category = 'skole'/'hjem'/'fritid',
+  // grades = [min, max] klassetrin (0-9). Mangler feltet = passer alle.
+  var CATEGORY_NAMES = { skole: '🎓 Skole', hjem: '🏠 Hjem', fritid: '🎈 Fritid' };
+  function gradeFits(grades, grade) {
+    if (!grades || !grades.length || grade == null) return true;
+    return grade >= grades[0] && grade <= (grades[1] != null ? grades[1] : 9);
+  }
+  function gradeLabel(g) { return g == null ? '' : g + '. klasse'; }
+
   // Samler alle aktiverede moduler til ét indholds-katalog.
   function windowState(mod) {
     if (!mod.window || !mod.window.from) return 'always';
@@ -578,6 +587,7 @@
     COSMETICS: COSMETICS, STICKERS: STICKERS,
     PETS: PETS, PET_STAGES: PET_STAGES, PET_EGG_LEVEL: PET_EGG_LEVEL, PET_HATCH_LEVEL: PET_HATCH_LEVEL,
     petStageFor: petStageFor, petView: petView,
+    CATEGORY_NAMES: CATEGORY_NAMES, gradeFits: gradeFits, gradeLabel: gradeLabel,
     windowState: windowState, assemble: assemble, childrenOf: childrenOf, mainSkills: mainSkills,
     computeState: computeState, skillXpOf: skillXpOf, skillLevelOf: skillLevelOf,
     computeStreak: computeStreak, pendingBadges: pendingBadges,
