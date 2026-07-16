@@ -195,11 +195,14 @@
     if (mod.window.to && today > mod.window.to) return 'after';
     return 'active';
   }
-  function assemble(modulesObj) {
+  // kidId (valgfri): filtrér til de moduler der er tildelt netop dét barn.
+  // assignedTo mangler eller er 'all' = alle helte; ellers {heroId: true, ...}.
+  function assemble(modulesObj, kidId) {
     var c = { skills: {}, skillOrder: [], quests: [], badges: [], streaks: [], modules: {} };
     Object.keys(modulesObj || {}).sort().forEach(function (mid) {
       var mod = modulesObj[mid];
       if (!mod || mod.enabled === false) return;
+      if (kidId && mod.assignedTo && mod.assignedTo !== 'all' && !mod.assignedTo[kidId]) return;
       var ws = windowState(mod);
       c.modules[mid] = { name: mod.name, window: mod.window || null, state: ws };
       (mod.skills || []).forEach(function (s) {

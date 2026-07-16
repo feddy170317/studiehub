@@ -117,7 +117,7 @@
     $('#screen-app').style.display = 'block';
     updateSoundBtn();
 
-    sub('modules', function (v) { st.modules = v || {}; st.content = HQ.assemble(st.modules); recompute(); });
+    sub('modules', function (v) { st.modules = v || {}; st.content = HQ.assemble(st.modules, st.kidId); recompute(); });
     sub('ledger/' + kidId, function (v) { st.ledger = v || {}; recompute(); });
     sub('completions/' + kidId, function (v) { st.completions = v || {}; renderQuests(); renderLog(); });
     sub('shop', function (v) { st.shop = v || {}; renderShop(); });

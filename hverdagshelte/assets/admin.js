@@ -383,6 +383,20 @@
   }
 
   // ═══════════ MODULER ═══════════
+  // Tildeling: assignedTo mangler/'all' = alle helte; ellers {heroId: true}
+  function isAssignedTo(m, kidId) {
+    return !m.assignedTo || m.assignedTo === 'all' || !!m.assignedTo[kidId];
+  }
+  function assignedNames(m) {
+    if (!m.assignedTo || m.assignedTo === 'all') return 'Alle helte';
+    var names = Object.keys(m.assignedTo).filter(function (k) { return m.assignedTo[k] && st.kids[k]; })
+      .map(function (id) { return st.kids[id].name; });
+    return names.length ? names.join(', ') : '⚠️ Ingen (skjult for alle)';
+  }
+  function activeKidIds() {
+    return Object.keys(st.kids).filter(function (id) { return !st.kids[id].archived; });
+  }
+
   function renderModules() {
     var box = $('#module-list');
     var ids = Object.keys(st.modules).sort();
@@ -393,7 +407,7 @@
       var winTxt = m.window && m.window.from ? ' · 📅 ' + m.window.from + (m.window.to ? ' → ' + m.window.to : '') +
         (ws === 'before' ? ' (kommer)' : ws === 'after' ? ' (udløbet)' : '') : '';
       var counts = (m.skills || []).length + ' skills · ' + (m.quests || []).length + ' quests · ' +
-        (m.badges || []).length + ' badges · ' + (m.streaks || []).length + ' streaks';
+        (m.badges || []).length + ' badges · ' + (m.streaks || []).length + ' streaks · 👥 ' + esc(assignedNames(m));
       var open = st.openModule === mid;
       return '<div class="card' + (m.enabled === false ? ' inactive' : '') + '">' +
         '<div class="mod-head" data-toggle-mod="' + mid + '">' +
@@ -442,18 +456,54 @@
       var ruleTxt = r.type === 'counter' ? r.count + ' quests' : r.type === 'milestone' ? skillName(r.skill) + ' level ' + r.level : r.type;
       return '<span class="chip" title="' + esc(ruleTxt) + '">' + esc(b.icon) + ' ' + esc(b.name) + (b.secret ? ' 🤫' : '') + '</span>';
     }).join(' ');
+    var allAssigned = !m.assignedTo || m.assignedTo === 'all';
+    var assignHtml = '<label style="display:flex;align-items:center;gap:8px;margin:4px 0;font-size:0.88rem">' +
+      '<input type="checkbox" class="assign-all" data-mid="' + mid + '" style="width:auto"' + (allAssigned ? ' checked' : '') + '> <b>Alle helte</b></label>' +
+      activeKidIds().map(function (kidId) {
+        var checked = isAssignedTo(m, kidId);
+        return '<label style="display:flex;align-items:center;gap:8px;margin:4px 0 4px 22px;font-size:0.88rem;opacity:' + (allAssigned ? '0.5' : '1') + '">' +
+          '<input type="checkbox" class="assign-kid" data-mid="' + mid + '" data-kid="' + kidId + '" style="width:auto"' +
+          (checked ? ' checked' : '') + (allAssigned ? ' disabled' : '') + '> ' +
+          esc(st.kids[kidId].avatar || '🧒') + ' ' + esc(st.kids[kidId].name) + '</label>';
+      }).join('');
     return '<div class="mod-body">' +
+      '<div class="mod-section-label">Tildelt til</div>' + assignHtml +
       '<div class="mod-section-label">Quests</div>' + (quests || '<div class="empty">Ingen quests</div>') +
       '<button class="btn small ghost" data-add-quest="' + mid + '" style="margin-top:8px">＋ Ny quest</button>' +
       '<div class="mod-section-label">Færdigheder</div>' + (skills || '<div class="empty">Ingen</div>') +
+      '<button class="btn small ghost" data-add-skill="' + mid + '" style="margin-top:8px">＋ Ny færdighed</button>' +
       '<div class="mod-section-label">Streaks</div>' + (streaks || '<div class="empty">Ingen</div>') +
       '<div class="mod-section-label">Badges</div><div class="q-chips">' + (badges || '<span class="empty">Ingen</span>') + '</div>' +
     '</div>';
   }
 
+  // Tildelings-checkbokse (delegeret change-handler)
+  document.addEventListener('change', function (e) {
+    var all = e.target.closest('.assign-all');
+    if (all) {
+      var mid = all.getAttribute('data-mid');
+      if (all.checked) {
+        HQ.ref('modules/' + mid + '/assignedTo').set('all');
+      } else {
+        // Konvertér til eksplicit liste med alle aktive helte (så kan der fravælges)
+        var obj = {};
+        activeKidIds().forEach(function (id) { obj[id] = true; });
+        HQ.ref('modules/' + mid + '/assignedTo').set(obj);
+      }
+      HQ.audit('modul-tildeling', mid + ' → ' + (all.checked ? 'alle' : 'pr. helt'));
+      return;
+    }
+    var ak = e.target.closest('.assign-kid');
+    if (ak && !ak.disabled) {
+      var mid2 = ak.getAttribute('data-mid'), kidId = ak.getAttribute('data-kid');
+      HQ.ref('modules/' + mid2 + '/assignedTo/' + kidId).set(ak.checked ? true : null);
+      HQ.audit('modul-tildeling', mid2 + (ak.checked ? ' +' : ' −') + (st.kids[kidId] || {}).name);
+    }
+  });
+
   document.addEventListener('click', function (e) {
     var tg = e.target.closest('[data-toggle-mod]');
-    if (tg && !e.target.closest('.icon-btn')) {
+    if (tg && !e.target.closest('.icon-btn') && !e.target.closest('label') && !e.target.closest('input')) {
       var mid = tg.getAttribute('data-toggle-mod');
       st.openModule = st.openModule === mid ? null : mid;
       renderModules();
@@ -489,6 +539,43 @@
     HQ.toast('📤 ' + (m.name || mid) + ' eksporteret');
   }
 
+  // ---- Nyt modul fra bunden (fx "Almas eget modul") ----
+  function slugify(s) {
+    return String(s).toLowerCase()
+      .replace(/æ/g, 'ae').replace(/ø/g, 'oe').replace(/å/g, 'aa')
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'modul';
+  }
+  $('#new-module').addEventListener('click', function () {
+    openModal(
+      '<h2>＋ Nyt modul</h2>' +
+      '<p style="color:var(--muted);font-size:0.82rem">Et tomt modul du selv fylder med færdigheder og quests — fx et personligt modul til ét barn (tildel det bagefter under "Tildelt til").</p>' +
+      '<label>Navn</label><input id="m-nname" placeholder="F.eks. Almas eventyr">' +
+      '<div class="row2"><div><label>Ikon</label>' + HQ.iconField('m-nicon', '✨') + '</div><div></div></div>' +
+      '<label>Beskrivelse (valgfri)</label><input id="m-ndesc">',
+      function (bg) {
+        var name = $('#m-nname', bg).value.trim();
+        if (!name) { HQ.toast('Navn mangler'); return false; }
+        var icon = $('#m-nicon', bg).value.trim();
+        var id = slugify(name);
+        while (st.modules[id]) id += '2';
+        var meta = (HQ.getOrg() && $('#org-title').textContent) || '';
+        st.openModule = id;   // FØR set(): Firebase affyrer lyttere synkront ved lokal skrivning
+        HQ.ref('modules/' + id).set({
+          format: 'hverdagshelte-module@1',
+          id: id,
+          name: name + (icon ? ' ' + icon : ''),
+          version: 1,
+          author: meta,
+          description: $('#m-ndesc', bg).value.trim(),
+          skills: [], quests: [], badges: [], streaks: [],
+          installedAt: Date.now(), enabled: true
+        });
+        HQ.audit('modul-oprettet', name);
+        HQ.toast('📦 ' + name + ' oprettet — tilføj færdigheder og quests');
+      }
+    );
+  });
+
   $('#import-module').addEventListener('click', function () { $('#import-file').click(); });
   $('#import-file').addEventListener('change', function () {
     var f = this.files[0];
@@ -515,7 +602,9 @@
     var m = st.modules[mid];
     var isNew = idx == null;
     var q = isNew ? { type: 'daily', active: true, days: [1, 2, 3, 4, 5, 6, 0], rewards: [] } : (m.quests || [])[idx];
-    var r0 = (q.rewards || []).filter(function (r) { return r.skill; })[0] || {};
+    var skillRewards = (q.rewards || []).filter(function (r) { return r.skill; });
+    var r0 = skillRewards[0] || {};
+    var r1 = skillRewards[1] || {};
     var rGold = ((q.rewards || []).filter(function (r) { return r.gold; })[0] || {}).gold || 0;
     var rCoin = ((q.rewards || []).filter(function (r) { return r.eventCoin || r.coin; })[0] || {});
     rCoin = rCoin.eventCoin || rCoin.coin || 0;
@@ -532,6 +621,9 @@
       '<label>Færdighed (XP gives her)</label><select id="m-skill">' + skillOptions(r0.skill) + '</select>' +
       '<div class="row2"><div><label>XP</label><input id="m-xp" type="number" value="' + (r0.xp || 20) + '"></div>' +
       '<div><label>Guld 🪙</label><input id="m-gold" type="number" value="' + rGold + '"></div></div>' +
+      '<label>Færdighed 2 (valgfri — fx løb der giver både udholdenhed og viljestyrke)</label>' +
+      '<select id="m-skill2"><option value="">— ingen —</option>' + skillOptions(r1.skill) + '</select>' +
+      '<div class="row2"><div><label>XP til færdighed 2</label><input id="m-xp2" type="number" value="' + (r1.xp || 0) + '"></div><div></div></div>' +
       '<div class="row2"><div><label>Event-mønter 💠</label><input id="m-coin" type="number" value="' + rCoin + '"></div>' +
       '<div><label>&nbsp;</label><label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="m-active" style="width:auto"' + (q.active !== false ? ' checked' : '') + '> Aktiv</label></div></div>' +
       '<label>Dage (kun daglige quests)</label>' +
@@ -544,6 +636,9 @@
         var rewards = [];
         var xp = parseInt($('#m-xp', bg).value, 10) || 0;
         if (xp) rewards.push({ skill: $('#m-skill', bg).value, xp: xp });
+        var skill2 = $('#m-skill2', bg).value;
+        var xp2 = parseInt($('#m-xp2', bg).value, 10) || 0;
+        if (skill2 && xp2) rewards.push({ skill: skill2, xp: xp2 });
         var gold = parseInt($('#m-gold', bg).value, 10) || 0;
         if (gold) rewards.push({ gold: gold });
         var coin = parseInt($('#m-coin', bg).value, 10) || 0;
@@ -565,18 +660,36 @@
 
   function skillModal(mid, idx) {
     var m = st.modules[mid];
-    var s = (m.skills || [])[idx];
+    var isNew = idx == null;
+    var s = isNew ? { icon: '⭐', color: '#9c6bff' } : (m.skills || [])[idx];
+    var parentOpts = '<option value="">— Ny hovedskill —</option>' +
+      HQ.mainSkills(st.content).map(function (id) {
+        var sk = st.content.skills[id];
+        return '<option value="' + esc(id) + '">Under: ' + esc(sk.icon + ' ' + sk.name) + '</option>';
+      }).join('');
     openModal(
-      '<h2>Redigér færdighed</h2>' +
-      '<p style="color:var(--muted);font-size:0.8rem">Id\'et (' + esc(s.id) + ') kan ikke ændres — XP er bogført på det.</p>' +
-      '<label>Navn</label><input id="m-sname" value="' + esc(s.name || '') + '">' +
+      '<h2>' + (isNew ? '＋ Ny færdighed' : 'Redigér færdighed') + '</h2>' +
+      (isNew ? '' : '<p style="color:var(--muted);font-size:0.8rem">Id\'et (' + esc(s.id) + ') kan ikke ændres — XP er bogført på det.</p>') +
+      '<label>Navn</label><input id="m-sname" value="' + esc(s.name || '') + '" placeholder="F.eks. Fodbold">' +
+      (isNew ? '<label>Placering</label><select id="m-sparent">' + parentOpts + '</select>' : '') +
       '<div class="row2"><div><label>Ikon</label>' + HQ.iconField('m-sicon', s.icon) + '</div>' +
       '<div><label>Farve</label><input id="m-scolor" type="color" value="' + esc(s.color || '#9c6bff') + '" style="height:44px;padding:4px"></div></div>',
       function (bg) {
         var name = $('#m-sname', bg).value.trim();
         if (!name) { HQ.toast('Navn mangler'); return false; }
         var arr = (m.skills || []).slice();
-        arr[idx] = Object.assign({}, s, { name: name, icon: $('#m-sicon', bg).value.trim() || '⭐', color: $('#m-scolor', bg).value });
+        if (isNew) {
+          var parent = $('#m-sparent', bg).value;
+          var slug = slugify(name).replace(/-/g, '');
+          var id = parent ? parent + '.' + slug : slug;
+          while (st.content.skills[id]) id += '2';
+          var data = { id: id, name: name, icon: $('#m-sicon', bg).value.trim() || '⭐', color: $('#m-scolor', bg).value };
+          if (parent) data.parent = parent;
+          arr.push(data);
+          HQ.audit('skill-oprettet', name + ' (' + id + ')');
+        } else {
+          arr[idx] = Object.assign({}, s, { name: name, icon: $('#m-sicon', bg).value.trim() || '⭐', color: $('#m-scolor', bg).value });
+        }
         HQ.ref('modules/' + mid + '/skills').set(arr);
       }
     );
@@ -618,6 +731,8 @@
       }
       return;
     }
+    var as2 = e.target.closest('[data-add-skill]');
+    if (as2) return skillModal(as2.getAttribute('data-add-skill'), null);
     var es = e.target.closest('[data-edit-skill]');
     if (es) { var p3 = es.getAttribute('data-edit-skill').split('|'); return skillModal(p3[0], parseInt(p3[1], 10)); }
     var est = e.target.closest('[data-edit-streak]');
@@ -885,18 +1000,50 @@
 
   function kidModal(id) {
     var k = id ? st.kids[id] : { avatar: '🦸‍♀️' };
+    var moduleBoxes = '';
+    if (id) {
+      moduleBoxes = '<label style="margin-top:14px">Moduler til denne helt</label>' +
+        Object.keys(st.modules).sort().map(function (mid) {
+          var m = st.modules[mid];
+          return '<label style="display:flex;align-items:center;gap:8px;margin:4px 0;font-size:0.88rem">' +
+            '<input type="checkbox" class="km-mod" data-mid="' + mid + '" style="width:auto"' +
+            (isAssignedTo(m, id) ? ' checked' : '') + '> ' + esc(m.name || mid) + '</label>';
+        }).join('');
+    }
     openModal(
       '<h2>' + (id ? 'Redigér helt' : 'Ny helt') + '</h2>' +
       '<label>Navn</label><input id="m-kname" value="' + esc(k.name || '') + '">' +
       '<div class="row2"><div><label>Avatar</label>' + HQ.iconField('m-kavatar', k.avatar || '🦸‍♀️') + '</div>' +
-      '<div><label>PIN (4 cifre)</label><input id="m-kpin" type="tel" maxlength="4" value="' + esc(k.pin || '') + '"></div></div>',
+      '<div><label>PIN (4 cifre)</label><input id="m-kpin" type="tel" maxlength="4" value="' + esc(k.pin || '') + '"></div></div>' +
+      moduleBoxes,
       function (bg) {
         var name = $('#m-kname', bg).value.trim();
         var pin = $('#m-kpin', bg).value.trim();
         if (!name) { HQ.toast('Navn mangler'); return false; }
         if (!/^\d{4}$/.test(pin)) { HQ.toast('PIN skal være 4 cifre'); return false; }
         var data = { name: name, avatar: $('#m-kavatar', bg).value.trim() || '🦸‍♀️', pin: pin };
-        if (id) HQ.ref('kids/' + id).update(data);
+        if (id) {
+          HQ.ref('kids/' + id).update(data);
+          // Modul-tildeling fra heltens vinkel
+          HQ.$all('.km-mod', bg).forEach(function (cb) {
+            var mid = cb.getAttribute('data-mid');
+            var m = st.modules[mid];
+            if (!m) return;
+            var was = isAssignedTo(m, id);
+            if (cb.checked === was) return;
+            if (cb.checked) {
+              if (m.assignedTo && m.assignedTo !== 'all') HQ.ref('modules/' + mid + '/assignedTo/' + id).set(true);
+            } else if (!m.assignedTo || m.assignedTo === 'all') {
+              // Konvertér 'alle' til eksplicit liste uden denne helt
+              var obj = {};
+              activeKidIds().forEach(function (kid2) { if (kid2 !== id) obj[kid2] = true; });
+              HQ.ref('modules/' + mid + '/assignedTo').set(obj);
+            } else {
+              HQ.ref('modules/' + mid + '/assignedTo/' + id).set(null);
+            }
+            HQ.audit('modul-tildeling', mid + (cb.checked ? ' +' : ' −') + name);
+          });
+        }
         else HQ.ref('kids').push(Object.assign({ created: Date.now() }, data));
       }
     );
