@@ -29,13 +29,13 @@
 
 ## Udestående
 
-- **FASE F AKTIVERING (Frederiks 3 konsol-trin):** (1) Opret master-konto i admin.html
-  (Opret konto, fx frederikr93+master@gmail.com — stop ved onboarding, opret INGEN familie);
-  (2) Firebase Console → Authentication → Users → kopiér kontoens UID → Realtime Database →
-  data-fanen → hq → tilføj barn `superadmins` → barn `<UID>` = `true` (boolean);
-  (3) Realtime Database → Rules → indsæt hele firebase-rules.json → Publish.
-  Derefter: åbn superadmin.html og log ind med master-kontoen. VIGTIGT: master-kontoen må
-  ALDRIG logges ind på børnenes enheder — brug den almindelige forældre-konto til familien.
+- **FASE F AKTIVERING (Frederiks konsol-trin — master-mail: hverdagsheltemaster@gmail.com):**
+  (1) admin.html → Opret konto med hverdagsheltemaster@gmail.com — stop ved onboarding,
+  opret INGEN familie; (2) åbn superadmin.html → log ind → "Ingen adgang"-skærmen VISER
+  kontoens UID → kopiér; (3) Firebase Console → Realtime Database → Data → hq → tilføj barn
+  `superadmins` → barn `<UID>` = `true` (boolean); (4) Realtime Database → Rules → indsæt
+  hele firebase-rules.json → Publish; (5) genindlæs superadmin.html → panelet åbner.
+  VIGTIGT: master-kontoen må ALDRIG logges ind på børnenes enheder.
 - Frederiks 3. emne fra 16/7-beskeden blev KLIPPET AF ("the next thing we need to do is…")
   — spørg ham hvad det var.
 - Fransk-modul (klon af tysk.js-skabelonen) hvis skolen har fransk som 2. fremmedsprog.
