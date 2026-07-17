@@ -21,14 +21,19 @@
       $('#' + s).style.display = s === id ? (s === 'sa-panel' ? 'block' : 'flex') : 'none';
     });
   }
+  // Viser UID'et så Frederik kan kopiere det direkte til Firebase-konsollen
+  function showDenied(user) {
+    $('#sa-uid').value = user.uid;
+    show('sa-denied');
+  }
 
   HQ.auth().onAuthStateChanged(function (user) {
     if (!user) { show('sa-auth'); return; }
     st.user = user;
     HQ.raw('hq/superadmins/' + user.uid).once('value').then(function (s) {
-      if (s.val() !== true) { show('sa-denied'); return; }
+      if (s.val() !== true) { showDenied(user); return; }
       enterPanel();
-    }).catch(function () { show('sa-denied'); });
+    }).catch(function () { showDenied(user); });
   });
 
   $('#sa-go').addEventListener('click', function () {
