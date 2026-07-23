@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sti — Maskinelementer</title>
+<link rel="stylesheet" href="../assets/path.css">
+</head>
+<body>
+<div class="path-wrap" id="pathRoot">
+  <div class="loading" style="padding:3rem;text-align:center;color:#94a3b8">Indlæser sti…</div>
+</div>
+<script>
+fetch('../content.json')
+  .then(function (r) { return r.json(); })
+  .then(function (data) {
+    window.__SH_CONTENT = data;
+    var s = document.createElement('script');
+    s.src = '../assets/path.js';
+    s.onload = function () { StudiehubPath.init('mem1', 'pathRoot'); };
+    document.body.appendChild(s);
+  })
+  .catch(function (err) {
+    document.getElementById('pathRoot').innerHTML = '<p style="padding:2rem;text-align:center">Kunne ikke indlæse content.json: ' + err.message + '</p>';
+  });
+</script>
+</body>
+</html>

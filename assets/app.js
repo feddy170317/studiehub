@@ -117,6 +117,9 @@ function renderHome() {
       </nav>
       <h2 style="margin-top:2rem">Andre værktøjer</h2>
       <nav class="courses">
+        <a class="btn-course" style="display:block;text-decoration:none" href="path/index.html">
+          🎮 Læringsstier — DYN2 / ELE1 / MEM1
+        </a>
         <a class="btn-course" style="display:block;text-decoration:none" href="klinisk-dansk/index.html">
           🫀 Klinisk Dansk — Sygeplejesprog (DA/EN)
         </a>
@@ -165,11 +168,17 @@ function renderCourse(eduId, semNum, courseId) {
     return;
   }
 
+  const pathCourses = ['dyn2', 'ele1', 'mem1'];
+  const pathButton = pathCourses.includes(courseId)
+    ? `<a class="btn-course" style="display:block;text-decoration:none;margin-bottom:1rem" href="path/${courseId}.html">🎮 Spil stien</a>`
+    : '';
+
   app.innerHTML = `
     <div class="view">
       <button class="btn-back" onclick="navigate('edu/${eduId}/sem${semNum}')">← Tilbage</button>
       <h1>${course.code}: ${course.name}</h1>
       <p class="meta">${course.description || 'Intet beskrivelse'}</p>
+      ${pathButton}
       <nav class="lessons">
         ${course.lessons && course.lessons.length > 0 ? course.lessons.map(l => `
           <button class="btn-lesson" onclick="navigate('edu/${eduId}/sem${semNum}/${courseId}/${l.id}')">

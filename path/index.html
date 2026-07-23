@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Læringsstier — Studiehub</title>
+<link rel="stylesheet" href="../assets/path.css">
+<style>
+  .hub-wrap { max-width: 560px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+  .hub-back { color: var(--path-text-muted); text-decoration: none; font-size: .85rem; }
+  .hub-title { font-size: 1.6rem; margin: .6rem 0 .3rem; }
+  .hub-sub { color: var(--path-text-muted); font-size: .9rem; margin-bottom: 1.5rem; }
+  .hub-card {
+    display: flex; align-items: center; gap: 1rem;
+    background: var(--path-surface); border: 1px solid var(--path-border);
+    border-radius: 1rem; padding: 1.1rem; margin-bottom: .9rem;
+    text-decoration: none; color: var(--path-text);
+  }
+  .hub-card .icon { font-size: 2rem; }
+  .hub-card .info { flex: 1; }
+  .hub-card .info h2 { font-size: 1.05rem; margin: 0 0 .3rem; }
+  .hub-card .info .bar { height: 6px; background: var(--path-bg); border-radius: 999px; overflow: hidden; margin-bottom: .3rem; }
+  .hub-card .info .bar > div { height: 100%; background: linear-gradient(90deg, #6366f1, #22c55e); }
+  .hub-card .info .meta { font-size: .78rem; color: var(--path-text-muted); }
+  .hub-card .xp { color: var(--path-gold); font-weight: 700; font-size: .85rem; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="hub-wrap">
+  <a class="hub-back" href="../index.html">← Studiehub</a>
+  <h1 class="hub-title">🎮 Læringsstier</h1>
+  <p class="hub-sub">Gennemfør emnerne i et kapitel, bestå prøven, og lås det næste op — Duolingo-stil.</p>
+  <div id="cards"></div>
+</div>
+<script>
+fetch('../content.json')
+  .then(function (r) { return r.json(); })
+  .then(function (data) {
+    window.__SH_CONTENT = data;
+    var s = document.createElement('script');
+    s.src = '../assets/path.js';
+    s.onload = renderCards;
+    document.body.appendChild(s);
+  });
+
+function renderCards() {
+  var courses = [
+    { id: 'dyn2', href: 'dyn2.html' },
+    { id: 'ele1', href: 'ele1.html' },
+    { id: 'mem1', href: 'mem1.html' }
+  ];
+  var html = '';
+  courses.forEach(function (c) {
+    var sum = StudiehubPath.summary(c.id);
+    var ratio = sum.total ? (sum.passed / sum.total * 100) : 0;
+    html += '<a class="hub-card" href="' + c.href + '">';
+    html += '  <span class="icon">' + sum.icon + '</span>';
+    html += '  <div class="info">';
+    html += '    <h2>' + sum.title + '</h2>';
+    html += '    <div class="bar"><div style="width:' + ratio + '%"></div></div>';
+    html += '    <div class="meta">' + sum.passed + '/' + sum.total + ' kapitler bestået</div>';
+    html += '  </div>';
+    html += '  <span class="xp">✨ ' + sum.xp + '</span>';
+    html += '</a>';
+  });
+  document.getElementById('cards').innerHTML = html;
+}
+</script>
+</body>
+</html>

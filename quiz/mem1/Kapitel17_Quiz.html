@@ -28,7 +28,7 @@
   .end{text-align:center}.end .score{font-size:2.6rem;color:var(--gold);font-weight:700}
   .grade{font-size:1.3rem;margin:8px 0}
   .retry{margin-top:18px;padding:12px 26px;border:0;border-radius:10px;background:var(--acc);color:#fff;font-weight:600;cursor:pointer;font-size:1rem}
-</style></head><body><div class="wrap">
+</style></head><body><script src="../../assets/path-report.js"></script><div class="wrap">
   <header><h1>Kapitel 17 --- Fjedre</h1><div class="sub">Fundamentals of Machine Elements (Hamrock) · Test dig selv</div></header>
   <div class="hud"><span>Spg. <b id="qnum">1</b>/<span id="qtot">10</span></span>
     <span class="combo">Combo ×<span id="combo">1</span></span>
@@ -63,7 +63,7 @@ function next(){i++;if(i<QUIZ.length)render();else end();}
 function end(){
   $('prog').style.width='100%';
   const maxS=(function(){let s=0,c=1;for(const q of QUIZ){s+=PTS[q.d]*c;c++;}return s;})();
-  const ratio=score/maxS;let gr;
+  const ratio=score/maxS;if(window.reportPathQuiz)reportPathQuiz(ratio,score);let gr;
   if(ratio>=.85)gr='🏆 Fremragende!';else if(ratio>=.6)gr='👍 Godt gået';else if(ratio>=.35)gr='📚 Ikke dårligt';else gr='🔁 Læs kapitlet igen';
   $('stage').innerHTML=`<div class="card end"><div class="grade">${gr}</div><div class="score">${score}</div><div class="sub">point · længste combo ×${best}</div><button class="retry" onclick="location.reload()">Prøv igen</button></div>`;
 }
