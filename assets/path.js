@@ -116,6 +116,14 @@
 
   function pct(r) { return Math.round((r || 0) * 100); }
 
+  // content.json-URL'er er relative til Studiehub-roden, men path/-siderne ligger
+  // ét niveau nede, så de skal have '../' foran for rent faktisk at pege rigtigt.
+  function resolveUrl(url) {
+    if (!url) return '#';
+    if (/^([a-z]+:)?\/\//i.test(url) || url.charAt(0) === '/') return url;
+    return '../' + url;
+  }
+
   function zigzag(i) {
     return Math.round(Math.sin(i * 0.85) * 72);
   }
@@ -216,7 +224,7 @@
     }
     topics.forEach(function (t) {
       var visited = t.url && isTopicVisited(course, ch.id, t.url);
-      html += '<a class="path-topic ' + (visited ? 'visited' : '') + '" href="' + (t.url || '#') + '" target="_blank" rel="noopener" data-url="' + (t.url || '') + '">';
+      html += '<a class="path-topic ' + (visited ? 'visited' : '') + '" href="' + resolveUrl(t.url) + '" target="_blank" rel="noopener" data-url="' + (t.url || '') + '">';
       html += '<span class="path-topic-icon">' + (visited ? '✅' : (MATERIAL_ICON[t.type] || '📌')) + '</span>';
       html += '<span class="path-topic-title">' + t.title + '</span>';
       html += '</a>';
@@ -231,7 +239,7 @@
       html += '<p class="path-quiz-hint">🔓 Åbn alle emner ovenfor for at låse prøven op.</p>';
       html += '<button class="path-quiz-btn" disabled>Start prøve</button>';
     } else {
-      html += '<a class="path-quiz-btn" href="' + (quizMat ? quizMat.url : '#') + '" target="_blank" rel="noopener">' + (quizResult ? '🔁 Prøv igen' : '▶ Start prøve') + '</a>';
+      html += '<a class="path-quiz-btn" href="' + resolveUrl(quizMat && quizMat.url) + '" target="_blank" rel="noopener">' + (quizResult ? '🔁 Prøv igen' : '▶ Start prøve') + '</a>';
       html += '<p class="path-quiz-hint">Kræver ' + pct(settings.threshold) + '% for at låse næste kapitel op.</p>';
     }
     if (st.passed) html += '<p class="path-quiz-passed">✓ Bestået — næste kapitel er låst op!</p>';
