@@ -117,6 +117,9 @@ function renderHome() {
       </nav>
       <h2 style="margin-top:2rem">Andre værktøjer</h2>
       <nav class="courses">
+        <a class="btn-course" style="display:block;text-decoration:none" href="html/videnskort/index.html">
+          🧠 Videnskort — Begrebsgraf på tværs af fag
+        </a>
         <a class="btn-course" style="display:block;text-decoration:none" href="path/index.html">
           🎮 Læringsstier — DYN2 / ELE1 / MEM1
         </a>
