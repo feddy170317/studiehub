@@ -21,10 +21,29 @@ STUDIEHUB = HER.parent                          # Studiehub/
 AI_ROD = STUDIEHUB.parent                       # Desktop/AI
 KURSER = AI_ROD / "Kurser"
 UD_DIR = STUDIEHUB / "html" / "videnskort"
+STANDARDBOG_INDEX = AI_ROD / "referencer" / "standardbog_index.json"
+
+
+def indlaes_standarder():
+    if not STANDARDBOG_INDEX.exists():
+        return {}
+    d = json.loads(STANDARDBOG_INDEX.read_text(encoding="utf-8"))
+    return {s["id"]: s for s in d.get("standarder", [])}
+
+
+def indlaes_figurer():
+    figurer = {}
+    for f in sorted(KURSER.glob("**/Figurkatalog/catalog.json")):
+        d = json.loads(f.read_text(encoding="utf-8"))
+        fag_navn = d.get("fag", "")
+        for fig in d.get("figurer", []):
+            fig = dict(fig, fag=fag_navn)
+            figurer[fig["id"]] = fig
+    return figurer
 
 
 def indlaes_fagfiler():
-    filer = sorted(KURSER.glob("*/videnskort.json"))
+    filer = sorted(KURSER.glob("**/videnskort.json"))
     if not filer:
         sys.exit(f"FEJL: ingen videnskort.json fundet under {KURSER}")
     fagdata = []
@@ -40,7 +59,11 @@ def indlaes_fagfiler():
     return fagdata
 
 
-def byg_graf(fagdata):
+def byg_graf(fagdata, standarder=None, figurer=None):
+    standarder = standarder or {}
+    figurer = figurer or {}
+    ukendte_standarder = []
+    ukendte_figurer = []
     noder = {}   # id -> node
     kanter = []  # {source, target, type}
     rigtige_fag = {d["fag"]["id"] for _, d in fagdata}
@@ -76,10 +99,29 @@ def byg_graf(fagdata):
             kanter.append({"source": lek["id"], "target": fid, "type": "del_af"})
 
         for b in d.get("begreber", []):
-            tilfoej_node(b["id"], {
+            node = {
                 "id": b["id"], "type": "begreb", "navn": b["navn"],
                 "resume": b.get("resume", ""), "fag": fid,
-            })
+            }
+            fig_stubs = []
+            for fig_id in b.get("figurer", []):
+                fig = figurer.get(fig_id)
+                if fig is None:
+                    ukendte_figurer.append((b["id"], fig_id))
+                    continue
+                fig_stubs.append({"id": fig["id"], "titel": fig.get("titel", ""), "fag": fig.get("fag", "")})
+            if fig_stubs:
+                node["figurer"] = fig_stubs
+            std_stubs = []
+            for std_id in b.get("standarder", []):
+                std = standarder.get(std_id)
+                if std is None:
+                    ukendte_standarder.append((b["id"], std_id))
+                    continue
+                std_stubs.append({"id": std["id"], "titel": std.get("titel", ""), "side": std.get("side")})
+            if std_stubs:
+                node["standarder"] = std_stubs
+            tilfoej_node(b["id"], node)
             for lid in b.get("lektioner", []):
                 kanter.append({"source": b["id"], "target": lid, "type": "daekkes_i"})
             for forud in b.get("bygger_paa", []):
@@ -95,17 +137,26 @@ def byg_graf(fagdata):
     for k in droppede:
         print(f"ADVARSEL: kant droppet ({k['source']} -> {k['target']}, ukendt node)")
 
+    for bid, fig_id in ukendte_figurer:
+        print(f"ADVARSEL: begreb '{bid}' refererer ukendt figur '{fig_id}'")
+    for bid, std_id in ukendte_standarder:
+        print(f"ADVARSEL: begreb '{bid}' refererer ukendt standard '{std_id}'")
+
     return {
         "version": 1,
         "_genereret": date.today().isoformat(),
         "noder": list(noder.values()),
         "kanter": gyldige,
+        "_ukendte_figur_referencer": len(ukendte_figurer),
+        "_ukendte_standard_referencer": len(ukendte_standarder),
     }
 
 
 def main():
     fagdata = indlaes_fagfiler()
-    graf = byg_graf(fagdata)
+    standarder = indlaes_standarder()
+    figurer = indlaes_figurer()
+    graf = byg_graf(fagdata, standarder=standarder, figurer=figurer)
     UD_DIR.mkdir(parents=True, exist_ok=True)
 
     (UD_DIR / "graph.json").write_text(
@@ -123,6 +174,8 @@ def main():
     print(f"OK: {len(fagdata)} fag-fil(er) -> {len(graf['noder'])} noder, {len(graf['kanter'])} kanter")
     print("  noder:", n_typer)
     print("  kanter:", k_typer)
+    print(f"  figur-referencer: {graf['_ukendte_figur_referencer']} ukendte, "
+          f"standard-referencer: {graf['_ukendte_standard_referencer']} ukendte")
 
 
 if __name__ == "__main__":

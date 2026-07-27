@@ -23,8 +23,8 @@ For hver lektion i output-JSON:
 ### Phase 3: Link eksisterende quizzer
 **Find quiz-mapper:**
 - `Kurser/MMT_Eksamen_Svar/Laering_MMT_Quiz/` → link til `quiz/mmt2/index.html`
-- `Kurser/Mek/MEK 2 opagver/Eksamens sæt/Laering_MEK2_Quiz/` → `quiz/mek2/index.html`
-- `Kurser/Mek/MEK 2 opagver/Eksamens sæt/Laering_MEK2_Opg7/` → `quiz/mek2/opg7.html`
+- `Kurser/Mek/MEK 2 Opgaver/Eksamens sæt/Laering_MEK2_Quiz/` → `quiz/mek2/index.html`
+- `Kurser/Mek/MEK 2 Opgaver/Eksamens sæt/Laering_MEK2_Opg7/` → `quiz/mek2/opg7.html`
 
 **Kopier quiz-struktur til Studiehub:**
 ```

@@ -62,7 +62,7 @@ Rekognitions-kort til gentagelse:
 
 ```powershell
 # Windows (PowerShell som Admin)
-cd "C:\Users\pif-m\OneDrive\Desktop\AI\Kurser\Mek\MEK 2 opagver\Lektion 1\2_Quiz"
+cd "C:\Users\pif-m\OneDrive\Desktop\AI\Kurser\Mek\MEK 2 Opgaver\Lektion 1\2_Quiz"
 .\copy_vendor.ps1
 ```
 

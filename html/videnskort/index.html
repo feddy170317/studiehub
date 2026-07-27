@@ -111,6 +111,14 @@
     cursor: pointer; border-radius: 6px;
   }
   #panel .relnode:hover { background: rgba(99, 102, 241, .12); }
+  #panel .refliste {
+    list-style: none; margin: 0; padding: 0;
+    font-size: .84rem; color: var(--text);
+  }
+  #panel .refliste li {
+    padding: .3rem .2rem; border-bottom: 1px solid var(--border);
+  }
+  #panel .refliste li:last-child { border-bottom: none; }
   #panel .relnode .prik {
     width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
   }
@@ -408,10 +416,22 @@
       });
       return h;
     }
+    function refListe(titel, liste, linjeFn) {
+      if (!liste || !liste.length) return '';
+      var h = '<h3>' + titel + ' (' + liste.length + ')</h3><ul class="refliste">';
+      liste.forEach(function (r) { h += '<li>' + esc(linjeFn(r)) + '</li>'; });
+      return h + '</ul>';
+    }
     if (n.type === 'begreb') {
       html += relListe('Dækkes i', grupper.daekkes_i.filter(function (m) { return m.type === 'lektion'; }));
       html += relListe('Bygger på', grupper.bygger_paa_ud);
       html += relListe('Bruges videre af', grupper.bygger_paa_ind);
+      html += refListe('Figurer', n.figurer, function (f) {
+        return f.titel + (f.fag ? ' (' + f.fag + ')' : '');
+      });
+      html += refListe('Standardreferencer', n.standarder, function (s) {
+        return s.titel + (s.side ? ' (s. ' + s.side + ')' : '');
+      });
     } else if (n.type === 'lektion') {
       html += relListe('Begreber i lektionen', grupper.daekkes_i);
     } else {
@@ -571,6 +591,16 @@
     lukPanel(); soegRamt = null; soeg.value = '';
     alpha = Math.max(alpha, 0.3);
   });
+
+  // --- #node=<id> deep-link (fx fra content.json's concept-map-materialer) ---
+  function aabenFraHash() {
+    var m = /#node=([^&]+)/.exec(location.hash);
+    if (!m) return;
+    var n = nodeAf[decodeURIComponent(m[1])];
+    if (n) { centrerPaa(n); visPanel(n); }
+  }
+  window.addEventListener('hashchange', aabenFraHash);
+  aabenFraHash();
 })();
 </script>
 </body>
