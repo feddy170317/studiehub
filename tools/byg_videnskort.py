@@ -22,6 +22,7 @@ AI_ROD = STUDIEHUB.parent                       # Desktop/AI
 KURSER = AI_ROD / "Kurser"
 UD_DIR = STUDIEHUB / "html" / "videnskort"
 STANDARDBOG_INDEX = AI_ROD / "referencer" / "standardbog_index.json"
+HAANDBOG_INDEX = AI_ROD / "referencer" / "haandbog_index.json"
 
 
 def indlaes_standarder():
@@ -29,6 +30,13 @@ def indlaes_standarder():
         return {}
     d = json.loads(STANDARDBOG_INDEX.read_text(encoding="utf-8"))
     return {s["id"]: s for s in d.get("standarder", [])}
+
+
+def indlaes_haandbog():
+    if not HAANDBOG_INDEX.exists():
+        return {}
+    d = json.loads(HAANDBOG_INDEX.read_text(encoding="utf-8"))
+    return {s["id"]: s for s in d.get("sektioner", [])}
 
 
 def indlaes_figurer():
@@ -59,11 +67,13 @@ def indlaes_fagfiler():
     return fagdata
 
 
-def byg_graf(fagdata, standarder=None, figurer=None):
+def byg_graf(fagdata, standarder=None, figurer=None, haandbog=None):
     standarder = standarder or {}
     figurer = figurer or {}
+    haandbog = haandbog or {}
     ukendte_standarder = []
     ukendte_figurer = []
+    ukendte_haandbog = []
     noder = {}   # id -> node
     kanter = []  # {source, target, type}
     rigtige_fag = {d["fag"]["id"] for _, d in fagdata}
@@ -121,6 +131,19 @@ def byg_graf(fagdata, standarder=None, figurer=None):
                 std_stubs.append({"id": std["id"], "titel": std.get("titel", ""), "side": std.get("side")})
             if std_stubs:
                 node["standarder"] = std_stubs
+            hb_stubs = []
+            for hb_id in b.get("haandbog", []):
+                hb = haandbog.get(hb_id)
+                if hb is None:
+                    ukendte_haandbog.append((b["id"], hb_id))
+                    continue
+                hb_stubs.append({
+                    "id": hb["id"], "titel": hb.get("titel", ""),
+                    "kapitel": hb.get("kapitel", ""), "fil": hb.get("fil", ""),
+                    "side_fra": hb.get("side_fra"), "side_til": hb.get("side_til"),
+                })
+            if hb_stubs:
+                node["haandbog"] = hb_stubs
             tilfoej_node(b["id"], node)
             for lid in b.get("lektioner", []):
                 kanter.append({"source": b["id"], "target": lid, "type": "daekkes_i"})
@@ -141,6 +164,8 @@ def byg_graf(fagdata, standarder=None, figurer=None):
         print(f"ADVARSEL: begreb '{bid}' refererer ukendt figur '{fig_id}'")
     for bid, std_id in ukendte_standarder:
         print(f"ADVARSEL: begreb '{bid}' refererer ukendt standard '{std_id}'")
+    for bid, hb_id in ukendte_haandbog:
+        print(f"ADVARSEL: begreb '{bid}' refererer ukendt haandbog-sektion '{hb_id}'")
 
     return {
         "version": 1,
@@ -149,6 +174,7 @@ def byg_graf(fagdata, standarder=None, figurer=None):
         "kanter": gyldige,
         "_ukendte_figur_referencer": len(ukendte_figurer),
         "_ukendte_standard_referencer": len(ukendte_standarder),
+        "_ukendte_haandbog_referencer": len(ukendte_haandbog),
     }
 
 
@@ -156,7 +182,8 @@ def main():
     fagdata = indlaes_fagfiler()
     standarder = indlaes_standarder()
     figurer = indlaes_figurer()
-    graf = byg_graf(fagdata, standarder=standarder, figurer=figurer)
+    haandbog = indlaes_haandbog()
+    graf = byg_graf(fagdata, standarder=standarder, figurer=figurer, haandbog=haandbog)
     UD_DIR.mkdir(parents=True, exist_ok=True)
 
     (UD_DIR / "graph.json").write_text(
@@ -175,7 +202,8 @@ def main():
     print("  noder:", n_typer)
     print("  kanter:", k_typer)
     print(f"  figur-referencer: {graf['_ukendte_figur_referencer']} ukendte, "
-          f"standard-referencer: {graf['_ukendte_standard_referencer']} ukendte")
+          f"standard-referencer: {graf['_ukendte_standard_referencer']} ukendte, "
+          f"haandbog-referencer: {graf['_ukendte_haandbog_referencer']} ukendte")
 
 
 if __name__ == "__main__":
