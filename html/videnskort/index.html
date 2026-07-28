@@ -119,6 +119,8 @@
     padding: .3rem .2rem; border-bottom: 1px solid var(--border);
   }
   #panel .refliste li:last-child { border-bottom: none; }
+  #panel .refliste a { color: var(--primary); text-decoration: none; }
+  #panel .refliste a:hover { text-decoration: underline; }
   #panel .relnode .prik {
     width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
   }
@@ -416,11 +418,23 @@
       });
       return h;
     }
-    function refListe(titel, liste, linjeFn) {
+    function refListe(titel, liste, linjeFn, hrefFn) {
       if (!liste || !liste.length) return '';
       var h = '<h3>' + titel + ' (' + liste.length + ')</h3><ul class="refliste">';
-      liste.forEach(function (r) { h += '<li>' + esc(linjeFn(r)) + '</li>'; });
+      liste.forEach(function (r) {
+        var tekst = esc(linjeFn(r));
+        var href = hrefFn ? hrefFn(r) : null;
+        h += '<li>' + (href ? '<a href="' + esc(href) + '" target="_blank" rel="noopener">' + tekst + '</a>' : tekst) + '</li>';
+      });
       return h + '</ul>';
+    }
+    // Håndbog-PDF'erne ligger uden for Studiehub (referencer/kapitler/), og bliver ALDRIG
+    // pushet til det offentlige repo — et relativt link virker derfor kun lokalt (file://),
+    // og fejler harmløst (404) hvis siden ses på den offentlige GitHub Pages-udgave.
+    var ER_LOKAL = location.protocol === 'file:';
+    function haandbogHref(h) {
+      if (!ER_LOKAL) return null;
+      return '../../../referencer/kapitler/' + h.kapitel + '/' + h.fil + '#page=' + h.side_fra;
     }
     if (n.type === 'begreb') {
       html += relListe('Dækkes i', grupper.daekkes_i.filter(function (m) { return m.type === 'lektion'; }));
@@ -434,8 +448,8 @@
       });
       html += refListe('Håndbogsafsnit', n.haandbog, function (h) {
         var side = h.side_fra === h.side_til ? h.side_fra : (h.side_fra + '–' + h.side_til);
-        return h.titel + ' (' + h.kapitel + ', s. ' + side + ')';
-      });
+        return h.titel + ' (' + h.kapitel + ', s. ' + side + ')' + (ER_LOKAL ? '' : ' 🔒 kun lokalt');
+      }, haandbogHref);
     } else if (n.type === 'lektion') {
       html += relListe('Begreber i lektionen', grupper.daekkes_i);
     } else {
