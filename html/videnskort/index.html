@@ -382,6 +382,28 @@
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
+  // Gør formel-notation i resuméer læsbar: unicode-super/subscript og
+  // understreg-baseret subscript (I_G, V_TH ...) bliver til rigtige <sup>/<sub>.
+  var SUP_MAP = { '⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9','⁺':'+','⁻':'-','ⁿ':'n','ⁱ':'i' };
+  var SUB_MAP = { '₀':'0','₁':'1','₂':'2','₃':'3','₄':'4','₅':'5','₆':'6','₇':'7','₈':'8','₉':'9','₊':'+','₋':'-','ₐ':'a','ₑ':'e','ₒ':'o','ₓ':'x','ₕ':'h','ₖ':'k','ₗ':'l','ₘ':'m','ₙ':'n','ₚ':'p','ₛ':'s','ₜ':'t' };
+  var SUP_RUN = new RegExp('[' + Object.keys(SUP_MAP).join('') + ']+', 'g');
+  var SUB_RUN = new RegExp('[' + Object.keys(SUB_MAP).join('') + ']+', 'g');
+  function formatMath(raw) {
+    var s = esc(raw);
+    s = s.replace(SUP_RUN, function (run) {
+      return '<sup>' + run.split('').map(function (c) { return SUP_MAP[c]; }).join('') + '</sup>';
+    });
+    s = s.replace(SUB_RUN, function (run) {
+      return '<sub>' + run.split('').map(function (c) { return SUB_MAP[c]; }).join('') + '</sub>';
+    });
+    // X_navn eller X_γ -> X<sub>navn</sub> (latinsk subscript-kæde standser før et
+    // efterfølgende græsk bogstav, så "I_Gω" bliver I<sub>G</sub>ω, ikke I<sub>Gω</sub>)
+    s = s.replace(/([A-Za-zΑ-Ωα-ω])_([A-Za-z0-9æøåÆØÅ]+|[Α-Ωα-ω])/g, function (m, base, sub) {
+      return base + '<sub>' + sub + '</sub>';
+    });
+    return s;
+  }
+
   function visPanel(n) {
     valgt = n; alpha = Math.max(alpha, 0.05);
     var badge = document.getElementById('p-badge');
@@ -391,7 +413,7 @@
     document.getElementById('p-titel').textContent =
       (n.type === 'lektion' ? 'L' + n.nummer + ' · ' : '') + n.navn;
 
-    var html = '<p class="resume">' + esc(n.resume || '') + '</p>';
+    var html = '<p class="resume">' + formatMath(n.resume || '') + '</p>';
     if (n.kapitel) html += '<p class="meta">' + esc(n.kapitel) + '</p>';
     if (n.sti) html += '<p class="meta">📁 ' + esc(n.sti) + '</p>';
 
@@ -503,7 +525,7 @@
     hover = nodeVed(e.clientX, e.clientY);
     if (hover) {
       tt.innerHTML = '<div class="t-navn">' + esc(hover.navn) + '</div>' +
-        (hover.resume ? '<div class="t-resume">' + esc(hover.resume) + '</div>' : '');
+        (hover.resume ? '<div class="t-resume">' + formatMath(hover.resume) + '</div>' : '');
       tt.style.display = 'block';
       tt.style.left = Math.min(e.clientX + 14, window.innerWidth - 280) + 'px';
       tt.style.top = (e.clientY + 14) + 'px';
