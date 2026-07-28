@@ -29,6 +29,17 @@
 
   /* ---------- helpers ---------- */
   function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  var SUP_MAP={'⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9','⁺':'+','⁻':'-','ⁿ':'n','ⁱ':'i'};
+  var SUB_MAP={'₀':'0','₁':'1','₂':'2','₃':'3','₄':'4','₅':'5','₆':'6','₇':'7','₈':'8','₉':'9','₊':'+','₋':'-','ₐ':'a','ₑ':'e','ₒ':'o','ₓ':'x','ₕ':'h','ₖ':'k','ₗ':'l','ₘ':'m','ₙ':'n','ₚ':'p','ₛ':'s','ₜ':'t'};
+  var SUP_RUN=new RegExp('['+Object.keys(SUP_MAP).join('')+']+','g');
+  var SUB_RUN=new RegExp('['+Object.keys(SUB_MAP).join('')+']+','g');
+  function formatMath(raw){
+    var s=String(raw||'');
+    s=s.replace(SUP_RUN,function(run){ return '<sup>'+run.split('').map(function(c){return SUP_MAP[c];}).join('')+'</sup>'; });
+    s=s.replace(SUB_RUN,function(run){ return '<sub>'+run.split('').map(function(c){return SUB_MAP[c];}).join('')+'</sub>'; });
+    s=s.replace(/([A-Za-zΑ-Ωα-ω])_([A-Za-z0-9æøåÆØÅ]+|[Α-Ωα-ω])/g,function(m,base,sub){ return base+'<sub>'+sub+'</sub>'; });
+    return s;
+  }
   function getBest(id){ try{ return JSON.parse(localStorage.getItem(LS+id)); }catch(e){ return null; } }
   function setBest(id,o){ try{ localStorage.setItem(LS+id, JSON.stringify(o)); }catch(e){} }
   function isActive(id){ return !!(window.MMT_TOPICS && window.MMT_TOPICS[id]); }
@@ -43,7 +54,12 @@
     progEl.style.width=(h>0?(window.scrollY/h*100):0)+'%';
   }
   function setScore(v){ topbarScore.textContent=v.toLocaleString('da-DK'); }
-  function sortedMC(t){ return (t.mc||[]).slice().sort(function(a,b){ return ORDER[lvlOf(a)]-ORDER[lvlOf(b)]; }); }
+  function shuffleQ(q){
+    var packed=q.options.map(function(o,idx){return {t:o,c:idx===q.correct};});
+    for(var i=packed.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=packed[i];packed[i]=packed[j];packed[j]=tmp;}
+    return Object.assign({},q,{options:packed.map(function(p){return p.t;}),correct:packed.findIndex(function(p){return p.c;})});
+  }
+  function sortedMC(t){ return (t.mc||[]).slice().sort(function(a,b){ return ORDER[lvlOf(a)]-ORDER[lvlOf(b)]; }).map(shuffleQ); }
   function levelCounts(t){ var c={let:0,middel:0,svaer:0}; (t.mc||[]).forEach(function(q){ c[lvlOf(q)]++; }); return c; }
 
   /* ---------- grader (smede-tema, kan overstyres pr. tema) ----------
@@ -67,7 +83,7 @@
     var done=0, sumPct=0, builtCount=0;
     man.forEach(function(m){ if(isActive(m.id)){ builtCount++; var b=getBest(m.id); if(b){ done++; sumPct+=b.pct; } } });
     var avg=done?Math.round(sumPct/done):0;
-    var mat=man.filter(function(m){return m.cat==='mat';});
+    var mat=man.filter(function(m){return m.cat!=='tek';});
     var tek=man.filter(function(m){return m.cat==='tek';});
 
     app.innerHTML=''+
@@ -129,8 +145,8 @@
         '<h2>'+esc(man.title)+'</h2>'+
       '</div>'+
       '<div class="panel intro">'+
-        '<h3>🔥 Intuition</h3><div>'+t.intro+'</div>'+
-        (t.analogi?'<div class="analogi">'+t.analogi+'</div>':'')+
+        '<h3>🔥 Intuition</h3><div>'+formatMath(t.intro)+'</div>'+
+        (t.analogi?'<div class="analogi">'+formatMath(t.analogi)+'</div>':'')+
         (examList?'<details><summary class="dim" style="cursor:pointer;margin-top:10px">Vis de oprindelige eksamensspørgsmål</summary><ul class="exam-qs">'+examList+'</ul></details>':'')+
       '</div>'+
       (t.svg?'<div class="panel"><h3>Diagram</h3><div class="figbox">'+t.svg+'</div>'+(t.svgCap?'<div class="figcap">'+t.svgCap+'</div>':'')+'</div>':'')+
@@ -148,13 +164,13 @@
     document.getElementById('q-fill').style.width=(Q.idx/Q.total*100)+'%';
     var opts=q.options.map(function(o,i){
       var L=String.fromCharCode(65+i);
-      return '<button class="opt" data-i="'+i+'"><span class="lett">'+L+'</span><span class="txt">'+o+'</span><span class="mark"></span></button>';
+      return '<button class="opt" data-i="'+i+'"><span class="lett">'+L+'</span><span class="txt">'+formatMath(o)+'</span><span class="mark"></span></button>';
     }).join('');
     var slot=document.getElementById('mc-slot');
     slot.innerHTML=''+
       '<div class="mc">'+
         '<div class="mc-top"><span class="qn">Spørgsmål '+(Q.idx+1)+'</span><span class="lvl '+lv.c+'">'+lv.t+' · '+PTS[lvlOf(q)]+'p</span></div>'+
-        '<div class="qtext">'+q.q+'</div>'+
+        '<div class="qtext">'+formatMath(q.q)+'</div>'+
         '<div id="opts">'+opts+'</div>'+
         '<div class="why" id="why"></div>'+
         '<div id="nextrow" style="margin-top:16px;display:none"></div>'+
@@ -184,7 +200,7 @@
     why.className='why '+(correct?'':'miss')+' show';
     why.innerHTML='<span class="wtag">'+(correct?'🔥 Rigtigt!':'✗ Ikke helt')+'</span>'+
       (correct?'<span class="pts">+'+gained.toLocaleString('da-DK')+'p'+(Q.combo>1?' (combo ×'+Q.combo+')':'')+'</span>':'')+
-      '<div style="margin-top:8px">'+q.why+'</div>';
+      '<div style="margin-top:8px">'+formatMath(q.why)+'</div>';
     renderMath(why);
 
     var last=(Q.idx>=Q.total-1);
