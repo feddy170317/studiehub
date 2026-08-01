@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bordfodbold — Trophy Tracker</title>
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="title">🏆 Bordfodbold Trophy Tracker</div>
+    <div class="subtitle" id="season-label">Season</div>
+  </header>
+
+  <section class="players" id="players"></section>
+
+  <div class="cta-row">
+    <button class="btn" id="open-modal-btn">＋ Log a match</button>
+  </div>
+
+  <section class="panel">
+    <h2>Season standings</h2>
+    <table class="standings">
+      <thead>
+        <tr><th></th><th>Player</th><th>Wins</th><th>Played</th><th>Goals</th><th>Diff</th></tr>
+      </thead>
+      <tbody id="standings-body"></tbody>
+    </table>
+  </section>
+
+  <section class="panel">
+    <h2>Match history</h2>
+    <div class="match-list" id="match-list"></div>
+  </section>
+
+  <footer class="foot">Gold = current trophy holder · Bronze = lost the last challenge · updates live for everyone</footer>
+</div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <h3>Log a match</h3>
+    <form id="match-form">
+      <div class="vs-row">
+        <div class="field">
+          <label>Player A</label>
+          <select id="playerA"></select>
+        </div>
+        <div class="field">
+          <label>Player B</label>
+          <select id="playerB"></select>
+        </div>
+      </div>
+      <div class="score-row">
+        <div class="field">
+          <label>Score A</label>
+          <input type="number" id="scoreA" min="0" inputmode="numeric" required>
+        </div>
+        <div class="dash">–</div>
+        <div class="field">
+          <label>Score B</label>
+          <input type="number" id="scoreB" min="0" inputmode="numeric" required>
+        </div>
+      </div>
+      <div class="field">
+        <label>Date</label>
+        <input type="date" id="matchDate" required>
+      </div>
+      <div class="field">
+        <label>PIN</label>
+        <input type="password" id="pinInput" inputmode="numeric" placeholder="Shared PIN" required>
+      </div>
+      <div class="error-msg" id="form-error"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn secondary" id="close-modal-btn">Cancel</button>
+        <button type="submit" class="btn">Save match</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="assets/firebase-config.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
