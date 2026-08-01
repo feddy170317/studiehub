@@ -1,8 +1,8 @@
 /* Bordfodbold — table football trophy tracker
    Realtime state via Firebase RTDB under /bordfodbold, shared with QuizLive's project. */
 
-const PLAYERS = ['Stefan', 'Frederick', 'Leeny'];
-const PLAYER_COLOR = { Stefan: 'var(--stefan)', Frederick: 'var(--frederick)', Leeny: 'var(--leeny)' };
+const PLAYERS = ['Frederik', 'Stefan', 'Line'];
+const PLAYER_COLOR = { Frederik: 'var(--frederik)', Stefan: 'var(--stefan)', Line: 'var(--line)' };
 const DEFAULT_PIN = '2026';
 const SEASON_LABEL = 'Season ' + new Date().getFullYear();
 
@@ -39,33 +39,33 @@ function computeStandings(list) {
 }
 
 function currentTrophyHolders(list) {
-  if (!list.length) return { gold: null, bronze: null };
+  if (!list.length) return { gold: null, poo: null };
   const latest = list[0]; // list is sorted newest first
-  return { gold: latest.winner, bronze: latest.loser };
+  return { gold: latest.winner, poo: latest.loser };
 }
 
 function render() {
   const sorted = [...matches].sort((a, b) => (b.ts || 0) - (a.ts || 0));
-  const { gold, bronze } = currentTrophyHolders(sorted);
+  const { gold, poo } = currentTrophyHolders(sorted);
   const stats = computeStandings(sorted);
 
-  renderPlayers(gold, bronze, stats);
+  renderPlayers(gold, poo, stats);
   renderStandings(stats);
   renderHistory(sorted);
 }
 
-function renderPlayers(gold, bronze, stats) {
+function renderPlayers(gold, poo, stats) {
   const el = document.getElementById('players');
   el.innerHTML = PLAYERS.map(p => {
     const isGold = p === gold;
-    const isBronze = p === bronze && !isGold;
-    const cardClass = isGold ? 'trophy' : (isBronze ? 'bronze' : '');
+    const isPoo = p === poo && !isGold;
+    const cardClass = isGold ? 'trophy' : (isPoo ? 'poo' : '');
     const badge = isGold
       ? '<div class="badge gold">🏆</div>'
-      : (isBronze ? '<div class="badge bronze-badge">🥉</div>' : '');
+      : (isPoo ? '<div class="badge poo-badge">💩</div>' : '');
     const status = isGold
       ? '<div class="player-status gold-text">Holds the trophy</div>'
-      : (isBronze ? '<div class="player-status bronze-text">Lost the last challenge</div>' : '<div class="player-status">&nbsp;</div>');
+      : (isPoo ? '<div class="player-status poo-text">Lost the last challenge</div>' : '<div class="player-status">&nbsp;</div>');
     const s = stats[p];
     const winPct = s.matches ? Math.round((s.wins / s.matches) * 100) : 0;
     return `
