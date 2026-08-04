@@ -38,13 +38,14 @@
   header a.tilbage:hover { color: var(--text); }
   header h1 { font-size: 1rem; font-weight: 600; white-space: nowrap; }
   header h1 span { color: var(--text-muted); font-weight: 400; }
-  #soeg {
+  #soeg, #fagvalg {
     flex: 1 1 140px; min-width: 120px; max-width: 320px;
     background: var(--surface); color: var(--text);
     border: 1px solid var(--border); border-radius: 8px;
     padding: .4rem .7rem; font-size: .85rem; outline: none;
   }
-  #soeg:focus { border-color: var(--primary); }
+  #fagvalg { flex: 0 1 200px; max-width: 220px; cursor: pointer; }
+  #soeg:focus, #fagvalg:focus { border-color: var(--primary); }
   button.knap {
     background: var(--surface); color: var(--text-muted);
     border: 1px solid var(--border); border-radius: 8px;
@@ -147,7 +148,9 @@
 <header>
   <a class="tilbage" href="../../index.html">← Studiehub</a>
   <h1>🕸️ Videnskort <span id="statistik"></span></h1>
+  <select id="fagvalg" aria-label="Vælg fag"><option value="">📚 Alle fag</option></select>
   <input id="soeg" type="search" placeholder="Søg begreb, lektion, fag…" autocomplete="off">
+  <button class="knap" id="tilpas">Tilpas visning</button>
   <button class="knap" id="nulstil">Nulstil</button>
 </header>
 
@@ -202,48 +205,92 @@
   document.getElementById('statistik').textContent =
     '— ' + noder.length + ' noder · ' + kanter.length + ' relationer';
 
-  // --- startpositioner: fag i centrum, lektioner i ring, begreber udenom ---
-  var lektioner = noder.filter(function (n) { return n.type === 'lektion'; });
-  lektioner.sort(function (a, b) { return (a.nummer || 0) - (b.nummer || 0); });
-  lektioner.forEach(function (l, i) {
-    var v = (i / lektioner.length) * 2 * Math.PI - Math.PI / 2;
-    l.x = Math.cos(v) * 260; l.y = Math.sin(v) * 260;
-    l._vinkel = v;
-  });
+  // --- klynge-opslag: hvert fag er en selvstændig "planet" ---
+  var klyngeAf = {}; // nodeId -> fagId (hvilken klynge et lektion/begreb hører til)
   noder.forEach(function (n) {
-    if (n.type === 'fag') { n.x = 0; n.y = 0; }
-    else if (n.type === 'ekstern') {
-      n.x = (Math.random() - 0.5) * 100; n.y = -620 + (Math.random() - 0.5) * 80;
-    } else if (n.type === 'begreb') {
-      var lek = (naboer[n.id] || []).map(function (r) { return r.node; })
-        .filter(function (m) { return m.type === 'lektion'; })[0];
-      if (lek) {
-        n.x = lek.x * 1.55 + (Math.random() - 0.5) * 90;
-        n.y = lek.y * 1.55 + (Math.random() - 0.5) * 90;
-      } else { n.x = (Math.random() - 0.5) * 700; n.y = (Math.random() - 0.5) * 700; }
-    }
+    if (n.type === 'lektion' || n.type === 'begreb') klyngeAf[n.id] = n.fag;
+    else klyngeAf[n.id] = n.id; // fag/ekstern er selv centrum i egen klynge
+  });
+  function erIKlynge(n, fagId) { return klyngeAf[n.id] === fagId; }
+
+  // --- startpositioner: fag-klynger spredt på en stor ring, hver klynge er
+  //     sit eget lille solsystem (fag i centrum, lektioner i ring, begreber i buer
+  //     udenfor "deres" lektion) — så fag ALDRIG overlapper hinanden, uanset størrelse.
+  var fagKlynger = noder.filter(function (n) { return n.type === 'fag' || n.type === 'ekstern'; });
+  fagKlynger.sort(function (a, b) {
+    return (a.semester || 99) - (b.semester || 99) || a.navn.localeCompare(b.navn, 'da');
+  });
+  var ringR = Math.max(760, fagKlynger.length * 300);
+  fagKlynger.forEach(function (f, i) {
+    var v = (i / fagKlynger.length) * 2 * Math.PI - Math.PI / 2;
+    f.x = Math.cos(v) * ringR; f.y = Math.sin(v) * ringR;
+
+    var leks = noder.filter(function (n) { return n.type === 'lektion' && n.fag === f.id; });
+    leks.sort(function (a, b) { return (a.nummer || 0) - (b.nummer || 0); });
+    var lekR = Math.max(140, 40 + leks.length * 24);
+    leks.forEach(function (l, li) {
+      var lv = (li / Math.max(leks.length, 1)) * 2 * Math.PI - Math.PI / 2;
+      l.x = f.x + Math.cos(lv) * lekR;
+      l.y = f.y + Math.sin(lv) * lekR;
+
+      var begs = (naboer[l.id] || [])
+        .filter(function (r) { return r.type === 'daekkes_i' && r.retning === 'ind'; })
+        .map(function (r) { return r.node; });
+      var buebredde = Math.min(Math.PI * 0.95, 0.6 + begs.length * 0.26);
+      begs.forEach(function (b, bi) {
+        var spred = begs.length > 1 ? (bi / (begs.length - 1) - 0.5) : 0;
+        var bv = lv + spred * buebredde;
+        var afstand = lekR + 130 + (bi % 3) * 58;
+        b.x = f.x + Math.cos(bv) * afstand;
+        b.y = f.y + Math.sin(bv) * afstand;
+      });
+    });
   });
 
-  // --- fysik ---
-  var FJEDER = { del_af: { l: 260, k: 0.05 }, daekkes_i: { l: 130, k: 0.04 }, bygger_paa: { l: 200, k: 0.012 } };
+  // --- fysik: rumligt grid (kun nabo-celler sammenlignes) + hård kollisions-
+  //     opløsning, så noder ALDRIG kan ende oven i hinanden — uanset hvor mange
+  //     der er. Simulationen "fryser" (alpha -> 0) når den har sat sig, så grafen
+  //     IKKE bliver ved med at flytte sig af sig selv (kun ved aktivt træk).
+  var FJEDER = { del_af: { l: 0, k: 0.06 }, daekkes_i: { l: 0, k: 0.05 }, bygger_paa: { l: 260, k: 0.01 } };
+  var CELLE = 130;
   var alpha = 1;
+  function gridNoegle(x, y) { return Math.floor(x / CELLE) + ',' + Math.floor(y / CELLE); }
+  function byggGrid() {
+    var grid = {};
+    for (var i = 0; i < noder.length; i++) {
+      var n = noder[i], key = gridNoegle(n.x, n.y);
+      (grid[key] || (grid[key] = [])).push(n);
+    }
+    return grid;
+  }
   function tikFysik() {
-    var i, j, n, m, dx, dy, d2, d, f;
-    for (i = 0; i < noder.length; i++) {
-      n = noder[i];
-      for (j = i + 1; j < noder.length; j++) {
-        m = noder[j];
-        dx = n.x - m.x; dy = n.y - m.y;
-        d2 = dx * dx + dy * dy + 0.01;
-        if (d2 > 160000) continue;
-        f = 2600 / d2 * alpha;
-        d = Math.sqrt(d2);
-        dx /= d; dy /= d;
-        n.vx += dx * f; n.vy += dy * f;
-        m.vx -= dx * f; m.vy -= dy * f;
+    var grid = byggGrid();
+    for (var i = 0; i < noder.length; i++) {
+      var n = noder[i];
+      if (n._laast) { n.vx = 0; n.vy = 0; continue; }
+      var cx = Math.floor(n.x / CELLE), cy = Math.floor(n.y / CELLE);
+      for (var dcx = -1; dcx <= 1; dcx++) {
+        for (var dcy = -1; dcy <= 1; dcy++) {
+          var liste = grid[(cx + dcx) + ',' + (cy + dcy)];
+          if (!liste) continue;
+          for (var j = 0; j < liste.length; j++) {
+            var m = liste[j];
+            if (m === n) continue;
+            var dx = n.x - m.x, dy = n.y - m.y;
+            var d2 = dx * dx + dy * dy + 0.01;
+            if (d2 > 90000) continue; // >300 verdens-enheder væk: ignorér
+            var d = Math.sqrt(d2);
+            dx /= d; dy /= d;
+            n.vx += dx * (2600 / d2) * alpha;
+            n.vy += dy * (2600 / d2) * alpha;
+            var minD = RADIUS[n.type] + RADIUS[m.type] + 10;
+            if (d < minD) {
+              var overlap = (minD - d) * 0.5;
+              n.x += dx * overlap; n.y += dy * overlap;
+            }
+          }
+        }
       }
-      n.vx -= n.x * 0.0012 * alpha;
-      n.vy -= n.y * 0.0012 * alpha;
     }
     kanter.forEach(function (k) {
       var fj = FJEDER[k.type] || FJEDER.bygger_paa;
@@ -255,13 +302,15 @@
       k.t.vx -= dx * f; k.t.vy -= dy * f;
     });
     noder.forEach(function (n) {
-      if (n._laast) { n.vx = 0; n.vy = 0; return; }
-      n.vx *= 0.85; n.vy *= 0.85;
+      if (n._laast) return;
+      n.vx *= 0.8; n.vy *= 0.8;
       n.x += n.vx; n.y += n.vy;
     });
-    if (alpha > 0.02) alpha *= 0.995;
+    if (alpha > 0.015) alpha *= 0.965; else alpha = 0;
   }
-  for (var varm = 0; varm < 200; varm++) tikFysik();
+  var VARMT_OP = Math.min(260, 90 + Math.round(noder.length / 3));
+  for (var varm = 0; varm < VARMT_OP; varm++) tikFysik();
+  alpha = 0; // frys layoutet helt efter opvarmning — ingen selvstændig bevægelse
 
   // --- canvas & kamera ---
   var canvas = document.getElementById('kort');
@@ -291,9 +340,10 @@
     };
   }
 
-  var valgt = null, hover = null, soegRamt = null;
+  var valgt = null, hover = null, soegRamt = null, fokusFag = null;
 
   function fremhaevet(n) {
+    if (fokusFag && !erIKlynge(n, fokusFag)) return false;
     if (soegRamt) return soegRamt.has(n.id);
     if (!valgt) return true;
     if (n === valgt) return true;
@@ -305,6 +355,7 @@
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
     kanter.forEach(function (k) {
+      if (fokusFag && !(erIKlynge(k.s, fokusFag) && erIKlynge(k.t, fokusFag))) return;
       var a = tilSkaerm(k.s), b = tilSkaerm(k.t);
       var aktiv = valgt && (k.s === valgt || k.t === valgt);
       var dæmpet = (valgt || soegRamt) && !aktiv;
@@ -331,7 +382,7 @@
       }
     });
 
-    noder.forEach(function (n) {
+    noder.forEach(function (n, indeks) {
       var p = tilSkaerm(n);
       var r = RADIUS[n.type] * Math.max(kam.skala, 0.55);
       var frem = fremhaevet(n);
@@ -342,8 +393,17 @@
         ctx.strokeStyle = '#f1f5f9'; ctx.lineWidth = 2;
         ctx.beginPath(); ctx.arc(p.x, p.y, r + 3, 0, 2 * Math.PI); ctx.stroke();
       }
-      var visLabel = n.type === 'fag' || n.type === 'ekstern' || n.type === 'lektion'
-        ? true : (kam.skala > 0.75 || n === valgt || n === hover || (soegRamt && soegRamt.has(n.id)));
+      // Labels vises gradvist: fag er altid landemærker; lektion/begreb-navne
+      // dukker først op når man er zoomet ind, har fokuseret ét fag, eller
+      // peger/har valgt/søgt — ellers drukner overbliks-visningen i tekst.
+      var fremhaevetNode = n === valgt || n === hover || (soegRamt && soegRamt.has(n.id));
+      var visLabel;
+      if (n.type === 'fag' || n.type === 'ekstern') visLabel = true;
+      else if (n.type === 'lektion') visLabel = kam.skala > 0.45 || !!fokusFag || fremhaevetNode;
+      // Begreb-navne kræver et ekstra manuelt zoom-skridt selv når et fag er
+      // fokuseret — ellers vælter et stort fag (fx 76 begreber) i tekst oven i
+      // hinanden. Prik-farverne (og hover-tooltip) er stadig synlige med det samme.
+      else visLabel = kam.skala > 1.05 || fremhaevetNode;
       if (visLabel && frem) {
         var fs = n.type === 'fag' ? 15 : (n.type === 'begreb' ? 11 : 12);
         ctx.font = (n.type === 'fag' ? '700 ' : '500 ') + fs + 'px system-ui, sans-serif';
@@ -351,14 +411,17 @@
         ctx.textAlign = 'center';
         var label = n.type === 'lektion' ? 'L' + n.nummer + ': ' + n.navn : n.navn;
         if (label.length > 34) label = label.slice(0, 32) + '…';
-        ctx.fillText(label, p.x, p.y + r + fs + 2);
+        // lige/ulige index skifter mellem label under/over noden, så to naboer
+        // med lang tekst ikke altid skriver oven i hinanden på samme linje
+        var lodret = (indeks % 2 === 0) ? (r + fs + 2) : -(r + 6);
+        ctx.fillText(label, p.x, p.y + lodret);
       }
     });
     ctx.globalAlpha = 1;
   }
 
   function loekke() {
-    if (alpha > 0.02) tikFysik();
+    if (alpha > 0.015) tikFysik();
     tegn();
     requestAnimationFrame(loekke);
   }
@@ -405,7 +468,9 @@
   }
 
   function visPanel(n) {
-    valgt = n; alpha = Math.max(alpha, 0.05);
+    // Bemærk: åbner KUN infopanelet — genstarter bevidst IKKE simulationen,
+    // så det ikke føles som om hele grafen "hopper" hver gang man klikker et sted.
+    valgt = n;
     var badge = document.getElementById('p-badge');
     badge.textContent = TYPENAVN[n.type];
     badge.style.background = FARVER[n.type] + '33';
@@ -497,6 +562,26 @@
     kam.x = n.x; kam.y = n.y;
     if (kam.skala < 0.9) kam.skala = 0.9;
   }
+
+  // --- kamera: "tilpas til" en mængde noder (bruges til startvisning, "Alle
+  //     fag" og til at zoome ind på ét fags klynge uden at måtte lede efter det) ---
+  function tilpasTilNoder(liste) {
+    if (!liste.length) return;
+    var minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    liste.forEach(function (n) {
+      minX = Math.min(minX, n.x); maxX = Math.max(maxX, n.x);
+      minY = Math.min(minY, n.y); maxY = Math.max(maxY, n.y);
+    });
+    kam.x = (minX + maxX) / 2; kam.y = (minY + maxY) / 2;
+    var bredde = Math.max(maxX - minX, 160), hoejde = Math.max(maxY - minY, 160);
+    var s = Math.min(window.innerWidth / (bredde * 1.3), window.innerHeight / (hoejde * 1.3));
+    kam.skala = Math.min(Math.max(s, 0.1), 2.2);
+  }
+  function tilpasTilAlt() { tilpasTilNoder(noder); }
+  function tilpasTilKlynge(fagId) {
+    tilpasTilNoder(noder.filter(function (n) { return erIKlynge(n, fagId); }));
+  }
+  tilpasTilAlt(); // startvisning: hele grafen samlet i billedet, intet skal ledes efter
 
   // --- mus ---
   var traek = null; // {type:'node'|'pan', node, startX, startY, flyttet}
@@ -621,15 +706,34 @@
   soeg.addEventListener('keydown', function (e) {
     if (e.key === 'Enter' && soegRamt && soegRamt.size) {
       var foerste = noder.filter(function (n) { return soegRamt.has(n.id); })[0];
+      fokusFag = null; fagvalg.value = ''; // søgning ser på tværs af alle fag
       centrerPaa(foerste); visPanel(foerste);
     }
     if (e.key === 'Escape') { soeg.value = ''; soegRamt = null; soeg.blur(); }
   });
 
   document.getElementById('nulstil').addEventListener('click', function () {
-    kam.x = 0; kam.y = 0; kam.skala = 1;
+    fokusFag = null; fagvalg.value = '';
     lukPanel(); soegRamt = null; soeg.value = '';
-    alpha = Math.max(alpha, 0.3);
+    tilpasTilAlt();
+  });
+
+  // --- fag-vælger: hop direkte til ét fags klynge, dæmp resten ---
+  var fagvalg = document.getElementById('fagvalg');
+  fagKlynger.forEach(function (f) {
+    var opt = document.createElement('option');
+    opt.value = f.id;
+    opt.textContent = (f.semester ? 'Sem ' + f.semester + ' · ' : '') + f.navn;
+    fagvalg.appendChild(opt);
+  });
+  fagvalg.addEventListener('change', function () {
+    lukPanel(); soegRamt = null; soeg.value = '';
+    if (!fagvalg.value) { fokusFag = null; tilpasTilAlt(); }
+    else { fokusFag = fagvalg.value; tilpasTilKlynge(fokusFag); }
+  });
+
+  document.getElementById('tilpas').addEventListener('click', function () {
+    if (fokusFag) tilpasTilKlynge(fokusFag); else tilpasTilAlt();
   });
 
   // --- #node=<id> deep-link (fx fra content.json's concept-map-materialer) ---
@@ -637,7 +741,7 @@
     var m = /#node=([^&]+)/.exec(location.hash);
     if (!m) return;
     var n = nodeAf[decodeURIComponent(m[1])];
-    if (n) { centrerPaa(n); visPanel(n); }
+    if (n) { fokusFag = null; fagvalg.value = ''; centrerPaa(n); visPanel(n); }
   }
   window.addEventListener('hashchange', aabenFraHash);
   aabenFraHash();
