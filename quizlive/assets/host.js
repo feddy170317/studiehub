@@ -35,7 +35,7 @@
     serverTimeOffset: 0,
     timerInterval: null,
     playerCount: 0,
-    players: {},           // playerId -> {name, score}
+    players: {},           // playerId -> {name, score, correctCount, registered}
     gameRef: null,
     answersListener: null,
     stateListener: null,
@@ -560,7 +560,12 @@
         snap.forEach(function (child) {
           var pid = child.key;
           var data = child.val();
-          g.players[pid] = { name: data.name, score: data.score || 0 };
+          g.players[pid] = {
+            name: data.name,
+            score: data.score || 0,
+            correctCount: data.correctCount || 0,
+            registered: !!data.registered
+          };
           count++;
           var chip = document.createElement('div');
           chip.className = 'player-chip';
@@ -773,8 +778,14 @@
           if (ans.choice === correctIdx && inTime) {
             var currentScore = (g.players[pid] && g.players[pid].score) || 0;
             var newScore = currentScore + pts;
-            if (g.players[pid]) g.players[pid].score = newScore;
+            var currentCorrect = (g.players[pid] && g.players[pid].correctCount) || 0;
+            var newCorrect = currentCorrect + 1;
+            if (g.players[pid]) {
+              g.players[pid].score = newScore;
+              g.players[pid].correctCount = newCorrect;
+            }
             updates['games/' + g.pin + '/players/' + pid + '/score'] = newScore;
+            updates['games/' + g.pin + '/players/' + pid + '/correctCount'] = newCorrect;
           }
         });
       }
@@ -912,7 +923,14 @@
       var players = [];
       if (snap.exists()) {
         snap.forEach(function (child) {
-          players.push({ name: child.val().name, score: child.val().score || 0 });
+          var d = child.val();
+          players.push({
+            pid: child.key,
+            name: d.name,
+            score: d.score || 0,
+            correctCount: d.correctCount || 0,
+            registered: !!d.registered
+          });
         });
       }
       players.sort(function (a, b) { return b.score - a.score; });
@@ -936,7 +954,37 @@
         setTimeout(function () { row.classList.add('show'); }, delay + 200);
       });
 
+      // Side-effekt: gem resultat pr. REGISTRERET elev (ikke gæster).
+      // Fire-and-forget — påvirker ikke podie-visning, ranking eller score.
+      recordResultsForRegisteredPlayers(players);
+
       showScreen('screen-podium-host');
+    });
+  }
+
+  /* --- Gem ét /results-opslag pr. REGISTRERET elev (gæster springes over) ---
+     Fire-and-forget: fejl logges men blokerer aldrig podie-UI'et. */
+  function recordResultsForRegisteredPlayers(players) {
+    var totalQuestions = g.quiz && Array.isArray(g.quiz.questions) ? g.quiz.questions.length : 0;
+    players.forEach(function (p) {
+      if (!p.registered) return; // gæster tracks aldrig
+      var percent = totalQuestions > 0 ? Math.round(100 * p.correctCount / totalQuestions) : 0;
+      db.ref('results/' + p.pid).push({
+        name: p.name,
+        quizId: g.quizId,
+        quizTitle: g.quiz.title,
+        semester: g.quiz.semester || '',
+        course: g.quiz.course || '',
+        lecture: g.quiz.lecture || '',
+        score: p.score,
+        correctCount: p.correctCount,
+        totalQuestions: totalQuestions,
+        percent: percent,
+        gamePin: g.pin,
+        playedAt: firebase.database.ServerValue.TIMESTAMP
+      }).catch(function (err) {
+        console.error('Kunne ikke gemme resultat for spiller ' + p.pid + ':', err);
+      });
     });
   }
 

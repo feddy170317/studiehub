@@ -137,7 +137,31 @@ QuizLive indeholder en elevliste-side (`roster.html`), hvor du kan indsætte en 
 - **"🖨 Udskriv"** printer en ren liste (kun tabellen) til at klippe ud og dele fysisk til eleverne
 - Slet en elev fra listen med et enkelt klik (kræver bekræftelse)
 
-**Vigtigt:** Dette er grundlaget for en kommende funktion med PIN-baseret login og resultat-sporing på tværs af quizzer — den funktionalitet er endnu ikke bygget. Indtil videre bruges elevlisten kun til at generere og uddele PIN-koder.
+**Vigtigt:** Elevlisten er også grundlaget for elev-login og resultat-sporing — se afsnittet "Leaderboard og elev-login" nedenfor.
+
+---
+
+## Leaderboard og elev-login
+
+Elever kan nu logge ind med deres 4-cifrede elev-PIN (fra `roster.html`) i stedet for at skrive et gæste-navn. Det er valgfrit — **gæster kan stadig spille med uden PIN**, de bliver bare ikke sporet.
+
+**Sådan fungerer join-skærmen (`index.html`):**
+- Spil-PIN (6 cifre) skal altid udfyldes.
+- Hvis eleven udfylder **Elev-PIN**, slås den op i `/students`, og eleven deltager under sit registrerede fornavn.
+- Hvis feltet står tomt, deltager man som gæst med et selvvalgt navn (som hidtil).
+- En forkert/ukendt elev-PIN giver en tydelig fejl i stedet for stille at falde tilbage til gæst — det undgår at nogen tror de er sporet, når de ikke er.
+- Browseren husker den seneste elev-PIN lokalt, så eleven ikke skal indtaste den igen på samme enhed.
+
+**Resultater (`/results`):**
+Hver gang en **registreret** elev spiller en quiz til podiet, gemmer host automatisk ét resultat i `/results/{elevPIN}/` med quiz, score, antal rigtige, procent og tidspunkt. Gæster får aldrig et resultat gemt.
+
+**Leaderboard (`leaderboard.html`):**
+- Klik på **"🏆 Leaderboard"** på host-opsætningssiden, eller åbn `leaderboard.html` direkte
+- Viser et samlet leaderboard (bedste score pr. quiz, summeret på tværs af alle quizzer eleven har spillet)
+- Klik på en elev for at se deres forsøg pr. quiz (bedste %, seneste %, tendens ↑/↓/→) og en kronologisk liste over alle forsøg
+- Vælg en enkelt quiz i dropdown'en for at se alle elevers forsøg på netop den quiz, sorteret efter tidspunkt
+
+Sikkerhedsreglerne ovenfor inkluderer allerede `"results": { ".read": true, ".write": true }` — der er ikke noget yderligere at konfigurere.
 
 ---
 

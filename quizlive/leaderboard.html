@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuizLive — Leaderboard</title>
+  <link rel="stylesheet" href="assets/app.css">
+  <style>
+    body { overflow-y: auto; }
+
+    /* --- Topbar (matcher roster.html) --- */
+    #lb-topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg-dark);
+      border-bottom: 2px solid #2d1b69;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    #lb-topbar .brand-small {
+      font-family: 'Bangers', cursive;
+      font-size: 1.5rem;
+      color: var(--accent-glow);
+      letter-spacing: 2px;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+    #lb-topbar .brand-small span { color: #fff; }
+    #lb-topbar .page-title {
+      color: var(--text-muted);
+      font-weight: 800;
+      font-size: 1.05rem;
+    }
+
+    /* --- Hoved-indhold --- */
+    #lb-main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 40px;
+      gap: 24px;
+    }
+    .lb-card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 24px;
+      width: 100%;
+      max-width: 900px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+      border: 2px solid #2d1b69;
+    }
+    .lb-card h2 {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+    #overall-status, .lb-status {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      margin-bottom: 12px;
+    }
+
+    /* --- Views (skift mellem overblik / elev / quiz) --- */
+    .lb-view { display: none; flex-direction: column; align-items: center; width: 100%; gap: 24px; }
+    .lb-view.active { display: flex; }
+
+    /* --- Tabeller --- */
+    table.lb-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.lb-table th,
+    table.lb-table td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid #2d1b6950;
+      font-size: 0.95rem;
+    }
+    table.lb-table th {
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-bottom: 2px solid #2d1b69;
+    }
+    table.lb-table td.col-rank {
+      font-family: 'Bangers', cursive;
+      font-size: 1.3rem;
+      color: var(--accent-glow);
+      width: 60px;
+    }
+    tr.lb-row-clickable { cursor: pointer; transition: background 0.15s; }
+    tr.lb-row-clickable:hover { background: #2d1b6950; }
+    td.trend-up   { color: #4ade80; font-weight: 800; }
+    td.trend-down { color: #f87171; font-weight: 800; }
+    td.trend-same { color: var(--text-muted); font-weight: 800; }
+
+    /* --- Tilbage-link --- */
+    .link-back {
+      display: inline-block;
+      color: var(--accent-glow);
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-decoration: none;
+      margin-bottom: 14px;
+    }
+    .link-back:hover { text-decoration: underline; }
+
+    /* --- Quiz-vælger --- */
+    #sel-quiz-picker { margin-bottom: 0; }
+
+    /* --- Footer --- */
+    #lb-footer {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      text-align: center;
+      opacity: 0.7;
+      max-width: 900px;
+      width: 100%;
+      padding-top: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Firebase-ikke-sat-op banner -->
+<div id="firebase-banner">
+  <h2>QuizLive</h2>
+  <p>Firebase er ikke sat op endnu — se <code>SETUP.md</code></p>
+  <p style="font-size:0.9rem; color:#6b7280;">Åbn <strong>SETUP.md</strong> og følg trin 1–4 for at tilslutte din Firebase Realtime Database.</p>
+</div>
+
+<!-- === Topbar === -->
+<div id="lb-topbar">
+  <a href="host.html" class="brand-small">Quiz<span>Live</span></a>
+  <span class="page-title">🏆 Leaderboard</span>
+</div>
+
+<!-- === Hoved-indhold === -->
+<div id="lb-main">
+
+  <!-- View 1: Samlet leaderboard + quiz-vælger -->
+  <div id="view-overall" class="lb-view active">
+    <div class="lb-card">
+      <h2>Samlet leaderboard</h2>
+      <div id="overall-status" class="lb-status">Indlæser resultater...</div>
+      <table class="lb-table" id="tbl-overall">
+        <thead>
+          <tr>
+            <th>Rang</th>
+            <th>Navn</th>
+            <th>Samlet bedste-score</th>
+            <th>Quizzer forsøgt</th>
+            <th>Forsøg i alt</th>
+          </tr>
+        </thead>
+        <tbody id="tbl-overall-body"></tbody>
+      </table>
+    </div>
+
+    <div class="lb-card">
+      <h2>Se alle forsøg på én quiz</h2>
+      <label for="sel-quiz-picker">Vælg quiz</label>
+      <select id="sel-quiz-picker">
+        <option value="">— vælg en quiz —</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- View 2: Per-elev detalje -->
+  <div id="view-student" class="lb-view">
+    <div class="lb-card">
+      <a href="#" id="link-back-student" class="link-back">◀ Tilbage til leaderboard</a>
+      <h2 id="student-detail-name">Elev</h2>
+      <table class="lb-table" id="tbl-student-quizzes">
+        <thead>
+          <tr>
+            <th>Quiz</th>
+            <th>Fag/Lektion</th>
+            <th>Antal forsøg</th>
+            <th>Bedste %</th>
+            <th>Seneste %</th>
+            <th>Tendens</th>
+          </tr>
+        </thead>
+        <tbody id="tbl-student-quizzes-body"></tbody>
+      </table>
+    </div>
+
+    <div class="lb-card">
+      <h2>Alle forsøg (nyeste først)</h2>
+      <table class="lb-table" id="tbl-student-attempts">
+        <thead>
+          <tr>
+            <th>Quiz</th>
+            <th>%</th>
+            <th>Dato</th>
+          </tr>
+        </thead>
+        <tbody id="tbl-student-attempts-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- View 3: Per-quiz detalje -->
+  <div id="view-quiz" class="lb-view">
+    <div class="lb-card">
+      <a href="#" id="link-back-quiz" class="link-back">◀ Tilbage til leaderboard</a>
+      <h2 id="quiz-detail-title">Quiz</h2>
+      <table class="lb-table" id="tbl-quiz-attempts">
+        <thead>
+          <tr>
+            <th>Navn</th>
+            <th>Forsøg #</th>
+            <th>%</th>
+            <th>Dato</th>
+          </tr>
+        </thead>
+        <tbody id="tbl-quiz-attempts-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="lb-footer">Data er synlig for alle med linket.</div>
+
+</div><!-- #lb-main -->
+
+<!-- Scripts -->
+<script src="assets/firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="assets/leaderboard.js"></script>
+</body>
+</html>

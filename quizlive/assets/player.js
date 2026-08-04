@@ -21,6 +21,7 @@
     pin: '',
     playerId: '',
     name: '',
+    registered: false,
     currentPhase: '',
     currentQIndex: -1,
     hasAnswered: false,
@@ -53,12 +54,22 @@
     localStorage.setItem('quizlive_player', JSON.stringify({
       pin: state.pin,
       playerId: state.playerId,
-      name: state.name
+      name: state.name,
+      registered: state.registered
     }));
   }
 
   function clearSession() {
     localStorage.removeItem('quizlive_player');
+  }
+
+  /* --- Elev-PIN huskes på tværs af spil (separat fra sessionen ovenfor,
+     som ryddes efter hvert spil) --- */
+  function saveElevPin(elevPin) {
+    try { localStorage.setItem('quizlive_elevpin', elevPin); } catch (e) {}
+  }
+  function getSavedElevPin() {
+    try { return localStorage.getItem('quizlive_elevpin') || ''; } catch (e) { return ''; }
   }
 
   /* --- URL-param PIN --- */
@@ -72,6 +83,12 @@
   var urlPin = getUrlPin();
   if (urlPin) {
     document.getElementById('input-pin').value = urlPin;
+  }
+
+  /* --- Pre-udfyld elev-PIN fra tidligere besøg --- */
+  var savedElevPin = getSavedElevPin();
+  if (savedElevPin) {
+    document.getElementById('input-elevpin').value = savedElevPin;
   }
 
   /* --- Server-tid offset --- */
@@ -91,22 +108,46 @@
   /* --- Deltag-knap --- */
   document.getElementById('btn-join').addEventListener('click', function () {
     var pin = document.getElementById('input-pin').value.trim();
+    var elevPin = document.getElementById('input-elevpin').value.trim();
     var name = document.getElementById('input-name').value.trim();
 
     if (pin.length !== 6 || !/^\d{6}$/.test(pin)) {
       setError('PIN skal være 6 cifre.');
       return;
     }
+
+    // Registreret elev — elev-PIN har forrang over gæste-navn
+    if (elevPin) {
+      if (!/^\d{4}$/.test(elevPin)) {
+        setError('Elev-PIN skal være 4 cifre.');
+        return;
+      }
+      setError('');
+      db.ref('students/' + elevPin).once('value', function (snap) {
+        if (!snap.exists()) {
+          setError('PIN ikke genkendt — tjek koden, eller lad feltet stå tomt for at deltage som gæst.');
+          return;
+        }
+        var studentName = (snap.val() && snap.val().name) || '';
+        saveElevPin(elevPin);
+        joinGame(pin, studentName, elevPin, true);
+      }, function () {
+        setError('Kunne ikke slå elev-PIN op. Prøv igen.');
+      });
+      return;
+    }
+
+    // Gæst — kræver navn
     if (!name) {
       setError('Indtast dit navn.');
       return;
     }
 
     setError('');
-    joinGame(pin, name, null);
+    joinGame(pin, name, null, false);
   });
 
-  function joinGame(pin, name, existingPlayerId) {
+  function joinGame(pin, name, existingPlayerId, registered) {
     db.ref('games/' + pin).once('value', function (snap) {
       if (!snap.exists()) {
         setError('Spillet findes ikke. Tjek PIN.');
@@ -115,19 +156,23 @@
       var gameData = snap.val();
       var phase = gameData.state ? gameData.state.phase : '';
 
-      // Generér eller genbrug playerId
+      // Registrerede elever bruger deres elev-PIN som stabilt playerId
+      // (samme id ved genindmeldelse); gæster får et tilfældigt id.
       var playerId = existingPlayerId || ('p_' + Math.random().toString(36).slice(2, 10));
 
       state.pin = pin;
       state.playerId = playerId;
       state.name = name;
+      state.registered = !!registered;
       state.timerSec = gameData.config ? (gameData.config.timerSec || 20) : 20;
 
       // Skriv spiller til databasen (merge-safe: sæt kun navn+joinedAt hvis ny)
       var playerRef = db.ref('games/' + pin + '/players/' + playerId);
       playerRef.once('value', function (pSnap) {
         if (!pSnap.exists()) {
-          playerRef.set({ name: name, score: 0, joinedAt: firebase.database.ServerValue.TIMESTAMP });
+          var playerData = { name: name, score: 0, joinedAt: firebase.database.ServerValue.TIMESTAMP };
+          if (registered) playerData.registered = true;
+          playerRef.set(playerData);
         }
         saveSession();
         startListening(phase);
@@ -384,8 +429,23 @@
   var restored = tryRestore();
   if (restored) {
     document.getElementById('input-pin').value = restored.pin;
-    document.getElementById('input-name').value = restored.name;
-    joinGame(restored.pin, restored.name, restored.playerId);
+    if (restored.registered) {
+      // Registreret elev — genbekræft at PIN'en stadig findes i elevlisten
+      // (kan være slettet/omdøbt siden sidst), brug altid det nuværende navn.
+      document.getElementById('input-elevpin').value = restored.playerId;
+      db.ref('students/' + restored.playerId).once('value', function (snap) {
+        if (snap.exists()) {
+          var freshName = (snap.val() && snap.val().name) || restored.name;
+          joinGame(restored.pin, freshName, restored.playerId, true);
+        } else {
+          // PIN findes ikke længere — lad brugeren melde sig ind igen manuelt
+          clearSession();
+        }
+      });
+    } else {
+      document.getElementById('input-name').value = restored.name;
+      joinGame(restored.pin, restored.name, restored.playerId, false);
+    }
   }
 
 }());
