@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Studiehub — Super Admin 👑</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>👑</text></svg>">
+<style>
+  * { box-sizing: border-box; }
+  :root {
+    --primary: #6366f1; --accent: #ec4899; --bg: #0f172a; --surface: #1e293b;
+    --surface2: #16213a; --text: #f1f5f9; --muted: #94a3b8; --border: #334155;
+    --green: #22c55e; --red: #ef4444;
+  }
+  html, body { margin: 0; min-height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 20px 16px 80px; }
+  .login-screen { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; }
+  .login-logo { font-size: 3rem; }
+  .login-title { font-size: 1.8rem; font-weight: 800; margin: 8px 0 4px; }
+  .login-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 18px; max-width: 420px; }
+  .card { background: linear-gradient(180deg, var(--surface), var(--surface2)); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 14px; }
+  label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--muted); margin: 10px 0 4px; text-align: left; }
+  input { width: 100%; font-family: inherit; font-size: 1rem; background: rgba(0,0,0,0.25); color: var(--text); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+  input:focus { outline: 2px solid var(--primary); border-color: transparent; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: var(--primary); color: #fff; font-weight: 700; font-size: 0.9rem; padding: 10px 16px; border: none; border-radius: 10px; cursor: pointer; }
+  .btn:hover { filter: brightness(1.1); }
+  .btn.ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+  .btn.red { background: var(--red); }
+  .btn.small { padding: 6px 10px; font-size: 0.78rem; }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  h1 { font-size: 1.4rem; }
+  h2 { font-size: 1.1rem; margin: 18px 0 10px; color: var(--primary); }
+  .row { display: flex; align-items: center; gap: 10px; }
+  .between { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .muted { color: var(--muted); font-size: 0.82rem; }
+  .empty { color: var(--muted); text-align: center; padding: 18px; }
+  .student-row { display: flex; align-items: center; gap: 10px; padding: 10px; border-bottom: 1px solid var(--border); }
+  .student-row:last-child { border-bottom: none; }
+  .s-avatar { font-size: 1.5rem; width: 34px; text-align: center; flex: 0 0 auto; }
+  .s-main { flex: 1; min-width: 0; }
+  .s-name { font-weight: 700; }
+  .s-pin { font-family: ui-monospace, monospace; font-size: 0.85rem; color: var(--muted); }
+  .log-row { display: flex; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 0.82rem; }
+  .log-row:last-child { border-bottom: none; }
+  .log-time { color: var(--muted); }
+  .banner-warn { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.4); color: #fca5a5; padding: 10px 14px; border-radius: 10px; font-size: 0.85rem; margin-bottom: 14px; }
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 12px); background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 10px 16px; border-radius: 10px; font-size: 0.88rem; opacity: 0; transition: opacity 0.2s, transform 0.2s; z-index: 999; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div id="sa-auth" class="login-screen" style="display:none">
+  <div class="login-logo">👑</div>
+  <h1 class="login-title">Studiehub — Super Admin</h1>
+  <p class="login-sub">Kun for platformens ejer — al adgang logges</p>
+  <div class="card" style="max-width:380px;width:100%;text-align:left">
+    <label>E-mail (master-konto)</label>
+    <input id="sa-email" type="email" autocomplete="username">
+    <label>Kodeord</label>
+    <input id="sa-pass" type="password" autocomplete="current-password">
+    <div style="margin-top:16px">
+      <button id="sa-go" class="btn" style="width:100%">Log ind 🗝️</button>
+    </div>
+  </div>
+</div>
+
+<!-- Afvist -->
+<div id="sa-denied" class="login-screen" style="display:none">
+  <div class="login-logo">⛔</div>
+  <h1 class="login-title" style="font-size:1.6rem">Ingen adgang</h1>
+  <p class="login-sub">Denne konto er ikke super admin for Studiehub. Rettigheden kan KUN tildeles i Firebase-konsollen.</p>
+  <div class="card" style="max-width:440px;width:100%;text-align:left">
+    <p class="muted">Skal denne konto være super admin? Kopiér UID'et herunder, og sæt i Firebase-konsollen:<br>Realtime Database → Data → <b>studiehub</b> → tilføj barn <b>superadmins</b> → barn <b>&lt;UID&gt;</b> = <b>true</b>.</p>
+    <label>Denne kontos UID</label>
+    <input id="sa-uid" readonly onclick="this.select()" style="font-family:monospace">
+  </div>
+  <button id="sa-logout-denied" class="btn ghost small" style="margin-top:16px">Log ud</button>
+</div>
+
+<!-- Panel -->
+<div id="sa-panel" style="display:none">
+  <div class="wrap">
+    <div class="card row">
+      <span style="font-size:1.8rem">👑</span>
+      <div style="flex:1">
+        <h1 style="margin:0">Studiehub — Super Admin</h1>
+        <div class="muted" id="sa-sub"></div>
+      </div>
+      <button id="sa-logout" class="btn ghost small">Log ud</button>
+    </div>
+
+    <div class="between">
+      <h2 style="margin:0">🧑‍🎓 Elever <small id="sa-count" class="muted"></small></h2>
+      <div class="row">
+        <button id="sa-seed" class="btn ghost small">🌱 Opret klasse-liste</button>
+        <button id="sa-add" class="btn small">➕ Tilføj elev</button>
+      </div>
+    </div>
+    <div class="card" id="sa-students"><div class="empty">Henter…</div></div>
+
+    <h2>🕒 Seneste aktivitet</h2>
+    <div class="card" id="sa-audit"><div class="empty">Henter…</div></div>
+  </div>
+</div>
+
+<div id="sa-toast" class="toast"></div>
+
+<script src="assets/firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="assets/sh-superadmin.js"></script>
+</body>
+</html>
