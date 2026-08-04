@@ -532,6 +532,7 @@
     var base = window.location.href.replace('host.html', 'index.html');
     var joinUrl = base + '?pin=' + g.pin;
     document.getElementById('host-url').textContent = joinUrl;
+    g.joinUrl = joinUrl; // gemmes til "Kopiér link"-knappen
 
     // QR-kode
     var qrDiv = document.getElementById('qr-code');
@@ -578,6 +579,47 @@
         count + ' spiller' + (count !== 1 ? 'e' : '');
       document.getElementById('btn-start').disabled = count < 1;
     });
+  }
+
+  /* --- Kopiér join-link (til at dele i chat i stedet for PIN/QR) --- */
+  var btnCopyLink = document.getElementById('btn-copy-link');
+  btnCopyLink.addEventListener('click', function () {
+    if (!g.joinUrl) return;
+    var onDone = function (ok) {
+      var original = '📋 Kopiér link';
+      btnCopyLink.textContent = ok ? '✅ Kopieret!' : '⚠ Kunne ikke kopiere';
+      setTimeout(function () { btnCopyLink.textContent = original; }, 2000);
+    };
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(g.joinUrl).then(function () {
+          onDone(true);
+        }).catch(function () {
+          fallbackCopyLink(g.joinUrl, onDone);
+        });
+      } else {
+        fallbackCopyLink(g.joinUrl, onDone);
+      }
+    } catch (e) {
+      fallbackCopyLink(g.joinUrl, onDone);
+    }
+  });
+
+  function fallbackCopyLink(text, cb) {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      var ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      cb(ok);
+    } catch (e) {
+      cb(false);
+    }
   }
 
   /* --- Start spillet --- */
