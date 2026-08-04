@@ -47,7 +47,10 @@
 
   /* --- Tom slide --- */
   function emptySlide() {
-    return { q: '', options: ['', '', '', ''], correct: -1, level: 'middel', why: '' };
+    return {
+      q: '', options: ['', '', '', ''], correct: -1, level: 'middel', why: '',
+      img: '', optImgs: ['', '', '', '']
+    };
   }
 
   /* ================================================================
@@ -69,6 +72,14 @@
   ];
   var inpLevel        = document.getElementById('inp-level');
   var inpWhy          = document.getElementById('inp-why');
+  var fileQImg        = document.getElementById('file-q-img');
+  var btnQImg         = document.getElementById('btn-q-img');
+  var qImgPreview     = document.getElementById('q-img-preview');
+  var qImgPreviewImg  = document.getElementById('q-img-preview-img');
+  var btnQImgRemove   = document.getElementById('btn-q-img-remove');
+  var fileOptImg      = document.getElementById('file-opt-img');
+  var optImgBtns      = document.querySelectorAll('.opt-img-btn');
+  var optImgThumbs    = document.querySelectorAll('.opt-img-thumb');
   var slideLabel      = document.getElementById('slide-label');
   var slideDotsWrap   = document.getElementById('slide-dots');
   var btnPrev         = document.getElementById('btn-prev-slide');
@@ -133,6 +144,9 @@
     inpLevel.value = s.level || 'middel';
     inpWhy.value   = s.why || '';
     updateCorrectUI(s.correct);
+    updateQImgUI(s.img || '');
+    var oImgs = s.optImgs || ['', '', '', ''];
+    for (var i = 0; i < 4; i++) { updateOptImgUI(i, oImgs[i] || ''); }
   }
 
   /* Opdatér de farvede shape-knapper baseret på correct-indeks */
@@ -146,6 +160,120 @@
       }
     });
   }
+
+  /* ================================================================
+     Billeder: komprimering + preview-UI (spørgsmål + svarmuligheder)
+     ================================================================ */
+
+  /* Læs en billedfil, skalér til maxDim og komprimér til JPEG data-URL.
+     Fylder canvas med hvid baggrund først, så gennemsigtige PNG'er
+     ikke bliver sorte. Kalder callback(dataUrl) ved succes. */
+  function readAndCompressImage(file, maxDim, callback) {
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      showToast('Billedet er for stort (maks. 10 MB).', true);
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      var img = new Image();
+      img.onload = function () {
+        var w = img.width || 1;
+        var h = img.height || 1;
+        var scale = Math.min(1, maxDim / Math.max(w, h));
+        var cw = Math.max(1, Math.round(w * scale));
+        var ch = Math.max(1, Math.round(h * scale));
+        var canvas = document.createElement('canvas');
+        canvas.width = cw;
+        canvas.height = ch;
+        var ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, cw, ch);
+        ctx.drawImage(img, 0, 0, cw, ch);
+        callback(canvas.toDataURL('image/jpeg', 0.7));
+      };
+      img.onerror = function () {
+        showToast('Kunne ikke indlæse billedet.', true);
+      };
+      img.src = e.target.result;
+    };
+    reader.onerror = function () {
+      showToast('Kunne ikke læse filen.', true);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  /* Vis/skjul spørgsmålsbillede-preview + skift knaptekst */
+  function updateQImgUI(dataUrl) {
+    if (dataUrl) {
+      qImgPreviewImg.src = dataUrl;
+      qImgPreview.classList.add('show');
+      btnQImg.textContent = '📷 Skift billede';
+    } else {
+      qImgPreviewImg.src = '';
+      qImgPreview.classList.remove('show');
+      btnQImg.textContent = '📷 Tilføj billede';
+    }
+  }
+
+  /* Vis/skjul svarmulighed-thumbnail for option-indeks i */
+  function updateOptImgUI(i, dataUrl) {
+    var thumb = document.querySelector('.opt-img-thumb[data-opt="' + i + '"]');
+    if (!thumb) return;
+    var img = thumb.querySelector('img');
+    if (dataUrl) {
+      img.src = dataUrl;
+      thumb.classList.add('show');
+    } else {
+      img.src = '';
+      thumb.classList.remove('show');
+    }
+  }
+
+  /* --- Spørgsmålsbillede: vælg/fjern --- */
+  btnQImg.addEventListener('click', function () { fileQImg.click(); });
+  fileQImg.addEventListener('change', function () {
+    var file = fileQImg.files && fileQImg.files[0];
+    fileQImg.value = ''; /* nulstil så samme fil kan vælges igen */
+    if (!file) return;
+    readAndCompressImage(file, 800, function (dataUrl) {
+      slides[currentIdx].img = dataUrl;
+      updateQImgUI(dataUrl);
+      renderDots();
+    });
+  });
+  btnQImgRemove.addEventListener('click', function () {
+    slides[currentIdx].img = '';
+    updateQImgUI('');
+    renderDots();
+  });
+
+  /* --- Svarmulighed-billeder: vælg/fjern --- */
+  var pendingOptImgIdx = -1;
+  optImgBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      pendingOptImgIdx = parseInt(btn.dataset.opt, 10);
+      fileOptImg.click();
+    });
+  });
+  fileOptImg.addEventListener('change', function () {
+    var file = fileOptImg.files && fileOptImg.files[0];
+    fileOptImg.value = ''; /* nulstil så samme fil kan vælges igen */
+    var idx = pendingOptImgIdx;
+    pendingOptImgIdx = -1;
+    if (!file || idx < 0) return;
+    readAndCompressImage(file, 400, function (dataUrl) {
+      slides[currentIdx].optImgs[idx] = dataUrl;
+      updateOptImgUI(idx, dataUrl);
+    });
+  });
+  optImgThumbs.forEach(function (thumb) {
+    thumb.addEventListener('click', function () {
+      var idx = parseInt(thumb.dataset.opt, 10);
+      slides[currentIdx].optImgs[idx] = '';
+      updateOptImgUI(idx, '');
+    });
+  });
 
   /* ================================================================
      Shape-knapper: klik markerer korrekt svar
@@ -315,7 +443,14 @@
       localStorage.setItem(LS_COURSE, course);
     } catch (e) {}
 
-    /* 5. Byg quiz-objekt */
+    /* 5. Byg quiz-objekt — saml billeder i separat map (imgId -> data-URL) */
+    var imagesMap = {};
+    function registerImage(dataUrl) {
+      var id = 'img_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10);
+      imagesMap[id] = dataUrl;
+      return id;
+    }
+
     var questions = slides.map(function (s) {
       var q = {
         q:       s.q.trim(),
@@ -324,10 +459,18 @@
         level:   s.level
       };
       if (s.why) q.why = s.why.trim();
+      if (s.img) q.img = registerImage(s.img);
+      var hasOptImgs = Array.isArray(s.optImgs) && s.optImgs.some(function (v) { return !!v; });
+      if (hasOptImgs) {
+        q.optImgs = [0, 1, 2, 3].map(function (i) {
+          var v = s.optImgs[i];
+          return v ? registerImage(v) : '';
+        });
+      }
       return q;
     });
 
-    /* 6. Skriv til Firebase */
+    /* 6. Skriv til Firebase (quiz-node + billed-node) */
     btnSave.disabled = true;
     btnSave.textContent = 'Gemmer...';
 
@@ -340,17 +483,30 @@
     if (semester) payload.semester = semester;
     if (course)   payload.course   = course;
 
+    /* Skriv billed-noden: sæt hele noden (fjernede billeder forsvinder),
+       eller fjern noden helt hvis der ingen billeder er */
+    function writeImages(quizId) {
+      var imgRef = db.ref('quizimages/' + quizId);
+      return Object.keys(imagesMap).length > 0 ? imgRef.set(imagesMap) : imgRef.remove();
+    }
+
     if (editingQuizId) {
       /* Redigér eksisterende */
       payload.createdAt = editingCreatedAt || ServerValue.TIMESTAMP;
       db.ref('quizzes/' + editingQuizId).set(payload).then(function () {
+        return writeImages(editingQuizId);
+      }).then(function () {
         onSaveSuccess(title);
       }).catch(onSaveError);
     } else {
-      /* Ny quiz */
+      /* Ny quiz — hent id fra push-ref FØR vi skriver billeder */
       payload.createdAt = ServerValue.TIMESTAMP;
-      db.ref('quizzes').push(payload).then(function (ref) {
-        editingQuizId = ref.key;
+      var newRef = db.ref('quizzes').push();
+      var newQuizId = newRef.key;
+      newRef.set(payload).then(function () {
+        editingQuizId = newQuizId;
+        return writeImages(newQuizId);
+      }).then(function () {
         onSaveSuccess(title);
       }).catch(onSaveError);
     }
@@ -457,9 +613,13 @@
         titleDiv.className = 'quiz-lib-title';
         titleDiv.textContent = qObj.title || '(Uden titel)';
 
+        var hasImg = Array.isArray(qObj.questions) && qObj.questions.some(function (q) {
+          return !!q.img || (Array.isArray(q.optImgs) && q.optImgs.some(function (v) { return !!v; }));
+        });
+
         var metaDiv = document.createElement('div');
         metaDiv.className = 'quiz-lib-meta';
-        metaDiv.textContent = qCnt + ' spørgsmål · af ' + (qObj.author || 'ukendt') + (date ? ' · ' + date : '');
+        metaDiv.textContent = qCnt + ' spørgsmål · af ' + (qObj.author || 'ukendt') + (date ? ' · ' + date : '') + (hasImg ? ' · 📷' : '');
 
         var btnEdit = document.createElement('button');
         btnEdit.className = 'btn btn-lib-edit';
@@ -549,40 +709,54 @@
     editingQuizId   = id;
     editingCreatedAt = qObj.createdAt || null;
 
-    /* Konvertér questions til slides */
-    if (Array.isArray(qObj.questions) && qObj.questions.length > 0) {
-      slides = qObj.questions.map(function (q) {
-        return {
-          q:       q.q || '',
-          options: Array.isArray(q.options) ? q.options.slice(0, 4).concat(['','','','']).slice(0,4) : ['','','',''],
-          correct: (typeof q.correct === 'number') ? q.correct : -1,
-          level:   q.level || 'middel',
-          why:     q.why   || ''
-        };
-      });
-    } else {
-      slides = [emptySlide()];
-    }
+    /* Hent billed-map og konvertér id-refs tilbage til data-URLs i slides */
+    db.ref('quizimages/' + id).once('value').then(function (snap) {
+      var imagesMap = snap.exists() ? snap.val() : {};
 
-    currentIdx = 0;
-    loadSlide(0);
-    renderDots();
-    renderNavButtons();
-    topbarError.textContent = '';
-    showToast('Quiz \'' + (qObj.title || '') + '\' indlæst til redigering.');
+      if (Array.isArray(qObj.questions) && qObj.questions.length > 0) {
+        slides = qObj.questions.map(function (q) {
+          return {
+            q:       q.q || '',
+            options: Array.isArray(q.options) ? q.options.slice(0, 4).concat(['','','','']).slice(0,4) : ['','','',''],
+            correct: (typeof q.correct === 'number') ? q.correct : -1,
+            level:   q.level || 'middel',
+            why:     q.why   || '',
+            img:     (q.img && imagesMap[q.img]) ? imagesMap[q.img] : '',
+            optImgs: [0, 1, 2, 3].map(function (i) {
+              var ref = Array.isArray(q.optImgs) ? q.optImgs[i] : '';
+              return (ref && imagesMap[ref]) ? imagesMap[ref] : '';
+            })
+          };
+        });
+      } else {
+        slides = [emptySlide()];
+      }
 
-    /* Fold biblioteket sammen */
-    libraryContent.classList.remove('open');
-    libraryToggle.classList.remove('open');
+      currentIdx = 0;
+      loadSlide(0);
+      renderDots();
+      renderNavButtons();
+      topbarError.textContent = '';
+      showToast('Quiz \'' + (qObj.title || '') + '\' indlæst til redigering.');
 
-    /* Scroll til toppen */
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+      /* Fold biblioteket sammen */
+      libraryContent.classList.remove('open');
+      libraryToggle.classList.remove('open');
+
+      /* Scroll til toppen */
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }).catch(function (err) {
+      showToast('Kunne ikke indlæse billeder: ' + (err && err.message ? err.message : 'fejl'), true);
+    });
   }
 
-  /* Slet en quiz fra DB */
+  /* Slet en quiz fra DB (inkl. tilhørende billed-node) */
   function deleteQuiz(id, title) {
     if (!confirm('Slet quizzen "' + (title || id) + '"?\nDette kan ikke fortrydes.')) return;
-    db.ref('quizzes/' + id).remove().then(function () {
+    Promise.all([
+      db.ref('quizzes/' + id).remove(),
+      db.ref('quizimages/' + id).remove()
+    ]).then(function () {
       /* Hvis vi redigerede denne quiz, nulstil editoren */
       if (editingQuizId === id) {
         resetEditor();

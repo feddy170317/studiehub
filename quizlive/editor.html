@@ -126,6 +126,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      flex-wrap: wrap;
     }
     .option-shape-btn {
       flex-shrink: 0;
@@ -177,6 +178,111 @@
       user-select: text;
     }
     .option-inp.invalid { border-color: #f87171; }
+
+    /* --- Spørgsmålsbillede --- */
+    .q-img-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .btn-img-add {
+      width: auto;
+      padding: 8px 16px;
+      font-size: 0.88rem;
+      background: #2d1b69;
+      color: var(--text-muted);
+      border: 2px solid #4c1d95;
+      text-transform: none;
+      letter-spacing: normal;
+    }
+    .btn-img-add:hover { background: #3b1d8a; color: #fff; }
+    .q-img-preview {
+      position: relative;
+      display: none;
+      align-items: center;
+    }
+    .q-img-preview.show { display: flex; }
+    .q-img-preview img {
+      max-height: 110px;
+      max-width: 220px;
+      border-radius: var(--radius-sm);
+      border: 2px solid #3b1d8a;
+      object-fit: contain;
+      background: #fff;
+    }
+    .q-img-preview .img-remove-btn {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: none;
+      background: #be123c;
+      color: #fff;
+      font-weight: 900;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+    .img-remove-btn:hover { background: #e11d48; }
+
+    /* --- Svarmulighed-billeder --- */
+    .opt-img-btn {
+      flex-shrink: 0;
+      width: 40px;
+      height: 46px;
+      border-radius: var(--radius-sm);
+      border: 2px solid #3b1d8a;
+      background: var(--bg-dark);
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .opt-img-btn:hover { border-color: var(--accent); color: #fff; }
+    .opt-img-thumb {
+      flex-shrink: 0;
+      width: 46px;
+      height: 46px;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      border: 2px solid #3b1d8a;
+      display: none;
+    }
+    .opt-img-thumb.show { display: block; }
+    .opt-img-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .opt-img-thumb .opt-img-thumb-x {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      width: 16px;
+      height: 16px;
+      background: #be123c;
+      color: #fff;
+      border-radius: 50%;
+      font-size: 0.65rem;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .opt-img-thumb:hover { border-color: #f87171; }
 
     /* Valgmuligheder for niveau + forklaring */
     .slide-meta {
@@ -453,31 +559,62 @@
     <label for="inp-question">Spørgsmål</label>
     <textarea id="inp-question" placeholder="Skriv dit spørgsmål her..."></textarea>
 
+    <!-- Spørgsmålsbillede -->
+    <div class="q-img-row">
+      <input type="file" id="file-q-img" accept="image/*" style="display:none;">
+      <button type="button" id="btn-q-img" class="btn btn-img-add">📷 Tilføj billede</button>
+      <div class="q-img-preview" id="q-img-preview">
+        <img id="q-img-preview-img" alt="Spørgsmålsbillede">
+        <button type="button" id="btn-q-img-remove" class="img-remove-btn" aria-label="Fjern billede">✕</button>
+      </div>
+    </div>
+
     <!-- Svarmuligheder -->
-    <label>Svarmuligheder <span style="color:#6b52a8; font-size:0.8rem; text-transform:none;">(klik på formen for at markere korrekt svar)</span></label>
+    <label>Svarmuligheder <span style="color:#6b52a8; font-size:0.8rem; text-transform:none;">(klik på formen for at markere korrekt svar, 📷 for at tilføje billede)</span></label>
     <div class="option-rows">
+      <input type="file" id="file-opt-img" accept="image/*" style="display:none;">
       <div class="option-row">
         <button class="option-shape-btn opt-a" data-opt="0" aria-label="Markér A som korrekt">
           ▲<span class="correct-tick">✓</span>
         </button>
+        <button type="button" class="opt-img-btn" data-opt="0" aria-label="Tilføj billede til svar A">📷</button>
+        <div class="opt-img-thumb" data-opt="0" title="Klik for at fjerne billede">
+          <img data-opt="0" alt="">
+          <span class="opt-img-thumb-x">✕</span>
+        </div>
         <input class="option-inp" id="inp-opt-0" type="text" placeholder="Svarmulighed A" autocomplete="off">
       </div>
       <div class="option-row">
         <button class="option-shape-btn opt-b" data-opt="1" aria-label="Markér B som korrekt">
           ◆<span class="correct-tick">✓</span>
         </button>
+        <button type="button" class="opt-img-btn" data-opt="1" aria-label="Tilføj billede til svar B">📷</button>
+        <div class="opt-img-thumb" data-opt="1" title="Klik for at fjerne billede">
+          <img data-opt="1" alt="">
+          <span class="opt-img-thumb-x">✕</span>
+        </div>
         <input class="option-inp" id="inp-opt-1" type="text" placeholder="Svarmulighed B" autocomplete="off">
       </div>
       <div class="option-row">
         <button class="option-shape-btn opt-c" data-opt="2" aria-label="Markér C som korrekt">
           ●<span class="correct-tick">✓</span>
         </button>
+        <button type="button" class="opt-img-btn" data-opt="2" aria-label="Tilføj billede til svar C">📷</button>
+        <div class="opt-img-thumb" data-opt="2" title="Klik for at fjerne billede">
+          <img data-opt="2" alt="">
+          <span class="opt-img-thumb-x">✕</span>
+        </div>
         <input class="option-inp" id="inp-opt-2" type="text" placeholder="Svarmulighed C" autocomplete="off">
       </div>
       <div class="option-row">
         <button class="option-shape-btn opt-d" data-opt="3" aria-label="Markér D som korrekt">
           ■<span class="correct-tick">✓</span>
         </button>
+        <button type="button" class="opt-img-btn" data-opt="3" aria-label="Tilføj billede til svar D">📷</button>
+        <div class="opt-img-thumb" data-opt="3" title="Klik for at fjerne billede">
+          <img data-opt="3" alt="">
+          <span class="opt-img-thumb-x">✕</span>
+        </div>
         <input class="option-inp" id="inp-opt-3" type="text" placeholder="Svarmulighed D" autocomplete="off">
       </div>
     </div>

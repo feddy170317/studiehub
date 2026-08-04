@@ -40,8 +40,17 @@
     answersListener: null,
     stateListener: null,
     questionStartAt: 0,
-    autoAdvanced: false
+    autoAdvanced: false,
+    imagesMap: {}           // imgId -> data-URL (kun til lokal host-visning, publiceres aldrig)
   };
+
+  /* Slå et billede op i g.imagesMap — returnerer data-URL eller null.
+     Bruges KUN på host — spillerne ser aldrig billeder. */
+  function imgSrc(idOrEmpty) {
+    if (!idOrEmpty) return null;
+    var v = g.imagesMap[idOrEmpty];
+    return v || null;
+  }
 
   /* --- Server-tid offset --- */
   db.ref('.info/serverTimeOffset').on('value', function (snap) {
@@ -195,30 +204,48 @@
     g.timerSec = timerSec;
     g.qIndex = 0;
     g.players = {};
+    g.imagesMap = {};
 
     var pin = generatePin();
     g.pin = pin;
     g.gameRef = db.ref('games/' + pin);
 
-    // Opret spil-node
-    g.gameRef.set({
-      config: {
-        timerSec: timerSec,
-        quizId: quizId,
-        title: quiz.title,
-        createdAt: firebase.database.ServerValue.TIMESTAMP
-      },
-      state: {
-        phase: 'lobby',
-        qIndex: 0,
-        totalQ: quiz.questions.length,
-        questionStartAt: 0,
-        correctChoice: -1,
-        lastPts: 0
-      }
-    }).then(function () {
-      showLobby();
-    });
+    function createGameNode() {
+      // Opret spil-node
+      g.gameRef.set({
+        config: {
+          timerSec: timerSec,
+          quizId: quizId,
+          title: quiz.title,
+          createdAt: firebase.database.ServerValue.TIMESTAMP
+        },
+        state: {
+          phase: 'lobby',
+          qIndex: 0,
+          totalQ: quiz.questions.length,
+          questionStartAt: 0,
+          correctChoice: -1,
+          lastPts: 0
+        }
+      }).then(function () {
+        showLobby();
+      });
+    }
+
+    // Hent quiz-billeder (kun DB-quizzer kan have billeder) FØR lobbyen vises.
+    // Billederne hentes én gang og bruges kun lokalt på host — de publiceres
+    // aldrig til /games, så spillerne ser dem aldrig.
+    if (selValue.indexOf('db:') === 0) {
+      db.ref('quizimages/' + quizId).once('value').then(function (snap) {
+        g.imagesMap = snap.exists() ? snap.val() : {};
+        createGameNode();
+      }).catch(function () {
+        g.imagesMap = {};
+        createGameNode();
+      });
+    } else {
+      createGameNode();
+    }
   });
 
   /* --- Lobby --- */
@@ -284,11 +311,14 @@
       var j = Math.floor(Math.random() * (i + 1));
       var tmp = order[i]; order[i] = order[j]; order[j] = tmp;
     }
+    var optImgs = Array.isArray(q.optImgs) ? q.optImgs : ['', '', '', ''];
     return {
       q: q.q,
       level: q.level,
       why: q.why,
+      img: q.img || '',
       options: order.map(function (idx) { return q.options[idx]; }),
+      optImgs: order.map(function (idx) { return optImgs[idx] || ''; }),
       correct: order.indexOf(q.correct)
     };
   }
@@ -331,6 +361,18 @@
       'Spørgsmål ' + (qIdx + 1) + '/' + total;
     document.getElementById('q-text').textContent = q.q;
 
+    // Spørgsmålsbillede (kun vist på host — publiceres ikke til spillerne)
+    var qImgWrap = document.getElementById('q-img-wrap');
+    var qImgEl = document.getElementById('q-img');
+    var qImgUrl = imgSrc(q.img);
+    if (qImgUrl) {
+      qImgEl.src = qImgUrl;
+      qImgWrap.classList.add('show');
+    } else {
+      qImgEl.src = '';
+      qImgWrap.classList.remove('show');
+    }
+
     // Level-badge
     var badge = document.getElementById('q-level-badge');
     var lvl = q.level || 'let';
@@ -343,7 +385,9 @@
     q.options.forEach(function (opt, i) {
       var card = document.createElement('div');
       card.className = 'option-card ' + SHAPE_CLASSES[i];
-      card.innerHTML = '<span class="icon">' + SHAPES[i] + '</span><span>' + escHtml(opt) + '</span>';
+      var optImgUrl = imgSrc(q.optImgs ? q.optImgs[i] : '');
+      var thumbHtml = optImgUrl ? '<img class="opt-thumb" src="' + optImgUrl + '" alt="">' : '';
+      card.innerHTML = thumbHtml + '<span class="icon">' + SHAPES[i] + '</span><span>' + escHtml(opt) + '</span>';
       optionsEl.appendChild(card);
     });
 
@@ -476,6 +520,18 @@
     document.getElementById('reveal-q-text').textContent = q.q;
     document.getElementById('reveal-why').textContent = q.why || '';
 
+    // Spørgsmålsbillede (kun vist på host)
+    var revealImgWrap = document.getElementById('reveal-img-wrap');
+    var revealImgEl = document.getElementById('reveal-img');
+    var revealImgUrl = imgSrc(q.img);
+    if (revealImgUrl) {
+      revealImgEl.src = revealImgUrl;
+      revealImgWrap.classList.add('show');
+    } else {
+      revealImgEl.src = '';
+      revealImgWrap.classList.remove('show');
+    }
+
     // Svarmuligheder med highlight
     var optionsEl = document.getElementById('reveal-options');
     optionsEl.innerHTML = '';
@@ -485,7 +541,9 @@
       if (i === correctIdx) cls += ' correct';
       else cls += ' dim';
       card.className = cls;
-      card.innerHTML = '<span class="icon">' + SHAPES[i] + '</span><span>' + escHtml(opt) + '</span>';
+      var optImgUrl = imgSrc(q.optImgs ? q.optImgs[i] : '');
+      var thumbHtml = optImgUrl ? '<img class="opt-thumb" src="' + optImgUrl + '" alt="">' : '';
+      card.innerHTML = thumbHtml + '<span class="icon">' + SHAPES[i] + '</span><span>' + escHtml(opt) + '</span>';
       optionsEl.appendChild(card);
     });
 

@@ -81,15 +81,17 @@ Når du er færdig med at teste, bør du sætte følgende regler i Firebase Cons
 ```json
 {
   "rules": {
-    "games":   { ".read": true, ".write": true },
-    "quizzes": { ".read": true, ".write": true },
-    "$other":  { ".read": false, ".write": false }
+    "games":      { ".read": true, ".write": true },
+    "quizzes":    { ".read": true, ".write": true },
+    "quizimages": { ".read": true, ".write": true },
+    "$other":     { ".read": false, ".write": false }
   }
 }
 ```
 
-Dette begrænser adgang til kun `/games`- og `/quizzes`-noderne.  
-`/quizzes` bruges af quiz-editoren til at gemme og hente quiz-data.
+Dette begrænser adgang til kun `/games`-, `/quizzes`- og `/quizimages`-noderne.  
+`/quizzes` bruges af quiz-editoren til at gemme og hente quiz-data.  
+`/quizimages` indeholder de komprimerede billeder tilhørt hver quiz (holdt adskilt fra `/quizzes` så quiz-listen forbliver hurtig at hente).
 
 ---
 
@@ -108,6 +110,8 @@ QuizLive indeholder en indbygget quiz-editor, som giver alle med linket mulighed
 - Tilføj valgfri forklaring til det korrekte svar
 - Gem quizzer til databasen — de er straks tilgængelige i host-dropdown
 - Redigér eller slet eksisterende quizzer fra "📚 Gemte quizzer"-panelet
+- Tilføj valgfrit et billede til spørgsmålet og/eller til hver af de 4 svarmuligheder ("📷 Tilføj billede" / kamera-ikonet ved hver svarmulighed). Billederne komprimeres automatisk i browseren og gemmes i databasen — der skal ikke uploades noget manuelt.
+- Billeder vises **kun på host-skærmen** (projektor/underviser), både under selve spørgsmålet og ved afsløringen af det korrekte svar. Spillernes telefoner viser fortsat kun farvede figur-knapper, uanset om spørgsmålet har billeder.
 
 **Adgang:**  
 Alle med linket til `editor.html` kan oprette og redigere quizzer. Der er ingen login-beskyttelse — brug firewall/adgangskodebeskyttelse på serverniveau hvis du vil begrænse adgangen.
