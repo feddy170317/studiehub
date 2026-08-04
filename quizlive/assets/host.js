@@ -87,13 +87,12 @@
     }
   });
 
-  /* --- Quiz-manifest + DB-quizzer i setup-dropdown --- */
+  /* --- Quiz-manifest + DB-quizzer i setup-dropdown (skjult <select>) --- */
   var dbQuizzesMap = {}; // id -> quiz-objekt fra DB
 
-  (function populateQuizList() {
+  /* Indbyggede quizzer fra manifest — tilføjes med det samme (afhænger ikke af DB) */
+  (function populateBuiltinOptions() {
     var sel = document.getElementById('sel-quiz');
-
-    /* Indbyggede quizzer fra manifest */
     if (window.QUIZ_MANIFEST && window.QUIZ_MANIFEST.length > 0) {
       var grpBuiltin = document.createElement('optgroup');
       grpBuiltin.label = 'Indbygget';
@@ -105,19 +104,36 @@
       });
       sel.appendChild(grpBuiltin);
     }
+  })();
+
+  /* Saml pr. "semester · fag" (fallback: forfatter) — bruges af den skjulte <select> */
+  function groupLabel(q) {
+    var sem = (q.semester || '').trim();
+    var course = (q.course || '').trim();
+    if (sem && course) return sem + ' · ' + course;
+    if (sem) return sem;
+    if (course) return course;
+    return 'Ukategoriseret — af ' + (q.author || 'ukendt').trim();
+  }
+
+  /* --- Katalog-datastruktur (drill-down UI) ---
+     catalog.semesters['3. semester'].courses['ELE 1'].lectures['Lektion 2'] = [{id, quiz}, ...]
+     catalog.uncategorized = [{id, quiz}, ...]  (DB-quizzer uden semester) */
+  var catalog = {
+    semesters: {},
+    uncategorized: [],
+    loaded: false
+  };
+
+  (function populateQuizList() {
+    var sel = document.getElementById('sel-quiz');
 
     /* Hent DB-quizzer én gang */
     db.ref('quizzes').once('value').then(function (snap) {
-      if (!snap.exists()) return;
-
-      /* Saml pr. "semester · fag" (fallback: forfatter) */
-      function groupLabel(q) {
-        var sem = (q.semester || '').trim();
-        var course = (q.course || '').trim();
-        if (sem && course) return sem + ' · ' + course;
-        if (sem) return sem;
-        if (course) return course;
-        return 'Ukategoriseret — af ' + (q.author || 'ukendt').trim();
+      if (!snap.exists()) {
+        catalog.loaded = true;
+        renderCatalogTop();
+        return;
       }
 
       var byGroup = {};
@@ -125,9 +141,26 @@
         var q = child.val();
         q._id = child.key;
         dbQuizzesMap[child.key] = q;
+
+        /* --- Flad optgroup-struktur (uændret — bruges kun til den skjulte <select>) --- */
         var key = groupLabel(q);
         if (!byGroup[key]) byGroup[key] = [];
         byGroup[key].push({ id: child.key, quiz: q });
+
+        /* --- Nested katalog-struktur (drill-down UI) --- */
+        var sem = (q.semester || '').trim();
+        if (!sem) {
+          catalog.uncategorized.push({ id: child.key, quiz: q });
+        } else {
+          var course = (q.course || '').trim() || 'Andet fag';
+          var lecture = (q.lecture || '').trim() || 'Andet';
+          if (!catalog.semesters[sem]) catalog.semesters[sem] = { courses: {} };
+          var semObj = catalog.semesters[sem];
+          if (!semObj.courses[course]) semObj.courses[course] = { lectures: {} };
+          var courseObj = semObj.courses[course];
+          if (!courseObj.lectures[lecture]) courseObj.lectures[lecture] = [];
+          courseObj.lectures[lecture].push({ id: child.key, quiz: q });
+        }
       });
 
       /* Sortér: semestre numerisk først, Ukategoriseret sidst */
@@ -162,10 +195,253 @@
         });
         sel.appendChild(grp);
       });
+
+      /* Options for både indbyggede og DB-quizzer findes nu i <select> —
+         katalog-UI'et kan trygt sætte sel.value til en af disse strenge. */
+      catalog.loaded = true;
+      renderCatalogTop();
     }).catch(function () {
       /* Hvis DB-hentning fejler, kør videre kun med built-in quizzer */
+      catalog.loaded = true;
+      renderCatalogTop();
     });
   })();
+
+  /* ================================================================
+     Katalog-UI: drill-down semester → fag → lektion → quiz
+     ================================================================ */
+  var catalogWrap       = document.getElementById('quiz-catalog');
+  var catalogBreadcrumb = document.getElementById('catalog-breadcrumb');
+  var catalogBody       = document.getElementById('catalog-body');
+  var quizSelectedBox   = document.getElementById('quiz-selected');
+  var quizSelectedText  = document.getElementById('quiz-selected-text');
+  var linkChangeQuiz    = document.getElementById('link-change-quiz');
+  var selQuizHidden     = document.getElementById('sel-quiz');
+  var btnCreateEl       = document.getElementById('btn-create');
+
+  /* Udtræk første tal i en streng (til naturlig sortering, "Lektion 10" > "Lektion 2") */
+  function firstNumIn(str) {
+    var m = String(str || '').match(/\d+/);
+    return m ? parseInt(m[0], 10) : Infinity;
+  }
+  /* Naturlig sortering: tal-præfiks først, ellers alfabetisk (dansk) */
+  function naturalCompare(a, b) {
+    var na = firstNumIn(a);
+    var nb = firstNumIn(b);
+    if (na !== nb) return na - nb;
+    return String(a).toLowerCase().localeCompare(String(b).toLowerCase(), 'da');
+  }
+  /* Sortering med en bestemt "sidste" bucket-værdi (Andet/Andet fag) altid til sidst */
+  function compareWithFallbackLast(fallbackVal) {
+    return function (a, b) {
+      if (a === fallbackVal && b !== fallbackVal) return 1;
+      if (b === fallbackVal && a !== fallbackVal) return -1;
+      return naturalCompare(a, b);
+    };
+  }
+
+  function makeTile(title, sub, onClick) {
+    var tile = document.createElement('div');
+    tile.className = 'catalog-tile';
+    tile.innerHTML = '<span>' + escHtml(title) + '</span>' +
+      (sub ? '<span class="tile-sub">' + escHtml(sub) + '</span>' : '');
+    tile.addEventListener('click', onClick);
+    return tile;
+  }
+
+  function makeBackBtn(label, onClick) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn btn-secondary catalog-back-btn';
+    btn.textContent = label;
+    btn.addEventListener('click', onClick);
+    return btn;
+  }
+
+  function makeQuizRow(value, quiz) {
+    var row = document.createElement('div');
+    row.className = 'catalog-quiz-row';
+    var qCnt = Array.isArray(quiz.questions) ? quiz.questions.length : (typeof quiz.count === 'number' ? quiz.count : 0);
+    row.innerHTML =
+      '<span class="cq-title">' + escHtml(quiz.title || '(uden titel)') + '</span>' +
+      '<span class="cq-meta">' + qCnt + ' spørgsmål' + (quiz.author ? ' · ' + escHtml(quiz.author) : '') + '</span>';
+    row.addEventListener('click', function () {
+      selectQuiz(value, quiz.title || '(uden titel)');
+    });
+    return row;
+  }
+
+  function renderBreadcrumb(segments) {
+    catalogBreadcrumb.innerHTML = '';
+    segments.forEach(function (seg, i) {
+      if (i > 0) {
+        var sep = document.createElement('span');
+        sep.className = 'crumb-sep';
+        sep.textContent = '›';
+        catalogBreadcrumb.appendChild(sep);
+      }
+      var el = document.createElement('span');
+      el.className = 'crumb' + (seg.onClick ? '' : ' crumb-current');
+      el.textContent = seg.label;
+      if (seg.onClick) el.addEventListener('click', seg.onClick);
+      catalogBreadcrumb.appendChild(el);
+    });
+  }
+
+  function countSemesterQuizzes(sem) {
+    var n = 0;
+    var courses = catalog.semesters[sem].courses;
+    Object.keys(courses).forEach(function (c) {
+      var lects = courses[c].lectures;
+      Object.keys(lects).forEach(function (l) { n += lects[l].length; });
+    });
+    return n;
+  }
+  function countCourseQuizzes(sem, course) {
+    var n = 0;
+    var lects = catalog.semesters[sem].courses[course].lectures;
+    Object.keys(lects).forEach(function (l) { n += lects[l].length; });
+    return n;
+  }
+
+  /* --- Niveau 1: semester / indbygget / ukategoriseret --- */
+  function renderCatalogTop() {
+    renderBreadcrumb([{ label: 'Kataloger' }]);
+    catalogBody.innerHTML = '';
+    var grid = document.createElement('div');
+    grid.className = 'catalog-grid';
+
+    var semKeys = Object.keys(catalog.semesters).sort(function (a, b) {
+      var ma = a.match(/^(\d+)/);
+      var mb = b.match(/^(\d+)/);
+      var na = ma ? parseInt(ma[1], 10) : Infinity;
+      var nb = mb ? parseInt(mb[1], 10) : Infinity;
+      if (na !== nb) return na - nb;
+      return a.toLowerCase().localeCompare(b.toLowerCase(), 'da');
+    });
+    semKeys.forEach(function (sem) {
+      grid.appendChild(makeTile(sem, countSemesterQuizzes(sem) + ' quizzer', function () {
+        renderCatalogCourses(sem);
+      }));
+    });
+
+    if (window.QUIZ_MANIFEST && window.QUIZ_MANIFEST.length > 0) {
+      grid.appendChild(makeTile('📦 Indbygget', window.QUIZ_MANIFEST.length + ' quizzer', renderCatalogBuiltin));
+    }
+    if (catalog.uncategorized.length > 0) {
+      grid.appendChild(makeTile('❓ Ukategoriseret', catalog.uncategorized.length + ' quizzer', renderCatalogUncategorized));
+    }
+
+    catalogBody.appendChild(grid);
+
+    if (!catalog.loaded) {
+      var loading = document.createElement('div');
+      loading.className = 'catalog-empty';
+      loading.textContent = 'Indlæser quizzer...';
+      catalogBody.appendChild(loading);
+    } else if (grid.children.length === 0) {
+      var empty = document.createElement('div');
+      empty.className = 'catalog-empty';
+      empty.textContent = 'Ingen quizzer fundet — opret en i quiz-editoren.';
+      catalogBody.appendChild(empty);
+    }
+  }
+
+  /* --- Niveau 2: fag (inden for et semester) --- */
+  function renderCatalogCourses(sem) {
+    renderBreadcrumb([
+      { label: 'Kataloger', onClick: renderCatalogTop },
+      { label: sem }
+    ]);
+    catalogBody.innerHTML = '';
+    var grid = document.createElement('div');
+    grid.className = 'catalog-grid';
+
+    var courses = catalog.semesters[sem].courses;
+    var courseKeys = Object.keys(courses).sort(compareWithFallbackLast('Andet fag'));
+    courseKeys.forEach(function (course) {
+      grid.appendChild(makeTile(course, countCourseQuizzes(sem, course) + ' quizzer', function () {
+        renderCatalogLectures(sem, course);
+      }));
+    });
+    catalogBody.appendChild(grid);
+    catalogBody.appendChild(makeBackBtn('◀ Tilbage', renderCatalogTop));
+  }
+
+  /* --- Niveau 3: lektion + quiz-liste (inden for fag) --- */
+  function renderCatalogLectures(sem, course) {
+    renderBreadcrumb([
+      { label: 'Kataloger', onClick: renderCatalogTop },
+      { label: sem, onClick: function () { renderCatalogCourses(sem); } },
+      { label: course }
+    ]);
+    catalogBody.innerHTML = '';
+
+    var lects = catalog.semesters[sem].courses[course].lectures;
+    var lectKeys = Object.keys(lects).sort(compareWithFallbackLast('Andet'));
+    lectKeys.forEach(function (lect) {
+      var heading = document.createElement('div');
+      heading.className = 'catalog-lecture-heading';
+      heading.textContent = lect;
+      catalogBody.appendChild(heading);
+      lects[lect].forEach(function (item) {
+        catalogBody.appendChild(makeQuizRow('db:' + item.id, item.quiz));
+      });
+    });
+    catalogBody.appendChild(makeBackBtn('◀ Tilbage', function () { renderCatalogCourses(sem); }));
+  }
+
+  /* --- Flad liste: indbyggede manifest-quizzer --- */
+  function renderCatalogBuiltin() {
+    renderBreadcrumb([
+      { label: 'Kataloger', onClick: renderCatalogTop },
+      { label: '📦 Indbygget' }
+    ]);
+    catalogBody.innerHTML = '';
+    (window.QUIZ_MANIFEST || []).forEach(function (qm) {
+      catalogBody.appendChild(makeQuizRow(qm.id, { title: qm.title, count: qm.count }));
+    });
+    catalogBody.appendChild(makeBackBtn('◀ Tilbage', renderCatalogTop));
+  }
+
+  /* --- Flad liste: DB-quizzer uden semester --- */
+  function renderCatalogUncategorized() {
+    renderBreadcrumb([
+      { label: 'Kataloger', onClick: renderCatalogTop },
+      { label: '❓ Ukategoriseret' }
+    ]);
+    catalogBody.innerHTML = '';
+    catalog.uncategorized.forEach(function (item) {
+      catalogBody.appendChild(makeQuizRow('db:' + item.id, item.quiz));
+    });
+    catalogBody.appendChild(makeBackBtn('◀ Tilbage', renderCatalogTop));
+  }
+
+  /* --- Vælg quiz: sæt den skjulte <select>, vis bekræftelse, aktivér "Opret spil" --- */
+  function selectQuiz(value, title) {
+    selQuizHidden.value = value;
+    try {
+      var evt = new Event('change', { bubbles: true });
+      selQuizHidden.dispatchEvent(evt);
+    } catch (e) { /* ældre browsere ignoreres — value er stadig sat */ }
+
+    quizSelectedText.textContent = '✅ Valgt: ' + title;
+    quizSelectedBox.style.display = 'flex';
+    catalogWrap.style.display = 'none';
+    btnCreateEl.disabled = false;
+  }
+
+  linkChangeQuiz.addEventListener('click', function (e) {
+    e.preventDefault();
+    selQuizHidden.value = '';
+    btnCreateEl.disabled = true;
+    quizSelectedBox.style.display = 'none';
+    catalogWrap.style.display = 'block';
+    renderCatalogTop();
+  });
+
+  /* Initial visning (mens DB-quizzer evt. stadig hentes) */
+  renderCatalogTop();
 
   /* --- Generér 6-cifret PIN --- */
   function generatePin() {

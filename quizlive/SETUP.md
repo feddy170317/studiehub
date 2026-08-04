@@ -84,14 +84,17 @@ Når du er færdig med at teste, bør du sætte følgende regler i Firebase Cons
     "games":      { ".read": true, ".write": true },
     "quizzes":    { ".read": true, ".write": true },
     "quizimages": { ".read": true, ".write": true },
+    "students":   { ".read": true, ".write": true },
+    "results":    { ".read": true, ".write": true },
     "$other":     { ".read": false, ".write": false }
   }
 }
 ```
 
-Dette begrænser adgang til kun `/games`-, `/quizzes`- og `/quizimages`-noderne.  
+Dette begrænser adgang til kun `/games`-, `/quizzes`-, `/quizimages`- og `/students`-noderne.  
 `/quizzes` bruges af quiz-editoren til at gemme og hente quiz-data.  
-`/quizimages` indeholder de komprimerede billeder tilhørt hver quiz (holdt adskilt fra `/quizzes` så quiz-listen forbliver hurtig at hente).
+`/quizimages` indeholder de komprimerede billeder tilhørt hver quiz (holdt adskilt fra `/quizzes` så quiz-listen forbliver hurtig at hente).  
+`/students` indeholder elevlisten (PIN-koder + fornavne) fra `roster.html` — se afsnittet "Elevliste" nedenfor.
 
 ---
 
@@ -115,6 +118,26 @@ QuizLive indeholder en indbygget quiz-editor, som giver alle med linket mulighed
 
 **Adgang:**  
 Alle med linket til `editor.html` kan oprette og redigere quizzer. Der er ingen login-beskyttelse — brug firewall/adgangskodebeskyttelse på serverniveau hvis du vil begrænse adgangen.
+
+---
+
+## Elevliste
+
+QuizLive indeholder en elevliste-side (`roster.html`), hvor du kan indsætte en liste over elever og få genereret en 4-cifret PIN-kode til hver.
+
+**Åbn elevlisten:**
+- Klik på **"🎓 Administrér elevliste"** på host-opsætningssiden (`host.html`)
+- Eller åbn `roster.html` direkte
+
+**Funktioner:**
+- Indsæt en liste af navne (ét pr. linje, fulde navne er fine) og klik **"➕ Generér PIN-koder"** — hver elev får en unik 4-cifret PIN
+- Tilføj enkeltvis en senere tilkommet elev uden at genindsætte hele listen
+- **Kun fornavnet gemmes** — databasen kan læses af alle med linket, så af hensyn til privatlivet gemmes aldrig efternavne
+- **"📋 Kopiér liste"** kopierer `Navn: PIN` (én pr. linje) til udklipsholderen
+- **"🖨 Udskriv"** printer en ren liste (kun tabellen) til at klippe ud og dele fysisk til eleverne
+- Slet en elev fra listen med et enkelt klik (kræver bekræftelse)
+
+**Vigtigt:** Dette er grundlaget for en kommende funktion med PIN-baseret login og resultat-sporing på tværs af quizzer — den funktionalitet er endnu ikke bygget. Indtil videre bruges elevlisten kun til at generere og uddele PIN-koder.
 
 ---
 

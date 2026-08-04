@@ -60,6 +60,7 @@
   var inpAuthor       = document.getElementById('inp-author');
   var inpSemester     = document.getElementById('inp-semester');
   var inpCourse       = document.getElementById('inp-course');
+  var inpLecture      = document.getElementById('inp-lecture');
   var courseDatalist  = document.getElementById('course-suggestions');
   var btnSave         = document.getElementById('btn-save-quiz');
   var topbarError     = document.getElementById('topbar-error');
@@ -100,15 +101,18 @@
   var LS_AUTHOR   = 'quizlive_author';
   var LS_SEMESTER = 'quizlive_semester';
   var LS_COURSE   = 'quizlive_course';
+  var LS_LECTURE  = 'quizlive_lecture';
 
   (function prefillAuthor() {
     try {
       var a = localStorage.getItem(LS_AUTHOR)   || '';
       var s = localStorage.getItem(LS_SEMESTER) || '';
       var c = localStorage.getItem(LS_COURSE)   || '';
+      var l = localStorage.getItem(LS_LECTURE)  || '';
       if (a) inpAuthor.value = a;
       if (s) inpSemester.value = s;
       if (c) inpCourse.value = c;
+      if (l) inpLecture.value = l;
     } catch (e) {}
   })();
 
@@ -120,6 +124,9 @@
   });
   inpCourse.addEventListener('change', function () {
     try { localStorage.setItem(LS_COURSE, inpCourse.value.trim()); } catch (e) {}
+  });
+  inpLecture.addEventListener('change', function () {
+    try { localStorage.setItem(LS_LECTURE, inpLecture.value.trim()); } catch (e) {}
   });
 
   /* ================================================================
@@ -434,13 +441,15 @@
       return;
     }
 
-    /* 4. Gem forfatter/semester/fag til næste gang */
+    /* 4. Gem forfatter/semester/fag/lektion til næste gang */
     var semester = inpSemester.value;
     var course   = inpCourse.value.trim();
+    var lecture  = inpLecture.value.trim();
     try {
       localStorage.setItem(LS_AUTHOR, author);
       localStorage.setItem(LS_SEMESTER, semester);
       localStorage.setItem(LS_COURSE, course);
+      localStorage.setItem(LS_LECTURE, lecture);
     } catch (e) {}
 
     /* 5. Byg quiz-objekt — saml billeder i separat map (imgId -> data-URL) */
@@ -482,6 +491,7 @@
     };
     if (semester) payload.semester = semester;
     if (course)   payload.course   = course;
+    if (lecture)  payload.lecture  = lecture;
 
     /* Skriv billed-noden: sæt hele noden (fjernede billeder forsvinder),
        eller fjern noden helt hvis der ingen billeder er */
@@ -706,6 +716,7 @@
     inpAuthor.value   = qObj.author   || '';
     inpSemester.value = qObj.semester || '';
     inpCourse.value   = qObj.course   || '';
+    inpLecture.value  = qObj.lecture  || '';
     editingQuizId   = id;
     editingCreatedAt = qObj.createdAt || null;
 
