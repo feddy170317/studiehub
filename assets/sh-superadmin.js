@@ -1,12 +1,18 @@
 /* Studiehub — Super admin-panel.
-   SIKKERHEDSDESIGN (samme princip som HverdagsHelte):
-   - Rettigheden bor i studiehub/superadmins/{uid}, som INGEN klient kan skrive til
-     (ingen .write-regel på den knude) — tildeles/fjernes kun i Firebase-konsollen.
+   SIKKERHEDSDESIGN:
+   - Rettigheden er en hardcoded UID-liste herunder — ingen klient kan ændre den,
+     kun en ny deploy af denne fil kan tilføje/fjerne en admin. Simplere end
+     HverdagsHelte's data-drevne variant, fordi der kun er én ejer her.
    - Elevernes PIN er almindelig data og KAN ses/nulstilles herfra — det er meningen,
      så Frederik kan give koden igen hvis en elev glemmer den.
    - Alle handlinger auditeres i studiehub/audit. */
 (function () {
   'use strict';
+
+  // Firebase Auth-UID'er der må åbne dette panel. Et UID er ikke hemmeligt i sig selv
+  // (adgangen kræver stadig at kunne logge ind som den konto med e-mail+kodeord) —
+  // men kun disse UID'er kommer forbi "Ingen adgang"-skærmen.
+  var SUPERADMIN_UIDS = ['WvRSSnc3jLWSlYdsQm4jlTObhkP2'];
 
   var AVATARS = ['🦸‍♂️', '🧑‍🚀', '🥷', '🧑‍🔧', '🧙‍♂️', '🕵️', '🧑‍🎓', '🦾', '🐺', '🦊', '🐯', '🦅'];
   var ROSTER = ['Alexandre', 'Frederik', 'Jacob H', 'Jacob Ø', 'Jimmy', 'Jonas', 'Lukas', 'Nicolai', 'Simon', 'Thomas'];
@@ -56,10 +62,8 @@
   auth.onAuthStateChanged(function (user) {
     if (!user) { show('sa-auth'); return; }
     st.user = user;
-    ref('superadmins/' + user.uid).once('value').then(function (s) {
-      if (s.val() !== true) { showDenied(user); return; }
-      enterPanel();
-    }).catch(function () { showDenied(user); });
+    if (SUPERADMIN_UIDS.indexOf(user.uid) === -1) { showDenied(user); return; }
+    enterPanel();
   });
 
   $('#sa-go').addEventListener('click', function () {
