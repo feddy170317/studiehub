@@ -122,6 +122,26 @@
     }
   })();
 
+  /* Auto-genererede spørgsmålsbanke — tilføjes med det samme (afhænger ikke af DB).
+     VIGTIGT: en <select>'s .value kan kun sættes til en værdi, der findes som
+     en <option> INDE i den — ellers ignoreres tildelingen stiltiende, og
+     "Opret spil" tror bagefter at intet er valgt. Uden disse <option>-elementer
+     ville et klik på en bank-quiz i kataloget aldrig rent faktisk vælge noget. */
+  (function populateBankOptions() {
+    var sel = document.getElementById('sel-quiz');
+    if (window.QUESTION_BANKS && window.QUESTION_BANKS.length > 0) {
+      var grpBank = document.createElement('optgroup');
+      grpBank.label = 'Automatiske quizzer';
+      window.QUESTION_BANKS.forEach(function (bank) {
+        var opt = document.createElement('option');
+        opt.value = 'bank:' + bank.id;
+        opt.textContent = bank.title + ' (' + bank.drawCount + ' tilfældige spørgsmål)';
+        grpBank.appendChild(opt);
+      });
+      sel.appendChild(grpBank);
+    }
+  })();
+
   /* Saml pr. "semester · fag" (fallback: forfatter) — bruges af den skjulte <select> */
   function groupLabel(q) {
     var sem = (q.semester || '').trim();
