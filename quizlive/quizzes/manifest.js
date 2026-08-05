@@ -5,17 +5,8 @@ window.QUIZ_MANIFEST = [
     title: 'Demo: Blandet paratviden',
     file: 'quizzes/demo.js',
     count: 8
-  },
-  {
-    id: 'dansk_almen_viden',
-    title: 'Dansk Almen Viden',
-    file: 'quizzes/dansk_almen_viden.js',
-    count: 12
-  },
-  {
-    id: 'verdens_almenviden',
-    title: 'Verdens Almenviden',
-    file: 'quizzes/verdens_almenviden.js',
-    count: 12
   }
 ];
+/* "Dansk Almen Viden" og "Verdens Almenviden" er nu auto-genererede quizzer,
+   der trækker 15 tilfældige spørgsmål fra en 100+ spørgsmåls-bank i Firebase
+   — se quizzes/bank_manifest.js og "🎲 Automatiske quizzer" i host-kataloget. */

@@ -19,6 +19,10 @@
      Løser "sidder fast i gammelt spil"-buggen: giver altid en manuel udvej. -->
 <button id="btn-leave" type="button" title="Forlad spillet / skift PIN" aria-label="Forlad spillet">✕</button>
 
+<!-- Vedvarende fremdrift-badge: viser "Spørgsmål N/Total" på TVÆRS af alle
+     skærme mens quizzen er i gang (ikke kun mens selve spørgsmålet vises). -->
+<div id="player-progress-badge" style="display:none;"></div>
+
 <!-- Skærm 1: Deltag -->
 <div id="screen-join" class="screen active">
   <div class="brand">Quiz<span>Live</span></div>
@@ -71,8 +75,9 @@
   </div>
 </div>
 
-<!-- Skærm 3: Spørgsmål (svarknapper) -->
+<!-- Skærm 3: Spørgsmål (svarknapper) — genbruges også til Sudden Death -->
 <div id="screen-question" class="screen" style="padding: 12px 8px;">
+  <div id="sd-player-banner" class="streak-badge mb8" style="display:none; background:linear-gradient(135deg,#ef4444,#7c3aed);">🔥 SUDDEN DEATH</div>
   <div id="q-timer-wrap" class="timer-wrap w100" style="max-width:600px; margin-bottom:8px;">
     <div id="q-timer-bar" class="timer-bar" style="width:100%;"></div>
   </div>
@@ -117,6 +122,17 @@
     <div class="text-muted mt8">point</div>
   </div>
   <div id="confetti-area"></div>
+</div>
+
+<!-- Skærm 6: Sudden Death — tilskuer (ikke selv med i afgørelsen) -->
+<div id="screen-sd-spectator" class="screen">
+  <div class="brand">Quiz<span>Live</span></div>
+  <div class="card mt16 text-center">
+    <div style="font-size:2.5rem; margin-bottom:8px;">🔥👀</div>
+    <div class="text-big mb8">Sudden Death!</div>
+    <div class="text-muted" id="sd-spectator-names">Afgør uafgjort...</div>
+    <div class="waiting-msg mt16">Se skærmen — det er ikke dig denne gang.</div>
+  </div>
 </div>
 
 <!-- Scripts -->

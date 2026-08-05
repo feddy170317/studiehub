@@ -29,7 +29,8 @@
     timerInterval: null,
     timerSec: 20,
     stateRef: null,
-    stateListener: null
+    stateListener: null,
+    sdRound: 0        // aktiv Sudden Death-runde (0-baseret) — bruges som DB-svar-nøgle
   };
 
   /* --- Skærm-hjælper --- */
@@ -242,12 +243,26 @@
     btnLeave.style.display = state.pin ? 'flex' : 'none';
   }
 
+  /* --- Vedvarende "Spørgsmål N/Total"-badge (synlig på tværs af alle skærme
+     mens quizzen kører, ikke kun mens selve spørgsmålet vises) --- */
+  function updateProgressBadge(current, total) {
+    var el = document.getElementById('player-progress-badge');
+    if (!el || !total) return;
+    el.textContent = 'Spørgsmål ' + current + '/' + total;
+    el.style.display = 'block';
+  }
+  function hideProgressBadge() {
+    var el = document.getElementById('player-progress-badge');
+    if (el) el.style.display = 'none';
+  }
+
   function handlePhase(phase, stateData) {
     stateData = stateData || {};
     var prevPhase = state.currentPhase;
     state.currentPhase = phase;
 
     if (phase === 'lobby') {
+      hideProgressBadge();
       showScreen('screen-lobby');
 
     } else if (phase === 'question') {
@@ -256,26 +271,56 @@
         state.currentQIndex = qIndex;
         state.hasAnswered = false;
       }
+      if (stateData.totalQ) updateProgressBadge(qIndex + 1, stateData.totalQ);
       showQuestionScreen(stateData);
 
     } else if (phase === 'reveal') {
       clearTimer();
+      if (stateData.totalQ) {
+        var qi = stateData.qIndex !== undefined ? stateData.qIndex : state.currentQIndex;
+        updateProgressBadge(qi + 1, stateData.totalQ);
+      }
       showRevealScreen(stateData);
 
     } else if (phase === 'scoreboard') {
       // Vis fortsat reveal / score mens host viser scoreboard
       // Player opdaterer score-visning
+      if (stateData.totalQ) {
+        var qi2 = stateData.qIndex !== undefined ? stateData.qIndex : state.currentQIndex;
+        updateProgressBadge(qi2 + 1, stateData.totalQ);
+      }
       showRevealScreen(stateData, true);
+
+    } else if (phase === 'suddendeath') {
+      hideProgressBadge();
+      state.sdRound = stateData.sdRound || 0;
+      var participants = stateData.sdParticipantIds || [];
+      var amParticipant = participants.indexOf(state.playerId) !== -1;
+      if (amParticipant) {
+        var sdKey = 'sd_' + state.sdRound;
+        if (sdKey !== state.currentQIndex) {
+          state.currentQIndex = sdKey;
+          state.hasAnswered = false;
+        }
+        showQuestionScreen(stateData);
+      } else {
+        clearTimer();
+        showSdSpectatorScreen(stateData);
+      }
 
     } else if (phase === 'podium') {
       clearTimer();
+      hideProgressBadge();
       showPodiumScreen();
     }
   }
 
-  /* --- Spørgsmål-skærm --- */
+  /* --- Spørgsmål-skærm (bruges til både almindelige spørgsmål og Sudden Death) --- */
   function showQuestionScreen(stateData) {
     showScreen('screen-question');
+
+    var sdBanner = document.getElementById('sd-player-banner');
+    if (sdBanner) sdBanner.style.display = (state.currentPhase === 'suddendeath') ? 'block' : 'none';
 
     // Nulstil knapper
     var btns = document.querySelectorAll('.answer-btn');
@@ -293,8 +338,22 @@
       document.getElementById('answered-msg').style.display = 'block';
     }
 
-    // Timer
-    startTimerBar(stateData.questionStartAt, state.timerSec);
+    // Timer — brug spørgsmålets EGEN tid, hvis den er publiceret (Sudden
+    // Death har altid 10s uanset spillets normale indstilling), ellers
+    // faldes tilbage til tiden fra da spilleren meldte sig ind.
+    startTimerBar(stateData.questionStartAt, stateData.timerSec || state.timerSec);
+  }
+
+  /* --- Sudden Death: tilskuer-skærm (spilleren er IKKE med i afgørelsen) --- */
+  function showSdSpectatorScreen(stateData) {
+    db.ref('games/' + state.pin + '/players').once('value', function (snap) {
+      var players = snap.val() || {};
+      var names = (stateData.sdParticipantIds || []).map(function (pid) {
+        return (players[pid] && players[pid].name) || '?';
+      });
+      document.getElementById('sd-spectator-names').textContent = names.join(' 🆚 ');
+      showScreen('screen-sd-spectator');
+    });
   }
 
   function startTimerBar(questionStartAt, timerSec) {
@@ -342,7 +401,7 @@
   document.querySelectorAll('.answer-btn').forEach(function (btn) {
     btn.addEventListener('click', function () {
       if (state.hasAnswered || !state.pin || !state.playerId) return;
-      if (state.currentPhase !== 'question') return;
+      if (state.currentPhase !== 'question' && state.currentPhase !== 'suddendeath') return;
 
       var choice = parseInt(btn.dataset.choice, 10);
       state.hasAnswered = true;
@@ -353,10 +412,15 @@
       });
       document.getElementById('answered-msg').style.display = 'block';
 
-      // Skriv svar til databasen
-      var answerRef = db.ref(
-        'games/' + state.pin + '/answers/' + state.currentQIndex + '/' + state.playerId
-      );
+      // Skriv svar til databasen — Sudden Death bruger en separat sti
+      // (sdAnswers/{round}), så den aldrig kan kollidere med det almindelige
+      // spørgsmåls svar-node.
+      var answerRef;
+      if (state.currentPhase === 'suddendeath') {
+        answerRef = db.ref('games/' + state.pin + '/sdAnswers/r' + (state.sdRound || 0) + '/' + state.playerId);
+      } else {
+        answerRef = db.ref('games/' + state.pin + '/answers/' + state.currentQIndex + '/' + state.playerId);
+      }
       answerRef.set({
         choice: choice,
         at: firebase.database.ServerValue.TIMESTAMP
@@ -432,27 +496,56 @@
     db.ref('games/' + state.pin + '/players').once('value', function (snap) {
       var players = snap.val() || {};
       var myScore = (players[state.playerId] && players[state.playerId].score) || 0;
-      var scores = Object.values(players).map(function (p) { return p.score || 0; });
-      scores.sort(function (a, b) { return b - a; });
-      var placement = scores.indexOf(myScore) + 1;
-      var total = scores.length;
 
-      document.getElementById('podium-score').textContent = myScore;
-      var placeTxt = '';
-      if (placement === 1) placeTxt = '🥇 Du vandt! Tillykke!';
-      else if (placement === 2) placeTxt = '🥈 Du kom på 2.-pladsen!';
-      else if (placement === 3) placeTxt = '🥉 Du kom på 3.-pladsen!';
-      else placeTxt = 'Du endte på ' + placement + '. pladsen af ' + total + '.';
-      document.getElementById('podium-placement-text').textContent = placeTxt;
+      db.ref('games/' + state.pin + '/state/sdWinnerId').once('value', function (sdSnap) {
+        var sdWinnerId = sdSnap.exists() ? sdSnap.val() : null;
 
-      showScreen('screen-podium');
-      clearSession();
-      updateLeaveBtnVisibility();
+        // Samme rangerings-logik som host.js's computeRanks(): normalt
+        // score-baseret, men hvis en Sudden Death har kåret en vinder,
+        // rykkes vedkommende alene på 1.-pladsen, og resten af den
+        // oprindeligt uafgjorte gruppe deler fortsat plads med hinanden.
+        var arr = Object.keys(players).map(function (pid) {
+          return { pid: pid, score: players[pid].score || 0 };
+        });
+        arr.sort(function (a, b) { return b.score - a.score; });
+        if (sdWinnerId) {
+          var wIdx = arr.findIndex(function (p) { return p.pid === sdWinnerId; });
+          if (wIdx > 0) {
+            var w = arr.splice(wIdx, 1)[0];
+            arr.unshift(w);
+          }
+        }
+        var ranks = [];
+        arr.forEach(function (p, i) {
+          if (i === 0) { ranks.push(1); return; }
+          var sameScore = p.score === arr[i - 1].score;
+          var isSdBoundary = sdWinnerId && i === 1 && arr[0].pid === sdWinnerId;
+          if (sameScore && !isSdBoundary) ranks.push(ranks[i - 1]);
+          else if (sameScore && isSdBoundary) ranks.push(ranks[i - 1] + 1);
+          else ranks.push(i + 1);
+        });
+        var myIdx = arr.findIndex(function (p) { return p.pid === state.playerId; });
+        var placement = myIdx >= 0 ? ranks[myIdx] : (arr.length + 1);
+        var total = arr.length;
 
-      // Konfetti for top-3
-      if (placement <= 3) {
-        launchConfetti();
-      }
+        document.getElementById('podium-score').textContent = myScore;
+        var placeTxt = '';
+        if (sdWinnerId && state.playerId === sdWinnerId) placeTxt = '🥇 Du vandt sudden death! Tillykke!';
+        else if (placement === 1) placeTxt = '🥇 Du vandt! Tillykke!';
+        else if (placement === 2) placeTxt = '🥈 Du kom på 2.-pladsen!';
+        else if (placement === 3) placeTxt = '🥉 Du kom på 3.-pladsen!';
+        else placeTxt = 'Du endte på ' + placement + '. pladsen af ' + total + '.';
+        document.getElementById('podium-placement-text').textContent = placeTxt;
+
+        showScreen('screen-podium');
+        clearSession();
+        updateLeaveBtnVisibility();
+
+        // Konfetti for top-3
+        if (placement <= 3) {
+          launchConfetti();
+        }
+      });
     });
   }
 

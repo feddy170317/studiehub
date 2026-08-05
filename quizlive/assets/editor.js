@@ -569,7 +569,12 @@
         return;
       }
       snap.forEach(function (child) {
-        dbQuizzes[child.key] = child.val();
+        var q = child.val();
+        // Spørgsmålsbanke (isBank:true) er de rå 100+ spørgsmåls-puljer bag
+        // de auto-genererede quizzer — skjul dem her, så de ikke ved en
+        // fejl redigeres/slettes gennem den visuelle editor.
+        if (q && q.isBank) return;
+        dbQuizzes[child.key] = q;
         dbQuizzes[child.key]._id = child.key;
       });
       renderLibrary();

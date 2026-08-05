@@ -42,7 +42,9 @@
     stateListener: null,
     questionStartAt: 0,
     autoAdvanced: false,
-    imagesMap: {}           // imgId -> data-URL (kun til lokal host-visning, publiceres aldrig)
+    imagesMap: {},          // imgId -> data-URL (kun til lokal host-visning, publiceres aldrig)
+    tiedPlayers: [],        // pids delt om 1.-pladsen ved podiet — udfyldt af showPodiumHost()
+    sd: null                // aktiv Sudden Death-sessions-tilstand, se startSuddenDeath()
   };
 
   /* Slå et billede op i g.imagesMap — returnerer data-URL eller null.
@@ -69,6 +71,19 @@
     });
     var el = document.getElementById(id);
     if (el) el.classList.add('active');
+  }
+
+  /* --- Vedvarende "Spørgsmål N/Total"-badge (synlig på tværs af spørgsmål,
+     reveal og scoreboard — ikke kun mens selve spørgsmålet vises) --- */
+  function setProgressBadge(text) {
+    var el = document.getElementById('host-progress-badge');
+    if (!el) return;
+    el.textContent = text;
+    el.style.display = 'block';
+  }
+  function hideProgressBadge() {
+    var el = document.getElementById('host-progress-badge');
+    if (el) el.style.display = 'none';
   }
 
   /* --- Keyboard shortcut: Space/Enter = next --- */
@@ -141,6 +156,14 @@
       snap.forEach(function (child) {
         var q = child.val();
         q._id = child.key;
+
+        /* Spørgsmålsbanke (isBank:true) er de RÅ 100+ spørgsmåls-puljer bag
+           "Automatiske quizzer" — de skal IKKE optræde i den normale liste
+           (ville vise en kæmpe fast quiz på 100+ spørgsmål og kunne
+           ved en fejl slettes via editoren). De håndteres separat af
+           loadQuestionBanks() og deres eget katalog-afsnit. */
+        if (q.isBank) return;
+
         dbQuizzesMap[child.key] = q;
 
         /* --- Flad optgroup-struktur (uændret — bruges kun til den skjulte <select>) --- */
@@ -326,6 +349,9 @@
       }));
     });
 
+    if (window.QUESTION_BANKS && window.QUESTION_BANKS.length > 0) {
+      grid.appendChild(makeTile('🎲 Automatiske quizzer', window.QUESTION_BANKS.length + ' emner', renderCatalogAuto));
+    }
     if (window.QUIZ_MANIFEST && window.QUIZ_MANIFEST.length > 0) {
       grid.appendChild(makeTile('📦 Indbygget', window.QUIZ_MANIFEST.length + ' quizzer', renderCatalogBuiltin));
     }
@@ -405,6 +431,32 @@
     catalogBody.appendChild(makeBackBtn('◀ Tilbage', renderCatalogTop));
   }
 
+  /* --- Flad liste: auto-genererede quizzer trukket fra en spørgsmålsbank --- */
+  function renderCatalogAuto() {
+    renderBreadcrumb([
+      { label: 'Kataloger', onClick: renderCatalogTop },
+      { label: '🎲 Automatiske quizzer' }
+    ]);
+    catalogBody.innerHTML = '';
+    (window.QUESTION_BANKS || []).forEach(function (bank) {
+      var row = document.createElement('div');
+      row.className = 'catalog-quiz-row';
+      row.innerHTML =
+        '<span class="cq-title">🎲 ' + escHtml(bank.title) + '</span>' +
+        '<span class="cq-meta">' + bank.drawCount + ' tilfældige spørgsmål af ' + (bank.poolSize || '100+') + '</span>';
+      row.addEventListener('click', function () {
+        selectQuiz('bank:' + bank.id, bank.title + ' (auto, ' + bank.drawCount + ' spørgsmål)');
+      });
+      catalogBody.appendChild(row);
+    });
+    var note = document.createElement('div');
+    note.className = 'catalog-empty';
+    note.textContent = 'Trækker ' + ((window.QUESTION_BANKS && window.QUESTION_BANKS[0] && window.QUESTION_BANKS[0].drawCount) || 15) +
+      ' tilfældige spørgsmål hver gang. Et spørgsmål går ikke igen, før alle andre i banken er brugt.';
+    catalogBody.appendChild(note);
+    catalogBody.appendChild(makeBackBtn('◀ Tilbage', renderCatalogTop));
+  }
+
   /* --- Flad liste: DB-quizzer uden semester --- */
   function renderCatalogUncategorized() {
     renderBreadcrumb([
@@ -449,13 +501,136 @@
     return String(Math.floor(100000 + Math.random() * 900000));
   }
 
+  /* --- Træk N tilfældige, ubrugte spørgsmål fra en spørgsmålsbank ---
+     ("shuffle bag": intet spørgsmål går igen, før ALLE andre i banken er
+     brugt — når puljen løber tør, nulstilles hele cyklussen og der trækkes
+     helt friskt). Bruges af de auto-genererede quizzer (Dansk/Verdens
+     Almenviden). Banken ligger under quizzes/{bankId} (samme skrivbare
+     Firebase-sti som almindelige DB-quizzer, blot med isBank:true). */
+  function drawFromBank(bankId, count, cb) {
+    var questionsRef = db.ref('quizzes/' + bankId + '/questions');
+    var usedRef = db.ref('quizzes/' + bankId + '/bankUsed');
+
+    Promise.all([questionsRef.once('value'), usedRef.once('value')]).then(function (results) {
+      var qSnap = results[0], usedSnap = results[1];
+      var allQ = [];
+      qSnap.forEach(function (child) {
+        var v = child.val();
+        v._id = child.key;
+        allQ.push(v);
+      });
+      if (allQ.length === 0) {
+        cb(new Error('Spørgsmålsbanken er tom — tjek Firebase-opsætningen.'));
+        return;
+      }
+
+      var used = usedSnap.val() || {};
+      var availableIds = allQ.map(function (q) { return q._id; }).filter(function (id) { return !used[id]; });
+
+      // Ikke nok utrukne spørgsmål tilbage til en hel quiz — cyklussen er
+      // udtømt. Nulstil hele "brugt"-mængden og træk fra en frisk cyklus.
+      if (availableIds.length < Math.min(count, allQ.length)) {
+        used = {};
+        availableIds = allQ.map(function (q) { return q._id; });
+      }
+
+      var pool = shuffleArray(availableIds.slice());
+      var picked = pool.slice(0, Math.min(count, pool.length));
+
+      var byId = {};
+      allQ.forEach(function (q) { byId[q._id] = q; });
+      var drawnQuestions = picked.map(function (id) { return byId[id]; });
+
+      var newUsed = Object.assign({}, used);
+      picked.forEach(function (id) { newUsed[id] = true; });
+
+      usedRef.set(newUsed).then(function () {
+        cb(null, drawnQuestions, allQ.length);
+      }).catch(function (err) { cb(err); });
+    }).catch(function (err) { cb(err); });
+  }
+
+  function shuffleArray(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+    return arr;
+  }
+
+  /* Normaliserer et bank-spørgsmål til samme form som quiz.questions[i]
+     forventer (img/optImgs er valgfrie felter, banken har dem ikke). */
+  function normalizeBankQuestion(q) {
+    return { q: q.q, level: q.level, why: q.why || '', img: q.img || '', options: q.options, optImgs: q.optImgs || ['', '', '', ''], correct: q.correct };
+  }
+
+  /* --- Opret spil-node i Firebase og gå til lobbyen (fælles slutpunkt for
+     alle quiz-kilder: indbygget, DB-quiz eller auto-trukket bank) --- */
+  function startGameWithQuiz(quizId, quiz, timerSec) {
+    g.quizId = quizId;
+    g.quiz = quiz;
+    g.timerSec = timerSec;
+    g.qIndex = 0;
+    g.players = {};
+    if (!g.imagesMap) g.imagesMap = {};
+
+    var pin = generatePin();
+    g.pin = pin;
+    g.gameRef = db.ref('games/' + pin);
+
+    g.gameRef.set({
+      config: {
+        timerSec: timerSec,
+        quizId: quizId,
+        title: quiz.title,
+        createdAt: firebase.database.ServerValue.TIMESTAMP
+      },
+      state: {
+        phase: 'lobby',
+        qIndex: 0,
+        totalQ: quiz.questions.length,
+        questionStartAt: 0,
+        correctChoice: -1,
+        lastPts: 0
+      }
+    }).then(function () {
+      showLobby();
+    });
+  }
+
   /* --- Opret spil --- */
   document.getElementById('btn-create').addEventListener('click', function () {
     var selValue = document.getElementById('sel-quiz').value;
     var timerSec = parseInt(document.getElementById('sel-timer').value, 10);
+    var createBtn = this;
 
     if (!selValue) {
       alert('Vælg en quiz først.');
+      return;
+    }
+
+    // Auto-genereret quiz: træk N tilfældige spørgsmål fra spørgsmålsbanken først
+    if (selValue.indexOf('bank:') === 0) {
+      var bankId = selValue.slice(5);
+      var bankMeta = (window.QUESTION_BANKS || []).filter(function (b) { return b.id === bankId; })[0];
+      var bankTitle = bankMeta ? bankMeta.title : bankId;
+      var drawCount = bankMeta ? bankMeta.drawCount : 15;
+
+      createBtn.disabled = true;
+      var originalLabel = createBtn.textContent;
+      createBtn.textContent = 'Trækker spørgsmål...';
+
+      drawFromBank(bankId, drawCount, function (err, questions) {
+        createBtn.disabled = false;
+        createBtn.textContent = originalLabel;
+        if (err || !questions || questions.length === 0) {
+          alert('Kunne ikke trække spørgsmål fra banken: ' + (err ? err.message : 'ukendt fejl'));
+          return;
+        }
+        g.imagesMap = {};
+        var quiz = { title: bankTitle, questions: questions.map(normalizeBankQuestion) };
+        startGameWithQuiz(bankId, quiz, timerSec);
+      });
       return;
     }
 
@@ -476,52 +651,20 @@
       return;
     }
 
-    g.quizId = quizId;
-    g.quiz = quiz;
-    g.timerSec = timerSec;
-    g.qIndex = 0;
-    g.players = {};
-    g.imagesMap = {};
-
-    var pin = generatePin();
-    g.pin = pin;
-    g.gameRef = db.ref('games/' + pin);
-
-    function createGameNode() {
-      // Opret spil-node
-      g.gameRef.set({
-        config: {
-          timerSec: timerSec,
-          quizId: quizId,
-          title: quiz.title,
-          createdAt: firebase.database.ServerValue.TIMESTAMP
-        },
-        state: {
-          phase: 'lobby',
-          qIndex: 0,
-          totalQ: quiz.questions.length,
-          questionStartAt: 0,
-          correctChoice: -1,
-          lastPts: 0
-        }
-      }).then(function () {
-        showLobby();
-      });
-    }
-
     // Hent quiz-billeder (kun DB-quizzer kan have billeder) FØR lobbyen vises.
     // Billederne hentes én gang og bruges kun lokalt på host — de publiceres
     // aldrig til /games, så spillerne ser dem aldrig.
     if (selValue.indexOf('db:') === 0) {
       db.ref('quizimages/' + quizId).once('value').then(function (snap) {
         g.imagesMap = snap.exists() ? snap.val() : {};
-        createGameNode();
+        startGameWithQuiz(quizId, quiz, timerSec);
       }).catch(function () {
         g.imagesMap = {};
-        createGameNode();
+        startGameWithQuiz(quizId, quiz, timerSec);
       });
     } else {
-      createGameNode();
+      g.imagesMap = {};
+      startGameWithQuiz(quizId, quiz, timerSec);
     }
   });
 
@@ -551,6 +694,7 @@
     }
 
     showScreen('screen-lobby-host');
+    hideProgressBadge();
 
     // Lyt på spillere
     g.gameRef.child('players').on('value', function (snap) {
@@ -668,6 +812,7 @@
       qIndex: qIdx,
       totalQ: g.quiz.questions.length,
       questionStartAt: firebase.database.ServerValue.TIMESTAMP,
+      timerSec: g.timerSec,
       correctChoice: -1,
       lastPts: 0
     }).then(function () {
@@ -684,6 +829,7 @@
     var total = g.quiz.questions.length;
     document.getElementById('q-progress').textContent =
       'Spørgsmål ' + (qIdx + 1) + '/' + total;
+    setProgressBadge('Spørgsmål ' + (qIdx + 1) + '/' + total);
     document.getElementById('q-text').textContent = q.q;
 
     // Spørgsmålsbillede (kun vist på host — publiceres ikke til spillerne)
@@ -980,9 +1126,13 @@
     }
   });
 
-  /* --- Podiet (host) --- */
-  function showPodiumHost() {
-    g.gameRef.child('state').update({ phase: 'podium' });
+  /* --- Podiet (host) ---
+     sdWinnerId (valgfri): sættes når podiet vises EFTER en afgjort Sudden
+     Death — sikrer at vinderen vises alene på 1.-pladsen, og at "Uafgjort"-
+     knappen ikke tilbydes igen. */
+  function showPodiumHost(sdWinnerId) {
+    hideProgressBadge();
+    g.gameRef.child('state').update({ phase: 'podium', sdWinnerId: sdWinnerId || null });
 
     g.gameRef.child('players').once('value', function (snap) {
       var players = [];
@@ -999,7 +1149,24 @@
         });
       }
       players.sort(function (a, b) { return b.score - a.score; });
-      var ranks = computeRanks(players);
+
+      // Uafgjort-detektion for førstepladsen (rå score, uafhængig af evt.
+      // tidligere sudden death) — styrer om "Afgør uafgjort"-knappen vises.
+      var btnSd = document.getElementById('btn-sudden-death');
+      if (players.length > 0 && !sdWinnerId) {
+        var topScore = players[0].score;
+        var tiedForFirst = players.filter(function (p) { return p.score === topScore; });
+        if (tiedForFirst.length > 1) {
+          g.tiedPlayers = tiedForFirst.map(function (p) { return p.pid; });
+          if (btnSd) btnSd.style.display = 'block';
+        } else if (btnSd) {
+          btnSd.style.display = 'none';
+        }
+      } else if (btnSd) {
+        btnSd.style.display = 'none';
+      }
+
+      var ranks = computeRanks(players, sdWinnerId);
 
       var medals = ['🥇', '🥈', '🥉'];
       var list = document.getElementById('podium-host-list');
@@ -1008,10 +1175,11 @@
       players.forEach(function (p, i) {
         var row = document.createElement('div');
         row.className = 'podium-row';
+        var sdTag = (sdWinnerId && p.pid === sdWinnerId) ? ' <span style="font-size:0.8rem; color:#f59e0b;">⚡ Sudden Death-vinder</span>' : '';
         // Medalje efter RANG, ikke listeposition — delt score = samme medalje
         row.innerHTML =
           '<div class="medal">' + (medals[ranks[i] - 1] || ranks[i] + '.') + '</div>' +
-          '<div class="p-name">' + escHtml(p.name) + '</div>' +
+          '<div class="p-name">' + escHtml(p.name) + sdTag + '</div>' +
           '<div class="p-pts">' + p.score + ' pt</div>';
         list.appendChild(row);
         // Animér én ad gangen (top-3 med forsinkelse)
@@ -1026,6 +1194,11 @@
       showScreen('screen-podium-host');
     });
   }
+
+  document.getElementById('btn-sudden-death').addEventListener('click', function () {
+    this.style.display = 'none';
+    startSuddenDeath();
+  });
 
   /* --- Gem ét /results-opslag pr. REGISTRERET elev (gæster springes over) ---
      Fire-and-forget: fejl logges men blokerer aldrig podie-UI'et. */
@@ -1060,21 +1233,257 @@
     db.ref('games/' + g.pin).remove().then(function () {
       g.pin = '';
       g.gameRef = null;
+      hideProgressBadge();
       showScreen('screen-setup');
     });
   });
 
-  /* --- Competition-ranking: delt score = delt placering (1, 1, 3, ...) --- */
-  function computeRanks(sortedPlayers) {
+  /* --- Competition-ranking: delt score = delt placering (1, 1, 3, ...) ---
+     sdWinnerId (valgfri): hvis sat, flyttes denne spiller forrest i
+     sortedPlayers (muterer arrayet — bevidst, så kaldere der bagefter
+     looper over samme array/rækkefølge også får vinderen først), og der
+     tvinges et rang-spring lige efter vinderen, så resten af den
+     oprindeligt uafgjorte gruppe fortsat deler plads med hinanden, men
+     IKKE længere med vinderen. */
+  function computeRanks(sortedPlayers, sdWinnerId) {
+    if (sdWinnerId) {
+      var wIdx = sortedPlayers.findIndex(function (p) { return p.pid === sdWinnerId; });
+      if (wIdx > 0) {
+        var w = sortedPlayers.splice(wIdx, 1)[0];
+        sortedPlayers.unshift(w);
+      }
+    }
     var ranks = [];
     sortedPlayers.forEach(function (p, i) {
-      if (i > 0 && p.score === sortedPlayers[i - 1].score) {
+      if (i === 0) { ranks.push(1); return; }
+      var sameScore = p.score === sortedPlayers[i - 1].score;
+      var isSdBoundary = sdWinnerId && i === 1 && sortedPlayers[0].pid === sdWinnerId;
+      if (sameScore && !isSdBoundary) {
         ranks.push(ranks[i - 1]);
+      } else if (sameScore && isSdBoundary) {
+        ranks.push(ranks[i - 1] + 1);
       } else {
         ranks.push(i + 1);
       }
     });
     return ranks;
+  }
+
+  /* ================================================================
+     Sudden Death — afgør uafgjort førsteplads
+     Trækker nye spørgsmål (starter let, eskalerer til middel → svær og
+     bliver der) kun til de spillere, der stadig er tilbage i uafgjortheden.
+     Forkert svar = ude. Rammer alle forkert samme runde = ingen ude, prøv
+     igen. Kun 1 tilbage = vinder. Rører ALDRIG den normale score/rangering
+     undervejs — kun en endelig sdWinnerId ved afslutning. Fast 10s-timer,
+     uafhængig af spillets valgte tid pr. spørgsmål. Bruger egne DB-stier
+     (sdAnswers/{round}) og egne timer/lytter-variable, adskilt fra den
+     almindelige spørgsmålsflow, for slet ikke at kunne kollidere med den. */
+  var sdTimerInterval = null;
+
+  function startSuddenDeath() {
+    g.sd = {
+      candidatePids: g.tiedPlayers.slice(),
+      round: 0,           // 0-baseret — bruges også som DB-nøgle ('r'+round)
+      usedQuestionTexts: [],
+      active: true
+    };
+    runSuddenDeathRound();
+  }
+
+  function sdLevelForRound(round) {
+    if (round === 0) return 'let';
+    if (round === 1) return 'middel';
+    return 'svaer';
+  }
+
+  /* Finder ét ubrugt spørgsmål på det ønskede niveau. Bruger den samme
+     Firebase-bank som quizzen selv stammer fra, hvis quizzen ER en
+     auto-genereret bank-quiz (den mest almindelige sudden death-situation).
+     Ellers falder den tilbage til at genbruge quizzens EGNE spørgsmål
+     (foretrækker rigtigt niveau, ellers hvad som helst ubrugt). */
+  function drawSuddenDeathQuestion(level, cb) {
+    var isFromBank = (window.QUESTION_BANKS || []).some(function (b) { return b.id === g.quizId; });
+    var shownTexts = g.quiz.questions.map(function (q) { return q.q; }).concat(g.sd.usedQuestionTexts);
+
+    if (isFromBank) {
+      db.ref('quizzes/' + g.quizId + '/questions').once('value', function (snap) {
+        var all = [];
+        snap.forEach(function (child) { var v = child.val(); v._id = child.key; all.push(v); });
+        if (all.length === 0) { cb(new Error('Banken er tom.')); return; }
+        var leveled = all.filter(function (q) { return q.level === level && shownTexts.indexOf(q.q) === -1; });
+        var candidates = leveled.length > 0 ? leveled : all.filter(function (q) { return shownTexts.indexOf(q.q) === -1; });
+        if (candidates.length === 0) candidates = all; // banken er brugt helt op — accepteret edge-case, genbrug
+        var pick = candidates[Math.floor(Math.random() * candidates.length)];
+        g.sd.usedQuestionTexts.push(pick.q);
+        cb(null, pick);
+      }, function (err) { cb(err); });
+      return;
+    }
+
+    var pool = g.quiz.questions.filter(function (q) { return shownTexts.indexOf(q.q) === -1; });
+    var leveled2 = pool.filter(function (q) { return q.level === level; });
+    var chooseFrom = leveled2.length > 0 ? leveled2 : pool;
+    if (chooseFrom.length === 0) chooseFrom = g.quiz.questions; // alt brugt — accepteret edge-case for en tiebreak
+    var pick2 = chooseFrom[Math.floor(Math.random() * chooseFrom.length)];
+    g.sd.usedQuestionTexts.push(pick2.q);
+    cb(null, pick2);
+  }
+
+  function runSuddenDeathRound() {
+    var level = sdLevelForRound(g.sd.round);
+    drawSuddenDeathQuestion(level, function (err, qObj) {
+      if (err || !qObj) {
+        alert('Kunne ikke finde flere spørgsmål til sudden death: ' + (err ? err.message : 'ukendt fejl'));
+        finishSuddenDeath(g.sd.candidatePids[0] || null);
+        return;
+      }
+
+      var shuffled = shuffleQuestion(qObj);
+      var roundKey = 'r' + g.sd.round;
+
+      g.gameRef.child('question').set({ text: shuffled.q, options: shuffled.options, level: shuffled.level });
+      g.gameRef.child('state').update({
+        phase: 'suddendeath',
+        questionStartAt: firebase.database.ServerValue.TIMESTAMP,
+        timerSec: 10,
+        correctChoice: -1,
+        sdParticipantIds: g.sd.candidatePids,
+        sdRound: g.sd.round
+      }).then(function () {
+        g.gameRef.child('state/questionStartAt').once('value', function (snap) {
+          var startAt = snap.val() || serverNow();
+          showSdQuestion(shuffled, g.sd.round, g.sd.candidatePids);
+
+          var settled = false;
+          var offAnswers = sdListenForAnswers(roundKey, g.sd.candidatePids, function () {
+            if (settled) return;
+            settled = true;
+            sdClearTimer();
+            resolveSuddenDeathRound(shuffled, startAt, roundKey);
+          });
+
+          sdStartTimer(startAt, 10, function () {
+            if (settled) return;
+            settled = true;
+            offAnswers();
+            resolveSuddenDeathRound(shuffled, startAt, roundKey);
+          });
+        });
+      });
+    });
+  }
+
+  function sdListenForAnswers(roundKey, candidatePids, onAllAnswered) {
+    var ref = g.gameRef.child('sdAnswers/' + roundKey);
+    var off = ref.on('value', function (snap) {
+      if (snap.numChildren() >= candidatePids.length) {
+        ref.off('value', off);
+        onAllAnswered();
+      }
+    });
+    return function () { ref.off('value', off); };
+  }
+
+  function resolveSuddenDeathRound(shuffled, startAt, roundKey) {
+    g.gameRef.child('sdAnswers/' + roundKey).once('value', function (snap) {
+      var answers = snap.val() || {};
+      var deadline = startAt + 11000; // 10s + 1s kulance
+      var survivors = [];
+      var eliminated = [];
+      g.sd.candidatePids.forEach(function (pid) {
+        var a = answers[pid];
+        var correct = a && a.choice === shuffled.correct && a.at <= deadline;
+        if (correct) survivors.push(pid); else eliminated.push(pid);
+      });
+
+      g.gameRef.child('state/correctChoice').set(shuffled.correct);
+      showSdReveal(shuffled, survivors, eliminated);
+
+      setTimeout(function () {
+        if (survivors.length === 0) {
+          // Alle dumpede denne runde — ingen ryger ud, prøv igen (sværhedsgraden fortsætter med at eskalere)
+          g.sd.round++;
+          runSuddenDeathRound();
+        } else if (survivors.length === 1) {
+          finishSuddenDeath(survivors[0]);
+        } else {
+          g.sd.candidatePids = survivors;
+          g.sd.round++;
+          runSuddenDeathRound();
+        }
+      }, 3500);
+    });
+  }
+
+  function finishSuddenDeath(winnerId) {
+    g.sd.active = false;
+    showPodiumHost(winnerId);
+  }
+
+  /* --- Sudden Death-timer (helt adskilt fra den almindelige spørgsmålstimer) --- */
+  function sdStartTimer(startAt, timerSec, onExpire) {
+    sdClearTimer();
+    var bar = document.getElementById('sd-timer-bar');
+    var numEl = document.getElementById('sd-timer-display');
+    function tick() {
+      var elapsed = (serverNow() - startAt) / 1000;
+      var remaining = timerSec - elapsed;
+      if (remaining < 0) remaining = 0;
+      var pct = (remaining / timerSec) * 100;
+      bar.style.width = pct + '%';
+      var secs = Math.ceil(remaining);
+      numEl.textContent = secs;
+      if (remaining <= 5) { bar.classList.add('urgent'); numEl.classList.add('urgent'); }
+      else { bar.classList.remove('urgent'); numEl.classList.remove('urgent'); }
+      if (remaining <= 0) {
+        sdClearTimer();
+        onExpire();
+      }
+    }
+    tick();
+    sdTimerInterval = setInterval(tick, 100);
+  }
+  function sdClearTimer() {
+    if (sdTimerInterval) { clearInterval(sdTimerInterval); sdTimerInterval = null; }
+  }
+
+  /* --- Sudden Death-skærm (host) --- */
+  function showSdQuestion(shuffled, round, participantPids) {
+    document.getElementById('sd-progress').textContent = '🔥 Runde ' + (round + 1) + ' — ' + (LEVEL_LABELS[shuffled.level] || shuffled.level) + '-niveau';
+    document.getElementById('sd-participants').textContent =
+      participantPids.map(function (pid) { return (g.players[pid] && g.players[pid].name) || '?'; }).join(' 🆚 ');
+    document.getElementById('sd-q-text').textContent = shuffled.q;
+    var badge = document.getElementById('sd-level-badge');
+    badge.textContent = LEVEL_LABELS[shuffled.level] || shuffled.level;
+    badge.className = 'level-badge ' + (LEVEL_CSS[shuffled.level] || 'level-let');
+
+    var optionsEl = document.getElementById('sd-options');
+    optionsEl.innerHTML = '';
+    shuffled.options.forEach(function (opt, i) {
+      var card = document.createElement('div');
+      card.className = 'option-card ' + SHAPE_CLASSES[i];
+      card.innerHTML = '<span class="icon">' + SHAPES[i] + '</span><span>' + escHtml(opt) + '</span>';
+      optionsEl.appendChild(card);
+    });
+
+    document.getElementById('sd-status').style.display = 'none';
+    showScreen('screen-sd');
+  }
+
+  function showSdReveal(shuffled, survivorPids, eliminatedPids) {
+    var cards = document.querySelectorAll('#sd-options .option-card');
+    cards.forEach(function (card, i) {
+      card.classList.add(i === shuffled.correct ? 'correct' : 'dim');
+    });
+    var survivorNames = survivorPids.map(function (pid) { return (g.players[pid] && g.players[pid].name) || '?'; });
+    var eliminatedNames = eliminatedPids.map(function (pid) { return (g.players[pid] && g.players[pid].name) || '?'; });
+    var lines = [];
+    if (survivorNames.length) lines.push('✅ Går videre: ' + survivorNames.join(', '));
+    if (eliminatedNames.length) lines.push('❌ Ude: ' + eliminatedNames.join(', '));
+    var status = document.getElementById('sd-status');
+    status.innerHTML = lines.join('<br>');
+    status.style.display = 'block';
   }
 
   /* --- HTML-escape hjælper --- */

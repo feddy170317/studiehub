@@ -10,13 +10,29 @@
     body { overflow: hidden; }
     #screen-setup, #screen-lobby-host,
     #screen-q, #screen-reveal-host,
-    #screen-score, #screen-podium-host {
+    #screen-score, #screen-podium-host,
+    #screen-sd {
       padding: 20px 32px;
       justify-content: flex-start;
       min-height: 100vh;
       overflow-y: auto;
     }
-    #screen-q { justify-content: center; }
+    #screen-q, #screen-sd { justify-content: center; }
+
+    #host-progress-badge {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      z-index: 500;
+      background: rgba(45, 27, 105, 0.9);
+      border: 2px solid var(--accent);
+      border-radius: 99px;
+      padding: 6px 16px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: #fff;
+      backdrop-filter: blur(4px);
+    }
 
     .host-topbar {
       display: flex;
@@ -194,6 +210,11 @@
   <p style="font-size:0.9rem; color:#6b7280;">Åbn <strong>SETUP.md</strong> og følg trin 1–4 for at tilslutte din Firebase Realtime Database.</p>
 </div>
 
+<!-- Vedvarende fremdrift-badge: viser "Spørgsmål N/Total" på TVÆRS af spørgsmål-,
+     reveal- og scoreboard-skærmene (ikke kun mens selve spørgsmålet vises), så man
+     aldrig mister overblikket over hvor langt man er i quizzen. Skjult i setup/lobby/podium. -->
+<div id="host-progress-badge" style="display:none;"></div>
+
 <!-- Skærm 1: Setup -->
 <div id="screen-setup" class="screen active">
   <div style="width:100%; max-width:520px; margin: 0 auto; padding-top:40px;">
@@ -309,9 +330,31 @@
   <div class="host-center">
     <div class="brand mb16">Spillet er slut! 🏆</div>
     <div id="podium-host-list" style="width:100%; max-width:600px; display:flex; flex-direction:column; gap:10px;"></div>
+    <button id="btn-sudden-death" class="btn btn-primary mt16" style="max-width:360px; display:none; background:linear-gradient(135deg,#ef4444,#f59e0b);">
+      ⚡ Uafgjort! Afgør med Sudden Death
+    </button>
     <button id="btn-end" class="btn btn-danger mt24" style="max-width:320px;">
       Afslut &amp; slet spil
     </button>
+  </div>
+</div>
+
+<!-- Skærm 7: Sudden Death (afgør uafgjort førsteplads) -->
+<div id="screen-sd" class="screen host-layout">
+  <div class="host-center">
+    <div class="brand" style="font-size:1.8rem; color:#ef4444; text-shadow:0 0 20px rgba(239,68,68,0.6);">🔥 SUDDEN DEATH</div>
+    <div class="q-meta" id="sd-progress">Runde 1</div>
+    <div class="q-meta" id="sd-participants" style="font-size:1.1rem; font-weight:800; color:#fff;"></div>
+    <div class="timer-wrap w100" style="max-width:640px;">
+      <div id="sd-timer-bar" class="timer-bar" style="width:100%;"></div>
+    </div>
+    <div class="timer-number" id="sd-timer-display">10</div>
+    <div class="q-text mt8" id="sd-q-text">Spørgsmål...</div>
+    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; justify-content:center;">
+      <span id="sd-level-badge" class="level-badge level-let">Nem</span>
+    </div>
+    <div class="option-cards w100" id="sd-options"></div>
+    <div id="sd-status" class="why-box mt16" style="display:none;"></div>
   </div>
 </div>
 
@@ -321,8 +364,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="quizzes/manifest.js"></script>
 <script src="quizzes/demo.js"></script>
-<script src="quizzes/dansk_almen_viden.js"></script>
-<script src="quizzes/verdens_almenviden.js"></script>
+<script src="quizzes/bank_manifest.js"></script>
 <script src="assets/vendor/qrcode.min.js"></script>
 <script src="assets/host.js"></script>
 </body>
