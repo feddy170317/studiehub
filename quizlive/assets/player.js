@@ -27,7 +27,9 @@
     hasAnswered: false,
     serverTimeOffset: 0,
     timerInterval: null,
-    timerSec: 20
+    timerSec: 20,
+    stateRef: null,
+    stateListener: null
   };
 
   /* --- Skærm-hjælper --- */
@@ -185,22 +187,59 @@
     // Vis lobby med det samme
     document.getElementById('lobby-greeting').textContent = 'Du er med, ' + state.name + '! 🎉 Kig op på skærmen.';
     showScreen('screen-lobby');
+    updateLeaveBtnVisibility();
 
     if (initialPhase && initialPhase !== 'lobby') {
       handlePhase(initialPhase);
     }
 
-    db.ref('games/' + state.pin + '/state').on('value', function (snap) {
+    state.stateRef = db.ref('games/' + state.pin + '/state');
+    state.stateListener = function (snap) {
       if (!snap.exists()) {
         // Spillet er slettet
-        clearSession();
-        showScreen('screen-join');
-        setError('Spillet er afsluttet.');
+        leaveGame('Spillet er afsluttet.');
         return;
       }
       var s = snap.val();
       handlePhase(s.phase, s);
+    };
+    state.stateRef.on('value', state.stateListener);
+  }
+
+  /* --- Forlad det aktuelle spil (manuelt via knap, eller fordi spillet er væk) ---
+     Frakobler DB-lytteren, rydder session + timer, og viser deltag-skærmen igen.
+     Uden dette sidder en spiller fast i et gammelt/afsluttet spil, hvis værten
+     lukker fanen uden at trykke "Afslut spil" — se play-again-bug 2026-08-05. */
+  function leaveGame(msg) {
+    if (state.stateRef && state.stateListener) {
+      state.stateRef.off('value', state.stateListener);
+    }
+    state.stateRef = null;
+    state.stateListener = null;
+    clearTimer();
+    clearSession();
+    state.pin = '';
+    state.playerId = '';
+    state.registered = false;
+    state.currentPhase = '';
+    state.currentQIndex = -1;
+    state.hasAnswered = false;
+    updateLeaveBtnVisibility();
+    showScreen('screen-join');
+    document.getElementById('input-pin').value = getUrlPin();
+    setError(msg || '');
+  }
+
+  /* --- "Forlad spil"-knap: vises på alle skærme undtagen deltag-skærmen --- */
+  var btnLeave = document.getElementById('btn-leave');
+  if (btnLeave) {
+    btnLeave.addEventListener('click', function () {
+      leaveGame('');
     });
+  }
+  function updateLeaveBtnVisibility() {
+    if (!btnLeave) return;
+    btnLeave.style.display = state.pin ? 'flex' : 'none';
   }
 
   function handlePhase(phase, stateData) {
@@ -331,6 +370,8 @@
     db.ref('games/' + state.pin + '/players').once('value', function (snap) {
       var players = snap.val() || {};
       var myScore = (players[state.playerId] && players[state.playerId].score) || 0;
+      var myStreak = (players[state.playerId] && players[state.playerId].streak) || 0;
+      var myBonus = (players[state.playerId] && players[state.playerId].lastBonus) || 0;
       var scores = Object.values(players).map(function (p) { return p.score || 0; });
       scores.sort(function (a, b) { return b - a; });
       var placement = scores.indexOf(myScore) + 1;
@@ -358,11 +399,23 @@
           feedbackBox.className = 'feedback-box mb16';
         } else if (isCorrect) {
           var pts = stateData.lastPts || 0;
-          feedbackBox.textContent = 'RIGTIGT! +' + pts;
+          var totalPts = pts + myBonus;
+          feedbackBox.textContent = 'RIGTIGT! +' + totalPts;
           feedbackBox.className = 'feedback-box correct mb16';
         } else {
           feedbackBox.textContent = 'FORKERT';
           feedbackBox.className = 'feedback-box wrong mb16';
+        }
+
+        // Streak-badge: kun vist når der er en aktiv bonus (streak >= 2)
+        var streakEl = document.getElementById('streak-badge');
+        if (streakEl) {
+          if (isCorrect && myStreak >= 2) {
+            streakEl.textContent = '🔥 ' + myStreak + ' i træk — +' + myBonus + ' bonus!';
+            streakEl.style.display = 'block';
+          } else {
+            streakEl.style.display = 'none';
+          }
         }
 
         document.getElementById('reveal-score').textContent = myScore;
@@ -394,6 +447,7 @@
 
       showScreen('screen-podium');
       clearSession();
+      updateLeaveBtnVisibility();
 
       // Konfetti for top-3
       if (placement <= 3) {
@@ -427,6 +481,18 @@
 
   /* --- Forsøg genindmeld ved page-load --- */
   var restored = tryRestore();
+
+  // Hvis siden er åbnet med en PIN i URL'en (nyt QR-scan/link) der IKKE matcher
+  // en evt. gemt session, har den friske PIN forrang. Ellers ville en spiller,
+  // der stadig har en gammel session liggende (fx fordi værten lukkede fanen
+  // uden at trykke "Afslut spil"), altid blive trukket tilbage ind i det gamle
+  // spil i stedet for det nye vedkommende lige har scannet sig ind i.
+  // Se play-again-bug 2026-08-05.
+  if (restored && urlPin && restored.pin !== urlPin) {
+    clearSession();
+    restored = null;
+  }
+
   if (restored) {
     document.getElementById('input-pin').value = restored.pin;
     if (restored.registered) {

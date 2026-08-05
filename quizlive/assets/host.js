@@ -22,6 +22,7 @@
   var SHAPES = ['▲', '◆', '●', '■'];
   var SHAPE_CLASSES = ['a', 'b', 'c', 'd'];
   var LEVEL_POINTS = { 'let': 100, 'middel': 150, 'svaer': 200, 'svær': 200 };
+  var STREAK_BONUS_STEP = 50; // flad bonus pr. streak-trin: 2 rigtige i træk = +50, 3 = +100, osv.
   var LEVEL_LABELS = { 'let': 'Nem', 'middel': 'Middel', 'svaer': 'Svær', 'svær': 'Svær' };
   var LEVEL_CSS = { 'let': 'level-let', 'middel': 'level-middel', 'svaer': 'level-svaer', 'svær': 'level-svaer' };
 
@@ -565,6 +566,7 @@
             name: data.name,
             score: data.score || 0,
             correctCount: data.correctCount || 0,
+            streak: data.streak || 0,
             registered: !!data.registered
           };
           count++;
@@ -802,7 +804,12 @@
     computeAndReveal(qIdx, q);
   }
 
-  /* --- Beregn scorer og vis reveal --- */
+  /* --- Beregn scorer og vis reveal ---
+     Inkl. streak-bonus: hver spiller der svarer rigtigt N gange i træk (N>=2)
+     får +50 pr. streak-trin oveni de faste sværhedsgrad-point. Forkert svar
+     eller intet svar nulstiller streaken. Vi løber over ALLE kendte spillere
+     (ikke kun dem der svarede på dette spørgsmål), så en spiller der springer
+     over/tiden løber ud får streaken nulstillet korrekt. */
   function computeAndReveal(qIdx, q) {
     var correctIdx = q.correct;
     var pts = LEVEL_POINTS[q.level] || 100;
@@ -810,27 +817,43 @@
 
     // Læs alle svar
     g.gameRef.child('answers/' + qIdx).once('value', function (snap) {
-      var updates = {};
+      var answersMap = {};
       if (snap.exists()) {
         snap.forEach(function (child) {
-          var pid = child.key;
-          var ans = child.val();
-          // Tjek tidsstempel (grace = +1s)
-          var inTime = ans.at <= deadline;
-          if (ans.choice === correctIdx && inTime) {
-            var currentScore = (g.players[pid] && g.players[pid].score) || 0;
-            var newScore = currentScore + pts;
-            var currentCorrect = (g.players[pid] && g.players[pid].correctCount) || 0;
-            var newCorrect = currentCorrect + 1;
-            if (g.players[pid]) {
-              g.players[pid].score = newScore;
-              g.players[pid].correctCount = newCorrect;
-            }
-            updates['games/' + g.pin + '/players/' + pid + '/score'] = newScore;
-            updates['games/' + g.pin + '/players/' + pid + '/correctCount'] = newCorrect;
-          }
+          answersMap[child.key] = child.val();
         });
       }
+
+      var updates = {};
+      Object.keys(g.players).forEach(function (pid) {
+        var ans = answersMap[pid];
+        var inTime = !!ans && ans.at <= deadline;
+        var isCorrect = inTime && ans.choice === correctIdx;
+        var prevStreak = g.players[pid].streak || 0;
+
+        if (isCorrect) {
+          var newStreak = prevStreak + 1;
+          var bonus = newStreak >= 2 ? (newStreak - 1) * STREAK_BONUS_STEP : 0;
+          var totalPts = pts + bonus;
+          var newScore = (g.players[pid].score || 0) + totalPts;
+          var newCorrect = (g.players[pid].correctCount || 0) + 1;
+
+          g.players[pid].score = newScore;
+          g.players[pid].correctCount = newCorrect;
+          g.players[pid].streak = newStreak;
+
+          updates['games/' + g.pin + '/players/' + pid + '/score'] = newScore;
+          updates['games/' + g.pin + '/players/' + pid + '/correctCount'] = newCorrect;
+          updates['games/' + g.pin + '/players/' + pid + '/streak'] = newStreak;
+          updates['games/' + g.pin + '/players/' + pid + '/lastBonus'] = bonus;
+        } else {
+          if (prevStreak !== 0) {
+            g.players[pid].streak = 0;
+            updates['games/' + g.pin + '/players/' + pid + '/streak'] = 0;
+          }
+          updates['games/' + g.pin + '/players/' + pid + '/lastBonus'] = 0;
+        }
+      });
 
       // Skriv scorer + sæt state til reveal
       var stateUpdate = {};
