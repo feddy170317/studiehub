@@ -526,13 +526,26 @@
      brugt — når puljen løber tør, nulstilles hele cyklussen og der trækkes
      helt friskt). Bruges af de auto-genererede quizzer (Dansk/Verdens
      Almenviden). Banken ligger under quizzes/{bankId} (samme skrivbare
-     Firebase-sti som almindelige DB-quizzer, blot med isBank:true). */
+     Firebase-sti som almindelige DB-quizzer, blot med isBank:true).
+
+     Delt "brugt"-hukommelse på tværs af ALLE værter/enheder — én person kører
+     en quiz, en ven kører en på sin telefon lige efter, og han får 15 ANDRE
+     spørgsmål, fordi "brugt"-mængden ligger i Firebase, ikke lokalt.
+
+     bankUsed opdateres via en Firebase-TRANSACTION (ikke bare read-så-set).
+     Grunden: to værter der opretter spil i samme øjeblik ville ellers begge
+     læse den samme (fx tomme) "brugt"-mængde, trække uafhængigt af hinanden,
+     og den der skriver sidst ville med et almindeligt .set() overskrive og
+     slette den andens markering — så samme spørgsmål kunne gå igen med det
+     samme, og hele cyklussen ville reelt aldrig hobe sig korrekt op.
+     transaction() garanterer at Firebase automatisk genkører funktionen med
+     den friskeste værdi ved konflikt, så opdateringen altid bliver en atomisk
+     tilføjelse til den seneste "brugt"-mængde, aldrig en overskrivning. */
   function drawFromBank(bankId, count, cb) {
     var questionsRef = db.ref('quizzes/' + bankId + '/questions');
     var usedRef = db.ref('quizzes/' + bankId + '/bankUsed');
 
-    Promise.all([questionsRef.once('value'), usedRef.once('value')]).then(function (results) {
-      var qSnap = results[0], usedSnap = results[1];
+    questionsRef.once('value').then(function (qSnap) {
       var allQ = [];
       qSnap.forEach(function (child) {
         var v = child.val();
@@ -544,29 +557,41 @@
         return;
       }
 
-      var used = usedSnap.val() || {};
-      var availableIds = allQ.map(function (q) { return q._id; }).filter(function (id) { return !used[id]; });
-
-      // Ikke nok utrukne spørgsmål tilbage til en hel quiz — cyklussen er
-      // udtømt. Nulstil hele "brugt"-mængden og træk fra en frisk cyklus.
-      if (availableIds.length < Math.min(count, allQ.length)) {
-        used = {};
-        availableIds = allQ.map(function (q) { return q._id; });
-      }
-
-      var pool = shuffleArray(availableIds.slice());
-      var picked = pool.slice(0, Math.min(count, pool.length));
-
+      var allIds = allQ.map(function (q) { return q._id; });
       var byId = {};
       allQ.forEach(function (q) { byId[q._id] = q; });
-      var drawnQuestions = picked.map(function (id) { return byId[id]; });
 
-      var newUsed = Object.assign({}, used);
-      picked.forEach(function (id) { newUsed[id] = true; });
+      // Sættes ved hvert (evt. gentaget) forsøg inde i transaction-funktionen.
+      // Ved commit svarer den sidst kørte invokation til det der rent
+      // faktisk blev skrevet, så den kan bruges direkte bagefter.
+      var picked = [];
 
-      usedRef.set(newUsed).then(function () {
+      usedRef.transaction(function (currentUsed) {
+        var used = currentUsed || {};
+        var availableIds = allIds.filter(function (id) { return !used[id]; });
+
+        // Ikke nok utrukne spørgsmål tilbage til en hel quiz — cyklussen er
+        // udtømt. Nulstil hele "brugt"-mængden og træk fra en frisk cyklus.
+        if (availableIds.length < Math.min(count, allIds.length)) {
+          used = {};
+          availableIds = allIds.slice();
+        }
+
+        var pool = shuffleArray(availableIds.slice());
+        picked = pool.slice(0, Math.min(count, pool.length));
+
+        var newUsed = Object.assign({}, used);
+        picked.forEach(function (id) { newUsed[id] = true; });
+        return newUsed;
+      }, function (err, committed) {
+        if (err) { cb(err); return; }
+        if (!committed) {
+          cb(new Error('Kunne ikke reservere spørgsmål (en anden vært trak samtidig) — prøv igen.'));
+          return;
+        }
+        var drawnQuestions = picked.map(function (id) { return byId[id]; });
         cb(null, drawnQuestions, allQ.length);
-      }).catch(function (err) { cb(err); });
+      });
     }).catch(function (err) { cb(err); });
   }
 
