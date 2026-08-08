@@ -38,20 +38,42 @@ function computeStandings(list) {
   return stats;
 }
 
-function currentTrophyHolders(list) {
-  if (!list.length) return { gold: null, poo: null };
-  const latest = list[0]; // list is sorted newest first
-  return { gold: latest.winner, poo: latest.loser };
+/* Trophy always sits with whoever won the most recent match — a challenger
+   who beats the incumbent simply takes it, a challenger who loses gets nothing.
+
+   The poo (💩) is stickier: it only ever moves when its CURRENT holder is one
+   of the two players in a match.
+     - holder plays and wins  -> poo passes to the player they beat
+     - holder plays and loses -> holder keeps it
+     - holder isn't playing   -> nothing happens, no matter who wins
+   The very first match ever logged has no holder yet, so it bootstraps the
+   poo onto its loser (mirroring the trophy bootstrapping onto its winner). */
+function computeTrophyState(list) {
+  const chrono = [...list].sort((a, b) => (a.ts || 0) - (b.ts || 0));
+  let gold = null, poo = null;
+  chrono.forEach(m => {
+    const { winner, loser } = m;
+    if (!winner || !loser) return;
+    gold = winner; // winner of the latest match always holds the trophy
+    if (poo === null) {
+      poo = loser; // bootstrap on the very first match
+    } else if (poo === winner) {
+      poo = loser; // holder won -> passes it on
+    }
+    // else: holder lost (keeps it) or wasn't playing (no change)
+  });
+  return { gold, poo };
 }
 
 function render() {
   const sorted = [...matches].sort((a, b) => (b.ts || 0) - (a.ts || 0));
-  const { gold, poo } = currentTrophyHolders(sorted);
+  const { gold, poo } = computeTrophyState(matches);
   const stats = computeStandings(sorted);
 
   renderPlayers(gold, poo, stats);
   renderStandings(stats);
   renderHistory(sorted);
+  renderHeadToHead();
 }
 
 function renderPlayers(gold, poo, stats) {
@@ -65,7 +87,7 @@ function renderPlayers(gold, poo, stats) {
       : (isPoo ? '<div class="badge poo-badge">💩</div>' : '');
     const status = isGold
       ? '<div class="player-status gold-text">Holds the trophy</div>'
-      : (isPoo ? '<div class="player-status poo-text">Lost the last challenge</div>' : '<div class="player-status">&nbsp;</div>');
+      : (isPoo ? '<div class="player-status poo-text">Stuck with the 💩</div>' : '<div class="player-status">&nbsp;</div>');
     const s = stats[p];
     const winPct = s.matches ? Math.round((s.wins / s.matches) * 100) : 0;
     return `
@@ -123,6 +145,74 @@ function renderHistory(sorted) {
   el.querySelectorAll('[data-del]').forEach(btn => {
     btn.addEventListener('click', () => deleteMatch(btn.getAttribute('data-del')));
   });
+}
+
+/* ---- Head-to-head ---- */
+function populateH2HSelects() {
+  const selA = document.getElementById('h2hPlayerA');
+  const selB = document.getElementById('h2hPlayerB');
+  if (selA.options.length) return; // only needs populating once
+  selA.innerHTML = PLAYERS.map(p => `<option value="${p}">${p}</option>`).join('');
+  selB.innerHTML = PLAYERS.map(p => `<option value="${p}">${p}</option>`).join('');
+  selB.value = PLAYERS[1];
+  syncH2HOptions();
+}
+
+function syncH2HOptions() {
+  const a = document.getElementById('h2hPlayerA').value;
+  const selB = document.getElementById('h2hPlayerB');
+  const prevB = selB.value;
+  selB.innerHTML = PLAYERS.filter(p => p !== a).map(p => `<option value="${p}">${p}</option>`).join('');
+  if (PLAYERS.filter(p => p !== a).includes(prevB)) selB.value = prevB;
+  renderHeadToHead();
+}
+
+function computeHeadToHead(list, p1, p2) {
+  const between = list
+    .filter(m => (m.playerA === p1 && m.playerB === p2) || (m.playerA === p2 && m.playerB === p1))
+    .sort((a, b) => (b.ts || 0) - (a.ts || 0));
+  let wins1 = 0, wins2 = 0, goals1 = 0, goals2 = 0;
+  between.forEach(m => {
+    const g1 = m.playerA === p1 ? m.scoreA : m.scoreB;
+    const g2 = m.playerA === p1 ? m.scoreB : m.scoreA;
+    goals1 += g1; goals2 += g2;
+    if (m.winner === p1) wins1++; else wins2++;
+  });
+  return { between, wins1, wins2, goals1, goals2 };
+}
+
+function renderHeadToHead() {
+  const selA = document.getElementById('h2hPlayerA');
+  const selB = document.getElementById('h2hPlayerB');
+  if (!selA || !selB) return;
+  const p1 = selA.value, p2 = selB.value;
+  const resultsEl = document.getElementById('h2h-results');
+  if (!p1 || !p2 || p1 === p2) {
+    resultsEl.innerHTML = '<div class="empty-note">Pick two different players.</div>';
+    return;
+  }
+  const { between, wins1, wins2, goals1, goals2 } = computeHeadToHead(matches, p1, p2);
+  if (!between.length) {
+    resultsEl.innerHTML = `<div class="empty-note">${p1} and ${p2} haven’t played each other yet.</div>`;
+    return;
+  }
+  const summary = `
+    <div class="h2h-summary">
+      <div class="h2h-side"><span class="h2h-name" style="color:${PLAYER_COLOR[p1]}">${p1}</span><b>${wins1}</b></div>
+      <div class="h2h-mid">wins &middot; ${between.length} played</div>
+      <div class="h2h-side"><b>${wins2}</b><span class="h2h-name" style="color:${PLAYER_COLOR[p2]}">${p2}</span></div>
+    </div>
+    <div class="h2h-goals">Goals: ${goals1} &ndash; ${goals2}</div>`;
+  const list = between.map(m => `
+    <div class="match-row">
+      <div class="who">
+        <span class="win">${m.winner}</span>
+        <span class="score">${m.winner === m.playerA ? m.scoreA : m.scoreB} – ${m.winner === m.playerA ? m.scoreB : m.scoreA}</span>
+        <span class="lose">${m.loser}</span>
+      </div>
+      <div class="who"><span class="date">${formatDate(m.date)}</span></div>
+    </div>`).join('');
+  resultsEl.innerHTML = summary + `<div class="match-list h2h-list">${list}</div>`;
 }
 
 function deleteMatch(id) {
@@ -225,5 +315,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.getElementById('match-form').addEventListener('submit', submitMatch);
   document.getElementById('playerA').addEventListener('change', syncOpponentOptions);
+  populateH2HSelects();
+  document.getElementById('h2hPlayerA').addEventListener('change', syncH2HOptions);
+  document.getElementById('h2hPlayerB').addEventListener('change', renderHeadToHead);
   initFirebase();
 });
