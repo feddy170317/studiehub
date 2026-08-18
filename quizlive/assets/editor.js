@@ -61,6 +61,7 @@
   var inpSemester     = document.getElementById('inp-semester');
   var inpCourse       = document.getElementById('inp-course');
   var inpLecture      = document.getElementById('inp-lecture');
+  var inpLanguage     = document.getElementById('inp-quiz-language');
   var courseDatalist  = document.getElementById('course-suggestions');
   var btnSave         = document.getElementById('btn-save-quiz');
   var topbarError     = document.getElementById('topbar-error');
@@ -102,6 +103,7 @@
   var LS_SEMESTER = 'quizlive_semester';
   var LS_COURSE   = 'quizlive_course';
   var LS_LECTURE  = 'quizlive_lecture';
+  var LS_LANGUAGE = 'quizlive_quiz_language';
 
   (function prefillAuthor() {
     try {
@@ -109,10 +111,12 @@
       var s = localStorage.getItem(LS_SEMESTER) || '';
       var c = localStorage.getItem(LS_COURSE)   || '';
       var l = localStorage.getItem(LS_LECTURE)  || '';
+      var lg = localStorage.getItem(LS_LANGUAGE) || '';
       if (a) inpAuthor.value = a;
       if (s) inpSemester.value = s;
       if (c) inpCourse.value = c;
       if (l) inpLecture.value = l;
+      if (lg && inpLanguage) inpLanguage.value = lg;
     } catch (e) {}
   })();
 
@@ -128,6 +132,11 @@
   inpLecture.addEventListener('change', function () {
     try { localStorage.setItem(LS_LECTURE, inpLecture.value.trim()); } catch (e) {}
   });
+  if (inpLanguage) {
+    inpLanguage.addEventListener('change', function () {
+      try { localStorage.setItem(LS_LANGUAGE, inpLanguage.value); } catch (e) {}
+    });
+  }
 
   /* ================================================================
      Gem og indlæs slides fra/til DOM
@@ -441,15 +450,17 @@
       return;
     }
 
-    /* 4. Gem forfatter/semester/fag/lektion til næste gang */
+    /* 4. Gem forfatter/semester/fag/lektion/sprog til næste gang */
     var semester = inpSemester.value;
     var course   = inpCourse.value.trim();
     var lecture  = inpLecture.value.trim();
+    var language = inpLanguage ? (inpLanguage.value || 'da') : 'da';
     try {
       localStorage.setItem(LS_AUTHOR, author);
       localStorage.setItem(LS_SEMESTER, semester);
       localStorage.setItem(LS_COURSE, course);
       localStorage.setItem(LS_LECTURE, lecture);
+      localStorage.setItem(LS_LANGUAGE, language);
     } catch (e) {}
 
     /* 5. Byg quiz-objekt — saml billeder i separat map (imgId -> data-URL) */
@@ -487,7 +498,8 @@
       title:     title,
       author:    author,
       updatedAt: ServerValue.TIMESTAMP,
-      questions: questions
+      questions: questions,
+      language:  language || 'da'
     };
     if (semester) payload.semester = semester;
     if (course)   payload.course   = course;
@@ -722,6 +734,7 @@
     inpSemester.value = qObj.semester || '';
     inpCourse.value   = qObj.course   || '';
     inpLecture.value  = qObj.lecture  || '';
+    if (inpLanguage) inpLanguage.value = qObj.language || 'da';
     editingQuizId   = id;
     editingCreatedAt = qObj.createdAt || null;
 

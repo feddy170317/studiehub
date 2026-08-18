@@ -5,6 +5,13 @@ window.QUIZ_MANIFEST = [
     title: 'Demo: Blandet paratviden',
     file: 'quizzes/demo.js',
     count: 8
+  },
+  {
+    id: 'demo_en',
+    title: 'Demo: General Knowledge (English)',
+    file: 'quizzes/demo_en.js',
+    count: 8,
+    language: 'en'
   }
 ];
 /* "Dansk Almen Viden" og "Verdens Almenviden" er nu auto-genererede quizzer,

@@ -16,6 +16,13 @@
   firebase.initializeApp(window.FIREBASE_CONFIG);
   var db = firebase.database();
 
+  /* --- Sprog: byg toggle-pillen + oversæt alt statisk mærket indhold --- */
+  if (window.QL_LANG) {
+    QL_LANG.renderToggle(document.getElementById('lang-toggle-container'));
+    QL_LANG.applyStatic();
+  }
+  var t = window.QL_LANG ? QL_LANG.t : function (key) { return key; };
+
   /* --- State --- */
   var state = {
     pin: '',
@@ -115,34 +122,34 @@
     var name = document.getElementById('input-name').value.trim();
 
     if (pin.length !== 6 || !/^\d{6}$/.test(pin)) {
-      setError('PIN skal være 6 cifre.');
+      setError(t('join.errPinLength'));
       return;
     }
 
     // Registreret elev — elev-PIN har forrang over gæste-navn
     if (elevPin) {
       if (!/^\d{4}$/.test(elevPin)) {
-        setError('Elev-PIN skal være 4 cifre.');
+        setError(t('join.errElevPinLength'));
         return;
       }
       setError('');
       db.ref('students/' + elevPin).once('value', function (snap) {
         if (!snap.exists()) {
-          setError('PIN ikke genkendt — tjek koden, eller lad feltet stå tomt for at deltage som gæst.');
+          setError(t('join.errElevPinNotFound'));
           return;
         }
         var studentName = (snap.val() && snap.val().name) || '';
         saveElevPin(elevPin);
         joinGame(pin, studentName, elevPin, true);
       }, function () {
-        setError('Kunne ikke slå elev-PIN op. Prøv igen.');
+        setError(t('join.errElevPinLookupFailed'));
       });
       return;
     }
 
     // Gæst — kræver navn
     if (!name) {
-      setError('Indtast dit navn.');
+      setError(t('join.errNameRequired'));
       return;
     }
 
@@ -153,7 +160,7 @@
   function joinGame(pin, name, existingPlayerId, registered) {
     db.ref('games/' + pin).once('value', function (snap) {
       if (!snap.exists()) {
-        setError('Spillet findes ikke. Tjek PIN.');
+        setError(t('join.errGameNotFound'));
         return;
       }
       var gameData = snap.val();
@@ -186,7 +193,7 @@
   /* --- Lyt på state-ændringer --- */
   function startListening(initialPhase) {
     // Vis lobby med det samme
-    document.getElementById('lobby-greeting').textContent = 'Du er med, ' + state.name + '! 🎉 Kig op på skærmen.';
+    document.getElementById('lobby-greeting').textContent = t('lobby.greeting', { name: state.name });
     showScreen('screen-lobby');
     updateLeaveBtnVisibility();
 
@@ -198,7 +205,7 @@
     state.stateListener = function (snap) {
       if (!snap.exists()) {
         // Spillet er slettet
-        leaveGame('Spillet er afsluttet.');
+        leaveGame(t('game.endedMsg'));
         return;
       }
       var s = snap.val();
@@ -248,7 +255,7 @@
   function updateProgressBadge(current, total) {
     var el = document.getElementById('player-progress-badge');
     if (!el || !total) return;
-    el.textContent = 'Spørgsmål ' + current + '/' + total;
+    el.textContent = t('progress.label', { n: current, total: total });
     el.style.display = 'block';
   }
   function hideProgressBadge() {
@@ -330,7 +337,7 @@
     });
     var answeredMsg = document.getElementById('answered-msg');
     answeredMsg.style.display = 'none';
-    answeredMsg.textContent = 'Svar sendt! ✔ Vent på resultatet...';
+    answeredMsg.textContent = t('question.answeredMsg');
 
     if (state.hasAnswered) {
       // Allerede besvaret — vis locked state
@@ -380,7 +387,7 @@
           state.hasAnswered = true;
           document.querySelectorAll('.answer-btn').forEach(function (b) { b.disabled = true; });
           var msg = document.getElementById('answered-msg');
-          msg.textContent = 'Tiden er udløbet! ⏰';
+          msg.textContent = t('question.timeUp');
           msg.style.display = 'block';
         }
       }
@@ -459,15 +466,15 @@
         var feedbackBox = document.getElementById('feedback-box');
         if (correctChoice === undefined) {
           // Endnu ikke reveal-data — vis score
-          feedbackBox.textContent = 'Vent...';
+          feedbackBox.textContent = t('reveal.waiting');
           feedbackBox.className = 'feedback-box mb16';
         } else if (isCorrect) {
           var pts = stateData.lastPts || 0;
           var totalPts = pts + myBonus;
-          feedbackBox.textContent = 'RIGTIGT! +' + totalPts;
+          feedbackBox.textContent = t('reveal.correct', { pts: totalPts });
           feedbackBox.className = 'feedback-box correct mb16';
         } else {
-          feedbackBox.textContent = 'FORKERT';
+          feedbackBox.textContent = t('reveal.wrong');
           feedbackBox.className = 'feedback-box wrong mb16';
         }
 
@@ -475,7 +482,7 @@
         var streakEl = document.getElementById('streak-badge');
         if (streakEl) {
           if (isCorrect && myStreak >= 2) {
-            streakEl.textContent = '🔥 ' + myStreak + ' i træk — +' + myBonus + ' bonus!';
+            streakEl.textContent = t('reveal.streakBonus', { n: myStreak, bonus: myBonus });
             streakEl.style.display = 'block';
           } else {
             streakEl.style.display = 'none';
@@ -484,7 +491,7 @@
 
         document.getElementById('reveal-score').textContent = myScore;
         document.getElementById('reveal-placement').textContent =
-          'Du er nr. ' + placement + ' af ' + total;
+          t('reveal.placement', { n: placement, total: total });
 
         showScreen('screen-reveal');
       });
@@ -530,11 +537,11 @@
 
         document.getElementById('podium-score').textContent = myScore;
         var placeTxt = '';
-        if (sdWinnerId && state.playerId === sdWinnerId) placeTxt = '🥇 Du vandt sudden death! Tillykke!';
-        else if (placement === 1) placeTxt = '🥇 Du vandt! Tillykke!';
-        else if (placement === 2) placeTxt = '🥈 Du kom på 2.-pladsen!';
-        else if (placement === 3) placeTxt = '🥉 Du kom på 3.-pladsen!';
-        else placeTxt = 'Du endte på ' + placement + '. pladsen af ' + total + '.';
+        if (sdWinnerId && state.playerId === sdWinnerId) placeTxt = t('podium.wonSuddenDeath');
+        else if (placement === 1) placeTxt = t('podium.first');
+        else if (placement === 2) placeTxt = t('podium.second');
+        else if (placement === 3) placeTxt = t('podium.third');
+        else placeTxt = t('podium.other', { n: placement, total: total });
         document.getElementById('podium-placement-text').textContent = placeTxt;
 
         showScreen('screen-podium');

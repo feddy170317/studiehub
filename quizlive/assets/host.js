@@ -18,12 +18,19 @@
   firebase.initializeApp(window.FIREBASE_CONFIG);
   var db = firebase.database();
 
+  /* --- Sprog: byg toggle-pillen + oversæt alt statisk mærket indhold --- */
+  if (window.QL_LANG) {
+    QL_LANG.renderToggle(document.getElementById('lang-toggle-container'));
+    QL_LANG.applyStatic();
+  }
+  var t = window.QL_LANG ? QL_LANG.t : function (key) { return key; };
+
   /* --- Konstanter --- */
   var SHAPES = ['▲', '◆', '●', '■'];
   var SHAPE_CLASSES = ['a', 'b', 'c', 'd'];
   var LEVEL_POINTS = { 'let': 100, 'middel': 150, 'svaer': 200, 'svær': 200 };
   var STREAK_BONUS_STEP = 50; // flad bonus pr. streak-trin: 2 rigtige i træk = +50, 3 = +100, osv.
-  var LEVEL_LABELS = { 'let': 'Nem', 'middel': 'Middel', 'svaer': 'Svær', 'svær': 'Svær' };
+  var LEVEL_LABELS = { 'let': t('level.let'), 'middel': t('level.middel'), 'svaer': t('level.svaer'), 'svær': t('level.svaer') };
   var LEVEL_CSS = { 'let': 'level-let', 'middel': 'level-middel', 'svaer': 'level-svaer', 'svær': 'level-svaer' };
 
   /* --- State --- */
@@ -111,11 +118,11 @@
     var sel = document.getElementById('sel-quiz');
     if (window.QUIZ_MANIFEST && window.QUIZ_MANIFEST.length > 0) {
       var grpBuiltin = document.createElement('optgroup');
-      grpBuiltin.label = 'Indbygget';
+      grpBuiltin.label = t('catalog.builtin');
       window.QUIZ_MANIFEST.forEach(function (qm) {
         var opt = document.createElement('option');
         opt.value = qm.id;
-        opt.textContent = qm.title + ' (' + qm.count + ' spørgsmål)';
+        opt.textContent = qm.title + ' (' + t('catalog.questionCount', { n: qm.count }) + ')';
         grpBuiltin.appendChild(opt);
       });
       sel.appendChild(grpBuiltin);
@@ -131,11 +138,11 @@
     var sel = document.getElementById('sel-quiz');
     if (window.QUESTION_BANKS && window.QUESTION_BANKS.length > 0) {
       var grpBank = document.createElement('optgroup');
-      grpBank.label = 'Automatiske quizzer';
+      grpBank.label = t('catalog.autoQuizzes');
       window.QUESTION_BANKS.forEach(function (bank) {
         var opt = document.createElement('option');
         opt.value = 'bank:' + bank.id;
-        opt.textContent = bank.title + ' (' + bank.drawCount + ' tilfældige spørgsmål)';
+        opt.textContent = bank.title + ' (' + t('catalog.questionCount', { n: bank.drawCount }) + ')';
         grpBank.appendChild(opt);
       });
       sel.appendChild(grpBank);
@@ -149,7 +156,7 @@
     if (sem && course) return sem + ' · ' + course;
     if (sem) return sem;
     if (course) return course;
-    return 'Ukategoriseret — af ' + (q.author || 'ukendt').trim();
+    return t('catalog.uncategorizedByAuthor', { author: (q.author || t('catalog.unknownAuthor')).trim() });
   }
 
   /* --- Katalog-datastruktur (drill-down UI) ---
@@ -196,8 +203,8 @@
         if (!sem) {
           catalog.uncategorized.push({ id: child.key, quiz: q });
         } else {
-          var course = (q.course || '').trim() || 'Andet fag';
-          var lecture = (q.lecture || '').trim() || 'Andet';
+          var course = (q.course || '').trim() || t('catalog.otherCourse');
+          var lecture = (q.lecture || '').trim() || t('catalog.otherLecture');
           if (!catalog.semesters[sem]) catalog.semesters[sem] = { courses: {} };
           var semObj = catalog.semesters[sem];
           if (!semObj.courses[course]) semObj.courses[course] = { lectures: {} };
@@ -218,8 +225,9 @@
         }
         if (ma) return -1;
         if (mb) return 1;
-        var ua = a.indexOf('Ukategoriseret') === 0;
-        var ub = b.indexOf('Ukategoriseret') === 0;
+        var uncatWord = t('catalog.uncategorizedWord');
+        var ua = a.indexOf(uncatWord) === 0;
+        var ub = b.indexOf(uncatWord) === 0;
         if (ua !== ub) return ua ? 1 : -1;
         return a.toLowerCase().localeCompare(b.toLowerCase(), 'da');
       });
@@ -234,7 +242,7 @@
           var qCnt = Array.isArray(item.quiz.questions) ? item.quiz.questions.length : 0;
           var opt = document.createElement('option');
           opt.value = 'db:' + item.id;
-          opt.textContent = item.quiz.title + ' (' + qCnt + ' spørgsmål · ' + (item.quiz.author || 'ukendt') + ')';
+          opt.textContent = item.quiz.title + ' (' + t('catalog.questionCount', { n: qCnt }) + ' · ' + (item.quiz.author || t('catalog.unknownAuthor')) + ')';
           grp.appendChild(opt);
         });
         sel.appendChild(grp);
@@ -306,11 +314,16 @@
     var row = document.createElement('div');
     row.className = 'catalog-quiz-row';
     var qCnt = Array.isArray(quiz.questions) ? quiz.questions.length : (typeof quiz.count === 'number' ? quiz.count : 0);
+    var titleText = quiz.title || t('catalog.untitled');
+    /* Rent informativt EN-flag når quiz-forfatteren har tagget quizzen som
+       engelsksproget (editor.html's inp-quiz-language) — helt uafhængigt af
+       spillerens/hostens egen UI-sprogvalg (se Del D i opgavebeskrivelsen). */
+    var flaggedTitle = (quiz.language === 'en' ? '🇬🇧 ' : '') + titleText;
     row.innerHTML =
-      '<span class="cq-title">' + escHtml(quiz.title || '(uden titel)') + '</span>' +
-      '<span class="cq-meta">' + qCnt + ' spørgsmål' + (quiz.author ? ' · ' + escHtml(quiz.author) : '') + '</span>';
+      '<span class="cq-title">' + escHtml(flaggedTitle) + '</span>' +
+      '<span class="cq-meta">' + t('catalog.questionCount', { n: qCnt }) + (quiz.author ? ' · ' + escHtml(quiz.author) : '') + '</span>';
     row.addEventListener('click', function () {
-      selectQuiz(value, quiz.title || '(uden titel)');
+      selectQuiz(value, flaggedTitle);
     });
     return row;
   }
@@ -350,7 +363,7 @@
 
   /* --- Niveau 1: semester / indbygget / ukategoriseret --- */
   function renderCatalogTop() {
-    renderBreadcrumb([{ label: 'Kataloger' }]);
+    renderBreadcrumb([{ label: t('catalog.root') }]);
     catalogBody.innerHTML = '';
     var grid = document.createElement('div');
     grid.className = 'catalog-grid';
@@ -364,19 +377,19 @@
       return a.toLowerCase().localeCompare(b.toLowerCase(), 'da');
     });
     semKeys.forEach(function (sem) {
-      grid.appendChild(makeTile(sem, countSemesterQuizzes(sem) + ' quizzer', function () {
+      grid.appendChild(makeTile(sem, t('catalog.quizCount', { n: countSemesterQuizzes(sem) }), function () {
         renderCatalogCourses(sem);
       }));
     });
 
     if (window.QUESTION_BANKS && window.QUESTION_BANKS.length > 0) {
-      grid.appendChild(makeTile('🎲 Automatiske quizzer', window.QUESTION_BANKS.length + ' emner', renderCatalogAuto));
+      grid.appendChild(makeTile(t('catalog.autoQuizzes'), t('catalog.topicsCount', { n: window.QUESTION_BANKS.length }), renderCatalogAuto));
     }
     if (window.QUIZ_MANIFEST && window.QUIZ_MANIFEST.length > 0) {
-      grid.appendChild(makeTile('📦 Indbygget', window.QUIZ_MANIFEST.length + ' quizzer', renderCatalogBuiltin));
+      grid.appendChild(makeTile(t('catalog.builtin'), t('catalog.quizCount', { n: window.QUIZ_MANIFEST.length }), renderCatalogBuiltin));
     }
     if (catalog.uncategorized.length > 0) {
-      grid.appendChild(makeTile('❓ Ukategoriseret', catalog.uncategorized.length + ' quizzer', renderCatalogUncategorized));
+      grid.appendChild(makeTile(t('catalog.uncategorized'), t('catalog.quizCount', { n: catalog.uncategorized.length }), renderCatalogUncategorized));
     }
 
     catalogBody.appendChild(grid);
@@ -384,12 +397,12 @@
     if (!catalog.loaded) {
       var loading = document.createElement('div');
       loading.className = 'catalog-empty';
-      loading.textContent = 'Indlæser quizzer...';
+      loading.textContent = t('catalog.loading');
       catalogBody.appendChild(loading);
     } else if (grid.children.length === 0) {
       var empty = document.createElement('div');
       empty.className = 'catalog-empty';
-      empty.textContent = 'Ingen quizzer fundet — opret en i quiz-editoren.';
+      empty.textContent = t('catalog.empty');
       catalogBody.appendChild(empty);
     }
   }
@@ -397,7 +410,7 @@
   /* --- Niveau 2: fag (inden for et semester) --- */
   function renderCatalogCourses(sem) {
     renderBreadcrumb([
-      { label: 'Kataloger', onClick: renderCatalogTop },
+      { label: t('catalog.root'), onClick: renderCatalogTop },
       { label: sem }
     ]);
     catalogBody.innerHTML = '';
@@ -405,27 +418,27 @@
     grid.className = 'catalog-grid';
 
     var courses = catalog.semesters[sem].courses;
-    var courseKeys = Object.keys(courses).sort(compareWithFallbackLast('Andet fag'));
+    var courseKeys = Object.keys(courses).sort(compareWithFallbackLast(t('catalog.otherCourse')));
     courseKeys.forEach(function (course) {
-      grid.appendChild(makeTile(course, countCourseQuizzes(sem, course) + ' quizzer', function () {
+      grid.appendChild(makeTile(course, t('catalog.quizCount', { n: countCourseQuizzes(sem, course) }), function () {
         renderCatalogLectures(sem, course);
       }));
     });
     catalogBody.appendChild(grid);
-    catalogBody.appendChild(makeBackBtn('◀ Tilbage', renderCatalogTop));
+    catalogBody.appendChild(makeBackBtn(t('catalog.back'), renderCatalogTop));
   }
 
   /* --- Niveau 3: lektion + quiz-liste (inden for fag) --- */
   function renderCatalogLectures(sem, course) {
     renderBreadcrumb([
-      { label: 'Kataloger', onClick: renderCatalogTop },
+      { label: t('catalog.root'), onClick: renderCatalogTop },
       { label: sem, onClick: function () { renderCatalogCourses(sem); } },
       { label: course }
     ]);
     catalogBody.innerHTML = '';
 
     var lects = catalog.semesters[sem].courses[course].lectures;
-    var lectKeys = Object.keys(lects).sort(compareWithFallbackLast('Andet'));
+    var lectKeys = Object.keys(lects).sort(compareWithFallbackLast(t('catalog.otherLecture')));
     lectKeys.forEach(function (lect) {
       var heading = document.createElement('div');
       heading.className = 'catalog-lecture-heading';
@@ -435,27 +448,27 @@
         catalogBody.appendChild(makeQuizRow('db:' + item.id, item.quiz));
       });
     });
-    catalogBody.appendChild(makeBackBtn('◀ Tilbage', function () { renderCatalogCourses(sem); }));
+    catalogBody.appendChild(makeBackBtn(t('catalog.back'), function () { renderCatalogCourses(sem); }));
   }
 
   /* --- Flad liste: indbyggede manifest-quizzer --- */
   function renderCatalogBuiltin() {
     renderBreadcrumb([
-      { label: 'Kataloger', onClick: renderCatalogTop },
-      { label: '📦 Indbygget' }
+      { label: t('catalog.root'), onClick: renderCatalogTop },
+      { label: t('catalog.builtin') }
     ]);
     catalogBody.innerHTML = '';
     (window.QUIZ_MANIFEST || []).forEach(function (qm) {
-      catalogBody.appendChild(makeQuizRow(qm.id, { title: qm.title, count: qm.count }));
+      catalogBody.appendChild(makeQuizRow(qm.id, { title: qm.title, count: qm.count, language: qm.language }));
     });
-    catalogBody.appendChild(makeBackBtn('◀ Tilbage', renderCatalogTop));
+    catalogBody.appendChild(makeBackBtn(t('catalog.back'), renderCatalogTop));
   }
 
   /* --- Flad liste: auto-genererede quizzer trukket fra en spørgsmålsbank --- */
   function renderCatalogAuto() {
     renderBreadcrumb([
-      { label: 'Kataloger', onClick: renderCatalogTop },
-      { label: '🎲 Automatiske quizzer' }
+      { label: t('catalog.root'), onClick: renderCatalogTop },
+      { label: t('catalog.autoQuizzes') }
     ]);
     catalogBody.innerHTML = '';
     (window.QUESTION_BANKS || []).forEach(function (bank) {
@@ -463,31 +476,30 @@
       row.className = 'catalog-quiz-row';
       row.innerHTML =
         '<span class="cq-title">🎲 ' + escHtml(bank.title) + '</span>' +
-        '<span class="cq-meta">' + bank.drawCount + ' tilfældige spørgsmål af ' + (bank.poolSize || '100+') + '</span>';
+        '<span class="cq-meta">' + t('catalog.bankDrawInfo', { n: bank.drawCount, pool: (bank.poolSize || '100+') }) + '</span>';
       row.addEventListener('click', function () {
-        selectQuiz('bank:' + bank.id, bank.title + ' (auto, ' + bank.drawCount + ' spørgsmål)');
+        selectQuiz('bank:' + bank.id, bank.title + ' (auto, ' + t('catalog.questionCount', { n: bank.drawCount }) + ')');
       });
       catalogBody.appendChild(row);
     });
     var note = document.createElement('div');
     note.className = 'catalog-empty';
-    note.textContent = 'Trækker ' + ((window.QUESTION_BANKS && window.QUESTION_BANKS[0] && window.QUESTION_BANKS[0].drawCount) || 15) +
-      ' tilfældige spørgsmål hver gang. Et spørgsmål går ikke igen, før alle andre i banken er brugt.';
+    note.textContent = t('catalog.bankNote', { n: (window.QUESTION_BANKS && window.QUESTION_BANKS[0] && window.QUESTION_BANKS[0].drawCount) || 15 });
     catalogBody.appendChild(note);
-    catalogBody.appendChild(makeBackBtn('◀ Tilbage', renderCatalogTop));
+    catalogBody.appendChild(makeBackBtn(t('catalog.back'), renderCatalogTop));
   }
 
   /* --- Flad liste: DB-quizzer uden semester --- */
   function renderCatalogUncategorized() {
     renderBreadcrumb([
-      { label: 'Kataloger', onClick: renderCatalogTop },
-      { label: '❓ Ukategoriseret' }
+      { label: t('catalog.root'), onClick: renderCatalogTop },
+      { label: t('catalog.uncategorized') }
     ]);
     catalogBody.innerHTML = '';
     catalog.uncategorized.forEach(function (item) {
       catalogBody.appendChild(makeQuizRow('db:' + item.id, item.quiz));
     });
-    catalogBody.appendChild(makeBackBtn('◀ Tilbage', renderCatalogTop));
+    catalogBody.appendChild(makeBackBtn(t('catalog.back'), renderCatalogTop));
   }
 
   /* --- Vælg quiz: sæt den skjulte <select>, vis bekræftelse, aktivér "Opret spil" --- */
@@ -498,7 +510,7 @@
       selQuizHidden.dispatchEvent(evt);
     } catch (e) { /* ældre browsere ignoreres — value er stadig sat */ }
 
-    quizSelectedText.textContent = '✅ Valgt: ' + title;
+    quizSelectedText.textContent = t('host.quizSelectedPrefix', { title: title });
     quizSelectedBox.style.display = 'flex';
     catalogWrap.style.display = 'none';
     btnCreateEl.disabled = false;
@@ -553,7 +565,7 @@
         allQ.push(v);
       });
       if (allQ.length === 0) {
-        cb(new Error('Spørgsmålsbanken er tom — tjek Firebase-opsætningen.'));
+        cb(new Error(t('bank.errEmpty')));
         return;
       }
 
@@ -563,7 +575,7 @@
       if (difficulty && difficulty !== 'random') {
         allQ = allQ.filter(function (q) { return normalizeLevel(q.level) === difficulty; });
         if (allQ.length === 0) {
-          cb(new Error('Banken har ingen spørgsmål med sværhedsgraden "' + (DIFFICULTY_LABELS[difficulty] || difficulty) + '".'));
+          cb(new Error(t('bank.errNoDifficulty', { level: (DIFFICULTY_LABELS[difficulty] || difficulty) })));
           return;
         }
       }
@@ -597,7 +609,7 @@
       }, function (err, committed) {
         if (err) { cb(err); return; }
         if (!committed) {
-          cb(new Error('Kunne ikke reservere spørgsmål (en anden vært trak samtidig) — prøv igen.'));
+          cb(new Error(t('bank.errReserveFailed')));
           return;
         }
         var drawnQuestions = picked.map(function (id) { return byId[id]; });
@@ -621,7 +633,7 @@
   }
 
   /* Sværhedsgrad-labels til fejlbesked */
-  var DIFFICULTY_LABELS = { 'let': 'Let', 'middel': 'Middel', 'svaer': 'Svær' };
+  var DIFFICULTY_LABELS = { 'let': t('difficulty.let'), 'middel': t('difficulty.middel'), 'svaer': t('difficulty.svaer') };
 
   /* Filtrér quiz.questions til én sværhedsgrad ('random' = ingen filtrering).
      Returnerer en NY quiz-kopi (rører aldrig den cachede/delte kilde-quiz),
@@ -644,7 +656,7 @@
   function startGameWithQuiz(quizId, quiz, timerSec, difficulty) {
     var filteredQuiz = filterQuizByDifficulty(quiz, difficulty);
     if (!filteredQuiz) {
-      alert('Denne quiz har ingen spørgsmål med sværhedsgraden "' + (DIFFICULTY_LABELS[difficulty] || difficulty) + '".');
+      alert(t('host.errNoQuestionsForDifficulty', { level: (DIFFICULTY_LABELS[difficulty] || difficulty) }));
       return;
     }
     quiz = filteredQuiz;
@@ -688,7 +700,7 @@
     var createBtn = this;
 
     if (!selValue) {
-      alert('Vælg en quiz først.');
+      alert(t('host.errChooseQuizFirst'));
       return;
     }
 
@@ -701,13 +713,13 @@
 
       createBtn.disabled = true;
       var originalLabel = createBtn.textContent;
-      createBtn.textContent = 'Trækker spørgsmål...';
+      createBtn.textContent = t('host.drawingQuestions');
 
       drawFromBank(bankId, drawCount, difficulty, function (err, questions) {
         createBtn.disabled = false;
         createBtn.textContent = originalLabel;
         if (err || !questions || questions.length === 0) {
-          alert('Kunne ikke trække spørgsmål fra banken: ' + (err ? err.message : 'ukendt fejl'));
+          alert(t('host.errBankDrawFailed', { msg: (err ? err.message : t('error.unknown')) }));
           return;
         }
         g.imagesMap = {};
@@ -730,7 +742,7 @@
     }
 
     if (!quiz) {
-      alert('Quiz-data ikke fundet. Tjek at quizzen er loadet korrekt.');
+      alert(t('host.errQuizDataNotFound'));
       return;
     }
 
@@ -773,7 +785,7 @@
         colorLight: '#ffffff'
       });
     } catch (e) {
-      qrDiv.textContent = '(QR ikke tilgængeligt)';
+      qrDiv.textContent = t('host.qrUnavailable');
     }
 
     showScreen('screen-lobby-host');
@@ -805,7 +817,7 @@
       }
       g.playerCount = count;
       document.getElementById('player-count-label').textContent =
-        count + ' spiller' + (count !== 1 ? 'e' : '');
+        count === 1 ? t('host.playerCountSingular', { n: count }) : t('host.playerCountPlural', { n: count });
       document.getElementById('btn-start').disabled = count < 1;
     });
   }
@@ -815,8 +827,8 @@
   btnCopyLink.addEventListener('click', function () {
     if (!g.joinUrl) return;
     var onDone = function (ok) {
-      var original = '📋 Kopiér link';
-      btnCopyLink.textContent = ok ? '✅ Kopieret!' : '⚠ Kunne ikke kopiere';
+      var original = t('host.copyLink');
+      btnCopyLink.textContent = ok ? t('host.copyLinkDone') : t('host.copyLinkFailed');
       setTimeout(function () { btnCopyLink.textContent = original; }, 2000);
     };
     try {
@@ -911,8 +923,8 @@
   function showQuestionScreen(q, qIdx) {
     var total = g.quiz.questions.length;
     document.getElementById('q-progress').textContent =
-      'Spørgsmål ' + (qIdx + 1) + '/' + total;
-    setProgressBadge('Spørgsmål ' + (qIdx + 1) + '/' + total);
+      t('progress.label', { n: qIdx + 1, total: total });
+    setProgressBadge(t('progress.label', { n: qIdx + 1, total: total }));
     document.getElementById('q-text').textContent = q.q;
 
     // Spørgsmålsbillede (kun vist på host — publiceres ikke til spillerne)
@@ -948,7 +960,7 @@
     showScreen('screen-q');
 
     // Nulstil svar-tæller
-    document.getElementById('q-answer-count').textContent = '0/' + g.playerCount + ' har svaret';
+    document.getElementById('q-answer-count').textContent = t('host.answerCount', { n: 0, total: g.playerCount });
 
     // Start timer
     startHostTimer(g.questionStartAt, g.timerSec, qIdx, q);
@@ -1007,7 +1019,7 @@
     var off = answersRef.on('value', function (snap) {
       var count = snap.numChildren();
       document.getElementById('q-answer-count').textContent =
-        count + '/' + g.playerCount + ' har svaret';
+        t('host.answerCount', { n: count, total: g.playerCount });
 
       // Auto-advance hvis alle har svaret
       if (count >= g.playerCount && g.playerCount > 0 && !g.autoAdvanced) {
@@ -1258,7 +1270,7 @@
       players.forEach(function (p, i) {
         var row = document.createElement('div');
         row.className = 'podium-row';
-        var sdTag = (sdWinnerId && p.pid === sdWinnerId) ? ' <span style="font-size:0.8rem; color:#f59e0b;">⚡ Sudden Death-vinder</span>' : '';
+        var sdTag = (sdWinnerId && p.pid === sdWinnerId) ? ' <span style="font-size:0.8rem; color:#f59e0b;">' + escHtml(t('sd.winnerTag')) + '</span>' : '';
         // Medalje efter RANG, ikke listeposition — delt score = samme medalje
         row.innerHTML =
           '<div class="medal">' + (medals[ranks[i] - 1] || ranks[i] + '.') + '</div>' +
@@ -1304,7 +1316,7 @@
         gamePin: g.pin,
         playedAt: firebase.database.ServerValue.TIMESTAMP
       }).catch(function (err) {
-        console.error('Kunne ikke gemme resultat for spiller ' + p.pid + ':', err);
+        console.error(t('host.errSaveResultFailed', { pid: p.pid }), err);
       });
     });
   }
@@ -1312,7 +1324,7 @@
   /* --- Afslut spil --- */
   document.getElementById('btn-end').addEventListener('click', function () {
     if (!g.pin) { showScreen('screen-setup'); return; }
-    if (!confirm('Er du sikker? Spillet og alle scorer slettes.')) return;
+    if (!confirm(t('host.confirmEndGame'))) return;
     db.ref('games/' + g.pin).remove().then(function () {
       g.pin = '';
       g.gameRef = null;
@@ -1393,7 +1405,7 @@
       db.ref('quizzes/' + g.quizId + '/questions').once('value', function (snap) {
         var all = [];
         snap.forEach(function (child) { var v = child.val(); v._id = child.key; all.push(v); });
-        if (all.length === 0) { cb(new Error('Banken er tom.')); return; }
+        if (all.length === 0) { cb(new Error(t('bank.errEmptyShort'))); return; }
         var leveled = all.filter(function (q) { return q.level === level && shownTexts.indexOf(q.q) === -1; });
         var candidates = leveled.length > 0 ? leveled : all.filter(function (q) { return shownTexts.indexOf(q.q) === -1; });
         if (candidates.length === 0) candidates = all; // banken er brugt helt op — accepteret edge-case, genbrug
@@ -1417,7 +1429,7 @@
     var level = sdLevelForRound(g.sd.round);
     drawSuddenDeathQuestion(level, function (err, qObj) {
       if (err || !qObj) {
-        alert('Kunne ikke finde flere spørgsmål til sudden death: ' + (err ? err.message : 'ukendt fejl'));
+        alert(t('host.errSdNoMoreQuestions', { msg: (err ? err.message : t('error.unknown')) }));
         finishSuddenDeath(g.sd.candidatePids[0] || null);
         return;
       }
@@ -1533,7 +1545,7 @@
 
   /* --- Sudden Death-skærm (host) --- */
   function showSdQuestion(shuffled, round, participantPids) {
-    document.getElementById('sd-progress').textContent = '🔥 Runde ' + (round + 1) + ' — ' + (LEVEL_LABELS[shuffled.level] || shuffled.level) + '-niveau';
+    document.getElementById('sd-progress').textContent = t('sd.roundLabel', { n: round + 1, level: (LEVEL_LABELS[shuffled.level] || shuffled.level) });
     document.getElementById('sd-participants').textContent =
       participantPids.map(function (pid) { return (g.players[pid] && g.players[pid].name) || '?'; }).join(' 🆚 ');
     document.getElementById('sd-q-text').textContent = shuffled.q;
@@ -1562,8 +1574,8 @@
     var survivorNames = survivorPids.map(function (pid) { return (g.players[pid] && g.players[pid].name) || '?'; });
     var eliminatedNames = eliminatedPids.map(function (pid) { return (g.players[pid] && g.players[pid].name) || '?'; });
     var lines = [];
-    if (survivorNames.length) lines.push('✅ Går videre: ' + survivorNames.join(', '));
-    if (eliminatedNames.length) lines.push('❌ Ude: ' + eliminatedNames.join(', '));
+    if (survivorNames.length) lines.push(t('sd.survivors') + survivorNames.join(', '));
+    if (eliminatedNames.length) lines.push(t('sd.eliminated') + eliminatedNames.join(', '));
     var status = document.getElementById('sd-status');
     status.innerHTML = lines.join('<br>');
     status.style.display = 'block';
