@@ -541,7 +541,7 @@
      transaction() garanterer at Firebase automatisk genkører funktionen med
      den friskeste værdi ved konflikt, så opdateringen altid bliver en atomisk
      tilføjelse til den seneste "brugt"-mængde, aldrig en overskrivning. */
-  function drawFromBank(bankId, count, cb) {
+  function drawFromBank(bankId, count, difficulty, cb) {
     var questionsRef = db.ref('quizzes/' + bankId + '/questions');
     var usedRef = db.ref('quizzes/' + bankId + '/bankUsed');
 
@@ -555,6 +555,17 @@
       if (allQ.length === 0) {
         cb(new Error('Spørgsmålsbanken er tom — tjek Firebase-opsætningen.'));
         return;
+      }
+
+      // Filtrér til den valgte sværhedsgrad FØR udtrækning, så "count"
+      // spørgsmål faktisk trækkes fra det rigtige undersæt (ikke smides
+      // væk bagefter, hvis de fleste tilfældigt trukne har forkert niveau).
+      if (difficulty && difficulty !== 'random') {
+        allQ = allQ.filter(function (q) { return normalizeLevel(q.level) === difficulty; });
+        if (allQ.length === 0) {
+          cb(new Error('Banken har ingen spørgsmål med sværhedsgraden "' + (DIFFICULTY_LABELS[difficulty] || difficulty) + '".'));
+          return;
+        }
       }
 
       var allIds = allQ.map(function (q) { return q._id; });
@@ -609,9 +620,35 @@
     return { q: q.q, level: q.level, why: q.why || '', img: q.img || '', options: q.options, optImgs: q.optImgs || ['', '', '', ''], correct: q.correct };
   }
 
+  /* Sværhedsgrad-labels til fejlbesked */
+  var DIFFICULTY_LABELS = { 'let': 'Let', 'middel': 'Middel', 'svaer': 'Svær' };
+
+  /* Filtrér quiz.questions til én sværhedsgrad ('random' = ingen filtrering).
+     Returnerer en NY quiz-kopi (rører aldrig den cachede/delte kilde-quiz),
+     eller null hvis filteret ikke giver nogen spørgsmål. */
+  /* Normaliser 'svær'/'svaer' til samme værdi (data i databasen bruger begge stavemåder —
+     se LEVEL_POINTS/LEVEL_LABELS ovenfor som allerede håndterer dette). */
+  function normalizeLevel(lvl) {
+    return lvl === 'svær' ? 'svaer' : lvl;
+  }
+
+  function filterQuizByDifficulty(quiz, difficulty) {
+    if (!difficulty || difficulty === 'random') return quiz;
+    var filtered = quiz.questions.filter(function (q) { return normalizeLevel(q.level) === difficulty; });
+    if (filtered.length === 0) return null;
+    return { title: quiz.title, questions: filtered };
+  }
+
   /* --- Opret spil-node i Firebase og gå til lobbyen (fælles slutpunkt for
      alle quiz-kilder: indbygget, DB-quiz eller auto-trukket bank) --- */
-  function startGameWithQuiz(quizId, quiz, timerSec) {
+  function startGameWithQuiz(quizId, quiz, timerSec, difficulty) {
+    var filteredQuiz = filterQuizByDifficulty(quiz, difficulty);
+    if (!filteredQuiz) {
+      alert('Denne quiz har ingen spørgsmål med sværhedsgraden "' + (DIFFICULTY_LABELS[difficulty] || difficulty) + '".');
+      return;
+    }
+    quiz = filteredQuiz;
+
     g.quizId = quizId;
     g.quiz = quiz;
     g.timerSec = timerSec;
@@ -647,6 +684,7 @@
   document.getElementById('btn-create').addEventListener('click', function () {
     var selValue = document.getElementById('sel-quiz').value;
     var timerSec = parseInt(document.getElementById('sel-timer').value, 10);
+    var difficulty = document.getElementById('sel-difficulty').value;
     var createBtn = this;
 
     if (!selValue) {
@@ -665,7 +703,7 @@
       var originalLabel = createBtn.textContent;
       createBtn.textContent = 'Trækker spørgsmål...';
 
-      drawFromBank(bankId, drawCount, function (err, questions) {
+      drawFromBank(bankId, drawCount, difficulty, function (err, questions) {
         createBtn.disabled = false;
         createBtn.textContent = originalLabel;
         if (err || !questions || questions.length === 0) {
@@ -674,7 +712,7 @@
         }
         g.imagesMap = {};
         var quiz = { title: bankTitle, questions: questions.map(normalizeBankQuestion) };
-        startGameWithQuiz(bankId, quiz, timerSec);
+        startGameWithQuiz(bankId, quiz, timerSec, difficulty);
       });
       return;
     }
@@ -702,14 +740,14 @@
     if (selValue.indexOf('db:') === 0) {
       db.ref('quizimages/' + quizId).once('value').then(function (snap) {
         g.imagesMap = snap.exists() ? snap.val() : {};
-        startGameWithQuiz(quizId, quiz, timerSec);
+        startGameWithQuiz(quizId, quiz, timerSec, difficulty);
       }).catch(function () {
         g.imagesMap = {};
-        startGameWithQuiz(quizId, quiz, timerSec);
+        startGameWithQuiz(quizId, quiz, timerSec, difficulty);
       });
     } else {
       g.imagesMap = {};
-      startGameWithQuiz(quizId, quiz, timerSec);
+      startGameWithQuiz(quizId, quiz, timerSec, difficulty);
     }
   });
 
