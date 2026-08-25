@@ -61,6 +61,29 @@
   function reveal() {
     document.documentElement.classList.remove('sh-pending');
     if (overlayEl) { overlayEl.remove(); overlayEl = null; }
+    showBadge();
+  }
+
+  // ---------- Bruger-badge (viser hvem der er logget ind + log ud-knap) ----------
+  var badgeEl = null;
+  function showBadge() {
+    var s = currentStudent();
+    if (!s) { hideBadge(); return; }
+    if (!badgeEl) {
+      badgeEl = document.createElement('div');
+      badgeEl.id = 'sh-user-badge';
+      document.documentElement.appendChild(badgeEl);
+    }
+    badgeEl.innerHTML =
+      '<span class="sh-badge-avatar">' + esc(s.avatar || '🙂') + '</span>' +
+      '<span class="sh-badge-name">' + esc(s.name) + '</span>' +
+      '<button type="button" class="sh-badge-logout">Log ud</button>';
+    badgeEl.querySelector('.sh-badge-logout').addEventListener('click', function () {
+      window.ShAuth.logout();
+    });
+  }
+  function hideBadge() {
+    if (badgeEl) { badgeEl.remove(); badgeEl = null; }
   }
 
   function renderPicker() {
