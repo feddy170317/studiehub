@@ -1,13 +1,23 @@
 # Bordfodbold — Trophy Tracker
 
-Live table-football scoreboard for Stefan, Frederick, and Leeny. Shares the `via-quiz`
-Firebase project used by QuizLive/HverdagsHelte, under a new `/bordfodbold` node.
+Live table-football scoreboard for Frederik, Steffan, Line, and Mads. Shares the
+`via-quiz` Firebase project used by QuizLive/HverdagsHelte, under a new `/bordfodbold` node.
 
 ## How it works
 
-- Every logged match is a trophy challenge. Winner takes (or keeps) the gold trophy 🏆,
-  loser gets the bronze/runner-up badge 🥉. The player not in the most recent match shows
-  neither badge.
+- The trophy 🏆 only changes hands via a successful **challenge** against its current
+  holder: beat the holder and you take it; the holder beats you and they keep it; if
+  neither player in a match holds the trophy, nothing happens to it no matter who wins.
+  Beating some other, non-holding player never earns you the trophy — you can only take
+  it off the person who has it. The very first match ever logged bootstraps the trophy
+  onto its winner.
+- The poo 💩 mirrors that shape, inverted: it only moves when its current holder plays
+  and loses (passing to whoever beat them). It bootstraps onto the first match's loser.
+- **Trophy/poo state is computed in chronological order by the match's played `date`,
+  not by when it was typed into the app.** That means a forgotten match can be logged
+  late — e.g. entering yesterday's game after today's is already in — and it still
+  slots into its true place in the timeline instead of scrambling who holds the trophy
+  today. Matches logged for the same date fall back to entry order as a tiebreak.
 - Season standings (total wins, matches, goals, goal diff) are tracked separately and
   accumulate continuously under the current year's label — this is what decides who
   actually "wins the season" regardless of who happens to hold the trophy right now.

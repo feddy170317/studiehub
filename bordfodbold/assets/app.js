@@ -1,8 +1,8 @@
 /* Bordfodbold — table football trophy tracker
    Realtime state via Firebase RTDB under /bordfodbold, shared with QuizLive's project. */
 
-const PLAYERS = ['Frederik', 'Stefan', 'Line'];
-const PLAYER_COLOR = { Frederik: 'var(--frederik)', Stefan: 'var(--stefan)', Line: 'var(--line)' };
+const PLAYERS = ['Frederik', 'Steffan', 'Line', 'Mads'];
+const PLAYER_COLOR = { Frederik: 'var(--frederik)', Steffan: 'var(--steffan)', Line: 'var(--line)', Mads: 'var(--mads)' };
 const DEFAULT_PIN = '2026';
 const SEASON_LABEL = 'Season ' + new Date().getFullYear();
 
@@ -38,23 +38,42 @@ function computeStandings(list) {
   return stats;
 }
 
-/* Trophy always sits with whoever won the most recent match — a challenger
-   who beats the incumbent simply takes it, a challenger who loses gets nothing.
+/* Chronological sort key: the match's actual played DATE decides order, never
+   the order it was typed into the app. This lets a forgotten match get logged
+   late (e.g. entering yesterday's game after today's is already in) without
+   scrambling who holds the trophy today — it slots into its true place in the
+   timeline and the state is recomputed from there. Same-day matches fall back
+   to entry order (ts) as the best available tiebreak. */
+function matchDateKey(m) {
+  return `${m.date || '0000-00-00'}#${String(m.ts || 0).padStart(20, '0')}`;
+}
 
-   The poo (💩) is stickier: it only ever moves when its CURRENT holder is one
-   of the two players in a match.
+/* The trophy (🏆) only changes hands via a successful CHALLENGE against its
+   current holder:
+     - holder plays and wins   -> trophy stays put
+     - holder plays and loses  -> trophy passes to whoever beat them
+     - holder isn't playing    -> nothing happens, no matter who wins
+   Beating some other, non-holding player never earns you the trophy — you can
+   only take it off the person who has it. The very first match ever logged
+   has no holder yet, so it bootstraps the trophy onto its winner.
+
+   The poo (💩) is stickier and mirrors the same shape, just inverted:
      - holder plays and wins  -> poo passes to the player they beat
      - holder plays and loses -> holder keeps it
      - holder isn't playing   -> nothing happens, no matter who wins
-   The very first match ever logged has no holder yet, so it bootstraps the
-   poo onto its loser (mirroring the trophy bootstrapping onto its winner). */
+   It bootstraps onto the first match's loser. */
 function computeTrophyState(list) {
-  const chrono = [...list].sort((a, b) => (a.ts || 0) - (b.ts || 0));
+  const chrono = [...list].sort((a, b) => matchDateKey(a).localeCompare(matchDateKey(b)));
   let gold = null, poo = null;
   chrono.forEach(m => {
     const { winner, loser } = m;
     if (!winner || !loser) return;
-    gold = winner; // winner of the latest match always holds the trophy
+    if (gold === null) {
+      gold = winner; // bootstrap: first match ever awards the trophy
+    } else if (gold === loser) {
+      gold = winner; // holder was challenged and lost -> trophy passes
+    }
+    // else: holder won (keeps it) or wasn't playing (no change)
     if (poo === null) {
       poo = loser; // bootstrap on the very first match
     } else if (poo === winner) {
@@ -66,7 +85,7 @@ function computeTrophyState(list) {
 }
 
 function render() {
-  const sorted = [...matches].sort((a, b) => (b.ts || 0) - (a.ts || 0));
+  const sorted = [...matches].sort((a, b) => matchDateKey(b).localeCompare(matchDateKey(a)));
   const { gold, poo } = computeTrophyState(matches);
   const stats = computeStandings(sorted);
 
@@ -170,7 +189,7 @@ function syncH2HOptions() {
 function computeHeadToHead(list, p1, p2) {
   const between = list
     .filter(m => (m.playerA === p1 && m.playerB === p2) || (m.playerA === p2 && m.playerB === p1))
-    .sort((a, b) => (b.ts || 0) - (a.ts || 0));
+    .sort((a, b) => matchDateKey(b).localeCompare(matchDateKey(a)));
   let wins1 = 0, wins2 = 0, goals1 = 0, goals2 = 0;
   between.forEach(m => {
     const g1 = m.playerA === p1 ? m.scoreA : m.scoreB;
