@@ -21,6 +21,19 @@ Live table-football scoreboard for Frederik, Steffan, Line, and Mads. Shares the
 - Season standings (total wins, matches, goals, goal diff) are tracked separately and
   accumulate continuously under the current year's label — this is what decides who
   actually "wins the season" regardless of who happens to hold the trophy right now.
+- **Match types**: a logged match is either **1v1** or **2v2 co-op** (picked in the log
+  form). A 2v2 match splits into two teams of two, defaulting to the usual
+  Frederik+Line vs Steffan+Mads split but fully editable to any 2-2 split of the four
+  players. Both teammates share their team's score for standings and rating purposes.
+  **2v2 results never touch the trophy or the poo** — those stay a personal 1v1
+  challenge mechanic and only read 1v1 matches.
+- **Rating**: a KDA-style number — goals scored weighted against goals conceded
+  (`goalsFor / goalsAgainst`, both 1v1 and 2v2 combined) — shown on each player's card
+  and in the season standings, for a quick read on who's actually playing well versus
+  who's just racked up wins. The same ratio, scoped to just the two players' matches
+  against each other, appears in the head-to-head panel too. 2v2 matches only count
+  toward a head-to-head between two players when they were on **opposing** teams —
+  games where they played as teammates are excluded from that comparison.
 - Anyone with the link can view live. Logging or deleting a match requires the shared PIN.
 
 ## One-time setup step (required)
@@ -55,6 +68,8 @@ Live URL (after push, GitHub Pages): `https://feddy170317.github.io/studiehub/bo
 
 ## Editing players
 
-Player names/colors are set in `assets/app.js` at the top (`PLAYERS`, `PLAYER_COLOR`).
-Renaming a player there does not rewrite historical match records — old matches keep
-whatever name was used when they were logged.
+Player names/colors are set in `assets/app.js` at the top (`PLAYERS`, `PLAYER_COLOR`),
+plus a default 2v2 split in `TEAM_DEFAULTS`. Renaming a player there does not rewrite
+historical match records — old matches keep whatever name was used when they were
+logged (renaming Stefan → Steffan in Aug 2026 required a one-off Firebase data
+migration for exactly this reason, not just a code change).

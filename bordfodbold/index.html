@@ -23,7 +23,7 @@
     <h2>Season standings</h2>
     <table class="standings">
       <thead>
-        <tr><th></th><th>Player</th><th>Wins</th><th>Played</th><th>Goals</th><th>Diff</th></tr>
+        <tr><th></th><th>Player</th><th>Wins</th><th>Played</th><th>Goals</th><th>Diff</th><th>Rating</th></tr>
       </thead>
       <tbody id="standings-body"></tbody>
     </table>
@@ -46,8 +46,10 @@
   </section>
 
   <section class="panel">
-    <h2>Match history</h2>
-    <div class="match-list" id="match-list"></div>
+    <details id="history-details">
+      <summary class="panel-summary">Match history <span class="history-count" id="history-count"></span></summary>
+      <div class="match-list" id="match-list"></div>
+    </details>
   </section>
 
   <footer class="foot">🏆 = current trophy holder · 💩 = current poo holder · updates live for everyone</footer>
@@ -57,24 +59,53 @@
   <div class="modal">
     <h3>Log a match</h3>
     <form id="match-form">
-      <div class="vs-row">
-        <div class="field">
-          <label>Player A</label>
-          <select id="playerA"></select>
-        </div>
-        <div class="field">
-          <label>Player B</label>
-          <select id="playerB"></select>
+      <div class="field">
+        <label>Match type</label>
+        <div class="mode-toggle">
+          <button type="button" class="mode-btn active" data-mode="1v1">1v1</button>
+          <button type="button" class="mode-btn" data-mode="2v2">2v2 co-op</button>
         </div>
       </div>
+
+      <div id="mode-1v1-fields">
+        <div class="vs-row">
+          <div class="field">
+            <label>Player A</label>
+            <select id="playerA"></select>
+          </div>
+          <div class="field">
+            <label>Player B</label>
+            <select id="playerB"></select>
+          </div>
+        </div>
+      </div>
+
+      <div id="mode-2v2-fields" style="display:none">
+        <div class="team-block">
+          <label class="team-label">Team A</label>
+          <div class="vs-row">
+            <div class="field"><select id="teamA1"></select></div>
+            <div class="field"><select id="teamA2"></select></div>
+          </div>
+        </div>
+        <div class="team-vs">vs</div>
+        <div class="team-block">
+          <label class="team-label">Team B</label>
+          <div class="vs-row">
+            <div class="field"><select id="teamB1"></select></div>
+            <div class="field"><select id="teamB2"></select></div>
+          </div>
+        </div>
+      </div>
+
       <div class="score-row">
         <div class="field">
-          <label>Score A</label>
+          <label id="scoreALabel">Score A</label>
           <input type="number" id="scoreA" min="0" inputmode="numeric" required>
         </div>
         <div class="dash">–</div>
         <div class="field">
-          <label>Score B</label>
+          <label id="scoreBLabel">Score B</label>
           <input type="number" id="scoreB" min="0" inputmode="numeric" required>
         </div>
       </div>
