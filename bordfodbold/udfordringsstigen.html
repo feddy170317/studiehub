@@ -1,0 +1,640 @@
+<!doctype html>
+<title>Udfordringsstigen</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,500&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+  :root{
+    --paper:#eef1ea;
+    --raised:#ffffff;
+    --ink:#182620;
+    --ink-dim:#51604f;
+    --line:#d3d9c9;
+    --line-strong:#b7c0ab;
+    --accent:#bd3a2f;
+    --accent-a:#2c6e86;
+    --accent-b:#a2712a;
+    --accent-c:#6c4d94;
+    --radius:14px;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#12190f;
+      --raised:#1b2418;
+      --ink:#eaeee2;
+      --ink-dim:#a7b19f;
+      --line:#2c352a;
+      --line-strong:#3c4638;
+      --accent:#e17568;
+      --accent-a:#67aac2;
+      --accent-b:#d6a15c;
+      --accent-c:#ac8ad4;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#12190f;
+    --raised:#1b2418;
+    --ink:#eaeee2;
+    --ink-dim:#a7b19f;
+    --line:#2c352a;
+    --line-strong:#3c4638;
+    --accent:#e17568;
+    --accent-a:#67aac2;
+    --accent-b:#d6a15c;
+    --accent-c:#ac8ad4;
+  }
+
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Newsreader', Georgia, 'Times New Roman', serif;
+    font-size:17px;
+    line-height:1.55;
+  }
+  h1,h2,h3,.eyebrow,.rule-name,.model-title,.badge,.day-label{
+    font-family:'Barlow Condensed','Arial Narrow',sans-serif;
+  }
+  h1,h2,h3{ text-wrap:balance; }
+  code, .mono, table td.num, .roster{ font-family:'IBM Plex Mono','SFMono-Regular',Consolas,monospace; }
+
+  .page{ max-width:760px; margin:0 auto; padding:0 20px 80px; }
+
+  /* ---- Masthead ---- */
+  header.masthead{
+    padding:48px 20px 34px;
+    background:
+      repeating-linear-gradient(180deg, transparent 0 39px, var(--line) 39px 40px),
+      var(--raised);
+    border-bottom:1px solid var(--line-strong);
+    margin-bottom:40px;
+  }
+  header.masthead .inner{ max-width:760px; margin:0 auto; }
+  .eyebrow{
+    font-weight:700;
+    font-size:13px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 10px;
+  }
+  h1{
+    font-weight:800;
+    font-size:clamp(40px,7vw,58px);
+    line-height:0.95;
+    letter-spacing:-0.01em;
+    margin:0 0 14px;
+  }
+  .lede{
+    font-size:19px;
+    color:var(--ink-dim);
+    max-width:52ch;
+    margin:0 0 18px;
+  }
+  .meta{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px 16px;
+    font-size:13px;
+    color:var(--ink-dim);
+    border-top:1px solid var(--line);
+    padding-top:14px;
+  }
+  .meta b{ color:var(--ink); font-weight:600; }
+
+  section{ margin-bottom:52px; }
+  h2{
+    font-weight:700;
+    font-size:29px;
+    letter-spacing:-0.005em;
+    margin:0 0 6px;
+  }
+  .section-sub{ color:var(--ink-dim); font-size:15px; margin:0 0 22px; max-width:60ch; }
+  p{ margin:0 0 14px; }
+  p:last-child{ margin-bottom:0; }
+
+  /* ---- Principle list ---- */
+  .principles{
+    display:grid;
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    margin-bottom:26px;
+  }
+  .principle{
+    background:var(--raised);
+    display:grid;
+    grid-template-columns:44px 1fr;
+    gap:14px;
+    padding:16px 18px;
+    align-items:start;
+  }
+  .principle .num{
+    font-family:'Barlow Condensed',sans-serif;
+    font-weight:800;
+    font-size:26px;
+    color:var(--accent);
+    line-height:1;
+  }
+  .principle .rule-name{
+    font-weight:700;
+    font-size:16px;
+    letter-spacing:0.01em;
+    margin:0 0 3px;
+    text-transform:uppercase;
+    color:var(--ink);
+  }
+  .principle p{ font-size:15.5px; color:var(--ink-dim); margin:0; }
+
+  /* ---- Figures ---- */
+  figure{ margin:0 0 10px; }
+  figure svg{ display:block; width:100%; height:auto; max-width:100%; }
+  .diagram-frame{
+    background:var(--raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px 22px 16px;
+  }
+  figcaption{
+    font-size:13.5px;
+    color:var(--ink-dim);
+    margin-top:12px;
+    padding-top:12px;
+    border-top:1px solid var(--line);
+  }
+
+  ol.steps{
+    padding-left:0;
+    list-style:none;
+    counter-reset:step;
+    margin:20px 0 0;
+    display:grid;
+    gap:10px;
+  }
+  ol.steps li{
+    counter-increment:step;
+    position:relative;
+    padding-left:34px;
+    font-size:15.5px;
+    color:var(--ink-dim);
+  }
+  ol.steps li::before{
+    content:counter(step);
+    position:absolute; left:0; top:1px;
+    width:22px; height:22px;
+    border-radius:50%;
+    background:var(--accent);
+    color:var(--raised);
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:600;
+    font-size:12px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  ol.steps b{ color:var(--ink); font-weight:600; }
+
+  /* ---- Model cards ---- */
+  .models{ display:grid; gap:22px; }
+  .model{
+    background:var(--raised);
+    border:1px solid var(--line);
+    border-left:5px solid var(--m-accent);
+    border-radius:var(--radius);
+    padding:24px 24px 22px;
+  }
+  .model.a{ --m-accent: var(--accent-a); }
+  .model.b{ --m-accent: var(--accent-b); }
+  .model.c{ --m-accent: var(--accent-c); }
+  .model-head{ display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:4px; }
+  .badge{
+    font-weight:800;
+    font-size:13px;
+    letter-spacing:0.08em;
+    color:var(--m-accent);
+    border:1.5px solid var(--m-accent);
+    border-radius:999px;
+    padding:2px 11px;
+  }
+  .model-title{ font-weight:700; font-size:24px; margin:0; }
+  .model-pitch{ color:var(--ink-dim); font-size:15.5px; margin:6px 0 18px; max-width:58ch; }
+  .model ul.mechanics{ margin:0 0 18px; padding-left:20px; }
+  .model ul.mechanics li{ font-size:15px; margin-bottom:6px; }
+  .prosconsx{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:18px; }
+  .prosconsx > div{ font-size:14px; }
+  .prosconsx .head{ font-family:'Barlow Condensed',sans-serif; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; font-size:12px; margin-bottom:5px; }
+  .prosconsx .fordele .head{ color:#3f7d4f; }
+  .prosconsx .ulemper .head{ color:var(--accent); }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .prosconsx .fordele .head{ color:#7fbf8f; } }
+  :root[data-theme="dark"] .prosconsx .fordele .head{ color:#7fbf8f; }
+  .prosconsx p{ color:var(--ink-dim); margin:0; }
+
+  /* ---- Comparison table ---- */
+  .table-wrap{ overflow-x:auto; border:1px solid var(--line); border-radius:var(--radius); }
+  table.compare{ width:100%; border-collapse:collapse; min-width:560px; background:var(--raised); }
+  table.compare th, table.compare td{ padding:12px 16px; text-align:left; border-bottom:1px solid var(--line); font-size:14.5px; vertical-align:top; }
+  table.compare thead th{
+    font-family:'Barlow Condensed',sans-serif;
+    font-weight:700; text-transform:uppercase; letter-spacing:0.05em; font-size:12.5px;
+    color:var(--ink-dim); border-bottom:1px solid var(--line-strong);
+  }
+  table.compare thead th.a{ color:var(--accent-a); }
+  table.compare thead th.b{ color:var(--accent-b); }
+  table.compare thead th.c{ color:var(--accent-c); }
+  table.compare tbody th{ font-weight:600; font-family:'Newsreader',serif; font-size:15px; white-space:nowrap; }
+  table.compare tr:last-child td, table.compare tr:last-child th{ border-bottom:none; }
+
+  /* ---- Vote callout ---- */
+  .vote{
+    background:var(--raised);
+    border:1px solid var(--line-strong);
+    border-radius:var(--radius);
+    padding:26px 26px;
+    text-align:left;
+  }
+  .vote h2{ font-size:24px; margin-bottom:8px; }
+  .vote p{ color:var(--ink-dim); font-size:15.5px; }
+  .vote .combo{ color:var(--ink); font-weight:600; }
+
+  footer.foot{
+    max-width:760px; margin:0 auto; padding:0 20px;
+    color:var(--ink-dim); font-size:13px; border-top:1px solid var(--line); padding-top:18px;
+  }
+  footer.foot a{ color:var(--ink-dim); }
+
+  @media (max-width:560px){
+    .prosconsx{ grid-template-columns:1fr; }
+    .principle{ grid-template-columns:32px 1fr; }
+  }
+</style>
+
+<header class="masthead">
+  <div class="inner">
+    <p class="eyebrow">Bordfodbold · forslag til afstemning</p>
+    <h1>Udfordringsstigen</h1>
+    <p class="lede">Tre modeller for hvordan man udfordrer sig op ad rangstigen — uden at banen bliver den nye kantine.</p>
+    <div class="meta">
+      <span><b>6 spillere</b></span>
+      <span>Frederik · Steffan · Line · Mads · Sebastian · Johannes</span>
+      <span>Opdateret <b>14. sep. 2026</b></span>
+    </div>
+  </div>
+</header>
+
+<div class="page">
+
+  <section id="baggrund">
+    <h2>Hvorfor overhovedet regler?</h2>
+    <p>Vi er lige gået fra fire til seks om bordet, og der er udsigt til mindre fri adgang til banen på arbejdspladsen. Uden en fast struktur ender det enten med at nogen aldrig kommer til at spille, eller at vi bruger markant mere tid ved bordet end ved skrivebordet.</p>
+    <p>De tre forslag herunder deler samme fundament — én rangstige og et dagligt kamp-loft på to kampe. De adskiller sig kun i <em>hvordan selve udfordringen organiseres</em>, ikke i hvem der har lov til at spille hvem.</p>
+  </section>
+
+  <section id="grundprincipper">
+    <h2>Det, alle tre forslag er enige om</h2>
+    <p class="section-sub">Fire regler, som gælder uanset hvilket forslag gruppen ender med at stemme for.</p>
+
+    <div class="principles">
+      <div class="principle">
+        <div class="num">1</div>
+        <div><div class="rule-name">Rangstige</div><p>Alle seks har én fast plads på stigen. 1.-pladsen er tops, 6.-pladsen er bunden.</p></div>
+      </div>
+      <div class="principle">
+        <div class="num">2</div>
+        <div><div class="rule-name">Udfordringsret</div><p>Du må udfordre den, der ligger <b>1 eller 2 pladser</b> over dig — aldrig længere væk, og aldrig nedad.</p></div>
+      </div>
+      <div class="principle">
+        <div class="num">3</div>
+        <div><div class="rule-name">Kamp-loft</div><p>Maks. <b>2 udfordringskampe pr. spiller pr. dag</b> — tæller uanset om du er udfordrer eller forsvarer.</p></div>
+      </div>
+      <div class="principle">
+        <div class="num">4</div>
+        <div><div class="rule-name">Sejr = bytte</div><p>Vinder og taber bytter plads direkte på stigen. Taber udfordreren, sker der ingenting.</p></div>
+      </div>
+    </div>
+
+    <div class="diagram-frame">
+      <figure>
+        <svg viewBox="0 0 620 400" role="img" aria-label="Rangstige med seks pladser, hvor 4.-pladsen kan udfordre 3.- og 2.-pladsen, men ikke 1.-pladsen eller nogen under sig.">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+            </marker>
+          </defs>
+          <!-- rungs -->
+          <g font-family="IBM Plex Mono, monospace" font-size="14">
+            <!-- rank 1 -->
+            <rect x="40" y="26" width="270" height="42" rx="8" fill="none" stroke="currentColor" stroke-opacity="0.35"/>
+            <text x="58" y="52" fill="currentColor">1. plads</text>
+            <!-- rank 2 -->
+            <rect x="40" y="81" width="270" height="42" rx="8" fill="none" stroke="var(--accent)" stroke-width="2"/>
+            <text x="58" y="107" fill="var(--accent)" font-weight="600">2. plads</text>
+            <!-- rank 3 -->
+            <rect x="40" y="136" width="270" height="42" rx="8" fill="none" stroke="var(--accent)" stroke-width="2"/>
+            <text x="58" y="162" fill="var(--accent)" font-weight="600">3. plads</text>
+            <!-- rank 4 (you are here) -->
+            <rect x="40" y="191" width="270" height="42" rx="8" fill="var(--accent)" fill-opacity="0.14" stroke="var(--accent)" stroke-width="2.5"/>
+            <text x="58" y="217" fill="currentColor" font-weight="700">4. plads — dig</text>
+            <!-- rank 5 -->
+            <rect x="40" y="246" width="270" height="42" rx="8" fill="none" stroke="currentColor" stroke-opacity="0.35"/>
+            <text x="58" y="272" fill="currentColor" stroke-opacity="0.6">5. plads</text>
+            <!-- rank 6 -->
+            <rect x="40" y="301" width="270" height="42" rx="8" fill="none" stroke="currentColor" stroke-opacity="0.35"/>
+            <text x="58" y="327" fill="currentColor" stroke-opacity="0.6">6. plads</text>
+          </g>
+
+          <!-- arrow: 4 -> 3, +1 -->
+          <path d="M 330 212 C 400 212, 400 157, 335 157" fill="none" stroke="var(--accent)" stroke-width="2" marker-end="url(#arrow)"/>
+          <text x="345" y="180" font-size="13" font-weight="600" fill="var(--accent)">+1 niveau</text>
+
+          <!-- arrow: 4 -> 2, +2 max -->
+          <path d="M 330 208 C 470 208, 470 102, 335 102" fill="none" stroke="var(--accent)" stroke-width="2" marker-end="url(#arrow)"/>
+          <text x="440" y="150" font-size="13" font-weight="600" fill="var(--accent)">+2 (maks. hop)</text>
+
+          <!-- blocked: 4 -> 1 -->
+          <path d="M 330 200 C 540 200, 540 47, 335 47" fill="none" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.5" stroke-dasharray="4 5" marker-end="url(#arrow)"/>
+          <text x="500" y="70" font-size="12.5" fill="currentColor" fill-opacity="0.6">for langt væk — ikke tilladt</text>
+
+          <!-- blocked: downward -->
+          <path d="M 330 224 C 380 224, 380 260, 335 264" fill="none" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.5" stroke-dasharray="4 5" marker-end="url(#arrow)"/>
+          <text x="345" y="300" font-size="12.5" fill="currentColor" fill-opacity="0.6">nedad — aldrig tilladt</text>
+
+          <!-- swap legend -->
+          <g transform="translate(40,362)">
+            <line x1="0" y1="0" x2="26" y2="0" stroke="var(--accent)" stroke-width="2.5" marker-end="url(#arrow)"/>
+            <line x1="26" y1="6" x2="0" y2="6" stroke="var(--accent)" stroke-width="2.5" marker-end="url(#arrow)"/>
+            <text x="36" y="8" font-size="13" fill="currentColor">Vinder udfordringen → bytter plads med den, du slog</text>
+          </g>
+        </svg>
+        <figcaption>4.-pladsen kan udfordre 3. eller 2. — aldrig 1. og aldrig nedad. Vinder udfordreren, bytter de to plads; taber udfordreren, forbliver stigen uændret.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="eksempel">
+    <h2>Sådan ser en dag ud i praksis</h2>
+    <p class="section-sub">Et opdigtet eksempel — ikke jeres nuværende stilling — med to kampe samme dag, der viser bytte-reglen og kamp-loftet i sving.</p>
+
+    <div class="diagram-frame">
+      <figure>
+        <svg viewBox="0 0 620 260" role="img" aria-label="Tre snapshots af stigen: udgangsstilling, efter Mads slår Frederik i et 2-niveaus hop, og efter Sebastian taber til Johannes uden ændring.">
+          <g font-family="IBM Plex Mono, monospace" font-size="12.5">
+            <!-- panel titles -->
+            <text x="15" y="18" fill="currentColor" font-weight="600" font-family="Barlow Condensed, sans-serif" font-size="13">KL. 09:00</text>
+            <text x="235" y="18" fill="currentColor" font-weight="600" font-family="Barlow Condensed, sans-serif" font-size="13">EFTER KAMP 1</text>
+            <text x="455" y="18" fill="currentColor" font-weight="600" font-family="Barlow Condensed, sans-serif" font-size="13">EFTER KAMP 2</text>
+
+            <!-- panel 1: start order -->
+            <g transform="translate(15,30)">
+              <rect x="0" y="0" width="170" height="24" rx="5" fill="none" stroke="currentColor" stroke-opacity="0.3"/><text x="8" y="16">1. Line</text>
+              <rect x="0" y="28" width="170" height="24" rx="5" fill="var(--accent-a)" fill-opacity="0.16" stroke="var(--accent-a)" stroke-width="1.5"/><text x="8" y="44">2. Frederik</text>
+              <rect x="0" y="56" width="170" height="24" rx="5" fill="none" stroke="currentColor" stroke-opacity="0.3"/><text x="8" y="72">3. Steffan</text>
+              <rect x="0" y="84" width="170" height="24" rx="5" fill="var(--accent-a)" fill-opacity="0.16" stroke="var(--accent-a)" stroke-width="1.5"/><text x="8" y="100">4. Mads</text>
+              <rect x="0" y="112" width="170" height="24" rx="5" fill="var(--accent-b)" fill-opacity="0.16" stroke="var(--accent-b)" stroke-width="1.5"/><text x="8" y="128">5. Johannes</text>
+              <rect x="0" y="140" width="170" height="24" rx="5" fill="var(--accent-b)" fill-opacity="0.16" stroke="var(--accent-b)" stroke-width="1.5"/><text x="8" y="156">6. Sebastian</text>
+            </g>
+
+            <!-- connector 1 -->
+            <g transform="translate(190,60)">
+              <path d="M0,20 L40,20" stroke="var(--accent-a)" stroke-width="2" marker-end="url(#arrow)"/>
+              <text x="2" y="8" font-size="11" fill="var(--accent-a)" font-weight="600">Mads vinder</text>
+            </g>
+
+            <!-- panel 2: after match 1 (Mads<->Frederik swapped) -->
+            <g transform="translate(235,30)">
+              <rect x="0" y="0" width="170" height="24" rx="5" fill="none" stroke="currentColor" stroke-opacity="0.3"/><text x="8" y="16">1. Line</text>
+              <rect x="0" y="28" width="170" height="24" rx="5" fill="var(--accent-a)" fill-opacity="0.22" stroke="var(--accent-a)" stroke-width="1.5"/><text x="8" y="44">2. Mads</text>
+              <rect x="0" y="56" width="170" height="24" rx="5" fill="none" stroke="currentColor" stroke-opacity="0.3"/><text x="8" y="72">3. Steffan</text>
+              <rect x="0" y="84" width="170" height="24" rx="5" fill="var(--accent-a)" fill-opacity="0.22" stroke="var(--accent-a)" stroke-width="1.5"/><text x="8" y="100">4. Frederik</text>
+              <rect x="0" y="112" width="170" height="24" rx="5" fill="var(--accent-b)" fill-opacity="0.16" stroke="var(--accent-b)" stroke-width="1.5"/><text x="8" y="128">5. Johannes</text>
+              <rect x="0" y="140" width="170" height="24" rx="5" fill="var(--accent-b)" fill-opacity="0.16" stroke="var(--accent-b)" stroke-width="1.5"/><text x="8" y="156">6. Sebastian</text>
+            </g>
+
+            <!-- connector 2 -->
+            <g transform="translate(410,60)">
+              <path d="M0,20 L40,20" stroke="currentColor" stroke-opacity="0.5" stroke-width="2" stroke-dasharray="3 4" marker-end="url(#arrow)"/>
+              <text x="2" y="8" font-size="11" fill="currentColor" fill-opacity="0.7" font-weight="600">Sebastian taber</text>
+            </g>
+
+            <!-- panel 3: after match 2 (no change) -->
+            <g transform="translate(455,30)">
+              <rect x="0" y="0" width="150" height="24" rx="5" fill="none" stroke="currentColor" stroke-opacity="0.3"/><text x="8" y="16">1. Line</text>
+              <rect x="0" y="28" width="150" height="24" rx="5" fill="none" stroke="currentColor" stroke-opacity="0.3"/><text x="8" y="44">2. Mads</text>
+              <rect x="0" y="56" width="150" height="24" rx="5" fill="none" stroke="currentColor" stroke-opacity="0.3"/><text x="8" y="72">3. Steffan</text>
+              <rect x="0" y="84" width="150" height="24" rx="5" fill="none" stroke="currentColor" stroke-opacity="0.3"/><text x="8" y="100">4. Frederik</text>
+              <rect x="0" y="112" width="150" height="24" rx="5" fill="none" stroke="currentColor" stroke-opacity="0.3"/><text x="8" y="128">5. Johannes</text>
+              <rect x="0" y="140" width="150" height="24" rx="5" fill="none" stroke="currentColor" stroke-opacity="0.3"/><text x="8" y="156">6. Sebastian</text>
+            </g>
+
+            <text x="15" y="215" font-size="12" fill="currentColor" fill-opacity="0.6">Stigen uændret efter kamp 2 — udfordreren tabte.</text>
+          </g>
+        </svg>
+        <figcaption>To kampe, samme dag, hver spiller bruger højst 2 af deres kamp-loft.</figcaption>
+      </figure>
+    </div>
+
+    <ol class="steps">
+      <li><b>Udgangsstilling kl. 9:</b> Line, Frederik, Steffan, Mads, Johannes, Sebastian — i den rækkefølge.</li>
+      <li><b>Kamp 1:</b> Mads (4.) udfordrer Frederik (2.) — det maksimale hop på 2 niveauer. Mads vinder 10–7 og overtager 2.-pladsen; Frederik rykker ned til 4.</li>
+      <li><b>Kamp 2:</b> Sebastian (6.) udfordrer Johannes (5.), ét niveau op. Sebastian taber 6–10 — ingen ændring.</li>
+      <li>Ved dagens slutning har Mads, Frederik, Johannes og Sebastian hver brugt 1 af deres 2 kampe — de kan stadig spille én mere i dag, hvis de vil. Line og Steffan har slet ikke spillet.</li>
+    </ol>
+  </section>
+
+  <section id="forslag">
+    <h2>Tre måder at organisere selve udfordringen på</h2>
+    <p class="section-sub">Grundprincipperne ovenfor er fælles for alle tre. Forskellen er hvornår og hvordan man udfordrer — ikke hvem der har lov.</p>
+
+    <div class="models">
+
+      <article class="model a">
+        <div class="model-head">
+          <span class="badge">Forslag A</span>
+          <h3 class="model-title">Fri Stige</h3>
+        </div>
+        <p class="model-pitch">Grundprincipperne helt uden tilføjelser — udfordr når som helst, banen tillader det.</p>
+        <ul class="mechanics">
+          <li>Ingen planlægning — du går bare hen og udfordrer, når banen er fri.</li>
+          <li>Det er præcis den mekanik, der er vist i diagrammerne ovenfor — der er ikke mere at forklare.</li>
+          <li>Kamp-loftet på 2/dag er det eneste, der bremser trafikken.</li>
+        </ul>
+        <div class="prosconsx">
+          <div class="fordele"><div class="head">Fordele</div><p>Ingen overhead, helt spontant, kræver intet fælles system eller opslagstavle.</p></div>
+          <div class="ulemper"><div class="head">Ulemper</div><p>Banen kan stadig blive optaget uforudsigeligt midt i en arbejdsopgave — ingen styrer hvornår.</p></div>
+        </div>
+      </article>
+
+      <article class="model b">
+        <div class="model-head">
+          <span class="badge">Forslag B</span>
+          <h3 class="model-title">Ugentligt Udfordringsvindue</h3>
+        </div>
+        <p class="model-pitch">Samme stige, men udfordringerne planlægges på forhånd i stedet for at opstå spontant.</p>
+
+        <div class="diagram-frame" style="margin-bottom:18px;">
+          <figure>
+            <svg viewBox="0 0 620 175" role="img" aria-label="Ugecyklus: mandag planlægges udfordringerne, tirsdag til torsdag spilles de, fredag låses resultaterne.">
+              <g font-family="Barlow Condensed, sans-serif" font-size="13" font-weight="700">
+                <text x="20" y="20" fill="currentColor">MAN</text>
+                <text x="135" y="20" fill="currentColor">TIR</text>
+                <text x="250" y="20" fill="currentColor">ONS</text>
+                <text x="365" y="20" fill="currentColor">TOR</text>
+                <text x="480" y="20" fill="currentColor">FRE</text>
+              </g>
+              <!-- cell: mon -->
+              <rect x="20" y="34" width="100" height="100" rx="10" fill="var(--accent-b)" fill-opacity="0.14" stroke="var(--accent-b)" stroke-width="1.5"/>
+              <rect x="42" y="58" width="56" height="8" rx="3" fill="var(--accent-b)"/>
+              <rect x="42" y="72" width="56" height="8" rx="3" fill="var(--accent-b)" fill-opacity="0.6"/>
+              <rect x="42" y="86" width="40" height="8" rx="3" fill="var(--accent-b)" fill-opacity="0.35"/>
+              <text x="70" y="120" text-anchor="middle" font-size="11.5" fill="currentColor">Planlægning</text>
+
+              <!-- cell: tue,wed,thu -->
+              <g>
+                <rect x="135" y="34" width="100" height="100" rx="10" fill="none" stroke="currentColor" stroke-opacity="0.3"/>
+                <circle cx="165" cy="65" r="9" fill="none" stroke="currentColor" stroke-opacity="0.6"/>
+                <circle cx="205" cy="65" r="9" fill="none" stroke="currentColor" stroke-opacity="0.6"/>
+                <line x1="174" y1="65" x2="196" y2="65" stroke="currentColor" stroke-opacity="0.6"/>
+                <circle cx="165" cy="90" r="9" fill="none" stroke="currentColor" stroke-opacity="0.6"/>
+                <circle cx="205" cy="90" r="9" fill="none" stroke="currentColor" stroke-opacity="0.6"/>
+                <line x1="174" y1="90" x2="196" y2="90" stroke="currentColor" stroke-opacity="0.6"/>
+                <text x="185" y="120" text-anchor="middle" font-size="11.5" fill="currentColor">Kampe spilles</text>
+              </g>
+              <g transform="translate(115,0)">
+                <rect x="135" y="34" width="100" height="100" rx="10" fill="none" stroke="currentColor" stroke-opacity="0.3"/>
+                <circle cx="165" cy="65" r="9" fill="none" stroke="currentColor" stroke-opacity="0.6"/>
+                <circle cx="205" cy="65" r="9" fill="none" stroke="currentColor" stroke-opacity="0.6"/>
+                <line x1="174" y1="65" x2="196" y2="65" stroke="currentColor" stroke-opacity="0.6"/>
+                <circle cx="165" cy="90" r="9" fill="none" stroke="currentColor" stroke-opacity="0.6"/>
+                <circle cx="205" cy="90" r="9" fill="none" stroke="currentColor" stroke-opacity="0.6"/>
+                <line x1="174" y1="90" x2="196" y2="90" stroke="currentColor" stroke-opacity="0.6"/>
+                <text x="185" y="120" text-anchor="middle" font-size="11.5" fill="currentColor">Kampe spilles</text>
+              </g>
+              <g transform="translate(230,0)">
+                <rect x="135" y="34" width="100" height="100" rx="10" fill="none" stroke="currentColor" stroke-opacity="0.3"/>
+                <circle cx="165" cy="65" r="9" fill="none" stroke="currentColor" stroke-opacity="0.6"/>
+                <circle cx="205" cy="65" r="9" fill="none" stroke="currentColor" stroke-opacity="0.6"/>
+                <line x1="174" y1="65" x2="196" y2="65" stroke="currentColor" stroke-opacity="0.6"/>
+                <circle cx="165" cy="90" r="9" fill="none" stroke="currentColor" stroke-opacity="0.6"/>
+                <circle cx="205" cy="90" r="9" fill="none" stroke="currentColor" stroke-opacity="0.6"/>
+                <line x1="174" y1="90" x2="196" y2="90" stroke="currentColor" stroke-opacity="0.6"/>
+                <text x="185" y="120" text-anchor="middle" font-size="11.5" fill="currentColor">Kampe spilles</text>
+              </g>
+
+              <!-- cell: fri, lock -->
+              <rect x="480" y="34" width="100" height="100" rx="10" fill="var(--accent-b)" fill-opacity="0.14" stroke="var(--accent-b)" stroke-width="1.5"/>
+              <rect x="512" y="58" width="36" height="26" rx="4" fill="none" stroke="var(--accent-b)" stroke-width="2"/>
+              <path d="M 520 58 L 520 48 A 10 10 0 0 1 540 48 L 540 58" fill="none" stroke="var(--accent-b)" stroke-width="2"/>
+              <text x="530" y="120" text-anchor="middle" font-size="11.5" fill="currentColor">Resultat låst</text>
+
+              <path d="M 122 84 L 133 84" stroke="currentColor" stroke-opacity="0.4" marker-end="url(#arrow)"/>
+              <path d="M 237 84 L 248 84" stroke="currentColor" stroke-opacity="0.4" marker-end="url(#arrow)"/>
+              <path d="M 352 84 L 363 84" stroke="currentColor" stroke-opacity="0.4" marker-end="url(#arrow)"/>
+              <path d="M 467 84 L 478 84" stroke="currentColor" stroke-opacity="0.4" marker-end="url(#arrow)"/>
+              <path d="M 580 84 C 600 84, 600 150, 10 150 C 10 150, 10 84, 18 84" fill="none" stroke="currentColor" stroke-opacity="0.3" stroke-dasharray="3 4" marker-end="url(#arrow)"/>
+              <text x="300" y="163" text-anchor="middle" font-size="11" fill="currentColor" fill-opacity="0.6">ugen gentages fra mandag med den nye stige</text>
+            </svg>
+            <figcaption>Udfordringerne bookes mandag, spilles tirsdag–torsdag, og fredag er stigen fastlåst til ugen efter.</figcaption>
+          </figure>
+        </div>
+
+        <ul class="mechanics">
+          <li><b>Mandag:</b> alle skriver deres ønskede udfordringer for ugen op (fx på tavlen eller i en kanal) — kamp-loftet på 2/dag gælder stadig.</li>
+          <li><b>Tirsdag–torsdag:</b> de bookede kampe spilles.</li>
+          <li><b>Fredag:</b> resultaterne låses, og den opdaterede stige gælder fra mandag.</li>
+        </ul>
+        <div class="prosconsx">
+          <div class="fordele"><div class="head">Fordele</div><p>Du ved på forhånd hvornår banen er optaget — ingen chok-afbrydelser midt i en deadline.</p></div>
+          <div class="ulemper"><div class="head">Ulemper</div><p>Kræver et fælles sted at skrive kampene op, og er mindre spontant end at bare gå ned og spille.</p></div>
+        </div>
+      </article>
+
+      <article class="model c">
+        <div class="model-head">
+          <span class="badge">Forslag C</span>
+          <h3 class="model-title">Lag-Pyramide</h3>
+        </div>
+        <p class="model-pitch">Samme grundregler, men selve stigen omstruktureres til tre lag af to, så de fleste kampe forbliver lokale.</p>
+
+        <div class="diagram-frame" style="margin-bottom:18px;">
+          <figure>
+            <svg viewBox="0 0 500 300" role="img" aria-label="Pyramide med tre lag: Guld (1.-2.), Sølv (3.-4.), Bronze (5.-6.). Frit at udfordre inden for eget lag; for at rykke op skal man slå bundpladsen i laget ovenover.">
+              <g font-family="Barlow Condensed, sans-serif" font-weight="700" font-size="13">
+                <!-- Gold tier -->
+                <rect x="170" y="20" width="160" height="52" rx="9" fill="var(--accent-c)" fill-opacity="0.14" stroke="var(--accent-c)" stroke-width="1.5"/>
+                <text x="250" y="14" text-anchor="middle" fill="var(--accent-c)">GULD-LAG</text>
+                <rect x="182" y="32" width="60" height="28" rx="6" fill="none" stroke="currentColor" stroke-opacity="0.5"/>
+                <rect x="258" y="32" width="60" height="28" rx="6" fill="none" stroke="currentColor" stroke-opacity="0.5"/>
+                <text x="212" y="50" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="500" fill="currentColor">1.</text>
+                <text x="288" y="50" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="500" fill="currentColor">2.</text>
+                <path d="M 245 46 L 255 46" stroke="currentColor" stroke-opacity="0.6" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+
+                <!-- Silver tier -->
+                <rect x="110" y="118" width="280" height="52" rx="9" fill="var(--accent-c)" fill-opacity="0.09" stroke="var(--accent-c)" stroke-width="1.5"/>
+                <text x="250" y="112" text-anchor="middle" fill="var(--accent-c)">SØLV-LAG</text>
+                <rect x="130" y="130" width="60" height="28" rx="6" fill="none" stroke="currentColor" stroke-opacity="0.5"/>
+                <rect x="310" y="130" width="60" height="28" rx="6" fill="none" stroke="currentColor" stroke-opacity="0.5"/>
+                <text x="160" y="148" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="500" fill="currentColor">3.</text>
+                <text x="340" y="148" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="500" fill="currentColor">4.</text>
+                <path d="M 193 144 L 307 144" stroke="currentColor" stroke-opacity="0.6" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+
+                <!-- Bronze tier -->
+                <rect x="40" y="216" width="420" height="52" rx="9" fill="var(--accent-c)" fill-opacity="0.05" stroke="var(--accent-c)" stroke-width="1.5"/>
+                <text x="250" y="210" text-anchor="middle" fill="var(--accent-c)">BRONZE-LAG</text>
+                <rect x="70" y="228" width="60" height="28" rx="6" fill="none" stroke="currentColor" stroke-opacity="0.5"/>
+                <rect x="370" y="228" width="60" height="28" rx="6" fill="none" stroke="currentColor" stroke-opacity="0.5"/>
+                <text x="100" y="246" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="500" fill="currentColor">5.</text>
+                <text x="400" y="246" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="500" fill="currentColor">6.</text>
+                <path d="M 133 242 L 367 242" stroke="currentColor" stroke-opacity="0.6" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+              </g>
+
+              <!-- promotion arrows -->
+              <path d="M 160 216 C 160 195, 190 178, 195 170" fill="none" stroke="var(--accent-c)" stroke-width="2" marker-end="url(#arrow)"/>
+              <path d="M 212 118 C 212 100, 212 88, 215 74" fill="none" stroke="var(--accent-c)" stroke-width="2" marker-end="url(#arrow)"/>
+              <text x="440" y="290" text-anchor="end" font-size="11.5" fill="currentColor" fill-opacity="0.65">op: slå bundpladsen i laget ovenover</text>
+            </svg>
+            <figcaption>Frit at udfordre inden for eget lag (vandrette dobbeltpile). For at rykke op skal du slå bundpladsen i laget ovenover.</figcaption>
+          </figure>
+        </div>
+
+        <ul class="mechanics">
+          <li>Stigen inddeles i tre lag efter nuværende stilling: Guld (1.–2.), Sølv (3.–4.), Bronze (5.–6.).</li>
+          <li>Frit at udfordre inden for eget lag — det almindelige ±2-hop gælder her.</li>
+          <li>For at rykke op i laget ovenover skal du slå <em>bundpladsen</em> i det lag — ikke gå direkte til tops.</li>
+        </ul>
+        <div class="prosconsx">
+          <div class="fordele"><div class="head">Fordele</div><p>Færre langdistance-udfordringer på tværs af hele stigen, og skalerer bedre den dag vi bliver flere end seks.</p></div>
+          <div class="ulemper"><div class="head">Ulemper</div><p>Sværere at forklare på 30 sekunder, og føles mindre "fair" for den, der ligger lige under et lagskel.</p></div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <section id="sammenligning">
+    <h2>Sammenligning</h2>
+    <div class="table-wrap">
+      <table class="compare">
+        <thead>
+          <tr><th></th><th class="a">A · Fri Stige</th><th class="b">B · Udfordringsvindue</th><th class="c">C · Lag-Pyramide</th></tr>
+        </thead>
+        <tbody>
+          <tr><th>Planlægning krævet</th><td>Ingen</td><td>Ugentlig (mandag)</td><td>Ingen, kun ved lag-inddeling</td></tr>
+          <tr><th>Forudsigelig banetid</th><td>Lav</td><td>Høj</td><td>Middel</td></tr>
+          <tr><th>Sværhedsgrad at forklare</th><td>Meget let</td><td>Let</td><td>Middel</td></tr>
+          <tr><th>Skalerer forbi 6 spillere</th><td>Dårligt</td><td>Middel</td><td>Godt</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="afstemning">
+    <div class="vote">
+      <h2>Sådan stemmer vi</h2>
+      <p>Tag en runde i gruppechatten eller ved bordet — vælg A, B eller C. I kan også blande, fx <span class="combo">C's lag-inddeling med B's ugentlige vindue</span>. Intet af dette er vedtaget endnu; det er tre forslag klar til afstemning.</p>
+    </div>
+  </section>
+
+</div>
+
+<footer class="foot">
+  Bordfodbold Trophy Tracker — samme rangliste-data, nye spilleregler for hvordan man udfordrer sig op ad den. Live app: feddy170317.github.io/studiehub/bordfodbold
+</footer>
