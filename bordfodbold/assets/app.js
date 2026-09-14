@@ -1,8 +1,8 @@
 /* Bordfodbold — table football trophy tracker
    Realtime state via Firebase RTDB under /bordfodbold, shared with QuizLive's project. */
 
-const PLAYERS = ['Frederik', 'Steffan', 'Line', 'Mads'];
-const PLAYER_COLOR = { Frederik: 'var(--frederik)', Steffan: 'var(--steffan)', Line: 'var(--line)', Mads: 'var(--mads)' };
+const PLAYERS = ['Frederik', 'Steffan', 'Line', 'Mads', 'Sebastian', 'Johannes'];
+const PLAYER_COLOR = { Frederik: 'var(--frederik)', Steffan: 'var(--steffan)', Line: 'var(--line)', Mads: 'var(--mads)', Sebastian: 'var(--sebastian)', Johannes: 'var(--johannes)' };
 const DEFAULT_PIN = '2026';
 const SEASON_LABEL = 'Season ' + new Date().getFullYear();
 const TEAM_SELECT_IDS = ['teamA1', 'teamA2', 'teamB1', 'teamB2'];

@@ -1,6 +1,9 @@
 # Bordfodbold — Trophy Tracker
 
-Live table-football scoreboard for Frederik, Steffan, Line, and Mads. Shares the
+Live table-football scoreboard for Frederik, Steffan, Line, Mads, Sebastian, and
+Johannes (Sebastian & Johannes joined 2026-09-14, starting from 0 wins like everyone
+else did — no historical backfill, no separate "Q-holdet" stats; they're just two more
+names in the same roster and can pair up freely in 2v2 like anyone else). Shares the
 `via-quiz` Firebase project used by QuizLive/HverdagsHelte, under a new `/bordfodbold` node.
 
 ## How it works
@@ -73,3 +76,13 @@ plus a default 2v2 split in `TEAM_DEFAULTS`. Renaming a player there does not re
 historical match records — old matches keep whatever name was used when they were
 logged (renaming Stefan → Steffan in Aug 2026 required a one-off Firebase data
 migration for exactly this reason, not just a code change).
+
+## Challenge-ladder rules (proposed, not yet implemented in the app)
+
+With six players now, a "who's free to just walk over and challenge anyone" system
+starts turning into unlimited table time. Three ladder-based proposals (rank range,
+daily match cap, tiered pyramid) are written up for the group to vote on — see the
+`Udfordringsregler` doc shared alongside this rollout. None of it is wired into the
+app yet; it's a social/paper (or shared-doc) ruleset layered on top of the existing
+match logging, not new app code, unless the group picks a model worth automating
+(e.g. enforcing the daily cap or auto-suggesting legal challenges) — TODO if voted in.
