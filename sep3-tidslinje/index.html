@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<title>SEP3 Fremdriftsplan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="top-left">
+      <div class="eyebrow">SEP3 · Maskiningeniør Trainee · 3. semester</div>
+      <h1>Snerydningsrobot: fremdriftsplan</h1>
+      <p class="lede">Drivlinje, motorvalg og styringsvalg på lukket privat industriareal. Kryds af, tilføj opgaver og se hvem der har gjort hvad.</p>
+      <div class="actions">
+        <button class="btn primary" id="btn-add" type="button">＋ Ny opgave</button>
+        <a class="btn" href="https://miro.com/app/board/uXjVHkwoTQ8=/" target="_blank" rel="noopener">Miro-kort ↗</a>
+        <button class="btn ghost" id="btn-settings" type="button">Startdato</button>
+        <span class="whoami" id="whoami"></span>
+      </div>
+    </div>
+    <aside class="titleblock" aria-label="Status">
+      <div class="tb-row">
+        <div class="tb-cell big">
+          <div class="tb-label">Uge</div>
+          <div class="tb-val" id="tb-week">–</div>
+        </div>
+        <div class="tb-cell">
+          <div class="tb-label">Færdigt</div>
+          <div class="tb-val" id="tb-pct">–</div>
+        </div>
+      </div>
+      <div class="tb-row single">
+        <div class="tb-label">Samlet fremdrift</div>
+        <div class="meter"><span id="tb-meter"></span></div>
+        <div class="tb-sub" id="tb-sub"></div>
+      </div>
+    </aside>
+  </header>
+
+  <div class="banner" id="banner" hidden></div>
+
+  <section class="summary" aria-label="Faser og næste afvejninger">
+    <div class="phases" id="phase-cards"></div>
+    <div class="next">
+      <h2>Næste afvejninger</h2>
+      <ol id="next-list"></ol>
+    </div>
+  </section>
+
+  <section class="tl-section" aria-label="Tidslinje">
+    <div class="toolbar">
+      <div class="chips" id="area-filter" role="group" aria-label="Område"></div>
+      <div class="toolbar-right">
+        <div class="seg" id="status-filter" role="group" aria-label="Status">
+          <button type="button" data-v="all" class="on">Alle</button>
+          <button type="button" data-v="open">Åbne</button>
+          <button type="button" data-v="done">Færdige</button>
+        </div>
+        <label class="check"><input type="checkbox" id="gates-only"> Kun afvejninger</label>
+      </div>
+    </div>
+
+    <div class="tl" id="timeline"></div>
+
+    <div class="legend">
+      <span><i class="lg bar"></i> Opgave, hul = åben, fyldt = færdig</span>
+      <span><i class="lg dia"></i> Beslutning eller milepæl</span>
+      <span><i class="lg dia sq"></i> Aflevering</span>
+      <span><i class="lg now"></i> I dag</span>
+      <span class="tag">delvist</span> hører kun delvist under afgrænsningen
+      <span class="tag warn">dato?</span> skal bekræftes i semesterplanen
+    </div>
+  </section>
+
+  <section class="log" aria-label="Aktivitet">
+    <h2>Seneste aktivitet</h2>
+    <ul id="activity"></ul>
+  </section>
+
+  <footer class="foot">Ændringer vises live for alle med linket. Afkrydsning og redigering kræver navn og gruppens kode.</footer>
+</div>
+
+<dialog id="dlg-login">
+  <form method="dialog" id="form-login">
+    <h3>Hvem er du?</h3>
+    <p class="hint">Navnet gemmes på det du krydser af, så vi kan dokumentere hvem der har gjort hvad.</p>
+    <label for="in-name">Navn</label>
+    <input id="in-name" type="text" autocomplete="name" maxlength="40" required>
+    <label for="in-pin">Gruppens kode</label>
+    <input id="in-pin" type="password" autocomplete="off" maxlength="40" required>
+    <div class="err" id="login-err" role="alert"></div>
+    <div class="dlg-actions">
+      <button type="button" class="btn ghost" id="login-cancel">Annullér</button>
+      <button type="submit" class="btn primary">Fortsæt</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlg-task">
+  <form method="dialog" id="form-task">
+    <h3>Ny opgave</h3>
+    <label for="t-title">Opgave</label>
+    <input id="t-title" type="text" maxlength="140" required placeholder="Fx: Beregn gearudveksling til bæltedrev">
+    <div class="two">
+      <div>
+        <label for="t-from">Uge fra</label>
+        <input id="t-from" type="number" min="1" max="12" value="1" required>
+      </div>
+      <div>
+        <label for="t-to">Uge til</label>
+        <input id="t-to" type="number" min="1" max="12" value="1" required>
+      </div>
+    </div>
+    <div class="two">
+      <div>
+        <label for="t-area">Område</label>
+        <select id="t-area"></select>
+      </div>
+      <div>
+        <label for="t-kind">Type</label>
+        <select id="t-kind">
+          <option value="opgave">Opgave</option>
+          <option value="beslutning">Beslutning</option>
+          <option value="milepael">Milepæl</option>
+          <option value="aflevering">Aflevering</option>
+        </select>
+      </div>
+    </div>
+    <div class="err" id="task-err" role="alert"></div>
+    <div class="dlg-actions">
+      <button type="button" class="btn ghost" id="task-cancel">Annullér</button>
+      <button type="submit" class="btn primary">Tilføj</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlg-start">
+  <form method="dialog" id="form-start">
+    <h3>Startdato for uge 1</h3>
+    <p class="hint">Vælg mandagen i uge 1. Alle ugedatoer og dagens markør regnes herfra.</p>
+    <label for="in-start">Dato</label>
+    <input id="in-start" type="date" required>
+    <div class="dlg-actions">
+      <button type="button" class="btn ghost" id="start-cancel">Annullér</button>
+      <button type="submit" class="btn primary">Gem</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="assets/firebase-config.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
