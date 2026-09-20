@@ -11,6 +11,8 @@
   --now: #e4572e;
   --now-tint: rgba(228, 87, 46, 0.11);
   --done: #2e7d4f;
+  --late: #b3261e;
+  --late-bg: #fdeceb;
   --warn: #a15c00;
   --warn-bg: #fff1d6;
   --focus: #0e5a73;
@@ -37,6 +39,8 @@
     --now: #ff8a5c;
     --now-tint: rgba(255, 138, 92, 0.14);
     --done: #5bc283;
+    --late: #ff8b80;
+    --late-bg: #3a1917;
     --warn: #f0b04a;
     --warn-bg: #3a2b0e;
     --focus: #5cc0de;
@@ -256,3 +260,49 @@ dialog .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .log li { grid-template-columns: 1fr; gap: 2px; }
 }
 @media (prefers-reduced-motion: reduce) { .meter span { transition: none; } }
+
+/* ---------- status: i gang, bagud, handlinger ---------- */
+.mini { font: 500 12px/1 "IBM Plex Sans", sans-serif; padding: 7px 11px; border-radius: 4px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); cursor: pointer; }
+.mini:hover { border-color: var(--accent); }
+.mini.go { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.mini.ok { background: var(--done); color: #fff; border-color: var(--done); }
+.acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.pill { font: 500 11px/1 "IBM Plex Sans", sans-serif; padding: 4px 8px; border-radius: 999px; border: 1px solid var(--line-strong); color: var(--muted); }
+.pill.doing { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.tag.late { color: var(--late); border-color: var(--late); background: var(--late-bg); }
+.row.late .chk { border-color: var(--late); }
+.row.late::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--late); }
+.row.doing .bar, .row.doing .dia { background: repeating-linear-gradient(45deg, var(--c) 0 4px, var(--t) 4px 8px); }
+.row.doing.done .bar { background: var(--c); }
+
+/* ---------- arbejdsoverblik ---------- */
+.board { margin-bottom: 28px; }
+.board-head { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin-bottom: 12px; }
+.people { display: flex; flex-wrap: wrap; gap: 8px; }
+.person { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 3px; padding: 8px 12px; background: var(--surface); border: 1px solid var(--line-strong); border-radius: 4px; cursor: pointer; color: var(--ink); font: inherit; text-align: left; }
+.person b { font-weight: 600; font-size: 14px; }
+.person span { font: 400 11px/1 "IBM Plex Mono", monospace; color: var(--muted); }
+.person[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.person[aria-pressed="true"] span { color: var(--bg); opacity: .8; }
+.cols { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; align-items: start; }
+.col { background: var(--surface); border: 1px solid var(--line); border-top: 3px solid var(--ink); min-width: 0; }
+.col-late { border-top-color: var(--late); }
+.col-doing { border-top-color: var(--accent); }
+.col-next { border-top-color: var(--now); }
+.col-later { border-top-color: var(--line-strong); }
+.colhead { display: flex; align-items: baseline; justify-content: space-between; padding: 10px 12px 6px; }
+.colhead h3 { font-size: 18px; letter-spacing: .07em; }
+.count { font: 500 13px/1 "IBM Plex Mono", monospace; color: var(--muted); }
+.cards { display: grid; gap: 8px; padding: 0 10px 10px; }
+.cards .empty { color: var(--muted); font-size: 13px; padding: 4px 2px 6px; }
+.card { background: var(--surface-2); border: 1px solid var(--line); border-left: 4px solid var(--c); padding: 9px 10px 10px; }
+.card.late { background: var(--late-bg); }
+.card .ct { font-weight: 500; line-height: 1.35; font-size: 14px; overflow-wrap: anywhere; }
+.card .cm { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; margin-top: 5px; font-size: 12px; color: var(--muted); }
+.cwho { font-size: 12px; margin-top: 7px; color: var(--muted); }
+.cwho.doing { color: var(--accent); }
+.cwho.free { font-style: italic; }
+.more-btn { justify-self: start; background: none; border: 0; color: var(--accent); cursor: pointer; font: 500 13px/1 "IBM Plex Sans", sans-serif; padding: 4px 2px; text-decoration: underline; }
+.detail .drow.owner { grid-template-columns: minmax(0, 320px); }
+@media (max-width: 1000px) { .cols { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .cols { grid-template-columns: minmax(0, 1fr); } }

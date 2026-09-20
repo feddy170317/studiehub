@@ -12,13 +12,15 @@ Console, Realtime Database, Rules. Tilføj ved siden af de eksisterende nøgler 
 }
 ```
 
-Første gang siden åbnes, lægger den selv de 43 opgaver ind, sætter startdato og gruppens kode.
+Første gang siden åbnes, lægger den selv de 43 opgaver ind og sætter startdato.
 
-## Standardværdier (kan ændres direkte i Firebase)
+## Standardværdier
 - `sep3/config/startDate`: mandag i uge 1 (kan også ændres med knappen Startdato). Standard 2026-09-07.
-- `sep3/config/pin`: gruppens kode. Standard `sne2026`.
 
 ## Sådan bruges den
-- Kryds af, tilføj og ret opgaver. Første gang skal man skrive sit navn og gruppens kode.
-- Navnet gemmes sammen med tidspunktet på hver afkrydsning og vises i aktivitetsloggen.
-- Koden er en blød lås mod tilfældige besøgende, ikke rigtig sikkerhed. Databasereglen er åben, så tilføj ikke følsomme oplysninger.
+- Der er ingen kode. Man skriver kun sit navn første gang (gemmes i browseren, kan skiftes).
+- Opgaver har tre trin: ikke startet, i gang (med navn og startdato) og færdig (med navn og tidspunkt).
+- Start tager opgaven, så de andre kan se den er taget. Giv slip frigiver den igen. Færdig lukker den.
+- Ansvarlig kan sættes på forhånd i opgavens detaljer, også før nogen er startet.
+- Arbejdsoverblikket viser Bagud (uge slut er passeret), I gang, Næste op (denne og næste uge) og Senere.
+- Databasereglen er åben, så læg ikke følsomme oplysninger i planen.

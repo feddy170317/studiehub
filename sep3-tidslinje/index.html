@@ -17,7 +17,7 @@
     <div class="top-left">
       <div class="eyebrow">SEP3 · Maskiningeniør Trainee · 3. semester</div>
       <h1>Snerydningsrobot: fremdriftsplan</h1>
-      <p class="lede">Drivlinje, motorvalg og styringsvalg på lukket privat industriareal. Kryds af, tilføj opgaver og se hvem der har gjort hvad.</p>
+      <p class="lede">Drivlinje, motorvalg og styringsvalg på lukket privat industriareal. Start en opgave, så de andre kan se den er taget. Kryds af, når den er færdig.</p>
       <div class="actions">
         <button class="btn primary" id="btn-add" type="button">＋ Ny opgave</button>
         <a class="btn" href="https://miro.com/app/board/uXjVHkwoTQ8=/" target="_blank" rel="noopener">Miro-kort ↗</a>
@@ -54,6 +54,15 @@
     </div>
   </section>
 
+  <section class="board" id="board" aria-label="Arbejdsoverblik">
+    <div class="board-head">
+      <h2>Hvem laver hvad</h2>
+      <div class="people" id="people"></div>
+      <datalist id="people-list"></datalist>
+    </div>
+    <div class="cols" id="cols"></div>
+  </section>
+
   <section class="tl-section" aria-label="Tidslinje">
     <div class="toolbar">
       <div class="chips" id="area-filter" role="group" aria-label="Område"></div>
@@ -61,6 +70,8 @@
         <div class="seg" id="status-filter" role="group" aria-label="Status">
           <button type="button" data-v="all" class="on">Alle</button>
           <button type="button" data-v="open">Åbne</button>
+          <button type="button" data-v="doing">I gang</button>
+          <button type="button" data-v="late">Bagud</button>
           <button type="button" data-v="done">Færdige</button>
         </div>
         <label class="check"><input type="checkbox" id="gates-only"> Kun afvejninger</label>
@@ -70,7 +81,7 @@
     <div class="tl" id="timeline"></div>
 
     <div class="legend">
-      <span><i class="lg bar"></i> Opgave, hul = åben, fyldt = færdig</span>
+      <span><i class="lg bar"></i> Opgave: hul = ikke startet, skråstribet = i gang, fyldt = færdig</span>
       <span><i class="lg dia"></i> Beslutning eller milepæl</span>
       <span><i class="lg dia sq"></i> Aflevering</span>
       <span><i class="lg now"></i> I dag</span>
@@ -84,18 +95,15 @@
     <ul id="activity"></ul>
   </section>
 
-  <footer class="foot">Ændringer vises live for alle med linket. Afkrydsning og redigering kræver navn og gruppens kode.</footer>
+  <footer class="foot">Ændringer vises live for alle med linket. Man skal kun skrive sit navn første gang.</footer>
 </div>
 
 <dialog id="dlg-login">
   <form method="dialog" id="form-login">
     <h3>Hvem er du?</h3>
-    <p class="hint">Navnet gemmes på det du krydser af, så vi kan dokumentere hvem der har gjort hvad.</p>
+    <p class="hint">Navnet vises på de opgaver du starter og gør færdige, så alle kan se hvem der laver hvad.</p>
     <label for="in-name">Navn</label>
     <input id="in-name" type="text" autocomplete="name" maxlength="40" required>
-    <label for="in-pin">Gruppens kode</label>
-    <input id="in-pin" type="password" autocomplete="off" maxlength="40" required>
-    <div class="err" id="login-err" role="alert"></div>
     <div class="dlg-actions">
       <button type="button" class="btn ghost" id="login-cancel">Annullér</button>
       <button type="submit" class="btn primary">Fortsæt</button>

@@ -3,7 +3,6 @@
 
 const ROOT = 'sep3';
 const DEFAULT_START = '2026-09-07';   // mandag i uge 1 (kan ændres i UI)
-const DEFAULT_PIN = 'sne2026';        // kan ændres direkte i Firebase: sep3/config/pin
 const WEEKS = 12;
 
 const PHASES = [
@@ -78,12 +77,13 @@ const SEED = [
 let db, tasksRef, configRef, activityRef, metaRef;
 let tasks = [];
 let activity = [];
-let config = { startDate: DEFAULT_START, pin: null };
+let config = { startDate: DEFAULT_START };
 let loaded = { tasks: false, config: false };
-let filters = { area: 'all', status: 'all', gatesOnly: false };
+let filters = { area: 'all', status: 'all', gatesOnly: false, person: null };
+const expanded = new Set();
 const openIds = new Set();
 let pendingRender = false;
-let session = null;   // {name, pin}
+let session = null;   // {name}
 
 try { session = JSON.parse(localStorage.getItem('sep3_session') || 'null'); } catch (e) { session = null; }
 
@@ -115,6 +115,13 @@ function currentWeek() {
   return Math.floor(diff / 7) + 1;   // <1 før start, >WEEKS efter slut
 }
 function weekLabel(t) { return t.start === t.end ? 'U' + t.start : 'U' + t.start + '–' + t.end; }
+function isLate(t) { const wk = currentWeek(); return !t.done && wk >= 1 && t.end < wk; }
+function statusOf(t) { return t.done ? 'done' : (t.startedAt ? 'doing' : 'todo'); }
+function sinceLabel(ms) {
+  if (!ms) return '';
+  const days = Math.floor((Date.now() - ms) / 86400000);
+  return days <= 0 ? 'i dag' : (days === 1 ? '1 dag' : days + ' dage');
+}
 function phaseFor(week) {
   const p = PHASES.find((x) => week >= x.from && week <= x.to);
   return p ? p.id : PHASES[PHASES.length - 1].id;
@@ -131,26 +138,22 @@ function friendlyErr(err) {
   return 'Kunne ikke gemme: ' + ((err && err.message) || err);
 }
 
-/* ---------- login (navn + gruppekode) ---------- */
+/* ---------- login (kun navn) ---------- */
 function requireLogin() {
   return new Promise((resolve, reject) => {
-    if (session && session.name && (!config.pin || session.pin === config.pin)) { resolve(session.name); return; }
+    if (session && session.name) { resolve(session.name); return; }
     const dlg = $('dlg-login');
-    $('in-name').value = (session && session.name) || '';
-    $('in-pin').value = '';
-    $('login-err').textContent = '';
+    $('in-name').value = '';
     const form = $('form-login');
     const cancel = $('login-cancel');
     function cleanup() { form.removeEventListener('submit', onSubmit); cancel.removeEventListener('click', onCancel); }
     function onSubmit(e) {
       e.preventDefault();
       const name = $('in-name').value.trim();
-      const pin = $('in-pin').value;
       if (!name) return;
-      if (config.pin && pin !== config.pin) { $('login-err').textContent = 'Forkert kode.'; return; }
-      session = { name, pin };
+      session = { name };
       try { localStorage.setItem('sep3_session', JSON.stringify(session)); } catch (er) { /* ignore */ }
-      cleanup(); dlg.close(); renderWho(); resolve(name);
+      cleanup(); dlg.close(); renderWho(); render(); resolve(name);
     }
     function onCancel() { cleanup(); dlg.close(); reject(new Error('cancelled')); }
     form.addEventListener('submit', onSubmit);
@@ -162,8 +165,8 @@ function requireLogin() {
 function renderWho() {
   const el = $('whoami');
   if (session && session.name) {
-    el.innerHTML = 'Logget ind som <b>' + esc(session.name) + '</b> · <button type="button" id="btn-switch">skift</button>';
-    $('btn-switch').addEventListener('click', () => { session = null; try { localStorage.removeItem('sep3_session'); } catch (e) { /* ignore */ } renderWho(); });
+    el.innerHTML = 'Du er <b>' + esc(session.name) + '</b> · <button type="button" id="btn-switch">skift navn</button>';
+    $('btn-switch').addEventListener('click', () => { session = null; try { localStorage.removeItem('sep3_session'); } catch (e) { /* ignore */ } renderWho(); render(); });
   } else {
     el.textContent = '';
   }
@@ -187,9 +190,24 @@ function toggleDone(t) {
       : { done: false, doneBy: null, doneAt: null };
     return tasksRef.child(t.id).update(patch).then(() => {
       showBanner('');
-      return logActivity(name, (nowDone ? 'afkrydsede' : 'fjernede afkrydsningen af') + ' "' + t.title + '"');
+      return logActivity(name, (nowDone ? 'gjorde færdig: "' : 'åbnede igen: "') + t.title + '"');
     });
   });
+}
+function startTask(t) {
+  guard((name) => {
+    if (t.startedAt && t.owner && t.owner !== name && !confirm(t.owner + ' er i gang med denne. Vil du overtage den?')) return;
+    return tasksRef.child(t.id).update({ owner: name, startedAt: firebase.database.ServerValue.TIMESTAMP, done: false, doneBy: null, doneAt: null }).then(() => {
+      showBanner('');
+      return logActivity(name, 'startede "' + t.title + '"');
+    });
+  });
+}
+function releaseTask(t) {
+  guard((name) => tasksRef.child(t.id).update({ owner: null, startedAt: null }).then(() => {
+    showBanner('');
+    return logActivity(name, 'gav slip på "' + t.title + '"');
+  }));
 }
 function saveTask(t, fields) {
   guard((name) => tasksRef.child(t.id).update(fields).then(() => { showBanner(''); return logActivity(name, 'rettede "' + (fields.title || t.title) + '"'); }));
@@ -214,7 +232,6 @@ function seedIfEmpty() {
         };
       });
       up['config/startDate'] = DEFAULT_START;
-      up['config/pin'] = DEFAULT_PIN;
       db.ref(ROOT).update(up).catch((e) => showBanner(friendlyErr(e)));
     }, false);
   }).catch((e) => showBanner(friendlyErr(e)));
@@ -225,7 +242,10 @@ function visibleTasks() {
   return tasks.filter((t) => {
     if (filters.area !== 'all' && t.area !== filters.area) return false;
     if (filters.status === 'open' && t.done) return false;
+    if (filters.status === 'doing' && statusOf(t) !== 'doing') return false;
+    if (filters.status === 'late' && !isLate(t)) return false;
     if (filters.status === 'done' && !t.done) return false;
+    if (filters.person && t.owner !== filters.person && t.doneBy !== filters.person) return false;
     if (filters.gatesOnly && GATES.indexOf(t.kind) < 0) return false;
     return true;
   });
@@ -275,6 +295,14 @@ function trackMarkup(t, wk) {
   return '<div class="track" aria-hidden="true">' + now + mark + '</div>';
 }
 
+function actionsMarkup(t) {
+  const id = esc(t.id);
+  const st = statusOf(t);
+  if (st === 'todo') return '<button type="button" class="mini go" data-start="' + id + '">Start</button>';
+  if (st === 'doing') return '<button type="button" class="mini ok" data-finish="' + id + '">Færdig</button><button type="button" class="mini" data-release="' + id + '">Giv slip</button>';
+  return '';
+}
+
 function detailMarkup(t) {
   const areaOpts = Object.keys(AREAS).map((k) => '<option value="' + k + '"' + (k === t.area ? ' selected' : '') + '>' + k + ' · ' + esc(AREAS[k]) + '</option>').join('');
   const kindOpts = Object.keys(KINDS).map((k) => '<option value="' + k + '"' + (k === t.kind ? ' selected' : '') + '>' + esc(KINDS[k]) + '</option>').join('');
@@ -292,6 +320,7 @@ function detailMarkup(t) {
       '<div><label for="e-area-' + id + '">Område</label><select id="e-area-' + id + '">' + areaOpts + '</select></div>' +
       '<div><label for="e-kind-' + id + '">Type</label><select id="e-kind-' + id + '">' + kindOpts + '</select></div>' +
     '</div>' +
+    '<div class="drow owner"><div><label for="e-owner-' + id + '">Ansvarlig</label><input id="e-owner-' + id + '" type="text" list="people-list" maxlength="40" value="' + esc(t.owner || '') + '" placeholder="Hvem skal lave den?"></div></div>' +
     '<div><label for="e-note-' + id + '">Note</label><textarea id="e-note-' + id + '" maxlength="600" placeholder="Fx link til beregning, fil eller aftale">' + esc(t.note || '') + '</textarea></div>' +
     '<div class="dbtns"><button type="button" class="btn primary" data-save="' + id + '">Gem</button>' +
     '<button type="button" class="btn danger" data-del="' + id + '">Slet opgave</button></div>' +
@@ -321,10 +350,16 @@ function renderTimeline() {
       const partial = t.partial ? '<span class="tag">delvist</span>' : '';
       const est = t.est ? '<span class="tag warn">dato?</span>' : '';
       const by = t.done && t.doneBy ? '<span class="byline">✓ ' + esc(t.doneBy) + (t.doneAt ? ' · ' + esc(fmtStamp(t.doneAt)) : '') + '</span>' : '';
-      html += '<div class="row area-' + esc(t.area) + (t.done ? ' done' : '') + '" data-id="' + esc(t.id) + '">' +
+      const late = isLate(t) ? '<span class="tag late">bagud</span>' : '';
+      const st = statusOf(t);
+      const pill = st === 'doing'
+        ? '<span class="pill doing">I gang · ' + esc(t.owner || '?') + ' · ' + esc(sinceLabel(t.startedAt)) + '</span>'
+        : (st === 'todo' && t.owner ? '<span class="pill">Tildelt: ' + esc(t.owner) + '</span>' : '');
+      const acts = actionsMarkup(t);
+      html += '<div class="row area-' + esc(t.area) + (t.done ? ' done' : '') + (st === 'doing' ? ' doing' : '') + (isLate(t) ? ' late' : '') + '" data-id="' + esc(t.id) + '">' +
         '<div class="chkcell"><button type="button" class="chk" data-toggle="' + esc(t.id) + '" aria-pressed="' + (t.done ? 'true' : 'false') + '" aria-label="' + (t.done ? 'Fjern afkrydsning: ' : 'Kryds af: ') + esc(t.title) + '">✓</button></div>' +
         '<div class="main"><div class="ttl">' + esc(t.title) + '</div>' +
-          '<div class="meta"><span class="area-tag"><i></i>' + esc(AREAS[t.area] || t.area) + '</span><span class="wk">' + weekLabel(t) + '</span>' + kindTag + partial + est + by + '</div></div>' +
+          '<div class="meta"><span class="area-tag"><i></i>' + esc(AREAS[t.area] || t.area) + '</span><span class="wk">' + weekLabel(t) + '</span>' + kindTag + partial + est + late + pill + by + '</div>' + (acts ? '<div class="acts">' + acts + '</div>' : '') + '</div>' +
         trackMarkup(t, wk) +
         '<button type="button" class="more" data-more="' + esc(t.id) + '" aria-expanded="' + (open ? 'true' : 'false') + '" aria-label="Detaljer">▾</button>' +
         (open ? detailMarkup(t) : '') +
@@ -334,6 +369,66 @@ function renderTimeline() {
   if (!list.length) html += '<div class="row"><div></div><div class="main"><div class="ttl" style="color:var(--muted)">' + (tasks.length ? 'Ingen opgaver matcher filteret.' : 'Indlæser plan …') + '</div></div></div>';
   html += '</div>';
   $('timeline').innerHTML = html;
+}
+
+function cardMarkup(t) {
+  const st = statusOf(t);
+  const kind = t.kind !== 'opgave' ? '<span class="tag kind">' + esc(KINDS[t.kind]) + '</span>' : '';
+  const est = t.est ? '<span class="tag warn">dato?</span>' : '';
+  let who = '';
+  if (st === 'doing') who = '<div class="cwho doing">I gang: <b>' + esc(t.owner || '?') + '</b> · ' + esc(sinceLabel(t.startedAt)) + '</div>';
+  else if (t.owner) who = '<div class="cwho">Tildelt: <b>' + esc(t.owner) + '</b></div>';
+  else who = '<div class="cwho free">Ingen har taget den</div>';
+  const acts = actionsMarkup(t);
+  return '<article class="card area-' + esc(t.area) + (isLate(t) ? ' late' : '') + '">' +
+    '<div class="ct">' + esc(t.title) + '</div>' +
+    '<div class="cm"><span class="area-tag"><i></i>' + esc(AREAS[t.area] || t.area) + '</span><span class="wk">' + weekLabel(t) + '</span>' + kind + est + '</div>' +
+    who + (acts ? '<div class="acts">' + acts + '</div>' : '') + '</article>';
+}
+
+function renderBoard() {
+  const wk = currentWeek();
+  const open = tasks.filter((t) => !t.done);
+  const byEnd = (a, b) => a.end - b.end || a.start - b.start || a.title.localeCompare(b.title, 'da');
+  const late = open.filter(isLate).sort(byEnd);
+  const doing = open.filter((t) => !isLate(t) && statusOf(t) === 'doing').sort((a, b) => (a.startedAt || 0) - (b.startedAt || 0));
+  const rest = open.filter((t) => !isLate(t) && statusOf(t) === 'todo').sort((a, b) => a.start - b.start || a.end - b.end || a.title.localeCompare(b.title, 'da'));
+  const next = rest.filter((t) => t.start <= wk + 1);
+  const later = rest.filter((t) => t.start > wk + 1);
+  const cols = [
+    ['late', 'Bagud', late, 'Intet bagud lige nu.'],
+    ['doing', 'I gang', doing, 'Ingen er i gang. Tryk Start på en opgave.'],
+    ['next', 'Næste op', next, 'Ikke flere opgaver denne og næste uge.'],
+    ['later', 'Senere', later, 'Ingen fremtidige opgaver.']
+  ];
+  const LIMIT = 4;
+  $('cols').innerHTML = cols.map((c) => {
+    const all = expanded.has(c[0]);
+    const list = all ? c[2] : c[2].slice(0, LIMIT);
+    const more = c[2].length > LIMIT
+      ? '<button type="button" class="more-btn" data-expand="' + c[0] + '">' + (all ? 'Vis færre' : 'Vis alle ' + c[2].length) + '</button>' : '';
+    return '<div class="col col-' + c[0] + '"><div class="colhead"><h3>' + c[1] + '</h3><span class="count">' + c[2].length + '</span></div>' +
+      '<div class="cards">' + (list.length ? list.map(cardMarkup).join('') : '<div class="empty">' + c[3] + '</div>') + more + '</div></div>';
+  }).join('');
+
+  const names = {};
+  tasks.forEach((t) => {
+    [t.owner, t.doneBy, t.createdBy && t.createdBy !== 'Plan' ? t.createdBy : null].forEach((n) => { if (n) names[n] = names[n] || { doing: 0, done: 0 }; });
+    if (t.owner && !t.done && t.startedAt) names[t.owner].doing++;
+    if (t.doneBy && t.done) names[t.doneBy].done++;
+  });
+  if (session && session.name && !names[session.name]) names[session.name] = { doing: 0, done: 0 };
+  const list = Object.keys(names).sort((a, b) => a.localeCompare(b, 'da'));
+  $('people').innerHTML = list.length
+    ? list.map((n) => '<button type="button" class="person" data-person="' + esc(n) + '" aria-pressed="' + (filters.person === n) + '"><b>' + esc(n) + '</b><span>' + names[n].doing + ' i gang · ' + names[n].done + ' færdige</span></button>').join('')
+    : '<span class="empty">Ingen navne endnu. Tryk Start på en opgave.</span>';
+  $('people-list').innerHTML = list.map((n) => '<option value="' + esc(n) + '"></option>').join('');
+}
+
+function onBoardClick(e) {
+  const ex = e.target.closest('[data-expand]');
+  if (ex) { const k = ex.dataset.expand; if (expanded.has(k)) expanded.delete(k); else expanded.add(k); render(); return; }
+  onTimelineClick(e);
 }
 
 function renderActivity() {
@@ -354,12 +449,19 @@ function render() {
   if (ae && ae.closest && ae.closest('.detail')) { pendingRender = true; return; }
   pendingRender = false;
   renderSummary();
+  renderBoard();
   renderTimeline();
   renderActivity();
 }
 
 /* ---------- events ---------- */
 function onTimelineClick(e) {
+  const st = e.target.closest('[data-start]');
+  if (st) { const t = tasks.find((x) => x.id === st.dataset.start); if (t) startTask(t); return; }
+  const fin = e.target.closest('[data-finish]');
+  if (fin) { const t = tasks.find((x) => x.id === fin.dataset.finish); if (t && !t.done) toggleDone(t); return; }
+  const rel = e.target.closest('[data-release]');
+  if (rel) { const t = tasks.find((x) => x.id === rel.dataset.release); if (t) releaseTask(t); return; }
   const tog = e.target.closest('[data-toggle]');
   if (tog) { const t = tasks.find((x) => x.id === tog.dataset.toggle); if (t) toggleDone(t); return; }
   const more = e.target.closest('[data-more]');
@@ -379,7 +481,8 @@ function onTimelineClick(e) {
     saveTask(t, {
       title, start, end, phase: phaseFor(end),
       area: $('e-area-' + id).value, kind: $('e-kind-' + id).value,
-      note: $('e-note-' + id).value.trim()
+      note: $('e-note-' + id).value.trim(),
+      owner: $('e-owner-' + id).value.trim() || null
     });
     return;
   }
@@ -394,6 +497,12 @@ function initUI() {
   areaSel.innerHTML = Object.keys(AREAS).map((k) => '<option value="' + k + '">' + k + ' · ' + esc(AREAS[k]) + '</option>').join('');
 
   $('timeline').addEventListener('click', onTimelineClick);
+  $('board').addEventListener('click', onBoardClick);
+  $('people').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-person]'); if (!b) return;
+    filters.person = filters.person === b.dataset.person ? null : b.dataset.person;
+    render();
+  });
   $('timeline').addEventListener('focusout', () => { if (pendingRender) setTimeout(() => { const a = document.activeElement; if (!(a && a.closest && a.closest('.detail'))) render(); }, 0); });
 
   $('area-filter').addEventListener('click', (e) => {
@@ -457,7 +566,7 @@ function initFirebase() {
 
   configRef.on('value', (snap) => {
     const v = snap.val() || {};
-    config = { startDate: v.startDate || DEFAULT_START, pin: v.pin || null };
+    config = { startDate: v.startDate || DEFAULT_START };
     loaded.config = true;
     render();
   }, (err) => showBanner(friendlyErr(err)));
@@ -470,6 +579,7 @@ function initFirebase() {
         id, title: t.title || '', phase: t.phase || phaseFor(t.end || 1),
         start: t.start || 1, end: t.end || t.start || 1, area: t.area || 'A', kind: t.kind || 'opgave',
         partial: !!t.partial, est: !!t.est, done: !!t.done, doneBy: t.doneBy || null, doneAt: t.doneAt || null,
+        owner: t.owner || null, startedAt: t.startedAt || null,
         note: t.note || '', createdBy: t.createdBy || ''
       };
     });
