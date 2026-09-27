@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Fjeder-masse-dæmper svingning</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Fjeder-masse-dæmper — egenfrekvens og dæmpning</h1>
+  <p>Fri svingning · Kapitel 22: Vibrationer</p>
+  <div class="badge">Skru på k, m og c — se dæmpningsformen ændre sig live</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  Bevægelsesligningen for en masse på en fjeder med dæmpning er m·ẍ + c·ẋ + k·x = 0. Egenfrekvensen
+  er <strong>ω_n = √(k/m)</strong>, og dæmpningsforholdet <strong>ζ = c / (2√(km))</strong> afgør om
+  systemet svinger underdæmpet (ζ&lt;1), kritisk dæmpet (ζ=1) eller overdæmpet (ζ&gt;1). Denne widget
+  viser fri svingning — påtvunget svingning/resonans er ikke inkluderet her.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Fjederstivhed k <span class="val" id="kVal">40 N/m</span></label>
+      <input type="range" id="kSlider" min="5" max="150" step="1" value="40">
+    </div>
+
+    <div class="slider-row">
+      <label>Masse m <span class="val" id="mVal">1.0 kg</span></label>
+      <input type="range" id="mSlider" min="0.2" max="5" step="0.1" value="1">
+    </div>
+
+    <div class="slider-row">
+      <label>Dæmpning c <span class="val" id="cVal">1.0 Ns/m</span></label>
+      <input type="range" id="cSlider" min="0" max="25" step="0.1" value="1">
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" id="pauseBtn">⏸ Pause</button>
+      <button class="btn secondary" id="resetBtn">Nulstil (x₀=1)</button>
+    </div>
+    <div class="paused-flag" id="pausedFlag">PAUSET</div>
+
+    <div class="formula-box">
+      <div><span class="f">ω_n</span> = √(k/m) &nbsp;·&nbsp; <span class="f">ζ</span> = c / (2√(km))</div>
+    </div>
+
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--accent-cyan)"></span> x(t)</span>
+      <span><span class="swatch" style="background:var(--accent-gold)"></span> dæmpnings-envelope</span>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Masse + tidsforløb x(t)</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">ω_n (egenfrekvens)</div><div class="num" id="outWn">—</div></div>
+      <div><div class="lbl">ζ (dæmpningsforhold)</div><div class="num" id="outZeta">—</div></div>
+      <div><div class="lbl">Dæmpningstype</div><div class="num" id="outType">—</div></div>
+      <div><div class="lbl">x(t)</div><div class="num" id="outX">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+
+  var kS=document.getElementById('kSlider'), mS=document.getElementById('mSlider'), cS=document.getElementById('cSlider');
+  var kVal=document.getElementById('kVal'), mVal=document.getElementById('mVal'), cVal=document.getElementById('cVal');
+  var outWn=document.getElementById('outWn'), outZeta=document.getElementById('outZeta');
+  var outType=document.getElementById('outType'), outX=document.getElementById('outX');
+  var resetBtn = document.getElementById('resetBtn');
+
+  var x = 1.0, v = 0.0;
+  var history = []; // {t, x}
+  var tAcc = 0;
+
+  function reset(){ x = 1.0; v = 0.0; history = []; tAcc = 0; }
+  resetBtn.addEventListener('click', reset);
+  reset();
+
+  var ceilY = 60, restY = 300, pxPerM = 160;
+
+  Widget.loop(function(dt){
+    var k = parseFloat(kS.value), m = parseFloat(mS.value), c = parseFloat(cS.value);
+    kVal.textContent = k.toFixed(0)+' N/m';
+    mVal.textContent = m.toFixed(1)+' kg';
+    cVal.textContent = c.toFixed(1)+' Ns/m';
+
+    var wn = Math.sqrt(k/m);
+    var zeta = c/(2*Math.sqrt(k*m));
+
+    outWn.textContent = wn.toFixed(2)+' rad/s';
+    outZeta.textContent = zeta.toFixed(3);
+    outType.textContent = zeta<0.999 ? 'Underdæmpet' : (zeta<1.001 ? 'Kritisk dæmpet' : 'Overdæmpet');
+    outX.textContent = x.toFixed(3)+' m';
+
+    // sub-stepping for numerisk stabilitet ved stiv fjeder
+    var steps = 6;
+    var h = dt/steps;
+    for (var s=0;s<steps;s++){
+      var a = -(k/m)*x - (c/m)*v;
+      v += a*h;
+      x += v*h;
+    }
+    tAcc += dt;
+
+    if (dt>0) {
+      history.push(x);
+      if (history.length > 500) history.shift();
+    }
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    // fjeder + masse (venstre halvdel af canvas)
+    var colX = 140;
+    var massY = restY + x*pxPerM;
+
+    ctx.strokeStyle='#e0e0e0';
+    ctx.lineWidth=4;
+    ctx.beginPath(); ctx.moveTo(colX-40,ceilY); ctx.lineTo(colX+40,ceilY); ctx.stroke();
+
+    // zigzag fjeder
+    ctx.strokeStyle = '#5ec8ff';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    var coils = 10;
+    var segH = (massY-30-ceilY)/coils;
+    ctx.moveTo(colX, ceilY);
+    for (var i=1;i<coils;i++){
+      var xx = colX + (i%2===0 ? -18 : 18);
+      ctx.lineTo(xx, ceilY+i*segH);
+    }
+    ctx.lineTo(colX, massY-30);
+    ctx.stroke();
+
+    ctx.fillStyle = '#ffa500';
+    ctx.fillRect(colX-30, massY-30, 60, 60);
+
+    ctx.strokeStyle='rgba(224,224,224,0.3)';
+    ctx.lineWidth=1;
+    ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(colX-70,restY); ctx.lineTo(colX+70,restY); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // x(t) graf (højre halvdel)
+    var gx0 = 320, gx1 = W-20, gy0=80, gy1=420, gyMid=(gy0+gy1)/2;
+    ctx.strokeStyle='rgba(255,255,255,0.15)';
+    ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(gx0,gyMid); ctx.lineTo(gx1,gyMid); ctx.stroke();
+    ctx.strokeStyle='rgba(224,224,224,0.4)';
+    ctx.beginPath(); ctx.moveTo(gx0,gy0); ctx.lineTo(gx0,gy1); ctx.stroke();
+
+    var xScale = 130; // px per meter på grafen
+    ctx.strokeStyle = '#5ec8ff';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    history.forEach(function(hx,i){
+      var px = gx0 + (i/500)*(gx1-gx0);
+      var py = gyMid - hx*xScale;
+      if (i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+    });
+    ctx.stroke();
+
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.font='11px Segoe UI';
+    ctx.fillText('x(t) — seneste ~8 s', gx0, gy0-10);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Excentrisk stød på en fritsvævende stang</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Excentrisk stød på en fritsvævende stang</h1>
+  <p>Impuls- og bevægelsesmængde af stift legeme · Kapitel 19</p>
+  <div class="badge">Ram stangen af centrum — den både flytter sig OG roterer</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  Et impulsstød J træffer stangen i afstand <strong>d</strong> fra massemidtpunktet G. Stødet giver
+  både en lineær hastighedsændring <strong>v_G = J/m</strong> og en vinkelhastighedsændring
+  <strong>ω = J·d / I_G</strong> (her I_G = (1/12)·m·L² for en tynd stang). Ram midt på (d=0), og
+  stangen glider uden at rotere. Ram tæt på enden, og den spinner kraftigt.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Impuls J <span class="val" id="jVal">6.0 Ns</span></label>
+      <input type="range" id="jSlider" min="0" max="15" step="0.2" value="6">
+    </div>
+
+    <div class="slider-row">
+      <label>Afstand d fra centrum G <span class="val" id="dVal">0.6 m</span></label>
+      <input type="range" id="dSlider" min="-1.0" max="1.0" step="0.05" value="0.6">
+    </div>
+
+    <div class="slider-row">
+      <label>Stangens masse m <span class="val" id="mVal">3.0 kg</span></label>
+      <input type="range" id="mSlider" min="0.5" max="8" step="0.1" value="3">
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" id="strikeBtn">💥 Giv stødet</button>
+      <button class="btn secondary" id="pauseBtn">⏸ Pause</button>
+    </div>
+    <div class="paused-flag" id="pausedFlag">PAUSET</div>
+
+    <div class="formula-box">
+      <div><span class="f">v_G</span> = J / m &nbsp;(massemidtpunktets fart)</div>
+      <div style="margin-top:0.35rem;"><span class="f">ω</span> = J·d / I_G &nbsp;(I_G = mL²/12, L = 2 m)</div>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Stangens bevægelse efter stødet</h2>
+    <canvas id="stage" width="740" height="420"></canvas>
+    <div class="readout">
+      <div><div class="lbl">v_G efter stød</div><div class="num" id="outV" style="color:var(--accent-green)">—</div></div>
+      <div><div class="lbl">ω efter stød</div><div class="num" id="outOmega" style="color:var(--accent-purple)">—</div></div>
+      <div><div class="lbl">I_G</div><div class="num" id="outI">—</div></div>
+      <div><div class="lbl">Status</div><div class="num" id="outStatus">Klar til stød</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var L = 2.0; // stanglængde i meter
+  var pxPerM = 70;
+
+  var jS=document.getElementById('jSlider'), dS=document.getElementById('dSlider'), mS=document.getElementById('mSlider');
+  var jVal=document.getElementById('jVal'), dVal=document.getElementById('dVal'), mVal=document.getElementById('mVal');
+  var outV=document.getElementById('outV'), outOmega=document.getElementById('outOmega');
+  var outI=document.getElementById('outI'), outStatus=document.getElementById('outStatus');
+  var strikeBtn = document.getElementById('strikeBtn');
+
+  var Gx=0, Gy=0, theta=0, vG=0, omega=0, struck=false;
+
+  function strike(){
+    var J = parseFloat(jS.value), d = parseFloat(dS.value), m = parseFloat(mS.value);
+    var I = m*L*L/12;
+    vG = J/m;
+    omega = J*d/I;
+    Gx=0; Gy=0; theta=0;
+    struck = true;
+    outStatus.textContent = 'Stang i fri bevægelse';
+    outStatus.style.color = 'var(--accent-gold)';
+  }
+  strikeBtn.addEventListener('click', strike);
+
+  function updateReadout(){
+    var J = parseFloat(jS.value), d = parseFloat(dS.value), m = parseFloat(mS.value);
+    var I = m*L*L/12;
+    jVal.textContent = J.toFixed(1)+' Ns';
+    dVal.textContent = d.toFixed(2)+' m';
+    mVal.textContent = m.toFixed(1)+' kg';
+    outI.textContent = I.toFixed(3)+' kg·m²';
+    if (!struck) { outV.textContent='—'; outOmega.textContent='—'; }
+  }
+  [jS,dS,mS].forEach(function(el){ el.addEventListener('input', updateReadout); });
+  updateReadout();
+
+  Widget.loop(function(dt){
+    if (struck) {
+      Gx += vG*dt;
+      theta += omega*dt;
+      outV.textContent = vG.toFixed(2)+' m/s';
+      outOmega.textContent = omega.toFixed(2)+' rad/s';
+      if (Math.abs(Gx) > 3.2) { Gx = 0; struck=false; theta=0; outStatus.textContent='Klar til stød'; outStatus.style.color='var(--text-light)'; }
+    }
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    var cx = W/2 + Gx*pxPerM, cy = H/2;
+
+    // markér stødpunktet (fast reference før stød er givet)
+    var d = parseFloat(dS.value);
+    if (!struck) {
+      var hitX = cx + d*pxPerM*Math.cos(theta), hitY = cy + d*pxPerM*Math.sin(theta);
+      ctx.fillStyle = '#ff5e5e';
+      ctx.beginPath(); ctx.arc(hitX,hitY,6,0,Math.PI*2); ctx.fill();
+      Widget.arrow(ctx, hitX-60, hitY, hitX-14, hitY, '#ff5e5e', 4);
+      ctx.fillStyle='#ff5e5e'; ctx.font='12px Segoe UI'; ctx.fillText('J', hitX-40, hitY-10);
+    }
+
+    ctx.save();
+    ctx.translate(cx,cy);
+    ctx.rotate(theta);
+    ctx.strokeStyle = '#e0e0e0';
+    ctx.lineWidth = 8;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-L/2*pxPerM, 0);
+    ctx.lineTo(L/2*pxPerM, 0);
+    ctx.stroke();
+    ctx.fillStyle = '#5ec8ff';
+    ctx.beginPath(); ctx.arc(0,0,6,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+
+    ctx.fillStyle = 'rgba(224,224,224,0.5)';
+    ctx.font = '12px Segoe UI';
+    ctx.fillText('G (massemidtpunkt)', cx+10, cy-14);
+  });
+})();
+</script>
+</body>
+</html>

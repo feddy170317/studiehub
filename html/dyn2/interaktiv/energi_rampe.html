@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Energiregnskab på en rampe med friktion</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Energiregnskab på en rampe</h1>
+  <p>Arbejde og energi · Kapitel 14: Kinetik: Arbejde og Energi</p>
+  <div class="badge">Følg PE, KE og friktionsvarme live — pause for at studere et øjeblik</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  En kloss glider ned en rampe med friktion. Al potentiel energi (PE) bliver undervejs omsat til
+  kinetisk energi (KE) og friktionsvarme (Q) — summen er konstant:
+  <strong>PE₀ = PE + KE + Q</strong>. Skru på hældning og friktion, og se hvordan de tre bjælker
+  flytter sig, mens klossen glider.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Rampevinkel θ <span class="val" id="thVal">30°</span></label>
+      <input type="range" id="thSlider" min="10" max="50" step="1" value="30">
+    </div>
+
+    <div class="slider-row">
+      <label>Friktionskoefficient μ <span class="val" id="muVal">0.15</span></label>
+      <input type="range" id="muSlider" min="0" max="0.6" step="0.01" value="0.15">
+    </div>
+
+    <div class="slider-row">
+      <label>Massen m <span class="val" id="mVal">5.0 kg</span></label>
+      <input type="range" id="mSlider" min="1" max="20" step="0.5" value="5">
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" id="pauseBtn">⏸ Pause</button>
+      <button class="btn secondary" id="resetBtn">Nulstil</button>
+    </div>
+    <div class="paused-flag" id="pausedFlag">PAUSET — klossen står stille</div>
+
+    <div class="formula-box">
+      <div><span class="f">a</span> = g·(sinθ − μ·cosθ)</div>
+      <div style="margin-top:0.35rem;"><span class="f">Q</span> = μ·m·g·cosθ · s &nbsp;(friktionsvarme, s = tilbagelagt vej)</div>
+    </div>
+
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--accent-cyan)"></span> PE (potentiel)</span>
+      <span><span class="swatch" style="background:var(--accent-green)"></span> KE (kinetisk)</span>
+      <span><span class="swatch" style="background:var(--accent-red)"></span> Q (friktionsvarme)</span>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Rampe og energibjælker</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">PE</div><div class="num" id="outPE" style="color:var(--accent-cyan)">—</div></div>
+      <div><div class="lbl">KE</div><div class="num" id="outKE" style="color:var(--accent-green)">—</div></div>
+      <div><div class="lbl">Q (varme)</div><div class="num" id="outQ" style="color:var(--accent-red)">—</div></div>
+      <div><div class="lbl">Sum (kontrol mod PE₀)</div><div class="num" id="outSum">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var g = 9.81;
+
+  var thSlider = document.getElementById('thSlider');
+  var muSlider = document.getElementById('muSlider');
+  var mSlider = document.getElementById('mSlider');
+  var thVal = document.getElementById('thVal');
+  var muVal = document.getElementById('muVal');
+  var mVal = document.getElementById('mVal');
+  var outPE = document.getElementById('outPE');
+  var outKE = document.getElementById('outKE');
+  var outQ = document.getElementById('outQ');
+  var outSum = document.getElementById('outSum');
+  var resetBtn = document.getElementById('resetBtn');
+
+  var rampLen = 6; // meter langs rampen
+  var s = 0;       // tilbagelagt vejlængde langs rampen
+  var vel = 0;
+
+  function reset(){ s = 0; vel = 0; }
+  resetBtn.addEventListener('click', reset);
+  thSlider.addEventListener('input', reset);
+  muSlider.addEventListener('input', reset);
+  mSlider.addEventListener('input', reset);
+
+  // rampens geometri på canvas
+  var baseX = 90, baseY = 400, rampPixelLen = 560;
+
+  Widget.loop(function(dt){
+    var thDeg = parseFloat(thSlider.value);
+    var th = thDeg*Math.PI/180;
+    var mu = parseFloat(muSlider.value);
+    var m = parseFloat(mSlider.value);
+
+    thVal.textContent = thDeg.toFixed(0)+'°';
+    muVal.textContent = mu.toFixed(2);
+    mVal.textContent = m.toFixed(1)+' kg';
+
+    var a = g*(Math.sin(th) - mu*Math.cos(th));
+    vel += a*dt;
+    if (vel < 0) vel = 0;
+    s += vel*dt;
+    if (s >= rampLen) { s = 0; vel = 0; } // gentag turen
+
+    var h0 = rampLen*Math.sin(th);
+    var hNow = (rampLen-s)*Math.sin(th);
+    var PE = m*g*hNow;
+    var PE0 = m*g*h0;
+    var KE = 0.5*m*vel*vel;
+    var Q = mu*m*g*Math.cos(th)*s;
+
+    outPE.textContent = PE.toFixed(1)+' J';
+    outKE.textContent = KE.toFixed(1)+' J';
+    outQ.textContent = Q.toFixed(1)+' J';
+    outSum.textContent = (PE+KE+Q).toFixed(1)+' J  (PE₀ = '+PE0.toFixed(1)+' J)';
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    // rampe (retvinklet trekant)
+    var topX = baseX, topY = baseY - rampPixelLen*Math.sin(th);
+    var botX = baseX + rampPixelLen*Math.cos(th), botY = baseY;
+    ctx.strokeStyle = '#e0e0e0';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(topX, topY);
+    ctx.lineTo(botX, botY);
+    ctx.lineTo(botX, topY);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.beginPath(); ctx.moveTo(topX,topY); ctx.lineTo(botX,botY); ctx.stroke();
+
+    // kloss på rampen
+    var frac = s/rampLen;
+    var bx = topX + frac*(botX-topX);
+    var by = topY + frac*(botY-topY);
+    ctx.save();
+    ctx.translate(bx,by);
+    ctx.rotate(-th);
+    ctx.fillStyle = '#ffa500';
+    ctx.fillRect(-16,-16,32,16);
+    ctx.restore();
+
+    // energibjælker (til højre)
+    var barX = 640, barW = 60, barMaxH = 220, barBaseY = 400;
+    var scale = barMaxH/Math.max(PE0, 0.001);
+    function bar(x,val,color,label){
+      var h = Math.max(val*scale,0);
+      ctx.fillStyle = color;
+      ctx.fillRect(x, barBaseY-h, barW*0.5, h);
+      ctx.fillStyle = 'rgba(224,224,224,0.7)';
+      ctx.font = '11px Segoe UI';
+      ctx.textAlign='center';
+      ctx.fillText(label, x+barW*0.25, barBaseY+16);
+      ctx.textAlign='left';
+    }
+    ctx.strokeStyle='rgba(255,255,255,0.15)';
+    ctx.beginPath(); ctx.moveTo(barX-20,barBaseY); ctx.lineTo(barX+80,barBaseY); ctx.stroke();
+    bar(barX-20, PE, '#5ec8ff', 'PE');
+    bar(barX+15, KE, '#00d984', 'KE');
+    bar(barX+50, Q, '#ff5e5e', 'Q');
+  });
+})();
+</script>
+</body>
+</html>

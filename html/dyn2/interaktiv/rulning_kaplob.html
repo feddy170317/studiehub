@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Kapløb ned ad rampe — hvem ruller hurtigst?</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Kapløb ned ad rampe — ring, cylinder eller kugle?</h1>
+  <p>Kinetisk energi ved translation + rotation · Kapitel 18</p>
+  <div class="badge">Samme rampe, samme starthøjde — men de ruller ikke lige hurtigt</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  Alle tre triller uden at glide (ren rulning). Den samlede kinetiske energi deles mellem
+  <strong>translation</strong> (½mv²) og <strong>rotation</strong> (½I_Gω²). Formfaktoren
+  <strong>c</strong> i I_G = c·m·r² bestemmer hvor stor en del af energien "går til at spinde" —
+  og dermed hvor hurtigt de accelererer: <strong>a = g·sinθ / (1+c)</strong>.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Rampevinkel θ <span class="val" id="thVal">25°</span></label>
+      <input type="range" id="thSlider" min="10" max="45" step="1" value="25">
+    </div>
+
+    <button class="btn" id="raceBtn">🏁 Start kapløb</button>
+    <div class="btn-row">
+      <button class="btn secondary" id="pauseBtn">⏸ Pause</button>
+    </div>
+    <div class="paused-flag" id="pausedFlag">PAUSET</div>
+
+    <div class="formula-box">
+      <div>Massiv kugle: c = 2/5</div>
+      <div>Massiv cylinder: c = 1/2</div>
+      <div>Ring/hul rør: c = 1</div>
+      <div style="margin-top:0.4rem;"><span class="f">a</span> = g·sinθ / (1+c)</div>
+    </div>
+
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--accent-green)"></span> Kugle</span>
+      <span><span class="swatch" style="background:var(--accent-cyan)"></span> Cylinder</span>
+      <span><span class="swatch" style="background:var(--accent-gold)"></span> Ring</span>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Rampe — set fra siden</h2>
+    <canvas id="stage" width="740" height="420"></canvas>
+    <div class="readout">
+      <div><div class="lbl">a (kugle)</div><div class="num" id="outASphere" style="color:var(--accent-green)">—</div></div>
+      <div><div class="lbl">a (cylinder)</div><div class="num" id="outACyl" style="color:var(--accent-cyan)">—</div></div>
+      <div><div class="lbl">a (ring)</div><div class="num" id="outARing" style="color:var(--accent-gold)">—</div></div>
+      <div><div class="lbl">Vinder</div><div class="num" id="outWinner">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var g = 9.81;
+  var rampLen = 5.5;
+
+  var thS = document.getElementById('thSlider');
+  var thVal = document.getElementById('thVal');
+  var outASphere=document.getElementById('outASphere'), outACyl=document.getElementById('outACyl');
+  var outARing=document.getElementById('outARing'), outWinner=document.getElementById('outWinner');
+  var raceBtn = document.getElementById('raceBtn');
+
+  var shapes = [
+    {name:'Kugle', c:2/5, color:'#00d984', s:0, v:0, lane:0},
+    {name:'Cylinder', c:1/2, color:'#5ec8ff', s:0, v:0, lane:1},
+    {name:'Ring', c:1, color:'#ffa500', s:0, v:0, lane:2}
+  ];
+  var finished = false;
+
+  function startRace(){
+    shapes.forEach(function(sh){ sh.s=0; sh.v=0; });
+    finished = false;
+    outWinner.textContent = '—';
+  }
+  raceBtn.addEventListener('click', startRace);
+
+  var baseX = 70, baseY = 380, rampPixelLen = 560;
+
+  Widget.loop(function(dt){
+    var thDeg = parseFloat(thS.value);
+    var th = thDeg*Math.PI/180;
+    thVal.textContent = thDeg.toFixed(0)+'°';
+
+    shapes.forEach(function(sh){
+      var a = g*Math.sin(th)/(1+sh.c);
+      sh.a = a;
+      if (sh.s < rampLen) {
+        sh.v += a*dt;
+        sh.s += sh.v*dt;
+        if (sh.s >= rampLen) { sh.s = rampLen; }
+      }
+    });
+
+    outASphere.textContent = shapes[0].a.toFixed(2)+' m/s²';
+    outACyl.textContent = shapes[1].a.toFixed(2)+' m/s²';
+    outARing.textContent = shapes[2].a.toFixed(2)+' m/s²';
+
+    if (!finished && shapes.every(function(sh){return sh.s>=rampLen;})) {
+      finished = true;
+      outWinner.textContent = shapes[0].name + ' vinder altid (lavest c ⇒ størst a)';
+    }
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    var topX = baseX, topY = baseY - rampPixelLen*Math.sin(th);
+    var botX = baseX + rampPixelLen*Math.cos(th), botY = baseY;
+    ctx.strokeStyle = '#e0e0e0';
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(topX,topY); ctx.lineTo(botX,botY); ctx.stroke();
+
+    shapes.forEach(function(sh, idx){
+      var frac = Math.min(sh.s/rampLen, 1);
+      var laneOffset = (idx-1)*22;
+      var perpX = Math.sin(th)*laneOffset, perpY = Math.cos(th)*laneOffset;
+      var bx = topX + frac*(botX-topX) + perpX;
+      var by = topY + frac*(botY-topY) + perpY;
+      var rr = 16;
+      // rotation proportional til rullet vejlængde / radius (illustrativ)
+      var spin = (sh.s/0.15) % (Math.PI*2);
+      ctx.save();
+      ctx.translate(bx,by);
+      ctx.rotate(spin);
+      ctx.strokeStyle = sh.color;
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(0,0,rr,0,Math.PI*2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(rr,0); ctx.stroke();
+      ctx.restore();
+    });
+  });
+
+  startRace();
+})();
+</script>
+</body>
+</html>

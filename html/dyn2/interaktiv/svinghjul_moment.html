@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Svinghjul — moment og massemoment af inerti</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Svinghjul — moment og massemoment af inerti</h1>
+  <p>Plan kinetik: kraft og acceleration · Kapitel 17</p>
+  <div class="badge">Samme moment, forskellig inerti — se hvor hurtigt hjulet spinner op</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  Et moment M drejer et hjul om dets centrum: <strong>ΣM_G = I_G·α</strong>. Et hjul med masse
+  koncentreret nær kanten har langt større massemoment af inerti I end et hjul med samme masse
+  samlet nær centrum — og accelererer derfor langsommere op ved samme moment.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Påført moment M <span class="val" id="mVal">8.0 Nm</span></label>
+      <input type="range" id="mSlider" min="0" max="30" step="0.5" value="8">
+    </div>
+
+    <div class="slider-row">
+      <label>Massemoment af inerti I_G <span class="val" id="iVal">1.5 kg·m²</span></label>
+      <input type="range" id="iSlider" min="0.2" max="6" step="0.1" value="1.5">
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" id="pauseBtn">⏸ Pause</button>
+      <button class="btn secondary" id="resetBtn">Nulstil ω</button>
+    </div>
+    <div class="paused-flag" id="pausedFlag">PAUSET — hjulet står stille</div>
+
+    <div class="formula-box">
+      <div><span class="f">α</span> = M / I_G</div>
+      <div style="margin-top:0.35rem;">ω(t) = ω₀ + α·t &nbsp;(spinner konstant op, α er konstant)</div>
+    </div>
+
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--accent-gold)"></span> M (moment, kurvet pil)</span>
+      <span><span class="swatch" style="background:var(--accent-cyan)"></span> massefordeling (I_G)</span>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Hjul under opspin</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">α = M / I_G</div><div class="num" id="outAlpha" style="color:var(--accent-gold)">—</div></div>
+      <div><div class="lbl">ω (live)</div><div class="num" id="outOmega" style="color:var(--accent-cyan)">—</div></div>
+      <div><div class="lbl">Omdrejninger/min (RPM)</div><div class="num" id="outRpm">—</div></div>
+      <div><div class="lbl">Tid til 100 rad/s</div><div class="num" id="outTime">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var cx = W/2, cy = H/2+10;
+  var Rpix = 150;
+
+  var mS=document.getElementById('mSlider'), iS=document.getElementById('iSlider');
+  var mVal=document.getElementById('mVal'), iVal=document.getElementById('iVal');
+  var outAlpha=document.getElementById('outAlpha'), outOmega=document.getElementById('outOmega');
+  var outRpm=document.getElementById('outRpm'), outTime=document.getElementById('outTime');
+  var resetBtn = document.getElementById('resetBtn');
+
+  var theta = 0, omega = 0;
+  resetBtn.addEventListener('click', function(){ omega = 0; });
+
+  Widget.loop(function(dt){
+    var M = parseFloat(mS.value);
+    var I = parseFloat(iS.value);
+    mVal.textContent = M.toFixed(1)+' Nm';
+    iVal.textContent = I.toFixed(1)+' kg·m²';
+
+    var alpha = M/I;
+    omega += alpha*dt;
+    theta += omega*dt;
+
+    outAlpha.textContent = alpha.toFixed(2)+' rad/s²';
+    outOmega.textContent = omega.toFixed(2)+' rad/s';
+    outRpm.textContent = (omega*60/(2*Math.PI)).toFixed(1)+' RPM';
+    outTime.textContent = alpha>0.001 ? (100/alpha).toFixed(1)+' s' : '—';
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    // massering: jo højere I ved fast "visuel radius", jo tættere på kanten sidder massen visuelt
+    var iMassFrac = Math.min(I/6, 1); // 0..1 hvor tæt på kanten massen sidder
+
+    ctx.strokeStyle = 'rgba(224,224,224,0.35)';
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(cx,cy,Rpix,0,Math.PI*2); ctx.stroke();
+
+    // eger
+    ctx.save();
+    ctx.translate(cx,cy);
+    ctx.rotate(theta);
+    ctx.strokeStyle = '#5ec8ff';
+    ctx.lineWidth = 3;
+    for (var k=0;k<8;k++){
+      var a = k*Math.PI/4;
+      ctx.beginPath();
+      ctx.moveTo(0,0);
+      ctx.lineTo(Rpix*Math.cos(a), Rpix*Math.sin(a));
+      ctx.stroke();
+    }
+    // massepunkter (illustrerer hvor massen sidder afhængig af I)
+    ctx.fillStyle = '#ffa500';
+    for (var k2=0;k2<8;k2++){
+      var a2 = k2*Math.PI/4 + Math.PI/8;
+      var rr = 20 + iMassFrac*(Rpix-30);
+      ctx.beginPath();
+      ctx.arc(rr*Math.cos(a2), rr*Math.sin(a2), 8, 0, Math.PI*2);
+      ctx.fill();
+    }
+    ctx.restore();
+
+    ctx.fillStyle = 'rgba(224,224,224,0.5)';
+    ctx.beginPath(); ctx.arc(cx,cy,6,0,Math.PI*2); ctx.fill();
+
+    // momentpil (kurvet)
+    ctx.strokeStyle = '#ffa500';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(cx,cy,Rpix+30,-0.3,1.1);
+    ctx.stroke();
+    var endAng = 1.1;
+    var ex = cx+(Rpix+30)*Math.cos(endAng), ey = cy+(Rpix+30)*Math.sin(endAng);
+    Widget.arrow(ctx, cx+(Rpix+30)*Math.cos(endAng-0.15), cy+(Rpix+30)*Math.sin(endAng-0.15), ex, ey, '#ffa500', 4);
+    ctx.fillStyle = '#ffa500';
+    ctx.font = '14px Segoe UI';
+    ctx.fillText('M', cx+(Rpix+50)*Math.cos(0.4), cy+(Rpix+50)*Math.sin(0.4));
+
+    ctx.fillStyle = 'rgba(224,224,224,0.5)';
+    ctx.font = '12px Segoe UI';
+    ctx.fillText(iMassFrac>0.5 ? 'masse sidder nær kanten (høj I)' : 'masse sidder nær centrum (lav I)', cx-140, cy+Rpix+40);
+  });
+})();
+</script>
+</body>
+</html>

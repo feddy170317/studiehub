@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Bil i kurve — Newtons 2. lov i n-t koordinater</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Bil i kurve — kræver friktionen nok?</h1>
+  <p>Newtons 2. lov i n–t koordinater · Kapitel 13: Kinetik: Kraft og Acceleration</p>
+  <div class="badge">Skru på fart, radius og friktion — se om bilen skrider</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  En bil kører gennem en flad kurve med radius ρ. For at følge kurven skal friktionen levere den
+  <strong>normale kraftkomponent</strong> ΣF_n = m·v²/ρ. Friktionen kan højst levere
+  F_maks = μ·m·g. Så snart den krævede kraft overstiger det, kan dækkene ikke følge med, og bilen skrider ud.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Hastighed v <span class="val" id="vVal">15.0 m/s</span></label>
+      <input type="range" id="vSlider" min="1" max="35" step="0.5" value="15">
+    </div>
+
+    <div class="slider-row">
+      <label>Kurveradius ρ <span class="val" id="rhoVal">25 m</span></label>
+      <input type="range" id="rhoSlider" min="5" max="60" step="1" value="25">
+    </div>
+
+    <div class="slider-row">
+      <label>Friktionskoefficient μ <span class="val" id="muVal">0.70</span></label>
+      <input type="range" id="muSlider" min="0.10" max="1.20" step="0.01" value="0.70">
+    </div>
+
+    <div class="slider-row">
+      <label>Bilens masse m <span class="val" id="mVal">1200 kg</span></label>
+      <input type="range" id="mSlider" min="800" max="2200" step="50" value="1200">
+    </div>
+
+    <button class="btn" id="pauseBtn">⏸ Pause</button>
+    <div class="paused-flag" id="pausedFlag">PAUSET — bilen står stille</div>
+
+    <div class="formula-box">
+      <div><span class="f">ΣF_n</span> = m·v² / ρ &nbsp;(krævet centripetalkraft)</div>
+      <div style="margin-top:0.35rem;"><span class="f">F_maks</span> = μ·m·g &nbsp;(friktionens formåen)</div>
+    </div>
+
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--accent-purple)"></span> F_n krævet</span>
+      <span><span class="swatch" style="background:var(--accent-green)"></span> F_maks (friktion)</span>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Kurve, set fra oven</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">F_n krævet</div><div class="num" id="outFn" style="color:var(--accent-purple)">—</div></div>
+      <div><div class="lbl">F_maks (friktion)</div><div class="num" id="outFmax" style="color:var(--accent-green)">—</div></div>
+      <div><div class="lbl">Margin (F_maks / F_n)</div><div class="num" id="outMargin">—</div></div>
+      <div><div class="lbl">Status</div><div class="num" id="outStatus">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var cx = W/2, cy = H/2 + 20;
+  var g = 9.81;
+
+  var vSlider = document.getElementById('vSlider');
+  var rhoSlider = document.getElementById('rhoSlider');
+  var muSlider = document.getElementById('muSlider');
+  var mSlider = document.getElementById('mSlider');
+  var vVal = document.getElementById('vVal');
+  var rhoVal = document.getElementById('rhoVal');
+  var muVal = document.getElementById('muVal');
+  var mVal = document.getElementById('mVal');
+  var outFn = document.getElementById('outFn');
+  var outFmax = document.getElementById('outFmax');
+  var outMargin = document.getElementById('outMargin');
+  var outStatus = document.getElementById('outStatus');
+
+  var theta = -Math.PI/2;
+
+  function pixelRadius(rho) {
+    var rMin=5, rMax=60, pMin=55, pMax=205;
+    return pMin + (rho-rMin)/(rMax-rMin) * (pMax-pMin);
+  }
+
+  Widget.loop(function(dt){
+    var v = parseFloat(vSlider.value);
+    var rho = parseFloat(rhoSlider.value);
+    var mu = parseFloat(muSlider.value);
+    var m = parseFloat(mSlider.value);
+
+    vVal.textContent = v.toFixed(1)+' m/s';
+    rhoVal.textContent = rho.toFixed(0)+' m';
+    muVal.textContent = mu.toFixed(2);
+    mVal.textContent = m.toFixed(0)+' kg';
+
+    var Fn = m*v*v/rho;
+    var Fmax = mu*m*g;
+    var skid = Fn > Fmax;
+    var margin = Fmax/Fn;
+
+    outFn.textContent = Fn.toFixed(0)+' N';
+    outFmax.textContent = Fmax.toFixed(0)+' N';
+    outMargin.textContent = margin.toFixed(2)+'×';
+    outStatus.textContent = skid ? 'SKRIDER!' : 'Holder vejen';
+    outStatus.style.color = skid ? 'var(--accent-red)' : 'var(--accent-green)';
+
+    var omega = v/rho;
+    theta += omega*dt;
+
+    var R = pixelRadius(rho);
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    ctx.strokeStyle = skid ? 'rgba(255,94,94,0.55)' : 'rgba(0,217,132,0.35)';
+    ctx.lineWidth = 22;
+    ctx.beginPath();
+    ctx.arc(cx,cy,R,0,Math.PI*2);
+    ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([8,8]);
+    ctx.beginPath();
+    ctx.arc(cx,cy,R,0,Math.PI*2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = 'rgba(224,224,224,0.5)';
+    ctx.beginPath();
+    ctx.arc(cx,cy,3,0,Math.PI*2);
+    ctx.fill();
+
+    var carDrift = skid ? Math.min((Fn-Fmax)/Fmax, 1) * 26 : 0;
+    var px = cx + (R+carDrift)*Math.cos(theta);
+    var py = cy + (R+carDrift)*Math.sin(theta);
+
+    var tx = -Math.sin(theta), ty = Math.cos(theta);
+    var nx = (cx-px)/R, ny = (cy-py)/R;
+
+    ctx.save();
+    ctx.translate(px,py);
+    ctx.rotate(Math.atan2(ty,tx));
+    ctx.fillStyle = skid ? '#ff5e5e' : '#5ec8ff';
+    ctx.fillRect(-14,-7,28,14);
+    ctx.restore();
+
+    var aScale = 0.012;
+    Widget.arrow(ctx, px,py, px+nx*Fn*aScale, py+ny*Fn*aScale, '#d984ff', 3);
+    Widget.arrow(ctx, px,py, px+nx*Fmax*aScale, py+ny*Fmax*aScale, '#00d984', 2);
+
+    if (skid) {
+      ctx.font = 'bold 22px Segoe UI';
+      ctx.fillStyle = '#ff5e5e';
+      ctx.textAlign = 'center';
+      ctx.fillText('SKRIDER — friktion slår ikke til!', W/2, 30);
+      ctx.textAlign = 'left';
+    }
+  });
+})();
+</script>
+</body>
+</html>

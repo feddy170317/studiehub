@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Corioliseffekt — kugle på roterende arm</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Corioliseffekt — kugle på en roterende arm</h1>
+  <p>3D kinematik: roterende referencesystem · Kapitel 20</p>
+  <div class="badge">Kuglen glider udad i en not i armen, mens armen selv roterer</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  I det roterende system er kuglens totale acceleration <strong>a = a_rel + 2Ω×v_rel + Ω×(Ω×r)</strong>.
+  De to sidste led er "fiktive" i det roterende system, men er reelle kræfter, som armen skal levere
+  for at holde kuglen i notet: Coriolis-leddet <strong>2Ω·v_rel</strong> (tværs på armen) og det
+  centripetale led <strong>Ω²·r</strong> (langs armen, ind mod centrum).
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Rotationshastighed Ω <span class="val" id="omVal">2.0 rad/s</span></label>
+      <input type="range" id="omSlider" min="-6" max="6" step="0.1" value="2">
+    </div>
+
+    <div class="slider-row">
+      <label>Relativ glidefart v_rel (udad i noten) <span class="val" id="vrelVal">0.8 m/s</span></label>
+      <input type="range" id="vrelSlider" min="0.1" max="2.5" step="0.05" value="0.8">
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" id="pauseBtn">⏸ Pause</button>
+      <button class="btn secondary" id="resetBtn">Nulstil kugle</button>
+    </div>
+    <div class="paused-flag" id="pausedFlag">PAUSET</div>
+
+    <div class="formula-box">
+      <div><span class="f">a_cor</span> = 2·Ω·v_rel &nbsp;(tværs på armen, gul pil)</div>
+      <div style="margin-top:0.35rem;"><span class="f">a_n</span> = Ω²·r &nbsp;(ind mod centrum, lilla pil)</div>
+    </div>
+
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--accent-gold)"></span> a_cor (Coriolis)</span>
+      <span><span class="swatch" style="background:var(--accent-purple)"></span> a_n (centripetal)</span>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Set fra oven, fast (inertielt) system</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">r (kuglens afstand fra centrum)</div><div class="num" id="outR">—</div></div>
+      <div><div class="lbl">|a_cor|</div><div class="num" id="outAcor" style="color:var(--accent-gold)">—</div></div>
+      <div><div class="lbl">|a_n| (centripetal)</div><div class="num" id="outAn" style="color:var(--accent-purple)">—</div></div>
+      <div><div class="lbl">Nødvendig sidekraft fra noten</div><div class="num" id="outForce">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var cx = W/2, cy = H/2+10;
+  var rMax = 2.0; // meter
+  var armPixelLen = 210;
+  var kuglemasse = 0.3; // kg, kun til kraft-illustration
+
+  var omS=document.getElementById('omSlider'), vrelS=document.getElementById('vrelSlider');
+  var omVal=document.getElementById('omVal'), vrelVal=document.getElementById('vrelVal');
+  var outR=document.getElementById('outR'), outAcor=document.getElementById('outAcor');
+  var outAn=document.getElementById('outAn'), outForce=document.getElementById('outForce');
+  var resetBtn = document.getElementById('resetBtn');
+
+  var theta = 0, r = 0.05, trail=[];
+  resetBtn.addEventListener('click', function(){ r = 0.05; trail=[]; });
+
+  Widget.loop(function(dt){
+    var Om = parseFloat(omS.value);
+    var vrel = parseFloat(vrelS.value);
+    omVal.textContent = Om.toFixed(1)+' rad/s';
+    vrelVal.textContent = vrel.toFixed(2)+' m/s';
+
+    r += vrel*dt;
+    if (r > rMax) { r = 0.05; trail=[]; }
+    theta += Om*dt;
+
+    var acor = 2*Om*vrel;
+    var an = Om*Om*r;
+
+    outR.textContent = r.toFixed(2)+' m';
+    outAcor.textContent = Math.abs(acor).toFixed(2)+' m/s²';
+    outAn.textContent = an.toFixed(2)+' m/s²';
+    outForce.textContent = (kuglemasse*Math.hypot(acor,an)).toFixed(2)+' N';
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    var ux = Math.cos(theta), uy = -Math.sin(theta);
+    var tx = -Math.sin(theta), ty = -Math.cos(theta);
+
+    // arm
+    ctx.strokeStyle = '#e0e0e0';
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.lineTo(cx+ux*armPixelLen, cy+uy*armPixelLen);
+    ctx.stroke();
+
+    ctx.fillStyle = '#5ec8ff';
+    ctx.beginPath(); ctx.arc(cx,cy,6,0,Math.PI*2); ctx.fill();
+
+    var rPix = (r/rMax)*armPixelLen;
+    var Px = cx+ux*rPix, Py = cy+uy*rPix;
+
+    // spor i det faste system (spiral)
+    trail.push([Px,Py]);
+    if (trail.length>250) trail.shift();
+    ctx.strokeStyle = 'rgba(94,200,255,0.35)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    trail.forEach(function(p,i){ if(i===0) ctx.moveTo(p[0],p[1]); else ctx.lineTo(p[0],p[1]); });
+    ctx.stroke();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath(); ctx.arc(Px,Py,7,0,Math.PI*2); ctx.fill();
+
+    var aScale = 12;
+    // a_cor = 2*Ω*v_rel er allerede fortegnsbestemt af Ω (tx,ty er θ̂-retningen for stigende θ)
+    Widget.arrow(ctx, Px,Py, Px+tx*acor*aScale, Py+ty*acor*aScale, '#ffa500', 3);
+    Widget.arrow(ctx, Px,Py, Px-ux*an*aScale, Py-uy*an*aScale, '#d984ff', 3);
+  });
+})();
+</script>
+</body>
+</html>

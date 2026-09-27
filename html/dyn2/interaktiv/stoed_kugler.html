@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Centralt stød mellem to kugler</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Centralt stød — bevægelsesmængde og stødtal e</h1>
+  <p>Impuls og bevægelsesmængde · Kapitel 15</p>
+  <div class="badge">Skru på masser, hastigheder og stødtal e — pause i selve sammenstødet</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  To kugler kolliderer centralt (langs samme linje). Bevægelsesmængden er altid bevaret:
+  <strong>m₁v₁ + m₂v₂ = m₁v₁′ + m₂v₂′</strong>. Stødtallet <strong>e</strong> (0 = fuldstændig plastisk,
+  1 = fuldstændig elastisk) bestemmer, hvor meget kinetisk energi der går tabt i stødet.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Masse m₁ <span class="val" id="m1Val">2.0 kg</span></label>
+      <input type="range" id="m1Slider" min="0.5" max="10" step="0.1" value="2">
+    </div>
+    <div class="slider-row">
+      <label>Hastighed v₁ (mod højre) <span class="val" id="v1Val">3.0 m/s</span></label>
+      <input type="range" id="v1Slider" min="-5" max="5" step="0.1" value="3">
+    </div>
+    <div class="slider-row">
+      <label>Masse m₂ <span class="val" id="m2Val">4.0 kg</span></label>
+      <input type="range" id="m2Slider" min="0.5" max="10" step="0.1" value="4">
+    </div>
+    <div class="slider-row">
+      <label>Hastighed v₂ (mod højre) <span class="val" id="v2Val">-1.0 m/s</span></label>
+      <input type="range" id="v2Slider" min="-5" max="5" step="0.1" value="-1">
+    </div>
+    <div class="slider-row">
+      <label>Stødtal e <span class="val" id="eVal">0.60</span></label>
+      <input type="range" id="eSlider" min="0" max="1" step="0.05" value="0.6">
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" id="pauseBtn">⏸ Pause</button>
+      <button class="btn secondary" id="resetBtn">Affyr igen</button>
+    </div>
+    <div class="paused-flag" id="pausedFlag">PAUSET</div>
+
+    <div class="formula-box">
+      <div><span class="f">v₁′</span> = (m₁v₁+m₂v₂+m₂e(v₂−v₁)) / (m₁+m₂)</div>
+      <div style="margin-top:0.35rem;"><span class="f">v₂′</span> = (m₁v₁+m₂v₂+m₁e(v₁−v₂)) / (m₁+m₂)</div>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Sammenstød (før → efter)</h2>
+    <canvas id="stage" width="740" height="360"></canvas>
+    <div class="readout">
+      <div><div class="lbl">Bevægelsesmængde, samlet (før)</div><div class="num" id="outPbefore">—</div></div>
+      <div><div class="lbl">Bevægelsesmængde, samlet (nu)</div><div class="num" id="outPnow">—</div></div>
+      <div><div class="lbl">Kinetisk energi før</div><div class="num" id="outKEbefore">—</div></div>
+      <div><div class="lbl">Kinetisk energi nu (energitab)</div><div class="num" id="outKEnow">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var midY = H/2;
+  var pxPerM = 55;
+
+  var m1S=document.getElementById('m1Slider'), v1S=document.getElementById('v1Slider');
+  var m2S=document.getElementById('m2Slider'), v2S=document.getElementById('v2Slider');
+  var eS=document.getElementById('eSlider');
+  var m1Val=document.getElementById('m1Val'), v1Val=document.getElementById('v1Val');
+  var m2Val=document.getElementById('m2Val'), v2Val=document.getElementById('v2Val');
+  var eVal=document.getElementById('eVal');
+  var outPbefore=document.getElementById('outPbefore'), outPnow=document.getElementById('outPnow');
+  var outKEbefore=document.getElementById('outKEbefore'), outKEnow=document.getElementById('outKEnow');
+  var resetBtn=document.getElementById('resetBtn');
+
+  var x1, x2, cv1, cv2, collided;
+
+  function reset(){
+    x1 = -4.5; x2 = 4.5;
+    cv1 = parseFloat(v1S.value); cv2 = parseFloat(v2S.value);
+    collided = false;
+  }
+  reset();
+  resetBtn.addEventListener('click', reset);
+  [m1S,v1S,m2S,v2S,eS].forEach(function(el){ el.addEventListener('input', reset); });
+
+  function radiusFor(m){ return 14 + Math.sqrt(m)*6; }
+
+  Widget.loop(function(dt){
+    var m1=parseFloat(m1S.value), v1=parseFloat(v1S.value);
+    var m2=parseFloat(m2S.value), v2=parseFloat(v2S.value);
+    var e=parseFloat(eS.value);
+
+    m1Val.textContent=m1.toFixed(1)+' kg'; v1Val.textContent=v1.toFixed(1)+' m/s';
+    m2Val.textContent=m2.toFixed(1)+' kg'; v2Val.textContent=v2.toFixed(1)+' m/s';
+    eVal.textContent=e.toFixed(2);
+
+    var r1=radiusFor(m1), r2=radiusFor(m2);
+
+    x1 += cv1*dt;
+    x2 += cv2*dt;
+
+    var gap = (x2-x1)*pxPerM - (r1+r2);
+    if (!collided && gap <= 0) {
+      var v1p = (m1*v1 + m2*v2 + m2*e*(v2-v1)) / (m1+m2);
+      var v2p = (m1*v1 + m2*v2 + m1*e*(v1-v2)) / (m1+m2);
+      cv1 = v1p; cv2 = v2p;
+      collided = true;
+    }
+
+    if (x1*pxPerM < -W/2-80 || x2*pxPerM > W/2+80) reset();
+
+    var pBefore = m1*v1 + m2*v2;
+    var pNow = m1*cv1 + m2*cv2;
+    var keBefore = 0.5*m1*v1*v1 + 0.5*m2*v2*v2;
+    var keNow = 0.5*m1*cv1*cv1 + 0.5*m2*cv2*cv2;
+
+    outPbefore.textContent = pBefore.toFixed(2)+' kg·m/s';
+    outPnow.textContent = pNow.toFixed(2)+' kg·m/s';
+    outKEbefore.textContent = keBefore.toFixed(2)+' J';
+    outKEnow.textContent = keNow.toFixed(2)+' J  (tab: '+(keBefore-keNow).toFixed(2)+' J)';
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    ctx.strokeStyle='rgba(255,255,255,0.15)';
+    ctx.beginPath(); ctx.moveTo(0,midY+40); ctx.lineTo(W,midY+40); ctx.stroke();
+
+    var cx1 = W/2 + x1*pxPerM, cx2 = W/2 + x2*pxPerM;
+
+    ctx.fillStyle = collided ? '#5ec8ff' : '#00d984';
+    ctx.beginPath(); ctx.arc(cx1, midY, r1, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = collided ? '#d984ff' : '#ffa500';
+    ctx.beginPath(); ctx.arc(cx2, midY, r2, 0, Math.PI*2); ctx.fill();
+
+    var vScale = 12;
+    Widget.arrow(ctx, cx1, midY, cx1+cv1*vScale, midY, '#e0e0e0', 3);
+    Widget.arrow(ctx, cx2, midY, cx2+cv2*vScale, midY, '#e0e0e0', 3);
+
+    ctx.fillStyle='rgba(224,224,224,0.85)'; ctx.font='12px Segoe UI'; ctx.textAlign='center';
+    ctx.fillText('m₁', cx1, midY-r1-10);
+    ctx.fillText('m₂', cx2, midY-r2-10);
+    ctx.textAlign='left';
+  });
+})();
+</script>
+</body>
+</html>

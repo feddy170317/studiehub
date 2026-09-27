@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Gyroskopisk præcession</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Gyroskopisk præcession</h1>
+  <p>3D kinetik: Eulers ligninger og gyroskopisk bevægelse · Kapitel 21</p>
+  <div class="badge">Se spinaksen præcessere om lodret — pause for at studere retningen i ro</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  Et hurtigt spinnende gyroskop, hængende excentrisk i et ophæng, falder ikke — det <strong>præcesserer</strong>
+  i stedet vandret. Tyngdekraften giver et moment M = m·g·d om ophænget, og i stedet for at give
+  vinkelacceleration (som med et ikke-spinnende legeme), drejer momentet spinaksens retning:
+  <strong>Ω_p = M / (I_s·ω_s)</strong>.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Spinhastighed ω_s <span class="val" id="wsVal">40 rad/s</span></label>
+      <input type="range" id="wsSlider" min="5" max="100" step="1" value="40">
+    </div>
+
+    <div class="slider-row">
+      <label>Moment M (fra tyngdekraft × arm d) <span class="val" id="mVal">1.5 Nm</span></label>
+      <input type="range" id="mSlider" min="0.1" max="5" step="0.1" value="1.5">
+    </div>
+
+    <div class="slider-row">
+      <label>Spin-inerti I_s <span class="val" id="iVal">0.02 kg·m²</span></label>
+      <input type="range" id="iSlider" min="0.005" max="0.08" step="0.001" value="0.02">
+    </div>
+
+    <button class="btn" id="pauseBtn">⏸ Pause</button>
+    <div class="paused-flag" id="pausedFlag">PAUSET — spinaksen står stille</div>
+
+    <div class="formula-box">
+      <div><span class="f">Ω_p</span> = M / (I_s·ω_s) &nbsp;(præcessionshastighed)</div>
+    </div>
+
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--accent-cyan)"></span> spinakse</span>
+      <span><span class="swatch" style="background:var(--accent-gold)"></span> M (tyngdemoment)</span>
+      <span><span class="swatch" style="background:var(--accent-purple)"></span> præcessionsspor</span>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Set fra oven (spinaksens spids)</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">Ω_p (præcessionshastighed)</div><div class="num" id="outOp" style="color:var(--accent-purple)">—</div></div>
+      <div><div class="lbl">Omløbstid for præcessionen</div><div class="num" id="outT">—</div></div>
+      <div><div class="lbl">Spin-vinkelmoment H_s = I_s·ω_s</div><div class="num" id="outH">—</div></div>
+      <div><div class="lbl">Status</div><div class="num" id="outStatus">Præcesserer</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var cx = W/2, cy = H/2+10;
+  var axisPixelLen = 190;
+
+  var wsS=document.getElementById('wsSlider'), mS=document.getElementById('mSlider'), iS=document.getElementById('iSlider');
+  var wsVal=document.getElementById('wsVal'), mVal=document.getElementById('mVal'), iVal=document.getElementById('iVal');
+  var outOp=document.getElementById('outOp'), outT=document.getElementById('outT'), outH=document.getElementById('outH');
+
+  var phi = 0, spinVisual = 0, trail=[];
+
+  Widget.loop(function(dt){
+    var ws = parseFloat(wsS.value);
+    var M = parseFloat(mS.value);
+    var Is = parseFloat(iS.value);
+    wsVal.textContent = ws.toFixed(0)+' rad/s';
+    mVal.textContent = M.toFixed(1)+' Nm';
+    iVal.textContent = Is.toFixed(3)+' kg·m²';
+
+    var Hs = Is*ws;
+    var Op = M/Hs;
+
+    outOp.textContent = Op.toFixed(2)+' rad/s';
+    outT.textContent = Op>0.0001 ? (2*Math.PI/Op).toFixed(1)+' s' : '—';
+    outH.textContent = Hs.toFixed(4)+' kg·m²/s';
+
+    phi += Op*dt;
+    spinVisual += ws*dt*0.05; // dæmpet visuel spinrate, kun til at antyde hurtig spin
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    // ophængspunkt
+    ctx.fillStyle = 'rgba(224,224,224,0.5)';
+    ctx.beginPath(); ctx.arc(cx,cy,6,0,Math.PI*2); ctx.fill();
+    ctx.font='12px Segoe UI'; ctx.fillStyle='rgba(224,224,224,0.6)';
+    ctx.fillText('ophæng', cx-24, cy-14);
+
+    var ax = Math.cos(phi), ay = -Math.sin(phi);
+    var tipX = cx+ax*axisPixelLen, tipY = cy+ay*axisPixelLen;
+
+    // præcessionsspor (cirkel antydet med prikker)
+    ctx.strokeStyle='rgba(217,132,255,0.3)';
+    ctx.lineWidth=1.5;
+    ctx.setLineDash([4,6]);
+    ctx.beginPath(); ctx.arc(cx,cy,axisPixelLen,0,Math.PI*2); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // spinakse
+    ctx.strokeStyle = '#5ec8ff';
+    ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(tipX,tipY); ctx.stroke();
+
+    // spinnende hjul for enden (roterende hashmærker for at antyde høj spin)
+    ctx.save();
+    ctx.translate(tipX,tipY);
+    ctx.rotate(spinVisual);
+    ctx.strokeStyle='#e0e0e0';
+    ctx.lineWidth=3;
+    ctx.beginPath(); ctx.arc(0,0,20,0,Math.PI*2); ctx.stroke();
+    for (var k=0;k<4;k++){
+      var a=k*Math.PI/2;
+      ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(20*Math.cos(a),20*Math.sin(a)); ctx.stroke();
+    }
+    ctx.restore();
+
+    // tyngdemoment-pil ved ophænget (peger nedad/udad, kurvet antydning)
+    Widget.arrow(ctx, cx, cy, cx+ax*40, cy+ay*40+40, '#ffa500', 3);
+    ctx.fillStyle='#ffa500'; ctx.font='12px Segoe UI';
+    ctx.fillText('M (tyngde × arm)', cx+ax*40+8, cy+ay*40+44);
+  });
+})();
+</script>
+</body>
+</html>
