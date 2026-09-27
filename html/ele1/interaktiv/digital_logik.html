@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Digitale logiske porte og en D-latch</title>
+<link rel="stylesheet" href="assets/widget.css">
+<style>
+  .switch { display:flex; align-items:center; justify-content:space-between; margin-bottom:0.8rem; }
+  .switch button { width:70px; padding:0.5rem; border:none; border-radius:6px; font-weight:700; cursor:pointer; font-family:'Consolas',monospace; }
+  .switch button.on { background:var(--accent-green); color:#0a1a2b; }
+  .switch button.off { background:var(--border-subtle); color:var(--text-light); }
+  .gate-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-top:0.6rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Digitale logiske porte + en D-latch</h1>
+  <p>Digitale logiske kredsløb · Kapitel 11</p>
+  <div class="badge">Toggle inputs, vælg gate, og se sandhedstabellen live</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  Kombinatorisk logik (AND/OR/XOR/…) har output der kun afhænger af inputs <em>lige nu</em>.
+  Sekventiel logik — som en D-latch — har derimod <strong>hukommelse</strong>: output Q holder sin
+  værdi, selv når D ændrer sig, indtil Enable går høj og "lukker" den nye værdi ind.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kombinatorisk gate</h2>
+
+    <div class="switch"><span>Input A</span><button id="aBtn" class="off">0</button></div>
+    <div class="switch"><span>Input B</span><button id="bBtn" class="off">0</button></div>
+
+    <div class="gate-grid">
+      <button class="btn secondary active" id="gAND">AND</button>
+      <button class="btn secondary" id="gOR">OR</button>
+      <button class="btn secondary" id="gXOR">XOR</button>
+      <button class="btn secondary" id="gNAND">NAND</button>
+      <button class="btn secondary" id="gNOR">NOR</button>
+      <button class="btn secondary" id="gXNOR">XNOR</button>
+    </div>
+
+    <h2 style="margin-top:1.6rem;">D-latch (sekventiel)</h2>
+    <div class="switch"><span>D (data)</span><button id="dBtn" class="off">0</button></div>
+    <div class="switch"><span>Enable</span><button id="enBtn" class="off">0</button></div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Output og sandhedstabel</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">Gate-output Y</div><div class="num" id="outY">—</div></div>
+      <div><div class="lbl">D-latch Q (hukommelse)</div><div class="num" id="outQ">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+
+  var aBtn=document.getElementById('aBtn'), bBtn=document.getElementById('bBtn');
+  var dBtn=document.getElementById('dBtn'), enBtn=document.getElementById('enBtn');
+  var outY=document.getElementById('outY'), outQ=document.getElementById('outQ');
+  var gateBtns = { AND:document.getElementById('gAND'), OR:document.getElementById('gOR'), XOR:document.getElementById('gXOR'),
+                   NAND:document.getElementById('gNAND'), NOR:document.getElementById('gNOR'), XNOR:document.getElementById('gXNOR') };
+
+  var A=0,B=0,D=0,EN=0,Q=0, gate='AND';
+
+  function toggle(btn, cb){
+    btn.addEventListener('click', function(){
+      var v = btn.classList.contains('on') ? 0 : 1;
+      btn.classList.toggle('on', v===1);
+      btn.classList.toggle('off', v===0);
+      btn.textContent = v;
+      cb(v);
+      render();
+    });
+  }
+  toggle(aBtn, function(v){A=v;});
+  toggle(bBtn, function(v){B=v;});
+  toggle(dBtn, function(v){D=v;});
+  toggle(enBtn, function(v){EN=v; if (EN===1) Q=D;}); // level-sensitiv latch: Q følger D når Enable=1
+
+  Object.keys(gateBtns).forEach(function(name){
+    gateBtns[name].addEventListener('click', function(){
+      gate = name;
+      Object.keys(gateBtns).forEach(function(n){ gateBtns[n].classList.toggle('active', n===name); });
+      render();
+    });
+  });
+
+  function gateOutput(a,b,g){
+    switch(g){
+      case 'AND': return a&&b ? 1:0;
+      case 'OR': return a||b ? 1:0;
+      case 'XOR': return (a!==b) ? 1:0;
+      case 'NAND': return (a&&b) ? 0:1;
+      case 'NOR': return (a||b) ? 0:1;
+      case 'XNOR': return (a===b) ? 1:0;
+    }
+  }
+
+  function led(x,y,on,label){
+    ctx.beginPath(); ctx.arc(x,y,14,0,Math.PI*2);
+    ctx.fillStyle = on ? '#00d984' : '#2a3a4b';
+    ctx.fill();
+    ctx.strokeStyle='rgba(224,224,224,0.4)'; ctx.lineWidth=2; ctx.stroke();
+    ctx.fillStyle='rgba(224,224,224,0.8)'; ctx.font='13px Segoe UI'; ctx.textAlign='center';
+    ctx.fillText(label, x, y+34);
+    ctx.textAlign='left';
+  }
+
+  function render(){
+    var Y = gateOutput(A,B,gate);
+    if (EN===1) Q=D; // hvis Enable holdes høj, følger Q løbende D ved re-render
+    outY.textContent = Y;
+    outQ.textContent = Q + (EN===1 ? ' (følger D)' : ' (holdt)');
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    // gate-visning
+    led(90,80,A,'A'); led(90,150,B,'B');
+    ctx.strokeStyle='#5ec8ff'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(104,80); ctx.lineTo(200,110); ctx.moveTo(104,150); ctx.lineTo(200,110); ctx.stroke();
+    ctx.strokeStyle='#e0e0e0'; ctx.lineWidth=3;
+    ctx.strokeRect(200,80,90,60);
+    ctx.fillStyle='rgba(224,224,224,0.9)'; ctx.font='bold 14px Segoe UI'; ctx.textAlign='center';
+    ctx.fillText(gate, 245, 115);
+    ctx.textAlign='left';
+    ctx.strokeStyle='#5ec8ff'; ctx.beginPath(); ctx.moveTo(290,110); ctx.lineTo(340,110); ctx.stroke();
+    led(354,110,Y,'Y (output)');
+
+    // sandhedstabel
+    var tx=470, ty=50;
+    ctx.fillStyle='rgba(224,224,224,0.7)'; ctx.font='13px Segoe UI';
+    ctx.fillText('Sandhedstabel for '+gate, tx, ty);
+    ctx.font='12px Consolas';
+    ctx.fillText('A  B  |  Y', tx, ty+26);
+    [[0,0],[0,1],[1,0],[1,1]].forEach(function(row,i){
+      var y = gateOutput(row[0],row[1],gate);
+      var rowY = ty+50+i*26;
+      var isCurrent = row[0]===A && row[1]===B;
+      if (isCurrent){ ctx.fillStyle='rgba(94,200,255,0.15)'; ctx.fillRect(tx-6,rowY-16,140,22); }
+      ctx.fillStyle = isCurrent ? '#5ec8ff' : 'rgba(224,224,224,0.7)';
+      ctx.fillText(row[0]+'  '+row[1]+'  |  '+y, tx, rowY);
+    });
+
+    // D-latch visning
+    var ly=280;
+    ctx.fillStyle='rgba(224,224,224,0.7)'; ctx.font='13px Segoe UI';
+    ctx.fillText('D-latch', 90, ly-30);
+    led(90,ly,D,'D'); led(90,ly+70,EN,'Enable');
+    ctx.strokeStyle='#5ec8ff'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(104,ly); ctx.lineTo(200,ly+35); ctx.moveTo(104,ly+70); ctx.lineTo(200,ly+35); ctx.stroke();
+    ctx.strokeStyle='#e0e0e0'; ctx.lineWidth=3; ctx.strokeRect(200,ly,90,70);
+    ctx.fillStyle='rgba(224,224,224,0.9)'; ctx.font='bold 13px Segoe UI'; ctx.textAlign='center';
+    ctx.fillText('D-LATCH', 245, ly+40);
+    ctx.textAlign='left';
+    ctx.strokeStyle='#5ec8ff'; ctx.beginPath(); ctx.moveTo(290,ly+35); ctx.lineTo(340,ly+35); ctx.stroke();
+    led(354,ly+35,Q,'Q (holdt værdi)');
+
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.font='11px Segoe UI';
+    ctx.fillText(EN===1 ? 'Enable HØJ: Q følger D lige nu' : 'Enable LAV: Q er "låst" til sidste værdi', tx, ly+40);
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: RLC-transientrespons efter kontaktskift</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>RLC-transient efter kontaktskift</h1>
+  <p>Transientanalyse · Kapitel 4: Transientanalyse</p>
+  <div class="badge">Skift kontakten — se v_C(t) op- eller aflade, evt. med ringning</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  Et RLC-seriekredsløb efter et kontaktskift følger <strong>LC·v̈_C + RC·v̇_C + v_C = V</strong> — matematisk
+  identisk med en fjeder-masse-dæmper (L↔m, R↔c, 1/C↔k). Dæmpningsforholdet
+  <strong>ζ = (R/2)·√(C/L)</strong> afgør om spændingen ringer (underdæmpet, ζ&lt;1) eller
+  glider stille på plads (overdæmpet, ζ&gt;1).
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Kildespænding V <span class="val" id="vVal">10.0 V</span></label>
+      <input type="range" id="vSlider" min="1" max="24" step="0.5" value="10">
+    </div>
+    <div class="slider-row">
+      <label>Modstand R <span class="val" id="rVal">20 Ω</span></label>
+      <input type="range" id="rSlider" min="0" max="200" step="1" value="20">
+    </div>
+    <div class="slider-row">
+      <label>Induktans L <span class="val" id="lVal">50 mH</span></label>
+      <input type="range" id="lSlider" min="1" max="300" step="1" value="50">
+    </div>
+    <div class="slider-row">
+      <label>Kapacitans C <span class="val" id="cVal">10 µF</span></label>
+      <input type="range" id="cSlider" min="1" max="200" step="1" value="10">
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" id="switchBtn">🔌 Skift kontakt (åbn nu)</button>
+    </div>
+    <div class="btn-row">
+      <button class="btn secondary" id="pauseBtn">⏸ Pause</button>
+      <button class="btn secondary" id="resetBtn">Nulstil</button>
+    </div>
+    <div class="paused-flag" id="pausedFlag">PAUSET</div>
+
+    <div class="formula-box">
+      <div><span class="f">ω_n</span> = 1/√(LC) &nbsp; <span class="f">ζ</span> = (R/2)·√(C/L)</div>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Kondensator + v_C(t)</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">ω_n</div><div class="num" id="outWn">—</div></div>
+      <div><div class="lbl">ζ</div><div class="num" id="outZeta">—</div></div>
+      <div><div class="lbl">Dæmpningstype</div><div class="num" id="outType">—</div></div>
+      <div><div class="lbl">v_C(t)</div><div class="num" id="outVc">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+
+  var vS=document.getElementById('vSlider'), rS=document.getElementById('rSlider'), lS=document.getElementById('lSlider'), cS=document.getElementById('cSlider');
+  var vVal=document.getElementById('vVal'), rVal=document.getElementById('rVal'), lVal=document.getElementById('lVal'), cVal=document.getElementById('cVal');
+  var outWn=document.getElementById('outWn'), outZeta=document.getElementById('outZeta'), outType=document.getElementById('outType'), outVc=document.getElementById('outVc');
+  var switchBtn=document.getElementById('switchBtn'), resetBtn=document.getElementById('resetBtn');
+
+  var vc = 0, ic = 0; // vc = spænding over C, ic ~ hastighed (dvc/dt)
+  var closed = true;
+  var history = [];
+
+  function reset(){ vc=0; ic=0; history=[]; }
+  resetBtn.addEventListener('click', reset);
+  switchBtn.addEventListener('click', function(){
+    closed = !closed;
+    switchBtn.textContent = closed ? '🔌 Skift kontakt (åbn nu)' : '🔌 Skift kontakt (luk nu)';
+  });
+
+  Widget.loop(function(dt){
+    var V = parseFloat(vS.value), R = parseFloat(rS.value);
+    var L = parseFloat(lS.value)/1000, C = parseFloat(cS.value)/1e6;
+    vVal.textContent = V.toFixed(1)+' V';
+    rVal.textContent = R.toFixed(0)+' Ω';
+    lVal.textContent = lS.value+' mH';
+    cVal.textContent = cS.value+' µF';
+
+    var wn = 1/Math.sqrt(L*C);
+    var zeta = (R/2)*Math.sqrt(C/L);
+    outWn.textContent = wn.toFixed(1)+' rad/s';
+    outZeta.textContent = zeta.toFixed(3);
+    outType.textContent = zeta<0.999 ? 'Underdæmpet (ringer)' : (zeta<1.001 ? 'Kritisk dæmpet' : 'Overdæmpet');
+
+    var Vsrc = closed ? V : 0;
+    var steps = 8;
+    var h = dt/steps;
+    for (var s=0;s<steps;s++){
+      // LC*vc'' + RC*vc' + vc = Vsrc  =>  vc'' = (Vsrc - vc - R*C*ic) / (L*C)
+      var a = (Vsrc - vc - R*C*ic) / (L*C);
+      ic += a*h;
+      vc += ic*h;
+    }
+    outVc.textContent = vc.toFixed(2)+' V';
+
+    if (dt>0) { history.push(vc); if (history.length>500) history.shift(); }
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    // kondensator-visning (venstre): to plader, afstand/farve antyder ladning
+    var colX=150, plateY0=140, plateY1=320;
+    ctx.strokeStyle='#e0e0e0'; ctx.lineWidth=6;
+    ctx.beginPath(); ctx.moveTo(colX-30,plateY0); ctx.lineTo(colX+30,plateY0); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(colX-30,plateY1); ctx.lineTo(colX+30,plateY1); ctx.stroke();
+    var frac = Math.max(0,Math.min(vc/Math.max(V,0.01),1.4));
+    ctx.fillStyle = 'rgba(94,200,255,'+(0.15+0.5*Math.min(frac,1))+')';
+    ctx.fillRect(colX-28, plateY0+6, 56, (plateY1-plateY0-12));
+    ctx.fillStyle='rgba(224,224,224,0.6)'; ctx.font='12px Segoe UI'; ctx.textAlign='center';
+    ctx.fillText('v_C', colX, plateY0-14);
+    ctx.fillText(closed ? 'kontakt: LUKKET' : 'kontakt: ÅBEN', colX, plateY1+26);
+    ctx.textAlign='left';
+
+    // v_C(t) graf (højre)
+    var gx0=320, gx1=W-20, gy0=60, gy1=420;
+    ctx.strokeStyle='rgba(224,224,224,0.4)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(gx0,gy1); ctx.lineTo(gx1,gy1); ctx.moveTo(gx0,gy0); ctx.lineTo(gx0,gy1); ctx.stroke();
+    ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.setLineDash([4,4]);
+    var vLineY = gy1 - (V/Math.max(V*1.5,1))*(gy1-gy0);
+    ctx.beginPath(); ctx.moveTo(gx0,vLineY); ctx.lineTo(gx1,vLineY); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.font='11px Segoe UI';
+    ctx.fillText('V (kilde)', gx0+4, vLineY-6);
+
+    var vScale = (gy1-gy0)/Math.max(V*1.5,1);
+    ctx.strokeStyle='#5ec8ff'; ctx.lineWidth=2;
+    ctx.beginPath();
+    history.forEach(function(hv,i){
+      var px = gx0 + (i/500)*(gx1-gx0);
+      var py = gy1 - hv*vScale;
+      if (i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+    });
+    ctx.stroke();
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.fillText('v_C(t)', gx0, gy0-10);
+  });
+})();
+</script>
+</body>
+</html>

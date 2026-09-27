@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: DC-motor moment-hastighedskarakteristik</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>DC-motor — moment-hastighedskarakteristik</h1>
+  <p>Introduktion til elektriske maskiner · Kapitel 13</p>
+  <div class="badge">Skru på belastningsmoment og spænding — se motoren finde sit driftspunkt</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  En DC-motor bremses af sin egen modspænding <strong>E = k·ω</strong>, så strømmen (og dermed momentet
+  T = k·I) falder, når den spinner hurtigere: <strong>V = I·R_a + k·ω</strong>. Driftspunktet er der,
+  hvor motorens moment netop matcher belastningsmomentet T_last — grafisk skæringen mellem den faldende
+  T-ω-linje og den vandrette T_last-linje. Bemærk: dette er DC-motorens simple karakteristik —
+  AC-maskiner (asynkron/synkron) har en anden, mere kompleks kurve.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Spænding V <span class="val" id="vVal">24 V</span></label>
+      <input type="range" id="vSlider" min="5" max="48" step="1" value="24">
+    </div>
+    <div class="slider-row">
+      <label>Ankermodstand R_a <span class="val" id="raVal">2.0 Ω</span></label>
+      <input type="range" id="raSlider" min="0.2" max="10" step="0.1" value="2">
+    </div>
+    <div class="slider-row">
+      <label>Motorkonstant k <span class="val" id="kVal">0.20</span></label>
+      <input type="range" id="kSlider" min="0.05" max="1" step="0.01" value="0.2">
+    </div>
+    <div class="slider-row">
+      <label>Belastningsmoment T_last <span class="val" id="tlVal">1.0 Nm</span></label>
+      <input type="range" id="tlSlider" min="0" max="10" step="0.1" value="1">
+    </div>
+
+    <button class="btn" id="pauseBtn">⏸ Pause</button>
+    <div class="paused-flag" id="pausedFlag">PAUSET — motoren står stille</div>
+
+    <div class="formula-box">
+      <div><span class="f">T</span> = (k·V)/R_a − (k²/R_a)·ω</div>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>T-ω-karakteristik + motor</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">ω (driftspunkt)</div><div class="num" id="outOmega">—</div></div>
+      <div><div class="lbl">RPM</div><div class="num" id="outRpm">—</div></div>
+      <div><div class="lbl">Strøm I</div><div class="num" id="outI">—</div></div>
+      <div><div class="lbl">Status</div><div class="num" id="outStatus">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+
+  var vS=document.getElementById('vSlider'), raS=document.getElementById('raSlider'), kS=document.getElementById('kSlider'), tlS=document.getElementById('tlSlider');
+  var vVal=document.getElementById('vVal'), raVal=document.getElementById('raVal'), kVal=document.getElementById('kVal'), tlVal=document.getElementById('tlVal');
+  var outOmega=document.getElementById('outOmega'), outRpm=document.getElementById('outRpm'), outI=document.getElementById('outI'), outStatus=document.getElementById('outStatus');
+
+  var shaftAngle = 0;
+
+  Widget.loop(function(dt){
+    var V=parseFloat(vS.value), Ra=parseFloat(raS.value), k=parseFloat(kS.value), Tload=parseFloat(tlS.value);
+    vVal.textContent=V.toFixed(0)+' V';
+    raVal.textContent=Ra.toFixed(1)+' Ω';
+    kVal.textContent=k.toFixed(2);
+    tlVal.textContent=Tload.toFixed(1)+' Nm';
+
+    var Tstall = k*V/Ra;
+    var omegaNoLoad = V/k;
+    var stalled = Tload >= Tstall;
+    var omegaOp = stalled ? 0 : (V - Tload*Ra/k)/k;
+    var I = stalled ? V/Ra : Tload/k;
+
+    outOmega.textContent = omegaOp.toFixed(2)+' rad/s';
+    outRpm.textContent = (omegaOp*60/(2*Math.PI)).toFixed(0)+' RPM';
+    outI.textContent = I.toFixed(2)+' A';
+    outStatus.textContent = stalled ? 'STALLET — T_last > T_maks!' : 'Kører stabilt';
+    outStatus.style.color = stalled ? 'var(--accent-red)' : 'var(--accent-green)';
+
+    shaftAngle += omegaOp*dt*0.3;
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    // T-omega graf
+    var gx0=70, gx1=420, gy0=50, gy1=380;
+    ctx.strokeStyle='rgba(224,224,224,0.3)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(gx0,gy0); ctx.lineTo(gx0,gy1); ctx.lineTo(gx1,gy1); ctx.stroke();
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.font='11px Segoe UI';
+    ctx.fillText('T (Nm)', gx0, gy0-10);
+    ctx.fillText('ω (rad/s)', gx1-50, gy1+18);
+
+    function X(om){ return gx0 + (om/Math.max(omegaNoLoad,1))*(gx1-gx0); }
+    function Y(t){ return gy1 - (t/Math.max(Tstall,1))*(gy1-gy0); }
+
+    ctx.strokeStyle='#5ec8ff'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(X(0),Y(Tstall)); ctx.lineTo(X(omegaNoLoad),Y(0)); ctx.stroke();
+
+    ctx.strokeStyle='rgba(217,132,255,0.6)'; ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(gx0,Y(Tload)); ctx.lineTo(gx1,Y(Tload)); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(217,132,255,0.8)'; ctx.fillText('T_last', gx0+4, Y(Tload)-6);
+
+    ctx.fillStyle = stalled ? '#ff5e5e' : '#00d984';
+    ctx.beginPath(); ctx.arc(X(omegaOp), Y(Math.min(Tload,Tstall)), 7, 0, Math.PI*2); ctx.fill();
+
+    // motor-visning (roterende skive)
+    var mx=580, my=210, mr=90;
+    ctx.strokeStyle='rgba(224,224,224,0.4)'; ctx.lineWidth=4;
+    ctx.beginPath(); ctx.arc(mx,my,mr,0,Math.PI*2); ctx.stroke();
+    ctx.save();
+    ctx.translate(mx,my);
+    ctx.rotate(shaftAngle);
+    ctx.strokeStyle = stalled ? '#ff5e5e' : '#5ec8ff'; ctx.lineWidth=4;
+    ctx.beginPath(); ctx.moveTo(-mr+10,0); ctx.lineTo(mr-10,0); ctx.moveTo(0,-mr+10); ctx.lineTo(0,mr-10); ctx.stroke();
+    ctx.restore();
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.font='12px Segoe UI'; ctx.textAlign='center';
+    ctx.fillText(stalled ? 'STALLET' : (omegaOp).toFixed(1)+' rad/s', mx, my+mr+24);
+    ctx.textAlign='left';
+  });
+})();
+</script>
+</body>
+</html>

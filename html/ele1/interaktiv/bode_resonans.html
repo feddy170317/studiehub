@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Bode-diagram og resonans (RLC-bandpas)</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Bode-diagram og resonans</h1>
+  <p>Frekvensrespons og systemkoncepter · Kapitel 5</p>
+  <div class="badge">Skru på R, L, C og flyt probe-frekvensen langs kurven</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  I et RLC-seriekredsløb med output over R er der resonans ved <strong>f₀ = 1/(2π√(LC))</strong>, hvor
+  spolens og kondensatorens reaktanser ophæver hinanden. Kvalitetsfaktoren <strong>Q = ω₀L/R</strong>
+  bestemmer, hvor smal og skarp resonanstoppen er.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Modstand R <span class="val" id="rVal">20 Ω</span></label>
+      <input type="range" id="rSlider" min="1" max="200" step="1" value="20">
+    </div>
+    <div class="slider-row">
+      <label>Induktans L <span class="val" id="lVal">10 mH</span></label>
+      <input type="range" id="lSlider" min="1" max="200" step="1" value="10">
+    </div>
+    <div class="slider-row">
+      <label>Kapacitans C <span class="val" id="cVal">1.0 µF</span></label>
+      <input type="range" id="cSlider" min="0.1" max="10" step="0.1" value="1">
+    </div>
+    <div class="slider-row">
+      <label>Probe-frekvens f <span class="val" id="fpVal">1000 Hz</span></label>
+      <input type="range" id="fpSlider" min="0" max="1000" step="1" value="500">
+    </div>
+
+    <div class="formula-box">
+      <div><span class="f">f₀</span> = 1/(2π√(LC)) &nbsp; <span class="f">Q</span> = ω₀L/R</div>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Bode-diagram (log-frekvens)</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">f₀ (resonansfrekvens)</div><div class="num" id="outF0">—</div></div>
+      <div><div class="lbl">Q (kvalitetsfaktor)</div><div class="num" id="outQ">—</div></div>
+      <div><div class="lbl">Gain ved probe</div><div class="num" id="outGain">—</div></div>
+      <div><div class="lbl">Fase ved probe</div><div class="num" id="outPhase">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+
+  var rS=document.getElementById('rSlider'), lS=document.getElementById('lSlider'), cS=document.getElementById('cSlider'), fpS=document.getElementById('fpSlider');
+  var rVal=document.getElementById('rVal'), lVal=document.getElementById('lVal'), cVal=document.getElementById('cVal'), fpVal=document.getElementById('fpVal');
+  var outF0=document.getElementById('outF0'), outQ=document.getElementById('outQ'), outGain=document.getElementById('outGain'), outPhase=document.getElementById('outPhase');
+
+  function magDb(f, R, L, C){
+    var w = 2*Math.PI*f;
+    var X = w*L - 1/(w*C);
+    var Hmag = R/Math.hypot(R,X);
+    return 20*Math.log10(Math.max(Hmag,1e-6));
+  }
+  function phaseDeg(f, R, L, C){
+    var w = 2*Math.PI*f;
+    var X = w*L - 1/(w*C);
+    return -Math.atan2(X,R)*180/Math.PI;
+  }
+
+  Widget.loop(function(){
+    var R = parseFloat(rS.value), L = parseFloat(lS.value)/1000, C = parseFloat(cS.value)/1e6;
+    rVal.textContent = R.toFixed(0)+' Ω';
+    lVal.textContent = lS.value+' mH';
+    cVal.textContent = cS.value+' µF';
+
+    var f0 = 1/(2*Math.PI*Math.sqrt(L*C));
+    var w0 = 2*Math.PI*f0;
+    var Q = w0*L/R;
+
+    var fMin = Math.max(f0/50,1), fMax = f0*50;
+    fpS.min = 0; fpS.max = 1000;
+    var fp = fMin*Math.pow(fMax/fMin, parseFloat(fpS.value)/1000);
+    fpVal.textContent = fp.toFixed(0)+' Hz';
+
+    outF0.textContent = f0.toFixed(1)+' Hz';
+    outQ.textContent = Q.toFixed(2);
+    outGain.textContent = magDb(fp,R,L,C).toFixed(1)+' dB';
+    outPhase.textContent = phaseDeg(fp,R,L,C).toFixed(1)+'°';
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    var gx0=70, gx1=W-30, gyM0=40, gyM1=240, gyP0=270, gyP1=430;
+
+    function xOf(f){ return gx0 + (Math.log10(f)-Math.log10(fMin))/(Math.log10(fMax)-Math.log10(fMin))*(gx1-gx0); }
+
+    // magnitude-akser
+    ctx.strokeStyle='rgba(224,224,224,0.3)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(gx0,gyM0); ctx.lineTo(gx0,gyM1); ctx.lineTo(gx1,gyM1); ctx.stroke();
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.font='11px Segoe UI';
+    ctx.fillText('Magnitude |H| (dB)', gx0, gyM0-8);
+
+    // gitterlinjer for dekader
+    ctx.font='10px Segoe UI';
+    for (var d=Math.ceil(Math.log10(fMin)); d<=Math.floor(Math.log10(fMax)); d++){
+      var fx = xOf(Math.pow(10,d));
+      ctx.strokeStyle='rgba(255,255,255,0.06)';
+      ctx.beginPath(); ctx.moveTo(fx,gyM0); ctx.lineTo(fx,gyP1); ctx.stroke();
+      ctx.fillStyle='rgba(224,224,224,0.4)';
+      ctx.fillText((Math.pow(10,d))+' Hz', fx-14, gyP1+16);
+    }
+
+    var dbMax=5, dbMin=-40;
+    function yMag(db){ return gyM1 - (db-dbMin)/(dbMax-dbMin)*(gyM1-gyM0); }
+
+    ctx.strokeStyle='#00d984'; ctx.lineWidth=2;
+    ctx.beginPath();
+    var N=200;
+    for (var n=0;n<=N;n++){
+      var f = fMin*Math.pow(fMax/fMin, n/N);
+      var db = magDb(f,R,L,C);
+      var px = xOf(f), py = yMag(Math.max(db,dbMin));
+      if (n===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+
+    // fase-akser
+    ctx.strokeStyle='rgba(224,224,224,0.3)';
+    ctx.beginPath(); ctx.moveTo(gx0,gyP0); ctx.lineTo(gx0,gyP1); ctx.lineTo(gx1,gyP1); ctx.stroke();
+    ctx.fillStyle='rgba(224,224,224,0.5)';
+    ctx.fillText('Fase (grader)', gx0, gyP0-8);
+
+    function yPhase(deg){ return gyP0 + (deg+90)/180*(gyP1-gyP0); }
+    ctx.strokeStyle='#d984ff'; ctx.lineWidth=2;
+    ctx.beginPath();
+    for (var n2=0;n2<=N;n2++){
+      var f2 = fMin*Math.pow(fMax/fMin, n2/N);
+      var ph = phaseDeg(f2,R,L,C);
+      var px2 = xOf(f2), py2 = yPhase(ph);
+      if (n2===0) ctx.moveTo(px2,py2); else ctx.lineTo(px2,py2);
+    }
+    ctx.stroke();
+
+    // probe-linje
+    var px3 = xOf(fp);
+    ctx.strokeStyle='#ffa500'; ctx.setLineDash([4,4]); ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(px3,gyM0); ctx.lineTo(px3,gyP1); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='#ffa500';
+    ctx.beginPath(); ctx.arc(px3, yMag(Math.max(magDb(fp,R,L,C),dbMin)), 5,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(px3, yPhase(phaseDeg(fp,R,L,C)), 5,0,Math.PI*2); ctx.fill();
+
+    // f0-markør
+    var pxF0 = xOf(f0);
+    ctx.strokeStyle='rgba(0,217,132,0.4)'; ctx.setLineDash([2,3]);
+    ctx.beginPath(); ctx.moveTo(pxF0,gyM0); ctx.lineTo(pxF0,gyM1); ctx.stroke();
+    ctx.setLineDash([]);
+  });
+})();
+</script>
+</body>
+</html>

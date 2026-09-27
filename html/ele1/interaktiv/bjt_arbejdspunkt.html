@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: BJT-karakteristik og arbejdspunkt (load-line)</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>BJT — karakteristikkurver og arbejdspunkt</h1>
+  <p>Bipolare transistorer (BJT) · Kapitel 9</p>
+  <div class="badge">Skru på I_B og se arbejdspunktet vandre mellem afskæring, aktivt og mætning</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  Load-linjen <strong>I_C = (V_CC − V_CE)/R_C</strong> skærer transistorens I_C-V_CE-kurve for det
+  valgte I_B netop i <strong>arbejdspunktet</strong>. I det aktive område er I_C ≈ β·I_B (næsten
+  konstant, uafhængig af V_CE) — men ved lav V_CE går transistoren i mætning, og I_C kan ikke følge
+  β·I_B længere.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Forsyning V_CC <span class="val" id="vccVal">12 V</span></label>
+      <input type="range" id="vccSlider" min="5" max="24" step="0.5" value="12">
+    </div>
+    <div class="slider-row">
+      <label>R_C (kollektormodstand) <span class="val" id="rcVal">1.0 kΩ</span></label>
+      <input type="range" id="rcSlider" min="0.2" max="5" step="0.1" value="1">
+    </div>
+    <div class="slider-row">
+      <label>Strømforstærkning β <span class="val" id="betaVal">100</span></label>
+      <input type="range" id="betaSlider" min="50" max="300" step="10" value="100">
+    </div>
+    <div class="slider-row">
+      <label>Basestrøm I_B <span class="val" id="ibVal">40 µA</span></label>
+      <input type="range" id="ibSlider" min="0" max="120" step="1" value="40">
+    </div>
+
+    <div class="formula-box">
+      <div>Load-linje: <span class="f">I_C</span> = (V_CC − V_CE)/R_C</div>
+      <div style="margin-top:0.35rem;">Aktivt område: <span class="f">I_C</span> ≈ β·I_B</div>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>I_C — V_CE karakteristik</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">I_C (arbejdspunkt)</div><div class="num" id="outIc">—</div></div>
+      <div><div class="lbl">V_CE (arbejdspunkt)</div><div class="num" id="outVce">—</div></div>
+      <div><div class="lbl">Område</div><div class="num" id="outRegion">—</div></div>
+      <div><div class="lbl">β·I_B (ønsket I_C)</div><div class="num" id="outBib">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+
+  var vccS=document.getElementById('vccSlider'), rcS=document.getElementById('rcSlider'), betaS=document.getElementById('betaSlider'), ibS=document.getElementById('ibSlider');
+  var vccVal=document.getElementById('vccVal'), rcVal=document.getElementById('rcVal'), betaVal=document.getElementById('betaVal'), ibVal=document.getElementById('ibVal');
+  var outIc=document.getElementById('outIc'), outVce=document.getElementById('outVce'), outRegion=document.getElementById('outRegion'), outBib=document.getElementById('outBib');
+
+  var VceSat = 0.2;
+
+  function icCurve(vce, ibMicro, beta){
+    var icMax = beta*ibMicro/1000; // mA
+    if (icMax<=0) return 0;
+    return icMax*(1-Math.exp(-vce/0.15));
+  }
+
+  Widget.loop(function(){
+    var Vcc=parseFloat(vccS.value), Rc=parseFloat(rcS.value), beta=parseFloat(betaS.value), Ib=parseFloat(ibS.value);
+    vccVal.textContent=Vcc.toFixed(1)+' V';
+    rcVal.textContent=Rc.toFixed(1)+' kΩ';
+    betaVal.textContent=beta.toFixed(0);
+    ibVal.textContent=Ib.toFixed(0)+' µA';
+
+    var icDesired = beta*Ib/1000; // mA (aktivt-områdets flade niveau)
+
+    // find arbejdspunkt: skæring mellem load-linje I_C=(Vcc-Vce)/Rc og icCurve(vce)
+    var bestVce=0, bestDiff=1e9;
+    for (var v=0; v<=Vcc; v+=0.02){
+      var iLoad = (Vcc-v)/Rc;
+      var iCurve = icCurve(v, Ib, beta);
+      var diff = Math.abs(iLoad-iCurve);
+      if (diff<bestDiff){ bestDiff=diff; bestVce=v; }
+    }
+    var Ic = (Vcc-bestVce)/Rc;
+
+    outIc.textContent = Ic.toFixed(2)+' mA';
+    outVce.textContent = bestVce.toFixed(2)+' V';
+    outBib.textContent = icDesired.toFixed(2)+' mA';
+    var region = Ib<=0.5 ? 'Afskæring (cutoff)' : (bestVce<VceSat+0.15 ? 'Mætning (saturation)' : 'Aktivt område');
+    outRegion.textContent = region;
+    outRegion.style.color = region.indexOf('Aktiv')>=0 ? 'var(--accent-green)' : (region.indexOf('Afsk')>=0 ? 'var(--text-light)' : 'var(--accent-gold)');
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    var gx0=70, gx1=W-40, gy0=50, gy1=420;
+    var icMaxAxis = Math.max(Vcc/Math.min(Rc,0.3)*0.6, beta*120/1000*1.2, 1);
+    function X(vce){ return gx0 + (vce/Vcc)*(gx1-gx0); }
+    function Y(ic){ return gy1 - (ic/icMaxAxis)*(gy1-gy0); }
+
+    ctx.strokeStyle='rgba(224,224,224,0.3)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(gx0,gy0); ctx.lineTo(gx0,gy1); ctx.lineTo(gx1,gy1); ctx.stroke();
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.font='11px Segoe UI';
+    ctx.fillText('I_C (mA)', gx0, gy0-10);
+    ctx.fillText('V_CE (V)', gx1-40, gy1+18);
+
+    // familie af kurver for forskellige I_B
+    [20,40,60,80,100,120].forEach(function(ibFam){
+      ctx.strokeStyle = ibFam===Math.round(Ib) ? '#ffa500' : 'rgba(94,200,255,0.25)';
+      ctx.lineWidth = ibFam===Math.round(Ib) ? 3 : 1.5;
+      ctx.beginPath();
+      for (var vv=0; vv<=Vcc; vv+=Vcc/60){
+        var icv = icCurve(vv, ibFam, beta);
+        var px=X(vv), py=Y(icv);
+        if (vv===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+      }
+      ctx.stroke();
+    });
+
+    // load-linje
+    ctx.strokeStyle='#d984ff'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(X(0), Y(Vcc/Rc)); ctx.lineTo(X(Vcc), Y(0)); ctx.stroke();
+    ctx.fillStyle='#d984ff'; ctx.fillText('Load-linje', X(Vcc)-90, Y(0)-10);
+
+    // arbejdspunkt
+    ctx.fillStyle = '#00d984';
+    ctx.beginPath(); ctx.arc(X(bestVce), Y(Ic), 7, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.setLineDash([3,4]);
+    ctx.beginPath(); ctx.moveTo(X(bestVce),Y(Ic)); ctx.lineTo(X(bestVce),gy1); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(gx0,Y(Ic)); ctx.lineTo(X(bestVce),Y(Ic)); ctx.stroke();
+    ctx.setLineDash([]);
+  });
+})();
+</script>
+</body>
+</html>

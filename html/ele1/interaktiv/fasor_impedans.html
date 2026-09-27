@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Fasordiagram og impedans (RL/RC)</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Fasordiagram — impedans i RL/RC-kredsløb</h1>
+  <p>AC netværksanalyse · Kapitel 3: AC Netværksanalyse</p>
+  <div class="badge">Skru på R, L/C og frekvens — se fasevinklen mellem V og I</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  I et RL-kredsløb sakker strømmen bagefter spændingen (induktiv, I forsinket). I et RC-kredsløb er det
+  omvendt — strømmen fører spændingen (kapacitiv). Impedansen er <strong>Z = R + jX</strong>, og fasevinklen
+  <strong>θ = atan(X/R)</strong> er netop den vinkel, fasorerne roterer forskudt med.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="btn-row">
+      <button class="btn secondary active" id="rlBtn">RL (induktiv)</button>
+      <button class="btn secondary" id="rcBtn">RC (kapacitiv)</button>
+    </div>
+
+    <div class="slider-row" style="margin-top:1rem;">
+      <label>Modstand R <span class="val" id="rVal">100 Ω</span></label>
+      <input type="range" id="rSlider" min="10" max="500" step="5" value="100">
+    </div>
+    <div class="slider-row">
+      <label>L (mH) / C (µF) <span class="val" id="xVal">100 mH</span></label>
+      <input type="range" id="xSlider" min="1" max="300" step="1" value="100">
+    </div>
+    <div class="slider-row">
+      <label>Frekvens f <span class="val" id="fVal">50 Hz</span></label>
+      <input type="range" id="fSlider" min="1" max="500" step="1" value="50">
+    </div>
+
+    <button class="btn" id="pauseBtn">⏸ Pause</button>
+    <div class="paused-flag" id="pausedFlag">PAUSET — fasorerne står stille</div>
+
+    <div class="formula-box">
+      <div><span class="f">|Z|</span> = √(R² + X²) &nbsp; <span class="f">θ</span> = atan(X/R)</div>
+    </div>
+
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--accent-cyan)"></span> V (spænding)</span>
+      <span><span class="swatch" style="background:var(--accent-green)"></span> I (strøm)</span>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Fasordiagram + tidsforløb</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">|Z|</div><div class="num" id="outZ">—</div></div>
+      <div><div class="lbl">θ (fasevinkel)</div><div class="num" id="outTheta">—</div></div>
+      <div><div class="lbl">I_m (amplitude)</div><div class="num" id="outIm" style="color:var(--accent-green)">—</div></div>
+      <div><div class="lbl">Type</div><div class="num" id="outType">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var Vm = 1;
+
+  var rS=document.getElementById('rSlider'), xS=document.getElementById('xSlider'), fS=document.getElementById('fSlider');
+  var rVal=document.getElementById('rVal'), xVal=document.getElementById('xVal'), fVal=document.getElementById('fVal');
+  var outZ=document.getElementById('outZ'), outTheta=document.getElementById('outTheta'), outIm=document.getElementById('outIm'), outType=document.getElementById('outType');
+  var rlBtn=document.getElementById('rlBtn'), rcBtn=document.getElementById('rcBtn');
+
+  var mode='RL';
+  rlBtn.addEventListener('click', function(){ mode='RL'; rlBtn.classList.add('active'); rcBtn.classList.remove('active'); });
+  rcBtn.addEventListener('click', function(){ mode='RC'; rcBtn.classList.add('active'); rlBtn.classList.remove('active'); });
+
+  var wt = 0;
+  var histV=[], histI=[];
+
+  Widget.loop(function(dt){
+    var R = parseFloat(rS.value), f = parseFloat(fS.value);
+    var xRaw = parseFloat(xS.value);
+    rVal.textContent = R.toFixed(0)+' Ω';
+    fVal.textContent = f.toFixed(0)+' Hz';
+    xVal.textContent = mode==='RL' ? xRaw.toFixed(0)+' mH' : xRaw.toFixed(0)+' µF';
+
+    var omega = 2*Math.PI*f;
+    var X = mode==='RL' ? omega*(xRaw/1000) : 1/(omega*(xRaw/1e6));
+    var Z = Math.hypot(R,X);
+    var theta = Math.atan2(X,R); // I ligger theta bagefter V (RL) eller theta foran V (RC), afhænger af fortegn nedenfor
+    var Im = Vm/Z;
+
+    outZ.textContent = Z.toFixed(1)+' Ω';
+    outTheta.textContent = (theta*180/Math.PI).toFixed(1)+'°';
+    outIm.textContent = Im.toFixed(3)+' A (norm. V_m=1)';
+    outType.textContent = mode==='RL' ? 'Strøm sakker bagefter (induktiv)' : 'Strøm fører (kapacitiv)';
+
+    wt += omega*dt*0.15; // visuelt dæmpet rotationshastighed
+
+    var thetaI = mode==='RL' ? wt - theta : wt + theta;
+
+    if (dt>0) {
+      histV.push(Vm*Math.cos(wt));
+      histI.push(Im*Math.cos(thetaI));
+      if (histV.length>400) { histV.shift(); histI.shift(); }
+    }
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    // fasordiagram (venstre)
+    var cx=190, cy=190, R_px=130;
+    ctx.strokeStyle='rgba(224,224,224,0.15)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.arc(cx,cy,R_px,0,Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx-R_px,cy); ctx.lineTo(cx+R_px,cy); ctx.moveTo(cx,cy-R_px); ctx.lineTo(cx,cy+R_px); ctx.stroke();
+
+    var vx = cx+R_px*Math.cos(wt), vy = cy-R_px*Math.sin(wt);
+    var ix = cx+(R_px*0.75)*Math.cos(thetaI), iy = cy-(R_px*0.75)*Math.sin(thetaI);
+    Widget.arrow(ctx, cx,cy, vx,vy, '#5ec8ff', 3);
+    Widget.arrow(ctx, cx,cy, ix,iy, '#00d984', 3);
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.font='11px Segoe UI';
+    ctx.fillText('Fasordiagram (roterer)', cx-70, cy-R_px-16);
+
+    // tidsforløb (højre)
+    var gx0=380, gx1=W-20, gy0=60, gy1=230, gyMid=(gy0+gy1)/2;
+    ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(gx0,gyMid); ctx.lineTo(gx1,gyMid); ctx.stroke();
+    ctx.strokeStyle='#5ec8ff'; ctx.lineWidth=2;
+    ctx.beginPath();
+    histV.forEach(function(v,i){ var px=gx0+(i/400)*(gx1-gx0); var py=gyMid-v*70; if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py); });
+    ctx.stroke();
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.font='11px Segoe UI'; ctx.fillText('v(t)', gx0, gy0-8);
+
+    var gy0b=260, gy1b=430, gyMidB=(gy0b+gy1b)/2;
+    ctx.strokeStyle='rgba(255,255,255,0.15)';
+    ctx.beginPath(); ctx.moveTo(gx0,gyMidB); ctx.lineTo(gx1,gyMidB); ctx.stroke();
+    ctx.strokeStyle='#00d984'; ctx.lineWidth=2;
+    ctx.beginPath();
+    histI.forEach(function(v,i){ var px=gx0+(i/400)*(gx1-gx0); var py=gyMidB-v*70; if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py); });
+    ctx.stroke();
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.fillText('i(t)', gx0, gy0b-8);
+  });
+})();
+</script>
+</body>
+</html>

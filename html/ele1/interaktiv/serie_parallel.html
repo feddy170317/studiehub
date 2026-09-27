@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Serie- og parallelkredsløb — Ohms og Kirchhoffs love</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Serie- og parallelkredsløb</h1>
+  <p>Ohms lov og Kirchhoffs love · Kapitel 1: Grundlæggende Elektriske Kredsløb</p>
+  <div class="badge">Se strømmen "flyde" — pause for at studere pilene i ro</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  I et seriekredsløb er strømmen ens overalt, og spændingerne deles op (KVL: ΣV=0 rundt om løkken).
+  I et parallelkredsløb er spændingen ens over hver gren, og strømmen deles op (KCL: strøm ind = strøm ud
+  af et knudepunkt). Punkternes fart langs ledningerne er proportional med strømstyrken.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="btn-row">
+      <button class="btn secondary active" id="serieBtn">Serie</button>
+      <button class="btn secondary" id="parallelBtn">Parallel</button>
+    </div>
+
+    <div class="slider-row" style="margin-top:1rem;">
+      <label>Spændingskilde V <span class="val" id="vVal">12.0 V</span></label>
+      <input type="range" id="vSlider" min="1" max="24" step="0.5" value="12">
+    </div>
+    <div class="slider-row">
+      <label>Modstand R₁ <span class="val" id="r1Val">100 Ω</span></label>
+      <input type="range" id="r1Slider" min="10" max="1000" step="10" value="100">
+    </div>
+    <div class="slider-row">
+      <label>Modstand R₂ <span class="val" id="r2Val">220 Ω</span></label>
+      <input type="range" id="r2Slider" min="10" max="1000" step="10" value="220">
+    </div>
+
+    <button class="btn" id="pauseBtn">⏸ Pause</button>
+    <div class="paused-flag" id="pausedFlag">PAUSET — strømmen står stille</div>
+
+    <div class="formula-box" id="formulaBox">
+      <div>Serie: <span class="f">I</span> = V / (R₁+R₂)</div>
+      <div style="margin-top:0.35rem;"><span class="f">V₁</span> = I·R₁ &nbsp; <span class="f">V₂</span> = I·R₂</div>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Kredsløb</h2>
+    <canvas id="stage" width="740" height="440"></canvas>
+    <div class="readout" id="readout"></div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+
+  var vS=document.getElementById('vSlider'), r1S=document.getElementById('r1Slider'), r2S=document.getElementById('r2Slider');
+  var vVal=document.getElementById('vVal'), r1Val=document.getElementById('r1Val'), r2Val=document.getElementById('r2Val');
+  var formulaBox = document.getElementById('formulaBox');
+  var readout = document.getElementById('readout');
+  var serieBtn = document.getElementById('serieBtn'), parallelBtn = document.getElementById('parallelBtn');
+
+  var mode = 'serie';
+  serieBtn.addEventListener('click', function(){ mode='serie'; serieBtn.classList.add('active'); parallelBtn.classList.remove('active');
+    formulaBox.innerHTML = '<div>Serie: <span class="f">I</span> = V / (R₁+R₂)</div><div style="margin-top:0.35rem;"><span class="f">V₁</span> = I·R₁ &nbsp; <span class="f">V₂</span> = I·R₂</div>'; });
+  parallelBtn.addEventListener('click', function(){ mode='parallel'; parallelBtn.classList.add('active'); serieBtn.classList.remove('active');
+    formulaBox.innerHTML = '<div>Parallel: <span class="f">I₁</span> = V/R₁ &nbsp; <span class="f">I₂</span> = V/R₂</div><div style="margin-top:0.35rem;"><span class="f">I</span> = I₁+I₂ (KCL)</div>'; });
+
+  // seriekredsløb: én løkke, batteri venstre, R1 på topledning, R2 på bundledning
+  var seriePts = [ {x:110,y:130}, {x:350,y:130}, {x:630,y:130}, {x:630,y:330}, {x:350,y:330}, {x:110,y:330}, {x:110,y:130} ];
+  // parallelkredsløb: batteri venstre, to lodrette grene (R1, R2) mellem top- og bundrail
+  var parPts1 = [ {x:110,y:130}, {x:370,y:130}, {x:370,y:330}, {x:110,y:330}, {x:110,y:130} ];
+  var parBranch1 = [ {x:370,y:130}, {x:370,y:330} ];
+  var parBranch2 = [ {x:600,y:130}, {x:600,y:330} ];
+  var parRail = [ {x:370,y:130}, {x:600,y:130} ];
+  var parRailBottom = [ {x:370,y:330}, {x:600,y:330} ];
+
+  var serieLoop = Widget.pathBuild(seriePts);
+  var dotOffset1 = 0, dotOffset2 = 0;
+
+  function drawBattery(x,y0,y1){
+    ctx.strokeStyle = '#e0e0e0'; ctx.lineWidth = 4;
+    var midY = (y0+y1)/2;
+    ctx.beginPath(); ctx.moveTo(x,y0); ctx.lineTo(x,midY-18); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x,midY+18); ctx.lineTo(x,y1); ctx.stroke();
+    ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(x-16,midY-10); ctx.lineTo(x+16,midY-10); ctx.stroke();
+    ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x-10,midY+10); ctx.lineTo(x+10,midY+10); ctx.stroke();
+    ctx.fillStyle='#e0e0e0'; ctx.font='16px Segoe UI';
+    ctx.fillText('+', x+24, midY-8);
+    ctx.fillText('−', x+24, midY+18);
+  }
+
+  function drawResistor(x0,y0,x1,y1,label,heat){
+    var zigzags = 6;
+    var dx=(x1-x0)/zigzags, dy=(y1-y0)/zigzags;
+    var nx = -(y1-y0), ny=(x1-x0); var nl=Math.hypot(nx,ny)||1; nx/=nl; ny/=nl;
+    ctx.strokeStyle = heat>0.5 ? '#ff5e5e' : '#ffa500';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(x0,y0);
+    for (var i=1;i<zigzags;i++){
+      var px = x0+dx*i, py = y0+dy*i;
+      var side = (i%2===0)?1:-1;
+      ctx.lineTo(px+nx*12*side, py+ny*12*side);
+    }
+    ctx.lineTo(x1,y1);
+    ctx.stroke();
+    ctx.fillStyle='rgba(224,224,224,0.8)'; ctx.font='13px Segoe UI'; ctx.textAlign='center';
+    ctx.fillText(label, (x0+x1)/2, y0-16);
+    ctx.textAlign='left';
+  }
+
+  function drawDot(pathObj, offset, color){
+    var p = Widget.pathAt(pathObj, offset);
+    ctx.fillStyle = color;
+    ctx.beginPath(); ctx.arc(p.x,p.y,5,0,Math.PI*2); ctx.fill();
+  }
+
+  Widget.loop(function(dt){
+    var V = parseFloat(vS.value), R1 = parseFloat(r1S.value), R2 = parseFloat(r2S.value);
+    vVal.textContent = V.toFixed(1)+' V';
+    r1Val.textContent = R1.toFixed(0)+' Ω';
+    r2Val.textContent = R2.toFixed(0)+' Ω';
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    if (mode==='serie') {
+      var I = V/(R1+R2);
+      var V1 = I*R1, V2 = I*R2, P1=I*I*R1, P2=I*I*R2;
+      readout.innerHTML =
+        '<div><div class="lbl">Strøm I (fælles)</div><div class="num">'+(I*1000).toFixed(1)+' mA</div></div>'+
+        '<div><div class="lbl">Effekt total</div><div class="num">'+(V*I).toFixed(2)+' W</div></div>'+
+        '<div><div class="lbl">V₁ over R₁</div><div class="num">'+V1.toFixed(2)+' V</div></div>'+
+        '<div><div class="lbl">V₂ over R₂</div><div class="num">'+V2.toFixed(2)+' V</div></div>';
+
+      Widget.drawPath(ctx, seriePts, '#5ec8ff', 3);
+      drawBattery(110,130,330);
+      drawResistor(230,130,470,130,'R₁ = '+R1.toFixed(0)+' Ω', Math.min(P1/2,1));
+      drawResistor(470,330,230,330,'R₂ = '+R2.toFixed(0)+' Ω', Math.min(P2/2,1));
+
+      var speed = I*2500;
+      dotOffset1 += speed*dt;
+      for (var k=0;k<4;k++) drawDot(serieLoop, dotOffset1 + k*(serieLoop.length/4), '#00d984');
+    } else {
+      var I1 = V/R1, I2 = V/R2, Itot = I1+I2;
+      var Req = 1/(1/R1+1/R2);
+      readout.innerHTML =
+        '<div><div class="lbl">I₁ gennem R₁</div><div class="num">'+(I1*1000).toFixed(1)+' mA</div></div>'+
+        '<div><div class="lbl">I₂ gennem R₂</div><div class="num">'+(I2*1000).toFixed(1)+' mA</div></div>'+
+        '<div><div class="lbl">I total (KCL)</div><div class="num">'+(Itot*1000).toFixed(1)+' mA</div></div>'+
+        '<div><div class="lbl">R_ækvivalent</div><div class="num">'+Req.toFixed(1)+' Ω</div></div>';
+
+      Widget.drawPath(ctx, parPts1, '#5ec8ff', 3);
+      Widget.drawPath(ctx, parBranch2, '#5ec8ff', 3);
+      Widget.drawPath(ctx, parRail, '#5ec8ff', 3);
+      Widget.drawPath(ctx, parRailBottom, '#5ec8ff', 3);
+      drawBattery(110,130,330);
+      drawResistor(370,180,370,280,'R₁ = '+R1.toFixed(0)+' Ω', Math.min(I1*I1*R1/2,1));
+      drawResistor(600,180,600,280,'R₂ = '+R2.toFixed(0)+' Ω', Math.min(I2*I2*R2/2,1));
+
+      var branch1Path = Widget.pathBuild(parBranch1);
+      var branch2Path = Widget.pathBuild(parBranch2);
+      dotOffset1 += I1*2500*dt;
+      dotOffset2 += I2*2500*dt;
+      for (var k1=0;k1<2;k1++) drawDot(branch1Path, dotOffset1 + k1*(branch1Path.length/2), '#00d984');
+      for (var k2=0;k2<2;k2++) drawDot(branch2Path, dotOffset2 + k2*(branch2Path.length/2), '#d984ff');
+    }
+  });
+})();
+</script>
+</body>
+</html>

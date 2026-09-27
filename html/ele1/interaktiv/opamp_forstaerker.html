@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Operationsforstærker — forstærkning og begrænsning</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Operationsforstærker — gain og saturering</h1>
+  <p>Operationsforstærkere · Kapitel 7</p>
+  <div class="badge">Skru på modstande og forsyningsspænding — se hvornår signalet klipper</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  Med de ideelle opamp-regler (ingen strøm ind i benene, samme spænding på begge indgange) bliver
+  forstærkningen bestemt alene af R₁ og R₂. Men output kan aldrig overstige forsyningsspændingen
+  ±V_cc — hvis R₂/R₁·V_in overskrider det, <strong>klipper</strong> signalet fladt.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="btn-row">
+      <button class="btn secondary active" id="invBtn">Inverterende</button>
+      <button class="btn secondary" id="noninvBtn">Ikke-inverterende</button>
+    </div>
+
+    <div class="slider-row" style="margin-top:1rem;">
+      <label>R₁ <span class="val" id="r1Val">10 kΩ</span></label>
+      <input type="range" id="r1Slider" min="1" max="100" step="1" value="10">
+    </div>
+    <div class="slider-row">
+      <label>R₂ (feedback) <span class="val" id="r2Val">30 kΩ</span></label>
+      <input type="range" id="r2Slider" min="1" max="300" step="1" value="30">
+    </div>
+    <div class="slider-row">
+      <label>V_in amplitude <span class="val" id="vinVal">0.5 V</span></label>
+      <input type="range" id="vinSlider" min="0.05" max="3" step="0.05" value="0.5">
+    </div>
+    <div class="slider-row">
+      <label>Forsyning ±V_cc <span class="val" id="vccVal">9 V</span></label>
+      <input type="range" id="vccSlider" min="3" max="15" step="0.5" value="9">
+    </div>
+
+    <button class="btn" id="pauseBtn">⏸ Pause</button>
+    <div class="paused-flag" id="pausedFlag">PAUSET</div>
+
+    <div class="formula-box" id="formulaBox">
+      <div>Inverterende: <span class="f">A</span> = −R₂/R₁</div>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>v_in(t) og v_out(t)</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">Forstærkning A</div><div class="num" id="outA">—</div></div>
+      <div><div class="lbl">V_out (uklippet)</div><div class="num" id="outVoutIdeal">—</div></div>
+      <div><div class="lbl">Status</div><div class="num" id="outStatus">—</div></div>
+      <div><div class="lbl">Klipningsmargin</div><div class="num" id="outMargin">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+
+  var r1S=document.getElementById('r1Slider'), r2S=document.getElementById('r2Slider'), vinS=document.getElementById('vinSlider'), vccS=document.getElementById('vccSlider');
+  var r1Val=document.getElementById('r1Val'), r2Val=document.getElementById('r2Val'), vinVal=document.getElementById('vinVal'), vccVal=document.getElementById('vccVal');
+  var outA=document.getElementById('outA'), outVoutIdeal=document.getElementById('outVoutIdeal'), outStatus=document.getElementById('outStatus'), outMargin=document.getElementById('outMargin');
+  var invBtn=document.getElementById('invBtn'), noninvBtn=document.getElementById('noninvBtn'), formulaBox=document.getElementById('formulaBox');
+
+  var mode='inv';
+  invBtn.addEventListener('click', function(){ mode='inv'; invBtn.classList.add('active'); noninvBtn.classList.remove('active');
+    formulaBox.innerHTML = '<div>Inverterende: <span class="f">A</span> = −R₂/R₁</div>'; });
+  noninvBtn.addEventListener('click', function(){ mode='noninv'; noninvBtn.classList.add('active'); invBtn.classList.remove('active');
+    formulaBox.innerHTML = '<div>Ikke-inverterende: <span class="f">A</span> = 1 + R₂/R₁</div>'; });
+
+  var wt=0, histIn=[], histOut=[];
+
+  Widget.loop(function(dt){
+    var R1=parseFloat(r1S.value), R2=parseFloat(r2S.value), Vin=parseFloat(vinS.value), Vcc=parseFloat(vccS.value);
+    r1Val.textContent=R1.toFixed(0)+' kΩ';
+    r2Val.textContent=R2.toFixed(0)+' kΩ';
+    vinVal.textContent=Vin.toFixed(2)+' V';
+    vccVal.textContent=Vcc.toFixed(1)+' V';
+
+    var A = mode==='inv' ? -R2/R1 : 1+R2/R1;
+    var VoutIdeal = A*Vin;
+    var clipping = Math.abs(VoutIdeal) > Vcc;
+
+    outA.textContent = A.toFixed(2);
+    outVoutIdeal.textContent = VoutIdeal.toFixed(2)+' V';
+    outStatus.textContent = clipping ? 'KLIPPER!' : 'Lineært område';
+    outStatus.style.color = clipping ? 'var(--accent-red)' : 'var(--accent-green)';
+    outMargin.textContent = (Vcc/Math.max(Math.abs(VoutIdeal),0.001)).toFixed(2)+'× til V_cc';
+
+    wt += 3*dt;
+    var vinNow = Vin*Math.sin(wt);
+    var voutNow = A*vinNow;
+    voutNow = Math.max(-Vcc, Math.min(Vcc, voutNow));
+
+    if (dt>0) { histIn.push(vinNow); histOut.push(voutNow); if (histIn.length>400) { histIn.shift(); histOut.shift(); } }
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    var gx0=40, gx1=W-20;
+    var gy0=60, gy1=230, gyMid=(gy0+gy1)/2;
+    ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(gx0,gyMid); ctx.lineTo(gx1,gyMid); ctx.stroke();
+    var scaleIn = (gyMid-gy0)/Math.max(Vin*1.4,0.1);
+    ctx.strokeStyle='#5ec8ff'; ctx.lineWidth=2;
+    ctx.beginPath();
+    histIn.forEach(function(v,i){ var px=gx0+(i/400)*(gx1-gx0); var py=gyMid-v*scaleIn; if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py); });
+    ctx.stroke();
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.font='11px Segoe UI';
+    ctx.fillText('v_in(t)', gx0, gy0-8);
+
+    var gy0b=270, gy1b=440, gyMidB=(gy0b+gy1b)/2;
+    ctx.strokeStyle='rgba(255,255,255,0.15)';
+    ctx.beginPath(); ctx.moveTo(gx0,gyMidB); ctx.lineTo(gx1,gyMidB); ctx.stroke();
+
+    var scaleOut = (gyMidB-gy0b)/Math.max(Vcc*1.1,0.1);
+    ctx.strokeStyle='rgba(255,94,94,0.4)'; ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(gx0,gyMidB-Vcc*scaleOut); ctx.lineTo(gx1,gyMidB-Vcc*scaleOut); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(gx0,gyMidB+Vcc*scaleOut); ctx.lineTo(gx1,gyMidB+Vcc*scaleOut); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(255,94,94,0.6)'; ctx.fillText('±V_cc', gx0+4, gyMidB-Vcc*scaleOut-6);
+
+    ctx.strokeStyle = clipping ? '#ff5e5e' : '#00d984'; ctx.lineWidth=2;
+    ctx.beginPath();
+    histOut.forEach(function(v,i){ var px=gx0+(i/400)*(gx1-gx0); var py=gyMidB-v*scaleOut; if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py); });
+    ctx.stroke();
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.fillText('v_out(t)', gx0, gy0b-8);
+  });
+})();
+</script>
+</body>
+</html>

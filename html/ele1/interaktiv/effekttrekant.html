@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Effekttrekant og effektfaktor</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Effekttrekant — P, Q og S</h1>
+  <p>AC Effekt · Kapitel 6: AC Effekt</p>
+  <div class="badge">Skru på fasevinklen φ og se effekttrekanten forme sig</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  Når spænding og strøm er forskudt med fasevinklen φ, deles den <strong>komplekse effekt</strong> op i
+  aktiv effekt <strong>P = V·I·cosφ</strong> (det nyttige arbejde) og reaktiv effekt
+  <strong>Q = V·I·sinφ</strong> (pendler frem og tilbage, udnyttes ikke). Den samlede
+  <strong>S = V·I</strong> (i VA) er hypotenusen i trekanten. Effektfaktoren er cosφ.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>V_rms <span class="val" id="vVal">230 V</span></label>
+      <input type="range" id="vSlider" min="10" max="400" step="1" value="230">
+    </div>
+    <div class="slider-row">
+      <label>I_rms <span class="val" id="iVal">5.0 A</span></label>
+      <input type="range" id="iSlider" min="0.5" max="20" step="0.1" value="5">
+    </div>
+    <div class="slider-row">
+      <label>Fasevinkel φ <span class="val" id="phiVal">30°</span></label>
+      <input type="range" id="phiSlider" min="-90" max="90" step="1" value="30">
+    </div>
+
+    <button class="btn" id="pauseBtn">⏸ Pause</button>
+    <div class="paused-flag" id="pausedFlag">PAUSET</div>
+
+    <div class="formula-box">
+      <div><span class="f">P</span> = V·I·cosφ &nbsp; <span class="f">Q</span> = V·I·sinφ &nbsp; <span class="f">S</span> = V·I</div>
+    </div>
+
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--accent-green)"></span> P (aktiv, W)</span>
+      <span><span class="swatch" style="background:var(--accent-purple)"></span> Q (reaktiv, VAr)</span>
+      <span><span class="swatch" style="background:var(--accent-cyan)"></span> S (apparent, VA)</span>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Effekttrekant + p(t) = v(t)·i(t)</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">P (aktiv effekt)</div><div class="num" id="outP" style="color:var(--accent-green)">—</div></div>
+      <div><div class="lbl">Q (reaktiv effekt)</div><div class="num" id="outQ" style="color:var(--accent-purple)">—</div></div>
+      <div><div class="lbl">S (apparent effekt)</div><div class="num" id="outS" style="color:var(--accent-cyan)">—</div></div>
+      <div><div class="lbl">Effektfaktor cosφ</div><div class="num" id="outPf">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+
+  var vS=document.getElementById('vSlider'), iS=document.getElementById('iSlider'), phiS=document.getElementById('phiSlider');
+  var vVal=document.getElementById('vVal'), iVal=document.getElementById('iVal'), phiVal=document.getElementById('phiVal');
+  var outP=document.getElementById('outP'), outQ=document.getElementById('outQ'), outS=document.getElementById('outS'), outPf=document.getElementById('outPf');
+
+  var wt=0, hist=[];
+
+  Widget.loop(function(dt){
+    var V=parseFloat(vS.value), I=parseFloat(iS.value), phiDeg=parseFloat(phiS.value);
+    vVal.textContent=V.toFixed(0)+' V';
+    iVal.textContent=I.toFixed(1)+' A';
+    phiVal.textContent=phiDeg.toFixed(0)+'°';
+
+    var phi = phiDeg*Math.PI/180;
+    var P = V*I*Math.cos(phi), Q = V*I*Math.sin(phi), S = V*I;
+
+    outP.textContent = P.toFixed(0)+' W';
+    outQ.textContent = Q.toFixed(0)+' VAr';
+    outS.textContent = S.toFixed(0)+' VA';
+    outPf.textContent = Math.cos(phi).toFixed(3);
+
+    wt += 3*dt;
+    var vNow = Math.sqrt(2)*V*Math.cos(wt);
+    var iNow = Math.sqrt(2)*I*Math.cos(wt-phi);
+    var pNow = vNow*iNow;
+    if (dt>0) { hist.push(pNow); if (hist.length>400) hist.shift(); }
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    // effekttrekant (venstre)
+    var ox=90, oy=340, scale=0.55;
+    var Ppx = P*scale, Qpx = Q*scale;
+    ctx.strokeStyle='#e0e0e0'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(ox+250,oy); ctx.moveTo(ox,oy); ctx.lineTo(ox,oy-250); ctx.stroke();
+
+    Widget.arrow(ctx, ox,oy, ox+Ppx,oy, '#00d984', 4);
+    Widget.arrow(ctx, ox+Ppx,oy, ox+Ppx,oy-Qpx, '#d984ff', 4);
+    Widget.arrow(ctx, ox,oy, ox+Ppx,oy-Qpx, '#5ec8ff', 3);
+
+    ctx.fillStyle='rgba(224,224,224,0.8)'; ctx.font='13px Segoe UI';
+    ctx.fillText('P', ox+Ppx/2-4, oy+18);
+    ctx.fillText('Q', ox+Ppx+14, oy-Qpx/2);
+    ctx.fillText('S', ox+Ppx/2-20, oy-Qpx/2-10);
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.font='11px Segoe UI';
+    ctx.fillText('Effekttrekant', ox, oy+40);
+
+    // p(t) graf (højre)
+    var gx0=380, gx1=W-20, gy0=60, gy1=420, gyMid=(gy0+gy1)/2;
+    ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(gx0,gyMid); ctx.lineTo(gx1,gyMid); ctx.stroke();
+
+    var pScale = (gy1-gy0)/(2*Math.max(S*1.3,1));
+    // gennemsnitslinje = P
+    ctx.strokeStyle='rgba(0,217,132,0.4)'; ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(gx0, gyMid-P*pScale); ctx.lineTo(gx1, gyMid-P*pScale); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(0,217,132,0.6)'; ctx.font='11px Segoe UI';
+    ctx.fillText('gennemsnit = P', gx0+4, gyMid-P*pScale-6);
+
+    ctx.strokeStyle='#ffa500'; ctx.lineWidth=2;
+    ctx.beginPath();
+    hist.forEach(function(p,i){ var px=gx0+(i/400)*(gx1-gx0); var py=gyMid-p*pScale; if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py); });
+    ctx.stroke();
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.fillText('p(t) = v(t)·i(t)', gx0, gy0-10);
+  });
+})();
+</script>
+</body>
+</html>

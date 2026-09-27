@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: MOSFET-karakteristik og arbejdspunkt</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>MOSFET — karakteristikkurver og arbejdspunkt</h1>
+  <p>Felteffekttransistorer (FET) · Kapitel 10</p>
+  <div class="badge">Skru på V_GS — se grænsen mellem triode og mætning flytte sig</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  I modsætning til BJT'en styres MOSFET'en af en <strong>spænding</strong> V_GS, ikke en strøm.
+  I mætning er <strong>I_D = k·(V_GS − V_th)²</strong> (næsten fladt, uafhængigt af V_DS). I
+  triode-området (V_DS &lt; V_GS − V_th) stiger I_D derimod med V_DS — det er grænsen mellem de to,
+  den stiplede parabel, der er MOSFET'ens signatur.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Forsyning V_DD <span class="val" id="vddVal">12 V</span></label>
+      <input type="range" id="vddSlider" min="5" max="24" step="0.5" value="12">
+    </div>
+    <div class="slider-row">
+      <label>R_D (drænmodstand) <span class="val" id="rdVal">1.0 kΩ</span></label>
+      <input type="range" id="rdSlider" min="0.2" max="5" step="0.1" value="1">
+    </div>
+    <div class="slider-row">
+      <label>Tærskelspænding V_th <span class="val" id="vthVal">2.0 V</span></label>
+      <input type="range" id="vthSlider" min="0.5" max="4" step="0.1" value="2">
+    </div>
+    <div class="slider-row">
+      <label>Gate-spænding V_GS <span class="val" id="vgsVal">6.0 V</span></label>
+      <input type="range" id="vgsSlider" min="0" max="12" step="0.1" value="6">
+    </div>
+
+    <div class="formula-box">
+      <div>Mætning: <span class="f">I_D</span> = k·(V_GS−V_th)²</div>
+      <div style="margin-top:0.35rem;">Triode-grænse: <span class="f">V_DS</span> = V_GS − V_th</div>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>I_D — V_DS karakteristik</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">I_D (arbejdspunkt)</div><div class="num" id="outId">—</div></div>
+      <div><div class="lbl">V_DS (arbejdspunkt)</div><div class="num" id="outVds">—</div></div>
+      <div><div class="lbl">Område</div><div class="num" id="outRegion">—</div></div>
+      <div><div class="lbl">V_GS − V_th (overdrive)</div><div class="num" id="outOver">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var k = 0.15; // transkonduktansparameter (mA/V^2), illustrativ fast værdi
+
+  var vddS=document.getElementById('vddSlider'), rdS=document.getElementById('rdSlider'), vthS=document.getElementById('vthSlider'), vgsS=document.getElementById('vgsSlider');
+  var vddVal=document.getElementById('vddVal'), rdVal=document.getElementById('rdVal'), vthVal=document.getElementById('vthVal'), vgsVal=document.getElementById('vgsVal');
+  var outId=document.getElementById('outId'), outVds=document.getElementById('outVds'), outRegion=document.getElementById('outRegion'), outOver=document.getElementById('outOver');
+
+  function idCurve(vds, vgs, vth){
+    var ov = vgs-vth;
+    if (ov<=0) return 0;
+    if (vds < ov) return k*(2*ov*vds - vds*vds); // triode
+    return k*ov*ov; // mætning
+  }
+
+  Widget.loop(function(){
+    var Vdd=parseFloat(vddS.value), Rd=parseFloat(rdS.value), Vth=parseFloat(vthS.value), Vgs=parseFloat(vgsS.value);
+    vddVal.textContent=Vdd.toFixed(1)+' V';
+    rdVal.textContent=Rd.toFixed(1)+' kΩ';
+    vthVal.textContent=Vth.toFixed(1)+' V';
+    vgsVal.textContent=Vgs.toFixed(1)+' V';
+
+    var overdrive = Vgs-Vth;
+    outOver.textContent = overdrive.toFixed(2)+' V';
+
+    var bestVds=0, bestDiff=1e9;
+    for (var v=0; v<=Vdd; v+=0.02){
+      var iLoad=(Vdd-v)/Rd;
+      var iCurve=idCurve(v,Vgs,Vth);
+      var diff=Math.abs(iLoad-iCurve);
+      if (diff<bestDiff){ bestDiff=diff; bestVds=v; }
+    }
+    var Id=(Vdd-bestVds)/Rd;
+
+    outId.textContent = Id.toFixed(2)+' mA';
+    outVds.textContent = bestVds.toFixed(2)+' V';
+    var region = overdrive<=0 ? 'Afskåret (V_GS < V_th)' : (bestVds<overdrive ? 'Triode' : 'Mætning');
+    outRegion.textContent = region;
+    outRegion.style.color = region==='Mætning' ? 'var(--accent-green)' : (region==='Triode' ? 'var(--accent-gold)' : 'var(--text-light)');
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    var gx0=70, gx1=W-40, gy0=50, gy1=420;
+    var idMaxAxis = Math.max(k*Math.pow(Math.max(12-1,1),2)*1.1, Vdd/Math.min(Rd,0.3)*0.6, 0.5);
+    function X(vds){ return gx0 + (vds/Vdd)*(gx1-gx0); }
+    function Y(id){ return gy1 - (id/idMaxAxis)*(gy1-gy0); }
+
+    ctx.strokeStyle='rgba(224,224,224,0.3)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(gx0,gy0); ctx.lineTo(gx0,gy1); ctx.lineTo(gx1,gy1); ctx.stroke();
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.font='11px Segoe UI';
+    ctx.fillText('I_D (mA)', gx0, gy0-10);
+    ctx.fillText('V_DS (V)', gx1-40, gy1+18);
+
+    [2,4,6,8,10,12].forEach(function(vgsFam){
+      ctx.strokeStyle = Math.abs(vgsFam-Vgs)<0.05 ? '#ffa500' : 'rgba(94,200,255,0.25)';
+      ctx.lineWidth = Math.abs(vgsFam-Vgs)<0.05 ? 3 : 1.5;
+      ctx.beginPath();
+      for (var vv=0; vv<=Vdd; vv+=Vdd/60){
+        var idv = idCurve(vv, vgsFam, Vth);
+        var px=X(vv), py=Y(idv);
+        if (vv===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+      }
+      ctx.stroke();
+    });
+
+    // triode/mætning-grænse (parabel V_DS = V_GS - V_th for varierende V_GS langs kurverne)
+    ctx.strokeStyle='rgba(224,224,224,0.35)'; ctx.setLineDash([4,4]); ctx.lineWidth=1.5;
+    ctx.beginPath();
+    for (var vgsB=Vth; vgsB<=12; vgsB+=0.2){
+      var vdsB = vgsB-Vth;
+      if (vdsB>Vdd) break;
+      var idB = k*(vgsB-Vth)*(vgsB-Vth);
+      var px2=X(vdsB), py2=Y(idB);
+      if (vgsB===Vth) ctx.moveTo(px2,py2); else ctx.lineTo(px2,py2);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // load-linje
+    ctx.strokeStyle='#d984ff'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(X(0), Y(Vdd/Rd)); ctx.lineTo(X(Vdd), Y(0)); ctx.stroke();
+
+    // arbejdspunkt
+    ctx.fillStyle = '#00d984';
+    ctx.beginPath(); ctx.arc(X(bestVds), Y(Id), 7, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.setLineDash([3,4]);
+    ctx.beginPath(); ctx.moveTo(X(bestVds),Y(Id)); ctx.lineTo(X(bestVds),gy1); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(gx0,Y(Id)); ctx.lineTo(X(bestVds),Y(Id)); ctx.stroke();
+    ctx.setLineDash([]);
+  });
+})();
+</script>
+</body>
+</html>

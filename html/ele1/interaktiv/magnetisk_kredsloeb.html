@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Magnetisk kredsløb — reluktans og luftgab</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Magnetisk kredsløb — reluktans og luftgab</h1>
+  <p>Grundlæggende elektromekanik · Kapitel 12</p>
+  <div class="badge">Skru på luftgab og µ_r — se hvor "mmf-faldet" ender</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  Magnetiske kredsløb regnes som elektriske: mmf = N·I er "spændingskilden", reluktans R er
+  "modstanden", og flux Φ er "strømmen": <strong>Φ = N·I / (R_core + R_gap)</strong>. Selv et
+  meget lille luftgab har typisk langt højere reluktans end hele jernkernen — fordi µ_r for jern
+  er tusinder af gange større end for luft.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Vindinger N <span class="val" id="nVal">200</span></label>
+      <input type="range" id="nSlider" min="10" max="500" step="10" value="200">
+    </div>
+    <div class="slider-row">
+      <label>Strøm I <span class="val" id="iVal">1.0 A</span></label>
+      <input type="range" id="iSlider" min="0.1" max="5" step="0.1" value="1">
+    </div>
+    <div class="slider-row">
+      <label>Luftgab g <span class="val" id="gVal">1.0 mm</span></label>
+      <input type="range" id="gSlider" min="0" max="10" step="0.1" value="1">
+    </div>
+    <div class="slider-row">
+      <label>Kernens µ_r <span class="val" id="muVal">2000</span></label>
+      <input type="range" id="muSlider" min="200" max="5000" step="50" value="2000">
+    </div>
+
+    <div class="formula-box">
+      <div><span class="f">R_core</span> = l / (µ₀µ_r·A) &nbsp; <span class="f">R_gap</span> = g / (µ₀·A)</div>
+      <div style="margin-top:0.35rem;">l = 0,3 m, A = 10 cm² (fast, illustrativt)</div>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Kerne + reluktans-analogi</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">Flux Φ</div><div class="num" id="outPhi">—</div></div>
+      <div><div class="lbl">B i luftgab</div><div class="num" id="outB">—</div></div>
+      <div><div class="lbl">mmf-andel i luftgab</div><div class="num" id="outShare" style="color:var(--accent-gold)">—</div></div>
+      <div><div class="lbl">R_gap / R_core</div><div class="num" id="outRatio">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var mu0 = 4*Math.PI*1e-7;
+  var l_core = 0.3, A = 0.001; // meter, m^2
+
+  var nS=document.getElementById('nSlider'), iS=document.getElementById('iSlider'), gS=document.getElementById('gSlider'), muS=document.getElementById('muSlider');
+  var nVal=document.getElementById('nVal'), iVal=document.getElementById('iVal'), gVal=document.getElementById('gVal'), muVal=document.getElementById('muVal');
+  var outPhi=document.getElementById('outPhi'), outB=document.getElementById('outB'), outShare=document.getElementById('outShare'), outRatio=document.getElementById('outRatio');
+
+  Widget.loop(function(){
+    var N=parseFloat(nS.value), I=parseFloat(iS.value), g=parseFloat(gS.value)/1000, mur=parseFloat(muS.value);
+    nVal.textContent=N.toFixed(0);
+    iVal.textContent=I.toFixed(1)+' A';
+    gVal.textContent=(g*1000).toFixed(1)+' mm';
+    muVal.textContent=mur.toFixed(0);
+
+    var Rcore = l_core/(mu0*mur*A);
+    var Rgap = g/(mu0*A);
+    var mmf = N*I;
+    var Phi = mmf/(Rcore+Rgap);
+    var B = Phi/A;
+    var mmfGap = Phi*Rgap, mmfCore = Phi*Rcore;
+    var shareGap = mmfGap/mmf*100;
+
+    outPhi.textContent = (Phi*1000).toFixed(3)+' mWb';
+    outB.textContent = B.toFixed(3)+' T';
+    outShare.textContent = shareGap.toFixed(1)+' %';
+    outRatio.textContent = (Rgap/Math.max(Rcore,1)).toFixed(1)+'×';
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    // kerne-skitse (top)
+    ctx.strokeStyle='#e0e0e0'; ctx.lineWidth=14;
+    ctx.strokeRect(150,40,300,180);
+    // luftgab (klip i højre side)
+    var gapPx = 4+Math.min(g*1000,10)*3;
+    ctx.clearRect(440,110,20+gapPx,20);
+    ctx.fillStyle='rgba(94,200,255,0.15)'; ctx.fillRect(444,112,gapPx,16);
+
+    // vinding
+    ctx.strokeStyle='#5ec8ff'; ctx.lineWidth=3;
+    for (var w=0;w<6;w++){ ctx.beginPath(); ctx.arc(180,60+w*20,16,0,Math.PI*2); ctx.stroke(); }
+    ctx.fillStyle='rgba(224,224,224,0.7)'; ctx.font='12px Segoe UI';
+    ctx.fillText('N vindinger, I', 200,64);
+    ctx.fillText('luftgab g', 452,100);
+
+    // reluktans-analogi (elektrisk kredsløb-diagram, nederst)
+    var by=340, x0=90,x1=650;
+    ctx.strokeStyle='#e0e0e0'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(x0,by); ctx.lineTo(x0,by+80); ctx.lineTo(x1,by+80); ctx.lineTo(x1,by); ctx.stroke();
+
+    // mmf-kilde
+    ctx.lineWidth=5; ctx.beginPath(); ctx.moveTo(x0,by+25); ctx.lineTo(x0,by+35); ctx.stroke();
+    ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(x0-6,by+45); ctx.lineTo(x0+6,by+45); ctx.stroke();
+    ctx.fillStyle='rgba(224,224,224,0.8)'; ctx.font='12px Segoe UI';
+    ctx.fillText('mmf=N·I', x0-50, by+40);
+
+    // R_core zigzag
+    var zz=6, cx0=200,cx1=380;
+    ctx.strokeStyle='#ffa500'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(cx0,by);
+    for (var i=1;i<zz;i++){ var px=cx0+(cx1-cx0)/zz*i; ctx.lineTo(px, by+((i%2===0)?10:-10)); }
+    ctx.lineTo(cx1,by); ctx.stroke();
+    ctx.fillStyle='rgba(255,165,0,0.9)'; ctx.fillText('R_core: '+mmfCore.toFixed(1)+' At', cx0, by-14);
+
+    // R_gap zigzag
+    var gx0b=420,gx1b=600;
+    ctx.strokeStyle='#d984ff'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(gx0b,by);
+    for (var j=1;j<zz;j++){ var pxj=gx0b+(gx1b-gx0b)/zz*j; ctx.lineTo(pxj, by+((j%2===0)?10:-10)); }
+    ctx.lineTo(gx1b,by); ctx.stroke();
+    ctx.fillStyle='rgba(217,132,255,0.9)'; ctx.fillText('R_gap: '+mmfGap.toFixed(1)+' At', gx0b, by-14);
+
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.font='11px Segoe UI';
+    ctx.fillText('Reluktans-analogi (som et elektrisk kredsløb): Φ er "strømmen" rundt i løkken', x0, by+110);
+  });
+})();
+</script>
+</body>
+</html>
