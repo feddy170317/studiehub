@@ -228,6 +228,7 @@ function renderMaterial(material) {
     podcast: '🎙',
     reading: '📖',
     slides: '📊',
+    interactive: '🎛️',
     exercise: '✏',
     link: '🔗',
     note: '📝'

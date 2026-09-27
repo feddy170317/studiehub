@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Tangential- og normalacceleration (n-t koordinater)</title>
+<style>
+  :root {
+    --bg-dark: #0a1a2b;
+    --card-bg: #1a2a3b;
+    --accent-cyan: #5ec8ff;
+    --accent-green: #00d984;
+    --accent-gold: #ffa500;
+    --accent-purple: #d984ff;
+    --text-light: #e0e0e0;
+    --border-subtle: #2a3a4b;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-light);
+    line-height: 1.6;
+  }
+  header {
+    padding: 2rem 1.5rem 1.5rem;
+    background: linear-gradient(135deg, var(--bg-dark), var(--card-bg));
+    border-bottom: 3px solid var(--accent-cyan);
+    text-align: center;
+  }
+  header h1 { font-size: 1.9rem; color: var(--accent-cyan); margin-bottom: 0.3rem; }
+  header p { color: var(--accent-gold); font-size: 1rem; }
+  .badge {
+    display:inline-block; margin-top:0.6rem; font-size:0.78rem; color: rgba(224,224,224,0.55);
+    border:1px solid var(--border-subtle); padding:0.2rem 0.6rem; border-radius:12px;
+  }
+  .wrap {
+    max-width: 1100px; margin: 0 auto; padding: 1.5rem;
+    display: grid; grid-template-columns: 320px 1fr; gap: 1.5rem;
+  }
+  @media (max-width: 800px) { .wrap { grid-template-columns: 1fr; } }
+  .panel, .stagepanel {
+    background: var(--card-bg); border-radius: 10px; padding: 1.2rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  }
+  .panel h2, .stagepanel h2 { color: var(--accent-cyan); font-size: 1.05rem; margin-bottom: 1rem; }
+  .slider-row { margin-bottom: 1.3rem; }
+  .slider-row label { display:flex; justify-content:space-between; font-size:0.92rem; margin-bottom:0.4rem; }
+  .slider-row .val { color: var(--accent-gold); font-weight:600; font-family: 'Consolas', monospace; }
+  input[type=range] { width: 100%; accent-color: var(--accent-cyan); }
+  .formula-box {
+    background: rgba(94,200,255,0.07); border-left: 3px solid var(--accent-cyan);
+    border-radius: 6px; padding: 0.8rem; margin-top: 1rem; font-size: 0.92rem;
+  }
+  .formula-box .f { font-family: 'Consolas', monospace; color: var(--accent-gold); }
+  .legend { display:flex; flex-wrap:wrap; gap:0.8rem; margin-top:0.8rem; font-size:0.82rem; }
+  .legend span { display:flex; align-items:center; gap:0.35rem; }
+  .swatch { width:14px; height:14px; border-radius:3px; display:inline-block; }
+  canvas { width:100%; height:auto; display:block; border-radius:8px; background:#0d2136; }
+  .readout {
+    display:grid; grid-template-columns: 1fr 1fr; gap:0.6rem; margin-top:1rem; font-size:0.9rem;
+  }
+  .readout div { background: rgba(255,255,255,0.03); border-radius:6px; padding:0.5rem 0.7rem; }
+  .readout .lbl { color: rgba(224,224,224,0.6); font-size:0.78rem; }
+  .readout .num { font-family:'Consolas',monospace; font-size:1.05rem; font-weight:600; }
+  .intro-box {
+    background: var(--card-bg); border-left: 4px solid var(--accent-gold);
+    padding: 1rem 1.2rem; margin: 0 1.5rem 0; border-radius: 6px; max-width: 1100px;
+    margin-left:auto; margin-right:auto; font-size:0.95rem;
+  }
+  .intro-box strong { color: var(--accent-gold); }
+  footer { text-align:center; padding: 1.5rem; font-size:0.82rem; color: rgba(224,224,224,0.5); }
+  footer a { color: var(--accent-cyan); text-decoration:none; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Tangential- og normalacceleration</h1>
+  <p>n–t koordinater · Kapitel 12: Kinematik af en Partikel</p>
+  <div class="badge">Proof-of-concept — flyt sliderne, se pilene ændre sig</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  En partikel bevæger sig langs en krum bane. Accelerationen deles op i to komponenter:
+  <strong>a_t</strong> (tangential — ændring i fart) og <strong>a_n</strong> (normal — ændring i retning,
+  peger altid mod krumningscentrum). Skru på hastighed <strong>v</strong>, krumningsradius <strong>ρ</strong>
+  og tangential-accelerationen <strong>a_t</strong>, og se hvordan pilene skalerer live.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Hastighed v <span class="val" id="vVal">8.0 m/s</span></label>
+      <input type="range" id="vSlider" min="0" max="20" step="0.1" value="8">
+    </div>
+
+    <div class="slider-row">
+      <label>Krumningsradius ρ <span class="val" id="rhoVal">6.0 m</span></label>
+      <input type="range" id="rhoSlider" min="1" max="15" step="0.1" value="6">
+    </div>
+
+    <div class="slider-row">
+      <label>Tangential-acceleration a_t <span class="val" id="atVal">0.0 m/s²</span></label>
+      <input type="range" id="atSlider" min="-8" max="8" step="0.1" value="0">
+    </div>
+
+    <div class="formula-box">
+      <div><span class="f">a_t</span> = dv/dt &nbsp;(fartændring, langs banen)</div>
+      <div style="margin-top:0.4rem;"><span class="f">a_n</span> = v² / ρ &nbsp;(retningsændring, mod centrum)</div>
+    </div>
+
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--accent-green)"></span> v (hastighed)</span>
+      <span><span class="swatch" style="background:var(--accent-gold)"></span> a_t (tangential)</span>
+      <span><span class="swatch" style="background:var(--accent-purple)"></span> a_n (normal)</span>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Bane og vektorer</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">|a_t| (tangential)</div><div class="num" id="outAt" style="color:var(--accent-gold)">0.00 m/s²</div></div>
+      <div><div class="lbl">|a_n| (normal)</div><div class="num" id="outAn" style="color:var(--accent-purple)">10.67 m/s²</div></div>
+      <div><div class="lbl">|a| samlet</div><div class="num" id="outA">10.67 m/s²</div></div>
+      <div><div class="lbl">ω = v/ρ</div><div class="num" id="outOmega">1.33 rad/s</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget-forslag til Studiehub — giv feedback via gruppen. ·
+  <a href="../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var cx = W/2, cy = H/2 + 20;
+
+  var vSlider = document.getElementById('vSlider');
+  var rhoSlider = document.getElementById('rhoSlider');
+  var atSlider = document.getElementById('atSlider');
+  var vVal = document.getElementById('vVal');
+  var rhoVal = document.getElementById('rhoVal');
+  var atVal = document.getElementById('atVal');
+  var outAt = document.getElementById('outAt');
+  var outAn = document.getElementById('outAn');
+  var outA = document.getElementById('outA');
+  var outOmega = document.getElementById('outOmega');
+
+  var theta = -Math.PI/2; // start top of circle
+  var lastT = null;
+
+  function pixelRadius(rho) {
+    // rho in [1,15] -> pixel radius in [55,200], purely illustrativt (ikke fast skala)
+    var rMin=1, rMax=15, pMin=55, pMax=200;
+    return pMin + (rho-rMin)/(rMax-rMin) * (pMax-pMin);
+  }
+
+  function drawArrow(x0,y0,x1,y1,color,width){
+    var headlen = 10;
+    var dx = x1-x0, dy = y1-y0;
+    var len = Math.hypot(dx,dy);
+    if (len < 1) return;
+    var angle = Math.atan2(dy,dx);
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = width || 3;
+    ctx.beginPath();
+    ctx.moveTo(x0,y0);
+    ctx.lineTo(x1,y1);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x1,y1);
+    ctx.lineTo(x1-headlen*Math.cos(angle-Math.PI/6), y1-headlen*Math.sin(angle-Math.PI/6));
+    ctx.lineTo(x1-headlen*Math.cos(angle+Math.PI/6), y1-headlen*Math.sin(angle+Math.PI/6));
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function render(dt){
+    var v = parseFloat(vSlider.value);
+    var rho = parseFloat(rhoSlider.value);
+    var at = parseFloat(atSlider.value);
+    var an = (v*v)/rho;
+    var omega = v/rho;
+
+    vVal.textContent = v.toFixed(1)+' m/s';
+    rhoVal.textContent = rho.toFixed(1)+' m';
+    atVal.textContent = at.toFixed(1)+' m/s²';
+    outAt.textContent = Math.abs(at).toFixed(2)+' m/s²';
+    outAn.textContent = an.toFixed(2)+' m/s²';
+    outA.textContent = Math.hypot(at,an).toFixed(2)+' m/s²';
+    outOmega.textContent = omega.toFixed(2)+' rad/s';
+
+    theta += omega*dt;
+
+    var R = pixelRadius(rho);
+
+    ctx.clearRect(0,0,W,H);
+
+    // baggrunds-grid
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+    ctx.lineWidth = 1;
+    for (var gx=0; gx<W; gx+=40){ ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,H); ctx.stroke(); }
+    for (var gy=0; gy<H; gy+=40){ ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(W,gy); ctx.stroke(); }
+
+    // banen (cirkel)
+    ctx.strokeStyle = 'rgba(94,200,255,0.35)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([6,6]);
+    ctx.beginPath();
+    ctx.arc(cx,cy,R,0,Math.PI*2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // centrum
+    ctx.fillStyle = 'rgba(224,224,224,0.5)';
+    ctx.beginPath();
+    ctx.arc(cx,cy,3,0,Math.PI*2);
+    ctx.fill();
+    ctx.font = '12px Segoe UI';
+    ctx.fillText('krumningscentrum', cx+8, cy-8);
+
+    // partiklens position
+    var px = cx + R*Math.cos(theta);
+    var py = cy + R*Math.sin(theta);
+
+    // enhedsvektorer: tangential t (retning af bevægelse), normal n (mod centrum)
+    var tx = -Math.sin(theta), ty = Math.cos(theta);
+    var nx = (cx-px)/R, ny = (cy-py)/R;
+
+    // skalering af pile (kun visuel, ikke fysisk skala)
+    var vScale = 6;   // px per m/s
+    var aScale = 6;   // px per m/s²
+
+    // v-vektor (grøn)
+    drawArrow(px,py, px+tx*v*vScale, py+ty*v*vScale, '#00d984', 3);
+    // a_t-vektor (gul) - langs tangenten, fortegn af at
+    var atx = tx*Math.sign(at||1);
+    var aty = ty*Math.sign(at||1);
+    if (Math.abs(at) > 0.01) drawArrow(px,py, px+tx*at*aScale, py+ty*at*aScale, '#ffa500', 3);
+    // a_n-vektor (lilla) - mod centrum
+    drawArrow(px,py, px+nx*an*aScale, py+ny*an*aScale, '#d984ff', 3);
+
+    // partikel
+    ctx.fillStyle = '#5ec8ff';
+    ctx.beginPath();
+    ctx.arc(px,py,6,0,Math.PI*2);
+    ctx.fill();
+  }
+
+  function loop(t){
+    if (lastT===null) lastT = t;
+    var dt = Math.min((t-lastT)/1000, 0.05);
+    lastT = t;
+    render(dt);
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
