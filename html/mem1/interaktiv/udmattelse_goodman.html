@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: S-N-kurve og Goodman-diagram</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Udmattelse — S-N-kurve og Goodman-diagram</h1>
+  <p>Udmattelse og stød · Kapitel 7</p>
+  <div class="badge">Skru på spændingsamplitude og middelspænding — hold dig under Goodman-linjen</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  S-N-kurven forudsiger levetid N ved <strong>ren svingende</strong> belastning (σm=0). Har lasten
+  også en middelspænding σm, bruges <strong>Goodman-linjen</strong>: σa/S_e + σm/S_ut = 1 — alt
+  under linjen er sikkert (uendelig levetid, forenklet).
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Trækstyrke S_ut <span class="val" id="sutVal">600 MPa</span></label>
+      <input type="range" id="sutSlider" min="200" max="1400" step="10" value="600">
+    </div>
+    <div class="slider-row">
+      <label>Spændingsamplitude σa <span class="val" id="saVal">150 MPa</span></label>
+      <input type="range" id="saSlider" min="10" max="500" step="5" value="150">
+    </div>
+    <div class="slider-row">
+      <label>Middelspænding σm <span class="val" id="smVal">50 MPa</span></label>
+      <input type="range" id="smSlider" min="0" max="600" step="5" value="50">
+    </div>
+
+    <div class="formula-box">
+      <div><span class="f">S_e</span> ≈ 0,5·S_ut &nbsp; (typisk tilnærmelse for stål)</div>
+      <div style="margin-top:0.3rem;">Goodman: σa/S_e + σm/S_ut = 1</div>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>S-N + Goodman</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">S_e (udmattelsesgrænse)</div><div class="num" id="outSe">—</div></div>
+      <div><div class="lbl">Forudsagt levetid N (σm=0)</div><div class="num" id="outN">—</div></div>
+      <div><div class="lbl">Goodman-udnyttelse</div><div class="num" id="outGoodman">—</div></div>
+      <div><div class="lbl">Status (m. σm)</div><div class="num" id="outStatus">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+
+  var sutS=document.getElementById('sutSlider'), saS=document.getElementById('saSlider'), smS=document.getElementById('smSlider');
+  var sutVal=document.getElementById('sutVal'), saVal=document.getElementById('saVal'), smVal=document.getElementById('smVal');
+  var outSe=document.getElementById('outSe'), outN=document.getElementById('outN'), outGoodman=document.getElementById('outGoodman'), outStatus=document.getElementById('outStatus');
+
+  function render(){
+    var Sut=parseFloat(sutS.value), sa=parseFloat(saS.value), sm=parseFloat(smS.value);
+    sutVal.textContent=Sut.toFixed(0)+' MPa';
+    saVal.textContent=sa.toFixed(0)+' MPa';
+    smVal.textContent=sm.toFixed(0)+' MPa';
+
+    var Se = 0.5*Sut;
+    var f = Sut<1400 ? 0.9 : 0.85;
+    var a = Math.pow(f*Sut,2)/Se;
+    var b = -(1/3)*Math.log10(f*Sut/Se);
+    var N = Math.pow(sa/a, 1/b);
+
+    outSe.textContent = Se.toFixed(0)+' MPa';
+    outN.textContent = N>1e9 ? '>10⁹ (uendelig)' : N.toExponential(2)+' cyklusser';
+
+    var goodmanUse = sa/Se + sm/Sut;
+    outGoodman.textContent = (goodmanUse*100).toFixed(0)+' %';
+    outStatus.textContent = goodmanUse<=1 ? 'Sikker (under Goodman-linjen)' : 'SVIGTER (over Goodman-linjen)';
+    outStatus.style.color = goodmanUse<=1 ? 'var(--accent-green)' : 'var(--accent-red)';
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    // S-N kurve (log-log), top
+    var gx0=70, gx1=W-30, gy0=40, gy1=220;
+    ctx.strokeStyle='rgba(224,224,224,0.3)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(gx0,gy0); ctx.lineTo(gx0,gy1); ctx.lineTo(gx1,gy1); ctx.stroke();
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.font='11px Segoe UI';
+    ctx.fillText('S-N (log N)', gx0, gy0-8);
+
+    var logNmin=3, logNmax=9;
+    function Xn(logN){ return gx0+(logN-logNmin)/(logNmax-logNmin)*(gx1-gx0); }
+    function Yn(s){ return gy1-(s/Sut)*(gy1-gy0); }
+
+    ctx.strokeStyle='#00d984'; ctx.lineWidth=2;
+    ctx.beginPath();
+    for (var logN=logNmin; logN<=6; logN+=0.05){
+      var s = a*Math.pow(Math.pow(10,logN), b);
+      var px=Xn(logN), py=Yn(s);
+      if (logN===logNmin) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+    }
+    ctx.lineTo(Xn(logNmax), Yn(Se));
+    ctx.stroke();
+
+    var logNop = Math.max(logNmin, Math.min(logNmax, Math.log10(Math.max(N,1))));
+    ctx.fillStyle='#ffa500';
+    ctx.beginPath(); ctx.arc(Xn(logNop), Yn(Math.min(sa,Sut)), 6,0,Math.PI*2); ctx.fill();
+
+    // Goodman-diagram, bund
+    var gy0b=280, gy1b=440;
+    ctx.strokeStyle='rgba(224,224,224,0.3)';
+    ctx.beginPath(); ctx.moveTo(gx0,gy0b); ctx.lineTo(gx0,gy1b); ctx.lineTo(gx1,gy1b); ctx.stroke();
+    ctx.fillStyle='rgba(224,224,224,0.5)';
+    ctx.fillText('Goodman: σa vs σm', gx0, gy0b-8);
+
+    function Xm(v){ return gx0+(v/Sut)*(gx1-gx0); }
+    function Ym(v){ return gy1b-(v/Se)*(gy1b-gy0b); }
+
+    ctx.strokeStyle='#5ec8ff'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(Xm(0),Ym(Se)); ctx.lineTo(Xm(Sut),Ym(0)); ctx.stroke();
+
+    ctx.fillStyle = goodmanUse<=1 ? '#00d984' : '#ff5e5e';
+    ctx.beginPath(); ctx.arc(Xm(sm), Ym(sa), 7, 0, Math.PI*2); ctx.fill();
+
+    ctx.fillStyle='rgba(224,224,224,0.4)'; ctx.font='10px Segoe UI';
+    ctx.fillText('σm →', gx1-40, gy1b+16);
+  }
+
+  [sutS,saS,smS].forEach(function(el){ el.addEventListener('input', render); });
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Mohrs cirkel</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Mohrs cirkel — hovedspændinger</h1>
+  <p>Spændinger og tøjninger · Kapitel 4</p>
+  <div class="badge">Skru på σx, σy og τxy — se cirklen og hovedspændingerne</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  Mohrs cirkel viser alle mulige spændingstilstande for et element, når det roteres. Hovedspændingerne
+  σ₁ og σ₂ er cirklens yderpunkter på σ-aksen (hvor forskydningsspændingen er nul), og maksimal
+  forskydning τ_maks er cirklens radius.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>σx <span class="val" id="sxVal">80 MPa</span></label>
+      <input type="range" id="sxSlider" min="-200" max="200" step="5" value="80">
+    </div>
+    <div class="slider-row">
+      <label>σy <span class="val" id="syVal">20 MPa</span></label>
+      <input type="range" id="sySlider" min="-200" max="200" step="5" value="20">
+    </div>
+    <div class="slider-row">
+      <label>τxy <span class="val" id="txyVal">40 MPa</span></label>
+      <input type="range" id="txySlider" min="-150" max="150" step="5" value="40">
+    </div>
+
+    <div class="formula-box">
+      <div><span class="f">σ₁,₂</span> = (σx+σy)/2 ± √[((σx−σy)/2)² + τxy²]</div>
+    </div>
+
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--accent-cyan)"></span> element ved x-y akser</span>
+      <span><span class="swatch" style="background:var(--accent-green)"></span> hovedspændingsakser</span>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Mohrs cirkel</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">σ₁ (maks. hovedspænding)</div><div class="num" id="outS1">—</div></div>
+      <div><div class="lbl">σ₂ (min. hovedspænding)</div><div class="num" id="outS2">—</div></div>
+      <div><div class="lbl">τ_maks</div><div class="num" id="outTmax">—</div></div>
+      <div><div class="lbl">θp (principal-vinkel)</div><div class="num" id="outTheta">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+
+  var sxS=document.getElementById('sxSlider'), syS=document.getElementById('sySlider'), txyS=document.getElementById('txySlider');
+  var sxVal=document.getElementById('sxVal'), syVal=document.getElementById('syVal'), txyVal=document.getElementById('txyVal');
+  var outS1=document.getElementById('outS1'), outS2=document.getElementById('outS2'), outTmax=document.getElementById('outTmax'), outTheta=document.getElementById('outTheta');
+
+  function render(){
+    var sx=parseFloat(sxS.value), sy=parseFloat(syS.value), txy=parseFloat(txyS.value);
+    sxVal.textContent=sx.toFixed(0)+' MPa';
+    syVal.textContent=sy.toFixed(0)+' MPa';
+    txyVal.textContent=txy.toFixed(0)+' MPa';
+
+    var c=(sx+sy)/2;
+    var R=Math.hypot((sx-sy)/2, txy);
+    var s1=c+R, s2=c-R;
+    var thetaP = 0.5*Math.atan2(2*txy, sx-sy)*180/Math.PI;
+
+    outS1.textContent=s1.toFixed(1)+' MPa';
+    outS2.textContent=s2.toFixed(1)+' MPa';
+    outTmax.textContent=R.toFixed(1)+' MPa';
+    outTheta.textContent=thetaP.toFixed(1)+'°';
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    // stress-element (venstre)
+    var ex=140, ey=110, es=70;
+    ctx.strokeStyle='#5ec8ff'; ctx.lineWidth=3;
+    ctx.strokeRect(ex-es/2, ey-es/2, es, es);
+    Widget.arrow(ctx, ex+es/2, ey, ex+es/2+Math.sign(sx||1)*30, ey, '#5ec8ff', 3);
+    Widget.arrow(ctx, ex, ey+es/2, ex, ey+es/2+Math.sign(sy||1)*30, '#5ec8ff', 3);
+    ctx.fillStyle='rgba(94,200,255,0.8)'; ctx.font='11px Segoe UI';
+    ctx.fillText('σx', ex+es/2+34, ey+4);
+    ctx.fillText('σy', ex-6, ey+es/2+44);
+    ctx.fillText('(x-y element)', ex-40, ey-60);
+
+    // Mohrs cirkel (midte/højre)
+    var gx0=280, gx1=W-30, gy0=60, gy1=420;
+    var axisMax = Math.max(Math.abs(s1),Math.abs(s2),R)*1.3+1;
+    var cx0 = (gx0+gx1)/2, cy0=(gy0+gy1)/2;
+    var scale = Math.min((gx1-gx0)/2, (gy1-gy0)/2)/axisMax;
+
+    ctx.strokeStyle='rgba(224,224,224,0.3)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(gx0,cy0); ctx.lineTo(gx1,cy0); ctx.moveTo(cx0,gy0); ctx.lineTo(cx0,gy1); ctx.stroke();
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.font='11px Segoe UI';
+    ctx.fillText('σ →', gx1-30, cy0-8);
+    ctx.fillText('τ', cx0+8, gy0+10);
+
+    var ccx = cx0 + c*scale;
+    ctx.strokeStyle='#e0e0e0'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(ccx, cy0, R*scale, 0, Math.PI*2); ctx.stroke();
+
+    // punkt (sx,txy) og (sy,-txy) - diametralt modsatte
+    var p1x = cx0+sx*scale, p1y = cy0-txy*scale;
+    var p2x = cx0+sy*scale, p2y = cy0+txy*scale;
+    ctx.strokeStyle='#5ec8ff'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(p1x,p1y); ctx.lineTo(p2x,p2y); ctx.stroke();
+    ctx.fillStyle='#5ec8ff';
+    ctx.beginPath(); ctx.arc(p1x,p1y,5,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(p2x,p2y,5,0,Math.PI*2); ctx.fill();
+    ctx.font='10px Segoe UI';
+    ctx.fillText('(σx,τxy)', p1x+8, p1y-6);
+    ctx.fillText('(σy,-τxy)', p2x+8, p2y+14);
+
+    // hovedspændinger
+    ctx.fillStyle='#00d984';
+    ctx.beginPath(); ctx.arc(cx0+s1*scale, cy0, 6, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx0+s2*scale, cy0, 6, 0, Math.PI*2); ctx.fill();
+    ctx.fillText('σ₁', cx0+s1*scale-6, cy0-14);
+    ctx.fillText('σ₂', cx0+s2*scale-6, cy0-14);
+  }
+
+  [sxS,syS,txyS].forEach(function(el){ el.addEventListener('input', render); });
+  render();
+})();
+</script>
+</body>
+</html>

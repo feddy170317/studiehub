@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Bremse med varmebetinget fading</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Bremse — friktionsmoment og fading</h1>
+  <p>Bremser og koblinger · Kapitel 18</p>
+  <div class="badge">Aktivér bremsen — se skiven bremse ned, og friktionen falde når det bliver varmt</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  Bremsemomentet er <strong>T = µ·F·r</strong>. Ved gentagen eller langvarig opbremsning ophobes
+  varme i bremsebelægningen, og friktionskoefficienten µ falder — det kaldes <strong>fading</strong>.
+  Samme klemkraft giver derfor mindre og mindre bremsemoment, hvis bremsen bliver for varm.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Klemkraft F <span class="val" id="fVal">2000 N</span></label>
+      <input type="range" id="fSlider" min="200" max="6000" step="50" value="2000">
+    </div>
+    <div class="slider-row">
+      <label>Effektiv radius r <span class="val" id="rVal">0.15 m</span></label>
+      <input type="range" id="rSlider" min="0.05" max="0.4" step="0.01" value="0.15">
+    </div>
+    <div class="slider-row">
+      <label>Friktionskoefficient µ₀ (kold) <span class="val" id="muVal">0.40</span></label>
+      <input type="range" id="muSlider" min="0.1" max="0.6" step="0.01" value="0.40">
+    </div>
+    <div class="slider-row">
+      <label>Inerti I (hjul+skive) <span class="val" id="iVal">1.5 kg·m²</span></label>
+      <input type="range" id="iSlider" min="0.2" max="10" step="0.1" value="1.5">
+    </div>
+    <div class="slider-row">
+      <label>Starthastighed ω₀ <span class="val" id="w0Val">40 rad/s</span></label>
+      <input type="range" id="w0Slider" min="5" max="120" step="1" value="40">
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" id="brakeBtn">🛑 Aktivér bremse</button>
+    </div>
+    <div class="btn-row">
+      <button class="btn secondary" id="pauseBtn">⏸ Pause</button>
+      <button class="btn secondary" id="resetBtn">Nulstil + afkøl</button>
+    </div>
+    <div class="paused-flag" id="pausedFlag">PAUSET</div>
+
+    <div class="formula-box">
+      <div><span class="f">T</span> = µ_eff·F·r &nbsp; <span class="f">µ_eff</span> falder med varme</div>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Bremseskive</h2>
+    <canvas id="stage" width="740" height="420"></canvas>
+    <div class="readout">
+      <div><div class="lbl">ω (live)</div><div class="num" id="outOmega">—</div></div>
+      <div><div class="lbl">µ_eff (nu)</div><div class="num" id="outMuEff">—</div></div>
+      <div><div class="lbl">Bremsemoment T</div><div class="num" id="outT">—</div></div>
+      <div><div class="lbl">Varmeniveau</div><div class="num" id="outHeat">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+
+  var fS=document.getElementById('fSlider'), rS=document.getElementById('rSlider'), muS=document.getElementById('muSlider'), iS=document.getElementById('iSlider'), w0S=document.getElementById('w0Slider');
+  var fVal=document.getElementById('fVal'), rVal=document.getElementById('rVal'), muVal=document.getElementById('muVal'), iVal=document.getElementById('iVal'), w0Val=document.getElementById('w0Val');
+  var outOmega=document.getElementById('outOmega'), outMuEff=document.getElementById('outMuEff'), outT=document.getElementById('outT'), outHeat=document.getElementById('outHeat');
+  var brakeBtn=document.getElementById('brakeBtn'), resetBtn=document.getElementById('resetBtn');
+
+  var omega = parseFloat(w0S.value);
+  var theta = 0;
+  var heat = 0; // 0..1
+  var braking = false;
+
+  brakeBtn.addEventListener('click', function(){
+    braking = !braking;
+    brakeBtn.textContent = braking ? '🛑 Slip bremsen' : '🛑 Aktivér bremse';
+  });
+  resetBtn.addEventListener('click', function(){
+    omega = parseFloat(w0S.value);
+    heat = 0;
+    braking = false;
+    brakeBtn.textContent = '🛑 Aktivér bremse';
+  });
+  w0S.addEventListener('input', function(){ if (!braking && omega===0) omega=parseFloat(w0S.value); });
+
+  Widget.loop(function(dt){
+    var F=parseFloat(fS.value), r=parseFloat(rS.value), mu0=parseFloat(muS.value), I=parseFloat(iS.value), w0=parseFloat(w0S.value);
+    fVal.textContent=F.toFixed(0)+' N';
+    rVal.textContent=r.toFixed(2)+' m';
+    muVal.textContent=mu0.toFixed(2);
+    iVal.textContent=I.toFixed(1)+' kg·m²';
+    w0Val.textContent=w0.toFixed(0)+' rad/s';
+
+    var muEff = mu0*(1-0.6*heat);
+    var T = braking && omega>0.01 ? muEff*F*r : 0;
+
+    if (braking && omega>0) {
+      var alpha = -T/I;
+      omega = Math.max(0, omega+alpha*dt);
+      heat = Math.min(1, heat + (T*Math.abs(omega))*dt*0.00002);
+    } else {
+      heat = Math.max(0, heat - dt*0.03); // afkøling når der ikke bremses
+    }
+    theta += omega*dt;
+
+    outOmega.textContent = omega.toFixed(2)+' rad/s';
+    outMuEff.textContent = muEff.toFixed(3);
+    outT.textContent = T.toFixed(1)+' Nm';
+    outHeat.textContent = (heat*100).toFixed(0)+' %';
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    var cx=250, cy=210, R=140;
+    ctx.strokeStyle='rgba(224,224,224,0.4)'; ctx.lineWidth=4;
+    ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.stroke();
+    ctx.save();
+    ctx.translate(cx,cy);
+    ctx.rotate(theta);
+    ctx.strokeStyle = braking ? '#ff5e5e' : '#5ec8ff'; ctx.lineWidth=4;
+    for (var k=0;k<6;k++){ var a=k*Math.PI/3; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(R*0.85*Math.cos(a),R*0.85*Math.sin(a)); ctx.stroke(); }
+    ctx.restore();
+
+    // bremsekaliber-skitse
+    if (braking) {
+      ctx.fillStyle='rgba(255,94,94,0.6)';
+      ctx.fillRect(cx+R-10, cy-30, 30, 60);
+      ctx.fillStyle='rgba(224,224,224,0.6)'; ctx.font='11px Segoe UI';
+      ctx.fillText('bremsebelægning', cx+R-4, cy-40);
+    }
+
+    // varme-gauge
+    var gx0=470, gx1=690, gy=100;
+    ctx.strokeStyle='rgba(224,224,224,0.3)'; ctx.lineWidth=14;
+    ctx.beginPath(); ctx.moveTo(gx0,gy); ctx.lineTo(gx1,gy); ctx.stroke();
+    var heatColor = heat<0.4 ? '#00d984' : (heat<0.75 ? '#ffa500' : '#ff5e5e');
+    ctx.strokeStyle=heatColor; ctx.lineWidth=14;
+    ctx.beginPath(); ctx.moveTo(gx0,gy); ctx.lineTo(gx0+heat*(gx1-gx0),gy); ctx.stroke();
+    ctx.fillStyle='rgba(224,224,224,0.6)'; ctx.font='12px Segoe UI';
+    ctx.fillText('Varme i bremsebelægning', gx0, gy-16);
+
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.font='12px Segoe UI';
+    ctx.fillText(braking ? 'BREMSER' : (omega<0.01 ? 'STOPPET' : 'Frihjul'), 460, 200);
+  });
+})();
+</script>
+</body>
+</html>

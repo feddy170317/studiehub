@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Tyndvægget trykbeholder</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Tyndvægget trykbeholder — hoop- og aksialspænding</h1>
+  <p>Cylindre og trykbeholdere · Kapitel 10</p>
+  <div class="badge">Skru på tryk, radius og vægtykkelse — hoop-spændingen er altid dobbelt så stor</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  I en tyndvægget cylinder under indre tryk er <strong>hoop-spændingen</strong> (rundt om cylinderen)
+  <strong>σ_h = p·r/t</strong> — dobbelt så stor som <strong>aksialspændingen</strong> (langs
+  cylinderen) <strong>σ_a = p·r/(2t)</strong>. Det er derfor pølser og trykflasker typisk revner på
+  langs, ikke tværs. Formlerne kræver r/t ≥ 10 for at være gyldige (tyndvægget antagelse).
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Indre tryk p <span class="val" id="pVal">5.0 MPa</span></label>
+      <input type="range" id="pSlider" min="0.1" max="30" step="0.1" value="5">
+    </div>
+    <div class="slider-row">
+      <label>Radius r <span class="val" id="rVal">200 mm</span></label>
+      <input type="range" id="rSlider" min="20" max="1000" step="5" value="200">
+    </div>
+    <div class="slider-row">
+      <label>Vægtykkelse t <span class="val" id="tVal">10 mm</span></label>
+      <input type="range" id="tSlider" min="2" max="100" step="1" value="10">
+    </div>
+
+    <div class="formula-box">
+      <div><span class="f">σ_h</span> = p·r/t &nbsp; <span class="f">σ_a</span> = p·r/(2t)</div>
+    </div>
+
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--accent-red)"></span> σ_h (hoop, rundt om)</span>
+      <span><span class="swatch" style="background:var(--accent-cyan)"></span> σ_a (aksial, langs)</span>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Cylinder under tryk</h2>
+    <canvas id="stage" width="740" height="420"></canvas>
+    <div class="readout">
+      <div><div class="lbl">σ_h (hoop)</div><div class="num" id="outH" style="color:var(--accent-red)">—</div></div>
+      <div><div class="lbl">σ_a (aksial)</div><div class="num" id="outA" style="color:var(--accent-cyan)">—</div></div>
+      <div><div class="lbl">r/t (tyndvægget-tjek)</div><div class="num" id="outRatio">—</div></div>
+      <div><div class="lbl">Gyldig tyndvægget-antagelse?</div><div class="num" id="outValid">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+
+  var pS=document.getElementById('pSlider'), rS=document.getElementById('rSlider'), tS=document.getElementById('tSlider');
+  var pVal=document.getElementById('pVal'), rVal=document.getElementById('rVal'), tVal=document.getElementById('tVal');
+  var outH=document.getElementById('outH'), outA=document.getElementById('outA'), outRatio=document.getElementById('outRatio'), outValid=document.getElementById('outValid');
+
+  function render(){
+    var p=parseFloat(pS.value)*1e6, r=parseFloat(rS.value)/1000, t=parseFloat(tS.value)/1000;
+    pVal.textContent=(p/1e6).toFixed(1)+' MPa';
+    rVal.textContent=(r*1000).toFixed(0)+' mm';
+    tVal.textContent=(t*1000).toFixed(0)+' mm';
+
+    var sigH = p*r/t, sigA = p*r/(2*t);
+    var ratio = r/t;
+
+    outH.textContent = (sigH/1e6).toFixed(1)+' MPa';
+    outA.textContent = (sigA/1e6).toFixed(1)+' MPa';
+    outRatio.textContent = ratio.toFixed(1);
+    outValid.textContent = ratio>=10 ? 'JA (r/t ≥ 10)' : 'NEJ — brug tykvægget teori (Lamé)';
+    outValid.style.color = ratio>=10 ? 'var(--accent-green)' : 'var(--accent-red)';
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    var cx=250, cy=210, R=140;
+    ctx.strokeStyle='#e0e0e0'; ctx.lineWidth=8;
+    ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.stroke();
+    ctx.fillStyle='rgba(94,200,255,0.08)';
+    ctx.beginPath(); ctx.arc(cx,cy,R-10,0,Math.PI*2); ctx.fill();
+
+    // hoop-pile (radiale, rødt, udad)
+    for (var k=0;k<8;k++){
+      var a = k*Math.PI/4;
+      var x0=cx+ (R-4)*Math.cos(a), y0=cy+(R-4)*Math.sin(a);
+      Widget.arrow(ctx, x0,y0, x0+30*Math.cos(a), y0+30*Math.sin(a), '#ff5e5e', 3);
+    }
+    ctx.fillStyle='rgba(255,94,94,0.8)'; ctx.font='12px Segoe UI';
+    ctx.fillText('σ_h (hoop)', cx-30, cy-R-40);
+
+    // aksial-pile (langs cylinderakse, lodret op/ned, cyan) - vist som et separat udsnit til højre
+    var ax=560, ay0=100, ay1=340;
+    ctx.strokeStyle='#e0e0e0'; ctx.lineWidth=6;
+    ctx.beginPath(); ctx.moveTo(ax-60,ay0); ctx.lineTo(ax+60,ay0); ctx.moveTo(ax-60,ay1); ctx.lineTo(ax+60,ay1); ctx.stroke();
+    ctx.strokeStyle='rgba(94,200,255,0.3)'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(ax-60,ay0); ctx.lineTo(ax-60,ay1); ctx.moveTo(ax+60,ay0); ctx.lineTo(ax+60,ay1); ctx.stroke();
+    Widget.arrow(ctx, ax-60, ay0+30, ax-60, ay0-10, '#5ec8ff', 3);
+    Widget.arrow(ctx, ax+60, ay0+30, ax+60, ay0-10, '#5ec8ff', 3);
+    ctx.fillStyle='rgba(94,200,255,0.8)'; ctx.fillText('σ_a (aksial, langs)', ax-50, ay0-20);
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.font='11px Segoe UI'; ctx.fillText('cylinder-endedæksel', ax-46, ay1+24);
+  }
+
+  [pS,rS,tS].forEach(function(el){ el.addEventListener('input', render); });
+  render();
+})();
+</script>
+</body>
+</html>

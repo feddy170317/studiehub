@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Glideleje — Sommerfeld-tal og excentricitet</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Glideleje — Sommerfeld-tal og excentricitet</h1>
+  <p>Glidelejer (hydrodynamiske) · Kapitel 12</p>
+  <div class="badge">Skru på hastighed, viskositet og last — se akslen finde sit hvilepunkt i lejet</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  Det dimensionsløse <strong>Sommerfeld-tal S = (r/c)²·(µN/P)</strong> samler geometri, viskositet,
+  hastighed og last i ét tal. Ved høj hastighed/viskositet (højt S) "flyder" akslen op og centrerer
+  sig i oliefilmen; ved lav hastighed/høj last (lavt S) presses den tættere på lejevæggen —
+  excentricitetsforholdet ε her er en illustrativ tilnærmelse, ikke et opslag i de rigtige
+  Raimondi-Boyd-diagrammer.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Viskositet µ <span class="val" id="muVal">0.05 Pa·s</span></label>
+      <input type="range" id="muSlider" min="1" max="200" step="1" value="50">
+    </div>
+    <div class="slider-row">
+      <label>Rotationshastighed N <span class="val" id="nVal">1500 RPM</span></label>
+      <input type="range" id="nSlider" min="100" max="6000" step="50" value="1500">
+    </div>
+    <div class="slider-row">
+      <label>Belastning P (enhedslast) <span class="val" id="pVal">1.0 MPa</span></label>
+      <input type="range" id="pSlider" min="0.1" max="10" step="0.1" value="1">
+    </div>
+    <div class="slider-row">
+      <label>r/c (radius/spillerum-forhold) <span class="val" id="rcVal">1000</span></label>
+      <input type="range" id="rcSlider" min="200" max="2000" step="10" value="1000">
+    </div>
+
+    <div class="formula-box">
+      <div><span class="f">S</span> = (r/c)² · µN / P</div>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Aksel i lejebøsning</h2>
+    <canvas id="stage" width="740" height="420"></canvas>
+    <div class="readout">
+      <div><div class="lbl">Sommerfeld-tal S</div><div class="num" id="outS">—</div></div>
+      <div><div class="lbl">Excentricitetsforhold ε (illustrativ)</div><div class="num" id="outEps">—</div></div>
+      <div><div class="lbl">Regime</div><div class="num" id="outRegime">—</div></div>
+      <div><div class="lbl">Risiko for metal-mod-metal?</div><div class="num" id="outRisk">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+
+  var muS=document.getElementById('muSlider'), nS=document.getElementById('nSlider'), pS=document.getElementById('pSlider'), rcS=document.getElementById('rcSlider');
+  var muVal=document.getElementById('muVal'), nVal=document.getElementById('nVal'), pVal=document.getElementById('pVal'), rcVal=document.getElementById('rcVal');
+  var outS=document.getElementById('outS'), outEps=document.getElementById('outEps'), outRegime=document.getElementById('outRegime'), outRisk=document.getElementById('outRisk');
+
+  function render(){
+    var mu=parseFloat(muS.value)/1000, N_rpm=parseFloat(nS.value), P=parseFloat(pS.value)*1e6, rc=parseFloat(rcS.value);
+    muVal.textContent=mu.toFixed(3)+' Pa·s';
+    nVal.textContent=N_rpm.toFixed(0)+' RPM';
+    pVal.textContent=(P/1e6).toFixed(1)+' MPa';
+    rcVal.textContent=rc.toFixed(0);
+
+    var N_rps = N_rpm/60;
+    var S = rc*rc*mu*N_rps/P;
+    // illustrativ tilnærmelse: eps -> 1 ved lav S (tæt på lejevæg), eps -> 0 ved høj S (centreret)
+    var eps = 1/(1+S*3);
+
+    outS.textContent = S.toFixed(3);
+    outEps.textContent = eps.toFixed(2);
+    var regime = S<0.05 ? 'Grænsesmøring (risiko)' : (S<0.3 ? 'Blandet smøring' : 'Hydrodynamisk (fuld film)');
+    outRegime.textContent = regime;
+    outRegime.style.color = S<0.05 ? 'var(--accent-red)' : (S<0.3 ? 'var(--accent-gold)' : 'var(--accent-green)');
+    outRisk.textContent = eps>0.85 ? 'JA — meget tæt på væggen' : (eps>0.6 ? 'Moderat' : 'Lav');
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    var cx=370, cy=210, Rbore=150, rShaft=100;
+    ctx.strokeStyle='#e0e0e0'; ctx.lineWidth=6;
+    ctx.beginPath(); ctx.arc(cx,cy,Rbore,0,Math.PI*2); ctx.stroke();
+
+    var offset = eps*(Rbore-rShaft-4);
+    var shaftCx = cx, shaftCy = cy+offset;
+    ctx.fillStyle='rgba(94,200,255,0.15)';
+    ctx.beginPath(); ctx.arc(shaftCx,shaftCy,rShaft,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='#5ec8ff'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.arc(shaftCx,shaftCy,rShaft,0,Math.PI*2); ctx.stroke();
+
+    // oliefilm-tykkelse antydet (tyndest i bund)
+    ctx.strokeStyle='rgba(255,165,0,0.5)'; ctx.setLineDash([4,4]); ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(shaftCx,shaftCy+rShaft); ctx.lineTo(cx,cy+Rbore); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(255,165,0,0.7)'; ctx.font='11px Segoe UI';
+    ctx.fillText('oliefilm', cx+8, (shaftCy+rShaft+cy+Rbore)/2);
+
+    ctx.fillStyle='rgba(224,224,224,0.6)'; ctx.font='12px Segoe UI'; ctx.textAlign='center';
+    ctx.fillText('ε = '+eps.toFixed(2), cx, 50);
+    ctx.textAlign='left';
+  }
+
+  [muS,nS,pS,rcS].forEach(function(el){ el.addEventListener('input', render); });
+  render();
+})();
+</script>
+</body>
+</html>

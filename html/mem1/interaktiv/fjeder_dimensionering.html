@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Skruefjeder — stivhed og Wahl-faktor</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Skruefjeder — stivhed og Wahl-faktor</h1>
+  <p>Fjedre · Kapitel 17</p>
+  <div class="badge">Skru på tråddiameter, coildiameter og vindinger — se fjederen sætte sig</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  Fjederstivheden <strong>k = G·d⁴/(8D³N)</strong> afhænger stærkt af tråddiameteren d (i 4. potens!).
+  Den maksimale forskydningsspænding i tråden korrigeres med <strong>Wahl-faktoren K_w</strong>, som
+  tager højde for krumning og direkte forskydning i en tæt viklet fjeder.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Tråddiameter d <span class="val" id="dVal">3.0 mm</span></label>
+      <input type="range" id="dSlider" min="0.5" max="10" step="0.1" value="3">
+    </div>
+    <div class="slider-row">
+      <label>Coildiameter D <span class="val" id="DVal">24 mm</span></label>
+      <input type="range" id="DSlider" min="5" max="100" step="1" value="24">
+    </div>
+    <div class="slider-row">
+      <label>Aktive vindinger N <span class="val" id="nVal">10</span></label>
+      <input type="range" id="nSlider" min="2" max="40" step="1" value="10">
+    </div>
+    <div class="slider-row">
+      <label>Anvendt last F <span class="val" id="fVal">50 N</span></label>
+      <input type="range" id="fSlider" min="0" max="500" step="5" value="50">
+    </div>
+
+    <button class="btn" id="pauseBtn">⏸ Pause</button>
+    <div class="paused-flag" id="pausedFlag">PAUSET</div>
+
+    <div class="formula-box">
+      <div><span class="f">k</span> = Gd⁴/(8D³N) &nbsp; (G=79,3 GPa, fjederstål)</div>
+      <div style="margin-top:0.3rem;"><span class="f">K_w</span> = (4C−1)/(4C−4) + 0,615/C, &nbsp; C=D/d</div>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Fjeder under last</h2>
+    <canvas id="stage" width="740" height="420"></canvas>
+    <div class="readout">
+      <div><div class="lbl">k (fjederstivhed)</div><div class="num" id="outK">—</div></div>
+      <div><div class="lbl">δ (deflektion ved F)</div><div class="num" id="outDelta">—</div></div>
+      <div><div class="lbl">K_w (Wahl-faktor)</div><div class="num" id="outKw">—</div></div>
+      <div><div class="lbl">τ_maks (korrigeret)</div><div class="num" id="outTau">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var G = 79.3e9;
+
+  var dS=document.getElementById('dSlider'), DS=document.getElementById('DSlider'), nS=document.getElementById('nSlider'), fS=document.getElementById('fSlider');
+  var dVal=document.getElementById('dVal'), DVal=document.getElementById('DVal'), nVal=document.getElementById('nVal'), fVal=document.getElementById('fVal');
+  var outK=document.getElementById('outK'), outDelta=document.getElementById('outDelta'), outKw=document.getElementById('outKw'), outTau=document.getElementById('outTau');
+
+  var x=0, v=0;
+  var zeta=0.35;
+
+  Widget.loop(function(dt){
+    var d=parseFloat(dS.value)/1000, D=parseFloat(DS.value)/1000, N=parseFloat(nS.value), F=parseFloat(fS.value);
+    dVal.textContent=(d*1000).toFixed(1)+' mm';
+    DVal.textContent=(D*1000).toFixed(0)+' mm';
+    nVal.textContent=N.toFixed(0);
+    fVal.textContent=F.toFixed(0)+' N';
+
+    var k = G*Math.pow(d,4)/(8*Math.pow(D,3)*N);
+    var C = D/d;
+    var Kw = (4*C-1)/(4*C-4) + 0.615/C;
+    var tau = Kw*8*F*D/(Math.PI*Math.pow(d,3));
+    var deltaEq = F/k;
+
+    outK.textContent = (k/1000).toFixed(2)+' kN/m';
+    outDelta.textContent = (deltaEq*1000).toFixed(1)+' mm';
+    outKw.textContent = Kw.toFixed(3);
+    outTau.textContent = (tau/1e6).toFixed(1)+' MPa';
+
+    // let dæmpet indsvingning mod deltaEq (kun til visuel liv, ikke reel dynamisk fjedermasse)
+    var m = 1, wn = Math.max(k/2000, 4); // illustrativ, holder svingningen synlig og hurtig
+    var c = 2*zeta*Math.sqrt(wn*m);
+    var steps=6, h=dt/steps;
+    for (var s=0;s<steps;s++){
+      var a = (-wn*(x-deltaEq) - c*v)/m;
+      v += a*h; x += v*h;
+    }
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    // fjeder-visning
+    var colX=300, topY=60, freeLen=280;
+    var compressedLen = Math.max(freeLen - x*4000, 40);
+    var coils = Math.max(Math.round(N),3);
+    ctx.strokeStyle='#5ec8ff'; ctx.lineWidth=3;
+    ctx.beginPath();
+    ctx.moveTo(colX,topY);
+    var segH = compressedLen/coils;
+    for (var i=1;i<coils;i++){
+      var xx = colX + ((i%2===0)?-30:30);
+      ctx.lineTo(xx, topY+i*segH);
+    }
+    ctx.lineTo(colX, topY+compressedLen);
+    ctx.stroke();
+
+    ctx.fillStyle='#e0e0e0';
+    ctx.fillRect(colX-50, topY-16, 100, 12);
+    ctx.fillRect(colX-60, topY+compressedLen, 120, 16);
+
+    Widget.arrow(ctx, colX, topY+compressedLen+70, colX, topY+compressedLen+20, '#ffa500', 4);
+    ctx.fillStyle='rgba(255,165,0,0.8)'; ctx.font='13px Segoe UI';
+    ctx.fillText('F', colX+12, topY+compressedLen+50);
+
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.font='11px Segoe UI';
+    ctx.fillText('C = D/d = '+C.toFixed(1)+' (bør typisk være 4–12)', 460, 100);
+  });
+})();
+</script>
+</body>
+</html>

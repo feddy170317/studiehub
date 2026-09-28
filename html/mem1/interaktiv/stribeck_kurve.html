@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Stribeck-kurven — smøreregimer</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Stribeck-kurven — smøreregimer</h1>
+  <p>Smøring, friktion og slid · Kapitel 8</p>
+  <div class="badge">Skru på driftsparameteren ηN/P — se friktionen ændre karakter</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  Friktionskoefficienten μ opfører sig meget forskelligt afhængigt af, om overfladerne er i
+  <strong>direkte metal-mod-metal-kontakt</strong> (grænsesmøring), delvist adskilt af olie
+  (blandet smøring) eller helt adskilt af en oliefilm (hydrodynamisk smøring). Kurvens minimum
+  er det mest effektive driftspunkt — men også tættest på grænsesmøring, hvis noget ændrer sig.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Driftsparameter ηN/P <span class="val" id="xVal">1.0</span></label>
+      <input type="range" id="xSlider" min="0" max="1000" step="1" value="500">
+    </div>
+
+    <div class="formula-box">
+      <div>Illustrativ model: <span class="f">μ(x)</span> = A/x + B·x</div>
+      <div style="margin-top:0.3rem;">(reelle Stribeck-kurver måles empirisk pr. system)</div>
+    </div>
+
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--accent-red)"></span> Grænsesmøring</span>
+      <span><span class="swatch" style="background:var(--accent-gold)"></span> Blandet smøring</span>
+      <span><span class="swatch" style="background:var(--accent-green)"></span> Hydrodynamisk</span>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>μ vs. ηN/P (log-skala)</h2>
+    <canvas id="stage" width="740" height="420"></canvas>
+    <div class="readout">
+      <div><div class="lbl">Friktionskoefficient μ</div><div class="num" id="outMu">—</div></div>
+      <div><div class="lbl">Regime</div><div class="num" id="outRegime">—</div></div>
+      <div><div class="lbl">Optimalt driftspunkt (min. μ)</div><div class="num" id="outOpt">—</div></div>
+      <div><div class="lbl">Filmtykkelse</div><div class="num" id="outFilm">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var A=0.08, B=0.00012; // formkonstanter, valgt for illustrativ kurve
+  var xOpt = Math.sqrt(A/B);
+  var logXmin=-2, logXmax=3;
+
+  var xS=document.getElementById('xSlider'), xVal=document.getElementById('xVal');
+  var outMu=document.getElementById('outMu'), outRegime=document.getElementById('outRegime'), outOpt=document.getElementById('outOpt'), outFilm=document.getElementById('outFilm');
+
+  function mu(x){ return A/x + B*x; }
+
+  function render(){
+    var logX = logXmin + (parseFloat(xS.value)/1000)*(logXmax-logXmin);
+    var x = Math.pow(10, logX);
+    xVal.textContent = x.toFixed(2);
+
+    var m = mu(x);
+    outMu.textContent = m.toFixed(3);
+    var regime = x<xOpt*0.3 ? 'Grænsesmøring' : (x<xOpt*3 ? 'Blandet smøring' : 'Hydrodynamisk');
+    outRegime.textContent = regime;
+    outRegime.style.color = regime==='Grænsesmøring' ? 'var(--accent-red)' : (regime==='Blandet smøring' ? 'var(--accent-gold)' : 'var(--accent-green)');
+    outOpt.textContent = xOpt.toFixed(2)+' (ηN/P)';
+    outFilm.textContent = regime==='Grænsesmøring' ? 'Meget tynd / kontakt' : (regime==='Blandet smøring' ? 'Delvis film' : 'Fuld separerende film');
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    var gx0=70, gx1=W-30, gy0=50, gy1=380;
+    function X(lx){ return gx0+(lx-logXmin)/(logXmax-logXmin)*(gx1-gx0); }
+    var muMax = mu(Math.pow(10,logXmin));
+    function Y(v){ return gy1-(v/muMax)*(gy1-gy0)*0.95; }
+
+    // regime-zoner
+    ctx.fillStyle='rgba(255,94,94,0.08)'; ctx.fillRect(gx0,gy0,X(Math.log10(xOpt*0.3))-gx0,gy1-gy0);
+    ctx.fillStyle='rgba(255,165,0,0.08)'; ctx.fillRect(X(Math.log10(xOpt*0.3)),gy0,X(Math.log10(xOpt*3))-X(Math.log10(xOpt*0.3)),gy1-gy0);
+    ctx.fillStyle='rgba(0,217,132,0.08)'; ctx.fillRect(X(Math.log10(xOpt*3)),gy0,gx1-X(Math.log10(xOpt*3)),gy1-gy0);
+
+    ctx.strokeStyle='rgba(224,224,224,0.3)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(gx0,gy0); ctx.lineTo(gx0,gy1); ctx.lineTo(gx1,gy1); ctx.stroke();
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.font='11px Segoe UI';
+    ctx.fillText('μ', gx0-4, gy0-10);
+    ctx.fillText('ηN/P (log) →', gx1-90, gy1+18);
+
+    ctx.strokeStyle='#5ec8ff'; ctx.lineWidth=2.5;
+    ctx.beginPath();
+    var N=200;
+    for (var i=0;i<=N;i++){
+      var lx = logXmin+(logXmax-logXmin)*i/N;
+      var xx = Math.pow(10,lx);
+      var yy = mu(xx);
+      var px=X(lx), py=Y(yy);
+      if (i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+
+    ctx.fillStyle='#ffa500';
+    ctx.beginPath(); ctx.arc(X(logX), Y(m), 7, 0, Math.PI*2); ctx.fill();
+  }
+
+  xS.addEventListener('input', render);
+  render();
+})();
+</script>
+</body>
+</html>

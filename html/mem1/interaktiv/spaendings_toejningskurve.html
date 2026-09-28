@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Spændings-tøjningskurve</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Spændings-tøjningskurve</h1>
+  <p>Materialer og fremstilling · Kapitel 3</p>
+  <div class="badge">Træk i prøvestykket — se det gå fra elastisk til flydning til brud</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  I det elastiske område følger materialet Hookes lov (σ=E·ε) og fjeder tilbage til sin
+  oprindelige form. Efter flydegrænsen S_y bliver deformationen <strong>permanent</strong> (plastisk).
+  Kurvens former her er illustrative, ikke eksakte materialedata.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="btn-row">
+      <button class="btn secondary active" id="steelBtn">Stål</button>
+      <button class="btn secondary" id="alBtn">Aluminium</button>
+      <button class="btn secondary" id="castBtn">Støbejern (sprødt)</button>
+    </div>
+
+    <div class="slider-row" style="margin-top:1rem;">
+      <label>Tøjning ε (træk i prøvestykket) <span class="val" id="epsVal">0.0 %</span></label>
+      <input type="range" id="epsSlider" min="0" max="1000" step="1" value="0">
+    </div>
+
+    <div class="formula-box" id="formulaBox">
+      <div><span class="f">σ</span> = E·ε (elastisk) &nbsp; op til S_y</div>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>σ-ε kurve</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">σ (nu)</div><div class="num" id="outSig">—</div></div>
+      <div><div class="lbl">Område</div><div class="num" id="outRegion">—</div></div>
+      <div><div class="lbl">E-modul</div><div class="num" id="outE">—</div></div>
+      <div><div class="lbl">S_y / S_u</div><div class="num" id="outSySu">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+
+  var mats = {
+    steel: {name:'Stål', E:200e9, Sy:250e6, epsY:0.00125, Su:400e6, epsU:0.15, Sf:300e6, epsF:0.25, brittle:false},
+    al: {name:'Aluminium', E:70e9, Sy:95e6, epsY:0.00136, Su:150e6, epsU:0.12, Sf:110e6, epsF:0.18, brittle:false},
+    cast: {name:'Støbejern', E:100e9, Sy:200e6, epsY:0.002, Su:200e6, epsU:0.002, Sf:0, epsF:0.006, brittle:true}
+  };
+  var mat = mats.steel;
+
+  var epsS=document.getElementById('epsSlider'), epsVal=document.getElementById('epsVal');
+  var outSig=document.getElementById('outSig'), outRegion=document.getElementById('outRegion'), outE=document.getElementById('outE'), outSySu=document.getElementById('outSySu');
+  var formulaBox=document.getElementById('formulaBox');
+  var steelBtn=document.getElementById('steelBtn'), alBtn=document.getElementById('alBtn'), castBtn=document.getElementById('castBtn');
+
+  function selectMat(key, btn){
+    mat = mats[key];
+    [steelBtn,alBtn,castBtn].forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    render();
+  }
+  steelBtn.addEventListener('click', function(){ selectMat('steel', steelBtn); });
+  alBtn.addEventListener('click', function(){ selectMat('al', alBtn); });
+  castBtn.addEventListener('click', function(){ selectMat('cast', castBtn); });
+
+  function sigmaOf(eps, m){
+    if (eps<=m.epsY) return m.E*eps;
+    if (m.brittle) return null; // brud ved epsF, ingen plastisk område
+    if (eps<=m.epsU){
+      var f = (eps-m.epsY)/(m.epsU-m.epsY);
+      return m.Sy + (m.Su-m.Sy)*Math.sqrt(f);
+    }
+    if (eps<=m.epsF){
+      var f2 = (eps-m.epsU)/(m.epsF-m.epsU);
+      return m.Su + (m.Sf-m.Su)*f2;
+    }
+    return null; // brudt
+  }
+
+  function render(){
+    var epsMaxSlider = Math.max(mat.epsF*1.05, 0.01);
+    var eps = (parseFloat(epsS.value)/1000)*epsMaxSlider;
+    epsVal.textContent = (eps*100).toFixed(2)+' %';
+
+    var broken = eps > mat.epsF;
+    var sig = broken ? 0 : sigmaOf(eps, mat);
+
+    outSig.textContent = broken ? 'BRUDT' : (sig/1e6).toFixed(0)+' MPa';
+    outE.textContent = (mat.E/1e9).toFixed(0)+' GPa';
+    outSySu.textContent = mat.brittle ? (mat.Su/1e6).toFixed(0)+' MPa (sprødt brud)' : (mat.Sy/1e6).toFixed(0)+' / '+(mat.Su/1e6).toFixed(0)+' MPa';
+
+    var region = broken ? 'Brudt' : (eps<=mat.epsY ? 'Elastisk' : (mat.brittle ? 'Elastisk (intet plastisk område)' : (eps<=mat.epsU ? 'Plastisk (hærdning)' : 'Nekning')));
+    outRegion.textContent = region;
+    outRegion.style.color = broken ? 'var(--accent-red)' : (region==='Elastisk' ? 'var(--accent-cyan)' : (region==='Nekning' ? 'var(--accent-gold)' : 'var(--accent-green)'));
+
+    if (mat.brittle) {
+      formulaBox.innerHTML = '<div><span class="f">σ</span> = E·ε — intet flydeområde, brud sker sprødt</div>';
+    } else if (!broken && eps<=mat.epsY) {
+      formulaBox.innerHTML = '<div><span class="f">σ</span> = E·ε (elastisk) &nbsp; op til S_y</div>';
+    } else {
+      formulaBox.innerHTML = '<div>Plastisk område: permanent deformation, kurven flader ud mod S_u</div>';
+    }
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    var gx0=70, gx1=W-30, gy0=50, gy1=420;
+    var epsAxisMax = Math.max(mat.epsF*1.1, 0.01);
+    var sigAxisMax = Math.max(mat.Su, mat.Sy)*1.15;
+    function X(e){ return gx0+(e/epsAxisMax)*(gx1-gx0); }
+    function Y(s){ return gy1-(s/sigAxisMax)*(gy1-gy0); }
+
+    ctx.strokeStyle='rgba(224,224,224,0.3)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(gx0,gy0); ctx.lineTo(gx0,gy1); ctx.lineTo(gx1,gy1); ctx.stroke();
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.font='11px Segoe UI';
+    ctx.fillText('σ (MPa)', gx0, gy0-10);
+    ctx.fillText('ε', gx1-14, gy1+18);
+
+    ctx.strokeStyle='#5ec8ff'; ctx.lineWidth=2.5;
+    ctx.beginPath();
+    var N=200, drawn=false;
+    for (var i=0;i<=N;i++){
+      var e = epsAxisMax*i/N;
+      if (e>mat.epsF) break;
+      var s = sigmaOf(e, mat);
+      if (s===null) break;
+      var px=X(e), py=Y(s);
+      if (!drawn){ ctx.moveTo(px,py); drawn=true; } else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+
+    // operating point
+    if (!broken) {
+      ctx.fillStyle = region==='Elastisk' ? '#5ec8ff' : (region==='Nekning' ? '#ffa500' : '#00d984');
+      ctx.beginPath(); ctx.arc(X(eps), Y(sig), 7, 0, Math.PI*2); ctx.fill();
+    } else {
+      ctx.fillStyle='#ff5e5e';
+      ctx.beginPath(); ctx.arc(X(mat.epsF), Y(0.02*sigAxisMax), 8, 0, Math.PI*2); ctx.fill();
+      ctx.fillText('BRUD', X(mat.epsF)-16, Y(0.02*sigAxisMax)-14);
+    }
+
+    // Sy/Su reference-linjer
+    ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.setLineDash([3,4]);
+    ctx.beginPath(); ctx.moveTo(gx0,Y(mat.Sy)); ctx.lineTo(gx1,Y(mat.Sy)); ctx.stroke();
+    if (!mat.brittle) { ctx.beginPath(); ctx.moveTo(gx0,Y(mat.Su)); ctx.lineTo(gx1,Y(mat.Su)); ctx.stroke(); }
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(224,224,224,0.4)'; ctx.font='10px Segoe UI';
+    ctx.fillText('S_y', gx0+4, Y(mat.Sy)-4);
+  }
+
+  epsS.addEventListener('input', render);
+  render();
+})();
+</script>
+</body>
+</html>

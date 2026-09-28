@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Søjleknækning (Eulers formel)</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Søjleknækning — Eulers kritiske last</h1>
+  <p>Søjler (knækning) · Kapitel 9</p>
+  <div class="badge">Skru på last og længde — se søjlen knække, når P når P_cr</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  En slank søjle kan svigte ved <strong>udknækning</strong>, længe før materialet flyder.
+  Randbetingelserne afgør en effektiv længdefaktor K: <strong>P_cr = π²EI / (KL)²</strong>. En
+  fastspændt-fri søjle (K=2) knækker ved kun en fjerdedel af lasten for en tosidet ledbevægelig
+  søjle (K=1) af samme længde.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="btn-row">
+      <button class="btn secondary active" id="k1Btn">Leje-leje (K=1)</button>
+      <button class="btn secondary" id="k2Btn">Fastspændt-fri (K=2)</button>
+    </div>
+    <div class="btn-row">
+      <button class="btn secondary" id="k05Btn">Fastspændt-fastspændt (K=0,5)</button>
+      <button class="btn secondary" id="k07Btn">Fastspændt-leje (K=0,7)</button>
+    </div>
+
+    <div class="slider-row" style="margin-top:1rem;">
+      <label>Længde L <span class="val" id="lVal">1.5 m</span></label>
+      <input type="range" id="lSlider" min="0.3" max="4" step="0.05" value="1.5">
+    </div>
+    <div class="slider-row">
+      <label>Diameter d <span class="val" id="dVal">20 mm</span></label>
+      <input type="range" id="dSlider" min="5" max="80" step="1" value="20">
+    </div>
+    <div class="slider-row">
+      <label>Anvendt last P <span class="val" id="pVal">5.0 kN</span></label>
+      <input type="range" id="pSlider" min="0.1" max="50" step="0.1" value="5">
+    </div>
+
+    <div class="formula-box">
+      <div><span class="f">P_cr</span> = π²EI / (KL)² &nbsp; (E=200 GPa, stål)</div>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Søjleform</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">P_cr (kritisk knæklast)</div><div class="num" id="outPcr">—</div></div>
+      <div><div class="lbl">Slankhedsforhold KL/r</div><div class="num" id="outSlank">—</div></div>
+      <div><div class="lbl">Sikkerhedsfaktor n=P_cr/P</div><div class="num" id="outN">—</div></div>
+      <div><div class="lbl">Status</div><div class="num" id="outStatus">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var E = 200e9;
+
+  var lS=document.getElementById('lSlider'), dS=document.getElementById('dSlider'), pS=document.getElementById('pSlider');
+  var lVal=document.getElementById('lVal'), dVal=document.getElementById('dVal'), pVal=document.getElementById('pVal');
+  var outPcr=document.getElementById('outPcr'), outSlank=document.getElementById('outSlank'), outN=document.getElementById('outN'), outStatus=document.getElementById('outStatus');
+  var kBtns = { 1:document.getElementById('k1Btn'), 2:document.getElementById('k2Btn'), 0.5:document.getElementById('k05Btn'), 0.7:document.getElementById('k07Btn') };
+
+  var K=1;
+  Object.keys(kBtns).forEach(function(key){
+    kBtns[key].addEventListener('click', function(){
+      K=parseFloat(key);
+      Object.keys(kBtns).forEach(function(k2){ kBtns[k2].classList.toggle('active', k2===key); });
+      render();
+    });
+  });
+
+  function render(){
+    var L=parseFloat(lS.value), d=parseFloat(dS.value)/1000, P=parseFloat(pS.value)*1000;
+    lVal.textContent=L.toFixed(2)+' m';
+    dVal.textContent=(d*1000).toFixed(0)+' mm';
+    pVal.textContent=(P/1000).toFixed(1)+' kN';
+
+    var I = Math.PI*Math.pow(d,4)/64;
+    var A = Math.PI*d*d/4;
+    var r = Math.sqrt(I/A);
+    var Pcr = Math.PI*Math.PI*E*I/Math.pow(K*L,2);
+    var slank = K*L/r;
+    var n = Pcr/P;
+
+    outPcr.textContent = (Pcr/1000).toFixed(2)+' kN';
+    outSlank.textContent = slank.toFixed(0);
+    outN.textContent = n.toFixed(2);
+    var buckled = P>=Pcr;
+    outStatus.textContent = buckled ? 'KNÆKKER!' : 'Stabil';
+    outStatus.style.color = buckled ? 'var(--accent-red)' : 'var(--accent-green)';
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    var x0=W/2, y0=420, colLenPx=320;
+    var overload = Math.max(0, Math.min((P/Pcr-1), 1));
+    var bowAmp = buckled ? 20+overload*60 : 0;
+
+    ctx.strokeStyle = buckled ? '#ff5e5e' : '#5ec8ff';
+    ctx.lineWidth = 10; ctx.lineCap='round';
+    ctx.beginPath();
+    var N=40;
+    for (var i=0;i<=N;i++){
+      var f = i/N;
+      var y = y0-f*colLenPx;
+      var bow = bowAmp*Math.sin(Math.PI*f);
+      var x = x0+bow;
+      if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+
+    // fastspænding nedenfor
+    ctx.fillStyle='#e0e0e0';
+    for (var h=0;h<10;h++){ ctx.fillRect(x0-40+h*8, y0+8, 6, 16); }
+
+    // last-pil foroven
+    Widget.arrow(ctx, x0, y0-colLenPx-50, x0, y0-colLenPx-6, '#ffa500', 4);
+    ctx.fillStyle='rgba(255,165,0,0.8)'; ctx.font='13px Segoe UI';
+    ctx.fillText('P', x0+12, y0-colLenPx-30);
+
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.font='11px Segoe UI';
+    ctx.fillText('K = '+K.toFixed(2), x0-200, 40);
+  }
+
+  [lS,dS,pS].forEach(function(el){ el.addEventListener('input', render); });
+  render();
+})();
+</script>
+</body>
+</html>

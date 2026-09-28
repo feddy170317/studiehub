@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Rullelejers L10-levetid</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Rullelejers levetid — L10</h1>
+  <p>Rullelejer · Kapitel 13</p>
+  <div class="badge">Skru på last og dynamisk bæreevne — se hvor hurtigt levetiden falder</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  L10-levetiden er antal omdrejninger (i millioner), hvor 90 % af en population af ens lejer
+  overlever: <strong>L10 = (C/P)^p</strong>, hvor p=3 for kugleleje og p=10/3 for rulleleje.
+  Kurven er meget stejl — en fordobling af lasten kan reducere levetiden med en faktor 8.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="btn-row">
+      <button class="btn secondary active" id="ballBtn">Kugleleje (p=3)</button>
+      <button class="btn secondary" id="rollerBtn">Rulleleje (p=10/3)</button>
+    </div>
+
+    <div class="slider-row" style="margin-top:1rem;">
+      <label>Dynamisk bæreevne C <span class="val" id="cVal">20 kN</span></label>
+      <input type="range" id="cSlider" min="1" max="100" step="1" value="20">
+    </div>
+    <div class="slider-row">
+      <label>Ækvivalent last P <span class="val" id="pVal">5.0 kN</span></label>
+      <input type="range" id="pSlider" min="0.5" max="80" step="0.5" value="5">
+    </div>
+    <div class="slider-row">
+      <label>Rotationshastighed N <span class="val" id="nVal">1500 RPM</span></label>
+      <input type="range" id="nSlider" min="50" max="6000" step="50" value="1500">
+    </div>
+
+    <div class="formula-box">
+      <div><span class="f">L10</span> = (C/P)^p &nbsp; [mio. omdr.]</div>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Levetid vs. last</h2>
+    <canvas id="stage" width="740" height="420"></canvas>
+    <div class="readout">
+      <div><div class="lbl">L10 (mio. omdrejninger)</div><div class="num" id="outL10">—</div></div>
+      <div><div class="lbl">L10 i driftstimer</div><div class="num" id="outHours" style="color:var(--accent-green)">—</div></div>
+      <div><div class="lbl">Ca. i år (kontinuert drift)</div><div class="num" id="outYears">—</div></div>
+      <div><div class="lbl">C/P (belastningsforhold)</div><div class="num" id="outRatio">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+
+  var cS=document.getElementById('cSlider'), pS=document.getElementById('pSlider'), nS=document.getElementById('nSlider');
+  var cVal=document.getElementById('cVal'), pVal=document.getElementById('pVal'), nVal=document.getElementById('nVal');
+  var outL10=document.getElementById('outL10'), outHours=document.getElementById('outHours'), outYears=document.getElementById('outYears'), outRatio=document.getElementById('outRatio');
+  var ballBtn=document.getElementById('ballBtn'), rollerBtn=document.getElementById('rollerBtn');
+
+  var p = 3;
+  ballBtn.addEventListener('click', function(){ p=3; ballBtn.classList.add('active'); rollerBtn.classList.remove('active'); render(); });
+  rollerBtn.addEventListener('click', function(){ p=10/3; rollerBtn.classList.add('active'); ballBtn.classList.remove('active'); render(); });
+
+  function render(){
+    var C=parseFloat(cS.value), P=parseFloat(pS.value), N=parseFloat(nS.value);
+    cVal.textContent=C.toFixed(0)+' kN';
+    pVal.textContent=P.toFixed(1)+' kN';
+    nVal.textContent=N.toFixed(0)+' RPM';
+
+    var L10 = Math.pow(C/P, p);
+    var hours = L10*1e6/(60*N);
+    var years = hours/8760;
+
+    outL10.textContent = L10.toFixed(1)+' mio. omdr.';
+    outHours.textContent = hours>1e6 ? (hours/1e6).toFixed(2)+' mio. timer' : hours.toFixed(0)+' timer';
+    outYears.textContent = years.toFixed(1)+' år';
+    outRatio.textContent = (C/P).toFixed(2);
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    var gx0=70, gx1=W-30, gy0=50, gy1=380;
+    ctx.strokeStyle='rgba(224,224,224,0.3)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(gx0,gy0); ctx.lineTo(gx0,gy1); ctx.lineTo(gx1,gy1); ctx.stroke();
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.font='11px Segoe UI';
+    ctx.fillText('L10 (mio. omdr., log)', gx0, gy0-10);
+    ctx.fillText('P (kN) →', gx1-50, gy1+18);
+
+    var pMin=0.5, pMax=Math.max(C*1.2, 10);
+    var logL10min=-1, logL10max=Math.log10(Math.pow(C/pMin,p));
+    function X(pp){ return gx0+(pp/pMax)*(gx1-gx0); }
+    function Y(l){ return gy1-(Math.log10(Math.max(l,0.01))-logL10min)/(logL10max-logL10min)*(gy1-gy0); }
+
+    ctx.strokeStyle='#00d984'; ctx.lineWidth=2;
+    ctx.beginPath();
+    var N2=100;
+    for (var i=0;i<=N2;i++){
+      var pp = pMin+(pMax-pMin)*i/N2;
+      var l = Math.pow(C/pp,p);
+      var px=X(pp), py=Y(l);
+      if (i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+
+    ctx.fillStyle='#ffa500';
+    ctx.beginPath(); ctx.arc(X(P), Y(L10), 7, 0, Math.PI*2); ctx.fill();
+  }
+
+  [cS,pS,nS].forEach(function(el){ el.addEventListener('input', render); });
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Remtræk — tensionsforhold og effekt</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Remtræk — tensionsforhold og effektoverførsel</h1>
+  <p>Fleksible maskinelementer (rem/kæde) · Kapitel 19</p>
+  <div class="badge">Skru på friktion, omslyngningsvinkel og hastighed — se remmen bevæge sig</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  Forholdet mellem stram- og slækside i et remtræk er <strong>F₁/F₂ = e^(µθ)</strong> — voksende
+  friktion eller omslyngningsvinkel gør, at strammen kan blive meget større end slækken uden at
+  remmen glider. Den overførte effekt er <strong>P = (F₁−F₂)·v</strong>, hvor v er remmens
+  omløbshastighed.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Friktionskoefficient µ <span class="val" id="muVal">0.30</span></label>
+      <input type="range" id="muSlider" min="0.05" max="0.8" step="0.01" value="0.30">
+    </div>
+    <div class="slider-row">
+      <label>Omslyngningsvinkel θ <span class="val" id="thVal">180°</span></label>
+      <input type="range" id="thSlider" min="90" max="270" step="5" value="180">
+    </div>
+    <div class="slider-row">
+      <label>Slækside-spænding F₂ <span class="val" id="f2Val">100 N</span></label>
+      <input type="range" id="f2Slider" min="10" max="500" step="5" value="100">
+    </div>
+    <div class="slider-row">
+      <label>Remhastighed v <span class="val" id="vVal">5.0 m/s</span></label>
+      <input type="range" id="vSlider" min="0.5" max="25" step="0.5" value="5">
+    </div>
+
+    <button class="btn" id="pauseBtn">⏸ Pause</button>
+    <div class="paused-flag" id="pausedFlag">PAUSET</div>
+
+    <div class="formula-box">
+      <div><span class="f">F₁</span> = F₂·e^(µθ) &nbsp; <span class="f">P</span> = (F₁−F₂)·v</div>
+    </div>
+
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--accent-red)"></span> F₁ (stramside)</span>
+      <span><span class="swatch" style="background:var(--accent-cyan)"></span> F₂ (slækside)</span>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Remtræk</h2>
+    <canvas id="stage" width="740" height="420"></canvas>
+    <div class="readout">
+      <div><div class="lbl">F₁ (stramside)</div><div class="num" id="outF1" style="color:var(--accent-red)">—</div></div>
+      <div><div class="lbl">F₁/F₂ (forhold)</div><div class="num" id="outRatio">—</div></div>
+      <div><div class="lbl">Effekt P</div><div class="num" id="outP" style="color:var(--accent-green)">—</div></div>
+      <div><div class="lbl">Netto trækkraft (F₁−F₂)</div><div class="num" id="outNet">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+
+  var muS=document.getElementById('muSlider'), thS=document.getElementById('thSlider'), f2S=document.getElementById('f2Slider'), vS=document.getElementById('vSlider');
+  var muVal=document.getElementById('muVal'), thVal=document.getElementById('thVal'), f2Val=document.getElementById('f2Val'), vVal=document.getElementById('vVal');
+  var outF1=document.getElementById('outF1'), outRatio=document.getElementById('outRatio'), outP=document.getElementById('outP'), outNet=document.getElementById('outNet');
+
+  var cx1=250, cx2=520, cy=210, r1=90, r2=70;
+  function arcPts(cx,cyy,r,a0,a1,n){
+    var pts=[];
+    for (var i=0;i<=n;i++){ var a=a0+(a1-a0)*i/n; pts.push({x:cx+r*Math.cos(a), y:cyy+r*Math.sin(a)}); }
+    return pts;
+  }
+  // topline: venstre-top -> højre-top; højre-arc (top->bund, med uret); bundline: højre-bund->venstre-bund; venstre-arc (bund->top)
+  var topL = {x:cx1, y:cy-r1}, topR = {x:cx2, y:cy-r2};
+  var botR = {x:cx2, y:cy+r2}, botL = {x:cx1, y:cy+r1};
+  var beltPts = [topL, topR]
+    .concat(arcPts(cx2,cy,r2,-Math.PI/2,Math.PI/2,20))
+    .concat([botL])
+    .concat(arcPts(cx1,cy,r1,Math.PI/2,3*Math.PI/2,20));
+  var beltPath = Widget.pathBuild(beltPts);
+  var dashOffset = 0;
+
+  Widget.loop(function(dt){
+    var mu=parseFloat(muS.value), thDeg=parseFloat(thS.value), F2=parseFloat(f2S.value), v=parseFloat(vS.value);
+    muVal.textContent=mu.toFixed(2);
+    thVal.textContent=thDeg.toFixed(0)+'°';
+    f2Val.textContent=F2.toFixed(0)+' N';
+    vVal.textContent=v.toFixed(1)+' m/s';
+
+    var th = thDeg*Math.PI/180;
+    var F1 = F2*Math.exp(mu*th);
+    var P = (F1-F2)*v;
+
+    outF1.textContent = F1.toFixed(0)+' N';
+    outRatio.textContent = (F1/F2).toFixed(2);
+    outP.textContent = (P/1000).toFixed(2)+' kW';
+    outNet.textContent = (F1-F2).toFixed(0)+' N';
+
+    dashOffset += v*40*dt;
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    // remslynge (baggrund, grå)
+    ctx.strokeStyle='rgba(224,224,224,0.25)'; ctx.lineWidth=10;
+    ctx.beginPath();
+    beltPts.forEach(function(p,i){ if(i===0) ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y); });
+    ctx.closePath(); ctx.stroke();
+
+    // topline = stramside (rød), bundline = slækside (cyan)
+    ctx.strokeStyle='#ff5e5e'; ctx.lineWidth=6;
+    ctx.beginPath(); ctx.moveTo(topL.x,topL.y); ctx.lineTo(topR.x,topR.y); ctx.stroke();
+    ctx.strokeStyle='#5ec8ff'; ctx.lineWidth=6;
+    ctx.beginPath(); ctx.moveTo(botR.x,botR.y); ctx.lineTo(botL.x,botL.y); ctx.stroke();
+
+    // remskiver
+    ctx.fillStyle='#1a2a3b'; ctx.strokeStyle='#e0e0e0'; ctx.lineWidth=4;
+    ctx.beginPath(); ctx.arc(cx1,cy,r1,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx2,cy,r2,0,Math.PI*2); ctx.fill(); ctx.stroke();
+
+    // bevægelses-prikker langs remmen
+    for (var k=0;k<10;k++){
+      var p = Widget.pathAt(beltPath, dashOffset + k*(beltPath.length/10));
+      ctx.fillStyle='#ffa500';
+      ctx.beginPath(); ctx.arc(p.x,p.y,4,0,Math.PI*2); ctx.fill();
+    }
+
+    ctx.fillStyle='rgba(255,94,94,0.8)'; ctx.font='12px Segoe UI';
+    ctx.fillText('F₁ (stram)', (topL.x+topR.x)/2-30, topL.y-14);
+    ctx.fillStyle='rgba(94,200,255,0.8)';
+    ctx.fillText('F₂ (slæk)', (botL.x+botR.x)/2-30, botL.y+22);
+  });
+})();
+</script>
+</body>
+</html>

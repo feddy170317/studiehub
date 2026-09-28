@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Brudteorier — von Mises, Tresca og Rankine</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Brudteorier i σ₁-σ₂-planet</h1>
+  <p>Brudforudsigelse (statisk) · Kapitel 6</p>
+  <div class="badge">Flyt driftspunktet — se hvornår de forskellige teorier siger "svigt"</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  Von Mises (ellipse) og Tresca (sekskant) bruges til <strong>sejt</strong> materiale og siger svigt
+  ved flydning. Rankine (kvadrat, maks. normalspænding) bruges typisk til <strong>sprødt</strong>
+  materiale, som knækker ved den højeste normalspænding uanset retning. Tresca er altid mere
+  konservativ end von Mises (ligger inde i ellipsen).
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>σ₁ (driftspunkt) <span class="val" id="s1Val">200 MPa</span></label>
+      <input type="range" id="s1Slider" min="-400" max="400" step="5" value="200">
+    </div>
+    <div class="slider-row">
+      <label>σ₂ (driftspunkt) <span class="val" id="s2Val">-80 MPa</span></label>
+      <input type="range" id="s2Slider" min="-400" max="400" step="5" value="-80">
+    </div>
+    <div class="slider-row">
+      <label>Flydegrænse S_y <span class="val" id="syVal">300 MPa</span></label>
+      <input type="range" id="sySlider" min="50" max="500" step="5" value="300">
+    </div>
+
+    <div class="formula-box">
+      <div>Von Mises: σ₁²−σ₁σ₂+σ₂² = S_y²</div>
+      <div style="margin-top:0.3rem;">Tresca: max(|σ₁|,|σ₂|,|σ₁−σ₂|) = S_y</div>
+    </div>
+
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--accent-cyan)"></span> Von Mises</span>
+      <span><span class="swatch" style="background:var(--accent-gold)"></span> Tresca</span>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>σ₁-σ₂ brudflade</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">Von Mises-spænding σ_vM</div><div class="num" id="outVm">—</div></div>
+      <div><div class="lbl">Von Mises: sikker?</div><div class="num" id="outVmStatus">—</div></div>
+      <div><div class="lbl">Tresca-spænding</div><div class="num" id="outTr">—</div></div>
+      <div><div class="lbl">Tresca: sikker?</div><div class="num" id="outTrStatus">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+
+  var s1S=document.getElementById('s1Slider'), s2S=document.getElementById('s2Slider'), syS=document.getElementById('sySlider');
+  var s1Val=document.getElementById('s1Val'), s2Val=document.getElementById('s2Val'), syVal=document.getElementById('syVal');
+  var outVm=document.getElementById('outVm'), outVmStatus=document.getElementById('outVmStatus'), outTr=document.getElementById('outTr'), outTrStatus=document.getElementById('outTrStatus');
+
+  function render(){
+    var s1=parseFloat(s1S.value), s2=parseFloat(s2S.value), Sy=parseFloat(syS.value);
+    s1Val.textContent=s1.toFixed(0)+' MPa';
+    s2Val.textContent=s2.toFixed(0)+' MPa';
+    syVal.textContent=Sy.toFixed(0)+' MPa';
+
+    var vm = Math.sqrt(s1*s1 - s1*s2 + s2*s2);
+    var tr = Math.max(Math.abs(s1), Math.abs(s2), Math.abs(s1-s2));
+
+    outVm.textContent = vm.toFixed(1)+' MPa';
+    outVmStatus.textContent = vm<=Sy ? 'Sikker' : 'SVIGTER';
+    outVmStatus.style.color = vm<=Sy ? 'var(--accent-green)' : 'var(--accent-red)';
+    outTr.textContent = tr.toFixed(1)+' MPa';
+    outTrStatus.textContent = tr<=Sy ? 'Sikker' : 'SVIGTER';
+    outTrStatus.style.color = tr<=Sy ? 'var(--accent-green)' : 'var(--accent-red)';
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    var axisMax = Math.max(Sy*1.6, Math.abs(s1)*1.2, Math.abs(s2)*1.2);
+    var cx=W/2, cy=H/2, scale=Math.min(W,H)/2/axisMax*0.85;
+    function X(v){ return cx+v*scale; }
+    function Y(v){ return cy-v*scale; }
+
+    ctx.strokeStyle='rgba(224,224,224,0.3)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(W,cy); ctx.moveTo(cx,0); ctx.lineTo(cx,H); ctx.stroke();
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.font='11px Segoe UI';
+    ctx.fillText('σ₁ →', W-50, cy-8);
+    ctx.fillText('σ₂', cx+8, 16);
+
+    // Tresca hexagon
+    var trPts = [[Sy,0],[Sy,Sy],[0,Sy],[-Sy,0],[-Sy,-Sy],[0,-Sy],[Sy,0]];
+    ctx.strokeStyle='rgba(255,165,0,0.7)'; ctx.lineWidth=2;
+    ctx.beginPath();
+    trPts.forEach(function(p,i){ var px=X(p[0]),py=Y(p[1]); if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py); });
+    ctx.stroke();
+
+    // Von Mises ellipse (parametrisk)
+    ctx.strokeStyle='rgba(94,200,255,0.8)'; ctx.lineWidth=2;
+    ctx.beginPath();
+    for (var i=0;i<=200;i++){
+      var t = i/200*Math.PI*2;
+      // parametrisering af σ1²-σ1σ2+σ2²=Sy² via rotation af ellipse-akser
+      var a = Sy*Math.sqrt(2), b = Sy*Math.sqrt(2/3);
+      var u = a*Math.cos(t), v = b*Math.sin(t);
+      var ang = Math.PI/4;
+      var sx = u*Math.cos(ang) - v*Math.sin(ang);
+      var sy2 = u*Math.sin(ang) + v*Math.cos(ang);
+      var px=X(sx), py=Y(sy2);
+      if (i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+    }
+    ctx.closePath();
+    ctx.stroke();
+
+    // driftspunkt
+    var safe = vm<=Sy;
+    ctx.fillStyle = safe ? '#00d984' : '#ff5e5e';
+    ctx.beginPath(); ctx.arc(X(s1),Y(s2),7,0,Math.PI*2); ctx.fill();
+  }
+
+  [s1S,s2S,syS].forEach(function(el){ el.addEventListener('input', render); });
+  render();
+})();
+</script>
+</body>
+</html>

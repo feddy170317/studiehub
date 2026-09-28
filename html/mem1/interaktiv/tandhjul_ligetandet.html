@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Ligetandede tandhjul — udveksling og bøjningsspænding</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Ligetandede tandhjul — udveksling og tandbelastning</h1>
+  <p>Tandhjul: Ligetandede · Kapitel 14</p>
+  <div class="badge">Skru på tandantal og moment — se hjulene rotere med korrekt udveksling</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  Udvekslingsforholdet <strong>i = N₂/N₁</strong> bestemmer, hvordan hastighed og moment omsættes:
+  hastigheden deles med i, momentet ganges med i (ideelt, uden tab). Den kraft, tænderne skal
+  overføre, <strong>F_t = 2T/d</strong>, giver en bøjningsspænding i tandroden — en meget forenklet
+  udgave af Lewis-formlen (Y sat til en fast, illustrativ værdi).
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Tænder på drivhjul N₁ <span class="val" id="n1Val">20</span></label>
+      <input type="range" id="n1Slider" min="8" max="60" step="1" value="20">
+    </div>
+    <div class="slider-row">
+      <label>Tænder på drevet hjul N₂ <span class="val" id="n2Val">40</span></label>
+      <input type="range" id="n2Slider" min="8" max="100" step="1" value="40">
+    </div>
+    <div class="slider-row">
+      <label>Modul m <span class="val" id="mVal">3 mm</span></label>
+      <input type="range" id="mSlider" min="1" max="10" step="0.5" value="3">
+    </div>
+    <div class="slider-row">
+      <label>Tandbredde b <span class="val" id="bVal">20 mm</span></label>
+      <input type="range" id="bSlider" min="5" max="60" step="1" value="20">
+    </div>
+    <div class="slider-row">
+      <label>Drivmoment T₁ <span class="val" id="t1Val">20 Nm</span></label>
+      <input type="range" id="t1Slider" min="1" max="200" step="1" value="20">
+    </div>
+    <div class="slider-row">
+      <label>Drivhastighed ω₁ <span class="val" id="w1Val">300 RPM</span></label>
+      <input type="range" id="w1Slider" min="10" max="1500" step="10" value="300">
+    </div>
+
+    <button class="btn" id="pauseBtn">⏸ Pause</button>
+    <div class="paused-flag" id="pausedFlag">PAUSET</div>
+
+    <div class="formula-box">
+      <div><span class="f">i</span> = N₂/N₁ &nbsp; <span class="f">F_t</span> = 2T₁/d₁</div>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Tandhjul i indgreb</h2>
+    <canvas id="stage" width="740" height="420"></canvas>
+    <div class="readout">
+      <div><div class="lbl">Udveksling i</div><div class="num" id="outI">—</div></div>
+      <div><div class="lbl">ω₂ (drevet hjul)</div><div class="num" id="outW2">—</div></div>
+      <div><div class="lbl">T₂ (drevet moment)</div><div class="num" id="outT2">—</div></div>
+      <div><div class="lbl">σ (tandrods-bøjning, illustrativ)</div><div class="num" id="outSig">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var Y_lewis = 0.4;
+
+  var n1S=document.getElementById('n1Slider'), n2S=document.getElementById('n2Slider'), mS=document.getElementById('mSlider'), bS=document.getElementById('bSlider'), t1S=document.getElementById('t1Slider'), w1S=document.getElementById('w1Slider');
+  var n1Val=document.getElementById('n1Val'), n2Val=document.getElementById('n2Val'), mVal=document.getElementById('mVal'), bVal=document.getElementById('bVal'), t1Val=document.getElementById('t1Val'), w1Val=document.getElementById('w1Val');
+  var outI=document.getElementById('outI'), outW2=document.getElementById('outW2'), outT2=document.getElementById('outT2'), outSig=document.getElementById('outSig');
+
+  var theta1=0;
+
+  Widget.loop(function(dt){
+    var N1=parseFloat(n1S.value), N2=parseFloat(n2S.value), m=parseFloat(mS.value), b=parseFloat(bS.value), T1=parseFloat(t1S.value), w1rpm=parseFloat(w1S.value);
+    n1Val.textContent=N1.toFixed(0);
+    n2Val.textContent=N2.toFixed(0);
+    mVal.textContent=m.toFixed(1)+' mm';
+    bVal.textContent=b.toFixed(0)+' mm';
+    t1Val.textContent=T1.toFixed(0)+' Nm';
+    w1Val.textContent=w1rpm.toFixed(0)+' RPM';
+
+    var i = N2/N1;
+    var w2rpm = w1rpm/i;
+    var T2 = T1*i;
+    var d1 = m*N1, d2 = m*N2; // mm
+    var Ft = 2*T1/(d1/1000); // N
+    var sig = Ft/((b/1000)*(m/1000)*Y_lewis); // Pa, meget forenklet
+
+    outI.textContent = i.toFixed(2);
+    outW2.textContent = w2rpm.toFixed(0)+' RPM';
+    outT2.textContent = T2.toFixed(1)+' Nm';
+    outSig.textContent = (sig/1e6).toFixed(1)+' MPa';
+
+    var w1 = w1rpm*2*Math.PI/60;
+    theta1 += w1*dt*0.2;
+    var theta2 = -theta1/i;
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    var scalePx = 3.0;
+    var R1 = d1/2*scalePx, R2 = d2/2*scalePx;
+    var cx1 = 220, cy = 210;
+    var cx2 = cx1 + R1 + R2;
+
+    function drawGear(cx,cyy,R,teeth,theta,color){
+      ctx.save();
+      ctx.translate(cx,cyy);
+      ctx.rotate(theta);
+      ctx.strokeStyle=color; ctx.lineWidth=3;
+      ctx.beginPath(); ctx.arc(0,0,R,0,Math.PI*2); ctx.stroke();
+      var nTeeth = Math.min(Math.round(teeth), 40);
+      for (var k=0;k<nTeeth;k++){
+        var a = k*2*Math.PI/nTeeth;
+        ctx.beginPath();
+        ctx.moveTo(R*0.75*Math.cos(a), R*0.75*Math.sin(a));
+        ctx.lineTo((R+8)*Math.cos(a), (R+8)*Math.sin(a));
+        ctx.stroke();
+      }
+      ctx.restore();
+      ctx.fillStyle='rgba(224,224,224,0.5)';
+      ctx.beginPath(); ctx.arc(cx,cyy,4,0,Math.PI*2); ctx.fill();
+    }
+
+    if (R1+R2 < 520) {
+      drawGear(cx1,cy,R1,N1,theta1,'#5ec8ff');
+      drawGear(cx2,cy,R2,N2,theta2,'#ffa500');
+      ctx.fillStyle='rgba(224,224,224,0.6)'; ctx.font='12px Segoe UI'; ctx.textAlign='center';
+      ctx.fillText('N₁='+N1, cx1, cy+R1+22);
+      ctx.fillText('N₂='+N2, cx2, cy+R2+22);
+      ctx.textAlign='left';
+
+      // Ft-pil ved indgrebspunktet
+      var meshX = cx1+R1;
+      Widget.arrow(ctx, meshX, cy-40, meshX, cy-10, '#ff5e5e', 3);
+      ctx.fillStyle='rgba(255,94,94,0.8)'; ctx.font='11px Segoe UI';
+      ctx.fillText('F_t', meshX+6, cy-30);
+    } else {
+      ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.font='12px Segoe UI';
+      ctx.fillText('(hjulene er for store til at vises i skala her — se tallene i panelet)', 100, 210);
+    }
+  });
+})();
+</script>
+</body>
+</html>

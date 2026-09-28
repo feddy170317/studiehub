@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Boltet samling — forspænding og lastdeling</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Boltet samling — forspænding og lastdeling</h1>
+  <p>Samlinger og skruer · Kapitel 16</p>
+  <div class="badge">Skru på forspænding, ekstern last og stivhedsforhold — se hvornår fugen åbner</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  En korrekt forspændt bolt bærer kun en <strong>del</strong> af den eksterne last —
+  <strong>C = k_b/(k_b+k_m)</strong> — fordi de sammenklemte dele også er stive og tager en del af
+  belastningen som aflastning af klemkraften. Fugen "åbner" (adskilles), hvis den eksterne last
+  bliver stor nok til at bringe klemkraften F_m ned til nul.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Forspænding F_i <span class="val" id="fiVal">20 kN</span></label>
+      <input type="range" id="fiSlider" min="1" max="60" step="1" value="20">
+    </div>
+    <div class="slider-row">
+      <label>Ekstern last P <span class="val" id="pVal">15 kN</span></label>
+      <input type="range" id="pSlider" min="0" max="80" step="1" value="15">
+    </div>
+    <div class="slider-row">
+      <label>Boltstivhed k_b <span class="val" id="kbVal">500 MN/m</span></label>
+      <input type="range" id="kbSlider" min="50" max="2000" step="10" value="500">
+    </div>
+    <div class="slider-row">
+      <label>Delenes stivhed k_m <span class="val" id="kmVal">1500 MN/m</span></label>
+      <input type="range" id="kmSlider" min="50" max="3000" step="10" value="1500">
+    </div>
+
+    <div class="formula-box">
+      <div><span class="f">F_b</span> = F_i + C·P &nbsp; <span class="f">F_m</span> = F_i − (1−C)·P</div>
+    </div>
+
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--accent-cyan)"></span> F_b (boltlast)</span>
+      <span><span class="swatch" style="background:var(--accent-green)"></span> F_m (klemkraft)</span>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Lastdeling</h2>
+    <canvas id="stage" width="740" height="420"></canvas>
+    <div class="readout">
+      <div><div class="lbl">C (stivhedsforhold)</div><div class="num" id="outC">—</div></div>
+      <div><div class="lbl">F_b (boltlast nu)</div><div class="num" id="outFb" style="color:var(--accent-cyan)">—</div></div>
+      <div><div class="lbl">F_m (klemkraft nu)</div><div class="num" id="outFm" style="color:var(--accent-green)">—</div></div>
+      <div><div class="lbl">Status</div><div class="num" id="outStatus">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+
+  var fiS=document.getElementById('fiSlider'), pS=document.getElementById('pSlider'), kbS=document.getElementById('kbSlider'), kmS=document.getElementById('kmSlider');
+  var fiVal=document.getElementById('fiVal'), pVal=document.getElementById('pVal'), kbVal=document.getElementById('kbVal'), kmVal=document.getElementById('kmVal');
+  var outC=document.getElementById('outC'), outFb=document.getElementById('outFb'), outFm=document.getElementById('outFm'), outStatus=document.getElementById('outStatus');
+
+  function render(){
+    var Fi=parseFloat(fiS.value), P=parseFloat(pS.value), kb=parseFloat(kbS.value), km=parseFloat(kmS.value);
+    fiVal.textContent=Fi.toFixed(0)+' kN';
+    pVal.textContent=P.toFixed(0)+' kN';
+    kbVal.textContent=kb.toFixed(0)+' MN/m';
+    kmVal.textContent=km.toFixed(0)+' MN/m';
+
+    var C = kb/(kb+km);
+    var Fb = Fi + C*P;
+    var Fm = Fi - (1-C)*P;
+
+    outC.textContent = C.toFixed(3);
+    outFb.textContent = Fb.toFixed(1)+' kN';
+    outFm.textContent = Fm.toFixed(1)+' kN';
+    var separated = Fm<=0;
+    outStatus.textContent = separated ? 'FUGEN ÅBNER!' : 'Fuge lukket, sikker';
+    outStatus.style.color = separated ? 'var(--accent-red)' : 'var(--accent-green)';
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    // samling-skitse (venstre)
+    var jx=180, jy0=100, jy1=320;
+    ctx.fillStyle='rgba(224,224,224,0.15)';
+    ctx.fillRect(jx-60,jy0,120,90);
+    ctx.fillRect(jx-60,jy0+90+ (separated?30:0),120,90);
+    ctx.strokeStyle='#e0e0e0'; ctx.lineWidth=2;
+    ctx.strokeRect(jx-60,jy0,120,90);
+    ctx.strokeRect(jx-60,jy0+90+(separated?30:0),120,90);
+    ctx.strokeStyle = separated ? '#ff5e5e' : '#5ec8ff';
+    ctx.lineWidth=8;
+    ctx.beginPath(); ctx.moveTo(jx,jy0-20); ctx.lineTo(jx,jy0+180+(separated?30:0)); ctx.stroke();
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.font='11px Segoe UI';
+    ctx.fillText(separated ? 'FUGE ÅBEN' : 'sammenklemte dele', jx-50, jy0-30);
+
+    // bar-sammenligning (højre)
+    var barX0=380, barW=80, barBase=380, scale=3;
+    function bar(x,val,color,label){
+      var h = Math.max(val,0)*scale;
+      ctx.fillStyle=color;
+      ctx.fillRect(x,barBase-h,barW,h);
+      ctx.fillStyle='rgba(224,224,224,0.8)'; ctx.font='12px Segoe UI'; ctx.textAlign='center';
+      ctx.fillText(label, x+barW/2, barBase+20);
+      ctx.fillText(val.toFixed(1)+' kN', x+barW/2, barBase-h-8);
+      ctx.textAlign='left';
+    }
+    ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.setLineDash([3,4]);
+    ctx.beginPath(); ctx.moveTo(barX0-20,barBase-Fi*scale); ctx.lineTo(W-20,barBase-Fi*scale); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(224,224,224,0.4)'; ctx.font='10px Segoe UI';
+    ctx.fillText('F_i (forspænding)', barX0-15, barBase-Fi*scale-6);
+
+    bar(barX0, Fb, '#5ec8ff', 'F_b');
+    bar(barX0+150, Fm, separated ? '#ff5e5e' : '#00d984', 'F_m');
+  }
+
+  [fiS,pS,kbS,kmS].forEach(function(el){ el.addEventListener('input', render); });
+  render();
+})();
+</script>
+</body>
+</html>

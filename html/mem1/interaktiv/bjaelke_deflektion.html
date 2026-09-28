@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Bjælkedeflektion (udkraget bjælke)</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Bjælkedeflektion — udkraget bjælke med endelast</h1>
+  <p>Deformation · Kapitel 5</p>
+  <div class="badge">Skru på last, længde, E og I — se bjælken bøje sig</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  For en udkraget (fastspændt i én ende) bjælke med en punktlast P for enden er nedbøjningen
+  <strong>y(x) = P·x²·(3L−x) / (6EI)</strong>, med maksimum for enden:
+  <strong>δ_maks = P·L³/(3EI)</strong>. Bemærk hvordan fordoblet længde giver 8× større nedbøjning —
+  L³ dominerer hurtigt.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Last P (for enden) <span class="val" id="pVal">500 N</span></label>
+      <input type="range" id="pSlider" min="10" max="3000" step="10" value="500">
+    </div>
+    <div class="slider-row">
+      <label>Længde L <span class="val" id="lVal">1.0 m</span></label>
+      <input type="range" id="lSlider" min="0.2" max="3" step="0.05" value="1">
+    </div>
+    <div class="slider-row">
+      <label>E-modul (materiale) <span class="val" id="eVal">200 GPa</span></label>
+      <input type="range" id="eSlider" min="10" max="220" step="5" value="200">
+    </div>
+    <div class="slider-row">
+      <label>Inertimoment I <span class="val" id="iVal">80 cm⁴</span></label>
+      <input type="range" id="iSlider" min="1" max="500" step="1" value="80">
+    </div>
+
+    <div class="formula-box">
+      <div><span class="f">δ_maks</span> = P·L³ / (3EI)</div>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Bjælkeform (nedbøjning stærkt overdrevet visuelt)</h2>
+    <canvas id="stage" width="740" height="420"></canvas>
+    <div class="readout">
+      <div><div class="lbl">δ_maks (for enden)</div><div class="num" id="outDelta" style="color:var(--accent-green)">—</div></div>
+      <div><div class="lbl">Maks. bøjningsspænding-indikation</div><div class="num" id="outNote">—</div></div>
+      <div><div class="lbl">EI (bøjningsstivhed)</div><div class="num" id="outEI">—</div></div>
+      <div><div class="lbl">δ/L (forhold)</div><div class="num" id="outRatio">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+
+  var pS=document.getElementById('pSlider'), lS=document.getElementById('lSlider'), eS=document.getElementById('eSlider'), iS=document.getElementById('iSlider');
+  var pVal=document.getElementById('pVal'), lVal=document.getElementById('lVal'), eVal=document.getElementById('eVal'), iVal=document.getElementById('iVal');
+  var outDelta=document.getElementById('outDelta'), outNote=document.getElementById('outNote'), outEI=document.getElementById('outEI'), outRatio=document.getElementById('outRatio');
+
+  function render(){
+    var P=parseFloat(pS.value), L=parseFloat(lS.value), E=parseFloat(eS.value)*1e9, I=parseFloat(iS.value)*1e-8;
+    pVal.textContent=P.toFixed(0)+' N';
+    lVal.textContent=L.toFixed(2)+' m';
+    eVal.textContent=(E/1e9).toFixed(0)+' GPa';
+    iVal.textContent=(I*1e8).toFixed(0)+' cm⁴';
+
+    var EI = E*I;
+    var deltaMax = P*Math.pow(L,3)/(3*EI);
+
+    outDelta.textContent = (deltaMax*1000).toFixed(2)+' mm';
+    outEI.textContent = EI.toFixed(0)+' Nm²';
+    outRatio.textContent = (deltaMax/L*100).toFixed(3)+' %';
+    outNote.textContent = deltaMax/L > 0.02 ? 'Meget slap — genovervej design' : (deltaMax/L>0.005 ? 'Mærkbar nedbøjning' : 'Stiv nok til mange formål');
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    var x0=60, x1=W-60, y0=200;
+    ctx.strokeStyle='rgba(224,224,224,0.2)'; ctx.lineWidth=2; ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y0); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // fastspænding (venstre)
+    ctx.fillStyle='#e0e0e0';
+    for (var h=0;h<8;h++){ ctx.fillRect(x0-16, y0-40+h*10, 16, 6); }
+
+    // deformeret bjælke (overdrevet skala for synlighed, normeret til δ_maks)
+    var maxVisualDrop = 120;
+    ctx.strokeStyle='#5ec8ff'; ctx.lineWidth=5; ctx.lineCap='round';
+    ctx.beginPath();
+    var N=60;
+    for (var i=0;i<=N;i++){
+      var xFrac = i/N;
+      var x = xFrac*L;
+      var y = (P*x*x*(3*L-x))/(6*EI);
+      var yNorm = deltaMax>0 ? y/deltaMax : 0;
+      var px = x0 + xFrac*(x1-x0);
+      var py = y0 + yNorm*maxVisualDrop;
+      if (i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+
+    ctx.fillStyle='#ffa500';
+    ctx.beginPath(); ctx.arc(x1, y0+maxVisualDrop, 6, 0, Math.PI*2); ctx.fill();
+    Widget.arrow(ctx, x1, y0+maxVisualDrop-40, x1, y0+maxVisualDrop-8, '#ffa500', 3);
+    ctx.fillStyle='rgba(255,165,0,0.8)'; ctx.font='12px Segoe UI';
+    ctx.fillText('P', x1+10, y0+maxVisualDrop-40);
+
+    ctx.fillStyle='rgba(224,224,224,0.5)'; ctx.font='11px Segoe UI';
+    ctx.fillText('(nedbøjningen er skaleret op visuelt, ikke i sand fysisk skala)', x0, y0+maxVisualDrop+40);
+  }
+
+  [pS,lS,eS,iS].forEach(function(el){ el.addEventListener('input', render); });
+  render();
+})();
+</script>
+</body>
+</html>

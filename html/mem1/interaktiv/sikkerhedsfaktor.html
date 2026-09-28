@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Sikkerhedsfaktor</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Sikkerhedsfaktor — hvor tæt er du på grænsen?</h1>
+  <p>Introduktion til maskinelementer · Kapitel 1</p>
+  <div class="badge">Skru på belastning og materialestyrke — se marginen live</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  Sikkerhedsfaktoren <strong>n = S_y / σ</strong> udtrykker, hvor langt den faktiske spænding σ er
+  fra materialets flydegrænse S_y. Et for lavt n giver risiko for brud, men et alt for højt n
+  betyder unødig overdimensionering (spild af materiale, vægt og pris) — designarbejdet er at
+  finde den rigtige balance for det pågældende anvendelsesområde.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Anvendt spænding σ <span class="val" id="sigVal">150 MPa</span></label>
+      <input type="range" id="sigSlider" min="10" max="500" step="5" value="150">
+    </div>
+    <div class="slider-row">
+      <label>Flydegrænse S_y <span class="val" id="syVal">250 MPa</span></label>
+      <input type="range" id="sySlider" min="50" max="1000" step="5" value="250">
+    </div>
+
+    <div class="formula-box">
+      <div><span class="f">n</span> = S_y / σ</div>
+      <div style="margin-top:0.35rem;">Typisk krav: n ≥ 1,5–3 (afhænger af konsekvens ved svigt)</div>
+    </div>
+
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--accent-red)"></span> n &lt; 1 (svigter)</span>
+      <span><span class="swatch" style="background:var(--accent-gold)"></span> 1 ≤ n &lt; 1,5</span>
+      <span><span class="swatch" style="background:var(--accent-green)"></span> n ≥ 1,5</span>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Margin</h2>
+    <canvas id="stage" width="740" height="420"></canvas>
+    <div class="readout">
+      <div><div class="lbl">Sikkerhedsfaktor n</div><div class="num" id="outN">—</div></div>
+      <div><div class="lbl">Status</div><div class="num" id="outStatus">—</div></div>
+      <div><div class="lbl">Margin til flydning</div><div class="num" id="outMargin">—</div></div>
+      <div><div class="lbl">Vurdering</div><div class="num" id="outVurdering">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+
+  var sigS=document.getElementById('sigSlider'), syS=document.getElementById('sySlider');
+  var sigVal=document.getElementById('sigVal'), syVal=document.getElementById('syVal');
+  var outN=document.getElementById('outN'), outStatus=document.getElementById('outStatus'), outMargin=document.getElementById('outMargin'), outVurdering=document.getElementById('outVurdering');
+
+  function render(){
+    var sigma = parseFloat(sigS.value), Sy = parseFloat(syS.value);
+    sigVal.textContent = sigma.toFixed(0)+' MPa';
+    syVal.textContent = Sy.toFixed(0)+' MPa';
+
+    var n = Sy/sigma;
+    outN.textContent = n.toFixed(2);
+    outStatus.textContent = n<1 ? 'SVIGTER (flyder)' : (n<1.5 ? 'Marginal' : 'Sikker margin');
+    outStatus.style.color = n<1 ? 'var(--accent-red)' : (n<1.5 ? 'var(--accent-gold)' : 'var(--accent-green)');
+    outMargin.textContent = (Sy-sigma).toFixed(0)+' MPa';
+    outVurdering.textContent = n<1 ? 'Redesign nødvendigt' : (n<1.5 ? 'Overvej større margin' : (n>4 ? 'Muligvis overdimensioneret' : 'Fornuftigt design'));
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    // bar-sammenligning
+    var barX0=100, barW=200, barBase=380, scale=0.6;
+    function bar(x,val,color,label){
+      var h = val*scale;
+      ctx.fillStyle=color;
+      ctx.fillRect(x,barBase-h,barW,h);
+      ctx.fillStyle='rgba(224,224,224,0.8)'; ctx.font='13px Segoe UI'; ctx.textAlign='center';
+      ctx.fillText(label, x+barW/2, barBase+22);
+      ctx.fillText(val.toFixed(0)+' MPa', x+barW/2, barBase-h-10);
+      ctx.textAlign='left';
+    }
+    bar(barX0, sigma, sigma>=Sy ? '#ff5e5e' : '#5ec8ff', 'σ (anvendt)');
+    bar(barX0+260, Sy, '#00d984', 'S_y (flydegrænse)');
+
+    // n-gauge (skala 0..4+)
+    var gx0=560, gx1=690, gy0=60, gy1=380;
+    ctx.strokeStyle='rgba(224,224,224,0.3)'; ctx.lineWidth=1;
+    ctx.strokeRect(gx0,gy0,gx1-gx0,gy1-gy0);
+    var nMax=4;
+    var zones=[[0,1,'#ff5e5e'],[1,1.5,'#ffa500'],[1.5,nMax,'#00d984']];
+    zones.forEach(function(z){
+      var y0 = gy1-(z[0]/nMax)*(gy1-gy0);
+      var y1 = gy1-(z[1]/nMax)*(gy1-gy0);
+      ctx.fillStyle=z[2]+'55';
+      ctx.fillRect(gx0,y1,gx1-gx0,y0-y1);
+    });
+    var nClamped = Math.min(n,nMax);
+    var markerY = gy1-(nClamped/nMax)*(gy1-gy0);
+    ctx.strokeStyle='#e0e0e0'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(gx0-10,markerY); ctx.lineTo(gx1+10,markerY); ctx.stroke();
+    ctx.fillStyle='rgba(224,224,224,0.7)'; ctx.font='11px Segoe UI'; ctx.textAlign='center';
+    ctx.fillText('n', (gx0+gx1)/2, gy0-14);
+    ctx.textAlign='left';
+  }
+
+  sigS.addEventListener('input', render);
+  syS.addEventListener('input', render);
+  render();
+})();
+</script>
+</body>
+</html>

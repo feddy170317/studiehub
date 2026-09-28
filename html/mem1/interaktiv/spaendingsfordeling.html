@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Spændingsfordeling i et tværsnit</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Spændingsfordeling i et tværsnit</h1>
+  <p>Last, spænding og tøjning · Kapitel 2</p>
+  <div class="badge">Skru på N, M og T — se spændingen sprede sig over tværsnittet</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  Normalkraft N giver en <strong>jævn</strong> spænding σ=N/A over hele tværsnittet. Bøjningsmoment M
+  lægger en <strong>lineær</strong> spænding σ=M·y/I til, som er nul i midten og størst ved kanten
+  (træk én side, tryk den anden). Vridningsmoment T giver en <strong>radial</strong> forskydningsspænding
+  τ=T·r/J, nul i centrum og størst ved overfladen.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Diameter d <span class="val" id="dVal">40 mm</span></label>
+      <input type="range" id="dSlider" min="10" max="100" step="1" value="40">
+    </div>
+    <div class="slider-row">
+      <label>Normalkraft N <span class="val" id="nVal">10 kN</span></label>
+      <input type="range" id="nSlider" min="-50" max="50" step="1" value="10">
+    </div>
+    <div class="slider-row">
+      <label>Bøjningsmoment M <span class="val" id="mVal">200 Nm</span></label>
+      <input type="range" id="mSlider" min="-500" max="500" step="10" value="200">
+    </div>
+    <div class="slider-row">
+      <label>Vridningsmoment T <span class="val" id="tVal">150 Nm</span></label>
+      <input type="range" id="tSlider" min="0" max="500" step="10" value="150">
+    </div>
+
+    <div class="formula-box">
+      <div><span class="f">σ</span> = N/A + M·y/I &nbsp; <span class="f">τ</span> = T·r/J</div>
+    </div>
+
+    <div class="legend">
+      <span><span class="swatch" style="background:#5ec8ff"></span> tryk (−)</span>
+      <span><span class="swatch" style="background:#ff5e5e"></span> træk (+)</span>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>σ (N+M) og τ (T) over tværsnittet</h2>
+    <canvas id="stage" width="740" height="420"></canvas>
+    <div class="readout">
+      <div><div class="lbl">σ_maks (kant, træk/tryk)</div><div class="num" id="outSigMax">—</div></div>
+      <div><div class="lbl">σ (midte, kun N)</div><div class="num" id="outSigMid">—</div></div>
+      <div><div class="lbl">τ_maks (overflade)</div><div class="num" id="outTauMax">—</div></div>
+      <div><div class="lbl">Areal A</div><div class="num" id="outA">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+
+  var dS=document.getElementById('dSlider'), nS=document.getElementById('nSlider'), mS=document.getElementById('mSlider'), tS=document.getElementById('tSlider');
+  var dVal=document.getElementById('dVal'), nVal=document.getElementById('nVal'), mVal=document.getElementById('mVal'), tVal=document.getElementById('tVal');
+  var outSigMax=document.getElementById('outSigMax'), outSigMid=document.getElementById('outSigMid'), outTauMax=document.getElementById('outTauMax'), outA=document.getElementById('outA');
+
+  function diverge(f){ // f in [-1,1]: -1=blå (tryk), +1=rød (træk)
+    f = Math.max(-1,Math.min(1,f));
+    if (f>=0) return 'rgb('+Math.round(94+161*f)+','+Math.round(200-106*f)+','+Math.round(255-161*f)+')';
+    var g=-f; return 'rgb('+Math.round(94-0*g)+','+Math.round(200-106*g)+','+Math.round(255-0*g)+')';
+  }
+
+  function render(){
+    var d = parseFloat(dS.value)/1000, N = parseFloat(nS.value)*1000, M = parseFloat(mS.value), T = parseFloat(tS.value);
+    dVal.textContent = (d*1000).toFixed(0)+' mm';
+    nVal.textContent = (N/1000).toFixed(0)+' kN';
+    mVal.textContent = M.toFixed(0)+' Nm';
+    tVal.textContent = T.toFixed(0)+' Nm';
+
+    var r = d/2;
+    var A = Math.PI*r*r;
+    var I = Math.PI*Math.pow(d,4)/64;
+    var J = 2*I;
+
+    var sigMid = N/A;
+    var sigMax = N/A + M*r/I;
+    var sigMin = N/A - M*r/I;
+    var tauMax = T*r/J;
+
+    outSigMax.textContent = (Math.max(Math.abs(sigMax),Math.abs(sigMin))/1e6).toFixed(1)+' MPa';
+    outSigMid.textContent = (sigMid/1e6).toFixed(1)+' MPa';
+    outTauMax.textContent = (tauMax/1e6).toFixed(1)+' MPa';
+    outA.textContent = (A*1e6).toFixed(0)+' mm²';
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    // σ-cirkel (N+M), venstre
+    var cx1=190, cy=210, R=150;
+    var maxSig = Math.max(Math.abs(sigMax),Math.abs(sigMin),1);
+    ctx.save();
+    ctx.beginPath(); ctx.arc(cx1,cy,R,0,Math.PI*2); ctx.clip();
+    var strips=60;
+    for (var i=0;i<strips;i++){
+      var yFrac = 1-2*(i+0.5)/strips; // +1 top til -1 bund
+      var yPhys = yFrac*r;
+      var sig = N/A + M*yPhys/I;
+      ctx.fillStyle = diverge(sig/maxSig);
+      var yPix = cy - yFrac*R;
+      ctx.fillRect(cx1-R, yPix-R/strips, 2*R, 2*R/strips+1);
+    }
+    ctx.restore();
+    ctx.strokeStyle='#e0e0e0'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.arc(cx1,cy,R,0,Math.PI*2); ctx.stroke();
+    ctx.fillStyle='rgba(224,224,224,0.7)'; ctx.font='12px Segoe UI'; ctx.textAlign='center';
+    ctx.fillText('σ (N + M)', cx1, cy-R-16);
+    ctx.textAlign='left';
+
+    // τ-cirkel (T), højre
+    var cx2=560;
+    ctx.save();
+    ctx.beginPath(); ctx.arc(cx2,cy,R,0,Math.PI*2); ctx.clip();
+    var rings=40;
+    for (var j=rings;j>=1;j--){
+      var rr = R*j/rings;
+      var rPhys = rr/R*r;
+      var tau = T*rPhys/J;
+      var f = tau/Math.max(tauMax,1e-6);
+      ctx.fillStyle = 'rgba(217,132,255,'+(0.15+0.7*f)+')';
+      ctx.beginPath(); ctx.arc(cx2,cy,rr,0,Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+    ctx.strokeStyle='#e0e0e0'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.arc(cx2,cy,R,0,Math.PI*2); ctx.stroke();
+    ctx.fillStyle='rgba(224,224,224,0.7)'; ctx.font='12px Segoe UI'; ctx.textAlign='center';
+    ctx.fillText('τ (vridning T)', cx2, cy-R-16);
+    ctx.textAlign='left';
+  }
+
+  [dS,nS,mS,tS].forEach(function(el){ el.addEventListener('input', render); });
+  render();
+})();
+</script>
+</body>
+</html>

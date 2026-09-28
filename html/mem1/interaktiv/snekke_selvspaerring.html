@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Snekketandhjul — selvspærring</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Snekketandhjul — selvspærring og virkningsgrad</h1>
+  <p>Tandhjul: Skrå/Kegle/Snekke · Kapitel 15</p>
+  <div class="badge">Skru på stigningsvinkel og friktion — samme princip som en skråplan</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  Et snekkedrev er selvspærrende — kan ikke bagdrives — hvis friktionsvinklen φ=atan(µ) er
+  <strong>større</strong> end stigningsvinklen λ. Det er præcis samme fysik som en kasse på et
+  skråplan: er friktionen stor nok i forhold til hældningen, glider kassen ikke tilbage af sig selv.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>Stigningsvinkel λ <span class="val" id="lamVal">5°</span></label>
+      <input type="range" id="lamSlider" min="1" max="40" step="0.5" value="5">
+    </div>
+    <div class="slider-row">
+      <label>Friktionskoefficient µ <span class="val" id="muVal">0.10</span></label>
+      <input type="range" id="muSlider" min="0.02" max="0.5" step="0.01" value="0.10">
+    </div>
+
+    <div class="formula-box">
+      <div>Selvspærring hvis <span class="f">µ ≥ tan(λ)</span></div>
+      <div style="margin-top:0.35rem;">Virkningsgrad: <span class="f">η</span> = tanλ / tan(λ+φ)</div>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Skråplan-analogi</h2>
+    <canvas id="stage" width="740" height="420"></canvas>
+    <div class="readout">
+      <div><div class="lbl">Friktionsvinkel φ</div><div class="num" id="outPhi">—</div></div>
+      <div><div class="lbl">Selvspærrende?</div><div class="num" id="outLock">—</div></div>
+      <div><div class="lbl">Virkningsgrad η (fremad)</div><div class="num" id="outEta">—</div></div>
+      <div><div class="lbl">Margin (φ − λ)</div><div class="num" id="outMargin">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+
+  var lamS=document.getElementById('lamSlider'), muS=document.getElementById('muSlider');
+  var lamVal=document.getElementById('lamVal'), muVal=document.getElementById('muVal');
+  var outPhi=document.getElementById('outPhi'), outLock=document.getElementById('outLock'), outEta=document.getElementById('outEta'), outMargin=document.getElementById('outMargin');
+
+  function render(){
+    var lamDeg=parseFloat(lamS.value), mu=parseFloat(muS.value);
+    lamVal.textContent=lamDeg.toFixed(1)+'°';
+    muVal.textContent=mu.toFixed(2);
+
+    var lam = lamDeg*Math.PI/180;
+    var phi = Math.atan(mu);
+    var selfLocking = mu >= Math.tan(lam);
+    var eta = Math.tan(lam)/Math.tan(lam+phi);
+
+    outPhi.textContent = (phi*180/Math.PI).toFixed(1)+'°';
+    outLock.textContent = selfLocking ? 'JA — kan ikke bagdrives' : 'NEJ — kan bagdrives';
+    outLock.style.color = selfLocking ? 'var(--accent-green)' : 'var(--accent-gold)';
+    outEta.textContent = (eta*100).toFixed(1)+' %';
+    outMargin.textContent = ((phi-lam)*180/Math.PI).toFixed(1)+'°';
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+
+    var x0=100, y0=350, len=450;
+    var x1 = x0+len*Math.cos(lam), y1 = y0-len*Math.sin(lam);
+    ctx.strokeStyle='#e0e0e0'; ctx.lineWidth=4;
+    ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y1); ctx.lineTo(x1,y0); ctx.closePath(); ctx.stroke();
+
+    // kasse på skråplanet
+    var boxFrac=0.45;
+    var bx = x0+boxFrac*len*Math.cos(lam), by = y0-boxFrac*len*Math.sin(lam);
+    ctx.save();
+    ctx.translate(bx,by);
+    ctx.rotate(-lam);
+    ctx.fillStyle = selfLocking ? '#00d984' : '#ffa500';
+    ctx.fillRect(-25,-40,50,40);
+    ctx.restore();
+
+    // hvis ikke selvspærrende: pil der viser den glider ned
+    if (!selfLocking) {
+      var ndx = -Math.cos(lam), ndy = Math.sin(lam);
+      Widget.arrow(ctx, bx,by-20, bx+ndx*50, by-20+ndy*50, '#ff5e5e', 3);
+      ctx.fillStyle='rgba(255,94,94,0.8)'; ctx.font='12px Segoe UI';
+      ctx.fillText('glider tilbage', bx+ndx*50+8, by-20+ndy*50);
+    } else {
+      ctx.fillStyle='rgba(0,217,132,0.8)'; ctx.font='12px Segoe UI';
+      ctx.fillText('sidder fast', bx-10, by-50);
+    }
+
+    // vinkel-markering
+    ctx.strokeStyle='rgba(224,224,224,0.4)'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.arc(x0,y0,60,-lam,0); ctx.stroke();
+    ctx.fillStyle='rgba(224,224,224,0.6)'; ctx.font='12px Segoe UI';
+    ctx.fillText('λ', x0+66, y0-14);
+  }
+
+  [lamS,muS].forEach(function(el){ el.addEventListener('input', render); });
+  render();
+})();
+</script>
+</body>
+</html>
