@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Determinanten — areal og orientering</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Determinanten — areal og orientering</h1>
+  <p>Determinanten · Kapitel 3</p>
+  <div class="badge">Se enhedskvadratet blive strukket, klemt eller vendt om</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  Determinanten <strong>det(M) = ad − bc</strong> er svaret på ét spørgsmål: <em>hvor meget skalerer
+  M arealer?</em> Enhedskvadratet med areal 1 bliver til et parallelogram med areal |det(M)|. Er
+  det(M) negativt, er rummet blevet <strong>vendt om</strong> (spejlvendt) — î og ĵ har byttet
+  indbyrdes rækkefølge. Er det(M)=0, er hele planet klemt fladt til en linje (eller et punkt).
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>a <span class="val" id="aVal">2.0</span></label>
+      <input type="range" id="aSlider" min="-3" max="3" step="0.1" value="2">
+    </div>
+    <div class="slider-row">
+      <label>b <span class="val" id="bVal">1.0</span></label>
+      <input type="range" id="bSlider" min="-3" max="3" step="0.1" value="1">
+    </div>
+    <div class="slider-row">
+      <label>c <span class="val" id="cVal">0.5</span></label>
+      <input type="range" id="cSlider" min="-3" max="3" step="0.1" value="0.5">
+    </div>
+    <div class="slider-row">
+      <label>d <span class="val" id="dVal">1.5</span></label>
+      <input type="range" id="dSlider" min="-3" max="3" step="0.1" value="1.5">
+    </div>
+
+    <button class="btn" id="pauseBtn">⏸ Pause</button>
+    <div class="paused-flag" id="pausedFlag">PAUSET</div>
+
+    <div class="formula-box">
+      <div><span class="f">det(M)</span> = ad − bc = arealet af det udspændte parallelogram</div>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Enhedskvadratet under M</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">det(M)</div><div class="num" id="outDet" style="color:var(--accent-gold)">—</div></div>
+      <div><div class="lbl">|areal| af parallelogram</div><div class="num" id="outArea">—</div></div>
+      <div><div class="lbl">Orientering</div><div class="num" id="outOrient">—</div></div>
+      <div><div class="lbl">Er M invertibel?</div><div class="num" id="outInv">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var cx=W/2, cy=H/2, scale=50;
+
+  var aS=document.getElementById('aSlider'), bS=document.getElementById('bSlider'), cS=document.getElementById('cSlider'), dS=document.getElementById('dSlider');
+  var aVal=document.getElementById('aVal'), bVal=document.getElementById('bVal'), cVal=document.getElementById('cVal'), dVal=document.getElementById('dVal');
+  var outDet=document.getElementById('outDet'), outArea=document.getElementById('outArea'), outOrient=document.getElementById('outOrient'), outInv=document.getElementById('outInv');
+
+  var Mshown=[1,0,0,1];
+
+  Widget.loop(function(dt){
+    var a=parseFloat(aS.value), b=parseFloat(bS.value), c=parseFloat(cS.value), d=parseFloat(dS.value);
+    aVal.textContent=a.toFixed(1); bVal.textContent=b.toFixed(1); cVal.textContent=c.toFixed(1); dVal.textContent=d.toFixed(1);
+    var Mtarget=[a,b,c,d];
+    var rate = 1-Math.pow(0.001, dt);
+    for (var i=0;i<4;i++) Mshown[i]+=(Mtarget[i]-Mshown[i])*rate;
+
+    var det = a*d-b*c;
+    outDet.textContent = det.toFixed(2);
+    outArea.textContent = Math.abs(det).toFixed(2);
+    outOrient.textContent = det>0 ? 'Bevaret (î før ĵ, mod uret)' : (det<0 ? 'VENDT (spejlvendt)' : 'Ingen — planet er fladtrykt');
+    outOrient.style.color = det>0 ? 'var(--accent-green)' : (det<0 ? 'var(--accent-gold)' : 'var(--accent-red)');
+    outInv.textContent = Math.abs(det)>1e-6 ? 'Ja' : 'Nej (det=0)';
+
+    ctx.clearRect(0,0,W,H);
+    Widget.drawGridTransform(ctx, cx, cy, scale, Mshown, { showSquare:true, range:5 });
+
+    ctx.fillStyle='rgba(224,224,224,0.6)'; ctx.font='13px Segoe UI';
+    ctx.fillText('areal = |det(M)| = '+Math.abs(det).toFixed(2), 20, 30);
+  });
+})();
+</script>
+</body>
+</html>

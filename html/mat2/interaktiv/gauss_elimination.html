@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Lineære ligningssystemer og Gauss-elimination</title>
+<link rel="stylesheet" href="assets/widget.css">
+<style>.step{font-family:'Consolas',monospace;font-size:0.85rem;margin-bottom:0.4rem;color:var(--text-light);}</style>
+</head>
+<body>
+<header>
+  <h1>Lineære ligningssystemer — to linjer, ét skæringspunkt</h1>
+  <p>Lineære ligningssystemer og Gauss-elimination · Kapitel 4</p>
+  <div class="badge">Skru på ligningerne — se linjerne bevæge sig og elimineringen ske live</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  Et 2×2-ligningssystem er geometrisk to rette linjer. Løsningen (x,y) er punktet, hvor de skærer
+  hinanden. Gauss-elimination er en systematisk måde at "fjerne" x fra den ene ligning ved at trække
+  et passende multiplum af den anden fra — algebraisk regning, men resultatet er stadig det samme
+  skæringspunkt.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>a₁ (Linje 1: a₁x+b₁y=e₁) <span class="val" id="a1Val">2.0</span></label>
+      <input type="range" id="a1Slider" min="-5" max="5" step="0.1" value="2">
+    </div>
+    <div class="slider-row">
+      <label>b₁ <span class="val" id="b1Val">1.0</span></label>
+      <input type="range" id="b1Slider" min="-5" max="5" step="0.1" value="1">
+    </div>
+    <div class="slider-row">
+      <label>e₁ <span class="val" id="e1Val">8.0</span></label>
+      <input type="range" id="e1Slider" min="-10" max="10" step="0.5" value="8">
+    </div>
+    <div class="slider-row">
+      <label>a₂ (Linje 2: a₂x+b₂y=e₂) <span class="val" id="a2Val">1.0</span></label>
+      <input type="range" id="a2Slider" min="-5" max="5" step="0.1" value="1">
+    </div>
+    <div class="slider-row">
+      <label>b₂ <span class="val" id="b2Val">-1.0</span></label>
+      <input type="range" id="b2Slider" min="-5" max="5" step="0.1" value="-1">
+    </div>
+    <div class="slider-row">
+      <label>e₂ <span class="val" id="e2Val">1.0</span></label>
+      <input type="range" id="e2Slider" min="-10" max="10" step="0.5" value="1">
+    </div>
+
+    <div class="formula-box">
+      <div id="steps"></div>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Linjerne og løsningen</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">Løsning x</div><div class="num" id="outX">—</div></div>
+      <div><div class="lbl">Løsning y</div><div class="num" id="outY">—</div></div>
+      <div><div class="lbl">det (koefficientmatrix)</div><div class="num" id="outDet">—</div></div>
+      <div><div class="lbl">Status</div><div class="num" id="outStatus">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var cx=W/2, cy=H/2, scale=35;
+
+  var ids=['a1','b1','e1','a2','b2','e2'];
+  var sl={}, va={};
+  ids.forEach(function(id){ sl[id]=document.getElementById(id+'Slider'); va[id]=document.getElementById(id+'Val'); });
+  var outX=document.getElementById('outX'), outY=document.getElementById('outY'), outDet=document.getElementById('outDet'), outStatus=document.getElementById('outStatus');
+  var stepsEl=document.getElementById('steps');
+
+  function toPx(x,y){ return {x:cx+x*scale, y:cy-y*scale}; }
+
+  function render(){
+    var v={};
+    ids.forEach(function(id){ v[id]=parseFloat(sl[id].value); va[id].textContent=v[id].toFixed(1); });
+
+    var det = v.a1*v.b2 - v.a2*v.b1;
+    var singular = Math.abs(det)<1e-6;
+    var x,y;
+    if (!singular) { x=(v.e1*v.b2-v.e2*v.b1)/det; y=(v.a1*v.e2-v.a2*v.e1)/det; }
+
+    outDet.textContent = det.toFixed(2);
+    if (singular) {
+      outX.textContent='—'; outY.textContent='—';
+      outStatus.textContent = 'Ingen entydig løsning (linjerne er parallelle)';
+      outStatus.style.color='var(--accent-red)';
+    } else {
+      outX.textContent=x.toFixed(2); outY.textContent=y.toFixed(2);
+      outStatus.textContent='Entydig løsning';
+      outStatus.style.color='var(--accent-green)';
+    }
+
+    // Gauss-eliminationstrin (tekst)
+    var html = '<div class="step">R1: '+v.a1.toFixed(1)+'x + '+v.b1.toFixed(1)+'y = '+v.e1.toFixed(1)+'</div>';
+    html += '<div class="step">R2: '+v.a2.toFixed(1)+'x + '+v.b2.toFixed(1)+'y = '+v.e2.toFixed(1)+'</div>';
+    if (Math.abs(v.a1)>1e-6) {
+      var m = v.a2/v.a1;
+      var b2p = v.b2 - m*v.b1, e2p = v.e2 - m*v.e1;
+      html += '<div class="step">R2 ← R2 − ('+m.toFixed(2)+')·R1</div>';
+      html += '<div class="step">R2\': 0x + '+b2p.toFixed(2)+'y = '+e2p.toFixed(2)+'</div>';
+      if (Math.abs(b2p)>1e-6) html += '<div class="step">→ y = '+(e2p/b2p).toFixed(2)+', sæt ind i R1 → x</div>';
+    } else {
+      html += '<div class="step">a₁=0 — ombyt R1 og R2 først</div>';
+    }
+    stepsEl.innerHTML = html;
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+    ctx.strokeStyle='rgba(224,224,224,0.25)'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(W,cy); ctx.moveTo(cx,0); ctx.lineTo(cx,H); ctx.stroke();
+
+    function drawLine(a,b,e,color){
+      ctx.strokeStyle=color; ctx.lineWidth=2.5;
+      ctx.beginPath();
+      var first=true;
+      var xr = W/2/scale + 2, yr = H/2/scale + 2;
+      if (Math.abs(b)>1e-6) {
+        [-xr,xr].forEach(function(xx){
+          var yy=(e-a*xx)/b;
+          var p=toPx(xx,yy);
+          if (first){ ctx.moveTo(p.x,p.y); first=false; } else ctx.lineTo(p.x,p.y);
+        });
+      } else if (Math.abs(a)>1e-6) {
+        var xx0=e/a;
+        var p1=toPx(xx0,-yr), p2=toPx(xx0,yr);
+        ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y);
+      }
+      ctx.stroke();
+    }
+    drawLine(v.a1,v.b1,v.e1,'#5ec8ff');
+    drawLine(v.a2,v.b2,v.e2,'#ffa500');
+
+    if (!singular) {
+      var p = toPx(x,y);
+      ctx.fillStyle='#00d984';
+      ctx.beginPath(); ctx.arc(p.x,p.y,7,0,Math.PI*2); ctx.fill();
+      ctx.font='12px Segoe UI'; ctx.fillText('('+x.toFixed(2)+', '+y.toFixed(2)+')', p.x+10, p.y-10);
+    }
+  }
+
+  ids.forEach(function(id){ sl[id].addEventListener('input', render); });
+  render();
+})();
+</script>
+</body>
+</html>

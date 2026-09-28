@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Matrixinvers og Ax=b</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Matrixinvers — at "spole tilbage"</h1>
+  <p>Matrixinvers og løsning af ligningssystemer · Kapitel 5</p>
+  <div class="badge">Anvend A, se x flytte til b — anvend så A⁻¹, og se b lande tilbage på x</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  Ligningen <strong>Ax = b</strong> spørger: "hvilken vektor x rammer b, når vi anvender A?" Den
+  inverse matrix A⁻¹ er den transformation, der præcis <strong>fortryder</strong> A — anvender du
+  A⁻¹ på b, lander du nøjagtig tilbage på x. Det virker kun, hvis det(A)≠0 (ellers findes ingen
+  entydig vej tilbage).
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>a <span class="val" id="aVal">2.0</span></label>
+      <input type="range" id="aSlider" min="-3" max="3" step="0.1" value="2">
+    </div>
+    <div class="slider-row">
+      <label>b <span class="val" id="bVal">1.0</span></label>
+      <input type="range" id="bSlider" min="-3" max="3" step="0.1" value="1">
+    </div>
+    <div class="slider-row">
+      <label>c <span class="val" id="cVal">0.5</span></label>
+      <input type="range" id="cSlider" min="-3" max="3" step="0.1" value="0.5">
+    </div>
+    <div class="slider-row">
+      <label>d <span class="val" id="dVal">1.5</span></label>
+      <input type="range" id="dSlider" min="-3" max="3" step="0.1" value="1.5">
+    </div>
+    <div class="slider-row">
+      <label>x₁ (input-vektor) <span class="val" id="x1Val">2.0</span></label>
+      <input type="range" id="x1Slider" min="-3" max="3" step="0.1" value="2">
+    </div>
+    <div class="slider-row">
+      <label>x₂ <span class="val" id="x2Val">1.0</span></label>
+      <input type="range" id="x2Slider" min="-3" max="3" step="0.1" value="1">
+    </div>
+
+    <div class="btn-row">
+      <button class="btn secondary active" id="fwdBtn">Anvend A (x→b)</button>
+      <button class="btn secondary" id="invBtn">Anvend A⁻¹ (b→x)</button>
+    </div>
+    <button class="btn" id="pauseBtn" style="margin-top:0.6rem;">⏸ Pause</button>
+    <div class="paused-flag" id="pausedFlag">PAUSET</div>
+
+    <div class="formula-box">
+      <div><span class="f">A⁻¹</span> = (1/det)·[ d&nbsp;−b ; −c&nbsp;&nbsp;a ]</div>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Gitteret under A eller A⁻¹</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">b = Ax</div><div class="num" id="outB">—</div></div>
+      <div><div class="lbl">A⁻¹b</div><div class="num" id="outInvB">—</div></div>
+      <div><div class="lbl">det(A)</div><div class="num" id="outDet">—</div></div>
+      <div><div class="lbl">Genfundet x korrekt?</div><div class="num" id="outCheck">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var cx=W/2, cy=H/2, scale=50;
+
+  var ids=['a','b','c','d','x1','x2'];
+  var sl={}, va={};
+  ids.forEach(function(id){ sl[id]=document.getElementById(id+'Slider'); va[id]=document.getElementById(id+'Val'); });
+  var outB=document.getElementById('outB'), outInvB=document.getElementById('outInvB'), outDet=document.getElementById('outDet'), outCheck=document.getElementById('outCheck');
+  var fwdBtn=document.getElementById('fwdBtn'), invBtn=document.getElementById('invBtn');
+
+  var mode='fwd';
+  fwdBtn.addEventListener('click', function(){ mode='fwd'; fwdBtn.classList.add('active'); invBtn.classList.remove('active'); });
+  invBtn.addEventListener('click', function(){ mode='inv'; invBtn.classList.add('active'); fwdBtn.classList.remove('active'); });
+
+  var Mshown=[1,0,0,1];
+
+  Widget.loop(function(dt){
+    var v={};
+    ids.forEach(function(id){ v[id]=parseFloat(sl[id].value); va[id].textContent=v[id].toFixed(1); });
+    var A=[v.a,v.b,v.c,v.d];
+    var det = Widget.mat.det(A);
+    var Ainv = Widget.mat.inv(A);
+    var bPt = Widget.mat.apply(A, v.x1, v.x2);
+
+    outB.textContent = '('+bPt.x.toFixed(2)+', '+bPt.y.toFixed(2)+')';
+    outDet.textContent = det.toFixed(2);
+
+    var invB = null;
+    if (Ainv) {
+      invB = Widget.mat.apply(Ainv, bPt.x, bPt.y);
+      outInvB.textContent = '('+invB.x.toFixed(2)+', '+invB.y.toFixed(2)+')';
+      var ok = Math.abs(invB.x-v.x1)<0.05 && Math.abs(invB.y-v.x2)<0.05;
+      outCheck.textContent = ok ? 'JA — tilbage til x' : 'Afrundingsfejl?';
+      outCheck.style.color = ok ? 'var(--accent-green)' : 'var(--accent-gold)';
+    } else {
+      outInvB.textContent = 'Findes ikke (det=0)';
+      outCheck.textContent = 'Nej — A er singulær';
+      outCheck.style.color = 'var(--accent-red)';
+    }
+
+    var Mtarget = mode==='fwd' ? A : (Ainv || [0,0,0,0]);
+    var rate = 1-Math.pow(0.001, dt);
+    for (var i=0;i<4;i++) Mshown[i]+=(Mtarget[i]-Mshown[i])*rate;
+
+    ctx.clearRect(0,0,W,H);
+    Widget.drawGridTransform(ctx, cx, cy, scale, Mshown, { showSquare:true, showBasis:false, range:5 });
+
+    if (mode==='fwd') {
+      var px1=cx+v.x1*scale, py1=cy-v.x2*scale;
+      var pb = Widget.mat.apply(Mshown, v.x1, v.x2);
+      var pbx=cx+pb.x*scale, pby=cy-pb.y*scale;
+      ctx.fillStyle='#5ec8ff'; ctx.beginPath(); ctx.arc(px1,py1,6,0,Math.PI*2); ctx.fill();
+      ctx.font='12px Segoe UI'; ctx.fillText('x', px1+8, py1-8);
+      Widget.arrow(ctx, px1,py1, pbx,pby, '#00d984', 3);
+      ctx.fillStyle='#00d984'; ctx.beginPath(); ctx.arc(pbx,pby,6,0,Math.PI*2); ctx.fill();
+      ctx.fillText('Ax = b', pbx+8, pby-8);
+    } else if (Ainv) {
+      var pB0 = {x:cx+bPt.x*scale, y:cy-bPt.y*scale};
+      var pRecovered = Widget.mat.apply(Mshown, bPt.x, bPt.y);
+      var pR = {x:cx+pRecovered.x*scale, y:cy-pRecovered.y*scale};
+      ctx.fillStyle='#ffa500'; ctx.beginPath(); ctx.arc(pB0.x,pB0.y,6,0,Math.PI*2); ctx.fill();
+      ctx.font='12px Segoe UI'; ctx.fillText('b', pB0.x+8, pB0.y-8);
+      Widget.arrow(ctx, pB0.x,pB0.y, pR.x,pR.y, '#5ec8ff', 3);
+      ctx.fillStyle='#5ec8ff'; ctx.beginPath(); ctx.arc(pR.x,pR.y,6,0,Math.PI*2); ctx.fill();
+      ctx.fillText('A⁻¹b = x', pR.x+8, pR.y-8);
+    }
+  });
+})();
+</script>
+</body>
+</html>

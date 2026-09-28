@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Lineær (u)afhængighed og span</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Lineær (u)afhængighed og span</h1>
+  <p>Lineær (u)afhængighed og basis · Kapitel 6</p>
+  <div class="badge">Flyt v hen på u's linje — se hele planet kollapse til én linje</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  <strong>Span</strong> af u og v er alle de punkter, du kan nå ved at kombinere dem:
+  au + bv for vilkårlige tal a,b. Normalt spænder to vektorer hele planet. Men er v bare et multiplum
+  af u (de peger langs samme linje), er de <strong>lineært afhængige</strong> — og deres span
+  kollapser til kun én linje, uanset hvor meget du skalerer og adderer.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>u_x <span class="val" id="uxVal">2.0</span></label>
+      <input type="range" id="uxSlider" min="-4" max="4" step="0.1" value="2">
+    </div>
+    <div class="slider-row">
+      <label>u_y <span class="val" id="uyVal">1.0</span></label>
+      <input type="range" id="uySlider" min="-4" max="4" step="0.1" value="1">
+    </div>
+    <div class="slider-row">
+      <label>v_x <span class="val" id="vxVal">-1.0</span></label>
+      <input type="range" id="vxSlider" min="-4" max="4" step="0.1" value="-1">
+    </div>
+    <div class="slider-row">
+      <label>v_y <span class="val" id="vyVal">2.0</span></label>
+      <input type="range" id="vySlider" min="-4" max="4" step="0.1" value="2">
+    </div>
+
+    <div class="formula-box">
+      <div>Afhængige hvis <span class="f">u_x·v_y − u_y·v_x = 0</span></div>
+      <div style="margin-top:0.3rem;">(bemærk — det er determinanten af [u v] igen!)</div>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Span af u og v</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">u_x·v_y − u_y·v_x</div><div class="num" id="outDet">—</div></div>
+      <div><div class="lbl">Status</div><div class="num" id="outStatus">—</div></div>
+      <div><div class="lbl">Span er</div><div class="num" id="outSpan">—</div></div>
+      <div><div class="lbl">Basis for R²?</div><div class="num" id="outBasis">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var cx=W/2, cy=H/2, scale=45;
+
+  var uxS=document.getElementById('uxSlider'), uyS=document.getElementById('uySlider'), vxS=document.getElementById('vxSlider'), vyS=document.getElementById('vySlider');
+  var uxVal=document.getElementById('uxVal'), uyVal=document.getElementById('uyVal'), vxVal=document.getElementById('vxVal'), vyVal=document.getElementById('vyVal');
+  var outDet=document.getElementById('outDet'), outStatus=document.getElementById('outStatus'), outSpan=document.getElementById('outSpan'), outBasis=document.getElementById('outBasis');
+
+  function toPx(x,y){ return {x:cx+x*scale, y:cy-y*scale}; }
+
+  function render(){
+    var ux=parseFloat(uxS.value), uy=parseFloat(uyS.value), vx=parseFloat(vxS.value), vy=parseFloat(vyS.value);
+    uxVal.textContent=ux.toFixed(1); uyVal.textContent=uy.toFixed(1); vxVal.textContent=vx.toFixed(1); vyVal.textContent=vy.toFixed(1);
+
+    var det = ux*vy-uy*vx;
+    var dependent = Math.abs(det)<0.15;
+
+    outDet.textContent = det.toFixed(2);
+    outStatus.textContent = dependent ? 'Lineært AFHÆNGIGE' : 'Lineært uafhængige';
+    outStatus.style.color = dependent ? 'var(--accent-red)' : 'var(--accent-green)';
+    outSpan.textContent = dependent ? 'Én linje gennem origo' : 'Hele planet (R²)';
+    outBasis.textContent = dependent ? 'Nej' : 'Ja';
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H);
+    ctx.strokeStyle='rgba(224,224,224,0.25)'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(W,cy); ctx.moveTo(cx,0); ctx.lineTo(cx,H); ctx.stroke();
+
+    if (dependent) {
+      // span = linje gennem origo og u (eller v, hvis u er nul)
+      var dirx=ux, diry=uy;
+      if (Math.hypot(dirx,diry)<1e-6) { dirx=vx; diry=vy; }
+      var len=Math.hypot(dirx,diry);
+      if (len>1e-6) {
+        var ux0=dirx/len, uy0=diry/len;
+        var R = 8;
+        var p1=toPx(-ux0*R,-uy0*R), p2=toPx(ux0*R,uy0*R);
+        ctx.strokeStyle='rgba(255,94,94,0.5)'; ctx.lineWidth=4;
+        ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y); ctx.stroke();
+      }
+    } else {
+      // span = hele planet - fyld baggrunden let grønligt
+      ctx.fillStyle='rgba(0,217,132,0.05)';
+      ctx.fillRect(0,0,W,H);
+    }
+
+    var pU=toPx(ux,uy), pV=toPx(vx,vy);
+    Widget.arrow(ctx, cx,cy, pU.x,pU.y, '#5ec8ff', 3);
+    Widget.arrow(ctx, cx,cy, pV.x,pV.y, '#ffa500', 3);
+    ctx.fillStyle='rgba(94,200,255,0.8)'; ctx.font='13px Segoe UI';
+    ctx.fillText('u', pU.x+8, pU.y-8);
+    ctx.fillStyle='rgba(255,165,0,0.8)';
+    ctx.fillText('v', pV.x+8, pV.y-8);
+  }
+
+  [uxS,uyS,vxS,vyS].forEach(function(el){ el.addEventListener('input', render); });
+  render();
+})();
+</script>
+</body>
+</html>

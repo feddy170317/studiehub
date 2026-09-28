@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Egenværdier og egenvektorer</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Egenværdier og egenvektorer</h1>
+  <p>Egenværdier og egenvektorer · Kapitel 8</p>
+  <div class="badge">Find de retninger, der IKKE drejer — kun strækkes eller krymper</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  De fleste vektorer drejer væk fra deres oprindelige retning, når M anvendes på dem. Men for de
+  fleste matricer findes der 1-2 særlige retninger — <strong>egenvektorerne</strong> — som M kun
+  <strong>skalerer</strong> langs, uden at dreje dem af deres linje. Skaleringsfaktoren er den
+  tilhørende <strong>egenværdi</strong> λ.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>a <span class="val" id="aVal">1.5</span></label>
+      <input type="range" id="aSlider" min="-3" max="3" step="0.1" value="1.5">
+    </div>
+    <div class="slider-row">
+      <label>b <span class="val" id="bVal">0.8</span></label>
+      <input type="range" id="bSlider" min="-3" max="3" step="0.1" value="0.8">
+    </div>
+    <div class="slider-row">
+      <label>c <span class="val" id="cVal">0.3</span></label>
+      <input type="range" id="cSlider" min="-3" max="3" step="0.1" value="0.3">
+    </div>
+    <div class="slider-row">
+      <label>d <span class="val" id="dVal">0.9</span></label>
+      <input type="range" id="dSlider" min="-3" max="3" step="0.1" value="0.9">
+    </div>
+
+    <button class="btn" id="pauseBtn">⏸ Pause</button>
+    <div class="paused-flag" id="pausedFlag">PAUSET</div>
+
+    <div class="formula-box">
+      <div>Karakteristisk lign.: λ² − (a+d)λ + (ad−bc) = 0</div>
+    </div>
+
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--accent-cyan)"></span> vektorer der drejer</span>
+      <span><span class="swatch" style="background:var(--accent-green)"></span> egenvektor-retninger</span>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Alle retninger under M</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">λ₁</div><div class="num" id="outL1">—</div></div>
+      <div><div class="lbl">λ₂</div><div class="num" id="outL2">—</div></div>
+      <div><div class="lbl">v₁ (retning)</div><div class="num" id="outV1">—</div></div>
+      <div><div class="lbl">v₂ (retning)</div><div class="num" id="outV2">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var cx=W/2, cy=H/2, scale=55;
+
+  var aS=document.getElementById('aSlider'), bS=document.getElementById('bSlider'), cS=document.getElementById('cSlider'), dS=document.getElementById('dSlider');
+  var aVal=document.getElementById('aVal'), bVal=document.getElementById('bVal'), cVal=document.getElementById('cVal'), dVal=document.getElementById('dVal');
+  var outL1=document.getElementById('outL1'), outL2=document.getElementById('outL2'), outV1=document.getElementById('outV1'), outV2=document.getElementById('outV2');
+
+  var Mshown=[1,0,0,1];
+
+  Widget.loop(function(dt){
+    var a=parseFloat(aS.value), b=parseFloat(bS.value), c=parseFloat(cS.value), d=parseFloat(dS.value);
+    aVal.textContent=a.toFixed(1); bVal.textContent=b.toFixed(1); cVal.textContent=c.toFixed(1); dVal.textContent=d.toFixed(1);
+    var M=[a,b,c,d];
+    var rate = 1-Math.pow(0.001, dt);
+    for (var i=0;i<4;i++) Mshown[i]+=(M[i]-Mshown[i])*rate;
+
+    var E = Widget.mat.eig(M);
+    if (E.real) {
+      outL1.textContent = E.l1.toFixed(2);
+      outL2.textContent = E.l2.toFixed(2);
+      outV1.textContent = '('+E.v1.x.toFixed(2)+', '+E.v1.y.toFixed(2)+')';
+      outV2.textContent = '('+E.v2.x.toFixed(2)+', '+E.v2.y.toFixed(2)+')';
+    } else {
+      outL1.textContent = 'Kompleks'; outL2.textContent='Kompleks';
+      outV1.textContent = 'Findes ikke'; outV2.textContent='(matricen roterer)';
+    }
+
+    ctx.clearRect(0,0,W,H);
+    Widget.drawGridTransform(ctx, cx, cy, scale, Mshown, { showBasis:false, range:6, gridColor:'rgba(94,200,255,0.12)' });
+
+    // "urskive" af sample-vektorer der viser hvem der drejer og hvem der ikke gør
+    var N=16, R=2.3;
+    for (var i=0;i<N;i++){
+      var ang = i*2*Math.PI/N;
+      var vx=R*Math.cos(ang), vy=R*Math.sin(ang);
+      var isEigen = false;
+      if (E.real) {
+        var d1 = Math.abs(vx*E.v1.y - vy*E.v1.x);
+        var d2 = Math.abs(vx*E.v2.y - vy*E.v2.x);
+        if (d1<0.15 || d2<0.15) isEigen = true;
+      }
+      var p = Widget.mat.apply(Mshown, vx, vy);
+      var px = cx+p.x*scale, py=cy-p.y*scale;
+      Widget.arrow(ctx, cx,cy, px,py, isEigen ? '#00d984' : 'rgba(94,200,255,0.55)', isEigen?3:1.5);
+    }
+
+    // eksplicitte egenlinjer (stiplet, hele vejen igennem)
+    if (E.real) {
+      [E.v1,E.v2].forEach(function(v){
+        var R2=8;
+        var p1={x:cx-v.x*R2*scale, y:cy+v.y*R2*scale};
+        var p2={x:cx+v.x*R2*scale, y:cy-v.y*R2*scale};
+        ctx.strokeStyle='rgba(0,217,132,0.25)'; ctx.setLineDash([5,5]); ctx.lineWidth=1.5;
+        ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y); ctx.stroke();
+        ctx.setLineDash([]);
+      });
+    } else {
+      ctx.fillStyle='rgba(255,165,0,0.8)'; ctx.font='13px Segoe UI';
+      ctx.fillText('Komplekse egenværdier — alle retninger drejer (roterende karakter)', 20, 30);
+    }
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Vektorer og vektoroperationer</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Vektorer — addition og skalering</h1>
+  <p>Vektorer og vektoroperationer · Kapitel 1</p>
+  <div class="badge">Skru på u og v — se parallelogram-reglen i praksis</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  En vektor er en pil med længde og retning. At <strong>addere</strong> to vektorer u+v svarer til
+  at sætte den ene pils hale ved den andens spids — resultatet er diagonalen i det parallelogram,
+  de udspænder. At <strong>skalere</strong> en vektor med et tal strækker/krymper den (og vender
+  den om, hvis tallet er negativt) uden at ændre dens retningslinje.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>u_x <span class="val" id="uxVal">3.0</span></label>
+      <input type="range" id="uxSlider" min="-5" max="5" step="0.1" value="3">
+    </div>
+    <div class="slider-row">
+      <label>u_y <span class="val" id="uyVal">1.0</span></label>
+      <input type="range" id="uySlider" min="-5" max="5" step="0.1" value="1">
+    </div>
+    <div class="slider-row">
+      <label>v_x <span class="val" id="vxVal">1.0</span></label>
+      <input type="range" id="vxSlider" min="-5" max="5" step="0.1" value="1">
+    </div>
+    <div class="slider-row">
+      <label>v_y <span class="val" id="vyVal">2.0</span></label>
+      <input type="range" id="vySlider" min="-5" max="5" step="0.1" value="2">
+    </div>
+    <div class="slider-row">
+      <label>Skalar k (for k·u) <span class="val" id="kVal">1.0</span></label>
+      <input type="range" id="kSlider" min="-2" max="2" step="0.1" value="1">
+    </div>
+
+    <div class="btn-row">
+      <button class="btn secondary active" id="addBtn">Vis u+v</button>
+      <button class="btn secondary" id="scaleBtn">Vis k·u</button>
+    </div>
+
+    <div class="formula-box" id="formulaBox">
+      <div><span class="f">u+v</span> = (u_x+v_x, u_y+v_y)</div>
+    </div>
+
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--accent-cyan)"></span> u</span>
+      <span><span class="swatch" style="background:var(--accent-gold)"></span> v</span>
+      <span><span class="swatch" style="background:var(--accent-green)"></span> resultat</span>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Vektordiagram</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">|u| (længde)</div><div class="num" id="outLenU">—</div></div>
+      <div><div class="lbl">|v| (længde)</div><div class="num" id="outLenV">—</div></div>
+      <div><div class="lbl">Resultat</div><div class="num" id="outResult" style="color:var(--accent-green)">—</div></div>
+      <div><div class="lbl">|resultat|</div><div class="num" id="outLenR">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var cx=W/2, cy=H/2, scale=45;
+
+  var uxS=document.getElementById('uxSlider'), uyS=document.getElementById('uySlider');
+  var vxS=document.getElementById('vxSlider'), vyS=document.getElementById('vySlider');
+  var kS=document.getElementById('kSlider');
+  var uxVal=document.getElementById('uxVal'), uyVal=document.getElementById('uyVal');
+  var vxVal=document.getElementById('vxVal'), vyVal=document.getElementById('vyVal'), kVal=document.getElementById('kVal');
+  var outLenU=document.getElementById('outLenU'), outLenV=document.getElementById('outLenV'), outResult=document.getElementById('outResult'), outLenR=document.getElementById('outLenR');
+  var addBtn=document.getElementById('addBtn'), scaleBtn=document.getElementById('scaleBtn'), formulaBox=document.getElementById('formulaBox');
+
+  var mode='add';
+  addBtn.addEventListener('click', function(){ mode='add'; addBtn.classList.add('active'); scaleBtn.classList.remove('active');
+    formulaBox.innerHTML='<div><span class="f">u+v</span> = (u_x+v_x, u_y+v_y)</div>'; render(); });
+  scaleBtn.addEventListener('click', function(){ mode='scale'; scaleBtn.classList.add('active'); addBtn.classList.remove('active');
+    formulaBox.innerHTML='<div><span class="f">k·u</span> = (k·u_x, k·u_y)</div>'; render(); });
+
+  function toPx(x,y){ return { x: cx+x*scale, y: cy-y*scale }; }
+
+  function render(){
+    var ux=parseFloat(uxS.value), uy=parseFloat(uyS.value), vx=parseFloat(vxS.value), vy=parseFloat(vyS.value), k=parseFloat(kS.value);
+    uxVal.textContent=ux.toFixed(1); uyVal.textContent=uy.toFixed(1);
+    vxVal.textContent=vx.toFixed(1); vyVal.textContent=vy.toFixed(1); kVal.textContent=k.toFixed(1);
+
+    var lenU = Math.hypot(ux,uy), lenV = Math.hypot(vx,vy);
+    outLenU.textContent = lenU.toFixed(2);
+    outLenV.textContent = lenV.toFixed(2);
+
+    ctx.clearRect(0,0,W,H);
+    Widget.grid(ctx,W,H,scale);
+    ctx.strokeStyle='rgba(224,224,224,0.25)'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(W,cy); ctx.moveTo(cx,0); ctx.lineTo(cx,H); ctx.stroke();
+
+    var pU = toPx(ux,uy), pV = toPx(vx,vy);
+    Widget.arrow(ctx, cx,cy, pU.x,pU.y, '#5ec8ff', 3);
+    Widget.arrow(ctx, cx,cy, pV.x,pV.y, '#ffa500', 3);
+
+    if (mode==='add'){
+      var rx=ux+vx, ry=uy+vy;
+      outResult.textContent = '('+rx.toFixed(1)+', '+ry.toFixed(1)+')';
+      outLenR.textContent = Math.hypot(rx,ry).toFixed(2);
+      var pR = toPx(rx,ry);
+      // parallelogram (stiplet)
+      ctx.strokeStyle='rgba(224,224,224,0.3)'; ctx.setLineDash([4,4]); ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.moveTo(pU.x,pU.y); ctx.lineTo(pR.x,pR.y); ctx.lineTo(pV.x,pV.y); ctx.stroke();
+      ctx.setLineDash([]);
+      Widget.arrow(ctx, cx,cy, pR.x,pR.y, '#00d984', 4);
+    } else {
+      var rx2=k*ux, ry2=k*uy;
+      outResult.textContent = '('+rx2.toFixed(1)+', '+ry2.toFixed(1)+')';
+      outLenR.textContent = Math.hypot(rx2,ry2).toFixed(2);
+      var pR2 = toPx(rx2,ry2);
+      Widget.arrow(ctx, cx,cy, pR2.x,pR2.y, '#00d984', 4);
+    }
+
+    ctx.fillStyle='rgba(94,200,255,0.8)'; ctx.font='13px Segoe UI';
+    ctx.fillText('u', pU.x+8, pU.y-8);
+    ctx.fillStyle='rgba(255,165,0,0.8)';
+    ctx.fillText('v', pV.x+8, pV.y-8);
+  }
+
+  [uxS,uyS,vxS,vyS,kS].forEach(function(el){ el.addEventListener('input', render); });
+  render();
+})();
+</script>
+</body>
+</html>

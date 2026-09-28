@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Transformationsgalleri</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Transformationsgalleri</h1>
+  <p>Lineære transformationer — rotation, skalering, spejling, forskydning · Kapitel 7</p>
+  <div class="badge">Vælg en type og se dens signaturmatrix warpe gitteret</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  De "navngivne" transformationer er bare matricer med et specielt mønster: rotation drejer uden at
+  skalere (kolonnerne forbliver enhedslange og vinkelrette), skalering strækker langs akserne,
+  spejling vender fortegn på én retning, og forskydning ("shear") skubber punkter sidelæns
+  proportionalt med deres afstand fra en akse.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Vælg transformation</h2>
+
+    <div class="gate-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+      <button class="btn secondary active" id="rotBtn">Rotation</button>
+      <button class="btn secondary" id="scaleBtn">Skalering</button>
+      <button class="btn secondary" id="reflBtn">Spejling</button>
+      <button class="btn secondary" id="shearBtn">Forskydning</button>
+    </div>
+
+    <div id="rotPanel" class="tpanel" style="margin-top:1rem;">
+      <div class="slider-row">
+        <label>Vinkel θ <span class="val" id="thVal">45°</span></label>
+        <input type="range" id="thSlider" min="-180" max="180" step="1" value="45">
+      </div>
+    </div>
+
+    <div id="scalePanel" class="tpanel" style="display:none;margin-top:1rem;">
+      <div class="slider-row">
+        <label>s_x <span class="val" id="sxVal">1.5</span></label>
+        <input type="range" id="sxSlider" min="-2" max="2" step="0.1" value="1.5">
+      </div>
+      <div class="slider-row">
+        <label>s_y <span class="val" id="syVal">0.6</span></label>
+        <input type="range" id="sySlider" min="-2" max="2" step="0.1" value="0.6">
+      </div>
+    </div>
+
+    <div id="reflPanel" class="tpanel" style="display:none;margin-top:1rem;">
+      <div class="btn-row">
+        <button class="btn secondary active" id="reflXBtn">Om x-aksen</button>
+        <button class="btn secondary" id="reflYBtn">Om y-aksen</button>
+      </div>
+      <div class="btn-row" style="margin-top:0.5rem;">
+        <button class="btn secondary" id="reflDiagBtn">Om linjen y=x</button>
+      </div>
+    </div>
+
+    <div id="shearPanel" class="tpanel" style="display:none;margin-top:1rem;">
+      <div class="slider-row">
+        <label>Forskydning k (vandret) <span class="val" id="kVal">1.0</span></label>
+        <input type="range" id="kSlider" min="-2" max="2" step="0.1" value="1">
+      </div>
+    </div>
+
+    <button class="btn" id="pauseBtn" style="margin-top:1rem;">⏸ Pause</button>
+    <div class="paused-flag" id="pausedFlag">PAUSET</div>
+
+    <div class="formula-box" id="formulaBox"></div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Gitteret</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">M</div><div class="num" id="outM" style="font-size:0.85rem;">—</div></div>
+      <div><div class="lbl">det(M)</div><div class="num" id="outDet">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var cx=W/2, cy=H/2, scale=50;
+
+  var panels = { rot:document.getElementById('rotPanel'), scale:document.getElementById('scalePanel'), refl:document.getElementById('reflPanel'), shear:document.getElementById('shearPanel') };
+  var tabBtns = { rot:document.getElementById('rotBtn'), scale:document.getElementById('scaleBtn'), refl:document.getElementById('reflBtn'), shear:document.getElementById('shearBtn') };
+  var mode='rot';
+  Object.keys(tabBtns).forEach(function(key){
+    tabBtns[key].addEventListener('click', function(){
+      mode=key;
+      Object.keys(tabBtns).forEach(function(k){ tabBtns[k].classList.toggle('active', k===key); panels[k].style.display = k===key ? 'block' : 'none'; });
+    });
+  });
+
+  var thS=document.getElementById('thSlider'), thVal=document.getElementById('thVal');
+  var sxS=document.getElementById('sxSlider'), syS=document.getElementById('sySlider'), sxVal=document.getElementById('sxVal'), syVal=document.getElementById('syVal');
+  var kS=document.getElementById('kSlider'), kVal=document.getElementById('kVal');
+  var reflXBtn=document.getElementById('reflXBtn'), reflYBtn=document.getElementById('reflYBtn'), reflDiagBtn=document.getElementById('reflDiagBtn');
+  var reflMode='x';
+  [ [reflXBtn,'x'], [reflYBtn,'y'], [reflDiagBtn,'diag'] ].forEach(function(pair){
+    pair[0].addEventListener('click', function(){
+      reflMode=pair[1];
+      [reflXBtn,reflYBtn,reflDiagBtn].forEach(function(b){ b.classList.remove('active'); });
+      pair[0].classList.add('active');
+    });
+  });
+
+  var outM=document.getElementById('outM'), outDet=document.getElementById('outDet'), formulaBox=document.getElementById('formulaBox');
+  var Mshown=[1,0,0,1];
+
+  function currentTarget(){
+    if (mode==='rot'){
+      var th=parseFloat(thS.value); thVal.textContent=th.toFixed(0)+'°';
+      var r=th*Math.PI/180;
+      formulaBox.innerHTML='<div>M = [ cosθ &nbsp;−sinθ ; sinθ &nbsp;cosθ ]</div>';
+      return [Math.cos(r), -Math.sin(r), Math.sin(r), Math.cos(r)];
+    }
+    if (mode==='scale'){
+      var sx=parseFloat(sxS.value), sy=parseFloat(syS.value);
+      sxVal.textContent=sx.toFixed(1); syVal.textContent=sy.toFixed(1);
+      formulaBox.innerHTML='<div>M = [ s_x &nbsp;0 ; 0 &nbsp;s_y ]</div>';
+      return [sx,0,0,sy];
+    }
+    if (mode==='refl'){
+      formulaBox.innerHTML='<div>Spejlingsmatricer har altid det(M) = −1</div>';
+      if (reflMode==='x') return [1,0,0,-1];
+      if (reflMode==='y') return [-1,0,0,1];
+      return [0,1,1,0];
+    }
+    if (mode==='shear'){
+      var k=parseFloat(kS.value); kVal.textContent=k.toFixed(1);
+      formulaBox.innerHTML='<div>M = [ 1 &nbsp;k ; 0 &nbsp;1 ] &nbsp; (bevarer altid areal, det=1)</div>';
+      return [1,k,0,1];
+    }
+  }
+
+  Widget.loop(function(dt){
+    var Mtarget = currentTarget();
+    var rate = 1-Math.pow(0.001, dt);
+    for (var i=0;i<4;i++) Mshown[i]+=(Mtarget[i]-Mshown[i])*rate;
+
+    outM.textContent = '['+Mshown[0].toFixed(2)+', '+Mshown[1].toFixed(2)+'; '+Mshown[2].toFixed(2)+', '+Mshown[3].toFixed(2)+']';
+    outDet.textContent = Widget.mat.det(Mshown).toFixed(2);
+
+    ctx.clearRect(0,0,W,H);
+    Widget.drawGridTransform(ctx, cx, cy, scale, Mshown, { showSquare:true, range:6 });
+  });
+})();
+</script>
+</body>
+</html>

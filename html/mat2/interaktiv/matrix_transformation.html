@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Matricer som lineære transformationer</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Matricer som lineære transformationer</h1>
+  <p>Matricer som lineære transformationer · Kapitel 2</p>
+  <div class="badge">Skru på a, b, c, d — se hele rummet blive "grebet" og trukket med</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  En 2×2-matrix er ikke bare et regneark med 4 tal — den er en <strong>opskrift på at flytte hvert
+  eneste punkt i planet</strong>. Kolonnerne i matricen fortæller præcis, hvor de to
+  grundvektorer î=(1,0) og ĵ=(0,1) ender henne — og fordi transformationen er lineær (rette linjer
+  forbliver rette, og origo bliver på plads), er det nok at vide, hvor î og ĵ lander, for at vide
+  hvor <em>alt andet</em> lander.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>a (M₁₁) <span class="val" id="aVal">1.5</span></label>
+      <input type="range" id="aSlider" min="-3" max="3" step="0.1" value="1.5">
+    </div>
+    <div class="slider-row">
+      <label>b (M₁₂) <span class="val" id="bVal">0.5</span></label>
+      <input type="range" id="bSlider" min="-3" max="3" step="0.1" value="0.5">
+    </div>
+    <div class="slider-row">
+      <label>c (M₂₁) <span class="val" id="cVal">-0.5</span></label>
+      <input type="range" id="cSlider" min="-3" max="3" step="0.1" value="-0.5">
+    </div>
+    <div class="slider-row">
+      <label>d (M₂₂) <span class="val" id="dVal">1.2</span></label>
+      <input type="range" id="dSlider" min="-3" max="3" step="0.1" value="1.2">
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" id="pauseBtn">⏸ Pause</button>
+      <button class="btn secondary" id="resetBtn">Nulstil til identitet</button>
+    </div>
+    <div class="paused-flag" id="pausedFlag">PAUSET — midt i morfningen</div>
+
+    <div class="formula-box">
+      <div>M = [ a&nbsp;&nbsp;b ; c&nbsp;&nbsp;d ] &nbsp; M·î = (a,c) &nbsp; M·ĵ = (b,d)</div>
+    </div>
+
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--accent-cyan)"></span> M·î (1. søjle)</span>
+      <span><span class="swatch" style="background:var(--accent-gold)"></span> M·ĵ (2. søjle)</span>
+    </div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Gitteret transformeres live</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">M·î (1. søjle)</div><div class="num" id="outCol1">—</div></div>
+      <div><div class="lbl">M·ĵ (2. søjle)</div><div class="num" id="outCol2">—</div></div>
+      <div><div class="lbl">det(M)</div><div class="num" id="outDet">—</div></div>
+      <div><div class="lbl">Status</div><div class="num" id="outStatus">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var cx=W/2, cy=H/2, scale=45;
+
+  var aS=document.getElementById('aSlider'), bS=document.getElementById('bSlider'), cS=document.getElementById('cSlider'), dS=document.getElementById('dSlider');
+  var aVal=document.getElementById('aVal'), bVal=document.getElementById('bVal'), cVal=document.getElementById('cVal'), dVal=document.getElementById('dVal');
+  var outCol1=document.getElementById('outCol1'), outCol2=document.getElementById('outCol2'), outDet=document.getElementById('outDet'), outStatus=document.getElementById('outStatus');
+  var resetBtn=document.getElementById('resetBtn');
+
+  var Mshown = [1,0,0,1]; // animeres mod Mtarget
+
+  resetBtn.addEventListener('click', function(){
+    aS.value=1; bS.value=0; cS.value=0; dS.value=1;
+  });
+
+  Widget.loop(function(dt){
+    var a=parseFloat(aS.value), b=parseFloat(bS.value), c=parseFloat(cS.value), d=parseFloat(dS.value);
+    aVal.textContent=a.toFixed(1); bVal.textContent=b.toFixed(1); cVal.textContent=c.toFixed(1); dVal.textContent=d.toFixed(1);
+    var Mtarget = [a,b,c,d];
+
+    var rate = 1-Math.pow(0.001, dt); // eksponentiel indhentning, ~ok selv ved paused dt=0
+    for (var i=0;i<4;i++) Mshown[i] += (Mtarget[i]-Mshown[i])*rate;
+
+    var det = Widget.mat.det(Mshown);
+    outCol1.textContent = '('+Mshown[0].toFixed(2)+', '+Mshown[2].toFixed(2)+')';
+    outCol2.textContent = '('+Mshown[1].toFixed(2)+', '+Mshown[3].toFixed(2)+')';
+    outDet.textContent = det.toFixed(2);
+    outStatus.textContent = Math.abs(det)<0.05 ? 'Næsten singulær — fladtrykker planet' : (det<0 ? 'Vender rummet (spejling)' : 'Bevarer orientering');
+    outStatus.style.color = Math.abs(det)<0.05 ? 'var(--accent-red)' : (det<0 ? 'var(--accent-gold)' : 'var(--accent-green)');
+
+    ctx.clearRect(0,0,W,H);
+    Widget.drawGridTransform(ctx, cx, cy, scale, Mshown, { showSquare:true });
+  });
+})();
+</script>
+</body>
+</html>

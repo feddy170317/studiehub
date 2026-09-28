@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktiv: Diagonalisering A=PDP⁻¹</title>
+<link rel="stylesheet" href="assets/widget.css">
+</head>
+<body>
+<header>
+  <h1>Diagonalisering — A = PDP⁻¹</h1>
+  <p>Diagonalisering · Kapitel 9</p>
+  <div class="badge">Gå trin for trin — og se at det ender nøjagtig samme sted som A direkte</div>
+</header>
+
+<div class="intro-box" style="margin-top:1.2rem;">
+  Enhver matrix med reelle, forskellige egenværdier kan skrives som <strong>A = PDP⁻¹</strong>, hvor
+  P's søjler er egenvektorerne og D er en diagonalmatrix af egenværdierne. Fortolkning: <strong>P⁻¹</strong>
+  drejer koordinatsystemet om, så egenretningerne bliver de nye akser, <strong>D</strong> skalerer
+  langs disse (nu lige) akser, og <strong>P</strong> drejer koordinatsystemet tilbage.
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Kontrolpanel</h2>
+
+    <div class="slider-row">
+      <label>a <span class="val" id="aVal">1.8</span></label>
+      <input type="range" id="aSlider" min="-3" max="3" step="0.1" value="1.8">
+    </div>
+    <div class="slider-row">
+      <label>b <span class="val" id="bVal">0.6</span></label>
+      <input type="range" id="bSlider" min="-3" max="3" step="0.1" value="0.6">
+    </div>
+    <div class="slider-row">
+      <label>c <span class="val" id="cVal">0.6</span></label>
+      <input type="range" id="cSlider" min="-3" max="3" step="0.1" value="0.6">
+    </div>
+    <div class="slider-row">
+      <label>d <span class="val" id="dVal">1.0</span></label>
+      <input type="range" id="dSlider" min="-3" max="3" step="0.1" value="1.0">
+    </div>
+
+    <div class="btn-row">
+      <button class="btn secondary active" id="s0Btn">Identitet</button>
+      <button class="btn secondary" id="s1Btn">1: P⁻¹</button>
+    </div>
+    <div class="btn-row" style="margin-top:0.5rem;">
+      <button class="btn secondary" id="s2Btn">2: D·P⁻¹</button>
+      <button class="btn secondary" id="s3Btn">3: P·D·P⁻¹ = A</button>
+    </div>
+    <button class="btn" id="directBtn" style="margin-top:0.5rem;">Sammenlign: A direkte</button>
+
+    <button class="btn" id="pauseBtn" style="margin-top:0.6rem;">⏸ Pause</button>
+    <div class="paused-flag" id="pausedFlag">PAUSET</div>
+
+    <div class="formula-box" id="formulaBox"></div>
+  </div>
+
+  <div class="stagepanel">
+    <h2>Gitteret</h2>
+    <canvas id="stage" width="740" height="480"></canvas>
+    <div class="readout">
+      <div><div class="lbl">D (diagonal)</div><div class="num" id="outD">—</div></div>
+      <div><div class="lbl">P (egenvektor-søjler)</div><div class="num" id="outP">—</div></div>
+      <div><div class="lbl">Nuværende trin</div><div class="num" id="outStep">—</div></div>
+      <div><div class="lbl">Diagonaliserbar?</div><div class="num" id="outOk">—</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Interaktiv widget til Studiehub — giv feedback via gruppen. ·
+  <a href="../../../index.html">Tilbage til Studiehub</a>
+</footer>
+
+<script src="assets/widget.js"></script>
+<script>
+(function(){
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var cx=W/2, cy=H/2, scale=50;
+
+  function matmul(A,B){ return [A[0]*B[0]+A[1]*B[2], A[0]*B[1]+A[1]*B[3], A[2]*B[0]+A[3]*B[2], A[2]*B[1]+A[3]*B[3]]; }
+
+  var aS=document.getElementById('aSlider'), bS=document.getElementById('bSlider'), cS=document.getElementById('cSlider'), dS=document.getElementById('dSlider');
+  var aVal=document.getElementById('aVal'), bVal=document.getElementById('bVal'), cVal=document.getElementById('cVal'), dVal=document.getElementById('dVal');
+  var outD=document.getElementById('outD'), outP=document.getElementById('outP'), outStep=document.getElementById('outStep'), outOk=document.getElementById('outOk');
+  var formulaBox=document.getElementById('formulaBox');
+
+  var stepBtns = { 0:document.getElementById('s0Btn'), 1:document.getElementById('s1Btn'), 2:document.getElementById('s2Btn'), 3:document.getElementById('s3Btn') };
+  var directBtn = document.getElementById('directBtn');
+  var step=0, showDirect=false;
+  Object.keys(stepBtns).forEach(function(key){
+    stepBtns[key].addEventListener('click', function(){
+      step=parseInt(key); showDirect=false;
+      Object.keys(stepBtns).forEach(function(k){ stepBtns[k].classList.toggle('active', k===key); });
+      directBtn.classList.remove('active');
+    });
+  });
+  directBtn.addEventListener('click', function(){
+    showDirect=true;
+    Object.keys(stepBtns).forEach(function(k){ stepBtns[k].classList.remove('active'); });
+    directBtn.classList.add('active');
+  });
+
+  var Mshown=[1,0,0,1];
+
+  Widget.loop(function(dt){
+    var a=parseFloat(aS.value), b=parseFloat(bS.value), c=parseFloat(cS.value), d=parseFloat(dS.value);
+    aVal.textContent=a.toFixed(1); bVal.textContent=b.toFixed(1); cVal.textContent=c.toFixed(1); dVal.textContent=d.toFixed(1);
+    var A=[a,b,c,d];
+    var E = Widget.mat.eig(A);
+
+    var Mtarget;
+    if (!E.real) {
+      outOk.textContent='Nej (komplekse egenværdier)'; outOk.style.color='var(--accent-red)';
+      outD.textContent='—'; outP.textContent='—'; outStep.textContent='—';
+      formulaBox.innerHTML='<div>Ingen reel diagonalisering mulig her — prøv andre a,b,c,d.</div>';
+      Mtarget = A;
+    } else {
+      var P = [E.v1.x, E.v2.x, E.v1.y, E.v2.y];
+      var D = [E.l1,0,0,E.l2];
+      var Pinv = Widget.mat.inv(P);
+      outOk.textContent = Pinv ? 'Ja' : 'Nej (egenvektorer parallelle)';
+      outOk.style.color = Pinv ? 'var(--accent-green)' : 'var(--accent-red)';
+      outD.textContent = '[' +E.l1.toFixed(2)+', 0; 0, '+E.l2.toFixed(2)+']';
+      outP.textContent = '['+E.v1.x.toFixed(2)+', '+E.v2.x.toFixed(2)+'; '+E.v1.y.toFixed(2)+', '+E.v2.y.toFixed(2)+']';
+
+      if (showDirect || !Pinv) {
+        outStep.textContent='A (direkte)';
+        formulaBox.innerHTML='<div>Viser A anvendt direkte, uden omvej om P/D.</div>';
+        Mtarget = A;
+      } else {
+        if (step===0){ outStep.textContent='Identitet'; formulaBox.innerHTML='<div>Udgangspunkt: ingenting anvendt endnu.</div>'; Mtarget=[1,0,0,1]; }
+        else if (step===1){ outStep.textContent='P⁻¹ (skift til egenbasis)'; formulaBox.innerHTML='<div>Drejer/skævvrider så egenretningerne bliver akserne.</div>'; Mtarget=Pinv; }
+        else if (step===2){ outStep.textContent='D·P⁻¹ (skalér langs egenakser)'; formulaBox.innerHTML='<div>Rent skalér nu, langs de (nu lige) egenakser.</div>'; Mtarget=matmul(D,Pinv); }
+        else { outStep.textContent='P·D·P⁻¹ = A'; formulaBox.innerHTML='<div>Drejer tilbage til original basis — identisk med A direkte!</div>'; Mtarget=matmul(P,matmul(D,Pinv)); }
+      }
+    }
+
+    var rate = 1-Math.pow(0.001, dt);
+    for (var i=0;i<4;i++) Mshown[i]+=(Mtarget[i]-Mshown[i])*rate;
+
+    ctx.clearRect(0,0,W,H);
+    Widget.drawGridTransform(ctx, cx, cy, scale, Mshown, { showSquare:true, range:6 });
+  });
+})();
+</script>
+</body>
+</html>
