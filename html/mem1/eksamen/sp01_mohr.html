@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spm. 1: Mohrs cirkel - MEM1 eksamen</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="assets/eksamen.css">
+</head>
+<body>
+<script>
+var QDATA = {
+nr: 1,
+titel: "Plan spændingstransformation og Mohrs cirkel",
+kapitel: 2,
+kapitelNavn: "Last, spænding og tøjning",
+mappe: "Spørgsmål 01 - Mohrs cirkel",
+next: "sp02_toejningsenergi.html",
+bog: "Kap. 2: §2.12 <i>Plane Stress</i>, lign. (2.12)&ndash;(2.17) og Fig. 2.17, s. 35&ndash;36 &middot; §2.13 <i>Mohr's Circle</i>, s. 37&ndash;38.",
+
+spmA: "Udled transformationsligningerne for plan spænding for normalspændingen $\\sigma_\\phi$ og forskydningsspændingen $\\tau_\\phi$ på et skråt snit orienteret under vinklen $\\phi$. Vis, hvordan disse ligninger danner en cirkel i $\\sigma$&ndash;$\\tau$-koordinatsystemet.",
+spmB: "En konstruktionsdel er udsat for plan spænding med $\\sigma_x = 90$ MPa, $\\sigma_y = 10$ MPa og $\\tau_{xy} = 30$ MPa. Beregn ved hjælp af Mohrs cirkel centerspændingen $\\sigma_c$, cirklens radius $R$, hovedspændingerne $\\sigma_1$ og $\\sigma_2$ samt den maksimale forskydningsspænding $\\tau_{max}$.",
+
+oversat: "Du får at vide, hvor hårdt et lille materialeelement bliver trukket og forskudt, <b>målt langs x- og y-akserne</b>. Men x og y er et tilfældigt valg &mdash; det er bare den måde, du holdt linealen på. Materialet er ligeglad med dine akser. Spørgsmålet er: <b>hvis jeg drejer mit snit, hvad er så den værste spænding, der findes nogen steder i elementet, og hvilken vej vender den?</b> Del (a) beder om beviset for, at alle mulige snitvinkler tilsammen tegner en cirkel. Del (b) beder dig bruge den cirkel som en lommeregner.",
+kerne: "Et spændingselement er ét fysisk faktum set fra uendeligt mange vinkler. Mohrs cirkel er landkortet over alle de udsigter på én gang &mdash; og du skal finde bjergtoppen.",
+
+historie: [
+ {h:"Hvorfor er der overhovedet et problem?",
+  t:"Forestil dig en flad plade, du trækker i. Du skærer den over på tværs og måler spændingen: ren træk, ingen forskydning. Nu skærer du i stedet skråt, 45°. Samme kraft, samme plade &mdash; men nu er snitfladen større, og kraften rammer den skævt. En del af kraften trykker vinkelret på snittet (normalspænding), og en del <i>skubber langs</i> snittet (forskydningsspænding). Spændingen afhænger altså af, <b>hvordan du skærer</b>. Det er hele pointen."},
+ {h:"Hvorfor det betyder noget i praksis",
+  t:"Materialer går ikke i stykker på den måde, du måler. Duktilt stål flyder, når <b>forskydningen</b> bliver for stor &mdash; og den er størst på et snit, der ligger 45° fra trækretningen. Derfor ses de karakteristiske 45°-glidelinjer på en trukket prøvestang. Sprødt materiale revner derimod vinkelret på den <b>største træk</b>-spænding. Uanset hvad, skal du kende ekstremerne, ikke bare det, der tilfældigvis stod langs x-aksen."},
+ {h:"Hvad hovedspændinger er",
+  t:"Når du drejer snittet rundt, er der præcis to vinkler (90° fra hinanden), hvor forskydningsspændingen forsvinder helt. På de snit står spændingen rent vinkelret &mdash; rent træk eller rent tryk. Dem kalder vi <b>hovedspændingerne</b> $\\sigma_1$ og $\\sigma_2$, og de er den største og den mindste normalspænding, der overhovedet findes i punktet. De er materialets egne akser, uafhængige af dit valg af koordinatsystem."},
+ {h:"Hvorfor det bliver en cirkel",
+  t:"Transformationsligningerne indeholder $\\cos 2\\phi$ og $\\sin 2\\phi$ ganget med de samme to konstanter. Flytter du middelværdien over på venstre side og kvadrerer, giver $\\cos^2+\\sin^2=1$ dig $(\\sigma_\\phi-\\sigma_c)^2+\\tau_\\phi^2=R^2$. Det <i>er</i> cirklens ligning. Cirklen er ikke en tegneteknik, nogen har fundet på &mdash; den er en direkte konsekvens af grundrelationen i trigonometrien."}
+],
+analogi: "Tænk på skyggen af en blyant på bordet. Flytter du lampen, bliver skyggen længere eller kortere, men blyanten har stadig én sand længde. Spændingstilstanden er den samme: $\\sigma_x$, $\\sigma_y$, $\\tau_{xy}$ er skyggerne set fra én bestemt vinkel. $\\sigma_1$ og $\\sigma_2$ er den sande længde.",
+
+plan: [
+ {t:"0&ndash;2 min", k:"warm", w:"Tegn elementet og sæt scenen",
+  d:"Tegn et lille kvadrat med $\\sigma_x$, $\\sigma_y$ og $\\tau_{xy}$ på. Sig: &bdquo;Det her er ét punkt i emnet, set i mit x-y-system. Jeg vil finde den værste spænding uanset snitvinkel.&ldquo; Nævn, at $\\tau_{xy}=\\tau_{yx}$ på grund af momentligevægt &mdash; det er gratis point."},
+ {t:"2&ndash;6 min", w:"Frilegeme og de to ligevægtsligninger",
+  d:"Skær et kileformet element af under vinklen $\\phi$. Tegn kræfterne på de tre flader. Opstil ligevægt vinkelret på og langs det skrå snit. Det er hele udledningen &mdash; resten er trigonometri."},
+ {t:"6&ndash;9 min", w:"Fra ligninger til cirkel",
+  d:"Vis de to transformationsligninger, flyt $\\sigma_c$ over, kvadrér og læg sammen. Peg på $\\cos^2+\\sin^2=1$. Skriv cirkelligningen op og sig, hvad centrum og radius er."},
+ {t:"9&ndash;12 min", w:"Tegn cirklen med opgavens tal",
+  d:"Tegn $\\sigma$&ndash;$\\tau$-akserne. Afsæt punkt X$(90,30)$ og Y$(10,-30)$, forbind dem &mdash; linjen skærer $\\sigma$-aksen i centrum. Det er hurtigere og mere overbevisende end at regne først."},
+ {t:"12&ndash;14 min", k:"end", w:"Aflæs facit og sig, hvad det betyder",
+  d:"$\\sigma_c=50$, $R=50$, $\\sigma_1=100$ MPa, $\\sigma_2=0$, $\\tau_{max}=50$ MPa, $\\theta_p=18{,}4^\\circ$. Slut med en fysisk kommentar: &bdquo;$\\sigma_2$ bliver nul &mdash; det er altså ensakset træk, bare set skævt.&ldquo; Den bemærkning viser forståelse."},
+ {t:"14&ndash;20 min", k:"end", w:"Spørgsmål",
+  d:"Se censors sandsynlige spørgsmål nederst."}
+],
+
+trin: [
+ {t:"Udgangspunkt: hvad vi kender, og hvad vi vil vide",
+  m:"\\text{Kendt: } \\sigma_x,\\ \\sigma_y,\\ \\tau_{xy} \\qquad \\text{Søgt: } \\sigma_\\phi,\\ \\tau_\\phi \\ \\text{ for vilkårlig } \\phi",
+  hvorfor:"Plan spænding betyder, at den tredje retning er spændingsfri ($\\sigma_z=\\tau_{xz}=\\tau_{yz}=0$) &mdash; typisk en tynd plade, hvor der ikke er noget til at holde igen ud af planet. Så har vi kun tre tal at holde styr på.",
+  sig:"Jeg har tre spændingskomposanter i mit eget koordinatsystem. Jeg vil vide, hvad en observatør, der har drejet sit snit vinklen fi, ville måle."},
+
+ {t:"Skær et kileelement og tegn frilegemet",
+  m:["\\text{Snitfladens areal} = A \\quad\\Rightarrow\\quad A_x = A\\cos\\phi,\\qquad A_y = A\\sin\\phi"],
+  hvorfor:"Det er det eneste geometriske trick i hele udledningen. Det skrå snit har areal $A$; de to andre flader har arealer, der er projektioner af $A$. Kraften på hver flade er spænding gange <i>den flades</i> areal &mdash; og det er derfor $\\cos\\phi$ og $\\sin\\phi$ overhovedet dukker op.",
+  sig:"Jeg skærer en trekant ud. Det skrå snit har arealet A, og de to andre flader har A gange cosinus og A gange sinus. Nu kan jeg lave kraftligevægt på trekanten."},
+
+ {t:"Ligevægt vinkelret på det skrå snit",
+  m:["\\sum F_n = 0:\\quad \\sigma_\\phi A = \\sigma_x A\\cos^2\\phi + \\sigma_y A\\sin^2\\phi + 2\\tau_{xy}A\\sin\\phi\\cos\\phi",
+     "\\sigma_\\phi = \\sigma_x\\cos^2\\phi + \\sigma_y\\sin^2\\phi + 2\\tau_{xy}\\sin\\phi\\cos\\phi"],
+  hvorfor:"Hver kraft projiceres ind på snittets normal. $\\sigma_x$ virker på fladen med areal $A\\cos\\phi$, og dens komposant langs normalen er endnu en $\\cos\\phi$ &mdash; deraf $\\cos^2\\phi$. Forskydningen bidrager to gange, fordi både $\\tau_{xy}$ og $\\tau_{yx}$ findes.",
+  sig:"Jeg projicerer alle kræfter ind på normalen til det skrå snit og dividerer med A. Cosinus i anden kommer af, at både arealet og kraftretningen skal projiceres."},
+
+ {t:"Ligevægt langs det skrå snit",
+  m:["\\sum F_t = 0:\\quad \\tau_\\phi = -(\\sigma_x-\\sigma_y)\\sin\\phi\\cos\\phi + \\tau_{xy}(\\cos^2\\phi-\\sin^2\\phi)"],
+  hvorfor:"Samme projektion, bare langs snittet i stedet for vinkelret på det. Læg mærke til, at forskellen $\\sigma_x-\\sigma_y$ styrer forskydningen: er de to normalspændinger lige store, kan de ikke skabe forskydning på noget snit.",
+  sig:"Nu projicerer jeg langs snittet i stedet. Det er kun forskellen mellem sigma-x og sigma-y, der bidrager &mdash; ikke deres middelværdi."},
+
+ {t:"Omskriv med dobbeltvinkler &mdash; her opstår 2 fi",
+  m:["\\cos^2\\phi=\\tfrac{1+\\cos 2\\phi}{2},\\qquad \\sin^2\\phi=\\tfrac{1-\\cos 2\\phi}{2},\\qquad 2\\sin\\phi\\cos\\phi=\\sin 2\\phi",
+     "\\boxed{\\ \\sigma_\\phi=\\frac{\\sigma_x+\\sigma_y}{2}+\\frac{\\sigma_x-\\sigma_y}{2}\\cos 2\\phi+\\tau_{xy}\\sin 2\\phi\\ }",
+     "\\boxed{\\ \\tau_\\phi=-\\frac{\\sigma_x-\\sigma_y}{2}\\sin 2\\phi+\\tau_{xy}\\cos 2\\phi\\ }"],
+  hvorfor:"Det er <b>her</b> cirklen bliver født. Alt afhænger nu af $2\\phi$, ikke $\\phi$. Derfor svarer en drejning på 45° i virkeligheden til 90° på cirklen &mdash; og derfor ligger maksimal forskydning altid 45° fra hovedspændingerne.",
+  sig:"Når jeg bruger dobbeltvinkelformlerne, står alt pludselig med to-fi. Det er grunden til, at vinkler på Mohrs cirkel er dobbelt så store som de fysiske vinkler."},
+
+ {t:"Kvadrér og læg sammen &mdash; cirklen falder ud",
+  m:["\\left(\\sigma_\\phi-\\underbrace{\\frac{\\sigma_x+\\sigma_y}{2}}_{\\sigma_c}\\right)^2+\\tau_\\phi^2=\\underbrace{\\left(\\frac{\\sigma_x-\\sigma_y}{2}\\right)^2+\\tau_{xy}^2}_{R^2}",
+     "\\boxed{\\ (\\sigma_\\phi-\\sigma_c)^2+\\tau_\\phi^2=R^2\\ }"],
+  hvorfor:"Flyt $\\sigma_c$ over, kvadrér begge ligninger og læg dem sammen. Krydsleddene ophæver hinanden, og $\\sin^2 2\\phi+\\cos^2 2\\phi=1$ fjerner vinklen helt. Tilbage står en cirkel med centrum $(\\sigma_c,0)$ og radius $R$ &mdash; uafhængig af $\\phi$. Det er beviset, censor beder om.",
+  sig:"Vinklen forsvinder, fordi sinus i anden plus cosinus i anden er ét. Tilbage har jeg cirklens ligning. Alle mulige snitvinkler ligger altså på én og samme cirkel."},
+
+ {t:"Aflæs hovedspændinger og maksimal forskydning",
+  m:["\\sigma_{1,2}=\\sigma_c\\pm R=\\frac{\\sigma_x+\\sigma_y}{2}\\pm\\sqrt{\\left(\\frac{\\sigma_x-\\sigma_y}{2}\\right)^2+\\tau_{xy}^2}",
+     "\\tau_{max}=R,\\qquad \\tan 2\\theta_p=\\frac{2\\tau_{xy}}{\\sigma_x-\\sigma_y}"],
+  hvorfor:"Cirklens yderpunkter på $\\sigma$-aksen har $\\tau=0$ &mdash; det er per definition hovedspændingerne. Cirklens top og bund har den største $|\\tau|$, nemlig radius. Da top og bund ligger 90° fra yderpunkterne <i>på cirklen</i>, ligger de 45° fra hovedretningerne <i>i virkeligheden</i>.",
+  sig:"Hovedspændingerne er centrum plus-minus radius. Maksimal forskydning er simpelthen radius &mdash; og den optræder 45 grader fra hovedretningerne, fordi cirklen regner i dobbeltvinkler."}
+],
+
+faldgruber: [
+ {t:"At glemme faktor 2 i vinklen", d:"Cirklen arbejder i $2\\phi$. Læser du 36,9° af på cirklen, er den fysiske drejning 18,4°. Halvér altid &mdash; det er den hyppigste fejl."},
+ {t:"At tro $\\tau_{max}$ er $(\\sigma_1-\\sigma_2)/2$ i 3D", d:"I planen er $\\tau_{max}=R$. Men i 3D skal $\\sigma_3=0$ tælles med: den sande maksimale forskydning er halvdelen af <i>den største</i> forskel mellem alle tre hovedspændinger. Har $\\sigma_1$ og $\\sigma_2$ samme fortegn, ligger den absolutte $\\tau_{max}$ uden for det plan, du har tegnet."},
+ {t:"Fortegn på $\\tau$ i tegningen", d:"Nogle bøger vender $\\tau$-aksen nedad, så rotationsretningen på cirklen matcher den fysiske. Vælg én konvention, sig hvilken, og hold fast. Størrelserne $\\sigma_1$, $\\sigma_2$ og $\\tau_{max}$ ændrer sig ikke."},
+ {t:"At kalde $\\sigma_2$ &bdquo;den mindste spænding&ldquo;", d:"$\\sigma_2$ er den mindste <b>i planen</b>. Med $\\sigma_2=0$ her og $\\sigma_3=0$ ud af planet er der reelt tale om ensakset træk &mdash; sig det &mdash; det er en stærk pointe."},
+ {t:"At regne uden at tegne", d:"Del (b) siger udtrykkeligt &bdquo;ved hjælp af Mohrs cirkel&ldquo;. Tegn den. En rigtig udregning uden tegning giver færre point end en tegning med aflæsning."}
+],
+
+qa: [
+ {q:"Hvorfor er $\\tau_{xy}=\\tau_{yx}$?",
+  a:"Momentligevægt om elementets centrum. Hvis de to forskydningsspændinger ikke var lige store, ville det uendeligt lille element have et resulterende moment og dermed uendelig vinkelacceleration. Derfor er spændingstensoren symmetrisk."},
+ {q:"Hvad sker der med cirklen, hvis $\\tau_{xy}=0$?",
+  a:"Så er $\\sigma_x$ og $\\sigma_y$ allerede hovedspændingerne, og cirklen går gennem dem på $\\sigma$-aksen. Radius bliver $|\\sigma_x-\\sigma_y|/2$. Prøv det i laboratoriet ovenfor &mdash; skru $\\tau_{xy}$ til nul."},
+ {q:"Hvad hvis $\\sigma_x=\\sigma_y$ og $\\tau_{xy}=0$?",
+  a:"Cirklen skrumper til et punkt. Spændingstilstanden er hydrostatisk i planen: den er ens på alle snit, og der er ingen forskydning nogen steder. Derfor kan hydrostatisk tryk alene ikke få duktilt materiale til at flyde &mdash; det er selve idéen bag von Mises, som er spørgsmål 5."},
+ {q:"Hvor på cirklen ligger det snit, du startede med?",
+  a:"Punkt X$(\\sigma_x,\\tau_{xy})$ og punkt Y$(\\sigma_y,-\\tau_{xy})$ ligger diametralt modsat hinanden &mdash; 180° på cirklen, altså 90° fysisk. Det passer: x-fladen og y-fladen står vinkelret på hinanden."},
+ {q:"Ville en sprød og en duktil komponent svigte forskelligt her?",
+  a:"Ja. Sprødt materiale revner vinkelret på $\\sigma_1=100$ MPa, altså på det snit, der er drejet 18,4°. Duktilt materiale flyder på det snit, hvor $\\tau=\\tau_{max}=50$ MPa, altså 45° fra hovedretningen. Samme spændingstilstand, to forskellige brudplaner."},
+ {q:"Hvordan bruger du det videre i dimensioneringen?",
+  a:"$\\sigma_1$ og $\\sigma_2$ er netop de inddata, flydekriterierne skal bruge. Tresca sammenligner $\\sigma_1-\\sigma_2$ med $S_y$, von Mises bruger $\\sqrt{\\sigma_1^2-\\sigma_1\\sigma_2+\\sigma_2^2}$. Mohrs cirkel er altså forarbejdet til spørgsmål 5."}
+],
+
+sammenhaeng: "Det her spørgsmål er <b>fundamentet under næsten alle de andre</b>. Enhver gang du beregner en spænding et andet sted i pensum &mdash; bøjning i en bjælke (spm. 3), tangentialspænding i en cylinder (spm. 8), kombineret bøjning og vridning i en aksel (spm. 9) &mdash; ender du med $\\sigma_x$, $\\sigma_y$ og $\\tau_{xy}$ i et punkt. Mohrs cirkel er den maskine, der omsætter dem til $\\sigma_1$ og $\\sigma_2$, så et flydekriterium (spm. 5) kan afgøre, om delen holder. Kan du forklare den sammenhæng uopfordret, har du vist overblik over hele faget.",
+
+links: [
+ {k:"SPM 5", t:"Flydekriterier bruger σ₁ og σ₂ herfra", u:"sp05_flydekriterier.html"},
+ {k:"SPM 9", t:"Akseldesign: bøjning + vridning i ét punkt", u:"sp09_akseldesign.html"},
+ {k:"WIDGET", t:"Den oprindelige Mohr-widget", u:"../interaktiv/mohrs_cirkel.html"},
+ {k:"KAP. 2", t:"Formeloverblik (PDF)", u:"../Kapitel02_Overblik.pdf"},
+ {k:"KAP. 2", t:"Quiz", u:"../../../quiz/mem1/Kapitel02_Quiz.html"},
+ {k:"KAP. 2", t:"Flashcards", u:"../../../flash/mem1/Kapitel02_Flashcards.html"}
+]
+};
+
+var LAB = {
+w: 720, h: 448,
+intro: "Skyderne står på eksamensopgavens tal. Læg mærke til, at $\\sigma_2$ lige præcis rammer nul &mdash; tilstanden er i virkeligheden ensakset træk, bare set fra et drejet koordinatsystem. Træk $\\tau_{xy}$ til nul og se cirklen skrumpe, eller sæt $\\sigma_x=\\sigma_y$ og se den blive til et punkt.",
+preset2: {navn: "Vis ren forskydning (σx = σy = 0)", v: {sx: 0, sy: 0, txy: 50}},
+
+inputs: [
+ {id:"sx",  label:"$\\sigma_x$",    min:-200, max:200, step:5, value:90, unit:"MPa"},
+ {id:"sy",  label:"$\\sigma_y$",    min:-200, max:200, step:5, value:10, unit:"MPa"},
+ {id:"txy", label:"$\\tau_{xy}$",   min:-150, max:150, step:5, value:30, unit:"MPa"}
+],
+
+compute: function (v) {
+  var c = (v.sx + v.sy) / 2;
+  var R = Math.hypot((v.sx - v.sy) / 2, v.txy);
+  var two = Math.atan2(2 * v.txy, v.sx - v.sy);
+  return { c: c, R: R, s1: c + R, s2: c - R, tmax: R,
+           two: two * 180 / Math.PI, thp: two * 90 / Math.PI };
+},
+
+readout: function (v, r) {
+  return [
+   {l:"Centrum $\\sigma_c$", v:r.c, dec:1, unit:"MPa"},
+   {l:"Radius $R$", v:r.R, dec:1, unit:"MPa"},
+   {l:"$\\sigma_1$ (største)", v:r.s1, dec:1, unit:"MPa", k:"hi"},
+   {l:"$\\sigma_2$ (mindste)", v:r.s2, dec:1, unit:"MPa"},
+   {l:"$\\tau_{max}$ i planen", v:r.tmax, dec:1, unit:"MPa", k:"hi"},
+   {l:"$\\theta_p$ (fysisk vinkel)", v:r.thp, dec:2, unit:"°"}
+  ];
+},
+
+steps: function (v, r) {
+  var T = Eks.tnum;
+  return [
+   {h:"1 · Centrum = middelspændingen",
+    m:"\\sigma_c=\\frac{\\sigma_x+\\sigma_y}{2}=\\frac{"+T(v.sx,0)+"+"+T(v.sy,0)+"}{2}="+T(r.c,1)+"\\ \\text{MPa}",
+    c:"Centrum flytter sig aldrig, når du drejer snittet &mdash; middelspændingen er en invariant."},
+   {h:"2 · Radius fra Pythagoras",
+    m:"R=\\sqrt{\\left(\\frac{\\sigma_x-\\sigma_y}{2}\\right)^{2}+\\tau_{xy}^{2}}=\\sqrt{"+T((v.sx-v.sy)/2,1)+"^{2}+"+T(v.txy,0)+"^{2}}="+T(r.R,1)+"\\ \\text{MPa}",
+    c:"Retvinklet trekant med katete $(\\sigma_x-\\sigma_y)/2$ og katete $\\tau_{xy}$."},
+   {h:"3 · Hovedspændingerne er centrum ± radius",
+    m:"\\sigma_1="+T(r.c,1)+"+"+T(r.R,1)+"="+T(r.s1,1)+"\\ \\text{MPa}\\qquad \\sigma_2="+T(r.c,1)+"-"+T(r.R,1)+"="+T(r.s2,1)+"\\ \\text{MPa}",
+    c:"Cirklens to skæringer med $\\sigma$-aksen, hvor $\\tau=0$."},
+   {h:"4 · Maksimal forskydning = radius",
+    m:"\\tau_{max}=R="+T(r.tmax,1)+"\\ \\text{MPa}=\\frac{\\sigma_1-\\sigma_2}{2}",
+    c:"Cirklens top. Ligger 45° fra hovedretningerne i virkeligheden (90° på cirklen)."},
+   {h:"5 · Hovedretningen",
+    m:"\\tan 2\\theta_p=\\frac{2\\tau_{xy}}{\\sigma_x-\\sigma_y}=\\frac{"+T(2*v.txy,0)+"}{"+T(v.sx-v.sy,0)+"}\\;\\Rightarrow\\;2\\theta_p="+T(r.two,2)+"^\\circ\\;\\Rightarrow\\;\\theta_p="+T(r.thp,2)+"^\\circ",
+    c:"Husk at halvere. Drej elementet $\\theta_p$ fysisk, og forskydningen forsvinder."}
+  ];
+},
+
+facit: function (v, r) {
+  if (v.sx === 90 && v.sy === 10 && v.txy === 30) {
+    return {t:"<b>✓ Eksamensopgavens facit:</b> $\\sigma_c=50$ MPa, $R=50$ MPa, $\\sigma_1=100$ MPa, $\\sigma_2=0$ MPa, $\\tau_{max}=50$ MPa. Bemærk at $\\sigma_2$ bliver præcis nul &mdash; tilstanden er ensakset træk på 100 MPa, set fra et koordinatsystem drejet 18,43°. Sig det højt til eksamen."};
+  }
+  if (Math.abs(r.R) < 1e-9) {
+    return {off:true, t:"<b>Cirklen er skrumpet til et punkt.</b> $\\sigma_x=\\sigma_y$ og $\\tau_{xy}=0$: spændingen er den samme på ethvert snit, og der findes ingen forskydning nogen steder. Hydrostatisk tilstand &mdash; duktilt materiale kan ikke flyde af den alene."};
+  }
+  if (Math.abs(v.sx - v.sy) < 1e-9 && Math.abs(v.txy) > 0) {
+    return {off:true, t:"<b>Ren forskydning.</b> Centrum ligger i $\\sigma_c=" + Eks.num(r.c,0) + "$, og $\\sigma_1=-\\sigma_2$ omkring det. Hovedretningerne ligger 45° fra x-aksen &mdash; det er derfor en vridningsbelastet aksel revner i en 45°-spiral, når materialet er sprødt."};
+  }
+  return {off:true, t:"Du har ændret inddata. Tryk på knappen for at komme tilbage til eksamensopgavens tal."};
+},
+
+draw: function (ctx, W, H, v, r, C) {
+  C.grid(ctx, W, H, 40);
+  var CY='#5ec8ff', GR='#00d984', GO='#ffa500', RD='#ff5e5e', DIM='rgba(227,235,243,.45)';
+
+  /* ---------- venstre: spændingselementet ---------- */
+  var ex=112, ey=132, s=46;
+  C.txt(ctx, 'Elementet i x-y', ex, ey-s-48, DIM, 11, 'center');
+  ctx.save(); ctx.strokeStyle=CY; ctx.lineWidth=2.2;
+  ctx.strokeRect(ex-s, ey-s, 2*s, 2*s); ctx.restore();
+  var a = 22;
+  // normalspaendinger (pil udad = traek)
+  var dx = v.sx>=0?1:-1, dy = v.sy>=0?1:-1;
+  C.arrow(ctx, ex+s*dx, ey, ex+(s+a)*dx, ey, CY, 2.2);
+  C.arrow(ctx, ex-s*dx, ey, ex-(s+a)*dx, ey, CY, 2.2);
+  C.arrow(ctx, ex, ey-s*dy, ex, ey-(s+a)*dy, CY, 2.2);
+  C.arrow(ctx, ex, ey+s*dy, ex, ey+(s+a)*dy, CY, 2.2);
+  C.mono(ctx, 'σx='+Eks.num(v.sx,0), ex+s+a+5, ey+4, CY, 11);
+  C.mono(ctx, 'σy='+Eks.num(v.sy,0), ex+9, ey-s-a-6, CY, 11, 'left');
+  // forskydning
+  if (Math.abs(v.txy) > 0.01) {
+    var sg = v.txy>=0?1:-1;
+    C.arrow(ctx, ex+s, ey-s*0.55, ex+s, ey+s*0.55, GO, 2, 8);
+    C.arrow(ctx, ex-s, ey+s*0.55, ex-s, ey-s*0.55, GO, 2, 8);
+    C.arrow(ctx, ex-s*0.55, ey-s, ex+s*0.55, ey-s, GO, 2, 8);
+    C.arrow(ctx, ex+s*0.55, ey+s, ex-s*0.55, ey+s, GO, 2, 8);
+    C.mono(ctx, 'τxy='+Eks.num(v.txy,0), ex, ey+s+a+16, GO, 11, 'center');
+  }
+
+  /* ---------- venstre nederst: hovedspændingselementet ---------- */
+  var px=112, py=330, ps=42, th=-r.thp*Math.PI/180;
+  C.txt(ctx, 'Drejet '+Eks.num(r.thp,1)+'° → hovedakser', px, py-ps-34, DIM, 11, 'center');
+  ctx.save(); ctx.translate(px,py); ctx.rotate(th);
+  ctx.strokeStyle=GR; ctx.lineWidth=2.2; ctx.strokeRect(-ps,-ps,2*ps,2*ps); ctx.restore();
+  function rot(dxx,dyy){ return [px+dxx*Math.cos(th)-dyy*Math.sin(th), py+dxx*Math.sin(th)+dyy*Math.cos(th)]; }
+  var g1=r.s1>=0?1:-1, g2=r.s2>=0?1:-1;
+  [[ps*g1,0],[-ps*g1,0]].forEach(function(p,i){
+    var f=rot(p[0],p[1]), t2=rot(p[0]+(i?-1:1)*20*g1,p[1]);
+    C.arrow(ctx,f[0],f[1],t2[0],t2[1],GR,2.2);
+  });
+  [[0,ps*g2],[0,-ps*g2]].forEach(function(p,i){
+    var f=rot(p[0],p[1]), t2=rot(p[0],p[1]+(i?-1:1)*20*g2);
+    C.arrow(ctx,f[0],f[1],t2[0],t2[1],GR,2.2);
+  });
+  C.mono(ctx,'σ1='+Eks.num(r.s1,0), px, py+ps+26, GR, 11,'center');
+  C.mono(ctx,'σ2='+Eks.num(r.s2,0), px, py+ps+40, GR, 11,'center');
+  C.txt(ctx,'ingen forskydning her', px, py+ps+56, DIM, 10, 'center');
+
+  /* ---------- højre: Mohrs cirkel ---------- */
+  var gx0=252, gx1=W-22, gy0=30, gy1=H-34;
+  var cx=(gx0+gx1)/2, cy=(gy0+gy1)/2;
+  var span=Math.max(Math.abs(r.c)+r.R, r.R, 10)*1.22;
+  var sc=Math.min((gx1-gx0)/2, (gy1-gy0)/2)/span;
+
+  C.line(ctx, gx0, cy, gx1, cy, DIM, 1.2);
+  C.line(ctx, cx, gy0, cx, gy1, DIM, 1.2);
+  C.txt(ctx,'σ', gx1-4, cy-8, DIM, 12, 'right');
+  C.txt(ctx,'τ', cx+8, gy0+12, DIM, 12, 'left');
+  C.txt(ctx,'Mohrs cirkel', gx0+4, gy0+12, 'rgba(227,235,243,.55)', 11, 'left');
+
+  var Cx = cx + r.c*sc, Rp = r.R*sc;
+  C.circle(ctx, Cx, cy, Rp, CY, null, 2.2);
+  C.circle(ctx, Cx, cy, 3.2, null, '#e3ebf3');
+  C.mono(ctx,'σc='+Eks.num(r.c,0), Cx, cy+17, DIM, 10, 'center');
+
+  // punkt X og Y (tau positiv opad)
+  var Xx=cx+v.sx*sc, Xy=cy-v.txy*sc, Yx=cx+v.sy*sc, Yy=cy+v.txy*sc;
+  C.line(ctx, Xx, Xy, Yx, Yy, GO, 1.6, [5,4]);
+  C.circle(ctx, Xx, Xy, 4.5, null, GO);
+  C.circle(ctx, Yx, Yy, 4.5, null, 'rgba(255,165,0,.5)');
+  C.mono(ctx,'X('+Eks.num(v.sx,0)+', '+Eks.num(v.txy,0)+')', Xx+8, Xy-7, GO, 10);
+  C.mono(ctx,'Y', Yx-8, Yy+13, 'rgba(255,165,0,.6)', 10, 'right');
+
+  // 2*theta-p bue fra sigma1 til X
+  if (Rp > 12) {
+    ctx.save(); ctx.strokeStyle=RD; ctx.lineWidth=1.8;
+    ctx.beginPath(); ctx.arc(Cx, cy, Math.min(Rp*0.42, 40), 0, -r.two*Math.PI/180, r.two > 0);
+    ctx.stroke(); ctx.restore();
+    C.mono(ctx,'2θp='+Eks.num(r.two,1)+'°', Cx+Math.min(Rp*0.45,44), cy-Math.min(Rp*0.3,26), RD, 10);
+  }
+
+  // hovedspaendinger + tau_max
+  [[r.s1,'σ1',GR],[r.s2,'σ2',GR]].forEach(function(p){
+    var x=cx+p[0]*sc;
+    C.circle(ctx,x,cy,4.5,null,GR);
+    C.mono(ctx,p[1]+'='+Eks.num(p[0],0), x, cy+(p[1]==='σ1'?30:26), GR, 11, 'center');
+  });
+  C.circle(ctx, Cx, cy-Rp, 4, null, RD);
+  C.line(ctx, Cx, cy, Cx, cy-Rp, RD, 1.4, [4,3]);
+  C.mono(ctx,'τmax='+Eks.num(r.tmax,0), Cx+8, cy-Rp-6, RD, 10);
+}
+};
+</script>
+<script src="assets/eksamen.js"></script>
+<script>Eks.build();</script>
+</body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spm. 8: Tykvægget trykbeholder - MEM1 eksamen</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="assets/eksamen.css">
+</head>
+<body>
+<script>
+var QDATA = {
+nr: 8,
+titel: "Tykvæggede trykbeholdere",
+kapitel: 10,
+kapitelNavn: "Spændinger og deformationer i cylindre",
+mappe: "Spørgsmål 08 - Tykvægget trykbeholder",
+prev: "sp07_soejleknaekning.html",
+next: "sp09_akseldesign.html",
+bog: "Kap. 10: §10.3.1 <i>Thin-Walled Cylinders</i>, s. 245&ndash;246 &middot; §10.3.2 <i>Thick-Walled Cylinders</i>, lign. (10.10)&ndash;(10.29), s. 247&ndash;249.",
+
+spmA: "Præsentér Lamés ligninger for tangentialspændingen ($\\sigma_\\theta$) og radialspændingen ($\\sigma_r$) i tykvæggede cylindre under indvendigt tryk $p_i$. Forklar, hvor den maksimale tangentialspænding optræder.",
+spmB: "En tykvægget hydraulikcylinder har inderradius $r_i=40$ mm og yderradius $r_o=60$ mm. Ved et indvendigt tryk $p_i=50$ MPa skal tangentialspændingen $\\sigma_\\theta$ og radialspændingen $\\sigma_r$ beregnes ved indersiden $r=r_i$.",
+
+oversat: "Et rør med tryk indeni vil gerne udvide sig. Væggen holder igen ved at blive <b>strakt rundt om omkredsen</b> (tangentialspænding, &bdquo;ringspænding&ldquo;) og <b>klemt i tykkelsesretningen</b> (radialspænding). I et tyndt rør er de spændinger stort set ens gennem væggen. I et tykt rør er de ikke: de inderste lag arbejder langt hårdere end de yderste. Lamés ligninger beskriver præcis, hvordan spændingen falder gennem væggen. Del (b): indsæt i formlerne ved indersiden, hvor det er værst.",
+kerne: "Den inderste del af væggen tager hovedparten af lasten. Tangentialspændingen er størst ved indervæggen og falder med $1/r^2$ udad &mdash; derfor hjælper ekstra godstykkelse mindre og mindre.",
+
+historie: [
+ {h:"Hvorfor tyndvægsformlen ikke rækker",
+  t:"For et tyndt rør er $\\sigma_\\theta=p\\,r/t$ en fin tilnærmelse: skær røret over på langs, og trykket på den projicerede flade $2r\\cdot L$ holdes af to vægsnit $2t\\cdot L$. Det forudsætter, at spændingen er jævnt fordelt over tykkelsen. Når $t$ er stor i forhold til $r$ (tommelfingerregel: $r/t<10$), er det ikke længere sandt. Her er $r_i/t=40/20=2$ &mdash; langt fra tyndvægget."},
+ {h:"Hvorfor spændingen er størst indvendigt",
+  t:"Forestil dig væggen som en stak af tynde ringe inden i hinanden. Trykket skubber den inderste ring ud, den skubber på den næste, og så videre. Den inderste ring flytter sig mindst lige så meget som de ydre, men dens omkreds er kortest, så den <i>relative</i> udvidelse er størst dér. Omkredstøjningen $\\epsilon_\\theta=u/r$ er derfor størst ved $r_i$ &mdash; og det samme er spændingen."},
+ {h:"Radialspændingen",
+  t:"Radialspændingen er tryk (negativ). Ved indersiden er den lig trykket: $\\sigma_r(r_i)=-p_i$. Ved ydersiden er der ingen last, så $\\sigma_r(r_o)=0$. Imellem stiger den glat fra $-p_i$ til $0$. Det er randbetingelserne, der bestemmer konstanterne i Lamés løsning."},
+ {h:"Den overraskende konsekvens",
+  t:"Lad $r_o$ gå mod uendelig: tangentialspændingen ved indervæggen falder ikke mod nul, men mod $p_i$. Uanset hvor tyk du gør væggen, kan du aldrig få $\\sigma_\\theta(r_i)$ under trykket selv. Til meget høje tryk bruger man derfor andre tricks: <b>krympeforbindelser</b> (to rør krympet sammen giver trykforspænding indvendigt, §10.5) eller <b>autofrettage</b> (plastisk forbehandling)."}
+],
+analogi: "En menneskemængde, der skubber udad i et rundt rum med flere lag vagter. Den inderste række vagter står tættest og får det hårdeste skub. Stiller du flere rækker bag dem, hjælper det, men den inderste række bærer altid mest.",
+
+plan: [
+ {t:"0&ndash;2 min", k:"warm", w:"Tegn tværsnittet",
+  d:"En ring med $r_i$ og $r_o$, pile for trykket indvendigt. Et lille element i væggen med $\\sigma_\\theta$ (tangentielt) og $\\sigma_r$ (radielt). Sig: &bdquo;Aksesymmetri: spændingerne afhænger kun af $r$.&ldquo;"},
+ {t:"2&ndash;6 min", w:"Opstil ligevægt og kinematik",
+  d:"Radial ligevægt af elementet: $\\frac{d\\sigma_r}{dr}+\\frac{\\sigma_r-\\sigma_\\theta}{r}=0$. Tøjninger fra forskydningen $u$: $\\epsilon_r=du/dr$, $\\epsilon_\\theta=u/r$. Hookes lov kobler dem. Resultat: $u=C_1r+C_2/r$."},
+ {t:"6&ndash;9 min", w:"Lamés ligninger",
+  d:"$\\sigma_{r,\\theta}=A\\mp B/r^2$. Randbetingelser $\\sigma_r(r_i)=-p_i$, $\\sigma_r(r_o)=0$ giver $A$ og $B$. Skriv slutformlerne op og tegn fordelingerne gennem væggen."},
+ {t:"9&ndash;12 min", w:"Regn designopgaven",
+  d:"$\\sigma_\\theta(r_i)=p_i\\frac{r_o^2+r_i^2}{r_o^2-r_i^2}=50\\cdot\\frac{5200}{2000}=130$ MPa. $\\sigma_r(r_i)=-50$ MPa. Sammenlign: yderside $\\sigma_\\theta=80$ MPa."},
+ {t:"12&ndash;14 min", k:"end", w:"Pointen",
+  d:"&bdquo;Tyndvægsformlen giver 100&ndash;125 MPa og undervurderer. Og forskydningen $\\tau_{max}=(\\sigma_\\theta-\\sigma_r)/2=90$ MPa ved indersiden er det, der styrer flydning af et duktilt rør.&ldquo;"},
+ {t:"14&ndash;20 min", k:"end", w:"Spørgsmål", d:"Se censors sandsynlige spørgsmål nederst."}
+],
+
+trin: [
+ {t:"Radial ligevægt af et vægelement",
+  m:"\\frac{d\\sigma_r}{dr}+\\frac{\\sigma_r-\\sigma_\\theta}{r}=0",
+  hvorfor:"Tag et lille element mellem $r$ og $r+dr$ med vinklen $d\\theta$. Radialspændingen er lidt forskellig på inder- og yderfladen, og yderfladen er lidt større. Tangentialspændingerne på de to sideflader har en lille komposant ind mod centrum (fordi fladerne ikke er parallelle). Summen skal være nul. Én ligning, to ukendte funktioner &mdash; vi mangler en ligning til.",
+  sig:"Jeg laver radial ligevægt på et lille vægelement. Tangentialspændingerne på siderne har en komposant indad, fordi siderne danner en vinkel."},
+
+ {t:"Kinematik: ringens udvidelse",
+  m:"\\epsilon_r=\\frac{du}{dr},\\qquad\\epsilon_\\theta=\\frac{2\\pi(r+u)-2\\pi r}{2\\pi r}=\\frac{u}{r}",
+  hvorfor:"Alt beskrives af én radial forskydning $u(r)$. Omkredstøjningen er simpel: en ring med radius $r$ får radius $r+u$. Det er den manglende ligning &mdash; kompatibilitet.",
+  sig:"Den radiale forskydning u bestemmer begge tøjninger. Omkredstøjningen er u over r."},
+
+ {t:"Hookes lov lukker systemet",
+  m:["\\epsilon_r=\\frac{1}{E}(\\sigma_r-\\nu\\sigma_\\theta),\\qquad\\epsilon_\\theta=\\frac{1}{E}(\\sigma_\\theta-\\nu\\sigma_r)",
+     "\\Rightarrow\\quad\\frac{d^2u}{dr^2}+\\frac{1}{r}\\frac{du}{dr}-\\frac{u}{r^2}=0\\quad\\Rightarrow\\quad u=C_1r+\\frac{C_2}{r}"],
+  hvorfor:"Udtryk spændingerne ved $u$ via Hookes lov (spm. 2), sæt ind i ligevægten, og du får en Euler-differentialligning. Løsningen kan gættes: $u=r^n$ giver $n=\\pm1$. To konstanter, to randbetingelser.",
+  sig:"Med Hookes lov fra spørgsmål 2 kan jeg skrive ligevægten som én differentialligning i u. Løsningen er C1 gange r plus C2 over r."},
+
+ {t:"Lamé-formen: spændingerne",
+  m:"\\sigma_r=A-\\frac{B}{r^2},\\qquad\\sigma_\\theta=A+\\frac{B}{r^2}",
+  hvorfor:"Sæt $u$ ind i Hookes lov igen. Bemærk: $\\sigma_r+\\sigma_\\theta=2A$ er <b>konstant</b> gennem væggen. Hvad radialspændingen stiger med, falder tangentialspændingen med. Og $1/r^2$-leddet er størst ved indersiden.",
+  sig:"Spændingerne får Lamé-formen A minus og plus B over r i anden. Summen er konstant, og variationen er størst indvendigt."},
+
+ {t:"Randbetingelser giver A og B",
+  m:["\\sigma_r(r_i)=-p_i,\\qquad\\sigma_r(r_o)=0",
+     "A=\\frac{p_i\\,r_i^2}{r_o^2-r_i^2},\\qquad B=\\frac{p_i\\,r_i^2r_o^2}{r_o^2-r_i^2}"],
+  hvorfor:"Trykket virker vinkelret på inderfladen (tryk = negativ radialspænding). Ydersiden er fri. To ligninger, to ukendte &mdash; løs dem.",
+  sig:"Indvendigt er radialspændingen lig minus trykket, udvendigt er den nul. Det giver de to konstanter."},
+
+ {t:"Lamés ligninger og maksimum",
+  m:["\\boxed{\\ \\sigma_\\theta=\\frac{p_ir_i^2}{r_o^2-r_i^2}\\left(1+\\frac{r_o^2}{r^2}\\right),\\qquad \\sigma_r=\\frac{p_ir_i^2}{r_o^2-r_i^2}\\left(1-\\frac{r_o^2}{r^2}\\right)\\ }",
+     "\\sigma_{\\theta,max}=\\sigma_\\theta(r_i)=p_i\\,\\frac{r_o^2+r_i^2}{r_o^2-r_i^2}"],
+  hvorfor:"$\\sigma_\\theta$ aftager monotont med $r$, så maksimum sidder ved <b>indervæggen</b>. Det er dér, revner og flydning starter. Med lukkede ender kommer en aksial spænding $\\sigma_z=p_ir_i^2/(r_o^2-r_i^2)=A$ oveni, konstant gennem væggen.",
+  sig:"Tangentialspændingen er størst ved indersiden og falder med en over r i anden. Det er derfor, et tykvægget rør svigter indefra."}
+],
+
+faldgruber: [
+ {t:"Fortegn på σᵣ", d:"Radialspændingen er <b>tryk</b>: $\\sigma_r(r_i)=-50$ MPa, ikke $+50$. Det betyder meget, når du bagefter bruger Tresca: $\\sigma_\\theta-\\sigma_r=130-(-50)=180$ MPa."},
+ {t:"Tyndvægsformlen på et tykt rør", d:"$p_ir_i/t=100$ MPa undervurderer med 23 %. Med middelradius $p_ir_m/t=125$ MPa er det tættere, men stadig for lavt. Brug Lamé, når $r/t<10$."},
+ {t:"Radier i anden", d:"Formlen bruger $r_o^2$ og $r_i^2$: $3600$ og $1600$ mm². Glemmer du at kvadrere, får du $50\\cdot100/20=250$ MPa &mdash; helt forkert."},
+ {t:"Glem ikke aksialspændingen", d:"Med lukkede ender (bunde på cylinderen) er $\\sigma_z=40$ MPa her. Det er den tredje hovedspænding, og den skal med i von Mises."},
+ {t:"Maksimum er ikke altid σθ", d:"For flydning er det $\\tau_{max}=(\\sigma_\\theta-\\sigma_r)/2=90$ MPa ved indersiden, der tæller i Tresca &mdash; ikke $\\sigma_\\theta$ alene."}
+],
+
+qa: [
+ {q:"Hvad sker der med σθ(rᵢ), hvis væggen gøres uendelig tyk?",
+  a:"$\\sigma_\\theta(r_i)=p_i\\frac{r_o^2+r_i^2}{r_o^2-r_i^2}\\to p_i$ for $r_o\\to\\infty$. Den kan aldrig blive mindre end trykket. Derfor bruger man krympeforbindelser eller autofrettage ved meget høje tryk i stedet for bare tykkere gods."},
+ {q:"Hvordan virker en krympeforbindelse?",
+  a:"En ydre cylinder med lidt for lille indvendig diameter varmes op og krympes uden på en indre. Når den køler, klemmer den den indre cylinder og giver <b>trykspænding</b> i dens indervæg. Når driftstrykket kommer, skal det først &bdquo;ophæve&ldquo; trykket, så den maksimale $\\sigma_\\theta$ bliver lavere. Det er emnet i §10.5."},
+ {q:"Hvor stor er von Mises-spændingen ved indervæggen?",
+  a:"Med lukkede ender: $\\sigma_\\theta=130$, $\\sigma_r=-50$, $\\sigma_z=40$ MPa. $\\sigma_e=\\sqrt{\\tfrac12[180^2+90^2+90^2]}=155{,}9$ MPa. Med åbne ender ($\\sigma_z=0$) bliver den 160,9 MPa."},
+ {q:"Hvorfor er σr + σθ konstant gennem væggen?",
+  a:"Fordi $\\sigma_r+\\sigma_\\theta=2A$ i Lamés løsning. Fysisk betyder det, at den aksiale tøjning fra de to spændinger er den samme overalt &mdash; plane snit forbliver plane i aksialretningen."},
+ {q:"Hvad hvis der også er et ydre tryk?",
+  a:"Så bliver randbetingelsen $\\sigma_r(r_o)=-p_o$, og $A=\\frac{p_ir_i^2-p_or_o^2}{r_o^2-r_i^2}$, $B=\\frac{(p_i-p_o)r_i^2r_o^2}{r_o^2-r_i^2}$. Det bruges til ubåde og brøndrør. Prøv at sætte $p_o>0$ i laboratoriet."},
+ {q:"Hvor meget udvider indervæggen sig?",
+  a:"$u(r_i)=r_i\\epsilon_\\theta=\\frac{r_i}{E}(\\sigma_\\theta-\\nu\\sigma_r)$ (åbne ender). Med stål: $\\frac{40}{200\\,000}(130+0{,}3\\cdot50)=0{,}029$ mm. Lille, men afgørende for tætninger og pasninger."}
+],
+
+sammenhaeng: "Lamé er et skoleeksempel på den generelle opskrift i mekanik: <b>ligevægt + kinematik + materialelov</b>. De samme tre byggesten gav bøjningsformlen i <b>spm. 3</b>, og materialeloven er den generaliserede Hookes lov fra <b>spm. 2</b>. Resultatet er en fleraksial spændingstilstand ($\\sigma_\\theta$, $\\sigma_r$, $\\sigma_z$), som skal vurderes med et flydekriterium fra <b>spm. 5</b>. Samme teori bruges til krympeforbindelser mellem aksel og nav, der overfører moment i <b>spm. 9</b>, og til roterende skiver (§10.4).",
+
+links: [
+ {k:"SPM 5", t:"Flydekriterium for σθ, σr, σz", u:"sp05_flydekriterier.html"},
+ {k:"SPM 2", t:"Hookes lov i 3D", u:"sp02_toejningsenergi.html"},
+ {k:"SPM 9", t:"Aksler og nav", u:"sp09_akseldesign.html"},
+ {k:"WIDGET", t:"Trykbeholder", u:"../interaktiv/trykbeholder.html"},
+ {k:"KAP. 10", t:"Formeloverblik (PDF)", u:"../Kapitel10_Overblik.pdf"},
+ {k:"KAP. 10", t:"Quiz", u:"../../../quiz/mem1/Kapitel10_Quiz.html"}
+]
+};
+
+var LAB = {
+w: 720, h: 430,
+intro: "Gør $r_o$ større og se $\\sigma_\\theta(r_i)$ nærme sig $p_i$ &mdash; men aldrig komme under. Gør væggen tynd ($r_o$ tæt på $r_i$), og se Lamé og tyndvægsformlen mødes. Den lilla probe viser spændingen i en valgt radius gennem væggen.",
+preset2: {navn: "Meget tyk væg: rₒ = 160 mm", v: {ro: 160}},
+
+inputs: [
+ {id:"ri",  label:"Inderradius $r_i$",       min:10,  max:100, step:1,  value:40, unit:"mm"},
+ {id:"ro",  label:"Yderradius $r_o$",        min:15,  max:200, step:1,  value:60, unit:"mm"},
+ {id:"pi",  label:"Indre tryk $p_i$",        min:0,   max:200, step:1,  value:50, unit:"MPa"},
+ {id:"po",  label:"Ydre tryk $p_o$",         min:0,   max:100, step:1,  value:0,  unit:"MPa"},
+ {id:"rf",  label:"Probe: $(r-r_i)/(r_o-r_i)$", min:0, max:1, step:0.05, value:0, dec:2, unit:""}
+],
+
+compute: function (v) {
+  var ri = v.ri, ro = Math.max(v.ro, v.ri + 1);
+  var den = ro * ro - ri * ri;
+  var A = (v.pi * ri * ri - v.po * ro * ro) / den;
+  var B = (v.pi - v.po) * ri * ri * ro * ro / den;
+  function st(r){ return A + B / (r * r); }
+  function sr(r){ return A - B / (r * r); }
+  var r = ri + v.rf * (ro - ri), t = ro - ri, rm = (ri + ro) / 2;
+  var sti = st(ri), sri = sr(ri), sz = A;          // sz: lukkede ender
+  var vm = Math.sqrt(0.5 * (Math.pow(sti - sri, 2) + Math.pow(sri - sz, 2) + Math.pow(sz - sti, 2)));
+  return { ro:ro, A:A, B:B, st:st, sr:sr, r:r, stp:st(r), srp:sr(r), sti:sti, sri:sri, sto:st(ro), sro:sr(ro),
+           sz:sz, t:t, thin:v.pi * rm / t, thinI:v.pi * ri / t, tmax:(sti - sri) / 2, vm:vm };
+},
+
+readout: function (v, r) {
+  return [
+   {l:"$\\sigma_\\theta(r_i)$ &mdash; max", v:r.sti, dec:1, unit:"MPa", k:"hi"},
+   {l:"$\\sigma_r(r_i)$", v:r.sri, dec:1, unit:"MPa", k:"hi"},
+   {l:"$\\sigma_\\theta(r_o)$", v:r.sto, dec:1, unit:"MPa"},
+   {l:"$\\sigma_z$ (lukkede ender)", v:r.sz, dec:1, unit:"MPa"},
+   {l:"$\\tau_{max}$ ved $r_i$", v:r.tmax, dec:1, unit:"MPa"},
+   {l:"von Mises ved $r_i$", v:r.vm, dec:1, unit:"MPa"},
+   {l:"Tyndvæg $p_ir_m/t$", v:r.thin, dec:1, unit:"MPa"},
+   {l:"Probe $\\sigma_\\theta$ / $\\sigma_r$", raw: Eks.num(r.stp,1)+" / "+Eks.num(r.srp,1), unit:"MPa"}
+  ];
+},
+
+steps: function (v, r) {
+  var T = Eks.tnum;
+  return [
+   {h:"1 · Konstanterne (randbetingelser)",
+    m:"A=\\frac{p_ir_i^2-p_or_o^2}{r_o^2-r_i^2}="+T(r.A,2)+"\\ \\text{MPa},\\qquad B=\\frac{(p_i-p_o)r_i^2r_o^2}{r_o^2-r_i^2}="+T(r.B,0)+"\\ \\text{MPa·mm}^2",
+    c:"$r_o^2-r_i^2="+Eks.num(r.ro*r.ro - v.ri*v.ri,0)+"$ mm²."},
+   {h:"2 · Tangentialspænding ved indersiden",
+    m:"\\sigma_\\theta(r_i)=A+\\frac{B}{r_i^2}=p_i\\frac{r_o^2+r_i^2}{r_o^2-r_i^2}\\Big|_{p_o=0}="+T(r.sti,1)+"\\ \\text{MPa}",
+    c:"Maksimum &mdash; indervæggen er det kritiske sted."},
+   {h:"3 · Radialspænding ved indersiden",
+    m:"\\sigma_r(r_i)=A-\\frac{B}{r_i^2}="+T(r.sri,1)+"\\ \\text{MPa}\\;(=-p_i)",
+    c:"Randbetingelsen: trykket selv, med minus fordi det er tryk."},
+   {h:"4 · Ydersiden til sammenligning",
+    m:"\\sigma_\\theta(r_o)="+T(r.sto,1)+"\\ \\text{MPa},\\qquad\\sigma_r(r_o)="+T(r.sro,1)+"\\ \\text{MPa}",
+    c:"Forholdet inder/yder: "+Eks.num(r.sti/Math.max(r.sto,1e-9),2)+"."},
+   {h:"5 · Tyndvægs-tilnærmelsen (til kontrol)",
+    m:"\\sigma_\\theta\\approx\\frac{p_i\\,r_m}{t}=\\frac{"+T(v.pi,0)+"\\cdot"+T((v.ri+r.ro)/2,1)+"}{"+T(r.t,0)+"}="+T(r.thin,1)+"\\ \\text{MPa}",
+    c:"Afviger "+Eks.num((r.thin/r.sti-1)*100,1)+" % fra Lamé. $r_i/t="+Eks.num(v.ri/r.t,1)+"$ (tyndvægget kræver ca. > 10)."}
+  ];
+},
+
+facit: function (v, r) {
+  if (v.ri===40 && v.ro===60 && v.pi===50 && v.po===0) {
+    return {t:"<b>✓ Eksamensopgavens facit:</b> $\\sigma_\\theta(r_i)=50\\cdot\\frac{3600+1600}{3600-1600}=130$ MPa og $\\sigma_r(r_i)=-50$ MPa. Ved ydersiden er $\\sigma_\\theta=80$ MPa. Største forskydning ved indersiden: $\\tau_{max}=(130+50)/2=90$ MPa."};
+  }
+  return {off:true, t:"Du har ændret inddata. Probe-skyderen ændrer ikke facit &mdash; brug knappen for at gendanne eksamensværdierne."};
+},
+
+draw: function (ctx, W, H, v, r, C) {
+  C.grid(ctx, W, H, 40);
+  var CY='#5ec8ff', GR='#00d984', GO='#ffa500', RD='#ff5e5e', PU='#d984ff', DIM='rgba(227,235,243,.45)';
+
+  /* ---------- tværsnit med farvegradient for sigma_theta ---------- */
+  var cx=160, cy=H/2+8, Ro=150, Ri=Ro*v.ri/r.ro;
+  C.txt(ctx,'Tværsnit — rødest hvor σθ er størst', cx, 22, DIM, 11, 'center');
+  var n=36;
+  var smax=Math.max(Math.abs(r.sti), Math.abs(r.sto), 1);
+  for (var k=0;k<n;k++){
+    var ra=Ri+(Ro-Ri)*k/n, rb=Ri+(Ro-Ri)*(k+1)/n;
+    var rr=v.ri+(r.ro-v.ri)*(k+0.5)/n;
+    var span=Math.max(r.sti-r.sto, 1e-6), s=(r.st(rr)-r.sto)/span;          // 0 ved ydersiden, 1 ved indersiden
+    var c='rgba(255,'+Math.round(210-160*s)+','+Math.round(110-80*s)+','+(0.28+0.62*s)+')';
+    ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,rb,0,2*Math.PI); ctx.arc(cx,cy,ra,0,2*Math.PI,true);
+    ctx.fillStyle=c; ctx.fill(); ctx.restore();
+  }
+  C.circle(ctx, cx, cy, Ro, '#e3ebf3', null, 1.6);
+  C.circle(ctx, cx, cy, Ri, '#e3ebf3', null, 1.6);
+  // trykpile
+  for (var a=0;a<12;a++){ var t=a/12*2*Math.PI;
+    C.arrow(ctx, cx+Math.cos(t)*Ri*0.35, cy+Math.sin(t)*Ri*0.35, cx+Math.cos(t)*(Ri-3), cy+Math.sin(t)*(Ri-3), CY, 1.6, 6); }
+  C.mono(ctx,'pi='+Eks.num(v.pi,0), cx, cy+4, CY, 11, 'center');
+  // maalsaetning
+  C.line(ctx, cx, cy, cx+Ri*Math.cos(-0.9), cy+Ri*Math.sin(-0.9), DIM, 1);
+  C.mono(ctx,'ri='+Eks.num(v.ri,0), cx+Ri*0.5*Math.cos(-0.9)+4, cy+Ri*0.5*Math.sin(-0.9)-4, DIM, 10);
+  C.line(ctx, cx, cy, cx+Ro*Math.cos(0.75), cy+Ro*Math.sin(0.75), DIM, 1);
+  C.mono(ctx,'ro='+Eks.num(r.ro,0), cx+Ro*0.8*Math.cos(0.75)+6, cy+Ro*0.8*Math.sin(0.75), DIM, 10);
+  // probe-radius
+  var Rp=Ri+(Ro-Ri)*v.rf;
+  C.circle(ctx, cx, cy, Rp, PU, null, 1.3, [4,3]);
+
+  /* ---------- fordelingen gennem væggen ---------- */
+  var gx0=356, gx1=W-26, gy0=40, gy1=H-44;
+  var hi=Math.max(r.sti, r.thin, 1)*1.12, lo=Math.min(r.sri, 0)*1.15;
+  function GX(rr){ return gx0 + (rr-v.ri)/(r.ro-v.ri)*(gx1-gx0); }
+  function GY(s){ return gy0 + (hi-s)/(hi-lo)*(gy1-gy0); }
+  C.line(ctx, gx0, GY(0), gx1, GY(0), DIM, 1.2);
+  C.line(ctx, gx0, gy0-6, gx0, gy1+4, DIM, 1.2);
+  C.txt(ctx,'Spænding gennem væggen', gx0, 22, DIM, 11);
+  var pt=[], pr=[];
+  for (var j=0;j<=60;j++){ var rr2=v.ri+(r.ro-v.ri)*j/60; pt.push([GX(rr2),GY(r.st(rr2))]); pr.push([GX(rr2),GY(r.sr(rr2))]); }
+  C.poly(ctx, pt, GO, null, 2.8);
+  C.poly(ctx, pr, CY, null, 2.8);
+  C.line(ctx, gx0, GY(r.thin), gx1, GY(r.thin), 'rgba(0,217,132,.7)', 1.4, [6,4]);
+  C.line(ctx, gx0, GY(r.sz), gx1, GY(r.sz), 'rgba(217,132,255,.45)', 1.2, [2,4]);
+  C.mono(ctx,'σθ='+Eks.num(r.sti,1), gx0+6, GY(r.sti)-8, GO, 11);
+  C.mono(ctx,Eks.num(r.sto,1), gx1-4, GY(r.sto)-8, GO, 11, 'right');
+  C.mono(ctx,'σr='+Eks.num(r.sri,1), gx0+6, GY(r.sri)+16, CY, 11);
+  C.mono(ctx,'0', gx1-4, GY(0)-6, CY, 10, 'right');
+  C.txt(ctx,'tyndvæg p·rm/t', gx1-4, GY(r.thin)-6, GR, 10, 'right');
+  C.txt(ctx,'σz (lukkede ender)', gx1-4, GY(r.sz)+13, PU, 10, 'right');
+  C.mono(ctx,'r = ri', gx0, gy1+16, DIM, 10, 'center');
+  C.mono(ctx,'r = ro', gx1, gy1+16, DIM, 10, 'center');
+  // probe
+  var px=GX(r.r);
+  C.line(ctx, px, gy0, px, gy1, PU, 1.2, [3,3]);
+  C.circle(ctx, px, GY(r.stp), 4.5, null, PU);
+  C.circle(ctx, px, GY(r.srp), 4.5, null, PU);
+}
+};
+</script>
+<script src="assets/eksamen.js"></script>
+<script>Eks.build();</script>
+</body>
+</html>

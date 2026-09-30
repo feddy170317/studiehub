@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MEM1 mundtlig eksamen - 16 spørgsmål</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="assets/eksamen.css">
+<style>
+  .how{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:.7rem;margin-top:.9rem}
+  .how div{background:var(--card);border-radius:9px;padding:.8rem .95rem;border-top:3px solid var(--cy);font-size:.9rem}
+  .how div b{display:block;color:var(--cy);margin-bottom:.25rem}
+  .how div:nth-child(2){border-top-color:var(--go)} .how div:nth-child(2) b{color:var(--go)}
+  .how div:nth-child(3){border-top-color:var(--gr)} .how div:nth-child(3) b{color:var(--gr)}
+  .how div:nth-child(4){border-top-color:var(--pu)} .how div:nth-child(4) b{color:var(--pu)}
+  #map{width:100%;height:auto;display:block;border-radius:10px;background:#0d2136;cursor:pointer}
+  .maphint{font-size:.85rem;color:var(--dim);margin-top:.5rem}
+  table.fac{width:100%;border-collapse:collapse;font-size:.88rem;margin-top:.8rem}
+  table.fac th{text-align:left;color:var(--dim2);font-weight:600;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;
+    border-bottom:1px solid var(--line);padding:.45rem .5rem}
+  table.fac td{border-bottom:1px solid rgba(42,58,75,.6);padding:.5rem;vertical-align:top}
+  table.fac td:first-child{font-family:var(--mono);color:var(--go);white-space:nowrap}
+  table.fac a{color:var(--cy);text-decoration:none}
+  .wrapx{overflow-x:auto}
+</style>
+</head>
+<body>
+<div class="topbar"><a href="../../../index.html">&#8592; Studiehub</a><span class="sp"></span><span class="now">MEM1 &middot; mundtlig eksamen</span></div>
+<header class="hero">
+  <div class="nr">MASKINELEMENTER OG DESIGN AF MASKINER &middot; VIA HORSENS</div>
+  <h1>Mundtlig eksamen &mdash; alle 16 spørgsmål</h1>
+  <div class="kap">Hamrock, Schmid &amp; Jacobson: <i>Fundamentals of Machine Elements</i>, 3. udg. &middot; 20 min pr. eksamination</div>
+</header>
+<main>
+
+<section>
+  <h2 class="sec"><span class="ic">&#129517;</span>Sådan bruger du siderne</h2>
+  <div class="card lead">Hvert spørgsmål har sin egen side, bygget op i samme rækkefølge som en god fremlæggelse. Start med <b>oversættelsen</b> og <b>den mekaniske historie</b>, så du forstår <i>hvorfor</i>, før du regner. Øv derefter <b>tavleplanen</b> højt med et ur. Brug <b>live-labbet</b> til at skrue på tallene, indtil du kan forudsige, hvad der sker, før du trækker i skyderen &mdash; det er dér, forståelsen sidder.</div>
+  <div class="how">
+    <div><b>1 · Forstå</b>Oversat spørgsmål, mekanisk historie og en hverdagsanalogi. Ingen formler endnu.</div>
+    <div><b>2 · Fremlæg</b>Minut-for-minut tavleplan og udledning trin for trin, med &bdquo;sig det sådan her&ldquo; til hvert trin.</div>
+    <div><b>3 · Leg</b>Live-lab med skydere. Tegning, facit og hele udregningen opdateres i realtid.</div>
+    <div><b>4 · Forsvar</b>Faldgruber og de spørgsmål, censor sandsynligvis stiller bagefter &mdash; med korte svar.</div>
+  </div>
+</section>
+
+<section>
+  <h2 class="sec"><span class="ic">&#128376;</span>Sådan hænger de 16 spørgsmål sammen</h2>
+  <canvas id="map" width="1040" height="470"></canvas>
+  <div class="maphint">Hold musen over (eller tryk på) et spørgsmål for at se, hvilke andre det bygger på eller leverer til. Klik for at åbne det. Hovedvægten ved eksamen ligger på netop disse forbindelser &mdash; nævn dem uopfordret.</div>
+</section>
+
+<section>
+  <h2 class="sec"><span class="ic">&#128218;</span>Spørgsmålene</h2>
+  <div id="groups"></div>
+</section>
+
+<section>
+  <h2 class="sec"><span class="ic">&#9989;</span>Facit-overblik til sidste-øjebliks-repetition</h2>
+  <div class="note">Kun tallene. Forståelsen og udledningerne står på de enkelte sider &mdash; og svarvejlednings-PDF'erne i hver spørgsmålsmappe.</div>
+  <div class="wrapx"><table class="fac" id="fac"><thead><tr><th>Spm.</th><th>Emne</th><th>Facit (designopgaven)</th></tr></thead><tbody></tbody></table></div>
+</section>
+</main>
+<footer>MEM1 &mdash; Maskinelementer og design af maskiner &middot; VIA Horsens<br><a href="../../../index.html">Tilbage til Studiehub</a></footer>
+
+<script>
+var Q = [
+ {n:1,  f:"sp01_mohr.html",             t:"Mohrs cirkel",                    g:0, k:2,  s:"Alle snitvinkler på én cirkel. Hovedspændinger = centrum ± radius.",
+  fac:"$\\sigma_c=50$, $R=50$, $\\sigma_1=100$, $\\sigma_2=0$, $\\tau_{max}=50$ MPa ($\\theta_p=18{,}4°$)"},
+ {n:2,  f:"sp02_toejningsenergi.html",  t:"Tøjningsenergi og resilience", g:0, k:3,  s:"Arealet under σ-ε-kurven er energi. Resilience = kapacitet op til S_y.",
+  fac:"$\\sigma=200$ MPa, $\\epsilon=10^{-3}$, $\\Delta d=-6{,}0$ µm, $n_y=1{,}25$; $u=0{,}10$ MJ/m³, $U=31{,}4$ J, $u_r=0{,}156$ MJ/m³, $U_{max}=49{,}1$ J"},
+ {n:3,  f:"sp03_bjaelkespaending.html", t:"Bøjning og forskydning i bjælker",  g:0, k:4,  s:"σ er størst i kanten, τ er størst i midten. De deler tværsnittet.",
+  fac:"$I=22\\,500$ mm⁴, $\\sigma_{max}=300$ MPa, $\\tau_{max}=50$ MPa ($=1{,}5V/A$)"},
+ {n:4,  f:"sp04_castigliano.html",      t:"Castiglianos sætning",              g:0, k:5,  s:"Udbøjning = energiens afledede efter lasten. Kun momentet skal kendes.",
+  fac:"$U=P^2L^3/(6EI)=1{,}5$ J, $\\delta=PL^3/(3EI)=10$ mm"},
+ {n:5,  f:"sp05_flydekriterier.html",   t:"von Mises og Tresca",               g:1, k:6,  s:"Duktilt metal flyder ved forskydning. To måder at måle den på.",
+  fac:"Tresca $n_s=280/160=1{,}75$; von Mises $\\sigma_e=144{,}2$ MPa, $n_s=1{,}94$"},
+ {n:6,  f:"sp06_goodman.html",          t:"Udmattelse og Goodman",             g:1, k:7,  s:"Middelspænding æder af den tilladte amplitude. Ret linje fra S_e til S_ut.",
+  fac:"$\\sigma_m=150$, $\\sigma_a=100$ MPa, $n_f=1{,}33$"},
+ {n:7,  f:"sp07_soejleknaekning.html",  t:"Euler og Johnson",                  g:1, k:9,  s:"Lange søjler svigter ved stabilitet, korte ved flydning. L_e/k afgør det.",
+  fac:"$P_{cr}=15{,}5$ kN, $L_e/k=200>(L_e/k)_{cr}=99{,}3$ → Euler; knækning før flydning ($P_y=125{,}7$ kN)"},
+ {n:8,  f:"sp08_trykbeholder.html",     t:"Tykvæggede cylindre (Lamé)",        g:1, k:10, s:"Inderste lag bærer mest. σθ falder med 1/r² gennem væggen.",
+  fac:"$\\sigma_\\theta(r_i)=130$ MPa, $\\sigma_r(r_i)=-50$ MPa ($\\sigma_\\theta(r_o)=80$ MPa)"},
+ {n:9,  f:"sp09_akseldesign.html",      t:"Aksel: bøjning + vridning",          g:1, k:11, s:"Mohr + Tresca i én formel: T_e er hypotenusen af M og T.",
+  fac:"$T_e=500$ N·m, $M_e=450$ N·m, $d=37{,}1$ mm → vælg 38 mm"},
+ {n:10, f:"sp10_rulleleje.html",        t:"Rullelejers levetid",               g:2, k:13, s:"Overfladeudmattelse, statistisk. Halv last = otte gange levetid.",
+  fac:"$L_{10}=1000$ mio. omdr., $L_{10h}=11\\,111$ h"},
+ {n:11, f:"sp11_lewis.html",            t:"Lewis: tandens bøjning",            g:2, k:14, s:"Tanden er en udkraget bjælke. Y samler formen i ét tal.",
+  fac:"$\\sigma_b=1600/(40\\cdot4\\cdot0{,}32)=31{,}25$ MPa"},
+ {n:12, f:"sp12_skraa_tandhjul.html",   t:"Kræfter på skrå tandhjul",          g:2, k:15, s:"Kraften står vinkelret på den skrå tand. Deraf aksialkraften.",
+  fac:"$F_r=1260$ N, $F_a=1732$ N ($\\phi_t=22{,}8°$, $W=3686$ N)"},
+ {n:13, f:"sp13_bevaegelsesskrue.html", t:"Bevægelsesskruer",                  g:2, k:16, s:"Gevind = skråplan. Selvhæmning når friktionsvinklen ≥ stigningsvinklen.",
+  fac:"$T=18{,}1$ N·m; selvhæmmende ($0{,}10>0{,}0796$); $e=44\\%$"},
+ {n:14, f:"sp14_fjeder.html",           t:"Skruetrykfjedre",                   g:2, k:17, s:"Tråden vrides, ikke bøjes. Wahl samler krumning og direkte forskydning.",
+  fac:"$\\tau=300{,}5$ MPa, $k=7{,}81$ N/mm, $\\delta=25{,}6$ mm"},
+ {n:15, f:"sp15_kobling.html",          t:"Friktionskoblinger",                g:2, k:18, s:"Tilslidt kobling: p·r = konstant. Effektiv arm = middelradius.",
+  fac:"$T=180$ N·m (ensformigt tryk: 186,7 N·m)"},
+ {n:16, f:"sp16_remtraek.html",         t:"Remtræk",                           g:2, k:19, s:"Friktion om en bue forstærker eksponentielt. Centrifugalkraft stjæler greb.",
+  fac:"$F_2=1000$ N, $T=400$ N·m (akselbelastning 4000 N)"}
+];
+var GROUPS = ["Spændinger, deformation og energi", "Svigt og dimensionering", "Maskinelementerne"];
+var EDGES = [[1,3],[1,5],[1,9],[2,4],[2,5],[2,8],[2,14],[3,4],[3,7],[3,9],[3,11],[4,14],[5,6],[5,8],[5,9],
+             [6,9],[6,10],[6,11],[6,14],[7,13],[7,14],[9,10],[9,11],[9,12],[9,16],[10,12],[10,16],[11,12],
+             [12,13],[13,15],[14,15],[15,16]];
+
+function tx(s){ return s.replace(/\$([^$]+)\$/g, function(_,m){ try{ if(typeof katex!=='undefined') return katex.renderToString(m,{throwOnError:false}); }catch(e){} return m; }); }
+
+function build(){
+  var g=document.getElementById('groups'), h='';
+  GROUPS.forEach(function(name,gi){
+    h+='<div class="grp"><div class="gh">'+name+'</div><div class="hubgrid">';
+    Q.filter(function(q){return q.g===gi;}).forEach(function(q){
+      h+='<a class="qcard" href="'+q.f+'"><span class="nr">SPØRGSMÅL '+q.n+' &middot; KAP. '+q.k+'</span>'+
+         '<span class="ti">'+q.t+'</span><span class="su">'+q.s+'</span>'+
+         '<span class="ft">Tavleplan &middot; udledning &middot; live-lab &middot; censor-spørgsmål</span></a>';
+    });
+    h+='</div></div>';
+  });
+  g.innerHTML=h;
+  var tb=document.querySelector('#fac tbody');
+  tb.innerHTML=Q.map(function(q){ return '<tr><td>'+q.n+'</td><td><a href="'+q.f+'">'+q.t+'</a></td><td>'+tx(q.fac)+'</td></tr>'; }).join('');
+  drawMap();
+}
+
+/* ---------- forbindelseskort ---------- */
+var cv, ctx, pos={}, hover=null;
+function drawMap(){
+  cv=document.getElementById('map'); ctx=cv.getContext('2d');
+  var W=cv.width, H=cv.height, colX=[150, 520, 890];
+  GROUPS.forEach(function(_,gi){
+    var qs=Q.filter(function(q){return q.g===gi;}), n=qs.length;
+    qs.forEach(function(q,i){ pos[q.n]={x:colX[gi]+(i%2? 70:-70)*(gi===2?1:0.6), y:70+(H-120)*(n===1?0.5:i/(n-1))}; });
+  });
+  render();
+  function pick(e){
+    var r=cv.getBoundingClientRect(), sx=cv.width/r.width, sy=cv.height/r.height;
+    var x=(e.clientX-r.left)*sx, y=(e.clientY-r.top)*sy, best=null, bd=1e9;
+    Q.forEach(function(q){ var p=pos[q.n], d=Math.hypot(p.x-x,p.y-y); if(d<bd){bd=d;best=q;} });
+    return bd<46?best:null;
+  }
+  cv.addEventListener('mousemove', function(e){ var q=pick(e); var n=q?q.n:null; if(n!==hover){hover=n; render();} cv.style.cursor=q?'pointer':'default'; });
+  cv.addEventListener('mouseleave', function(){ hover=null; render(); });
+  cv.addEventListener('click', function(e){ var q=pick(e); if(q){ if(hover===q.n || !('ontouchstart' in window)) location.href=q.f; else {hover=q.n; render();} } });
+}
+function render(){
+  var W=cv.width, H=cv.height, cols=['#5ec8ff','#ffa500','#00d984'];
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='rgba(255,255,255,.04)'; for(var gx=0;gx<W;gx+=40){ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,H);ctx.stroke();}
+  for(var gy=0;gy<H;gy+=40){ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(W,gy);ctx.stroke();}
+  ctx.font='600 13px "Segoe UI",sans-serif'; ctx.textAlign='center';
+  ['Spændinger og energi','Svigt og dimensionering','Maskinelementerne'].forEach(function(t,i){ ctx.fillStyle=cols[i]; ctx.fillText(t, [150,520,890][i], 26); });
+  var nb={}; EDGES.forEach(function(e){ (nb[e[0]]=nb[e[0]]||[]).push(e[1]); (nb[e[1]]=nb[e[1]]||[]).push(e[0]); });
+  EDGES.forEach(function(e){
+    var a=pos[e[0]], b=pos[e[1]], on = hover!==null && (e[0]===hover || e[1]===hover);
+    ctx.save(); ctx.strokeStyle= on ? '#ffffff' : (hover===null ? 'rgba(227,235,243,.18)' : 'rgba(227,235,243,.05)');
+    ctx.lineWidth= on ? 2.4 : 1.3;
+    ctx.beginPath(); ctx.moveTo(a.x,a.y);
+    var mx=(a.x+b.x)/2, my=(a.y+b.y)/2 - Math.abs(a.x-b.x)*0.08;
+    ctx.quadraticCurveTo(mx,my,b.x,b.y); ctx.stroke(); ctx.restore();
+  });
+  Q.forEach(function(q){
+    var p=pos[q.n], act = hover===null || hover===q.n || (nb[hover]||[]).indexOf(q.n)>=0, c=cols[q.g];
+    ctx.save(); ctx.globalAlpha = act?1:0.25;
+    ctx.beginPath(); ctx.arc(p.x,p.y, hover===q.n?25:21, 0, 2*Math.PI);
+    ctx.fillStyle='#16273a'; ctx.fill(); ctx.lineWidth= hover===q.n?3.2:2; ctx.strokeStyle=c; ctx.stroke();
+    ctx.fillStyle=c; ctx.font='700 14px Consolas,monospace'; ctx.textAlign='center'; ctx.fillText(q.n, p.x, p.y+5);
+    ctx.font='12px "Segoe UI",sans-serif'; ctx.fillStyle='#e3ebf3';
+    var right = q.g===2 ? (q.n%2===0) : true;
+    ctx.textAlign = right?'left':'right';
+    ctx.fillText(q.t, p.x + (right?32:-32), p.y+4);
+    ctx.restore();
+  });
+  if (hover!==null){ var q=Q[hover-1];
+    ctx.save(); ctx.fillStyle='rgba(10,26,43,.92)'; ctx.fillRect(12,H-40,W-24,30);
+    ctx.fillStyle='#e3ebf3'; ctx.font='13px "Segoe UI",sans-serif'; ctx.textAlign='left';
+    ctx.fillText('Spm. '+q.n+' · '+q.t+' — forbundet med: '+(nb[hover]||[]).sort(function(a,b){return a-b;}).map(function(n){return 'spm. '+n;}).join(', '), 22, H-20);
+    ctx.restore(); }
+}
+if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', build); else build();
+</script>
+</body>
+</html>

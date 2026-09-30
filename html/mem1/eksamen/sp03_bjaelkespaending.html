@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spm. 3: Bjælkespændinger - MEM1 eksamen</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="assets/eksamen.css">
+</head>
+<body>
+<script>
+var QDATA = {
+nr: 3,
+titel: "Bøjningsspænding og forskydningsspænding i bjælker",
+kapitel: 4,
+kapitelNavn: "Spændinger og tøjninger",
+mappe: "Spørgsmål 03 - Bjælkespændinger",
+prev: "sp02_toejningsenergi.html",
+next: "sp04_castigliano.html",
+bog: "Kap. 4: bøjningsformlen lign. (4.45), s. 100&ndash;101 &middot; §4.6 <i>Transverse Shear Stress</i>, lign. (4.63)&ndash;(4.65), s. 104&ndash;106.",
+
+spmA: "Udled bøjningsformlen $\\sigma_b=-My/I$ for en bjælke i ren bøjning. Forklar ligningen for forskydningsspænding fra tværkraft $\\tau=VQ/(Ib)$, og hvorfor den maksimale forskydningsspænding optræder i neutralaksen for rektangulære tværsnit.",
+spmB: "En rektangulær maskinarm har bredden $b=10$ mm og højden $h=30$ mm og bærer en tværkraft $V=10$ kN og et bøjningsmoment $M=450$ N·m. Beregn den maksimale bøjningsspænding $\\sigma_{max}$ i yderfiberen og den maksimale forskydningsspænding $\\tau_{max}$ i neutralaksen.",
+
+oversat: "En bjælke, der bøjes, bliver <b>strakt på den ene side og klemt på den anden</b>. Midt imellem ligger en linje, der hverken strækkes eller klemmes &mdash; neutralaksen. Del (a) vil have dig til at vise, at spændingen vokser <b>lineært</b> med afstanden fra den linje, og hvorfor den linje ligger lige gennem tyngdepunktet. Derefter skal du forklare den <i>anden</i> spænding i en bjælke: forskydning fra tværkraften. Den opfører sig stik modsat &mdash; den er størst i midten og nul i yderkanterne. Del (b) er to indsætninger i formler, men pointen er at forstå, at de to maksima sidder på <b>helt forskellige steder</b> i tværsnittet.",
+kerne: "Bøjningsspænding er størst i kanten og nul i midten. Forskydningsspænding er størst i midten og nul i kanten. De to spændinger deler tværsnittet mellem sig.",
+
+historie: [
+ {h:"Hvorfor bøjningsspændingen er lineær",
+  t:"Bøj en viskelæder og tegn lodrette streger på siden først. Stregerne forbliver <b>rette</b> &mdash; de drejer bare. Det er Bernoullis antagelse: plane snit forbliver plane. Når en ret linje drejer omkring et punkt, flytter hvert punkt på linjen sig proportionalt med afstanden fra omdrejningspunktet. Derfor er tøjningen lineær i $y$, og med Hookes lov er spændingen det også. Hele bøjningsformlen udspringer af den ene observation."},
+ {h:"Hvorfor neutralaksen går gennem tyngdepunktet",
+  t:"Bjælken bærer rent moment &mdash; ingen aksialkraft. Så skal alle trækspændinger og alle trykspændinger ophæve hinanden: $\\int\\sigma\\,dA=0$. Da $\\sigma\\propto y$, betyder det $\\int y\\,dA=0$, og det er præcis definitionen på, at $y$ måles fra tyngdepunktet. Neutralaksen ligger ikke der, fordi nogen har bestemt det &mdash; den <i>tvinges</i> derhen af ligevægten."},
+ {h:"Hvor forskydningen kommer fra",
+  t:"Læg to brædder oven på hinanden og bøj dem: de glider mod hinanden. Limer du dem sammen, skal limen modstå den glidning &mdash; det er forskydningsspændingen. Den opstår, fordi momentet <b>ændrer sig</b> langs bjælken ($dM/dx=V$). Et stykke af bjælken over et vandret snit får lidt mere bøjningskraft på den ene endeflade end på den anden. Forskellen skal bæres af forskydning i det vandrette snit. Derfor $\\tau=VQ/(Ib)$: tværkraften $V$ driver det, $Q$ måler hvor meget areal der sidder <i>over</i> snittet og hvor langt ude."},
+ {h:"Hvorfor maksimum ligger i neutralaksen",
+  t:"$Q$ er størst, når snittet lægges gennem neutralaksen: så medregner du <i>hele</i> trækzonen (eller hele trykzonen), og alt dens areal har samme fortegn på $y$. Flytter du snittet op, udelader du areal. Ved yderfiberen er der intet areal over snittet: $Q=0$, $\\tau=0$. Det er også fysisk nødvendigt: yderfladen er fri, og en fri overflade kan ikke bære forskydning."}
+],
+analogi: "En bogstabel, du bøjer: siderne glider mod hinanden. Limer du dem sammen, skal limen forhindre glidningen &mdash; og det er limen i midten af stablen, der arbejder hårdest, mens limen under de yderste sider næsten intet laver. Det er forskydningsspændingens parabel.",
+
+plan: [
+ {t:"0&ndash;2 min", k:"warm", w:"Tegn bjælkestykket og tværsnittet",
+  d:"Et bjælkestykke med moment i begge ender, neutralaksen stiplet. Ved siden af: tværsnittet $b\\times h$ med $y$-aksen. Sig antagelserne højt: lineær elasticitet, plane snit forbliver plane, symmetrisk tværsnit."},
+ {t:"2&ndash;7 min", w:"Udled bøjningsformlen",
+  d:"Kinematik $\\epsilon=-y/\\rho$ → Hooke → $\\sum F=0$ giver neutralaksen i tyngdepunktet → $\\sum M=0$ giver $1/\\rho=M/(EI)$ → sæt sammen: $\\sigma=-My/I$. Tegn den lineære fordeling."},
+ {t:"7&ndash;10 min", w:"Forklar $\\tau=VQ/(Ib)$",
+  d:"Tegn et bjælkeelement $dx$ med et vandret snit i højden $y_1$. Vis ubalancen mellem endefladerne og at forskydningen i snittet skal udligne den. Definér $Q$. Tegn parablen."},
+ {t:"10&ndash;13 min", w:"Regn designopgaven",
+  d:"$I=22\\,500$ mm⁴, $\\sigma_{max}=Mc/I=300$ MPa i yderfiberen, $Q=1125$ mm³, $\\tau_{max}=50$ MPa $=1{,}5\\,V/A$ i neutralaksen."},
+ {t:"13&ndash;15 min", k:"end", w:"Pointen, der løfter karakteren",
+  d:"&bdquo;$\\sigma_{max}/\\tau_{max}=6=4(M/V)/h$. Armen er kort ($M/V=45$ mm mod $h=30$ mm), så forskydningen er <i>ikke</i> ubetydelig her. På en lang, slank bjælke ville bøjningen totalt dominere.&ldquo;"},
+ {t:"15&ndash;20 min", k:"end", w:"Spørgsmål", d:"Se censors sandsynlige spørgsmål nederst."}
+],
+
+trin: [
+ {t:"Antagelserne &mdash; sig dem højt",
+  m:"\\text{lineær elastisk}\\quad\\cdot\\quad\\text{plane snit forbliver plane}\\quad\\cdot\\quad\\text{symmetrisk tværsnit}\\quad\\cdot\\quad\\text{ren bøjning}",
+  hvorfor:"Formlen er ikke naturlov &mdash; den er konsekvensen af de fire antagelser. Censor vil høre, at du ved, hvad du antager, for så ved du også, hvornår formlen <i>ikke</i> gælder: plastisk bøjning, stærkt krumme bjælker, usymmetriske tværsnit.",
+  sig:"Jeg antager lineær elasticitet, at plane snit forbliver plane, og et symmetrisk tværsnit i ren bøjning."},
+
+ {t:"Kinematik: tøjningen er lineær i y",
+  m:"\\epsilon_x=-\\frac{y}{\\rho}",
+  hvorfor:"Bjælkestykket bøjes til en cirkelbue med krumningsradius $\\rho$. En fiber i afstanden $y$ over neutralaksen får buelængden $(\\rho-y)d\\theta$ mod $\\rho\\,d\\theta$ i neutralaksen. Tøjningen er forskellen divideret med den oprindelige længde: $-y/\\rho$. Minus, fordi fibre over neutralaksen forkortes ved positivt moment (bjælken &bdquo;smiler&ldquo;).",
+  sig:"Fordi snittene forbliver plane, er tøjningen proportional med afstanden fra neutralaksen. Fibrene over bliver trykket sammen, fibrene under bliver strakt."},
+
+ {t:"Hookes lov: spændingen er også lineær",
+  m:"\\sigma_x=E\\,\\epsilon_x=-\\frac{E}{\\rho}\\,y",
+  hvorfor:"Et simpelt skridt, men læg mærke til, at vi nu har spændingen udtrykt ved en <i>ukendt</i> krumning $\\rho$. Den skal findes fra momentligevægt. Og vi ved endnu ikke, hvor $y=0$ ligger.",
+  sig:"Med Hookes lov bliver spændingen også lineær i y. Jeg mangler at finde krumningen og placeringen af neutralaksen."},
+
+ {t:"Kraftligevægt placerer neutralaksen",
+  m:"\\sum F_x=0:\\quad\\int_A\\sigma_x\\,dA=-\\frac{E}{\\rho}\\int_A y\\,dA=0\\quad\\Rightarrow\\quad\\int_A y\\,dA=0",
+  hvorfor:"Ingen aksialkraft betyder, at træk og tryk skal balancere. $\\int y\\,dA=0$ er definitionen på, at $y$ måles fra tyngdepunktet. <b>Neutralaksen går altså gennem tyngdepunktet</b> &mdash; det er et resultat, ikke en antagelse.",
+  sig:"Fordi der ikke er nogen normalkraft, skal det første arealmoment være nul. Det betyder, at neutralaksen går gennem tyngdepunktet."},
+
+ {t:"Momentligevægt giver krumningen",
+  m:["\\sum M=0:\\quad M=-\\int_A y\\,\\sigma_x\\,dA=\\frac{E}{\\rho}\\int_A y^2\\,dA=\\frac{EI}{\\rho}",
+     "\\frac{1}{\\rho}=\\frac{M}{EI}"],
+  hvorfor:"Hver fiber giver et moment $y\\cdot\\sigma\\,dA$ om neutralaksen. Summen skal være det påførte moment. Integralet $\\int y^2 dA$ dukker op af sig selv &mdash; det er <b>inertimomentet</b> $I$, og nu ved du, hvorfor det hedder sådan: det måler, hvor langt ude arealet sidder, i anden potens.",
+  sig:"Summen af fibrenes momenter skal give M. Her dukker inertimomentet op som integralet af y i anden over arealet, og jeg får krumningen: en over rho er M over EI."},
+
+ {t:"Sæt sammen: bøjningsformlen",
+  m:["\\boxed{\\ \\sigma_x=-\\frac{M\\,y}{I}\\ }\\qquad\\sigma_{max}=\\frac{M\\,c}{I}=\\frac{M}{W},\\qquad W=\\frac{I}{c}=\\frac{bh^2}{6}\\ \\text{(rektangel)}"],
+  hvorfor:"Indsæt $E/\\rho=M/I$ i spændingsudtrykket. Maksimum sidder i yderfiberen, $|y|=c=h/2$. Modstandsmomentet $W=I/c$ samler hele tværsnittets bøjningsstyrke i ét tal. Bemærk at $h$ indgår i <b>anden potens</b> i $W$: dobbelt så høj bjælke er fire gange så stærk, men dobbelt så bred kun dobbelt så stærk.",
+  sig:"Spændingen er minus M y over I. Den største spænding sidder i yderfiberen, hvor y er lig c. Højden tæller i anden potens &mdash; derfor står bjælker på højkant."},
+
+ {t:"Forskydning fra tværkraft: ligevægt af et udsnit",
+  m:["\\tau\\,b\\,dx=\\frac{dM}{I}\\int_{y_1}^{c}y\\,dA=\\frac{dM}{I}\\,Q\\quad\\Rightarrow\\quad\\boxed{\\ \\tau=\\frac{V\\,Q}{I\\,b}\\ },\\qquad V=\\frac{dM}{dx}"],
+  hvorfor:"Skær et stykke af bjælken ud med længden $dx$ og et vandret snit i højden $y_1$. Delen over snittet har bøjningsspændinger på begge endeflader &mdash; men momentet er $M$ på den ene og $M+dM$ på den anden. Forskellen i kraft er $(dM/I)\\cdot Q$. Den eneste flade, der kan tage forskellen, er det vandrette snit med arealet $b\\,dx$. Divider, og brug $dM/dx=V$.",
+  sig:"Et udsnit over et vandret snit har en lille ubalance i bøjningskraft, fordi momentet ændrer sig langs bjælken. Den ubalance bæres af forskydning i snittet. Det giver tau lig V Q over I b."},
+
+ {t:"Parablen: hvorfor maksimum ligger i neutralaksen",
+  m:["Q(y_1)=b\\left(\\tfrac{h}{2}-y_1\\right)\\cdot\\tfrac12\\left(\\tfrac{h}{2}+y_1\\right)=\\frac{b}{2}\\left(\\frac{h^2}{4}-y_1^2\\right)",
+     "\\tau(y_1)=\\frac{V}{2I}\\left(\\frac{h^2}{4}-y_1^2\\right)\\quad\\Rightarrow\\quad\\tau_{max}=\\tau(0)=\\frac{3}{2}\\,\\frac{V}{A}"],
+  hvorfor:"$Q$ er arealet over snittet gange afstanden til dets tyngdepunkt. Det er en <b>parabel</b> i $y_1$ med top i $y_1=0$. Ved yderfiberen er $Q=0$: fri overflade, ingen forskydning. I neutralaksen er $\\tau$ 50 % større end middelværdien $V/A$ &mdash; derfor må man aldrig bare regne $V/A$.",
+  sig:"Q er størst, når snittet går gennem neutralaksen, fordi jeg så får hele trækzonen med. Fordelingen er en parabel, nul i kanterne og halvanden gange middelværdien i midten."}
+],
+
+faldgruber: [
+ {t:"Byt ikke om på b og h i $I$", d:"$I=bh^3/12$, hvor $h$ er højden <b>i bøjningsplanet</b>. Bytter du om, får du $I=hb^3/12=2500$ mm⁴ &mdash; ni gange for lidt, og $\\sigma$ bliver 2700 MPa. Tjek altid: hvilken vej bøjer bjælken?"},
+ {t:"Enheder: N·m til N·mm", d:"$M=450$ N·m $=450\\,000$ N·mm. Med mm og N får du direkte MPa. Glemmer du faktor 1000, er svaret 0,3 MPa &mdash; og censor spørger, om det lyder rimeligt."},
+ {t:"$c=h/2$, ikke $h$", d:"$c$ er afstanden fra neutralaksen til yderfiberen. Bruger du $h$, fordobler du spændingen."},
+ {t:"$V/A$ er ikke $\\tau_{max}$", d:"Middelværdien $V/A=33{,}3$ MPa undervurderer maksimum med 50 % for et rektangel. For et cirkulært tværsnit er faktoren $4/3$, for et I-profil bærer kroppen næsten det hele."},
+ {t:"Læg ikke $\\sigma_{max}$ og $\\tau_{max}$ sammen", d:"De sidder i forskellige punkter: $\\sigma_{max}$ i yderfiberen (hvor $\\tau=0$) og $\\tau_{max}$ i neutralaksen (hvor $\\sigma=0$). I et mellempunkt har du begge &mdash; og så skal du bruge Mohrs cirkel (spm. 1). Prøv probe-skyderen i laboratoriet."}
+],
+
+qa: [
+ {q:"Hvorfor forbliver plane snit plane?",
+  a:"I ren bøjning følger det af symmetri: der er ingen grund til, at et snit skulle krumme den ene vej frem for den anden. Med tværkraft er det kun tilnærmelsesvis sandt &mdash; forskydningen får snittene til at hvælve sig lidt. For slanke bjælker ($L/h>10$) er fejlen ubetydelig."},
+ {q:"Hvor ligger neutralaksen i et T-profil?",
+  a:"Gennem tyngdepunktet, som ikke længere ligger midt i højden. Så er $c$ forskellig for top og bund, og den største spænding sidder i den fiber, der er længst fra tyngdepunktet. Det følger direkte af $\\int y\\,dA=0$."},
+ {q:"Hvorfor er I-profiler så effektive?",
+  a:"$I=\\int y^2 dA$ belønner areal langt fra neutralaksen i anden potens. Flangerne sidder i yderfibrene, hvor de bidrager maksimalt. Kroppen er tynd, fordi den kun skal bære forskydning og holde flangerne fra hinanden."},
+ {q:"Hvad sker der, hvis armen gøres dobbelt så lang med samme kraft?",
+  a:"Momentet fordobles ($M=VL$), så $\\sigma_{max}$ fordobles til 600 MPa. Forskydningen er uændret, fordi $V$ er den samme. Bøjningen dominerer mere og mere, jo længere bjælken er: $\\sigma_{max}/\\tau_{max}=4L/h$."},
+ {q:"Hvordan ser forskydningsfordelingen ud i en cirkulær aksel?",
+  a:"Også parabolsk med maksimum i neutralaksen, men $\\tau_{max}=\\frac{4}{3}\\frac{V}{A}$. Bredden $b$ i formlen er korden i snithøjden, og den varierer."},
+ {q:"Hvad er spændingstilstanden i et punkt midt mellem neutralakse og yderfiber?",
+  a:"Både $\\sigma_x$ og $\\tau_{xy}$ er forskellige fra nul. Med opgavens tal og $y=-h/4$: $\\sigma_x=150$ MPa og $\\tau_{xy}=37{,}5$ MPa. Via Mohrs cirkel giver det $\\sigma_1=158{,}9$ MPa &mdash; større end $\\sigma_x$ alene. Det er grunden til, at man i korte, hårdt belastede emner skal tjekke mellempunkter."}
+],
+
+sammenhaeng: "Bøjningsformlen $\\sigma=Mc/I$ er nok den mest brugte formel i hele faget. Den dukker op i <b>spm. 9</b> (aksler: $\\sigma=32M/\\pi d^3$), i <b>spm. 11</b> (Lewis betragter tanden som en udkraget bjælke og bruger præcis $Mc/I$), og i udmattelse (<b>spm. 6</b>), hvor $\\sigma_a$ og $\\sigma_m$ ofte er bøjningsspændinger. Krumningen $1/\\rho=M/EI$ er grundlaget for udbøjning (<b>spm. 4</b>). Og når både $\\sigma$ og $\\tau$ er til stede i ét punkt, er det Mohrs cirkel (<b>spm. 1</b>), der samler dem til hovedspændinger.",
+
+links: [
+ {k:"SPM 1", t:"Mohrs cirkel samler σ og τ i ét punkt", u:"sp01_mohr.html"},
+ {k:"SPM 4", t:"Samme bjælke: nu udbøjningen", u:"sp04_castigliano.html"},
+ {k:"SPM 11", t:"Lewis: tanden som udkraget bjælke", u:"sp11_lewis.html"},
+ {k:"WIDGET", t:"Spændingsfordeling i tværsnit", u:"../interaktiv/spaendingsfordeling.html"},
+ {k:"KAP. 4", t:"Formeloverblik (PDF)", u:"../Kapitel04_Overblik.pdf"},
+ {k:"KAP. 4", t:"Quiz", u:"../../../quiz/mem1/Kapitel04_Quiz.html"}
+]
+};
+
+var LAB = {
+w: 720, h: 440,
+intro: "Flyt <b>probe-skyderen</b> op og ned i tværsnittet. Den viser $\\sigma$ og $\\tau$ i netop den højde &mdash; og hovedspændingen $\\sigma_1$ via Mohrs cirkel. Læg mærke til, at $\\sigma$ og $\\tau$ aldrig er maksimale samme sted. Prøv også at gøre $h$ større: $\\sigma$ falder med $h^2$, $\\tau$ kun med $h$.",
+preset2: {navn: "Lang arm: M = 1500 N·m (slank bjælke)", v: {M: 1500}},
+
+inputs: [
+ {id:"b",  label:"Bredde $b$",          min:4,   max:40,   step:1,   value:10,  unit:"mm"},
+ {id:"h",  label:"Højde $h$",           min:10,  max:80,   step:1,   value:30,  unit:"mm"},
+ {id:"V",  label:"Tværkraft $V$",       min:0,   max:30,   step:0.5, value:10,  dec:1, unit:"kN"},
+ {id:"M",  label:"Moment $M$",          min:0,   max:2000, step:10,  value:450, unit:"N·m"},
+ {id:"yf", label:"Probe: højde $y/(h/2)$", min:-1, max:1,  step:0.05, value:-0.5, dec:2, unit:""}
+],
+
+compute: function (v) {
+  var I = v.b * Math.pow(v.h, 3) / 12;           // mm4
+  var c = v.h / 2;
+  var W = I / c;
+  var Mn = v.M * 1000;                            // N*mm
+  var Vn = v.V * 1000;                            // N
+  var smax = Mn * c / I;
+  var A = v.b * v.h;
+  var Qmax = v.b * v.h * v.h / 8;
+  var tmax = Vn * Qmax / (I * v.b);
+  var y = v.yf * c;
+  var sy = -Mn * y / I;
+  var Qy = v.b / 2 * (c * c - y * y);
+  var ty = Vn * Qy / (I * v.b);
+  var cc = sy / 2, R = Math.hypot(sy / 2, ty);
+  return { I:I, c:c, W:W, smax:smax, A:A, Qmax:Qmax, tmax:tmax, tavg:Vn / A,
+           y:y, sy:sy, Qy:Qy, ty:ty, s1:cc + R, s2:cc - R, ratio: tmax > 0 ? smax / tmax : Infinity };
+},
+
+readout: function (v, r) {
+  return [
+   {l:"Inertimoment $I$", v:r.I, dec:0, unit:"mm⁴"},
+   {l:"Modstandsmoment $W$", v:r.W, dec:0, unit:"mm³"},
+   {l:"$\\sigma_{max}$ (yderfiber)", v:r.smax, dec:1, unit:"MPa", k:"hi"},
+   {l:"$\\tau_{max}$ (neutralakse)", v:r.tmax, dec:1, unit:"MPa", k:"hi"},
+   {l:"$\\tau_{middel}=V/A$", v:r.tavg, dec:1, unit:"MPa"},
+   {l:"$\\sigma_{max}/\\tau_{max}$", raw: isFinite(r.ratio) ? Eks.num(r.ratio,2) : "∞", unit:""},
+   {l:"Probe: $\\sigma_x(y)$", v:r.sy, dec:1, unit:"MPa"},
+   {l:"Probe: $\\tau(y)$", v:r.ty, dec:1, unit:"MPa"},
+   {l:"Probe: $\\sigma_1$ (Mohr)", v:r.s1, dec:1, unit:"MPa", k:"hi"}
+  ];
+},
+
+steps: function (v, r) {
+  var T = Eks.tnum;
+  return [
+   {h:"1 · Inertimoment om neutralaksen",
+    m:"I=\\frac{b\\,h^3}{12}=\\frac{"+T(v.b,0)+"\\cdot"+T(v.h,0)+"^3}{12}="+T(r.I,0)+"\\ \\text{mm}^4",
+    c:"$h$ er højden i bøjningsplanet &mdash; den tæller i tredje potens."},
+   {h:"2 · Bøjningsspænding i yderfiberen",
+    m:"\\sigma_{max}=\\frac{M\\,c}{I}=\\frac{"+T(v.M*1000,0)+"\\ \\text{N·mm}\\cdot"+T(r.c,1)+"\\ \\text{mm}}{"+T(r.I,0)+"\\ \\text{mm}^4}="+T(r.smax,1)+"\\ \\text{MPa}",
+    c:"Tryk i den ene yderfiber, træk i den anden. Samme værdi som $M/W$ med $W=bh^2/6="+Eks.num(r.W,0)+"$ mm³."},
+   {h:"3 · Første arealmoment i neutralaksen",
+    m:"Q_{max}=b\\cdot\\frac{h}{2}\\cdot\\frac{h}{4}=\\frac{b\\,h^2}{8}=\\frac{"+T(v.b,0)+"\\cdot"+T(v.h,0)+"^2}{8}="+T(r.Qmax,0)+"\\ \\text{mm}^3",
+    c:"Arealet over neutralaksen gange afstanden til dets tyngdepunkt ($h/4$)."},
+   {h:"4 · Maksimal forskydningsspænding",
+    m:"\\tau_{max}=\\frac{V\\,Q}{I\\,b}=\\frac{"+T(v.V*1000,0)+"\\cdot"+T(r.Qmax,0)+"}{"+T(r.I,0)+"\\cdot"+T(v.b,0)+"}="+T(r.tmax,1)+"\\ \\text{MPa}=\\frac{3}{2}\\frac{V}{A}",
+    c:"Kontrol: $1{,}5\\cdot V/A=1{,}5\\cdot"+Eks.num(r.tavg,2)+"="+Eks.num(1.5*r.tavg,1)+"$ MPa."},
+   {h:"5 · Probe-punktet: begge spændinger på én gang",
+    m:"y="+T(r.y,2)+"\\ \\text{mm}:\\quad\\sigma_x=-\\frac{My}{I}="+T(r.sy,1)+",\\quad\\tau=\\frac{V\\,Q(y)}{I\\,b}="+T(r.ty,1)+"\\ \\text{MPa}",
+    c:"$Q(y)="+Eks.num(r.Qy,0)+"$ mm³. Her virker <b>både</b> normal- og forskydningsspænding &mdash; derfor Mohr i næste trin."},
+   {h:"6 · Mohrs cirkel i probe-punktet (spm. 1)",
+    m:"\\sigma_{1,2}=\\frac{\\sigma_x}{2}\\pm\\sqrt{\\left(\\frac{\\sigma_x}{2}\\right)^2+\\tau^2}\\quad\\Rightarrow\\quad\\sigma_1="+T(r.s1,1)+",\\ \\ \\sigma_2="+T(r.s2,1)+"\\ \\text{MPa}",
+    c:"Med $\\sigma_y=0$ i en bjælke. Bemærk at $|\\sigma_1|$ eller $|\\sigma_2|$ kan være større end $|\\sigma_x|$ i punktet."}
+  ];
+},
+
+facit: function (v, r) {
+  if (v.b===10 && v.h===30 && v.V===10 && v.M===450) {
+    return {t:"<b>✓ Eksamensopgavens facit:</b> $I=22\\,500$ mm⁴, $\\sigma_{max}=300$ MPa i yderfiberen og $\\tau_{max}=50$ MPa i neutralaksen ($=1{,}5\\cdot V/A$). <b>Pointen:</b> forholdet $\\sigma_{max}/\\tau_{max}=6$ svarer til $4(M/V)/h=4\\cdot45/30$ &mdash; armen er kort, så forskydningen er ikke ubetydelig."};
+  }
+  return {off:true, t:"Du har ændret inddata. Probe-skyderen alene ændrer ikke facit &mdash; brug knappen for at gendanne alle eksamensværdier."};
+},
+
+draw: function (ctx, W, H, v, r, C) {
+  C.grid(ctx, W, H, 40);
+  var CY='#5ec8ff', GR='#00d984', GO='#ffa500', RD='#ff5e5e', PU='#d984ff', DIM='rgba(227,235,243,.45)';
+  var top=62, bot=H-58, mid=(top+bot)/2, half=(bot-top)/2;
+  function Yp(y){ return mid - y/r.c*half; }   // y [mm] -> pixel
+
+  /* ---------- tværsnit ---------- */
+  var sx=108, aspect=Math.max(0.05, Math.min(v.b/v.h, 1.25));
+  var bw=Math.max(8, (bot-top)*aspect);
+  C.txt(ctx,'Tværsnit', sx, top-30, DIM, 11, 'center');
+  ctx.save(); ctx.fillStyle='rgba(94,200,255,.12)'; ctx.strokeStyle=CY; ctx.lineWidth=2;
+  ctx.fillRect(sx-bw/2, top, bw, bot-top); ctx.strokeRect(sx-bw/2, top, bw, bot-top); ctx.restore();
+  C.line(ctx, sx-bw/2-24, mid, sx+bw/2+24, mid, GO, 1.4, [6,4]);
+  C.txt(ctx,'NA', sx+bw/2+26, mid+4, GO, 10);
+  C.mono(ctx,'b='+Eks.num(v.b,0), sx, bot+16, DIM, 10, 'center');
+  C.dim(ctx, sx-bw/2-16, top, sx-bw/2-16, bot, DIM, null);
+  C.mono(ctx,'h='+Eks.num(v.h,0), sx-bw/2-20, mid-8, DIM, 10, 'right');
+
+  /* ---------- sigma-fordeling ---------- */
+  var S = Math.max(r.smax, r.tmax, 1), sc = 96 / S;
+  var ax1 = 330;
+  C.txt(ctx,'Bøjning σ(y) = −My/I', ax1, top-30, CY, 11, 'center');
+  C.line(ctx, ax1, top-8, ax1, bot+8, DIM, 1.2);
+  C.poly(ctx, [[ax1,top],[ax1-r.smax*sc,top],[ax1+r.smax*sc,bot],[ax1,bot]], null, null);
+  C.poly(ctx, [[ax1,top],[ax1-r.smax*sc,top],[ax1,mid]], CY, 'rgba(255,94,94,.18)', 2);
+  C.poly(ctx, [[ax1,bot],[ax1+r.smax*sc,bot],[ax1,mid]], CY, 'rgba(94,200,255,.18)', 2);
+  C.mono(ctx,'−'+Eks.num(r.smax,0)+' (tryk)', ax1-r.smax*sc-4, top-8, RD, 10, 'left');
+  C.mono(ctx,'+'+Eks.num(r.smax,0)+' (træk)', ax1+r.smax*sc+4, bot+14, CY, 10, 'right');
+
+  /* ---------- tau-fordeling ---------- */
+  var ax2 = 520;
+  C.txt(ctx,'Forskydning τ(y) = VQ/(Ib)', ax2+60, top-30, GR, 11, 'center');
+  C.line(ctx, ax2, top-8, ax2, bot+8, DIM, 1.2);
+  var pts=[[ax2,top]];
+  for (var i=0;i<=40;i++){ var yy=r.c-i*(2*r.c)/40; var t=(v.V*1000)/(2*r.I)*(r.c*r.c-yy*yy); pts.push([ax2+t*sc, Yp(yy)]); }
+  pts.push([ax2,bot]);
+  C.poly(ctx, pts, GR, 'rgba(0,217,132,.16)', 2);
+  C.mono(ctx,'τmax='+Eks.num(r.tmax,1), ax2+r.tmax*sc+6, mid+4, GR, 10);
+  C.mono(ctx,'0', ax2+4, top+4, DIM, 10);
+  C.mono(ctx,'0', ax2+4, bot, DIM, 10);
+
+  /* ---------- probe ---------- */
+  var py = Yp(r.y);
+  C.line(ctx, sx-bw/2-6, py, W-24, py, PU, 1.4, [3,3]);
+  C.circle(ctx, sx, py, 4.5, null, PU);
+  C.circle(ctx, ax1 + r.sy*sc, py, 4.5, null, PU);
+  C.circle(ctx, ax2 + r.ty*sc, py, 4.5, null, PU);
+  C.mono(ctx,'σ='+Eks.num(r.sy,1), ax1 + (r.sy>=0? r.sy*sc+8 : r.sy*sc-8), py-7, PU, 10, r.sy>=0?'left':'right');
+  C.mono(ctx,'τ='+Eks.num(r.ty,1), ax2 + r.ty*sc + 8, py-7, PU, 10);
+  C.txt(ctx,'probe → σ1='+Eks.num(r.s1,1)+' MPa (Mohr)', W-26, bot+34, PU, 11, 'right', true);
+  C.txt(ctx,'Samme MPa-skala på begge diagrammer', 200, bot+34, DIM, 10, 'left');
+}
+};
+</script>
+<script src="assets/eksamen.js"></script>
+<script>Eks.build();</script>
+</body>
+</html>

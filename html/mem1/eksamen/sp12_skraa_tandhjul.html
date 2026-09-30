@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spm. 12: Skrå tandhjul - MEM1 eksamen</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="assets/eksamen.css">
+</head>
+<body>
+<script>
+var QDATA = {
+nr: 12,
+titel: "Kraftkomposanter på skrå tandhjul",
+kapitel: 15,
+kapitelNavn: "Skrå tandhjul, keglehjul og snekkedrev",
+mappe: "Spørgsmål 12 - Skrå tandhjul",
+prev: "sp11_lewis.html",
+next: "sp13_bevaegelsesskrue.html",
+bog: "Kap. 15: §15.2.1 <i>Helical Gear Relationships</i> og §15.2.2 <i>Pitches of Helical Gears</i>, s. 422&ndash;423 &middot; §15.2.5 <i>Loads and Stresses</i> (kraftkomposanterne), s. 424.",
+
+spmA: "Forklar de geometriske sammenhænge mellem normal indgrebsvinkel $\\phi_n$, tværgående indgrebsvinkel $\\phi_t$ og skråvinkel $\\psi$. Udled ligningerne for tangentialkraften $F_t$, radialkraften $F_r$ og aksialkraften $F_a$ på et skråt tandhjul.",
+spmB: "Et skråt tandhjul med normal indgrebsvinkel $\\phi_n=20°$ og skråvinkel $\\psi=30°$ overfører en tangentiallast $F_t=3000$ N. Givet $\\tan\\phi_t=\\frac{\\tan\\phi_n}{\\cos\\psi}=\\frac{0{,}364}{0{,}866}=0{,}420$, beregn radialkraften $F_r$ og aksialkraften $F_a$.",
+
+oversat: "På et skråt tandhjul står tænderne ikke parallelt med akslen, men snoet som et skruegevind. Det gør gearet stille og stærkt, fordi tænderne glider gradvist i indgreb. Men der er en pris: tandkraften står vinkelret på den skrå tand, og derfor får den en komposant <b>langs akslen</b>. Del (a): forklar, hvorfor der er to indgrebsvinkler (én målt vinkelret på tanden, én målt vinkelret på akslen), og dekomponér tandkraften i tre retninger. Del (b): to indsætninger.",
+kerne: "Tandkraften står vinkelret på tanden. Snoes tanden vinklen $\\psi$, snoes kraften med &mdash; og den del, der nu peger langs akslen, er aksialkraften $F_a=F_t\\tan\\psi$.",
+
+historie: [
+ {h:"Hvorfor skrå tænder overhovedet",
+  t:"På et ligetandet hjul går en hel tand i indgreb på én gang og slipper på én gang. Det giver stød og støj. På et skråt hjul starter kontakten i den ene ende af tanden og &bdquo;ruller&ldquo; hen over bredden. Der er altid flere tænder i indgreb, lasten fordeles, og gearet kører roligt og kan bære mere. Derfor har næsten alle bilgearkasser skrå tandhjul."},
+ {h:"De tre retninger",
+  t:"Et tandhjul har tre naturlige retninger i indgrebspunktet: <b>tangentielt</b> (langs omkredsen &mdash; det, der giver moment), <b>radialt</b> (ind mod centrum &mdash; skubber hjulene fra hinanden) og <b>aksialt</b> (langs akslen). På et ligetandet hjul er den aksiale komposant nul. På et skråt hjul er den ikke."},
+ {h:"Hvorfor der er to indgrebsvinkler",
+  t:"Indgrebsvinklen er tandflankens hældning. Men <i>hvilken</i> hældning afhænger af, hvor du skærer. Skærer du vinkelret på tanden (normalsnit), ser du værktøjets vinkel $\\phi_n$ &mdash; typisk 20°. Skærer du vinkelret på akslen (tværsnit), skærer du tanden skævt, og vinklen ser større ud: $\\phi_t>\\phi_n$. Sammenhængen falder direkte ud af kraftdekompositionen: $\\tan\\phi_t=\\tan\\phi_n/\\cos\\psi$."},
+ {h:"Konsekvensen: aksiallejer",
+  t:"Aksialkraften skal tages af akslens lejer. Et almindeligt rilleleje tåler lidt aksiallast, men ved store skråvinkler kræver det vinkelkontaktlejer eller koniske rullelejer (spm. 10). Alternativet er dobbeltskrå (&bdquo;sildebens&ldquo;-) hjul, hvor to modsat skrå halvdele ophæver hinandens aksialkraft."}
+],
+analogi: "Skub en kasse hen over gulvet med en planke, du holder skråt: kassen glider både frem og til siden, fordi planken skubber vinkelret på sin egen flade. Tanden er planken &mdash; og &bdquo;til siden&ldquo; er langs akslen.",
+
+plan: [
+ {t:"0&ndash;2 min", k:"warm", w:"Tegn delefladen rullet ud",
+  d:"Et rektangel = delecylinderen rullet ud. Tænderne som skrå linjer med vinklen $\\psi$ til akseretningen. Marker tangential og aksial retning. Sig: &bdquo;Kraften står vinkelret på tanden.&ldquo;"},
+ {t:"2&ndash;6 min", w:"Dekomponér W i tre trin",
+  d:"(1) I normalsnittet: $W_r=W\\sin\\phi_n$ radialt og $W\\cos\\phi_n$ i delefladen. (2) I delefladen: den komposant vinkelret på tanden deles i $F_t=W\\cos\\phi_n\\cos\\psi$ og $F_a=W\\cos\\phi_n\\sin\\psi$. (3) Saml."},
+ {t:"6&ndash;9 min", w:"Udled sammenhængene",
+  d:"$F_a/F_t=\\tan\\psi$. $F_r/F_t=\\tan\\phi_n/\\cos\\psi$. Men i tværsnittet er $F_r/F_t$ netop $\\tan\\phi_t$ &mdash; så $\\tan\\phi_t=\\tan\\phi_n/\\cos\\psi$. Nævn også $m_n=m_t\\cos\\psi$."},
+ {t:"9&ndash;11 min", w:"Regn designopgaven",
+  d:"$F_r=F_t\\tan\\phi_t=3000\\cdot0{,}420=1260$ N. $F_a=F_t\\tan\\psi=3000\\cdot0{,}577=1732$ N. Samlet $W=F_t/(\\cos\\phi_n\\cos\\psi)=3686$ N."},
+ {t:"11&ndash;14 min", k:"end", w:"Pointen",
+  d:"&bdquo;Aksialkraften er 58 % af tangentialkraften &mdash; større end radialkraften. Den skal tages af lejerne, så valget af $\\psi$ er et kompromis mellem rolig gang og lejebelastning. Typisk vælges 15&ndash;30°.&ldquo;"},
+ {t:"14&ndash;20 min", k:"end", w:"Spørgsmål", d:"Se censors sandsynlige spørgsmål nederst."}
+],
+
+trin: [
+ {t:"Tandkraften W står vinkelret på tandfladen",
+  m:"\\vec W\\perp\\text{tandflanken},\\qquad |\\vec W|=W",
+  hvorfor:"Uden friktion kan kontaktkraften kun virke vinkelret på fladerne. Tandfladen er både hældet (indgrebsvinklen) og snoet (skråvinklen), så $\\vec W$ har komposanter i alle tre retninger. Vi dekomponerer i to trin.",
+  sig:"Kontaktkraften står vinkelret på tandfladen, som både er hældet og snoet. Derfor har den tre komposanter."},
+
+ {t:"Første trin: normalsnittet",
+  m:"W_r=W\\sin\\phi_n\\ \\ (\\text{radial}),\\qquad W_p=W\\cos\\phi_n\\ \\ (\\text{i delefladen, vinkelret på tanden})",
+  hvorfor:"I planet vinkelret på tanden ser tanden ud som et almindeligt ligetandet profil med indgrebsvinklen $\\phi_n$. Kraften deles i en radial del og en del, der ligger i delefladen.",
+  sig:"I normalsnittet ligner tanden en almindelig tand med normal-indgrebsvinklen. Kraften deles i en radial del og en del i delefladen."},
+
+ {t:"Andet trin: delefladen",
+  m:["F_t=W_p\\cos\\psi=W\\cos\\phi_n\\cos\\psi",
+     "F_a=W_p\\sin\\psi=W\\cos\\phi_n\\sin\\psi"],
+  hvorfor:"$W_p$ ligger i delefladen og står vinkelret på tanden, som er drejet $\\psi$ fra akseretningen. Så $W_p$ er drejet $\\psi$ fra tangentialretningen. Den deles i en tangential del (moment) og en aksial del.",
+  sig:"Komposanten i delefladen er drejet skråvinklen væk fra tangentialretningen. Den deles i tangentialkraften og aksialkraften."},
+
+ {t:"Udtryk alt ved Fₜ",
+  m:["\\boxed{\\ F_a=F_t\\tan\\psi\\ },\\qquad \\boxed{\\ F_r=W_r=F_t\\,\\frac{\\tan\\phi_n}{\\cos\\psi}\\ },\\qquad W=\\frac{F_t}{\\cos\\phi_n\\cos\\psi}"],
+  hvorfor:"Divider $F_a$ med $F_t$: $\\cos\\phi_n$ forkortes ud. Divider $F_r$ med $F_t$: $\\sin\\phi_n/(\\cos\\phi_n\\cos\\psi)$. $F_t$ kendes altid fra momentet: $F_t=2T/d$.",
+  sig:"Alle komposanter kan udtrykkes ved tangentialkraften, som jeg kender fra momentet."},
+
+ {t:"Tværsnittet giver indgrebsvinkel-sammenhængen",
+  m:["\\tan\\phi_t=\\frac{F_r}{F_t}\\quad\\Rightarrow\\quad\\boxed{\\ \\tan\\phi_t=\\frac{\\tan\\phi_n}{\\cos\\psi}\\ }",
+     "p_n=p_t\\cos\\psi,\\qquad m_n=m_t\\cos\\psi"],
+  hvorfor:"I tværsnittet (vinkelret på akslen) ser du kun $F_t$ og $F_r$. Vinklen mellem deres resultant og tangentialretningen er per definition den tværgående indgrebsvinkel. Da $\\cos\\psi<1$, er $\\phi_t>\\phi_n$: vinklen ser større ud, når man skærer skråt gennem tanden. Delingen følger samme mønster: målt vinkelret på tænderne er den kortere.",
+  sig:"I tværsnittet er vinklen mellem radial- og tangentialkraft den tværgående indgrebsvinkel. Derfor er tan fi t lig tan fi n over cos psi."}
+],
+
+faldgruber: [
+ {t:"Fr = Fₜ tan φₜ, ikke tan φₙ", d:"Med $\\tan\\phi_n=0{,}364$ får du $F_r=1092$ N &mdash; 13 % for lidt. I tværsnittet skal den tværgående vinkel bruges (eller $\\tan\\phi_n/\\cos\\psi$)."},
+ {t:"Fₐ afhænger ikke af indgrebsvinklen", d:"$F_a=F_t\\tan\\psi$. Mange blander $\\phi$ ind i den. Aksialkraften skyldes kun snoningen."},
+ {t:"Retningen af Fₐ", d:"Retningen afhænger af tandhældning (højre/venstre), omløbsretning og om hjulet driver eller drives. De to hjul i et par får altid lige store, modsat rettede aksialkræfter. Tegn det, hvis du bliver spurgt."},
+ {t:"cos vs. sin på ψ", d:"$\\cos30°=0{,}866$, $\\tan30°=0{,}577$. Et hurtigt tjek: ved $\\psi=0$ skal $F_a=0$ og $\\phi_t=\\phi_n$."},
+ {t:"Lewis på skrå hjul", d:"Formfaktoren skal slås op ved det ækvivalente tandantal $N'=N/\\cos^3\\psi$, og i normalsnittet med $m_n$. Ikke det faktiske tandantal."}
+],
+
+qa: [
+ {q:"Hvorfor er skrå tandhjul mere støjsvage?",
+  a:"Kontakten starter i den ene ende af tanden og bevæger sig gradvist hen over bredden, og der er flere tandpar i indgreb samtidig (højere kontaktforhold). Lastoverførslen er glattere, og der er færre stød."},
+ {q:"Hvordan fjerner man aksialkraften?",
+  a:"Med dobbeltskrå (sildebens-) hjul: to halvdele med modsat skråvinkel, så aksialkræfterne ophæver hinanden inden i hjulet. Ulempen er dyrere fremstilling og følsomhed over for aksial position."},
+ {q:"Hvad er det ækvivalente tandantal?",
+  a:"Et normalsnit gennem et skråt hjul skærer delecylinderen i en ellipse med større krumningsradius. Tanden ligner derfor en tand på et større, ligetandet hjul med $N'=N/\\cos^3\\psi$ tænder. Det bruges til at slå Lewis' $Y$ op."},
+ {q:"Hvor stor er den samlede tandkraft?",
+  a:"$W=F_t/(\\cos\\phi_n\\cos\\psi)=3000/(0{,}940\\cdot0{,}866)=3686$ N. Kontrol: $\\sqrt{F_t^2+F_r^2+F_a^2}=\\sqrt{3000^2+1260^2+1732^2}=3686$ N ✓."},
+ {q:"Hvordan belaster aksialkraften akslen?",
+  a:"Den virker i delecirklens radius og giver derfor et <b>bøjningsmoment</b> $F_a\\cdot d/2$ i akslen, udover selve aksialkraften. Det skal med i akseldimensioneringen (spm. 9) og i lejevalget (spm. 10)."},
+ {q:"Hvad er grænsen for skråvinklen?",
+  a:"Større $\\psi$ giver mere rolig gang, men større aksialkraft og lavere virkningsgrad pga. mere glidning. Typisk 15&ndash;30° for enkeltskrå, op til 45° for dobbeltskrå."}
+],
+
+sammenhaeng: "Kraftdekompositionen her er ren statik, men konsekvenserne spreder sig: $F_t$ giver akslens vridning, $F_r$ og $F_a\\cdot d/2$ giver bøjning (<b>spm. 9</b>), og $F_a$ bestemmer lejetypen (<b>spm. 10</b>). Tandens bøjningsstyrke vurderes med Lewis (<b>spm. 11</b>) i normalsnittet. Og samme geometri &mdash; en flade snoet med en vinkel &mdash; går igen i snekkedrev og i bevægelsesskruer (<b>spm. 13</b>), hvor skråvinklen hedder stigningsvinkel og styrer både virkningsgrad og selvhæmning.",
+
+links: [
+ {k:"SPM 11", t:"Lewis: bøjning af tanden", u:"sp11_lewis.html"},
+ {k:"SPM 10", t:"Aksialkraften skal tages af lejer", u:"sp10_rulleleje.html"},
+ {k:"SPM 13", t:"Samme geometri: gevind", u:"sp13_bevaegelsesskrue.html"},
+ {k:"WIDGET", t:"Snekkedrev og selvspærring", u:"../interaktiv/snekke_selvspaerring.html"},
+ {k:"KAP. 15", t:"Formeloverblik (PDF)", u:"../Kapitel15_Overblik.pdf"},
+ {k:"KAP. 15", t:"Quiz", u:"../../../quiz/mem1/Kapitel15_Quiz.html"}
+]
+};
+
+var LAB = {
+w: 720, h: 460,
+intro: "Sæt skråvinklen til 0°, og du har et ligetandet hjul: ingen aksialkraft, og $\\phi_t=\\phi_n$. Skru den op, og se aksialkraften vokse med $\\tan\\psi$ &mdash; ved 45° er den lige så stor som tangentialkraften. De tre paneler viser kraften set i hvert sit plan.",
+preset2: {navn: "Ligetandet: ψ = 0°", v: {psi: 0}},
+
+inputs: [
+ {id:"phin", label:"Normal indgrebsvinkel $\\phi_n$", min:14.5, max:25,  step:0.5, value:20,   dec:1, unit:"°"},
+ {id:"psi",  label:"Skråvinkel $\\psi$",              min:0,    max:45,  step:1,   value:30,   unit:"°"},
+ {id:"Ft",   label:"Tangentialkraft $F_t$",            min:500,  max:8000,step:100, value:3000, unit:"N"}
+],
+
+compute: function (v) {
+  var rad = Math.PI / 180, tn = Math.tan(v.phin * rad), cp = Math.cos(v.psi * rad);
+  var tt = tn / cp, pht = Math.atan(tt) / rad;
+  var Fr = v.Ft * tt, Fa = v.Ft * Math.tan(v.psi * rad);
+  var W = v.Ft / (Math.cos(v.phin * rad) * cp);
+  return { tn:tn, cp:cp, tt:tt, pht:pht, Fr:Fr, Fa:Fa, W:W, Wp:W * Math.cos(v.phin * rad), rad:rad };
+},
+
+readout: function (v, r) {
+  return [
+   {l:"$\\tan\\phi_t$", v:r.tt, dec:4, unit:""},
+   {l:"$\\phi_t$", v:r.pht, dec:2, unit:"°"},
+   {l:"Radialkraft $F_r$", v:r.Fr, dec:0, unit:"N", k:"hi"},
+   {l:"Aksialkraft $F_a$", v:r.Fa, dec:0, unit:"N", k:"hi"},
+   {l:"Samlet $W$", v:r.W, dec:0, unit:"N"},
+   {l:"$F_a/F_t=\\tan\\psi$", v:r.Fa/v.Ft, dec:3, unit:""}
+  ];
+},
+
+steps: function (v, r) {
+  var T = Eks.tnum;
+  return [
+   {h:"1 · Tværgående indgrebsvinkel",
+    m:"\\tan\\phi_t=\\frac{\\tan\\phi_n}{\\cos\\psi}=\\frac{"+T(r.tn,3)+"}{"+T(r.cp,3)+"}="+T(r.tt,3)+"\\quad\\Rightarrow\\quad\\phi_t="+T(r.pht,2)+"^\\circ",
+    c:"Altid større end $\\phi_n$ (medmindre $\\psi=0$)."},
+   {h:"2 · Radialkraft",
+    m:"F_r=F_t\\tan\\phi_t="+T(v.Ft,0)+"\\cdot"+T(r.tt,3)+"="+T(r.Fr,0)+"\\ \\text{N}",
+    c:"Skubber hjulene fra hinanden."},
+   {h:"3 · Aksialkraft",
+    m:"F_a=F_t\\tan\\psi="+T(v.Ft,0)+"\\cdot\\tan"+T(v.psi,0)+"^\\circ="+T(v.Ft,0)+"\\cdot"+T(Math.tan(v.psi*r.rad),4)+"="+T(r.Fa,0)+"\\ \\text{N}",
+    c:"Skal tages af et leje, der kan bære aksiallast."},
+   {h:"4 · Samlet tandkraft (kontrol)",
+    m:"W=\\frac{F_t}{\\cos\\phi_n\\cos\\psi}="+T(r.W,0)+"\\ \\text{N}=\\sqrt{F_t^2+F_r^2+F_a^2}="+T(Math.sqrt(v.Ft*v.Ft+r.Fr*r.Fr+r.Fa*r.Fa),0)+"\\ \\text{N}",
+    c:"De tre komposanter står vinkelret på hinanden."}
+  ];
+},
+
+facit: function (v, r) {
+  if (v.phin===20 && v.psi===30 && v.Ft===3000) {
+    return {t:"<b>✓ Eksamensopgavens facit:</b> $F_r=3000\\cdot0{,}420=1260$ N (1261 N med uafrundet $\\tan\\phi_t=0{,}4203$) og $F_a=3000\\cdot\\tan30°=1732$ N ($\\phi_t=22{,}8°$). Samlet tandkraft $W=3686$ N. Aksialkraften er større end radialkraften &mdash; en vigtig pointe for lejevalget."};
+  }
+  if (v.psi===0) return {off:true, t:"<b>Ligetandet hjul:</b> $\\psi=0$ giver $F_a=0$ og $\\phi_t=\\phi_n$. Det er specialtilfældet fra spm. 11."};
+  return {off:true, t:"Du har ændret inddata. Tryk på knappen for at komme tilbage til eksamensopgavens tal."};
+},
+
+draw: function (ctx, W, H, v, r, C) {
+  C.grid(ctx, W, H, 40);
+  var CY='#5ec8ff', GR='#00d984', GO='#ffa500', RD='#ff5e5e', PU='#d984ff', DIM='rgba(227,235,243,.45)';
+  var sc=120/Math.max(v.Ft, r.W*0.8, 1);
+  var ps=v.psi*r.rad, pn=v.phin*r.rad, pt=r.pht*r.rad;
+
+  /* ---------- A: delefladen rullet ud ---------- */
+  var ax0=20, ax1=350, ay0=34, ay1=236, cx=(ax0+ax1)/2-20, cy=(ay0+ay1)/2+8;
+  C.txt(ctx,'A · Delefladen (rullet ud) set ovenfra', ax0+4, ay0-10, DIM, 11);
+  ctx.save(); ctx.strokeStyle='rgba(94,200,255,.25)'; ctx.strokeRect(ax0, ay0, ax1-ax0, ay1-ay0); ctx.restore();
+  ctx.save(); ctx.beginPath(); ctx.rect(ax0, ay0, ax1-ax0, ay1-ay0); ctx.clip();
+  for (var k=-6;k<=6;k++){ var x0=cx+k*46, dx=Math.tan(ps)*(ay1-ay0)/2;
+    C.line(ctx, x0+dx, ay1, x0-dx, ay0, 'rgba(94,200,255,.55)', 2); }   // tandlinje: hælder psi fra aksial; W_p står vinkelret på den
+  ctx.restore();
+  C.txt(ctx,'tangentialt →', ax1-6, ay1-6, DIM, 10, 'right');
+  C.txt(ctx,'aksialt ↑', ax0+6, ay0+14, DIM, 10);
+  // Wp vinkelret paa tanden, i delefladen: retning (cos psi, -sin psi) (op = aksial)
+  var wx=r.Wp*sc*Math.cos(ps), wy=r.Wp*sc*Math.sin(ps);
+  C.arrow(ctx, cx, cy, cx+v.Ft*sc, cy, GO, 3);
+  C.arrow(ctx, cx+v.Ft*sc, cy, cx+v.Ft*sc, cy-r.Fa*sc, GR, 3);
+  C.arrow(ctx, cx, cy, cx+wx, cy-wy, PU, 2.4);
+  C.mono(ctx,'Ft', cx+v.Ft*sc/2, cy+16, GO, 11, 'center');
+  C.mono(ctx,'Fa', cx+v.Ft*sc+8, cy-r.Fa*sc/2, GR, 11);
+  C.mono(ctx,'W·cosφn', cx+wx/2-6, cy-wy/2-8, PU, 10, 'right');
+  if (v.psi>0){ ctx.save(); ctx.strokeStyle=RD; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(cx, cy, 34, -ps, 0); ctx.stroke(); ctx.restore();
+    C.mono(ctx,'ψ='+v.psi+'°', cx+38, cy-8, RD, 10); }
+
+  /* ---------- B: normalsnit ---------- */
+  var bx0=20, by0=262, bx1=350, by1=H-14, ox=bx0+60, oy=by1-30;
+  C.txt(ctx,'B · Normalsnit (vinkelret på tanden)', bx0+4, by0-8, DIM, 11);
+  ctx.save(); ctx.strokeStyle='rgba(94,200,255,.25)'; ctx.strokeRect(bx0, by0, bx1-bx0, by1-by0); ctx.restore();
+  var s2=Math.min(sc, 140/Math.max(r.W,1));
+  C.arrow(ctx, ox, oy, ox+r.Wp*s2, oy, PU, 3);
+  C.arrow(ctx, ox+r.Wp*s2, oy, ox+r.Wp*s2, oy-r.Fr*s2, CY, 3);
+  C.arrow(ctx, ox, oy, ox+r.Wp*s2, oy-r.Fr*s2, '#e3ebf3', 2.2);
+  C.mono(ctx,'W·cosφn', ox+r.Wp*s2/2, oy+15, PU, 10, 'center');
+  C.mono(ctx,'Fr = W·sinφn', ox+r.Wp*s2+8, oy-r.Fr*s2/2, CY, 10);
+  C.mono(ctx,'W', ox+r.Wp*s2/2-12, oy-r.Fr*s2/2-8, '#e3ebf3', 11, 'right');
+  ctx.save(); ctx.strokeStyle=RD; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(ox, oy, 40, -pn, 0); ctx.stroke(); ctx.restore();
+  C.mono(ctx,'φn='+Eks.num(v.phin,1)+'°', ox+44, oy-6, RD, 10);
+
+  /* ---------- C: tværsnit ---------- */
+  var cx0=376, cy0=34, cx1=W-16, cy1=236, qx=cx0+50, qy=cy1-34;
+  C.txt(ctx,'C · Tværsnit (vinkelret på akslen)', cx0+4, cy0-10, DIM, 11);
+  ctx.save(); ctx.strokeStyle='rgba(94,200,255,.25)'; ctx.strokeRect(cx0, cy0, cx1-cx0, cy1-cy0); ctx.restore();
+  var s3=Math.min(sc*1.3, 230/Math.max(v.Ft,1), 150/Math.max(r.Fr,1));
+  C.arrow(ctx, qx, qy, qx+v.Ft*s3, qy, GO, 3);
+  C.arrow(ctx, qx+v.Ft*s3, qy, qx+v.Ft*s3, qy-r.Fr*s3, CY, 3);
+  C.arrow(ctx, qx, qy, qx+v.Ft*s3, qy-r.Fr*s3, '#e3ebf3', 2);
+  C.mono(ctx,'Ft', qx+v.Ft*s3/2, qy+15, GO, 11, 'center');
+  C.mono(ctx,'Fr', qx+v.Ft*s3+8, qy-r.Fr*s3/2, CY, 11);
+  ctx.save(); ctx.strokeStyle=RD; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(qx, qy, 46, -pt, 0); ctx.stroke(); ctx.restore();
+  C.mono(ctx,'φt='+Eks.num(r.pht,1)+'°', qx+50, qy-8, RD, 10);
+
+  /* ---------- søjler ---------- */
+  var gx0=386, gy1=H-24, bw=58, gap=22, mx=Math.max(r.W, 1), hmax=150;
+  C.txt(ctx,'Størrelser [N]', gx0, 272, DIM, 11);
+  [['Ft',v.Ft,GO],['Fr',r.Fr,CY],['Fa',r.Fa,GR],['W',r.W,'#e3ebf3']].forEach(function(b,i){
+    var x=gx0+i*(bw+gap), hgt=b[1]/mx*hmax;
+    ctx.save(); ctx.fillStyle=b[2]; ctx.globalAlpha=0.75; ctx.fillRect(x, gy1-hgt, bw, hgt); ctx.restore();
+    C.mono(ctx, b[0], x+bw/2, gy1+14, b[2], 11, 'center');
+    C.mono(ctx, Eks.num(b[1],0), x+bw/2, gy1-hgt-6, b[2], 11, 'center');
+  });
+}
+};
+</script>
+<script src="assets/eksamen.js"></script>
+<script>Eks.build();</script>
+</body>
+</html>

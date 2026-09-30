@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spm. 10: Rullelejers levetid - MEM1 eksamen</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="assets/eksamen.css">
+</head>
+<body>
+<script>
+var QDATA = {
+nr: 10,
+titel: "Levetid og bæreevne for rullelejer",
+kapitel: 13,
+kapitelNavn: "Rullelejer",
+mappe: "Spørgsmål 10 - Rullelejers levetid",
+prev: "sp09_akseldesign.html",
+next: "sp11_lewis.html",
+bog: "Kap. 13: §13.9.3 <i>Dynamic Load Rating</i>, lign. (13.77)&ndash;(13.84), s. 363 &middot; §13.9.4 <i>Equivalent Dynamic Load</i> og §13.9.5 <i>Life Adjustment Factors</i>, s. 364.",
+
+spmA: "Forklar levetidsligningen $L_{10}=(C/P)^p$ for rullelejer. Redegør for forskellen på levetidseksponenten $p$ for kuglelejer og rullelejer, og definer den dynamiske basisbæreevne $C$.",
+spmB: "Et dybt rilleleje ($p=3$) bærer en ækvivalent radiallast $P=5$ kN. Den dynamiske basisbæreevne er $C=50$ kN. Beregn den nominelle levetid $L_{10}$ i millioner omdrejninger og i driftstimer ved 1500 o/min.",
+
+oversat: "Et rulleleje slides ikke op som en bremseklods &mdash; det <b>udmattes</b>. Hver gang en kugle ruller hen over et punkt på løbebanen, bliver det punkt klemt og aflastet. Efter mange millioner gange opstår der en revne under overfladen, og et stykke metal skaller af. Del (a): forklar formlen, der forudsiger, hvor mange omdrejninger det tager, og hvorfor den er så følsom over for lasten. Del (b): indsæt tallene og omregn til timer.",
+kerne: "Lejelevetid er udmattelse i kontaktfladen og derfor statistisk. $L_{10}$ er den levetid, 90 % af lejerne når. Halvér lasten, og et kugleleje lever otte gange så længe.",
+
+historie: [
+ {h:"Hvordan et leje dør",
+  t:"Kontakten mellem kugle og løbebane er et lille punkt med et enormt tryk &mdash; ofte 1500&ndash;3000 MPa (Hertz-kontakt). Den største <b>forskydningsspænding</b> ligger ikke i overfladen, men lidt under den. Der starter en mikrorevne ved en indeslutning i stålet, den vokser op mod overfladen, og et stykke skaller af (&bdquo;spalling&ldquo;). Det er et udmattelsesbrud, præcis som i spm. 6 &mdash; bare i en kontaktflade."},
+ {h:"Hvorfor levetiden er statistisk",
+  t:"Tag 100 identiske lejer, kør dem under samme last, og de dør på vidt forskellige tidspunkter &mdash; spredningen kan være en faktor 20. Årsagen er de tilfældigt placerede indeslutninger i stålet. Derfor giver det ikke mening at tale om <i>den</i> levetid. Man angiver $L_{10}$: den levetid, som 90 % af lejerne mindst opnår (10 % er døde). Fordelingen følger Weibull."},
+ {h:"Hvor formlen kommer fra",
+  t:"Forsøg viser, at levetid og last hænger sammen som $L\\cdot P^p=\\text{konstant}$. Vælger man konstanten, så $L=1$ million omdrejninger ved $P=C$, får man $L_{10}=(C/P)^p$ i millioner omdrejninger. $C$ er altså defineret som den last, et leje kan bære i netop én million omdrejninger med 90 % pålidelighed. Tallet står i producentens katalog."},
+ {h:"Hvorfor eksponenten afhænger af lejetypen",
+  t:"En kugle har <b>punktkontakt</b>, en rulle har <b>linjekontakt</b>. De to kontaktformer får kontaktspændingen til at vokse forskelligt med lasten, og derfor bliver udmattelsesloven forskellig: $p=3$ for kuglelejer og $p=10/3$ for rullelejer (Lundberg&ndash;Palmgren). Den højere eksponent betyder, at et rulleleje belønnes lidt mere for en lav last."}
+],
+analogi: "Lejer er som pærer i en stor pakke: nogle går hurtigt, de fleste holder længe. Producenten lover ikke, hvornår <i>din</i> pære går, men at 90 % af dem mindst holder $L_{10}$.",
+
+plan: [
+ {t:"0&ndash;2 min", k:"warm", w:"Tegn lejet og kontaktpunktet",
+  d:"Inderring, yderring, kugler. Marker lasten $P$ og den belastede zone. Sig: &bdquo;Lejer svigter ikke af slid, men af overfladeudmattelse fra gentagen kontaktspænding.&ldquo;"},
+ {t:"2&ndash;6 min", w:"Statistik og definitionen af L₁₀",
+  d:"Skitsér en Weibull-overlevelseskurve: andel levende mod omdrejninger. Marker 90 %-linjen og $L_{10}$. Forklar, hvorfor spredningen er stor, og hvorfor man derfor bruger en pålidelighedsbaseret levetid."},
+ {t:"6&ndash;9 min", w:"Levetidsligningen, C og p",
+  d:"$LP^p=$ konst. → $L_{10}=(C/P)^p$. Definér $C$ (1 mio. omdr., 90 %). $p=3$ kugle (punktkontakt), $p=10/3$ rulle (linjekontakt). Nævn $P=XF_r+YF_a$ ved kombineret last."},
+ {t:"9&ndash;12 min", w:"Regn designopgaven",
+  d:"$L_{10}=(50/5)^3=1000$ mio. omdr. $L_{10h}=\\frac{10^6\\cdot1000}{60\\cdot1500}=11\\,111$ h ≈ 1,3 år i døgndrift."},
+ {t:"12&ndash;14 min", k:"end", w:"Pointen",
+  d:"&bdquo;Lasten indgår i tredje potens. 10 % mere last giver 25 % kortere levetid; halv last giver 8 gange længere levetid. Derfor er et korrekt bestemt $P$ vigtigere end næsten alt andet.&ldquo;"},
+ {t:"14&ndash;20 min", k:"end", w:"Spørgsmål", d:"Se censors sandsynlige spørgsmål nederst."}
+],
+
+trin: [
+ {t:"Svigtmekanismen: overfladeudmattelse",
+  m:"\\text{Hertz-kontakt}\\ \\Rightarrow\\ \\tau_{max}\\ \\text{under overfladen}\\ \\Rightarrow\\ \\text{revne}\\ \\Rightarrow\\ \\text{afskalning}",
+  hvorfor:"Et korrekt smurt og tæt leje slides stort set ikke. Det svigter ved udmattelse, fordi hvert punkt på løbebanen belastes og aflastes millioner af gange. Den største forskydning ligger lidt under overfladen (ved kuglekontakt ca. en halv kontaktradius nede) &mdash; dér starter revnen.",
+  sig:"Et rulleleje svigter typisk ved overfladeudmattelse. Kontaktspændingen giver en maksimal forskydning lidt under overfladen, hvor revner starter."},
+
+ {t:"Levetiden er statistisk: Weibull og L₁₀",
+  m:"\\text{Andel overlevende: }\\ R(L)=\\exp\\!\\left[-\\left(\\frac{L}{\\theta}\\right)^{b}\\right],\\qquad R(L_{10})=0{,}90",
+  hvorfor:"Levetiden for et enkelt leje kan ikke forudsiges, men fordelingen for mange lejer kan. $L_{10}$ er den levetid, hvor 10 % er svigtet. Weibull-hældningen $b$ er typisk 1,1&ndash;1,5 for lejer. Det er også grunden til, at man kan korrigere med en pålidelighedsfaktor $a_1$, hvis man vil have 95 % eller 99 %.",
+  sig:"Levetiden er statistisk fordelt. L10 er den levetid, som 90 procent af en stor gruppe identiske lejer mindst opnår."},
+
+ {t:"Last-levetidsloven fra forsøg",
+  m:"L\\cdot P^p=\\text{konstant}",
+  hvorfor:"Plotter man levetid mod last i dobbeltlogaritmisk skala, får man en ret linje med hældning $-p$. Det er et empirisk resultat, underbygget af Lundberg&ndash;Palmgren-teorien.",
+  sig:"Forsøg viser, at levetid gange lasten i p'te potens er konstant. I et log-log-plot er det en ret linje."},
+
+ {t:"Definér C og få levetidsligningen",
+  m:["L=10^6\\ \\text{omdr. ved}\\ P=C\\quad\\Rightarrow\\quad L_{10}\\cdot P^p=1\\cdot C^p",
+     "\\boxed{\\ L_{10}=\\left(\\frac{C}{P}\\right)^{p}\\ \\ [10^6\\ \\text{omdr.}]\\ }"],
+  hvorfor:"$C$, den dynamiske basisbæreevne, er defineret som den konstante last, lejet kan bære i <b>1 million omdrejninger</b> med 90 % pålidelighed. Det er ikke en last, lejet skal køre med &mdash; ved $P=C$ holder det kun 1 million omdrejninger, hvilket er meget kort. Det er en reference.",
+  sig:"Den dynamiske bæreevne C er den last, der giver en levetid på én million omdrejninger. Det giver levetidsligningen L10 lig C over P i p'te."},
+
+ {t:"Eksponenten: kugle mod rulle",
+  m:"p=3\\ \\text{(kuglelejer, punktkontakt)},\\qquad p=\\tfrac{10}{3}\\ \\text{(rullelejer, linjekontakt)}",
+  hvorfor:"Ved punktkontakt vokser kontaktarealet med lasten på én måde, ved linjekontakt på en anden. Det giver forskellige spændingsforløb og dermed forskellige udmattelseseksponenter. Praktisk: med $C/P=10$ lever et kugleleje $10^3=1000$ mio. omdr., et rulleleje $10^{10/3}\\approx2154$ mio. omdr.",
+  sig:"For kuglelejer er eksponenten tre, for rullelejer ti tredjedele, fordi punkt- og linjekontakt giver forskellige kontaktspændinger."},
+
+ {t:"Fra omdrejninger til timer",
+  m:"\\boxed{\\ L_{10h}=\\frac{10^6}{60\\,n}\\left(\\frac{C}{P}\\right)^p\\ }\\qquad(n\\ \\text{i o/min})",
+  hvorfor:"$L_{10}$ i millioner omdrejninger gange $10^6$ giver omdrejninger. Divider med omdrejninger pr. time ($60n$). Det er den form, konstruktører bruger, fordi krav typisk stilles i timer (fx 20 000 h for en industrimaskine i enkeltskiftsdrift).",
+  sig:"For at få timer ganger jeg med en million og dividerer med 60 gange omdrejningstallet."}
+],
+
+faldgruber: [
+ {t:"L₁₀ er i millioner omdrejninger", d:"$(50/5)^3=1000$ betyder $1000\\cdot10^6=10^9$ omdrejninger, ikke 1000. Glemmer du $10^6$, bliver timetallet 0,011 h."},
+ {t:"60 i nævneren", d:"$n$ er i omdrejninger pr. <b>minut</b>. Pr. time er det $60n=90\\,000$. Mange glemmer omregningen og får 666 667 h."},
+ {t:"P er den ækvivalente last", d:"Ved kombineret radial- og aksiallast skal $P=XF_r+YF_a$ bruges (faktorer fra katalog). At bruge $F_r$ alene undervurderer lasten og overvurderer levetiden kraftigt pga. tredje potens."},
+ {t:"C er ikke den tilladte last", d:"Ved $P=C$ holder lejet kun $10^6$ omdrejninger &mdash; ved 1500 o/min er det 11 timer. Typisk er $C/P$ mellem 5 og 15."},
+ {t:"Forveksl ikke C og C₀", d:"$C_0$ er den <b>statiske</b> bæreevne (varig deformation ved stilstand). Den bruges, når lejet står stille eller roterer meget langsomt under last."}
+],
+
+qa: [
+ {q:"Hvad sker der med levetiden, hvis lasten stiger 10 %?",
+  a:"$L\\propto P^{-3}$, så $1{,}1^{-3}=0{,}75$. Levetiden falder med 25 %. Følsomheden er grunden til, at man skal bestemme lasterne omhyggeligt."},
+ {q:"Hvad er levetiden med 99 % pålidelighed?",
+  a:"Ganges med $a_1\\approx0{,}21$ (ISO 281): $L_1=0{,}21\\cdot1000=210$ mio. omdr. ≈ 2330 h. Prøv pålidelighedsskyderen i laboratoriet."},
+ {q:"Hvorfor ikke bare vælge et meget stort leje?",
+  a:"Større leje giver større $C$ og længere levetid, men også mere friktion, større masse, højere pris, lavere maksimalt omdrejningstal og ofte mere plads. Man dimensionerer til den krævede levetid, typisk 20 000&ndash;50 000 h for industrimaskiner."},
+ {q:"Hvad betyder smøring for levetiden?",
+  a:"Meget. En tyk, adskillende oliefilm (højt $\\Lambda$-tal, EHL fra kap. 8/13) mindsker metal-mod-metal-kontakt og kan forlænge levetiden flere gange. Det indgår i justeringsfaktoren $a_3$ (bogen §13.9.5)."},
+ {q:"Hvordan passer lejelevetid ind i udmattelsesteorien fra spm. 6?",
+  a:"Kontaktspændingen går fra 0 til maksimum, hver gang en kugle passerer, så der er både middel og amplitude. Men modellen er empirisk: man måler direkte levetid mod last i stedet for at bruge Goodman."},
+ {q:"Hvordan håndteres varierende last?",
+  a:"Med Miners delskadehypotese: $\\sum n_i/L_i=1$. Det giver en ækvivalent konstant last $P_e=\\left(\\sum\\beta_iP_i^p\\right)^{1/p}$, hvor $\\beta_i$ er tidsandele (§13.10)."}
+],
+
+sammenhaeng: "Lejelevetid er <b>udmattelse</b> (spm. 6), men i en kontaktflade i stedet for i et tværsnit, og derfor en empirisk last-levetidslov i stedet for Goodman. Lasten $P$ er reaktionskræfterne fra akslen (<b>spm. 9</b>), som igen kommer fra tandhjul (<b>spm. 11&ndash;12</b>: især aksialkraften $F_a$ fra skrå tandhjul kræver lejer, der kan tage aksiallast) og remtræk (<b>spm. 16</b>: $F_1+F_2$ belaster lejerne radialt). Så valget af tandhjul og rem bestemmer i sidste ende, hvor længe lejerne holder.",
+
+links: [
+ {k:"SPM 6", t:"Udmattelse i tværsnit", u:"sp06_goodman.html"},
+ {k:"SPM 12", t:"Aksialkraft fra skrå tandhjul", u:"sp12_skraa_tandhjul.html"},
+ {k:"SPM 16", t:"Remtræk belaster lejerne", u:"sp16_remtraek.html"},
+ {k:"WIDGET", t:"Rulleleje-levetid", u:"../interaktiv/rulleleje_levetid.html"},
+ {k:"KAP. 13", t:"Formeloverblik (PDF)", u:"../Kapitel13_Overblik.pdf"},
+ {k:"KAP. 13", t:"Quiz", u:"../../../quiz/mem1/Kapitel13_Quiz.html"}
+]
+};
+
+var LAB = {
+w: 720, h: 430,
+intro: "Log-log-diagrammet til højre er levetidsloven: en ret linje med hældning $-p$. Flyt lasten og se levetiden ændre sig med tredje potens. Skift til rulleleje, og linjen bliver stejlere. Pålidelighedsskyderen viser, hvad det koster at kræve mere end 90 % overlevelse (ISO 281-faktoren $a_1$).",
+preset2: {navn: "Halv last: P = 2,5 kN", v: {P: 2.5}},
+
+inputs: [
+ {id:"C",   label:"Dyn. bæreevne $C$",         min:5,   max:150,  step:1,    value:50,   unit:"kN"},
+ {id:"P",   label:"Ækv. last $P$",             min:0.5, max:30,   step:0.5,  value:5,    dec:1, unit:"kN"},
+ {id:"n",   label:"Omdrejningstal $n$",        min:100, max:6000, step:100,  value:1500, unit:"o/min"},
+ {id:"typ", label:"Lejetype",                  min:0,   max:1,    step:1,    value:0,    choices:["Kugleleje, p = 3", "Rulleleje, p = 10/3"]},
+ {id:"Rel", label:"Pålidelighed",              min:90,  max:99,   step:1,    value:90,   unit:"%"}
+],
+
+compute: function (v) {
+  var p = v.typ >= 0.5 ? 10 / 3 : 3;
+  var L10 = Math.pow(v.C / v.P, p);                 // mio. omdr.
+  var h = L10 * 1e6 / (60 * v.n);
+  var R = v.Rel / 100;
+  var a1 = Math.pow(Math.log(1 / R) / Math.log(1 / 0.9), 1 / 1.5);   // Weibull b = 1,5 (svarer til ISO 281-tabellen)
+  var pAlt = p === 3 ? 10 / 3 : 3;
+  return { p:p, L10:L10, h:h, a1:a1, Ln:a1 * L10, hn:a1 * h, years:h / 8760, Lalt:Math.pow(v.C / v.P, pAlt) };
+},
+
+readout: function (v, r) {
+  return [
+   {l:"Eksponent $p$", raw: r.p === 3 ? "3" : "10/3", unit:""},
+   {l:"$C/P$", v:v.C/v.P, dec:2, unit:""},
+   {l:"$L_{10}$", v:r.L10, dec:0, unit:"mio. omdr.", k:"hi"},
+   {l:"$L_{10h}$", v:r.h, dec:0, unit:"h", k:"hi"},
+   {l:"Døgndrift", v:r.years, dec:2, unit:"år"},
+   {l:"$a_1$ ved "+v.Rel+" %", v:r.a1, dec:3, unit:""},
+   {l:"Levetid ved "+v.Rel+" %", v:r.hn, dec:0, unit:"h"},
+   {l:"Anden lejetype (sml.)", v:r.Lalt, dec:0, unit:"mio. omdr."}
+  ];
+},
+
+steps: function (v, r) {
+  var T = Eks.tnum;
+  var pS = r.p === 3 ? "3" : "10/3";
+  return [
+   {h:"1 · Lastforholdet",
+    m:"\\frac{C}{P}=\\frac{"+T(v.C,0)+"}{"+T(v.P,1)+"}="+T(v.C/v.P,3),
+    c:"Samme enhed i tæller og nævner (kN)."},
+   {h:"2 · Nominel levetid",
+    m:"L_{10}=\\left(\\frac{C}{P}\\right)^{"+pS+"}="+T(v.C/v.P,3)+"^{"+pS+"}="+T(r.L10,1)+"\\ \\text{mio. omdr.}",
+    c:"$="+Eks.num(r.L10*1e6,0)+"$ omdrejninger."},
+   {h:"3 · I driftstimer",
+    m:"L_{10h}=\\frac{10^6\\cdot L_{10}}{60\\,n}=\\frac{10^6\\cdot"+T(r.L10,1)+"}{60\\cdot"+T(v.n,0)+"}="+T(r.h,0)+"\\ \\text{h}",
+    c:"$60n="+Eks.num(60*v.n,0)+"$ omdrejninger pr. time. Svarer til "+Eks.num(r.years,2)+" år i døgndrift."},
+   {h:"4 · Hvis du kræver "+v.Rel+" % overlevelse",
+    m:"L_{"+(100-v.Rel)+"}=a_1\\,L_{10}="+T(r.a1,3)+"\\cdot"+T(r.L10,1)+"="+T(r.Ln,1)+"\\ \\text{mio. omdr.}",
+    c:"$a_1$ fra Weibull med hældning 1,5 (gengiver ISO 281: 0,62 ved 95 %, 0,21 ved 99 %)."}
+  ];
+},
+
+facit: function (v, r) {
+  if (v.C===50 && v.P===5 && v.n===1500 && v.typ===0) {
+    return {t:"<b>✓ Eksamensopgavens facit:</b> $L_{10}=(50/5)^3=1000$ mio. omdrejninger. $L_{10h}=10^9/(60\\cdot1500)=11\\,111$ h ≈ 1,27 år i døgndrift. Et rulleleje med samme $C$ ville give $10^{10/3}=2154$ mio. omdrejninger."};
+  }
+  return {off:true, t:"Du har ændret inddata (pålideligheden ændrer ikke $L_{10}$ selv). Tryk på knappen for at komme tilbage til eksamensopgavens tal."};
+},
+
+draw: function (ctx, W, H, v, r, C) {
+  C.grid(ctx, W, H, 40);
+  var CY='#5ec8ff', GR='#00d984', GO='#ffa500', RD='#ff5e5e', PU='#d984ff', DIM='rgba(227,235,243,.45)';
+
+  /* ---------- lejet ---------- */
+  var cx=150, cy=H/2+10, Ro=128, Rri=Ro-22, Rb=(Ro-22+60+22)/2, Rin=60+22, Rin0=60;
+  C.txt(ctx, v.typ>=0.5 ? 'Rulleleje (linjekontakt)' : 'Kugleleje (punktkontakt)', cx, 24, DIM, 11, 'center');
+  C.circle(ctx, cx, cy, Ro, CY, 'rgba(94,200,255,.06)', 2);
+  C.circle(ctx, cx, cy, Rri, CY, null, 2);
+  C.circle(ctx, cx, cy, Rin, CY, 'rgba(94,200,255,.06)', 2);
+  C.circle(ctx, cx, cy, Rin0, CY, 'rgba(10,26,43,1)', 2);
+  var nb=10, br=(Rri-Rin)/2-1;
+  for (var i=0;i<nb;i++){ var t=i/nb*2*Math.PI + Math.PI/2;
+    var bx=cx+Math.cos(t)*Rb, by=cy+Math.sin(t)*Rb;
+    var load = Math.max(0, Math.sin(t));        // lastzone nederst (P peger ned)
+    var col = load>0.05 ? 'rgba(255,'+Math.round(170-140*load)+','+Math.round(60-40*load)+',0.95)' : 'rgba(227,235,243,.6)';
+    if (v.typ>=0.5) { ctx.save(); ctx.translate(bx,by); ctx.rotate(t); ctx.fillStyle=col; ctx.fillRect(-br, -br*0.62, 2*br, 1.24*br); ctx.restore(); }
+    else C.circle(ctx, bx, by, br, null, col); }
+  C.arrow(ctx, cx, cy-24, cx, cy+46, GO, 3);
+  C.mono(ctx,'P='+Eks.num(v.P,1)+' kN', cx+8, cy-8, GO, 11);
+  C.txt(ctx,'lastzone', cx, cy+Ro+22, RD, 10, 'center');
+
+  /* ---------- log-log: L10 mod P ---------- */
+  var gx0=338, gx1=W-22, gy0=42, gy1=H-44;
+  var Pmin=0.5, Pmax=Math.max(60, v.C*1.5), Lmin=0.1, Lmax=1e6;
+  function GX(P){ return gx0 + (Math.log10(P)-Math.log10(Pmin))/(Math.log10(Pmax)-Math.log10(Pmin))*(gx1-gx0); }
+  function GY(L){ var l=Math.max(Math.min(L,Lmax),Lmin); return gy1 - (Math.log10(l)-Math.log10(Lmin))/(Math.log10(Lmax)-Math.log10(Lmin))*(gy1-gy0); }
+  C.axes(ctx, gx0, gy0-12, gx1, gy1, '', 'L10 [mio. omdr.] (log)');
+  C.txt(ctx,'P [kN] (log)', gx1-4, gy1+28, DIM, 11, 'right');
+  [0.1,1,10,100,1000,1e4,1e5,1e6].forEach(function(L){ C.line(ctx, gx0, GY(L), gx1, GY(L), 'rgba(255,255,255,.05)', 1);
+    C.mono(ctx, L>=1000 ? (L/1000)+'k' : String(L), gx0-4, GY(L)+4, DIM, 9, 'right'); });
+  [1,2,5,10,20,50,100,200].filter(function(P){ return P<Pmax*0.9; }).forEach(function(P){ C.line(ctx, GX(P), gy0, GX(P), gy1, 'rgba(255,255,255,.05)', 1);
+    C.mono(ctx, String(P), GX(P), gy1+13, DIM, 9, 'center'); });
+  function curve(p, col, w, dash){ var pts=[]; for (var k=0;k<=80;k++){ var P=Pmin*Math.pow(Pmax/Pmin,k/80);
+    pts.push([GX(P), GY(Math.pow(v.C/P, p))]); } C.poly(ctx, pts, col, null, w, dash); }
+  curve(r.p===3?10/3:3, 'rgba(217,132,255,.5)', 1.5, [5,4]);
+  curve(r.p, CY, 2.6);
+  // C-punkt (L=1)
+  C.circle(ctx, GX(v.C), GY(1), 4.5, null, GO);
+  C.mono(ctx,'P = C → 1 mio.', GX(v.C)-6, GY(1)+16, GO, 10, 'right');
+  // driftspunkt
+  C.line(ctx, GX(v.P), gy1, GX(v.P), GY(r.L10), GR, 1.2, [3,3]);
+  C.line(ctx, gx0, GY(r.L10), GX(v.P), GY(r.L10), GR, 1.2, [3,3]);
+  C.circle(ctx, GX(v.P), GY(r.L10), 6.5, '#fff', GR, 2);
+  C.mono(ctx,'L10='+Eks.num(r.L10,0), GX(v.P)+10, GY(r.L10)-8, GR, 11);
+  C.txt(ctx,'hældning −p', gx1-8, gy0+14, CY, 11, 'right', true);
+  C.txt(ctx,'- - anden lejetype', gx1-8, gy0+30, PU, 10, 'right');
+}
+};
+</script>
+<script src="assets/eksamen.js"></script>
+<script>Eks.build();</script>
+</body>
+</html>

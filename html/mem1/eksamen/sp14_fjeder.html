@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spm. 14: Skruetrykfjeder - MEM1 eksamen</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="assets/eksamen.css">
+</head>
+<body>
+<script>
+var QDATA = {
+nr: 14,
+titel: "Spændinger og nedbøjning i skruetrykfjedre",
+kapitel: 17,
+kapitelNavn: "Fjedre",
+mappe: "Spørgsmål 14 - Skruetrykfjeder",
+prev: "sp13_bevaegelsesskrue.html",
+next: "sp15_kobling.html",
+bog: "Kap. 17: §17.3 <i>Helical Compression Springs</i>, §17.3.1 <i>Torsional Shear Stress</i> og §17.3.2&ndash;17.3.3 (tværkraft og krumning, Wahl), lign. (17.4)&ndash;(17.9), s. 495 &middot; §17.3.4 <i>Deflection</i>, lign. (17.10)&ndash;(17.18), s. 496.",
+
+spmA: "Udled ligningen for den maksimale forskydningsspænding $\\tau=K_w\\frac{8FD}{\\pi d^3}$ i en skruefjeder. Forklar Wahl-faktoren $K_w$, og udled udtrykket for fjederkonstanten $k=\\frac{Gd^4}{8D^3N_a}$.",
+spmB: "En fjeder med tråddiameter $d=4$ mm, middelvindingsdiameter $D=32$ mm (fjederindeks $C=8$), $N_a=10$ aktive vindinger og forskydningsmodul $G=80$ GPa belastes med $F=200$ N. Med $K_w=1{,}18$ skal den maksimale forskydningsspænding $\\tau$ og fjederens nedbøjning $\\delta$ beregnes.",
+
+oversat: "En skruefjeder ser ud, som om den bliver bøjet, når du trykker på den. Men det gør den ikke &mdash; tråden bliver <b>vredet</b>. Skær fjederen over, og du ser, at kraften $F$ virker med en arm $D/2$ om trådens midte: det er et vridningsmoment. Del (a): udled forskydningsspændingen fra den vridning, forklar de to korrektioner (direkte forskydning og trådens krumning), som Wahl-faktoren samler, og udled fjederkonstanten. Del (b): to indsætninger.",
+kerne: "En trykfjeder er en oprullet torsionsstang. Kraften giver et vridningsmoment $FD/2$ i tråden. Stivheden følger af vridningsvinklen &mdash; eller elegant af Castigliano.",
+
+historie: [
+ {h:"Hvorfor tråden vrides, ikke bøjes",
+  t:"Lav et snit gennem tråden og kig på den ene halvdel af fjederen. For at den er i ligevægt, skal snittet bære en kraft $F$ (op) og et moment $F\\cdot D/2$, fordi den ydre kraft virker på fjederens akse, mens snittet sidder i afstanden $D/2$ ude. Momentets akse ligger langs trådens længderetning &mdash; det er altså et <b>vridningsmoment</b> på tråden. Rul tråden ud, og du har en lang, tynd torsionsstang."},
+ {h:"De tre bidrag til spændingen",
+  t:"(1) Vridning: $\\tau=Tr/J=8FD/(\\pi d^3)$, størst på trådens overflade. (2) Direkte forskydning fra $F$: $F/A$, oveni på fjederens inderside, hvor de to har samme retning. (3) Krumning: tråden er ikke lige, men krum. Indersiden af hver vinding er kortere end ydersiden, så den samme vridningsvinkel giver større tøjning indvendigt &mdash; præcis som i en krum bjælke. Alle tre peger mod, at <b>det farligste sted er indersiden af vindingen</b>."},
+ {h:"Wahl-faktoren samler det",
+  t:"A.M. Wahl viste i 1920'erne, at bidrag (2) og (3) kan samles i én faktor, der kun afhænger af fjederindekset $C=D/d$: $K_w=\\frac{4C-1}{4C-4}+\\frac{0{,}615}{C}$. Tæt viklede fjedre (lille $C$) er hårdest ramt, fordi krumningen er skarp. For $C=8$ er $K_w\\approx1{,}18$: 18 % ekstra spænding i forhold til ren vridning."},
+ {h:"Fjederkonstanten er vridningsstivhed",
+  t:"Når tråden vrides vinklen $\\theta=TL/(GJ)$ over hele sin længde $L=\\pi DN_a$, drejer den ene ende af fjederen, og fjederen trykkes sammen $\\delta=\\theta\\cdot D/2$. Resultatet $k=Gd^4/(8D^3N_a)$ har to vigtige træk: $d^4$ (tykkere tråd er <i>meget</i> stivere) og $D^3$ (større vindingsdiameter er <i>meget</i> blødere). $E$ indgår slet ikke &mdash; kun $G$."}
+],
+analogi: "Tag en lige stålstang og vrid den &mdash; det kræver et stort moment og giver en lille vinkel. Vikl den samme stang op til en fjeder, og det samme vrid bliver til en stor, blød sammentrykning, fordi hele den lange tråd vrides lidt ad gangen.",
+
+plan: [
+ {t:"0&ndash;2 min", k:"warm", w:"Tegn fjederen og snittet",
+  d:"Fjeder med $F$ i begge ender, $D$ og $d$ markeret. Skær igennem tråden og tegn frilegemet: kraft $F$ og vridningsmoment $T=FD/2$ i snittet. Sig: &bdquo;Tråden er vredet, ikke bøjet.&ldquo;"},
+ {t:"2&ndash;6 min", w:"Spændingen og Wahl",
+  d:"$\\tau=Tr/J=\\frac{(FD/2)(d/2)}{\\pi d^4/32}=\\frac{8FD}{\\pi d^3}$. Læg direkte forskydning til → $K_s=1+0{,}5/C$. Forklar krumningseffekten og Wahl: $K_w=\\frac{4C-1}{4C-4}+\\frac{0{,}615}{C}$. Tegn spændingsfordelingen i trådtværsnittet med max indvendigt."},
+ {t:"6&ndash;10 min", w:"Fjederkonstanten via Castigliano",
+  d:"$U=\\frac{T^2L}{2GJ}$ med $T=FD/2$ og $L=\\pi DN_a$ → $U=\\frac{4F^2D^3N_a}{Gd^4}$. $\\delta=\\partial U/\\partial F=\\frac{8FD^3N_a}{Gd^4}$, $k=\\frac{Gd^4}{8D^3N_a}$. Sig: &bdquo;Samme metode som i spm. 4.&ldquo;"},
+ {t:"10&ndash;12 min", w:"Regn designopgaven",
+  d:"$\\tau=1{,}18\\cdot\\frac{8\\cdot200\\cdot32}{\\pi\\cdot64}=300{,}5$ MPa. $k=\\frac{80\\,000\\cdot256}{8\\cdot32\\,768\\cdot10}=7{,}81$ N/mm. $\\delta=200/7{,}81=25{,}6$ mm."},
+ {t:"12&ndash;14 min", k:"end", w:"Pointen",
+  d:"&bdquo;300 MPa er typisk for fjederstål med $S_{sy}\\approx0{,}45S_{ut}$. Og energien i fjederen er $\\tfrac12F\\delta=2{,}56$ J &mdash; det er derfor fjederstål har høj flydespænding: høj resilience, som i spm. 2.&ldquo;"},
+ {t:"14&ndash;20 min", k:"end", w:"Spørgsmål", d:"Se censors sandsynlige spørgsmål nederst."}
+],
+
+trin: [
+ {t:"Snit gennem tråden: vridningsmoment",
+  m:"T=F\\cdot\\frac{D}{2},\\qquad V=F",
+  hvorfor:"Ligevægt af halvdelen af fjederen. Den ydre kraft virker på fjederens centerakse, snittet sidder $D/2$ derfra. Momentet har akse langs tråden → vridning. Tværkraften $V=F$ giver direkte forskydning.",
+  sig:"Snittet gennem tråden skal bære kraften F og et moment F gange D halve. Momentet vrider tråden."},
+
+ {t:"Vridningsspændingen i tråden",
+  m:"\\tau_T=\\frac{T\\,r}{J}=\\frac{(FD/2)(d/2)}{\\pi d^4/32}=\\frac{8FD}{\\pi d^3}",
+  hvorfor:"Torsionsformlen for et massivt cirkulært tværsnit med $J=\\pi d^4/32$. Maksimum på trådens overflade. Samme $16T/(\\pi d^3)$ som i akseldesign (spm. 9), bare med $T=FD/2$.",
+  sig:"Med torsionsformlen bliver spændingen otte F D over pi d i tredje."},
+
+ {t:"Direkte forskydning og fjederindekset",
+  m:["\\tau=\\frac{8FD}{\\pi d^3}+\\frac{4F}{\\pi d^2}=\\frac{8FD}{\\pi d^3}\\left(1+\\frac{0{,}5}{C}\\right)=K_s\\,\\frac{8FD}{\\pi d^3}",
+     "C=\\frac{D}{d}\\qquad(\\text{typisk }4\\text{–}12)"],
+  hvorfor:"På indersiden af vindingen har vridnings- og tværkraftspændingen samme retning og lægges sammen. Udtrykt ved fjederindekset $C$ bliver korrektionen $1+0{,}5/C$. For $C=8$: 6 %.",
+  sig:"På indersiden lægger den direkte forskydning sig oveni. Det giver faktoren en plus en halv over C."},
+
+ {t:"Krumning: Wahl-faktoren",
+  m:["\\boxed{\\ \\tau_{max}=K_w\\,\\frac{8FD}{\\pi d^3}\\ },\\qquad K_w=\\frac{4C-1}{4C-4}+\\frac{0{,}615}{C}"],
+  hvorfor:"Tråden er krum. Fibrene på vindingens inderside er kortere end på ydersiden, så samme vridningsvinkel giver større forskydningstøjning indvendigt &mdash; som den krumme bjælke. Wahls faktor indeholder <b>både</b> krumning og direkte forskydning. For $C=8$: $K_w=31/28+0{,}077=1{,}184$. Opgaven runder til 1,18.",
+  sig:"Fordi tråden er krum, er spændingen højere på indersiden af vindingen. Wahl-faktoren samler krumningen og den direkte forskydning i ét tal, der kun afhænger af fjederindekset."},
+
+ {t:"Fjederkonstanten via Castigliano (spm. 4)",
+  m:["U=\\frac{T^2L}{2GJ}=\\frac{(FD/2)^2\\cdot\\pi DN_a}{2G\\cdot\\pi d^4/32}=\\frac{4F^2D^3N_a}{G\\,d^4}",
+     "\\delta=\\frac{\\partial U}{\\partial F}=\\frac{8FD^3N_a}{G\\,d^4}\\quad\\Rightarrow\\quad\\boxed{\\ k=\\frac{F}{\\delta}=\\frac{G\\,d^4}{8\\,D^3N_a}\\ }"],
+  hvorfor:"Vridningsenergi i en stang med længden $L$: $T^2L/(2GJ)$ &mdash; samme mønster som $M^2/(2EI)$ i spm. 4. Trådens længde er $\\pi D$ pr. aktiv vinding. Tværkraftsenergien er ubetydelig og udelades. Alternativt: vridningsvinkel $\\theta=TL/(GJ)$ og $\\delta=\\theta D/2$ &mdash; samme resultat.",
+  sig:"Med Castigliano: vridningsenergien er T i anden gange L over 2GJ. Differentierer jeg med hensyn til F, får jeg nedbøjningen, og fjederkonstanten er G d i fjerde over otte D i tredje N a."},
+
+ {t:"Aktive vindinger og designgrænser",
+  m:"N_t=N_a+2\\ \\ (\\text{planslebne og sammentrykte ender}),\\qquad \\tau_{max}\\le S_{sy}\\approx0{,}45\\,S_{ut}",
+  hvorfor:"Kun de vindinger, der kan vride sig frit, tæller i $N_a$. Endevindingerne ligger an mod hinanden og bærer ikke. Fjederen skal også tjekkes for at gå &bdquo;på blok&ldquo; (alle vindinger rører), for knækning (lange fjedre) og for udmattelse, hvis lasten svinger.",
+  sig:"Kun de aktive vindinger tæller i stivheden. Spændingen sammenlignes med fjedermaterialets forskydningsflydespænding."}
+],
+
+faldgruber: [
+ {t:"D er middeldiameteren", d:"$D$ er målt til trådens midte, ikke yder- eller inderdiameteren. Med yderdiameteren $D_o=36$ mm bliver $k$ 30 % for lille."},
+ {t:"d⁴ og D³", d:"$4^4=256$ og $32^3=32\\,768$. Små fejl i potenserne giver store fejl: en 10 % tykkere tråd gør fjederen 46 % stivere."},
+ {t:"Kw eller Ks?", d:"$K_w$ bruges til maksimal spænding (statisk og især udmattelse). $K_s=1+0{,}5/C$ er kun den direkte forskydning. Opgaven giver $K_w$ &mdash; brug den."},
+ {t:"G, ikke E", d:"Tråden vrides, så det er forskydningsmodulet $G=80$ GPa, der indgår. For stål er $G=E/[2(1+\\nu)]\\approx80$ GPa (spm. 2)."},
+ {t:"Na, ikke Nt", d:"Brug de <b>aktive</b> vindinger. Endevindinger tæller ikke. Opgaven giver $N_a=10$ direkte."}
+],
+
+qa: [
+ {q:"Hvorfor er spændingen størst på indersiden af vindingen?",
+  a:"To grunde: den direkte forskydning fra $F$ har samme retning som vridningsspændingen dér, og trådens krumning giver større tøjning på indersiden (kortere fiberlængde, samme vinkel). Udmattelsesbrud i fjedre starter derfor næsten altid på indersiden."},
+ {q:"Hvor meget energi er der i fjederen?",
+  a:"$U=\\tfrac12F\\delta=\\tfrac12\\cdot200\\cdot0{,}0256=2{,}56$ J. Fjedre er energilagre &mdash; og det er derfor materialet skal have høj resilience $S_y^2/(2E)$ (spm. 2)."},
+ {q:"Hvad sker der, hvis fjederindekset er meget lille, fx C = 3?",
+  a:"$K_w=11/8+0{,}205=1{,}58$: 58 % ekstra spænding. Fjederen er svær at vikle, og spændingen er høj. Meget store $C$ (> 12) giver bløde fjedre, der let knækker ud eller filtrer sig sammen. Derfor $4\\le C\\le12$."},
+ {q:"Hvad sker der med k, hvis fjederen skæres over i to halvdele?",
+  a:"$N_a$ halveres, så $k$ fordobles. Kortere fjeder = stivere. Det svarer til, at to fjedre i serie er blødere end én."},
+ {q:"Hvornår knækker en trykfjeder?",
+  a:"Når den fri længde er stor i forhold til diameteren (typisk $L_0/D>4$ for faste ender) og nedbøjningen stor. Det er søjleknækning (spm. 7) for en meget blød &bdquo;søjle&ldquo;. Man sætter fjederen på en dorn eller i et hus."},
+ {q:"Hvordan dimensioneres en fjeder, der belastes cyklisk?",
+  a:"Med $\\tau_a$ og $\\tau_m$ fra $F_a$ og $F_m$ og $K_w$ på amplituden, og et Goodman-kriterium i forskydning (spm. 6). Kuglestråling af tråden øger udmattelsesstyrken markant."}
+],
+
+sammenhaeng: "Fjederen er et fantastisk <b>samlespørgsmål</b>: vridning og $J$ (som i akslen, <b>spm. 9</b>), $G=E/[2(1+\\nu)]$ fra Hookes lov i 3D (<b>spm. 2</b>), energimetoden fra Castigliano (<b>spm. 4</b>), resilience som begrundelse for materialevalget (<b>spm. 2</b>), knækning af lange fjedre (<b>spm. 7</b>) og udmattelse ved svingende last (<b>spm. 6</b>). Kan du fortælle fjederens historie med de koblinger, har du vist, at du har forstået faget som helhed.",
+
+links: [
+ {k:"SPM 4", t:"Castigliano giver fjederkonstanten", u:"sp04_castigliano.html"},
+ {k:"SPM 2", t:"Resilience og G", u:"sp02_toejningsenergi.html"},
+ {k:"SPM 9", t:"Vridning: samme τ = Tr/J", u:"sp09_akseldesign.html"},
+ {k:"WIDGET", t:"Fjederdimensionering", u:"../interaktiv/fjeder_dimensionering.html"},
+ {k:"KAP. 17", t:"Formeloverblik (PDF)", u:"../Kapitel17_Overblik.pdf"},
+ {k:"KAP. 17", t:"Quiz", u:"../../../quiz/mem1/Kapitel17_Quiz.html"}
+]
+};
+
+var LAB = {
+w: 720, h: 440,
+intro: "Fjederen til venstre trykkes sammen i sand skala i forhold til sin frie længde. Øg tråddiameteren en smule, og se stivheden eksplodere ($d^4$). Øg vindingsdiameteren, og se den falde ($D^3$). Skift Wahl-faktoren til den beregnede, og se, hvordan den afhænger af fjederindekset.",
+preset2: {navn: "Tæt viklet: D = 16 mm (C = 4)", v: {D: 16, kw: 1}},
+
+inputs: [
+ {id:"d",  label:"Tråddiameter $d$",          min:1,   max:10,  step:0.1,  value:4,   dec:1, unit:"mm"},
+ {id:"D",  label:"Middeldiameter $D$",         min:8,   max:80,  step:1,    value:32,  unit:"mm"},
+ {id:"Na", label:"Aktive vindinger $N_a$",     min:2,   max:30,  step:1,    value:10,  unit:""},
+ {id:"G",  label:"Forskydningsmodul $G$",      min:25,  max:90,  step:1,    value:80,  unit:"GPa"},
+ {id:"F",  label:"Kraft $F$",                  min:10,  max:1000,step:10,   value:200, unit:"N"},
+ {id:"kw", label:"Wahl-faktor",                min:0,   max:1,   step:1,    value:0,   choices:["K_w = 1,18 (opgaven)", "Beregnet af C"]}
+],
+
+compute: function (v) {
+  var C = v.D / v.d, G = v.G * 1000;
+  var KwCalc = (4 * C - 1) / (4 * C - 4) + 0.615 / C;
+  var Kw = v.kw >= 0.5 ? KwCalc : 1.18;
+  var t0 = 8 * v.F * v.D / (Math.PI * Math.pow(v.d, 3));
+  var tau = Kw * t0, Ks = 1 + 0.5 / C;
+  var k = G * Math.pow(v.d, 4) / (8 * Math.pow(v.D, 3) * v.Na);
+  var del = v.F / k;
+  return { C:C, Kw:Kw, KwCalc:KwCalc, Ks:Ks, t0:t0, tau:tau, k:k, del:del, U:0.5 * v.F * del / 1000,
+           Ls:(v.Na + 2) * v.d };
+},
+
+readout: function (v, r) {
+  return [
+   {l:"Fjederindeks $C=D/d$", v:r.C, dec:2, unit:""},
+   {l:"Anvendt $K_w$", v:r.Kw, dec:3, unit:""},
+   {l:"Wahl beregnet af $C$", v:r.KwCalc, dec:3, unit:""},
+   {l:"$\\tau_{max}$", v:r.tau, dec:1, unit:"MPa", k:"hi"},
+   {l:"Ren vridning (uden $K$)", v:r.t0, dec:1, unit:"MPa"},
+   {l:"Fjederkonstant $k$", v:r.k, dec:3, unit:"N/mm", k:"hi"},
+   {l:"Nedbøjning $\\delta$", v:r.del, dec:2, unit:"mm", k:"hi"},
+   {l:"Energi $\\tfrac12F\\delta$", v:r.U, dec:3, unit:"J"}
+  ];
+},
+
+steps: function (v, r) {
+  var T = Eks.tnum;
+  return [
+   {h:"1 · Fjederindeks og Wahl",
+    m:"C=\\frac{D}{d}=\\frac{"+T(v.D,0)+"}{"+T(v.d,1)+"}="+T(r.C,2)+",\\qquad K_w=\\frac{4C-1}{4C-4}+\\frac{0{,}615}{C}="+T(r.KwCalc,3),
+    c: v.kw>=0.5 ? "Den beregnede værdi bruges." : "Opgaven bruger den afrundede værdi $K_w=1{,}18$."},
+   {h:"2 · Maksimal forskydningsspænding",
+    m:"\\tau=K_w\\,\\frac{8FD}{\\pi d^3}="+T(r.Kw,3)+"\\cdot\\frac{8\\cdot"+T(v.F,0)+"\\cdot"+T(v.D,0)+"}{\\pi\\cdot"+T(v.d,1)+"^3}="+T(r.Kw,3)+"\\cdot"+T(r.t0,2)+"="+T(r.tau,1)+"\\ \\text{MPa}",
+    c:"På indersiden af vindingen."},
+   {h:"3 · Fjederkonstant",
+    m:"k=\\frac{G\\,d^4}{8D^3N_a}=\\frac{"+T(v.G*1000,0)+"\\cdot"+T(v.d,1)+"^4}{8\\cdot"+T(v.D,0)+"^3\\cdot"+T(v.Na,0)+"}="+T(r.k,3)+"\\ \\text{N/mm}",
+    c:"$d^4="+Eks.num(Math.pow(v.d,4),1)+"$ mm⁴, $D^3="+Eks.num(Math.pow(v.D,3),0)+"$ mm³."},
+   {h:"4 · Nedbøjning",
+    m:"\\delta=\\frac{F}{k}=\\frac{8FD^3N_a}{Gd^4}=\\frac{"+T(v.F,0)+"}{"+T(r.k,3)+"}="+T(r.del,2)+"\\ \\text{mm}",
+    c:"Lagret energi $\\tfrac12F\\delta="+Eks.num(r.U,3)+"$ J."}
+  ];
+},
+
+facit: function (v, r) {
+  if (v.d===4 && v.D===32 && v.Na===10 && v.G===80 && v.F===200 && v.kw===0) {
+    return {t:"<b>✓ Eksamensopgavens facit:</b> $\\tau=1{,}18\\cdot\\frac{8\\cdot200\\cdot32}{\\pi\\cdot4^3}=1{,}18\\cdot254{,}6=300{,}5$ MPa. $k=\\frac{80\\,000\\cdot256}{8\\cdot32\\,768\\cdot10}=7{,}81$ N/mm, så $\\delta=25{,}6$ mm. (Med den uafrundede $K_w=1{,}184$: 301,5 MPa.)"};
+  }
+  return {off:true, t:"Du har ændret inddata. Tryk på knappen for at komme tilbage til eksamensopgavens tal."};
+},
+
+draw: function (ctx, W, H, v, r, C) {
+  C.grid(ctx, W, H, 40);
+  var CY='#5ec8ff', GR='#00d984', GO='#ffa500', RD='#ff5e5e', PU='#d984ff', DIM='rgba(227,235,243,.45)';
+
+  /* ---------- fjederen ---------- */
+  var cx=120, bot=H-40, Na=Math.round(v.Na), nt=Na+2;
+  var L0=Math.max(r.Ls + r.del*1.6 + 5*v.d, r.Ls*1.4);   // fri længde (antaget) i mm
+  var Lf=Math.max(L0 - r.del, r.Ls);                      // belastet længde
+  var sc=Math.min(330/L0, 170/v.D);
+  var len=Lf*sc, Dp=v.D*sc, wth=Math.max(1.5, v.d*sc);
+  var top=bot-len;
+  C.txt(ctx,'Fjeder: '+Na+' aktive + 2 endevindinger', cx, 20, DIM, 11, 'center');
+  // fri længde (stiplet)
+  C.line(ctx, cx-Dp/2-24, bot-L0*sc, cx+Dp/2+24, bot-L0*sc, 'rgba(227,235,243,.3)', 1, [4,4]);
+  C.mono(ctx,'fri længde', cx+Dp/2+26, bot-L0*sc+4, DIM, 9);
+  // vindinger som teknisk sidebillede: bagstrenge (dæmpet) først, så forstrenge
+  var pitch=len/nt, xl=cx-Dp/2, xr=cx+Dp/2;
+  ctx.save(); ctx.lineCap='round';
+  ctx.strokeStyle='rgba(94,200,255,.35)'; ctx.lineWidth=wth;
+  for (var i=0;i<nt;i++){ var y=bot-i*pitch; ctx.beginPath(); ctx.moveTo(xr, y-pitch/2); ctx.lineTo(xl, y-pitch); ctx.stroke(); }
+  ctx.strokeStyle=CY;
+  for (var i2=0;i2<nt;i2++){ var y2=bot-i2*pitch; ctx.beginPath(); ctx.moveTo(xl, y2); ctx.lineTo(xr, y2-pitch/2); ctx.stroke(); }
+  ctx.restore();
+  C.line(ctx, cx-Dp/2-14, bot+2, cx+Dp/2+14, bot+2, DIM, 3);
+  C.line(ctx, cx-Dp/2-14, top-2, cx+Dp/2+14, top-2, GO, 3);
+  C.arrow(ctx, cx, top-50, cx, top-6, GO, 2.8);
+  C.mono(ctx,'F='+Eks.num(v.F,0)+' N', cx+8, top-36, GO, 11);
+  C.dim(ctx, cx+Dp/2+34, bot-L0*sc, cx+Dp/2+34, top, GR, null);
+  C.mono(ctx,'δ='+Eks.num(r.del,1), cx+Dp/2+40, (bot-L0*sc+top)/2+4, GR, 11);
+  C.dim(ctx, cx-Dp/2, bot+16, cx+Dp/2, bot+16, DIM, null);
+  C.mono(ctx,'D='+Eks.num(v.D,0), cx, bot+32, DIM, 10, 'center');
+
+  /* ---------- trådtværsnit med spændinger ---------- */
+  var wx=372, wy=128, R=62;
+  C.txt(ctx,'Trådens tværsnit (indersiden af vindingen til venstre)', wx-44, 24, DIM, 11);
+  C.circle(ctx, wx, wy, R, CY, 'rgba(94,200,255,.1)', 2);
+  C.line(ctx, wx-R-14, wy, wx+R+14, wy, 'rgba(227,235,243,.25)', 1, [4,4]);
+  // vridning: pile tangentielt, laengde prop. med radius
+  for (var a=0;a<12;a++){ var th=a/12*2*Math.PI, px=wx+Math.cos(th)*R*0.8, py=wy+Math.sin(th)*R*0.8;
+    C.arrow(ctx, px, py, px-Math.sin(th)*16, py+Math.cos(th)*16, GO, 1.6, 6); }
+  // direkte forskydning: ens nedadrettet
+  C.arrow(ctx, wx+R+34, wy-26, wx+R+34, wy+26, PU, 2.2);
+  C.mono(ctx,'F/A', wx+R+40, wy+4, PU, 10);
+  C.circle(ctx, wx-R, wy, 6, null, RD);
+  C.txt(ctx,'max: inderside', wx-R-8, wy+R+18, RD, 11, 'left', true);
+  C.mono(ctx,'τ='+Eks.num(r.tau,0)+' MPa', wx-R-8, wy+R+34, RD, 11);
+
+  /* ---------- F-delta ---------- */
+  var gx0=520, gx1=W-20, gy0=40, gy1=240;
+  var dm=Math.max(r.del*1.4, 1), Fm=v.F*1.4;
+  function GX(d){ return gx0 + d/dm*(gx1-gx0); }
+  function GY(f){ return gy1 - f/Fm*(gy1-gy0); }
+  C.axes(ctx, gx0, gy0-8, gx1, gy1, 'δ', 'F');
+  C.poly(ctx, [[GX(0),GY(0)],[GX(r.del),GY(v.F)],[GX(r.del),GY(0)]], null, 'rgba(0,217,132,.22)');
+  C.line(ctx, GX(0), GY(0), GX(dm), GY(dm*r.k), CY, 2.4);
+  C.circle(ctx, GX(r.del), GY(v.F), 5.5, '#fff', GO, 2);
+  C.mono(ctx,'k='+Eks.num(r.k,2)+' N/mm', gx0+8, gy0+14, CY, 10);
+  C.mono(ctx,'U=½Fδ', GX(r.del*0.55), GY(v.F*0.2), GR, 10, 'center');
+
+  /* ---------- Wahl mod C ---------- */
+  var hx0=372, hx1=W-20, hy0=292, hy1=H-30;
+  C.txt(ctx,'Wahl-faktor mod fjederindeks C', hx0, hy0-12, DIM, 11);
+  function HX(c){ return hx0 + (c-3)/(15-3)*(hx1-hx0); }
+  function HY(k){ return hy1 - (k-1)/(0.6)*(hy1-hy0); }
+  C.axes(ctx, hx0, hy0-4, hx1, hy1, 'C', 'Kw');
+  var wp=[]; for (var c=3;c<=15;c+=0.1){ wp.push([HX(c), HY((4*c-1)/(4*c-4)+0.615/c)]); }
+  C.poly(ctx, wp, PU, null, 2.2);
+  [4,8,12].forEach(function(c){ C.mono(ctx, String(c), HX(c), hy1+12, DIM, 9, 'center'); });
+  var cc=Math.max(3, Math.min(15, r.C));
+  C.circle(ctx, HX(cc), HY(r.KwCalc), 5, '#fff', PU, 2);
+  C.mono(ctx,'C='+Eks.num(r.C,1)+' → Kw='+Eks.num(r.KwCalc,3), HX(cc)+8, HY(r.KwCalc)-8, PU, 10);
+}
+};
+</script>
+<script src="assets/eksamen.js"></script>
+<script>Eks.build();</script>
+</body>
+</html>

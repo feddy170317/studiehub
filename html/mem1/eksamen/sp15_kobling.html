@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spm. 15: Friktionskobling - MEM1 eksamen</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="assets/eksamen.css">
+</head>
+<body>
+<script>
+var QDATA = {
+nr: 15,
+titel: "Friktionskoblinger med skiver (ensformigt tryk og ensformigt slid)",
+kapitel: 18,
+kapitelNavn: "Bremser og koblinger",
+mappe: "Spørgsmål 15 - Friktionskobling",
+prev: "sp14_fjeder.html",
+next: "sp16_remtraek.html",
+bog: "Kap. 18: §18.3 <i>Thrust Pad Clutches and Brakes</i>, §18.3.1 <i>Uniform Pressure Model</i> og §18.3.2 <i>Uniform Wear Model</i>, lign. (18.1)&ndash;(18.17), s. 522&ndash;523.",
+
+spmA: "Sammenlign teorierne om ensformigt tryk og ensformigt slid for skivekoblinger. Udled formlen for momentkapaciteten $T=N\\mu F\\frac{r_o+r_i}{2}$ under antagelsen om ensformigt slid.",
+spmB: "En flerpladekobling med $N=4$ aktive friktionsflader arbejder under antagelsen om ensformigt slid. Inderradius er $r_i=50$ mm, yderradius er $r_o=100$ mm, og friktionskoefficienten er $\\mu=0{,}30$. Beregn det overførte moment $T$ ved en aksial spændkraft $F=2000$ N.",
+
+oversat: "En skivekobling er to ringformede flader, der trykkes sammen med en aksial kraft $F$. Friktionen mellem dem overfører momentet &mdash; som en bils kobling. Spørgsmålet er: <b>hvordan fordeler trykket sig hen over ringen?</b> Det afhænger af, om koblingen er ny eller tilslidt. Ny og perfekt plan: trykket er ens overalt (ensformigt tryk). Tilslidt: den ydre del har glidet længere og er slidt mere, så trykket er flyttet indad (ensformigt slid). Del (a) sammenligner og udleder. Del (b) er én indsætning.",
+kerne: "Slid ∝ tryk × glidevej. Glidevejen vokser med radius, så en tilslidt kobling har $p\\cdot r=$ konstant: størst tryk inderst. Det giver lidt mindre moment end ensformigt tryk &mdash; derfor dimensionerer man efter slid.",
+
+historie: [
+ {h:"Hvorfor trykfordelingen betyder noget",
+  t:"Momentet er friktionskraft gange arm. En friktionskraft langt ude giver meget moment; tæt på centrum giver den lidt. Så det er ikke ligegyldigt, <i>hvor</i> på ringen trykket sidder. Den samme spændkraft $F$ kan give forskelligt moment afhængigt af fordelingen."},
+ {h:"Ny kobling: ensformigt tryk",
+  t:"Når fladerne er nye og helt plane, og pladerne er stive, er det rimeligt at antage, at trykket er det samme overalt: $p=F/[\\pi(r_o^2-r_i^2)]$. Men det holder ikke længe. Den ydre del af fladen glider hurtigere (hastighed $v=\\omega r$) og bliver derfor slidt mere."},
+ {h:"Tilslidt kobling: ensformigt slid",
+  t:"Slid følger Archards lov: slidt dybde ∝ tryk × glidevej. Glidevejen pr. omdrejning er $2\\pi r$. Den ydre del slides mere, indtil den ikke længere bærer så meget. Ligevægten indfinder sig, når sliddet er ens overalt: $p\\cdot r=$ konstant, altså $p=p_{max}r_i/r$. Trykket er størst ved indersiden. Efter indkøring er det den tilstand, koblingen lever i resten af sit liv."},
+ {h:"Hvorfor man dimensionerer efter slid",
+  t:"Ensformigt slid flytter trykket indad, hvor armen er kort, så det giver <b>mindre</b> moment end ensformigt tryk ved samme $F$. Det er den konservative antagelse, og den gælder det meste af koblingens levetid. Med $r_i/r_o=0{,}5$ er forskellen kun ca. 4 %, men den går den rigtige vej."}
+],
+analogi: "En ny sko har ens tryk under hele sålen. Efter et år er hælen slidt skæv, og trykket har flyttet sig derhen, hvor der er slidt mindst. En kobling slider sig på samme måde til en ligevægt &mdash; ens slid overalt.",
+
+plan: [
+ {t:"0&ndash;2 min", k:"warm", w:"Tegn koblingen",
+  d:"En ringformet friktionsflade, $r_i$ og $r_o$ markeret, $F$ aksialt. Et ringelement $dr$ i afstanden $r$ med arealet $2\\pi r\\,dr$. Sig: &bdquo;Friktionen på ringelementet giver momentbidraget $\\mu p\\cdot2\\pi r\\,dr\\cdot r$.&ldquo;"},
+ {t:"2&ndash;5 min", w:"Ensformigt tryk",
+  d:"$p$ konstant. $F=p\\pi(r_o^2-r_i^2)$. $T=\\int\\mu p\\,2\\pi r^2dr=\\tfrac23\\pi\\mu p(r_o^3-r_i^3)$ → $T=\\tfrac23\\mu F\\frac{r_o^3-r_i^3}{r_o^2-r_i^2}$."},
+ {t:"5&ndash;9 min", w:"Ensformigt slid",
+  d:"Archard: slid ∝ $p\\cdot v\\propto p\\cdot r$ → $pr=p_{max}r_i$. $F=2\\pi p_{max}r_i(r_o-r_i)$. $T=\\pi\\mu p_{max}r_i(r_o^2-r_i^2)$. Divider: $T=\\mu F\\frac{r_o+r_i}{2}$. Gang med $N$ flader."},
+ {t:"9&ndash;11 min", w:"Regn designopgaven",
+  d:"$T=4\\cdot0{,}30\\cdot2000\\cdot\\frac{100+50}{2}=180\\,000$ N·mm $=180$ N·m. Til sammenligning ensformigt tryk: 186,7 N·m."},
+ {t:"11&ndash;14 min", k:"end", w:"Pointerne",
+  d:"&bdquo;Slidmodellen giver 3,6 % mindre moment og er konservativ. Maksimaltrykket sidder inderst: $p_{max}=F/[2\\pi r_i(r_o-r_i)]=0{,}127$ MPa &mdash; det er det, belægningen skal tåle. Og $N$ flader giver $N$ gange momentet med samme $F$, fordi kraften går igennem alle pladerne.&ldquo;"},
+ {t:"14&ndash;20 min", k:"end", w:"Spørgsmål", d:"Se censors sandsynlige spørgsmål nederst."}
+],
+
+trin: [
+ {t:"Ringelementet: kraft og moment",
+  m:["dF=p\\cdot2\\pi r\\,dr,\\qquad dT=r\\cdot\\mu\\,dF=2\\pi\\mu\\,p\\,r^2\\,dr"],
+  hvorfor:"Et tyndt ringelement i afstanden $r$ med bredden $dr$ har arealet $2\\pi r\\,dr$. Normalkraften er tryk gange areal, friktionskraften $\\mu$ gange den, og momentbidraget er friktionskraften gange armen $r$. Resten er integration med den valgte trykfordeling.",
+  sig:"Jeg ser på en tynd ring med radius r. Friktionskraften er my gange tryk gange ringens areal, og momentbidraget er den gange r."},
+
+ {t:"Ensformigt tryk (ny kobling)",
+  m:["F=\\int_{r_i}^{r_o}p\\,2\\pi r\\,dr=\\pi p\\,(r_o^2-r_i^2)",
+     "T=\\int_{r_i}^{r_o}2\\pi\\mu p\\,r^2dr=\\tfrac23\\pi\\mu p\\,(r_o^3-r_i^3)\\quad\\Rightarrow\\quad T=\\tfrac23\\,\\mu F\\,\\frac{r_o^3-r_i^3}{r_o^2-r_i^2}"],
+  hvorfor:"Med $p$ konstant er integralerne trivielle. Divider $T$ med $F$ for at eliminere $p$. Den effektive friktionsradius er $\\tfrac23\\frac{r_o^3-r_i^3}{r_o^2-r_i^2}$ &mdash; lidt større end middelradius.",
+  sig:"Med ensformigt tryk integrerer jeg og eliminerer trykket. Den effektive friktionsradius bliver to tredjedele af forholdet mellem kubikkerne og kvadraterne."},
+
+ {t:"Slidloven: hvorfor p·r er konstant",
+  m:"\\text{slid}\\propto p\\cdot v=p\\cdot\\omega r\\quad\\Rightarrow\\quad\\text{ens slid}:\\ p\\,r=\\text{konst.}=p_{max}\\,r_i",
+  hvorfor:"Archards slidlov: slidt volumen ∝ normalkraft × glidevej. Pr. arealenhed: slidt dybde ∝ $p\\cdot$ glidevej. Glidevejen pr. omdrejning er $2\\pi r$. Efter indkøring er sliddet ens overalt, ellers ville de højeste steder fortsat blive slidt ned. Trykket er størst, hvor $r$ er mindst: ved $r_i$.",
+  sig:"Slid er proportionalt med tryk gange glidevej, og glidevejen vokser med radius. Efter indkøring er sliddet ens, så tryk gange radius er konstant, og det største tryk sidder inderst."},
+
+ {t:"Ensformigt slid: kraften",
+  m:"F=\\int_{r_i}^{r_o}\\frac{p_{max}r_i}{r}\\,2\\pi r\\,dr=2\\pi p_{max}r_i\\,(r_o-r_i)",
+  hvorfor:"$r$ i $p$ og $r$ i arealet forkortes ud &mdash; integralet bliver bare en længde. Det giver $p_{max}$, hvis $F$ er kendt.",
+  sig:"Med trykket omvendt proportionalt med r forkortes r ud, og kraften bliver to pi p max r i gange ringens bredde."},
+
+ {t:"Ensformigt slid: momentet",
+  m:["T=\\int_{r_i}^{r_o}2\\pi\\mu\\frac{p_{max}r_i}{r}r^2dr=\\pi\\mu p_{max}r_i\\,(r_o^2-r_i^2)",
+     "\\frac{T}{F}=\\mu\\,\\frac{\\pi p_{max}r_i(r_o-r_i)(r_o+r_i)}{2\\pi p_{max}r_i(r_o-r_i)}=\\mu\\,\\frac{r_o+r_i}{2}"],
+  hvorfor:"Divider momentet med kraften: alt forkortes, undtagen middelradius. Den effektive friktionsradius ved ensformigt slid er simpelthen <b>middelradius</b> $(r_o+r_i)/2$.",
+  sig:"Dividerer jeg momentet med kraften, forsvinder p max, og den effektive arm er bare middelradius."},
+
+ {t:"N friktionsflader",
+  m:"\\boxed{\\ T=N\\,\\mu\\,F\\,\\frac{r_o+r_i}{2}\\ }",
+  hvorfor:"I en lamelkobling går den samme aksialkraft $F$ igennem hele pakken (som i en stak mønter, du klemmer). Hver af de $N$ friktionsflader overfører derfor samme moment, og de lægges sammen. Sådan får man stort moment i lille diameter &mdash; motorcykelkoblinger og automatgear.",
+  sig:"Med N friktionsflader i serie går den samme kraft igennem alle, så momentet ganges med N."}
+],
+
+faldgruber: [
+ {t:"N er antal friktionsflader, ikke plader", d:"Med 5 plader (fx 3 stål + 2 belagte) er der 4 friktionsflader. Opgaven siger direkte $N=4$ aktive flader &mdash; brug det."},
+ {t:"Middelradius, ikke yderradius", d:"$T=N\\mu F(r_o+r_i)/2$. Bruger du $r_o$, overvurderer du momentet med 33 %."},
+ {t:"Enheder", d:"$F$ i N og $r$ i mm giver N·mm. $180\\,000$ N·mm $=180$ N·m. Et moment på 180 N·m svarer til en mellemstor bilmotor &mdash; brug det som fornuftstjek."},
+ {t:"Maksimaltrykket ved ensformigt slid", d:"Det sidder ved $r_i$, ikke $r_o$. Belægningens tilladte tryk skal sammenlignes med $p_{max}=F/[2\\pi r_i(r_o-r_i)]$."},
+ {t:"Hvilken model giver hvad", d:"Ensformigt <b>tryk</b> giver det <b>største</b> moment. Ensformigt <b>slid</b> giver det <b>mindste</b> og er derfor konservativt. Byt ikke om."}
+],
+
+qa: [
+ {q:"Hvor stort er maksimaltrykket i opgaven?",
+  a:"$p_{max}=\\frac{F}{2\\pi r_i(r_o-r_i)}=\\frac{2000}{2\\pi\\cdot50\\cdot50}=0{,}127$ MPa ved indersiden. Ved ensformigt tryk ville det være $\\frac{2000}{\\pi(100^2-50^2)}=0{,}085$ MPa overalt. Bemærk: $F$ er den samme for alle fladerne i pakken, så trykket er det samme på hver."},
+ {q:"Hvad er det optimale forhold mellem rᵢ og rₒ?",
+  a:"For en given $r_o$ og tilladt $p_{max}$ giver ensformigt slid det største moment ved $r_i=r_o/\\sqrt3\\approx0{,}577r_o$. I praksis bruges $r_i/r_o=0{,}45$&ndash;$0{,}8$."},
+ {q:"Hvorfor er forskellen mellem modellerne så lille her?",
+  a:"Fordi ringen er forholdsvis smal ($r_i/r_o=0{,}5$). Jo smallere ringen er, jo mindre betyder fordelingen &mdash; i grænsen $r_i\\to r_o$ giver begge $\\mu F r$. Ved en fuld skive ($r_i=0$) er forskellen 25 % ($\\tfrac23r_o$ mod $\\tfrac12r_o$)."},
+ {q:"Hvad begrænser en koblings levetid?",
+  a:"Varme. Ved hver indkobling glider fladerne, og energien bliver til varme i belægningen. For høj temperatur giver &bdquo;fading&ldquo; (faldende $\\mu$) og slid. Derfor tjekkes $p\\cdot v$ og energi pr. indkobling (§18.2)."},
+ {q:"Hvad er forskellen på en kobling og en bremse?",
+  a:"Ingen fysisk: begge overfører moment via friktion. En kobling forbinder to roterende dele, en bremse forbinder en roterende del med en stillestående. Formlerne er de samme."},
+ {q:"Hvorfor bruger automatgear våde lamelkoblinger?",
+  a:"Mange flader ($N$ stor) giver stort moment i lille diameter. Olien køler og giver blød indkobling, men sænker $\\mu$ (ca. 0,1), så man skal bruge flere lameller."}
+],
+
+sammenhaeng: "Koblingen forbinder <b>friktion</b> (som i bevægelsesskruen, <b>spm. 13</b>, hvor friktion var et tab &mdash; her er den ønsket) med <b>slid</b> (Archards lov, kap. 8). Det overførte moment er præcis det $T$, akslen skal dimensioneres for (<b>spm. 9</b>), og spændkraften $F$ kommer typisk fra en fjeder (<b>spm. 14</b>: tallerkenfjedre eller skruefjedre). Remme (<b>spm. 16</b>) er den anden friktionsbaserede kraftoverførsel i pensum &mdash; der er tricket bare en eksponentialfunktion i stedet for et integral over radius.",
+
+links: [
+ {k:"SPM 16", t:"Remtræk: friktion over en bue", u:"sp16_remtraek.html"},
+ {k:"SPM 14", t:"Fjederen der giver spændkraften", u:"sp14_fjeder.html"},
+ {k:"SPM 13", t:"Friktion som tab", u:"sp13_bevaegelsesskrue.html"},
+ {k:"WIDGET", t:"Bremse og fading", u:"../interaktiv/bremse_fading.html"},
+ {k:"KAP. 18", t:"Formeloverblik (PDF)", u:"../Kapitel18_Overblik.pdf"},
+ {k:"KAP. 18", t:"Quiz", u:"../../../quiz/mem1/Kapitel18_Quiz.html"}
+]
+};
+
+var LAB = {
+w: 720, h: 440,
+intro: "Ringen til venstre er farvet efter trykket ved ensformigt slid &mdash; mørkest inderst. Diagrammet til højre sammenligner de to trykfordelinger ved samme kraft $F$. Træk $r_i$ ned mod nul, og se forskellen mellem modellerne vokse; træk den op mod $r_o$, og se den forsvinde.",
+preset2: {navn: "Fuld skive: rᵢ = 5 mm", v: {ri: 5}},
+
+inputs: [
+ {id:"N",  label:"Antal friktionsflader $N$",  min:1,   max:12,   step:1,    value:4,    unit:""},
+ {id:"ri", label:"Inderradius $r_i$",          min:5,   max:150,  step:1,    value:50,   unit:"mm"},
+ {id:"ro", label:"Yderradius $r_o$",           min:20,  max:200,  step:1,    value:100,  unit:"mm"},
+ {id:"mu", label:"Friktionskoefficient $\\mu$", min:0.05,max:0.6,  step:0.01, value:0.30, dec:2, unit:""},
+ {id:"F",  label:"Spændkraft $F$",             min:100, max:10000,step:50,   value:2000, unit:"N"}
+],
+
+compute: function (v) {
+  var ri = Math.min(v.ri, v.ro - 1), ro = v.ro;
+  var Tw = v.N * v.mu * v.F * (ro + ri) / 2;
+  var Tp = v.N * v.mu * v.F * (2 / 3) * (Math.pow(ro, 3) - Math.pow(ri, 3)) / (ro * ro - ri * ri);
+  var pmaxW = v.F / (2 * Math.PI * ri * (ro - ri));
+  var pP = v.F / (Math.PI * (ro * ro - ri * ri));
+  return { ri:ri, ro:ro, Tw:Tw, Tp:Tp, pmaxW:pmaxW, pP:pP, rW:(ro + ri) / 2,
+           rP:(2 / 3) * (Math.pow(ro, 3) - Math.pow(ri, 3)) / (ro * ro - ri * ri) };
+},
+
+readout: function (v, r) {
+  return [
+   {l:"$T$ ensformigt slid", v:r.Tw/1000, dec:1, unit:"N·m", k:"hi"},
+   {l:"$T$ ensformigt tryk", v:r.Tp/1000, dec:1, unit:"N·m"},
+   {l:"Forhold slid/tryk", v:r.Tw/r.Tp, dec:4, unit:""},
+   {l:"Friktionsradius (slid)", v:r.rW, dec:1, unit:"mm"},
+   {l:"Friktionsradius (tryk)", v:r.rP, dec:1, unit:"mm"},
+   {l:"$p_{max}$ ved $r_i$ (slid)", v:r.pmaxW, dec:4, unit:"MPa"},
+   {l:"$p$ ensformigt tryk", v:r.pP, dec:4, unit:"MPa"}
+  ];
+},
+
+steps: function (v, r) {
+  var T = Eks.tnum;
+  return [
+   {h:"1 · Middelradius",
+    m:"r_m=\\frac{r_o+r_i}{2}=\\frac{"+T(r.ro,0)+"+"+T(r.ri,0)+"}{2}="+T(r.rW,1)+"\\ \\text{mm}",
+    c:"Den effektive friktionsradius ved ensformigt slid."},
+   {h:"2 · Moment ved ensformigt slid",
+    m:"T=N\\mu F\\,\\frac{r_o+r_i}{2}="+T(v.N,0)+"\\cdot"+T(v.mu,2)+"\\cdot"+T(v.F,0)+"\\cdot"+T(r.rW,1)+"="+T(r.Tw,0)+"\\ \\text{N·mm}="+T(r.Tw/1000,1)+"\\ \\text{N·m}",
+    c:"Dimensionerende (konservativ) værdi."},
+   {h:"3 · Til sammenligning: ensformigt tryk",
+    m:"T=N\\mu F\\cdot\\tfrac23\\,\\frac{r_o^3-r_i^3}{r_o^2-r_i^2}="+T(v.N*v.mu*v.F,0)+"\\cdot"+T(r.rP,2)+"="+T(r.Tp/1000,1)+"\\ \\text{N·m}",
+    c:"Forholdet slid/tryk er "+Eks.num(r.Tw/r.Tp,3)+"."},
+   {h:"4 · Maksimaltryk ved indersiden",
+    m:"p_{max}=\\frac{F}{2\\pi r_i(r_o-r_i)}=\\frac{"+T(v.F,0)+"}{2\\pi\\cdot"+T(r.ri,0)+"\\cdot"+T(r.ro-r.ri,0)+"}="+T(r.pmaxW,4)+"\\ \\text{MPa}",
+    c:"Det er det, belægningen skal tåle."}
+  ];
+},
+
+facit: function (v, r) {
+  if (v.N===4 && v.ri===50 && v.ro===100 && Math.abs(v.mu-0.30)<1e-9 && v.F===2000) {
+    return {t:"<b>✓ Eksamensopgavens facit:</b> $T=4\\cdot0{,}30\\cdot2000\\cdot\\frac{100+50}{2}=180\\,000$ N·mm $=180$ N·m. Med ensformigt tryk ville det være 186,7 N·m &mdash; slidmodellen er 3,6 % mere konservativ. Maksimaltrykket ved indersiden er 0,127 MPa."};
+  }
+  return {off:true, t:"Du har ændret inddata. Tryk på knappen for at komme tilbage til eksamensopgavens tal."};
+},
+
+draw: function (ctx, W, H, v, r, C) {
+  C.grid(ctx, W, H, 40);
+  var CY='#5ec8ff', GR='#00d984', GO='#ffa500', RD='#ff5e5e', PU='#d984ff', DIM='rgba(227,235,243,.45)';
+
+  /* ---------- friktionsfladen, farvet efter p (slid) ---------- */
+  var cx=150, cy=178, Ro=132, Ri=Ro*r.ri/r.ro;
+  C.txt(ctx,'Friktionsflade — tryk ved ensformigt slid', cx, 22, DIM, 11, 'center');
+  var n=40;
+  for (var k=0;k<n;k++){
+    var ra=Ri+(Ro-Ri)*k/n, rb=Ri+(Ro-Ri)*(k+1)/n, rr=r.ri+(r.ro-r.ri)*(k+0.5)/n;
+    var s=(r.ri/rr - r.ri/r.ro)/Math.max(1 - r.ri/r.ro, 1e-6);    // 1 ved indersiden, 0 ved ydersiden
+    ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,rb,0,2*Math.PI); ctx.arc(cx,cy,ra,0,2*Math.PI,true);
+    ctx.fillStyle='rgba(255,'+Math.round(200-150*s)+','+Math.round(90-60*s)+','+(0.25+0.6*s)+')'; ctx.fill(); ctx.restore();
+  }
+  C.circle(ctx, cx, cy, Ro, '#e3ebf3', null, 1.5);
+  C.circle(ctx, cx, cy, Ri, '#e3ebf3', null, 1.5);
+  // friktionskraefter (tangentielle) ved tre radier
+  [0.15,0.5,0.85].forEach(function(f){ var rp=Ri+(Ro-Ri)*f, rrmm=r.ri+(r.ro-r.ri)*f, pr=r.ri/rrmm;
+    for (var a=0;a<6;a++){ var th=a/6*2*Math.PI+f; var x=cx+Math.cos(th)*rp, y=cy+Math.sin(th)*rp, L=8+16*pr;
+      C.arrow(ctx, x, y, x-Math.sin(th)*L, y+Math.cos(th)*L, GO, 1.5, 5); } });
+  C.circle(ctx, cx, cy, (Ri+Ro)/2, GR, null, 1.3, [5,4]);
+  C.mono(ctx,'rm='+Eks.num(r.rW,0), cx, cy-(Ri+Ro)/2-6, GR, 10, 'center');
+  C.mono(ctx,'ri', cx+Ri*0.7, cy+Ri*0.7, '#e3ebf3', 10);
+  C.mono(ctx,'ro', cx+Ro*0.72, cy+Ro*0.72+10, '#e3ebf3', 10);
+
+  /* ---------- lamelpakke ---------- */
+  var sx0=40, sy=H-58, nf=Math.round(v.N), plates=nf+1, pw=Math.min(22, 250/plates), gap=4;
+  C.txt(ctx,'Lamelpakke: '+plates+' plader → '+nf+' friktionsflader', sx0, sy-38, DIM, 10);
+  for (var p=0;p<plates;p++){ var x=sx0+30+p*(pw+gap);
+    ctx.save(); ctx.fillStyle = p%2 ? 'rgba(255,165,0,.55)' : 'rgba(94,200,255,.55)';
+    ctx.fillRect(x, sy-24+(p%2?6:0), pw, 44-(p%2?6:0)); ctx.restore(); }
+  var xe=sx0+30+plates*(pw+gap);
+  C.arrow(ctx, sx0, sy, sx0+26, sy, RD, 2.6);
+  C.arrow(ctx, xe+26, sy, xe+2, sy, RD, 2.6);
+  C.mono(ctx,'F', sx0+4, sy-8, RD, 11);
+
+  /* ---------- p(r) for begge modeller ---------- */
+  var gx0=356, gx1=W-22, gy0=48, gy1=300;
+  var pm=Math.max(r.pmaxW, r.pP)*1.2;
+  function GX(rr){ return gx0 + (rr)/(r.ro*1.05)*(gx1-gx0); }
+  function GY(p){ return gy1 - p/pm*(gy1-gy0); }
+  C.axes(ctx, gx0, gy0-10, gx1, gy1, 'r [mm]', 'p [MPa]');
+  C.txt(ctx,'Trykfordeling ved samme F', gx0+10, 22, DIM, 11);
+  // ensformigt tryk
+  C.poly(ctx, [[GX(r.ri),GY(0)],[GX(r.ri),GY(r.pP)],[GX(r.ro),GY(r.pP)],[GX(r.ro),GY(0)]], CY, 'rgba(94,200,255,.1)', 2.2);
+  // ensformigt slid
+  var wp=[[GX(r.ri),GY(0)]];
+  for (var j=0;j<=50;j++){ var rr2=r.ri+(r.ro-r.ri)*j/50; wp.push([GX(rr2), GY(r.pmaxW*r.ri/rr2)]); }
+  wp.push([GX(r.ro),GY(0)]);
+  C.poly(ctx, wp, GO, 'rgba(255,165,0,.12)', 2.4);
+  C.line(ctx, GX(r.rW), gy1, GX(r.rW), gy0, GR, 1.2, [4,3]);
+  C.mono(ctx,'rm', GX(r.rW)+4, gy0+10, GR, 10);
+  C.mono(ctx,'pmax='+Eks.num(r.pmaxW,3), GX(r.ri)+6, GY(r.pmaxW)-6, GO, 10);
+  C.mono(ctx,'p='+Eks.num(r.pP,3), GX(r.ro)-4, GY(r.pP)-6, CY, 10, 'right');
+  C.mono(ctx,'ri', GX(r.ri), gy1+13, DIM, 9, 'center');
+  C.mono(ctx,'ro', GX(r.ro), gy1+13, DIM, 9, 'center');
+  C.txt(ctx,'— ensformigt slid (p·r = konst.)', gx0+8, gy1+36, GO, 11, 'left', true);
+  C.txt(ctx,'— ensformigt tryk (ny kobling)', gx0+8, gy1+52, CY, 11, 'left', true);
+  C.txt(ctx,'T slid = '+Eks.num(r.Tw/1000,1)+' N·m    T tryk = '+Eks.num(r.Tp/1000,1)+' N·m', gx0+8, gy1+76, '#e3ebf3', 12, 'left', true);
+}
+};
+</script>
+<script src="assets/eksamen.js"></script>
+<script>Eks.build();</script>
+</body>
+</html>

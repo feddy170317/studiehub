@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spm. 7: Søjleknækning - MEM1 eksamen</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="assets/eksamen.css">
+</head>
+<body>
+<script>
+var QDATA = {
+nr: 7,
+titel: "Søjleknækning: overgang mellem Euler og Johnson",
+kapitel: 9,
+kapitelNavn: "Søjler",
+mappe: "Spørgsmål 07 - Søjleknækning",
+prev: "sp06_goodman.html",
+next: "sp08_trykbeholder.html",
+bog: "Kap. 9: §9.3 <i>Concentrically Loaded Columns</i>, lign. (9.1)&ndash;(9.11), s. 229&ndash;230 &middot; §9.4 <i>End Conditions</i>, s. 231 &middot; §9.5 <i>Slenderness Ratio</i> og §9.6 <i>Johnson's Buckling Criterion</i>, lign. (9.14)&ndash;(9.18), s. 232&ndash;233.",
+
+spmA: "Udled Eulers kritiske knæklast $P_{cr}=\\frac{\\pi^2EI}{L_e^2}$. Definer det kritiske slankhedsforhold $(L_e/k)_{cr}$, der bestemmer overgangen mellem Euler-kriteriet (lange søjler) og Johnson-kriteriet (korte/mellemlange søjler).",
+spmB: "Et massivt, rundt stålstag, charnierlejret i begge ender ($E=200$ GPa, $S_y=400$ MPa), har diameteren $d=20$ mm ($I=\\frac{\\pi}{64}d^4=2500\\pi$ mm⁴) og den effektive længde $L_e=1$ m. Beregn Eulers kritiske last $P_{cr}$, og undersøg, om knækning indtræffer før flydning.",
+
+oversat: "Tryk på en tynd plastiklineal fra enderne: den forbliver lige op til en bestemt kraft &mdash; og så slår den pludselig ud til siden. Den brækker ikke, den <b>knækker ud</b>. Det er ikke materialet, der giver op; det er <b>geometrien</b>, der bliver ustabil. Del (a): udled den last, hvor det sker (Euler), og forklar, hvornår Euler gælder, og hvornår en kort, tyk søjle i stedet flyder først (Johnson). Del (b): regn knæklasten for et stålstag og afgør, hvilken af de to svigtformer der kommer først.",
+kerne: "Lange søjler svigter ved stabilitet (afhænger af $E$, ikke styrke). Korte søjler svigter ved flydning (afhænger af $S_y$). Slankhedsforholdet $L_e/k$ afgør, hvilken verden du er i.",
+
+historie: [
+ {h:"Knækning er en stabilitetsfejl, ikke en styrkefejl",
+  t:"I alle de andre spørgsmål svigter emnet, fordi spændingen når en materialegrænse. Her er det anderledes: den lige søjle er i ligevægt, men ligevægten bliver <b>ustabil</b>. Et lille skub til siden giver en udbøjning, udbøjningen giver et moment ($P\\cdot y$), momentet giver mere udbøjning. Under $P_{cr}$ retter søjlen sig op igen; over $P_{cr}$ løber det løbsk. Derfor indgår $S_y$ slet ikke i Eulers formel &mdash; kun stivheden $EI$."},
+ {h:"Hvad slankhed betyder",
+  t:"Inertiradius $k=\\sqrt{I/A}$ er tværsnittets &bdquo;effektive tykkelse&ldquo; mod bøjning. For en massiv cirkel er $k=d/4$. Slankhedsforholdet $L_e/k$ siger, hvor lang søjlen er i forhold til sin tykkelse. En tynd, lang søjle (højt $L_e/k$) knækker ved en lav spænding. En tyk, kort søjle ville kræve en enorm spænding for at knække &mdash; så den flyder i stedet."},
+ {h:"Hvorfor Euler ikke kan stå alene",
+  t:"Eulers spænding $\\sigma_{cr}=\\pi^2E/(L_e/k)^2$ går mod uendelig, når søjlen bliver kort. Det er åbenlyst forkert &mdash; ingen søjle tåler mere end $S_y$. Samtidig begynder materialet at opføre sig ikke-lineært, allerede før $S_y$ (restspændinger, krumhed). Johnson erstatter derfor Euler-kurven med en <b>parabel</b> for korte søjler: den starter i $S_y$ ved $L_e/k=0$ og møder Euler-kurven tangentielt."},
+ {h:"Hvor overgangen ligger",
+  t:"Johnson-parablen er valgt, så den rører Euler-kurven netop, hvor $\\sigma_{cr}=S_y/2$. Sætter du $\\pi^2E/(L_e/k)^2=S_y/2$ og løser, får du $(L_e/k)_{cr}=\\sqrt{2\\pi^2E/S_y}$. For stål med $S_y=400$ MPa er det ca. 99. Staget i opgaven har $L_e/k=200$ &mdash; langt over. Det er en lang søjle, og Euler gælder."}
+],
+analogi: "Et sugerør, du trykker sammen fra enderne. Det krøller ikke, fordi plastikken er svag, men fordi røret er langt og tyndt. Et kort stykke af det samme rør kan du næsten ikke knække &mdash; der ville plastikken give efter først.",
+
+plan: [
+ {t:"0&ndash;2 min", k:"warm", w:"Tegn den udbøjede søjle",
+  d:"Lodret søjle, charnier i begge ender, last $P$ ovenfra. Tegn den udbøjet som en halv sinusbølge og marker $y(x)$. Sig: &bdquo;Knækning er ustabilitet: udbøjningen giver et moment, der giver mere udbøjning.&ldquo;"},
+ {t:"2&ndash;7 min", w:"Udled Euler",
+  d:"Moment i snittet $M=-Py$. Krumning $EIy''=M$ → $y''+\\lambda^2y=0$ med $\\lambda^2=P/EI$. Løsning $A\\sin\\lambda x+B\\cos\\lambda x$. Randbetingelser: $B=0$, og $\\sin\\lambda L=0$ → $\\lambda L=\\pi$. Så $P_{cr}=\\pi^2EI/L^2$. Nævn $L_e=KL$ for andre understøtninger."},
+ {t:"7&ndash;10 min", w:"Slankhed og Johnson",
+  d:"Omskriv til spænding: $\\sigma_{cr}=\\pi^2E/(L_e/k)^2$. Tegn kurven $\\sigma_{cr}$ mod $L_e/k$ med $S_y$ som vandret linje. Vis problemet ved korte søjler og indtegn Johnson-parablen. Udled $(L_e/k)_{cr}=\\sqrt{2\\pi^2E/S_y}$ fra tangentpunktet i $S_y/2$."},
+ {t:"10&ndash;13 min", w:"Regn designopgaven",
+  d:"$P_{cr}=\\pi^2\\cdot200\\,000\\cdot2500\\pi/1000^2=15{,}5$ kN. $k=d/4=5$ mm, $L_e/k=200$, $(L_e/k)_{cr}=99{,}3$ → Euler gælder. Flydelast $P_y=S_yA=125{,}7$ kN."},
+ {t:"13&ndash;15 min", k:"end", w:"Konklusion med tal",
+  d:"&bdquo;Staget knækker ved 15,5 kN &mdash; kun 12 % af den last, hvor det ville flyde. Spændingen ved knækning er bare 49 MPa. Et stærkere stål ville ikke hjælpe det mindste; kun større $I$ eller kortere $L_e$ gør.&ldquo;"},
+ {t:"15&ndash;20 min", k:"end", w:"Spørgsmål", d:"Se censors sandsynlige spørgsmål nederst."}
+],
+
+trin: [
+ {t:"Opstil momentet i den udbøjede søjle",
+  m:"M(x)=-P\\,y(x)",
+  hvorfor:"Nøgleskridtet: vi betragter søjlen i en <b>let udbøjet</b> tilstand og spørger, om den kan være i ligevægt dér. Den aksiale last har en arm $y$ til snittet og giver derfor et bøjningsmoment. Det er det, der gør knækning anderledes end almindelig bøjning: momentet afhænger af deformationen selv.",
+  sig:"Jeg antager en lille udbøjning y. Lasten P har nu en arm y, så der opstår et moment minus P gange y i hvert snit."},
+
+ {t:"Bjælkens differentialligning",
+  m:"EI\\,\\frac{d^2y}{dx^2}=M=-P\\,y\\quad\\Rightarrow\\quad \\frac{d^2y}{dx^2}+\\lambda^2y=0,\\qquad\\lambda^2=\\frac{P}{EI}",
+  hvorfor:"Krumningen $y''\\approx1/\\rho=M/EI$ fra spm. 3. Ligningen har samme form som en harmonisk svinger &mdash; derfor sinusformen.",
+  sig:"Med krumningsrelationen fra bjælketeorien får jeg en andenordens differentialligning, der ligner en svingningsligning."},
+
+ {t:"Generel løsning og randbetingelser",
+  m:["y(x)=A\\sin\\lambda x+B\\cos\\lambda x",
+     "y(0)=0\\Rightarrow B=0,\\qquad y(L)=0\\Rightarrow A\\sin\\lambda L=0"],
+  hvorfor:"Charnierer i begge ender: ingen udbøjning dér. $A=0$ er den trivielle løsning (lige søjle). En udbøjet ligevægt kræver $\\sin\\lambda L=0$, altså $\\lambda L=n\\pi$. Bemærk at $A$ forbliver <b>ubestemt</b> &mdash; teorien siger, hvornår søjlen kan udbøje, ikke hvor meget.",
+  sig:"Charniererne giver nul udbøjning i begge ender. Den eneste ikke-trivielle løsning kræver, at sinus til lambda L er nul."},
+
+ {t:"Den kritiske last",
+  m:["\\lambda L=n\\pi\\quad\\Rightarrow\\quad P=\\frac{n^2\\pi^2EI}{L^2}",
+     "\\boxed{\\ P_{cr}=\\frac{\\pi^2EI}{L_e^2}\\ }\\qquad L_e=K\\,L"],
+  hvorfor:"$n=1$ giver den laveste last &mdash; den, der betyder noget. For andre understøtninger erstattes $L$ af den effektive længde $L_e$, som er afstanden mellem vendepunkterne i den udbøjede form: fast&ndash;fri $K=2$, charnier&ndash;charnier $K=1$, fast&ndash;charnier $K\\approx0{,}7$, fast&ndash;fast $K=0{,}5$. Bogen anbefaler i praksis lidt større værdier, fordi ideel indspænding ikke findes.",
+  sig:"Den laveste løsning er n lig én, og det giver Eulers knæklast. For andre understøtninger bruger jeg den effektive længde."},
+
+ {t:"Omskriv til spænding og slankhed",
+  m:"\\sigma_{cr}=\\frac{P_{cr}}{A}=\\frac{\\pi^2E}{(L_e/k)^2},\\qquad k=\\sqrt{\\frac{I}{A}}\\qquad(\\text{massiv cirkel: }k=d/4)",
+  hvorfor:"Med $I=Ak^2$ forsvinder tværsnittets størrelse, og kun ét geometrisk tal er tilbage: slankheden $L_e/k$. Det gør det muligt at tegne én kurve for alle søjler af samme materiale.",
+  sig:"Dividerer jeg med arealet og indfører inertiradius, afhænger knækspændingen kun af E og slankhedsforholdet."},
+
+ {t:"Johnson-parablen og overgangen",
+  m:["\\frac{P_{cr}}{A}=S_y-\\frac{S_y^2}{4\\pi^2E}\\left(\\frac{L_e}{k}\\right)^2",
+     "\\frac{\\pi^2E}{(L_e/k)^2}=\\frac{S_y}{2}\\quad\\Rightarrow\\quad\\boxed{\\ \\left(\\frac{L_e}{k}\\right)_{cr}=\\sqrt{\\frac{2\\pi^2E}{S_y}}\\ }"],
+  hvorfor:"Johnson starter i $S_y$ for $L_e/k=0$ og er konstrueret til at røre Euler-kurven <b>tangentielt</b> ved $\\sigma=S_y/2$. Indsæt og tjek: begge kurver giver $S_y/2$ i overgangspunktet. Er $L_e/k$ større end $(L_e/k)_{cr}$, bruges Euler; ellers Johnson.",
+  sig:"For korte søjler bruger jeg Johnsons parabel, der starter i flydespændingen og rører Euler-kurven ved det halve af flydespændingen. Det definerer det kritiske slankhedsforhold."}
+],
+
+faldgruber: [
+ {t:"$k=d/4$, ikke $d/2$", d:"$k=\\sqrt{I/A}=\\sqrt{(\\pi d^4/64)/(\\pi d^2/4)}=d/4=5$ mm. Med $d/2$ får du $L_e/k=100$ og havner næsten i Johnson-området &mdash; forkert konklusion."},
+ {t:"Enheder i Pcr", d:"Med $E$ i MPa (N/mm²), $I$ i mm⁴ og $L_e$ i mm får du N. $L_e=1$ m $=1000$ mm &mdash; ikke 1."},
+ {t:"Brug ikke Euler for korte søjler", d:"Er $L_e/k<(L_e/k)_{cr}$, giver Euler en for høj knæklast. Tjek altid slankheden først &mdash; det er selve pointen i spørgsmålet."},
+ {t:"$S_y$ indgår ikke i Euler", d:"Et stærkere stål hæver ikke Eulers knæklast. Kun $E$, $I$ og $L_e$ tæller. Alle stållegeringer har $E\\approx200$ GPa, så et dyrt højstyrkestål er spild i en lang søjle."},
+ {t:"Knækning om den svage akse", d:"For et ikke-cirkulært tværsnit knækker søjlen om den akse med det <b>mindste</b> $I$. Brug $I_{min}$ og det tilsvarende $k$."}
+],
+
+qa: [
+ {q:"Hvorfor bestemmer teorien ikke, hvor stor udbøjningen bliver?",
+  a:"Fordi vi brugte den lineære krumningstilnærmelse $y''\\approx1/\\rho$. Amplituden $A$ forbliver ubestemt: ved $P_{cr}$ er enhver lille udbøjning en ligevægt (neutral stabilitet). En ikke-lineær analyse viser, at udbøjningen vokser hurtigt lige over $P_{cr}$."},
+ {q:"Hvad gør man for at øge knæklasten i opgaven?",
+  a:"Øg $I$ (fx et rør med samme vægt, men materialet længere ude: $I$ vokser meget), eller afkort $L_e$ (en mellemunderstøtning halverer $L_e$ og firdobler $P_{cr}$). Et stærkere stål hjælper ikke."},
+ {q:"Hvad er den effektive længde for en fanestang, der er støbt fast i jorden?",
+  a:"Fast&ndash;fri: $L_e=2L$. Knæklasten bliver en fjerdedel af den charnierlejrede. Det er den værst tænkelige understøtning."},
+ {q:"Hvorfor er sikkerhedsfaktoren mod knækning ofte større end mod flydning?",
+  a:"Knækning er pludselig og ofte katastrofal, og Euler-lasten er meget følsom over for imperfektioner: en lille krumhed eller excentrisk last sænker den reelle bæreevne. Derfor bruges ofte $n\\ge2$&ndash;3."},
+ {q:"Hvad sker der ved en excentrisk last?",
+  a:"Så er der moment fra starten, og søjlen bøjer ud gradvist i stedet for pludseligt. Man bruger sekantformlen, der kombinerer aksial spænding og bøjning (§9.8 i bogen)."},
+ {q:"Er Johnson-parablen fysik eller kurvetilpasning?",
+  a:"Overvejende empiri. Den fanger, at restspændinger og imperfektioner giver ikke-lineær opførsel før $S_y$. Den er valgt, så den er simpel og møder Euler glat."}
+],
+
+sammenhaeng: "Knækning bruger bjælketeoriens krumning $EIy''=M$ fra <b>spm. 3</b>, men med den afgørende forskel, at momentet afhænger af deformationen. Inertimomentet $I$ er igen hovedpersonen (som i spm. 3 og 4). Knækning er den eneste svigtform i pensum, der ikke styres af en spænding, og derfor er den vigtig at kontrastere med flydekriterierne i <b>spm. 5</b>. I praksis dukker den op i stempelstænger, bevægelsesskruer (<b>spm. 13</b>, lange skruer i tryk) og lange fjedre (<b>spm. 14</b>, fjederknækning).",
+
+links: [
+ {k:"SPM 3", t:"Krumningen EIy'' = M", u:"sp03_bjaelkespaending.html"},
+ {k:"SPM 13", t:"Bevægelsesskruer i tryk", u:"sp13_bevaegelsesskrue.html"},
+ {k:"SPM 5", t:"Flydning: den anden svigtform", u:"sp05_flydekriterier.html"},
+ {k:"WIDGET", t:"Søjleknækning", u:"../interaktiv/soejleknaekning.html"},
+ {k:"KAP. 9", t:"Formeloverblik (PDF)", u:"../Kapitel09_Overblik.pdf"},
+ {k:"KAP. 9", t:"Quiz", u:"../../../quiz/mem1/Kapitel09_Quiz.html"}
+]
+};
+
+var LAB = {
+w: 720, h: 440,
+intro: "Skru ned for længden eller op for diameteren, og se punktet vandre fra Euler-området (lang søjle) over i Johnson-området (kort søjle). Prøv også at øge $S_y$: for en lang søjle ændrer det <b>ingenting</b> ved knæklasten. Faktoren $K$ er endebetingelsen: 0,5 fast&ndash;fast, 0,7 fast&ndash;charnier, 1 charnier&ndash;charnier, 2 fast&ndash;fri.",
+preset2: {navn: "Kort stag: L = 0,3 m (Johnson-området)", v: {L: 0.3}},
+
+inputs: [
+ {id:"d",  label:"Diameter $d$",               min:5,   max:60,  step:1,    value:20,  unit:"mm"},
+ {id:"L",  label:"Fysisk længde $L$",          min:0.1, max:3,   step:0.05, value:1,   dec:2, unit:"m"},
+ {id:"K",  label:"Endebetingelse $K$",         min:0.5, max:2,   step:0.1,  value:1,   dec:1, unit:""},
+ {id:"E",  label:"E-modul $E$",                min:70,  max:220, step:5,    value:200, unit:"GPa"},
+ {id:"Sy", label:"Flydespænding $S_y$",        min:150, max:1000,step:10,   value:400, unit:"MPa"}
+],
+
+compute: function (v) {
+  var E = v.E * 1000, Le = v.K * v.L * 1000;           // MPa, mm
+  var I = Math.PI / 64 * Math.pow(v.d, 4), A = Math.PI / 4 * v.d * v.d;
+  var k = Math.sqrt(I / A), sl = Le / k;
+  var slc = Math.sqrt(2 * Math.PI * Math.PI * E / v.Sy);
+  var Peu = Math.PI * Math.PI * E * I / (Le * Le);
+  var sJ = v.Sy - v.Sy * v.Sy / (4 * Math.PI * Math.PI * E) * sl * sl;
+  var euler = sl >= slc;
+  var scr = euler ? Peu / A : sJ;
+  return { E:E, Le:Le, I:I, A:A, k:k, sl:sl, slc:slc, Peu:Peu, sEu:Peu / A, sJ:sJ, euler:euler,
+           scr:scr, Pcr:scr * A, Py:v.Sy * A };
+},
+
+readout: function (v, r) {
+  return [
+   {l:"$I=\\pi d^4/64$", v:r.I, dec:0, unit:"mm⁴"},
+   {l:"Inertiradius $k=d/4$", v:r.k, dec:2, unit:"mm"},
+   {l:"Slankhed $L_e/k$", v:r.sl, dec:1, unit:"", k:"hi"},
+   {l:"$(L_e/k)_{cr}$", v:r.slc, dec:1, unit:""},
+   {l:"Kriterium", raw: r.euler ? "Euler (lang)" : "Johnson (kort)", unit:""},
+   {l:"Euler $P_{cr}$", v:r.Peu/1000, dec:2, unit:"kN"},
+   {l:"Gældende $P_{cr}$", v:r.Pcr/1000, dec:2, unit:"kN", k:"hi"},
+   {l:"Flydelast $P_y=S_yA$", v:r.Py/1000, dec:1, unit:"kN"},
+   {l:"$P_{cr}/P_y$", v:r.Pcr/r.Py*100, dec:1, unit:"%"}
+  ];
+},
+
+steps: function (v, r) {
+  var T = Eks.tnum;
+  return [
+   {h:"1 · Inertimoment og areal",
+    m:"I=\\frac{\\pi d^4}{64}="+T(r.I,1)+"\\ \\text{mm}^4,\\qquad A=\\frac{\\pi d^2}{4}="+T(r.A,2)+"\\ \\text{mm}^2",
+    c:"For $d=20$ mm: $I=2500\\pi$ mm⁴, som opgaven oplyser."},
+   {h:"2 · Eulers knæklast",
+    m:"P_{cr}=\\frac{\\pi^2EI}{L_e^2}=\\frac{\\pi^2\\cdot"+T(r.E,0)+"\\cdot"+T(r.I,1)+"}{"+T(r.Le,0)+"^2}="+T(r.Peu,0)+"\\ \\text{N}",
+    c:"$L_e=K\\cdot L="+Eks.num(r.Le,0)+"$ mm. Knækspænding $P_{cr}/A="+Eks.num(r.sEu,1)+"$ MPa."},
+   {h:"3 · Slankhed",
+    m:"k=\\sqrt{I/A}="+T(r.k,2)+"\\ \\text{mm},\\qquad \\frac{L_e}{k}=\\frac{"+T(r.Le,0)+"}{"+T(r.k,2)+"}="+T(r.sl,1),
+    c:"Massiv cirkel: $k=d/4$."},
+   {h:"4 · Det kritiske slankhedsforhold",
+    m:"\\left(\\frac{L_e}{k}\\right)_{cr}=\\sqrt{\\frac{2\\pi^2E}{S_y}}=\\sqrt{\\frac{2\\pi^2\\cdot"+T(r.E,0)+"}{"+T(v.Sy,0)+"}}="+T(r.slc,1),
+    c: r.euler ? "$L_e/k>(L_e/k)_{cr}$ → <b>lang søjle, Euler gælder</b>." : "$L_e/k<(L_e/k)_{cr}$ → <b>kort søjle, brug Johnson</b>."},
+   {h: r.euler ? "5 · Knækning eller flydning?" : "5 · Johnson-knæklasten",
+    m: r.euler
+      ? "\\sigma_{cr}=\\frac{P_{cr}}{A}="+T(r.sEu,1)+"\\ \\text{MPa}\\ \\ll\\ S_y="+T(v.Sy,0)+"\\ \\text{MPa}\\quad\\Rightarrow\\quad\\text{knækning først}"
+      : "\\frac{P_{cr}}{A}=S_y-\\frac{S_y^2}{4\\pi^2E}\\left(\\frac{L_e}{k}\\right)^2="+T(r.sJ,1)+"\\ \\text{MPa}\\ \\Rightarrow\\ P_{cr}="+T(r.Pcr/1000,2)+"\\ \\text{kN}",
+    c: r.euler ? "Staget knækker ved "+Eks.num(r.Pcr/r.Py*100,1)+" % af flydelasten." : "Euler ville have givet "+Eks.num(r.sEu,0)+" MPa &mdash; for højt."}
+  ];
+},
+
+facit: function (v, r) {
+  if (v.d===20 && Math.abs(v.L-1)<1e-9 && Math.abs(v.K-1)<1e-9 && v.E===200 && v.Sy===400) {
+    return {t:"<b>✓ Eksamensopgavens facit:</b> $P_{cr}=\\pi^2\\cdot200\\,000\\cdot2500\\pi/1000^2=15{,}5$ kN ($\\sigma_{cr}=49{,}3$ MPa). $L_e/k=200>(L_e/k)_{cr}=99{,}3$ → lang søjle, Euler gælder. <b>Knækning indtræffer før flydning</b>: 15,5 kN mod $P_y=125{,}7$ kN &mdash; kun 12 % af flydelasten."};
+  }
+  return {off:true, t:"Du har ændret inddata. Tryk på knappen for at komme tilbage til eksamensopgavens tal."};
+},
+
+draw: function (ctx, W, H, v, r, C) {
+  C.grid(ctx, W, H, 40);
+  var CY='#5ec8ff', GR='#00d984', GO='#ffa500', RD='#ff5e5e', PU='#d984ff', DIM='rgba(227,235,243,.45)';
+
+  /* ---------- søjlen ---------- */
+  var cx=98, y0=92, y1=H-50, Lp=y1-y0;
+  C.txt(ctx,'Knækform (K = '+Eks.num(v.K,1)+')', cx, H-12, DIM, 11, 'center');
+  var amp=26, a=4.4934;
+  // eksakte knækformer, s=0 i bunden og s=1 i toppen, normaliseret til max = 1
+  function f(s){
+    if (v.K>=1.5)  return 1-Math.cos(Math.PI*s/2);                        // fast bund, fri top
+    if (v.K<=0.6)  return 1-Math.cos(2*Math.PI*s);                        // fast-fast
+    if (v.K<=0.85) return Math.sin(a*s)-a*s+a*(1-Math.cos(a*s));          // fast bund, charnier top (tan aL = aL)
+    return Math.sin(Math.PI*s);                                           // charnier-charnier
+  }
+  var fm=0; for (var t=0;t<=200;t++) fm=Math.max(fm, Math.abs(f(t/200)));
+  var pts=[];
+  for (var i=0;i<=60;i++){ var s=i/60; pts.push([cx+amp*f(s)/fm, y1-s*Lp]); }
+  C.line(ctx, cx, y0, cx, y1, 'rgba(227,235,243,.2)', 1, [4,4]);
+  ctx.save(); ctx.lineCap='round'; C.poly(ctx, pts, CY, null, Math.max(3, Math.min(v.d/2.2, 14))); ctx.restore();
+  // understoetninger
+  function pin(x,y,up){ C.poly(ctx, [[x,y],[x-10,y+(up?-14:14)],[x+10,y+(up?-14:14)]], DIM, 'rgba(227,235,243,.12)', 1.5); }
+  if (v.K>=1.5) { C.line(ctx, cx-22, y1+2, cx+22, y1+2, DIM, 3); }
+  else if (v.K<=0.85) { C.line(ctx, cx-22, y1+2, cx+22, y1+2, DIM, 3); if (v.K<=0.6) C.line(ctx, cx-22, y0-2, cx+22, y0-2, DIM, 3); else pin(cx, y0-2, true); }
+  else { pin(cx, y1+2, false); pin(cx, y0-2, true); }
+  C.arrow(ctx, pts[60][0], y0-52, pts[60][0], y0-14, GO, 2.8);
+  C.mono(ctx,'Pcr='+Eks.num(r.Pcr/1000,1)+' kN', cx, y0-60, GO, 11, 'center');
+  C.mono(ctx,'Le='+Eks.num(r.Le/1000,2)+' m', cx+40, (y0+y1)/2, DIM, 10);
+
+  /* ---------- sigma_cr mod slankhed ---------- */
+  var gx0=236, gx1=W-24, gy0=44, gy1=H-50;
+  var xm=Math.max(250, r.sl*1.15, r.slc*1.6), ym=v.Sy*1.25;
+  function GX(s){ return gx0 + s/xm*(gx1-gx0); }
+  function GY(s){ return gy1 - Math.min(s,ym)/ym*(gy1-gy0); }
+  C.axes(ctx, gx0, gy0-10, gx1, gy1, 'Le/k', 'σcr [MPa]');
+  // Sy og Sy/2
+  C.line(ctx, gx0, GY(v.Sy), gx1-8, GY(v.Sy), RD, 1.3, [6,4]);
+  C.mono(ctx,'Sy='+Eks.num(v.Sy,0), gx1-8, GY(v.Sy)-6, RD, 10, 'right');
+  C.line(ctx, gx0, GY(v.Sy/2), GX(r.slc), GY(v.Sy/2), 'rgba(255,165,0,.4)', 1, [3,3]);
+  C.mono(ctx,'Sy/2', gx0+4, GY(v.Sy/2)-5, GO, 10);
+  // Euler (stiplet hvor ugyldig)
+  var eu1=[], eu2=[];
+  for (var j=1;j<=160;j++){ var sl=j/160*xm, s=Math.PI*Math.PI*r.E/(sl*sl);
+    if (s > ym*1.02) continue;
+    (sl < r.slc ? eu1 : eu2).push([GX(sl), GY(s)]); }
+  C.poly(ctx, eu1, 'rgba(94,200,255,.45)', null, 1.6, [5,4]);
+  C.poly(ctx, eu2, CY, null, 2.6);
+  // Johnson
+  var jo=[];
+  for (var q=0;q<=60;q++){ var sl2=q/60*r.slc; jo.push([GX(sl2), GY(v.Sy - v.Sy*v.Sy/(4*Math.PI*Math.PI*r.E)*sl2*sl2)]); }
+  C.poly(ctx, jo, GR, null, 2.6);
+  // overgang
+  C.line(ctx, GX(r.slc), gy1, GX(r.slc), GY(v.Sy/2), GO, 1.2, [3,3]);
+  C.mono(ctx,'(Le/k)cr='+Eks.num(r.slc,1), GX(r.slc), gy1+15, GO, 10, 'center');
+  C.circle(ctx, GX(r.slc), GY(v.Sy/2), 4, null, GO);
+  // driftspunkt
+  C.line(ctx, GX(r.sl), gy1, GX(r.sl), GY(r.scr), PU, 1.2, [3,3]);
+  C.circle(ctx, GX(r.sl), GY(r.scr), 6.5, '#fff', PU, 2);
+  C.mono(ctx,'Le/k='+Eks.num(r.sl,0)+', σcr='+Eks.num(r.scr,1), GX(r.sl)+(r.sl>xm*0.6?-10:10), GY(r.scr)-12, PU, 11, r.sl>xm*0.6?'right':'left');
+  C.txt(ctx,'Johnson (kort)', GX(r.slc*0.12), GY(v.Sy)+18, GR, 11, 'left', true);
+  C.txt(ctx,'Euler (lang)', GX(Math.min(r.slc*1.55, xm*0.8)), GY(Math.PI*Math.PI*r.E/Math.pow(Math.min(r.slc*1.55,xm*0.8),2))-12, CY, 11, 'left', true);
+}
+};
+</script>
+<script src="assets/eksamen.js"></script>
+<script>Eks.build();</script>
+</body>
+</html>

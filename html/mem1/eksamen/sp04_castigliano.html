@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spm. 4: Castigliano - MEM1 eksamen</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="assets/eksamen.css">
+</head>
+<body>
+<script>
+var QDATA = {
+nr: 4,
+titel: "Bjælkeudbøjning med Castiglianos sætning",
+kapitel: 5,
+kapitelNavn: "Deformation",
+mappe: "Spørgsmål 04 - Castigliano",
+prev: "sp03_bjaelkespaending.html",
+next: "sp05_flydekriterier.html",
+bog: "Kap. 5: §5.5 <i>Strain Energy</i>, lign. (5.12)&ndash;(5.24), s. 120&ndash;122 &middot; §5.6 <i>Castigliano's Theorem</i>, lign. (5.25)&ndash;(5.30), s. 123&ndash;125.",
+
+spmA: "Formulér Castiglianos anden sætning. Udled udtrykket for bøjningstøjningsenergien $U=\\int\\frac{M^2}{2EI}dx$, og vis, hvordan udbøjningen i et lastangrebspunkt bestemmes.",
+spmB: "En udkraget aktuatoraksel med længden $L=1$ m og bøjningsstivheden $EI=10$ kN·m² bærer en lodret koncentreret endelast $P=300$ N. Beregn den oplagrede tøjningsenergi i bjælken og den lodrette udbøjning $\\delta$ i spidsen.",
+
+oversat: "I stedet for at regne bjælkens form ud punkt for punkt (dobbeltintegration med randbetingelser), regner du ud, <b>hvor meget energi der er gemt i den</b>. Castiglianos idé er genial i sin enkelhed: hvis du skruer en lille smule op for en kraft, stiger energien &mdash; og <i>hvor hurtigt</i> den stiger, er præcis hvor langt kraftens angrebspunkt flytter sig. Del (a): vis hvor energiformlen kommer fra, og hvorfor differentiation giver udbøjningen. Del (b): energien og udbøjningen for en udkraget bjælke med endelast.",
+kerne: "Udbøjning = hvor følsom den lagrede energi er over for lasten: $\\delta=\\partial U/\\partial P$. Du behøver aldrig finde hele bjælkens kurve &mdash; kun momentet.",
+
+historie: [
+ {h:"Samme idé som i spørgsmål 2",
+  t:"I spm. 2 lærte du, at et elastisk emne gemmer energien $u=\\sigma^2/(2E)$ pr. rumfang. En bøjet bjælke er ikke anderledes &mdash; spændingen varierer bare over tværsnittet ($\\sigma=My/I$) og langs bjælken ($M$ afhænger af $x$). Integrerer du $\\sigma^2/(2E)$ over hele rumfanget, falder $\\int y^2 dA=I$ ud af sig selv, og du står med $U=\\int M^2/(2EI)\\,dx$. Samme struktur: last i anden divideret med to gange stivhed."},
+ {h:"Hvorfor differentiation giver udbøjningen",
+  t:"Forestil dig, at du øger lasten med en lille smule $dP$. Kraften flytter sig $\\delta$ og udfører det ekstra arbejde $dP\\cdot\\delta$ (plus et andenordens led, der forsvinder). Det arbejde går ind som energi: $dU=\\delta\\,dP$. Del med $dP$: $\\delta=\\partial U/\\partial P$. Det er hele sætningen &mdash; energibevarelse set gennem et forstørrelsesglas."},
+ {h:"Hvorfor metoden er så stærk",
+  t:"Du skal kun kende momentet $M(x)$ &mdash; ikke løse en differentialligning med randbetingelser. Metoden virker lige godt på krumme bjælker, rammer og sammensatte konstruktioner. Og vil du kende udbøjningen et sted, hvor der <i>ikke</i> sidder en last, sætter du en fiktiv last $Q$ dér, differentierer og sætter $Q=0$ bagefter. Samme trick med et fiktivt moment giver vinkeldrejningen."},
+ {h:"Hvor energien faktisk sidder",
+  t:"Momentet i en udkraget bjælke er størst ved indspændingen og nul i spidsen. Energitætheden går med $M^2$, så <b>næsten al energien sidder ved væggen</b>: den inderste halvdel af bjælken rummer 7/8 af energien. Det er derfor forstærkninger nær indspændingen er så effektive &mdash; og det kan du se direkte i laboratoriet nedenfor."}
+],
+analogi: "En fiskestang: det er den tykke del ved håndtaget, der arbejder, når du trækker en fisk ind. Spidsen bevæger sig mest, men det er fordi hele stangen drejer om den stærkt belastede rod. Energien sidder i roden, udbøjningen ses i spidsen.",
+
+plan: [
+ {t:"0&ndash;2 min", k:"warm", w:"Formulér sætningen og tegn bjælken",
+  d:"&bdquo;Udbøjningen i et lastangrebspunkt, i lastens retning, er den partielle afledede af den samlede tøjningsenergi med hensyn til lasten.&ldquo; Tegn den udkragede bjælke med $P$ i spidsen og $x$ målt fra spidsen."},
+ {t:"2&ndash;6 min", w:"Udled bøjningsenergien",
+  d:"Start i $u=\\sigma^2/(2E)$ fra spm. 2. Indsæt $\\sigma=My/I$, integrér over tværsnittet ($\\int y^2dA=I$) og langs bjælken. Nævn alternativet: $dU=\\tfrac12 M\\,d\\theta$ med $d\\theta=M\\,dx/(EI)$."},
+ {t:"6&ndash;9 min", w:"Vis hvorfor ∂U/∂P = δ",
+  d:"Energibalance ved en lille lastforøgelse $dP$: $dU=\\delta\\,dP$. Skriv så arbejdsformen op: $\\delta=\\int\\frac{M}{EI}\\frac{\\partial M}{\\partial P}dx$ &mdash; differentiér <i>før</i> du integrerer, det er lettere."},
+ {t:"9&ndash;12 min", w:"Regn designopgaven",
+  d:"$M=-Px$, $\\partial M/\\partial P=-x$. $U=P^2L^3/(6EI)=1{,}5$ J. $\\delta=PL^3/(3EI)=10$ mm. Kontrol: $U=\\tfrac12 P\\delta=\\tfrac12\\cdot300\\cdot0{,}01=1{,}5$ J ✓."},
+ {t:"12&ndash;14 min", k:"end", w:"Pointen der viser overblik",
+  d:"&bdquo;Kontrollen $U=\\tfrac12P\\delta$ er Clapeyrons sætning &mdash; samme halve som i spm. 2. Og stivheden er $k=3EI/L^3=30$ N/mm: halvér længden, og bjælken bliver otte gange stivere.&ldquo;"},
+ {t:"14&ndash;20 min", k:"end", w:"Spørgsmål", d:"Se censors sandsynlige spørgsmål nederst."}
+],
+
+trin: [
+ {t:"Castiglianos anden sætning &mdash; formulér den præcist",
+  m:"\\boxed{\\ \\delta_i=\\frac{\\partial U}{\\partial P_i}\\ }\\qquad\\text{og}\\qquad \\theta_i=\\frac{\\partial U}{\\partial M_i}",
+  hvorfor:"Tre betingelser skal nævnes: <b>lineært elastisk</b> system, udbøjningen måles <b>i lastens angrebspunkt</b> og <b>i lastens retning</b>. Den tilsvarende sætning for momenter giver vinkeldrejninger.",
+  sig:"Castiglianos anden sætning siger, at udbøjningen i et lastangrebspunkt i lastens retning er den partielle afledede af den samlede elastiske energi med hensyn til den last."},
+
+ {t:"Hvorfor sætningen er sand: energibalance",
+  m:"dU=\\delta\\,dP\\quad\\Rightarrow\\quad\\delta=\\frac{dU}{dP}",
+  hvorfor:"Øg lasten med $dP$. Angrebspunktet flytter sig yderligere, og kraften udfører ekstra arbejde. Til første orden er det arbejde $\\delta\\,dP$, og det gemmes som energi. Med flere laster holdes de andre konstante &mdash; derfor den <i>partielle</i> afledede.",
+  sig:"Hvis jeg øger lasten en smule, udfører den et ekstra arbejde, der svarer til udbøjningen gange lasttilvæksten. Det arbejde lagres som energi. Derfor er udbøjningen energiens afledede."},
+
+ {t:"Bøjningsenergien: fra u = σ²/2E til et linjeintegral",
+  m:["U=\\int_V\\frac{\\sigma^2}{2E}\\,dV=\\int_0^L\\!\\!\\int_A\\frac{M^2y^2}{2EI^2}\\,dA\\,dx",
+     "=\\int_0^L\\frac{M^2}{2EI^2}\\underbrace{\\int_A y^2\\,dA}_{I}\\,dx\\quad\\Rightarrow\\quad\\boxed{\\ U=\\int_0^L\\frac{M^2}{2EI}\\,dx\\ }"],
+  hvorfor:"Energitætheden fra spm. 2 med bøjningsspændingen fra spm. 3 indsat. Integralet over tværsnittet giver præcis inertimomentet. Læg mærke til mønsteret: (last)² divideret med 2·(stivhed) &mdash; for træk er det $F^2L/(2EA)$, for vridning $T^2L/(2GJ)$, for bøjning $M^2/(2EI)$ pr. længde.",
+  sig:"Jeg tager energitætheden sigma i anden over 2E og indsætter bøjningsspændingen. Integralet af y i anden over tværsnittet er inertimomentet, og jeg står med M i anden over 2EI integreret langs bjælken."},
+
+ {t:"Alternativ udledning: momentet arbejder på en vinkel",
+  m:"dU=\\tfrac12\\,M\\,d\\theta,\\qquad d\\theta=\\frac{dx}{\\rho}=\\frac{M}{EI}\\,dx\\quad\\Rightarrow\\quad dU=\\frac{M^2}{2EI}\\,dx",
+  hvorfor:"Et bjælkestykke $dx$ drejes vinklen $d\\theta$ af momentet $M$. Momentet vokser lineært fra 0, så arbejdet er halvdelen af $M\\,d\\theta$ &mdash; samme halve som altid. Krumningen $1/\\rho=M/EI$ er fra spm. 3. Godt at kunne begge veje, hvis censor spørger.",
+  sig:"Man kan også se det sådan, at momentet udfører et arbejde på den lille vinkeldrejning. Med den halve fra den lineære belastning får jeg det samme resultat."},
+
+ {t:"Differentiér under integraltegnet",
+  m:"\\delta=\\frac{\\partial U}{\\partial P}=\\int_0^L\\frac{M}{EI}\\,\\frac{\\partial M}{\\partial P}\\,dx",
+  hvorfor:"Differentiér <b>før</b> du integrerer &mdash; så kvadrerer du aldrig et langt udtryk. $\\partial M/\\partial P$ er simpelthen momentet fra en enhedslast i samme punkt. Den form er også den, du bruger med en fiktiv last $Q$: differentiér, sæt $Q=0$, integrér.",
+  sig:"I praksis differentierer jeg inde under integralet. Så skal jeg bare bruge M og dets afledede med hensyn til P."},
+
+ {t:"Anvend på den udkragede bjælke",
+  m:["M(x)=-P\\,x,\\qquad \\frac{\\partial M}{\\partial P}=-x\\qquad(x\\text{ målt fra spidsen})",
+     "U=\\int_0^L\\frac{P^2x^2}{2EI}\\,dx=\\frac{P^2L^3}{6EI},\\qquad \\delta=\\int_0^L\\frac{(-Px)(-x)}{EI}\\,dx=\\boxed{\\ \\frac{P\\,L^3}{3EI}\\ }"],
+  hvorfor:"At måle $x$ fra spidsen gør momentet enkelt: $M=-Px$, uden reaktioner. Fortegnet er ligegyldigt, fordi $M$ indgår i anden potens (eller som produkt af to led med samme fortegn). Resultatet $PL^3/(3EI)$ er standardformlen fra enhver tabel &mdash; du har nu udledt den.",
+  sig:"Jeg måler x fra spidsen, så momentet er minus P x. Energien bliver P i anden L i tredje over 6EI, og udbøjningen P L i tredje over 3EI."},
+
+ {t:"Kontrol: Clapeyrons sætning",
+  m:"U=\\tfrac12\\,P\\,\\delta\\quad\\Rightarrow\\quad \\delta=\\frac{2U}{P}",
+  hvorfor:"For én last er det ydre arbejde $\\tfrac12P\\delta$, og det skal være lig den lagrede energi. Det giver et hurtigt tjek af både $U$ og $\\delta$ &mdash; og det gør indtryk at vise det uopfordret.",
+  sig:"Som kontrol skal energien være en halv gange lasten gange udbøjningen. Det passer."}
+],
+
+faldgruber: [
+ {t:"Enheder i $EI$", d:"$EI=10$ kN·m² $=10\\,000$ N·m². Med N og m får du $\\delta$ i meter: $0{,}01$ m $=10$ mm. Blander du mm og m, er du tusind gange forkert."},
+ {t:"Integrér ikke før du differentierer", d:"Det er ikke forkert, men det er langsommere og fejlbehæftet. $\\int\\frac{M}{EI}\\frac{\\partial M}{\\partial P}dx$ er vejen frem."},
+ {t:"Castigliano giver kun δ i lastens punkt og retning", d:"Vil du kende udbøjningen et andet sted, skal du sætte en <b>fiktiv last</b> $Q$ dér og sætte $Q=0$ <i>efter</i> differentiationen. Sætter du $Q=0$ før, forsvinder det hele."},
+ {t:"Glem ikke hvorfor forskydningsenergien udelades", d:"Der findes også energi fra tværkraften: $\\int\\alpha V^2/(2GA)\\,dx$. For slanke bjælker er den af størrelsesorden $(h/L)^2$ af bøjningsenergien &mdash; ubetydelig her. Sig det, hvis du udelader den."},
+ {t:"Kun lineær elasticitet", d:"Sætningen forudsætter, at $U$ er en kvadratisk funktion af lasterne. Ved flydning eller store udbøjninger gælder den ikke i den form."}
+],
+
+qa: [
+ {q:"Hvordan finder du udbøjningen midt på bjælken, hvor der ikke sidder nogen last?",
+  a:"Sæt en fiktiv last $Q$ i midtpunktet. Opstil $M(x)$ med både $P$ og $Q$, beregn $\\int\\frac{M}{EI}\\frac{\\partial M}{\\partial Q}dx$ og sæt $Q=0$. For den udkragede bjælke giver det $\\delta_{L/2}=\\frac{5PL^3}{48EI}=3{,}13$ mm."},
+ {q:"Hvordan finder du vinkeldrejningen i spidsen?",
+  a:"Et fiktivt moment $M_0$ i spidsen: $\\theta=\\partial U/\\partial M_0$ ved $M_0=0$. Resultatet er $\\theta=\\frac{PL^2}{2EI}=0{,}015$ rad $\\approx0{,}86^\\circ$."},
+ {q:"Hvad er bjælkens stivhed?",
+  a:"$k=P/\\delta=3EI/L^3=30$ N/mm. $L$ i tredje potens betyder, at halv længde giver otte gange så stiv en bjælke. Det er den vigtigste designparameter for udbøjning."},
+ {q:"Hvordan bruges Castigliano på statisk ubestemte konstruktioner?",
+  a:"Behandl den overtallige reaktion $R$ som en ukendt last. Understøtningen flytter sig ikke, så $\\partial U/\\partial R=0$. Det giver den manglende ligning."},
+ {q:"Hvorfor er energien kvadratisk i lasten?",
+  a:"Både momentet og deformationen er proportionale med $P$ i et lineært system, og energi er produktet af de to. Dobbelt last giver fire gange energi &mdash; samme pointe som $U_{max}/U=n_y^2$ i spm. 2."},
+ {q:"Hvor stor en del af energien sidder i den inderste halvdel af bjælken?",
+  a:"$\\int_{L/2}^{L}x^2dx\\big/\\int_0^L x^2dx=7/8$. Næsten al energien sidder nær indspændingen, hvor momentet er størst. Det ses direkte i laboratoriet."}
+],
+
+sammenhaeng: "Castigliano binder tre tidligere spørgsmål sammen: <b>energitætheden</b> $u=\\sigma^2/(2E)$ fra spm. 2, <b>bøjningsspændingen</b> $\\sigma=My/I$ og <b>krumningen</b> $1/\\rho=M/EI$ fra spm. 3. Samme energiidé bruges på fjedre i <b>spm. 14</b>, hvor fjederkonstanten $k=Gd^4/(8D^3N_a)$ kan udledes med præcis denne metode via vridningsenergien $T^2L/(2GJ)$. Udbøjning er også grundlaget for akselstivhed (spm. 9) og kritiske omdrejningstal.",
+
+links: [
+ {k:"SPM 2", t:"Energitætheden u = σ²/2E", u:"sp02_toejningsenergi.html"},
+ {k:"SPM 3", t:"σ = My/I og krumningen M/EI", u:"sp03_bjaelkespaending.html"},
+ {k:"SPM 14", t:"Fjederkonstanten via vridningsenergi", u:"sp14_fjeder.html"},
+ {k:"WIDGET", t:"Bjælkeudbøjning", u:"../interaktiv/bjaelke_deflektion.html"},
+ {k:"KAP. 5", t:"Formeloverblik (PDF)", u:"../Kapitel05_Overblik.pdf"},
+ {k:"KAP. 5", t:"Quiz", u:"../../../quiz/mem1/Kapitel05_Quiz.html"}
+]
+};
+
+var LAB = {
+w: 720, h: 470,
+intro: "Skru på lasten, længden og stivheden. Nederste diagram viser <b>energitætheden</b> $M^2/(2EI)$ langs bjælken &mdash; arealet under kurven er $U$. Læg mærke til, hvordan energien klumper sig ved væggen, og hvordan $L$ i tredje potens slår igennem: gør bjælken dobbelt så lang, og udbøjningen bliver otte gange større.",
+preset2: {navn: "Halv længde: L = 0,5 m", v: {L: 0.5}},
+
+inputs: [
+ {id:"P",  label:"Endelast $P$",          min:0,   max:1000, step:10,   value:300, unit:"N"},
+ {id:"L",  label:"Længde $L$",            min:0.2, max:2,    step:0.05, value:1,   dec:2, unit:"m"},
+ {id:"EI", label:"Bøjningsstivhed $EI$",  min:2,   max:40,   step:0.5,  value:10,  dec:1, unit:"kN·m²"}
+],
+
+compute: function (v) {
+  var EI = v.EI * 1000;                       // N*m2
+  var U = v.P * v.P * Math.pow(v.L, 3) / (6 * EI);   // J
+  var d = v.P * Math.pow(v.L, 3) / (3 * EI);         // m
+  var th = v.P * v.L * v.L / (2 * EI);               // rad
+  var k = 3 * EI / Math.pow(v.L, 3);                 // N/m
+  var Mmax = v.P * v.L;                               // N*m
+  return { EI:EI, U:U, d:d, dmm:d * 1000, th:th, k:k, Mmax:Mmax, dmid: 5 * v.P * Math.pow(v.L,3) / (48 * EI) * 1000 };
+},
+
+readout: function (v, r) {
+  return [
+   {l:"Lagret energi $U$", v:r.U, dec:3, unit:"J", k:"hi"},
+   {l:"Udbøjning $\\delta$ i spidsen", v:r.dmm, dec:2, unit:"mm", k:"hi"},
+   {l:"Kontrol $2U/P$", raw: v.P>0 ? Eks.num(2*r.U/v.P*1000,2) : "--", unit:"mm"},
+   {l:"$M_{max}$ ved væggen", v:r.Mmax, dec:0, unit:"N·m"},
+   {l:"Vinkel $\\theta$ i spidsen", v:r.th*180/Math.PI, dec:3, unit:"°"},
+   {l:"Stivhed $k=3EI/L^3$", v:r.k/1000, dec:2, unit:"N/mm"},
+   {l:"δ midt på (fiktiv last)", v:r.dmid, dec:2, unit:"mm"}
+  ];
+},
+
+steps: function (v, r) {
+  var T = Eks.tnum;
+  return [
+   {h:"1 · Momentet (x målt fra spidsen)",
+    m:"M(x)=-P\\,x=-"+T(v.P,0)+"\\,x\\quad\\Rightarrow\\quad |M_{max}|=P\\,L="+T(r.Mmax,0)+"\\ \\text{N·m}",
+    c:"Og $\\partial M/\\partial P=-x$."},
+   {h:"2 · Tøjningsenergien",
+    m:"U=\\int_0^L\\frac{M^2}{2EI}dx=\\frac{P^2L^3}{6EI}=\\frac{"+T(v.P,0)+"^2\\cdot"+T(v.L,2)+"^3}{6\\cdot"+T(r.EI,0)+"}="+T(r.U,3)+"\\ \\text{J}",
+    c:"$EI="+Eks.num(r.EI,0)+"$ N·m²."},
+   {h:"3 · Udbøjningen via Castigliano",
+    m:"\\delta=\\frac{\\partial U}{\\partial P}=\\frac{P\\,L^3}{3EI}=\\frac{"+T(v.P,0)+"\\cdot"+T(v.L,2)+"^3}{3\\cdot"+T(r.EI,0)+"}="+T(r.d,5)+"\\ \\text{m}="+T(r.dmm,2)+"\\ \\text{mm}",
+    c:"Differentiér $P^2L^3/(6EI)$ med hensyn til $P$: faktoren 2 fra $P^2$ gør 6 til 3."},
+   {h:"4 · Kontrol med Clapeyron",
+    m:"\\tfrac12\\,P\\,\\delta=\\tfrac12\\cdot"+T(v.P,0)+"\\cdot"+T(r.d,5)+"="+T(0.5*v.P*r.d,3)+"\\ \\text{J}=U\\ \\checkmark",
+    c:"Ydre arbejde = indre energi."},
+   {h:"5 · Stivheden",
+    m:"k=\\frac{P}{\\delta}=\\frac{3EI}{L^3}="+T(r.k/1000,2)+"\\ \\text{N/mm}",
+    c:"$L^3$ i nævneren: det er længden, der styrer alt."}
+  ];
+},
+
+facit: function (v, r) {
+  if (v.P===300 && Math.abs(v.L-1)<1e-9 && Math.abs(v.EI-10)<1e-9) {
+    return {t:"<b>✓ Eksamensopgavens facit:</b> $U=P^2L^3/(6EI)=1{,}5$ J og $\\delta=PL^3/(3EI)=0{,}010$ m $=10$ mm. Kontrol: $\\tfrac12P\\delta=\\tfrac12\\cdot300\\cdot0{,}010=1{,}5$ J ✓. Stivheden er $30$ N/mm."};
+  }
+  return {off:true, t:"Du har ændret inddata. Tryk på knappen for at komme tilbage til eksamensopgavens tal."};
+},
+
+draw: function (ctx, W, H, v, r, C) {
+  C.grid(ctx, W, H, 40);
+  var CY='#5ec8ff', GR='#00d984', GO='#ffa500', RD='#ff5e5e', PU='#d984ff', DIM='rgba(227,235,243,.45)';
+  var x0=96, x1=W-70, Lpx=x1-x0;
+
+  /* ---------- bjælken (nedbøjet, forstørret) ---------- */
+  var by=92, sc=Math.min(7, 110/Math.max(r.dmm, 0.01));   // px pr. mm
+  C.txt(ctx,'Udkraget bjælke — udbøjning forstørret ×'+Eks.num(sc,1)+' px/mm', x0, 26, DIM, 11);
+  C.hatch(ctx, x0, by-38, by+38, DIM, 1);
+  C.line(ctx, x0, by, x1, by, 'rgba(227,235,243,.25)', 1.2, [5,4]);
+  var pts=[];
+  for (var i=0;i<=60;i++){ var xi=i/60;   // fra vaeggen, 0..1
+    var yv = r.dmm * xi*xi*(3-xi)/2;       // P x^2(3L-x)/(6EI), normaliseret til spidsen
+    pts.push([x0+xi*Lpx, by+yv*sc]); }
+  ctx.save(); ctx.lineCap='round';
+  C.poly(ctx, pts, CY, null, 7); ctx.restore();
+  var tipY = by + r.dmm*sc;
+  C.arrow(ctx, x1, tipY-58, x1, tipY-8, GO, 2.8);
+  C.mono(ctx,'P='+Eks.num(v.P,0)+' N', x1+8, tipY-44, GO, 11);
+  C.dim(ctx, x1+36, by, x1+36, tipY, GR, null);
+  C.mono(ctx,'δ='+Eks.num(r.dmm,2)+' mm', x1+40, (by+tipY)/2+12, GR, 11);
+  C.mono(ctx,'L='+Eks.num(v.L,2)+' m', (x0+x1)/2, by-14, DIM, 10, 'center');
+
+  /* ---------- momentdiagram ---------- */
+  var my0=228, mh=70;
+  C.txt(ctx,'Moment |M(x)| — størst ved væggen', x0, my0-mh-12, CY, 11);
+  C.line(ctx, x0, my0, x1, my0, DIM, 1.2);
+  C.poly(ctx, [[x0,my0],[x0,my0-mh],[x1,my0]], CY, 'rgba(94,200,255,.16)', 2);
+  C.mono(ctx,'PL='+Eks.num(r.Mmax,0)+' N·m', x0+6, my0-mh+14, CY, 10);
+
+  /* ---------- energitæthed ---------- */
+  var ey0=H-44, eh=120;
+  C.txt(ctx,'Energitæthed M²/(2EI) langs bjælken — arealet er U', x0, ey0-eh-14, GR, 11);
+  C.line(ctx, x0, ey0, x1, ey0, DIM, 1.2);
+  var ep=[[x0,ey0]];
+  for (var j=0;j<=60;j++){ var s=j/60; ep.push([x0+s*Lpx, ey0-eh*(1-s)*(1-s)]); }
+  ep.push([x1,ey0]);
+  C.poly(ctx, ep, GR, 'rgba(0,217,132,.18)', 2);
+  // halvdelsmarkering
+  var xh=x0+Lpx/2;
+  C.line(ctx, xh, ey0, xh, ey0-eh-4, PU, 1.3, [4,3]);
+  C.txt(ctx,'7/8 af energien', x0+Lpx*0.18, ey0-10, PU, 11, 'center', true);
+  C.txt(ctx,'1/8', xh+Lpx*0.18, ey0-10, PU, 11, 'center', true);
+  C.mono(ctx,'U='+Eks.num(r.U,3)+' J', x1, ey0-eh+4, GR, 12, 'right');
+  C.txt(ctx,'væg', x0, ey0+16, DIM, 10, 'center');
+  C.txt(ctx,'spids', x1, ey0+16, DIM, 10, 'center');
+}
+};
+</script>
+<script src="assets/eksamen.js"></script>
+<script>Eks.build();</script>
+</body>
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spm. 11: Lewis tandhjul - MEM1 eksamen</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="assets/eksamen.css">
+</head>
+<body>
+<script>
+var QDATA = {
+nr: 11,
+titel: "Bøjningsspænding i cylindriske tandhjul (Lewis' ligning)",
+kapitel: 14,
+kapitelNavn: "Generel tandhjulsteori; cylindriske tandhjul",
+mappe: "Spørgsmål 11 - Lewis tandhjul",
+prev: "sp10_rulleleje.html",
+next: "sp12_skraa_tandhjul.html",
+bog: "Kap. 14: §14.3 <i>Gear Geometry</i> (modul, delediameter, indgrebslinje og indgrebsvinkel), s. 380&ndash;386 &middot; Lewis-ligningen lign. (14.52)&ndash;(14.55) og formfaktortabel 14.7, s. 401. Bemærk: bogens tabel 14.7 gælder 14,5° indgrebsvinkel; opgavens $Y=0{,}32$ svarer til 20° fuld tandhøjde.",
+
+spmA: "Forklar den grundlæggende tandhjulsgeometri (modul $m$, delediameter $d$, indgrebsvinkel $\\phi$). Udled den forenklede Lewis-formel $\\sigma_b=\\frac{F_t}{bmY}$ for tandfodens bøjningsspænding, og forklar den fysiske betydning af Lewis' formfaktor $Y$.",
+spmB: "Et cylindrisk drev med modul $m=4$ mm, tandbredde $b=40$ mm og 20 tænder overfører en tangentialkraft $F_t=1600$ N. Lewis' formfaktor er $Y=0{,}32$. Beregn tandens bøjningsspænding $\\sigma_b$.",
+
+oversat: "En tand på et tandhjul er i virkeligheden en lille, kort, tyk <b>udkraget bjælke</b>, der sidder fast i hjulets krop. Når hjulet overfører moment, skubber det modsatte hjuls tand på den, og den bøjes &mdash; præcis som bjælken i spm. 3. Del (a): forklar, hvordan tandhjul beskrives (modul, delediameter, indgrebsvinkel), og vis, hvordan Wilfred Lewis i 1892 beregnede bøjningsspændingen ved tandfoden med et elegant geometrisk trick. Del (b): én indsætning.",
+kerne: "Tanden er en udkraget bjælke. Lewis' formfaktor $Y$ samler tandens form i ét tal &mdash; uafhængigt af størrelsen. Større modul betyder større tand og lavere spænding.",
+
+historie: [
+ {h:"Modul: tandens størrelse i ét tal",
+  t:"Modulet $m$ er delediameteren divideret med antallet af tænder: $m=d/N$. Det er et <b>størrelsesmål</b> for tanden: modul 4 betyder, at hver tand &bdquo;fylder&ldquo; 4 mm af delediameteren. To hjul kan kun gribe ind i hinanden, hvis de har samme modul. Tandhøjden er ca. $2{,}25m$, og afstanden mellem tænderne langs delecirklen er $p=\\pi m$."},
+ {h:"Delecirklen og indgrebsvinklen",
+  t:"Delecirklen er den tænkte cirkel, hvor to hjul ruller på hinanden uden at glide, som to friktionshjul. Kraften mellem tænderne virker ikke langs tangenten, men langs <b>indgrebslinjen</b>, der hælder med indgrebsvinklen $\\phi$ (standard 20°). Den samlede kraft $W$ deles i en tangential del $F_t=W\\cos\\phi$, som overfører momentet og bøjer tanden, og en radial del $F_r=F_t\\tan\\phi$, som skubber hjulene fra hinanden."},
+ {h:"Lewis' trick: en bjælke med ens styrke",
+  t:"En tand er ikke en simpel bjælke &mdash; den er bred ved foden og smal ved toppen. Lewis indskrev en <b>parabel</b> i tanden med toppunkt i lastens angrebspunkt. En udkraget bjælke formet som den parabel har præcis samme bøjningsspænding overalt (ens styrke). Den rigtige tand er bredere end parablen overalt, <i>undtagen</i> ved foden, hvor de to rører hinanden. Dér er tanden svagest, og dér regnes spændingen."},
+ {h:"Hvad Y betyder",
+  t:"Når man regner parablens geometri igennem, forsvinder alle tandens absolutte mål, og der står kun forholdet mellem tandens form og modulet tilbage: $Y=2x/(3m)$. $Y$ afhænger derfor kun af <b>tandformen</b> &mdash; antal tænder og indgrebsvinkel &mdash; ikke af størrelsen. Flere tænder giver bredere, mere retlinede tænder og højere $Y$ (lavere spænding). Få tænder giver smalle, underskårne tænder og lavt $Y$."}
+],
+analogi: "Tanden er som en tommelfinger, du presser mod bordkanten: den knækker ved roden, ikke ved spidsen. Lewis spørger bare: hvor tyk er fingeren ved roden, og hvor langt ude trykker du?",
+
+plan: [
+ {t:"0&ndash;3 min", k:"warm", w:"Geometrien",
+  d:"Tegn to hjul i indgreb med delecirklerne. Definér $d=mN$, $p=\\pi m$, indgrebslinjen og $\\phi=20°$. Dekomponér $W$ i $F_t$ og $F_r$. Sig: &bdquo;$F_t$ overfører momentet og bøjer tanden.&ldquo;"},
+ {t:"3&ndash;7 min", w:"Tanden som udkraget bjælke",
+  d:"Tegn én tand stort. $F_t$ i spidsen (værste tilfælde), arm $l$, fodbredde $t$, tandbredde $b$. $\\sigma=Mc/I=6F_tl/(bt^2)$."},
+ {t:"7&ndash;10 min", w:"Parablen og ligedannede trekanter",
+  d:"Indskriv parablen med toppunkt i lastpunktet, tangent til flankerne ved foden. Ligedannede trekanter: $(t/2)/x=l/(t/2)$ → $x=t^2/(4l)$. Indsæt: $\\sigma=3F_t/(2bx)$. Gang med $m/m$: $\\sigma=F_t/(bmY)$ med $Y=2x/(3m)$."},
+ {t:"10&ndash;12 min", w:"Regn designopgaven",
+  d:"$\\sigma_b=1600/(40\\cdot4\\cdot0{,}32)=31{,}25$ MPa. $d=mN=80$ mm, så momentet er $F_t\\cdot d/2=64$ N·m."},
+ {t:"12&ndash;14 min", k:"end", w:"Begrænsninger",
+  d:"&bdquo;Lewis ignorerer spændingskoncentration i tandfoden, den radiale trykkomposant, dynamiske stød og lastdeling mellem flere tandpar. AGMA udvider med faktorer: $K_v$, $K_o$, $K_m$ og geometrifaktoren $J$.&ldquo;"},
+ {t:"14&ndash;20 min", k:"end", w:"Spørgsmål", d:"Se censors sandsynlige spørgsmål nederst."}
+],
+
+trin: [
+ {t:"Grundgeometri",
+  m:["m=\\frac{d}{N},\\qquad p=\\pi m,\\qquad \\text{tandhøjde}\\approx2{,}25\\,m",
+     "d_b=d\\cos\\phi\\qquad(\\text{grundcirkel})"],
+  hvorfor:"Modulet er tandhjulets &bdquo;skostørrelse&ldquo;. Grundcirklen er den cirkel, evolventprofilet vikles ud fra &mdash; evolventen sikrer, at omsætningsforholdet er konstant under indgrebet (loven om konjugeret indgreb).",
+  sig:"Modulet er delediameteren over antallet af tænder. To hjul skal have samme modul for at gribe ind i hinanden."},
+
+ {t:"Kraften mellem tænderne",
+  m:["W=\\frac{F_t}{\\cos\\phi},\\qquad F_t=\\frac{2T}{d},\\qquad F_r=F_t\\tan\\phi"],
+  hvorfor:"Kraften virker langs indgrebslinjen (fælles normal til tandfladerne). Den tangentiale komposant $F_t$ er den, der overfører momentet $T=F_t\\cdot d/2$ og bøjer tanden. Den radiale $F_r$ giver et lille tryk i tanden (som Lewis ser bort fra) og belaster akslens lejer.",
+  sig:"Tandkraften virker langs indgrebslinjen. Den tangentiale del overfører momentet og bøjer tanden, den radiale del skubber hjulene fra hinanden."},
+
+ {t:"Tanden som udkraget bjælke",
+  m:"\\sigma=\\frac{M\\,c}{I}=\\frac{F_t\\,l\\,(t/2)}{b\\,t^3/12}=\\frac{6\\,F_t\\,l}{b\\,t^2}",
+  hvorfor:"Bøjningsformlen fra spm. 3 på et rektangulært snit $b\\times t$ i tandfoden, med momentarmen $l$ fra lastpunkt til fod. Værste tilfælde: hele lasten i tandens spids (kun ét tandpar i indgreb).",
+  sig:"Jeg betragter tanden som en udkraget bjælke. Bøjningsspændingen ved foden er seks F t l over b t i anden."},
+
+ {t:"Den indskrevne parabel og ligedannede trekanter",
+  m:["\\frac{t/2}{x}=\\frac{l}{t/2}\\quad\\Rightarrow\\quad x=\\frac{t^2}{4\\,l}\\quad\\Rightarrow\\quad\\frac{l}{t^2}=\\frac{1}{4x}",
+     "\\sigma=\\frac{6F_t}{b}\\cdot\\frac{1}{4x}=\\frac{3F_t}{2\\,b\\,x}"],
+  hvorfor:"Parablen har toppunkt i lastpunktet og rører tandflankerne ved foden &mdash; det er tandens svageste snit. For en parabel følger det af ligedannede trekanter, at $l/t^2$ kan erstattes af $1/(4x)$, hvor $x$ er en længde, der kun afhænger af tandens form. Så slipper man for at kende både $l$ og $t$ hver for sig.",
+  sig:"Lewis indskriver en parabel i tanden. Ved ligedannede trekanter kan l over t i anden erstattes med en over fire x, og spændingen bliver tre F t over to b x."},
+
+ {t:"Indfør modulet: Lewis' ligning",
+  m:["\\sigma=\\frac{3F_t}{2bx}\\cdot\\frac{m}{m}=\\frac{F_t}{b\\,m}\\cdot\\frac{3m}{2x}",
+     "\\boxed{\\ \\sigma_b=\\frac{F_t}{b\\,m\\,Y}\\ },\\qquad Y=\\frac{2x}{3m}"],
+  hvorfor:"Gang med $m/m$ og saml formen i $Y$. Bogen skriver det med diametral pitch $p_d=1/m$ (tommer): $\\sigma=W_tp_d/(bY)$ &mdash; samme ligning. $Y$ er dimensionsløs og afhænger kun af formen: $x$ skalerer med $m$, så $x/m$ er konstant for en given tandform.",
+  sig:"Ganger jeg med m over m, får jeg Lewis' ligning: sigma er F t over b m Y. Y samler tandens form og er uafhængig af tandens størrelse."},
+
+ {t:"Formfaktoren Y: hvad den fortæller",
+  m:"N\\uparrow\\ \\Rightarrow\\ Y\\uparrow\\qquad(20°:\\ N=12\\to0{,}245,\\ \\ N=20\\to0{,}322,\\ \\ N=100\\to0{,}447)",
+  hvorfor:"Et hjul med få tænder har spidse, underskårne tænder (smal fod) → lav $Y$ → høj spænding. Et stort hjul har brede, næsten retlinede tænder → høj $Y$. Større indgrebsvinkel giver også bredere fod. Derfor er det næsten altid <b>det lille hjul (pinion)</b>, der er kritisk i bøjning.",
+  sig:"Y vokser med antallet af tænder, fordi tandfoden bliver bredere. Derfor er det lille hjul næsten altid det kritiske."}
+],
+
+faldgruber: [
+ {t:"Brug Fₜ, ikke W", d:"Lewis bruger den <b>tangentiale</b> komposant. Den samlede kraft $W=F_t/\\cos20°$ er 6 % større og ville give for høj spænding."},
+ {t:"b er tandbredden, ikke tandtykkelsen", d:"$b=40$ mm er bredden langs akslen (hjulets &bdquo;tykkelse&ldquo;). Tandens tykkelse $t$ indgår kun via $Y$."},
+ {t:"Tabelværdi for den rigtige indgrebsvinkel", d:"$Y$ afhænger af $\\phi$. Bogens tabel 14.7 er for 14,5°: dér er $Y(20)=0{,}283$. For 20° fuld tandhøjde er $Y(20)=0{,}322$. Brug altid den opgivne værdi, og sig hvilken tabel den kommer fra."},
+ {t:"Lewis alene er ikke design", d:"Uden dynamikfaktor, kærvvirkning og overlastfaktor er 31 MPa en <b>nominel</b> spænding. Et reelt design (AGMA) kan give 2&ndash;3 gange så meget."},
+ {t:"Tandbrud er ikke den eneste svigtform", d:"Tandhjul svigter også ved <b>pitting</b> (overfladeudmattelse fra kontaktspænding, Hertz). Den kontrolleres separat &mdash; ofte er den dimensionerende."}
+],
+
+qa: [
+ {q:"Hvorfor regner Lewis med lasten i tandens spids?",
+  a:"Det er værste tilfælde: størst arm. I praksis deler to tandpar lasten, når spidsen er i indgreb (kontaktforhold > 1), så den største spænding optræder, når lasten sidder ved det højeste punkt med kun ét tandpar &mdash; det er det punkt, AGMA's geometrifaktor $J$ bygger på."},
+ {q:"Hvad sker der med spændingen, hvis modulet fordobles?",
+  a:"$\\sigma\\propto1/m$ ved samme $F_t$. Men med samme antal tænder fordobles $d$ også, så for samme <i>moment</i> halveres $F_t$. Samlet: $\\sigma\\propto1/m^2$ for fast moment og tandantal. Modulet er det stærkeste håndtag."},
+ {q:"Hvad er dynamikfaktoren?",
+  a:"Ved høje hastigheder slår tænderne mod hinanden pga. fremstillingsfejl. Barths faktor $K_v=(6{,}1+v)/6{,}1$ (fræste tænder, $v$ i m/s på delecirklen) ganges på spændingen. Ved 1500 o/min og $d=80$ mm: $v=6{,}3$ m/s → $K_v=2{,}0$ &mdash; spændingen fordobles."},
+ {q:"Hvorfor er indgrebsvinklen typisk 20°?",
+  a:"Større vinkel giver bredere tandfod (stærkere tand, mindre underskæring), men større radialkraft (mere lejelast). 20° er et kompromis. 14,5° er ældre standard; 25° bruges til hårdt belastede gear."},
+ {q:"Hvilket moment overfører drevet?",
+  a:"$T=F_t\\cdot d/2=1600\\cdot0{,}040=64$ N·m, med $d=mN=80$ mm."},
+ {q:"Hvordan hænger det sammen med udmattelse?",
+  a:"En tand belastes én gang pr. omdrejning (pulserende, $R\\approx0$) &mdash; i et mellemhjul endda vekslende. Tandfodens bøjningsspænding skal derfor sammenlignes med en udmattelsesstyrke, ikke flydespændingen. Det er Goodman-logikken fra spm. 6."}
+],
+
+sammenhaeng: "Lewis er <b>bøjningsformlen fra spm. 3</b> anvendt på en ny geometri &mdash; og det er præcis den slags overførsel, censor gerne vil se. Tandkraften $F_t$ er den, der giver akslens vridningsmoment $T=F_td/2$ og, sammen med $F_r$, bøjningsmomentet i akslen (<b>spm. 9</b>). Tænderne belastes cyklisk, så de skal i praksis vurderes mod udmattelse (<b>spm. 6</b>). For skrå tandhjul (<b>spm. 12</b>) kommer en aksialkomposant til, og Lewis bruges med et ækvivalent tandantal.",
+
+links: [
+ {k:"SPM 3", t:"Bøjningsformlen Mc/I", u:"sp03_bjaelkespaending.html"},
+ {k:"SPM 12", t:"Skrå tandhjul: tre kraftkomposanter", u:"sp12_skraa_tandhjul.html"},
+ {k:"SPM 9", t:"Tandkræfterne belaster akslen", u:"sp09_akseldesign.html"},
+ {k:"WIDGET", t:"Ligetandede tandhjul", u:"../interaktiv/tandhjul_ligetandet.html"},
+ {k:"KAP. 14", t:"Formeloverblik (PDF)", u:"../Kapitel14_Overblik.pdf"},
+ {k:"KAP. 14", t:"Quiz", u:"../../../quiz/mem1/Kapitel14_Quiz.html"}
+]
+};
+
+/* Lewis formfaktor, 20° indgrebsvinkel, fuld tandhøjde */
+var YTAB = [[12,.245],[13,.261],[14,.277],[15,.290],[16,.296],[17,.303],[18,.309],[19,.314],[20,.322],[21,.328],[22,.331],[24,.337],[26,.346],[28,.353],[30,.359],[34,.371],[38,.384],[43,.397],[50,.409],[60,.422],[75,.435],[100,.447],[150,.460],[300,.472],[400,.480]];
+function Ytab(N){ if (N<=YTAB[0][0]) return YTAB[0][1];
+  for (var i=1;i<YTAB.length;i++) if (N<=YTAB[i][0]) { var a=YTAB[i-1], b=YTAB[i]; return a[1]+(b[1]-a[1])*(N-a[0])/(b[0]-a[0]); }
+  return YTAB[YTAB.length-1][1]; }
+
+var LAB = {
+w: 720, h: 440,
+intro: "Til højre er tanden tegnet som udkraget bjælke med Lewis-parablen (stiplet). Skift <b>Y-kilde</b> til tabellen, og træk i tandantallet: med få tænder bliver foden smal og spændingen høj. Øg modulet, og hele tanden vokser &mdash; formen (og $Y$) er den samme, men spændingen falder.",
+preset2: {navn: "Lille pinion: N = 12 (tabel-Y)", v: {N: 12, ysrc: 1}},
+
+inputs: [
+ {id:"m",    label:"Modul $m$",               min:1,   max:10,   step:0.5, value:4,    dec:1, unit:"mm"},
+ {id:"b",    label:"Tandbredde $b$",           min:10,  max:120,  step:1,   value:40,   unit:"mm"},
+ {id:"N",    label:"Antal tænder $N$",         min:12,  max:100,  step:1,   value:20,   unit:""},
+ {id:"Ft",   label:"Tangentialkraft $F_t$",    min:100, max:8000, step:50,  value:1600, unit:"N"},
+ {id:"ysrc", label:"Y-kilde",                  min:0,   max:1,    step:1,   value:0,    choices:["Opgavens Y (skyder nedenfor)", "Tabel, 20° fuld tandhøjde"]},
+ {id:"Y",    label:"Formfaktor $Y$ (manuel)",  min:0.2, max:0.5,  step:0.01,value:0.32, dec:2, unit:""}
+],
+
+compute: function (v) {
+  var Y = v.ysrc >= 0.5 ? Ytab(v.N) : v.Y;
+  var sb = v.Ft / (v.b * v.m * Y);
+  var d = v.m * v.N;
+  var x = 1.5 * Y * v.m, l = 2.25 * v.m, t = 2 * Math.sqrt(l * x);
+  return { Y:Y, sb:sb, d:d, p:Math.PI * v.m, T:v.Ft * d / 2 / 1000, Fr:v.Ft * Math.tan(20 * Math.PI / 180),
+           W:v.Ft / Math.cos(20 * Math.PI / 180), x:x, l:l, t:t, Ytab:Ytab(v.N) };
+},
+
+readout: function (v, r) {
+  return [
+   {l:"Anvendt $Y$", v:r.Y, dec:3, unit:"", k:"hi"},
+   {l:"Tabel-$Y$ for N = "+v.N+" (20°)", v:r.Ytab, dec:3, unit:""},
+   {l:"Bøjningsspænding $\\sigma_b$", v:r.sb, dec:2, unit:"MPa", k:"hi"},
+   {l:"Delediameter $d=mN$", v:r.d, dec:1, unit:"mm"},
+   {l:"Deling $p=\\pi m$", v:r.p, dec:2, unit:"mm"},
+   {l:"Moment $T=F_td/2$", v:r.T, dec:1, unit:"N·m"},
+   {l:"Radialkraft $F_r$ (20°)", v:r.Fr, dec:0, unit:"N"},
+   {l:"Lewis-mål $x$ / $t$", raw: Eks.num(r.x,2)+" / "+Eks.num(r.t,2), unit:"mm"}
+  ];
+},
+
+steps: function (v, r) {
+  var T = Eks.tnum;
+  return [
+   {h:"1 · Geometri",
+    m:"d=m\\,N="+T(v.m,1)+"\\cdot"+T(v.N,0)+"="+T(r.d,1)+"\\ \\text{mm},\\qquad p=\\pi m="+T(r.p,2)+"\\ \\text{mm}",
+    c:"Momentet der overføres: $T=F_t\\,d/2="+Eks.num(r.T,1)+"$ N·m."},
+   {h:"2 · Lewis' ligning",
+    m:"\\sigma_b=\\frac{F_t}{b\\,m\\,Y}=\\frac{"+T(v.Ft,0)+"}{"+T(v.b,0)+"\\cdot"+T(v.m,1)+"\\cdot"+T(r.Y,3)+"}="+T(r.sb,2)+"\\ \\text{MPa}",
+    c:"Nævneren $b\\,m\\,Y="+Eks.num(v.b*v.m*r.Y,2)+"$ mm² er tandens &bdquo;effektive bøjningsareal&ldquo;."},
+   {h:"3 · Hvad Y svarer til geometrisk",
+    m:"x=\\tfrac32\\,Y\\,m="+T(r.x,2)+"\\ \\text{mm},\\qquad l\\approx2{,}25\\,m="+T(r.l,2)+",\\qquad t=2\\sqrt{l\\,x}="+T(r.t,2)+"\\ \\text{mm}",
+    c:"Tandfodens bredde $t$ bag parablen, hvis lasten sidder i spidsen."},
+   {h:"4 · Kontrol med bjælkeformlen",
+    m:"\\sigma=\\frac{6F_tl}{bt^2}=\\frac{6\\cdot"+T(v.Ft,0)+"\\cdot"+T(r.l,2)+"}{"+T(v.b,0)+"\\cdot"+T(r.t,2)+"^2}="+T(6*v.Ft*r.l/(v.b*r.t*r.t),2)+"\\ \\text{MPa}",
+    c:"Samme tal: Lewis <i>er</i> bøjningsformlen."}
+  ];
+},
+
+facit: function (v, r) {
+  if (v.m===4 && v.b===40 && v.N===20 && v.Ft===1600 && v.ysrc===0 && Math.abs(v.Y-0.32)<1e-9) {
+    return {t:"<b>✓ Eksamensopgavens facit:</b> $\\sigma_b=\\frac{1600}{40\\cdot4\\cdot0{,}32}=\\frac{1600}{51{,}2}=31{,}25$ MPa. Delediameter $d=80$ mm, moment $T=64$ N·m. Med tabellens $Y=0{,}322$ bliver det 31,06 MPa."};
+  }
+  return {off:true, t:"Du har ændret inddata. Tryk på knappen for at komme tilbage til eksamensopgavens tal."};
+},
+
+draw: function (ctx, W, H, v, r, C) {
+  C.grid(ctx, W, H, 40);
+  var CY='#5ec8ff', GR='#00d984', GO='#ffa500', RD='#ff5e5e', PU='#d984ff', DIM='rgba(227,235,243,.45)';
+
+  /* ---------- tandhjulet ---------- */
+  var gx=150, gy=H/2+14, Rp=118, Nn=Math.round(v.N);
+  var ra=Rp*(1+2/Nn), rf=Rp*(1-2.5/Nn), pitch=2*Math.PI/Nn;
+  C.txt(ctx,'N = '+Nn+', d = mN = '+Eks.num(r.d,0)+' mm', gx, 24, DIM, 11, 'center');
+  ctx.save(); ctx.beginPath();
+  for (var i=0;i<Nn;i++){
+    var a0=i*pitch - Math.PI/2;
+    var pts=[[rf, a0-0.30*pitch],[rf, a0-0.25*pitch],[ra, a0-0.12*pitch],[ra, a0+0.12*pitch],[rf, a0+0.25*pitch],[rf, a0+0.30*pitch]];
+    pts.forEach(function(q,k){ var X=gx+q[0]*Math.cos(q[1]), Y=gy+q[0]*Math.sin(q[1]); if(i===0&&k===0) ctx.moveTo(X,Y); else ctx.lineTo(X,Y); });
+  }
+  ctx.closePath(); ctx.fillStyle='rgba(94,200,255,.12)'; ctx.fill(); ctx.strokeStyle=CY; ctx.lineWidth=1.6; ctx.stroke(); ctx.restore();
+  C.circle(ctx, gx, gy, Rp, GO, null, 1.3, [5,4]);
+  C.circle(ctx, gx, gy, 12, CY, 'rgba(10,26,43,1)', 1.6);
+  C.mono(ctx,'delecirkel', gx+Rp*0.72, gy+Rp*0.72+14, GO, 10);
+  // markér tanden øverst
+  C.circle(ctx, gx, gy-ra, 5, null, RD);
+  C.arrow(ctx, gx+46, gy-ra-2, gx+8, gy-ra-2, RD, 2.4);
+  C.mono(ctx,'Ft', gx+50, gy-ra+2, RD, 11);
+
+  /* ---------- tanden som udkraget bjælke ---------- */
+  var bx=520, base=H-112, sc=Math.min(230/r.l, 90/r.x, 230/r.t, 60);
+  var L=r.l*sc, T2=r.t*sc/2, tip=0.35*r.t*sc/2, X=r.x*sc;
+  C.txt(ctx,'Tanden = udkraget bjælke (Lewis)', bx, 24, DIM, 11, 'center');
+  // tandprofil
+  C.poly(ctx, [[bx-T2-26, base],[bx-T2, base],[bx-tip, base-L-6],[bx+tip, base-L-6],[bx+T2, base],[bx+T2+26, base],[bx+T2+26, base+22],[bx-T2-26, base+22]],
+         CY, 'rgba(94,200,255,.12)', 2);
+  // Lewis-parabel: toppunkt i lastpunktet (bx, base-L), gennem (bx±T2, base)
+  var par=[];
+  for (var k=-30;k<=30;k++){ var w=k/30*T2; par.push([bx+w, base-L + L*(w/T2)*(w/T2)]); }
+  C.poly(ctx, par, GO, null, 1.8, [5,3]);
+  // last
+  C.arrow(ctx, bx+tip+70, base-L, bx+tip+4, base-L, RD, 2.8);
+  C.mono(ctx,'Ft='+Eks.num(v.Ft,0)+' N', bx+tip+74, base-L+4, RD, 11);
+  // maal: l og t
+  C.dim(ctx, bx-T2-40, base-L, bx-T2-40, base, GR, null);
+  C.mono(ctx,'l', bx-T2-52, base-L/2+4, GR, 12);
+  C.dim(ctx, bx-T2, base+X+20, bx+T2, base+X+20, GR, null);
+  C.mono(ctx,'t', bx, base+X+36, GR, 12, 'center');
+  // ligedannede trekanter: a (lastpunkt), c (fodens midte), b (tangentpunkt), e (x under foden)
+  var ax_=bx, ay_=base-L, bxp=bx+T2, byp=base, ey=base+X;
+  C.line(ctx, ax_, ay_, bxp, byp, PU, 1.3);
+  C.line(ctx, bxp, byp, ax_, ey, PU, 1.3);
+  C.line(ctx, ax_, ay_, ax_, ey, 'rgba(217,132,255,.5)', 1, [3,3]);
+  C.mono(ctx,'x', ax_-12, base+X/2+4, PU, 12, 'right');
+  C.circle(ctx, bxp, byp, 3.5, null, PU);
+  // spændingsfordeling i foden
+  var sfy=base+4;
+  C.poly(ctx, [[bx-T2, sfy],[bx-T2, sfy+18],[bx, sfy]], null, 'rgba(94,200,255,.35)');
+  C.poly(ctx, [[bx+T2, sfy],[bx+T2, sfy+18],[bx, sfy]], null, 'rgba(255,94,94,.35)');
+  C.txt(ctx,'σb = '+Eks.num(r.sb,2)+' MPa i tandfoden', bx, 46, GO, 13, 'center', true);
+}
+};
+</script>
+<script src="assets/eksamen.js"></script>
+<script>Eks.build();</script>
+</body>
+</html>

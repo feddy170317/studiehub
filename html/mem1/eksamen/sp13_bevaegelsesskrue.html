@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spm. 13: Bevægelsesskrue - MEM1 eksamen</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="assets/eksamen.css">
+</head>
+<body>
+<script>
+var QDATA = {
+nr: 13,
+titel: "Kinematik og virkningsgrad for bevægelsesskruer",
+kapitel: 16,
+kapitelNavn: "Befæstelseselementer, samlinger og bevægelsesskruer",
+mappe: "Spørgsmål 13 - Bevægelsesskrue",
+prev: "sp12_skraa_tandhjul.html",
+next: "sp14_fjeder.html",
+bog: "Kap. 16: §16.3 <i>Power Screws</i>, §16.3.1 <i>Forces and Torque</i>, s. 450&ndash;451 &middot; §16.3.2 <i>Power and Efficiency</i>, s. 452 &middot; §16.3.3 <i>Self-Locking Screws</i>, s. 453.",
+
+spmA: "Udled det nødvendige moment for at løfte en last $W$ med en bevægelsesskrue med firkantgevind: $T=\\frac{Wd_m}{2}\\left(\\frac{l+\\pi\\mu d_m}{\\pi d_m-\\mu l}\\right)$. Definer betingelsen for selvhæmning.",
+spmB: "En bevægelsesskrue med firkantgevind har middeldiameteren $d_m=20$ mm, stigningen $p=5$ mm (enkeltgænget, $l=5$ mm) og gevindfriktionskoefficienten $\\mu=0{,}10$. Beregn momentet $T$, der kræves for at løfte en last $W=10$ kN ($\\pi d_m\\approx62{,}83$ mm).",
+
+oversat: "En bevægelsesskrue omsætter drejning til lineær bevægelse &mdash; som i en donkraft, en skruestik eller spindlen i en drejebænk. Del (a) beder dig udlede, hvor stort et moment man skal dreje med for at løfte en last. Tricket: <b>rul ét gevindomløb ud</b>, så bliver gevindet til et skråplan, og møtrikken til en klods, der skubbes op ad det. Så er det ren statik med friktion. Selvhæmning betyder, at lasten ikke selv kan dreje skruen tilbage, når du slipper &mdash; bilen bliver stående på donkraften. Del (b): én indsætning.",
+kerne: "Et gevind er et skråplan viklet om en cylinder. At løfte med en skrue er at skubbe en klods op ad et skråplan med friktion. Selvhæmning: friktionsvinklen er større end stigningsvinklen.",
+
+historie: [
+ {h:"Rul gevindet ud",
+  t:"Tag ét omløb af gevindet og rul det ud på et bord. Omkredsen $\\pi d_m$ bliver grundlinjen, og stigningen $l$ (så langt møtrikken flytter sig pr. omgang) bliver højden. Gevindet er nu et <b>skråplan</b> med hældningen $\\tan\\lambda=l/(\\pi d_m)$. Møtrikken med lasten $W$ er en klods på skråplanet, og det moment, du drejer med, svarer til en vandret kraft $P=2T/d_m$ på klodsen."},
+ {h:"Friktionen er det hele",
+  t:"Uden friktion skulle du kun bruge $P=W\\tan\\lambda$ &mdash; næsten ingenting, fordi skråplanet er meget fladt. Men gevindfriktionen modvirker bevægelsen, og den er ofte <b>større</b> end selve løftearbejdet. Med $\\mu=0{,}10$ går over halvdelen af dit arbejde tabt som varme. Det er prisen for selvhæmning."},
+ {h:"Friktionsvinklen gør det elegant",
+  t:"Skriv $\\mu=\\tan\\rho$. Så bliver løftekraften $P=W\\tan(\\lambda+\\rho)$: det er som at skubbe en friktionsløs klods op ad et skråplan, der er <b>stejlere med friktionsvinklen</b>. Ved nedsænkning vender friktionen: $P=W\\tan(\\rho-\\lambda)$. Er $\\rho>\\lambda$, er den kraft positiv &mdash; du skal aktivt dreje for at sænke. Lasten kan ikke selv glide ned. Det er selvhæmning."},
+ {h:"Selvhæmning koster virkningsgrad",
+  t:"Virkningsgraden er $e=\\tan\\lambda/\\tan(\\lambda+\\rho)$. En selvhæmmende skrue med firkantgevind har altid $e<50\\%$. Vil du have høj virkningsgrad (fx 90 % i en kugleskrue til CNC), mister du selvhæmningen og må bruge en bremse. Den afvejning er den vigtigste designbeslutning for en bevægelsesskrue."}
+],
+analogi: "Et snoet bjergpas: vejen (gevindet) snor sig op ad bjerget i en flad hældning, så bilen (lasten) kan køre op med lille kraft. En parkeret bil med håndbremse (friktion) ruller ikke ned igen, hvis vejen er flad nok &mdash; det er selvhæmning.",
+
+plan: [
+ {t:"0&ndash;2 min", k:"warm", w:"Tegn skruen og rul gevindet ud",
+  d:"Skrue med møtrik og last $W$. Ved siden af: en retvinklet trekant med grundlinje $\\pi d_m$, højde $l$ og vinkel $\\lambda$. Sig: &bdquo;Et gevind er et skråplan.&ldquo;"},
+ {t:"2&ndash;7 min", w:"Frilegeme af klodsen ved løft",
+  d:"Klods på skråplan: $W$ nedad, $P$ vandret, normalkraft $N$ vinkelret på planet, friktion $\\mu N$ ned ad planet. To ligevægtsligninger, isolér $P$: $P=W\\frac{\\sin\\lambda+\\mu\\cos\\lambda}{\\cos\\lambda-\\mu\\sin\\lambda}$."},
+ {t:"7&ndash;9 min", w:"Til moment",
+  d:"Divider med $\\cos\\lambda$, indsæt $\\tan\\lambda=l/(\\pi d_m)$, gang med $\\pi d_m/\\pi d_m$. $T=P\\,d_m/2$. Du har formlen. Nævn kravefriktionen $T_c=\\mu_cWd_c/2$, hvis der er et aksialleje."},
+ {t:"9&ndash;11 min", w:"Selvhæmning",
+  d:"Nedsænkning: friktionen vender → $T_L=\\frac{Wd_m}{2}\\frac{\\pi\\mu d_m-l}{\\pi d_m+\\mu l}$. Selvhæmning: $T_L\\ge0$ ⟺ $\\mu\\ge l/(\\pi d_m)=\\tan\\lambda$, dvs. $\\rho\\ge\\lambda$."},
+ {t:"11&ndash;13 min", w:"Regn designopgaven",
+  d:"$T=\\frac{10\\,000\\cdot20}{2}\\cdot\\frac{5+6{,}283}{62{,}83-0{,}5}=18\\,102$ N·mm $=18{,}1$ N·m. $\\tan\\lambda=0{,}080<\\mu=0{,}10$ → selvhæmmende. Virkningsgrad $e=Wl/(2\\pi T)=44\\%$."},
+ {t:"13&ndash;20 min", k:"end", w:"Pointe og spørgsmål",
+  d:"&bdquo;Selvhæmmende og under 50 % virkningsgrad &mdash; det hænger uløseligt sammen for firkantgevind.&ldquo; Derefter spørgsmål."}
+],
+
+trin: [
+ {t:"Geometri: stigning og stigningsvinkel",
+  m:"\\tan\\lambda=\\frac{l}{\\pi d_m},\\qquad l=n\\cdot p\\quad(n=\\text{antal gange})",
+  hvorfor:"Stigningen $l$ (&bdquo;lead&ldquo;) er, hvor langt møtrikken flytter sig pr. omdrejning. For et enkeltgænget gevind er den lig delingen $p$. Middeldiameteren $d_m$ er, hvor kontakten i gennemsnit sker. Rul ét omløb ud: det er en trekant.",
+  sig:"Stigningsvinklen er stigningen divideret med omkredsen ved middeldiameteren. Et omløb af gevindet rullet ud er et skråplan."},
+
+ {t:"Frilegeme: klods på skråplan, løft",
+  m:["\\sum F_x=0:\\quad P-N\\sin\\lambda-\\mu N\\cos\\lambda=0",
+     "\\sum F_y=0:\\quad N\\cos\\lambda-\\mu N\\sin\\lambda-W=0"],
+  hvorfor:"Når lasten løftes, bevæger klodsen sig op ad planet, så friktionen $\\mu N$ virker <b>ned ad</b> planet. $P$ er den vandrette kraft ved middelradius, der svarer til momentet. $N$ står vinkelret på planet.",
+  sig:"Jeg laver kraftligevægt på klodsen. Ved løft peger friktionen ned ad skråplanet."},
+
+ {t:"Løs for P",
+  m:"P=W\\,\\frac{\\sin\\lambda+\\mu\\cos\\lambda}{\\cos\\lambda-\\mu\\sin\\lambda}=W\\,\\frac{\\tan\\lambda+\\mu}{1-\\mu\\tan\\lambda}",
+  hvorfor:"Isolér $N$ fra den lodrette ligning, sæt ind i den vandrette. Divider tæller og nævner med $\\cos\\lambda$. Med $\\mu=\\tan\\rho$ er det additionsformlen: $P=W\\tan(\\lambda+\\rho)$.",
+  sig:"Isolerer jeg P, får jeg W gange tan lambda plus my over en minus my tan lambda. Det er W gange tangens til stigningsvinklen plus friktionsvinklen."},
+
+ {t:"Indsæt geometrien og gå til moment",
+  m:["P=W\\,\\frac{\\frac{l}{\\pi d_m}+\\mu}{1-\\mu\\frac{l}{\\pi d_m}}=W\\,\\frac{l+\\pi\\mu d_m}{\\pi d_m-\\mu l}",
+     "\\boxed{\\ T=P\\,\\frac{d_m}{2}=\\frac{W\\,d_m}{2}\\left(\\frac{l+\\pi\\mu d_m}{\\pi d_m-\\mu l}\\right)\\ }"],
+  hvorfor:"Gang tæller og nævner med $\\pi d_m$. Kraften $P$ virker ved middelradius $d_m/2$, så momentet er $P\\cdot d_m/2$. Har skruen et aksialleje (krave), lægges $T_c=\\mu_cWd_c/2$ til.",
+  sig:"Indsætter jeg geometrien og ganger med middelradius, har jeg løftemomentet."},
+
+ {t:"Nedsænkning og selvhæmning",
+  m:["T_L=\\frac{W\\,d_m}{2}\\left(\\frac{\\pi\\mu d_m-l}{\\pi d_m+\\mu l}\\right)=\\frac{Wd_m}{2}\\tan(\\rho-\\lambda)",
+     "\\text{Selvhæmning:}\\quad T_L\\ge0\\quad\\Longleftrightarrow\\quad\\boxed{\\ \\mu\\ge\\frac{l}{\\pi d_m}=\\tan\\lambda\\ }\\quad\\Longleftrightarrow\\quad\\rho\\ge\\lambda"],
+  hvorfor:"Ved nedsænkning bevæger klodsen sig ned ad planet, så friktionen vender (fortegnet på $\\mu$ skifter). Er $T_L$ positiv, skal du aktivt dreje for at sænke &mdash; lasten kan ikke selv dreje skruen. Er den negativ, skal du <i>holde igen</i>, ellers kører lasten ned af sig selv.",
+  sig:"Ved nedsænkning vender friktionen. Skruen er selvhæmmende, hvis nedsænkningsmomentet er positivt, dvs. hvis friktionskoefficienten er større end tangens til stigningsvinklen."},
+
+ {t:"Virkningsgrad",
+  m:"e=\\frac{\\text{nyttigt arbejde}}{\\text{tilført arbejde}}=\\frac{W\\,l}{2\\pi T}=\\frac{\\tan\\lambda}{\\tan(\\lambda+\\rho)}",
+  hvorfor:"Pr. omdrejning løftes $W$ stykket $l$, mens momentet $T$ drejer $2\\pi$. Ved selvhæmningsgrænsen $\\rho=\\lambda$ er $e=\\tan\\lambda/\\tan2\\lambda=(1-\\tan^2\\lambda)/2<\\tfrac12$. En selvhæmmende firkantskrue har derfor altid under 50 % virkningsgrad.",
+  sig:"Virkningsgraden er løftearbejdet over drejearbejdet pr. omgang. For en selvhæmmende skrue er den altid under halvtreds procent."}
+],
+
+faldgruber: [
+ {t:"Friktionens retning", d:"Ved <b>løft</b> virker friktionen ned ad planet (+ i tælleren). Ved <b>nedsænkning</b> op ad planet (− i tælleren). Byt ikke om &mdash; det er selve forskellen mellem $T$ og $T_L$."},
+ {t:"l er ikke altid p", d:"$l=n\\cdot p$. Et dobbeltgænget gevind med $p=5$ mm har $l=10$ mm &mdash; dobbelt så hurtig, men mindre selvhæmmende. Opgaven siger enkeltgænget, så $l=p$."},
+ {t:"Brug middeldiameteren", d:"Ikke den ydre diameter. $d_m=d-p/2$ for firkantgevind. Den ydre diameter giver en forkert stigningsvinkel og et forkert moment."},
+ {t:"Kravefriktion", d:"Har skruen et aksialleje (krave), kommer $T_c=\\mu_cWd_c/2$ oveni &mdash; ofte lige så stort som gevindmomentet. Opgaven har ingen krave, så den er udeladt. Sig det."},
+ {t:"Enheder", d:"$W\\cdot d_m/2=10\\,000\\cdot10=100\\,000$ N·mm. Svaret $18\\,102$ N·mm er $18{,}1$ N·m. Et løftemoment på 18 N·m er realistisk for en donkraft &mdash; brug det som fornuftstjek."}
+],
+
+qa: [
+ {q:"Hvad er virkningsgraden i opgaven?",
+  a:"$e=Wl/(2\\pi T)=10\\,000\\cdot5/(2\\pi\\cdot18\\,102)=0{,}44$. Kun 44 % af dit arbejde løfter lasten; resten er friktionsvarme i gevindet."},
+ {q:"Hvor stort er nedsænkningsmomentet?",
+  a:"$T_L=100\\,000\\cdot\\frac{6{,}283-5}{62{,}83+0{,}5}=2026$ N·mm $\\approx2{,}0$ N·m. Positivt → du skal aktivt dreje skruen for at sænke. Selvhæmmende."},
+ {q:"Hvorfor bruger CNC-maskiner kugleskruer?",
+  a:"Kugleskruer har rullende kontakt med $\\mu\\approx0{,}005$ og virkningsgrad over 90 %. Det giver præcis, let bevægelse &mdash; men de er ikke selvhæmmende, så lodrette akser kræver en bremse."},
+ {q:"Hvad ændrer sig med trapezgevind (ACME) i stedet for firkantgevind?",
+  a:"Flankerne hælder med vinklen $\\alpha$ (14,5°), så normalkraften bliver større, og friktionen virker som $\\mu/\\cos\\alpha$. Formlen får $\\mu\\sec\\alpha$ i stedet for $\\mu$. Trapezgevind er lettere at fremstille og optager slid, men har lidt lavere virkningsgrad."},
+ {q:"Kan vibrationer ophæve selvhæmningen?",
+  a:"Ja. Vibrationer kan kortvarigt sænke den effektive friktion, så en skrue, der er selvhæmmende i hvile, kan krybe. Derfor har man ofte en ekstra sikkerhedsmargin eller bremse på kritiske løft."},
+ {q:"Hvordan hænger det sammen med skrå tandhjul og snekkedrev?",
+  a:"Samme geometri: en flade snoet med en vinkel om en cylinder. Et snekkedrev er en bevægelsesskrue, der driver et tandhjul, og det kan også være selvhæmmende, hvis stigningsvinklen er mindre end friktionsvinklen."}
+],
+
+sammenhaeng: "Bevægelsesskruen er <b>statik med friktion</b> på et skråplan, og den samme geometri &mdash; en flade viklet om en cylinder med en vinkel &mdash; går igen i skrå tandhjul (<b>spm. 12</b>, hvor skråvinklen giver aksialkraft) og snekkedrev. Skruen selv skal dimensioneres for vridning og tryk (<b>spm. 5</b>, von Mises), og en lang skrue i tryk kan knække (<b>spm. 7</b>, Euler). Friktionsdelen af emnet peger frem mod koblinger og bremser (<b>spm. 15</b>), hvor friktion er det, man <i>vil</i> have.",
+
+links: [
+ {k:"SPM 12", t:"Samme geometri: skrå tænder", u:"sp12_skraa_tandhjul.html"},
+ {k:"SPM 7", t:"Lang skrue i tryk: knækning", u:"sp07_soejleknaekning.html"},
+ {k:"SPM 15", t:"Friktion som det ønskede", u:"sp15_kobling.html"},
+ {k:"WIDGET", t:"Boltet samling", u:"../interaktiv/boltet_samling.html"},
+ {k:"KAP. 16", t:"Formeloverblik (PDF)", u:"../Kapitel16_Overblik.pdf"},
+ {k:"KAP. 16", t:"Quiz", u:"../../../quiz/mem1/Kapitel16_Quiz.html"}
+]
+};
+
+var LAB = {
+w: 720, h: 440,
+intro: "Til venstre er ét gevindomløb rullet ud til et skråplan, med klodsen (møtrikken) og kræfterne ved løft. Til højre er virkningsgraden som funktion af stigningsvinklen; det skraverede område er <b>selvhæmmende</b> ($\\lambda\\le\\rho$). Øg stigningen, og se punktet krydse grænsen: så løber lasten ned af sig selv.",
+preset2: {navn: "Dobbeltgænget: l = 10 mm", v: {l: 10}},
+
+inputs: [
+ {id:"dm", label:"Middeldiameter $d_m$",       min:8,   max:60,  step:1,    value:20,  unit:"mm"},
+ {id:"l",  label:"Stigning $l$",               min:1,   max:25,  step:0.5,  value:5,   dec:1, unit:"mm"},
+ {id:"mu", label:"Friktionskoefficient $\\mu$", min:0.01,max:0.30,step:0.01, value:0.10,dec:2, unit:""},
+ {id:"W",  label:"Last $W$",                    min:1,   max:50,  step:0.5,  value:10,  dec:1, unit:"kN"}
+],
+
+compute: function (v) {
+  var W = v.W * 1000, pd = Math.PI * v.dm;
+  var T = W * v.dm / 2 * (v.l + v.mu * pd) / (pd - v.mu * v.l);
+  var TL = W * v.dm / 2 * (v.mu * pd - v.l) / (pd + v.mu * v.l);
+  var tl = v.l / pd, lam = Math.atan(tl) * 180 / Math.PI, rho = Math.atan(v.mu) * 180 / Math.PI;
+  var e = W * v.l / (2 * Math.PI * T);
+  return { W:W, pd:pd, T:T, TL:TL, tl:tl, lam:lam, rho:rho, e:e, self: v.mu >= tl, P:2 * T / v.dm, T0:W * v.l / (2 * Math.PI) };
+},
+
+readout: function (v, r) {
+  return [
+   {l:"Løftemoment $T$", v:r.T/1000, dec:2, unit:"N·m", k:"hi"},
+   {l:"Nedsænkning $T_L$", v:r.TL/1000, dec:2, unit:"N·m", k: r.TL<0?"warn":""},
+   {l:"$\\tan\\lambda=l/(\\pi d_m)$", v:r.tl, dec:4, unit:""},
+   {l:"Stigningsvinkel $\\lambda$", v:r.lam, dec:2, unit:"°"},
+   {l:"Friktionsvinkel $\\rho$", v:r.rho, dec:2, unit:"°"},
+   {l:"Selvhæmmende?", raw: r.self ? "JA (ρ ≥ λ)" : "NEJ (ρ < λ)", unit:"", k: r.self?"hi":"warn"},
+   {l:"Virkningsgrad $e$", v:r.e*100, dec:1, unit:"%"},
+   {l:"Friktionsfrit moment", v:r.T0/1000, dec:2, unit:"N·m"}
+  ];
+},
+
+steps: function (v, r) {
+  var T = Eks.tnum;
+  return [
+   {h:"1 · Geometri",
+    m:"\\pi d_m=\\pi\\cdot"+T(v.dm,0)+"="+T(r.pd,2)+"\\ \\text{mm},\\qquad\\tan\\lambda=\\frac{l}{\\pi d_m}=\\frac{"+T(v.l,1)+"}{"+T(r.pd,2)+"}="+T(r.tl,4),
+    c:"$\\lambda="+Eks.num(r.lam,2)+"°$."},
+   {h:"2 · Løftemoment",
+    m:"T=\\frac{W\\,d_m}{2}\\cdot\\frac{l+\\pi\\mu d_m}{\\pi d_m-\\mu l}=\\frac{"+T(r.W,0)+"\\cdot"+T(v.dm,0)+"}{2}\\cdot\\frac{"+T(v.l,1)+"+"+T(v.mu*r.pd,3)+"}{"+T(r.pd,2)+"-"+T(v.mu*v.l,2)+"}="+T(r.T,0)+"\\ \\text{N·mm}",
+    c:"$="+Eks.num(r.T/1000,2)+"$ N·m. Uden friktion ville det kun være "+Eks.num(r.T0/1000,2)+" N·m."},
+   {h:"3 · Selvhæmning",
+    m:"\\mu="+T(v.mu,2)+"\\ "+(r.self?"\\ge":"<")+"\\ \\tan\\lambda="+T(r.tl,4)+"\\quad\\Rightarrow\\quad\\text{"+(r.self?"selvhæmmende":"IKKE selvhæmmende")+"}",
+    c:"Ækvivalent: $\\rho="+Eks.num(r.rho,2)+"°$ "+(r.self?"≥":"<")+" $\\lambda="+Eks.num(r.lam,2)+"°$."},
+   {h:"4 · Nedsænkningsmoment",
+    m:"T_L=\\frac{W\\,d_m}{2}\\cdot\\frac{\\pi\\mu d_m-l}{\\pi d_m+\\mu l}="+T(r.TL,0)+"\\ \\text{N·mm}",
+    c: r.TL>=0 ? "Positivt: du skal aktivt dreje for at sænke." : "<b style='color:#ff5e5e'>Negativt: lasten kører ned af sig selv &mdash; kræver bremse.</b>"},
+   {h:"5 · Virkningsgrad",
+    m:"e=\\frac{W\\,l}{2\\pi T}=\\frac{"+T(r.W,0)+"\\cdot"+T(v.l,1)+"}{2\\pi\\cdot"+T(r.T,0)+"}="+T(r.e*100,1)+"\\ \\%",
+    c:"Selvhæmmende firkantskruer har altid $e<50\\%$."}
+  ];
+},
+
+facit: function (v, r) {
+  if (v.dm===20 && v.l===5 && Math.abs(v.mu-0.10)<1e-9 && v.W===10) {
+    return {t:"<b>✓ Eksamensopgavens facit:</b> $T=\\frac{10\\,000\\cdot20}{2}\\cdot\\frac{5+6{,}283}{62{,}83-0{,}5}=18\\,102$ N·mm $=18{,}1$ N·m. Skruen er selvhæmmende ($\\mu=0{,}10>\\tan\\lambda=0{,}0796$), nedsænkning kræver $2{,}0$ N·m, og virkningsgraden er 44 %."};
+  }
+  return {off:true, t:"Du har ændret inddata. Tryk på knappen for at komme tilbage til eksamensopgavens tal."};
+},
+
+draw: function (ctx, W, H, v, r, C) {
+  C.grid(ctx, W, H, 40);
+  var CY='#5ec8ff', GR='#00d984', GO='#ffa500', RD='#ff5e5e', PU='#d984ff', DIM='rgba(227,235,243,.45)';
+
+  /* ---------- skråplanet (et omløb rullet ud) ---------- */
+  var x0=24, y0=H-110, base=330, lamR=Math.atan(r.tl), hgt=base*Math.tan(lamR);
+  var vis=Math.min(1, 150/Math.max(hgt,1)); // skaler hvis planet bliver meget stejlt
+  var b2=base*vis, h2=hgt*vis;
+  C.txt(ctx,'Ét gevindomløb rullet ud', x0, 24, DIM, 11);
+  C.poly(ctx, [[x0,y0],[x0+b2,y0],[x0+b2,y0-h2]], CY, 'rgba(94,200,255,.1)', 2);
+  C.mono(ctx,'π·dm = '+Eks.num(r.pd,1)+' mm (sand hældning)', x0+b2/2, y0+62, CY, 10, 'center');
+  C.mono(ctx,'l = '+Eks.num(v.l,1), x0+b2+6, y0-h2/2, CY, 10);
+  ctx.save(); ctx.strokeStyle=RD; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(x0, y0, 46, -lamR, 0); ctx.stroke(); ctx.restore();
+  C.mono(ctx,'λ='+Eks.num(r.lam,1)+'°', x0+50, y0-6, RD, 10);
+  // klods midt på planet
+  var t=0.58, kx=x0+t*b2, ky=y0-t*h2, s=26;
+  ctx.save(); ctx.translate(kx, ky); ctx.rotate(-lamR);
+  ctx.fillStyle='rgba(255,165,0,.25)'; ctx.strokeStyle=GO; ctx.lineWidth=2; ctx.fillRect(-s, -2*s+2, 2*s, 2*s-2); ctx.strokeRect(-s, -2*s+2, 2*s, 2*s-2); ctx.restore();
+  var cxk=kx-Math.sin(lamR)*s, cyk=ky-Math.cos(lamR)*s;   // klodsens centrum
+  var F=56;
+  C.arrow(ctx, cxk, cyk, cxk, cyk+F, '#e3ebf3', 2.4);                            // W
+  C.mono(ctx,'W', cxk+7, cyk+F-2, '#e3ebf3', 11);
+  C.arrow(ctx, cxk-F*1.1, cyk, cxk-s-2, cyk, GO, 2.6);                             // P
+  C.mono(ctx,'P = 2T/dm', cxk-F*1.1, cyk-8, GO, 10);
+  C.arrow(ctx, kx, ky, kx-Math.sin(lamR)*F*0.9, ky-Math.cos(lamR)*F*0.9, CY, 2);    // N (vinkelret paa planet)
+  C.mono(ctx,'N', kx-Math.sin(lamR)*F*0.9+6, ky-Math.cos(lamR)*F*0.9, CY, 11);
+  C.arrow(ctx, kx+Math.cos(lamR)*s, ky-Math.sin(lamR)*s, kx+Math.cos(lamR)*s-Math.cos(lamR)*48, ky-Math.sin(lamR)*s+Math.sin(lamR)*48, RD, 2); // friktion ned ad planet
+  C.mono(ctx,'μN', kx+Math.cos(lamR)*s-30, ky-Math.sin(lamR)*s+18, RD, 11);
+  C.txt(ctx, r.self ? '✓ selvhæmmende' : '✗ ikke selvhæmmende', x0, 46, r.self?GR:RD, 12, 'left', true);
+
+  /* ---------- virkningsgrad mod stigningsvinkel ---------- */
+  var gx0=400, gx1=W-22, gy0=40, gy1=H-48, Lm=60;
+  function GX(a){ return gx0 + a/Lm*(gx1-gx0); }
+  function GY(e){ return gy1 - e*(gy1-gy0); }
+  C.axes(ctx, gx0, gy0-10, gx1, gy1, 'λ [°]', 'e');
+  // selvhaemmende zone
+  ctx.save(); ctx.fillStyle='rgba(0,217,132,.10)'; ctx.fillRect(gx0, gy0, GX(r.rho)-gx0, gy1-gy0); ctx.restore();
+  C.line(ctx, GX(r.rho), gy0, GX(r.rho), gy1, GR, 1.3, [5,4]);
+  C.txt(ctx,'selvhæmmende', gx0+4, gy0+14, GR, 10);
+  C.mono(ctx,'ρ='+Eks.num(r.rho,1)+'°', GX(r.rho)+4, gy0+30, GR, 10);
+  // 50 %-linje
+  C.line(ctx, gx0, GY(0.5), gx1, GY(0.5), 'rgba(255,165,0,.5)', 1.2, [3,3]);
+  C.mono(ctx,'50 %', gx1-4, GY(0.5)-5, GO, 10, 'right');
+  [0,0.25,0.5,0.75,1].forEach(function(e){ C.mono(ctx, Math.round(e*100)+'', gx0-4, GY(e)+4, DIM, 9, 'right'); });
+  [0,15,30,45,60].forEach(function(a){ C.mono(ctx, a+'', GX(a), gy1+13, DIM, 9, 'center'); });
+  // kurve e(lambda)
+  var pts=[], rr=r.rho*Math.PI/180;
+  for (var k=1;k<=120;k++){ var a=k/120*Lm, ar=a*Math.PI/180; if (ar+rr>=Math.PI/2) break;
+    pts.push([GX(a), GY(Math.tan(ar)/Math.tan(ar+rr))]); }
+  C.poly(ctx, pts, CY, null, 2.6);
+  // driftspunkt
+  C.circle(ctx, GX(r.lam), GY(r.e), 6.5, '#fff', r.self?GR:RD, 2);
+  C.mono(ctx,'e='+Eks.num(r.e*100,1)+'%', GX(r.lam)+10, GY(r.e)-8, r.self?GR:RD, 11);
+}
+};
+</script>
+<script src="assets/eksamen.js"></script>
+<script>Eks.build();</script>
+</body>
+</html>

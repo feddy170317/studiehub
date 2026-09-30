@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spm. 6: Goodman udmattelse - MEM1 eksamen</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="assets/eksamen.css">
+</head>
+<body>
+<script>
+var QDATA = {
+nr: 6,
+titel: "Udmattelsesdesign og modificeret Goodman-kriterium",
+kapitel: 7,
+kapitelNavn: "Udmattelse og slag",
+mappe: "Spørgsmål 06 - Goodman udmattelse",
+prev: "sp05_flydekriterier.html",
+next: "sp07_soejleknaekning.html",
+bog: "Kap. 7: §7.8 <i>The Modified Endurance Limit</i>, lign. (7.18), s. 171&ndash;172 (bogen kalder faktorerne $k_f,k_s,k_r,k_t,k_m$) &middot; Goodman-linjen lign. (7.28), Soderberg (7.29), flydelinje (7.30), s. 177&ndash;178 &middot; modificeret Goodman-diagram Fig. 7.17.",
+
+spmA: "Beskriv den modificerede udmattelsesgrænse med Marin-faktorerne $S_e=k_ak_bk_ck_dk_eS'_e$. Udled ligningen for den modificerede Goodman-brudlinje, der forbinder middelspændingen $\\sigma_m$, amplitudespændingen $\\sigma_a$, brudstyrken $S_{ut}$ og udmattelsesgrænsen $S_e$.",
+spmB: "En komponent med udmattelsesgrænsen $S_e=200$ MPa og brudstyrken $S_{ut}=600$ MPa er udsat for en cyklisk aksialspænding, der varierer mellem $\\sigma_{min}=50$ MPa og $\\sigma_{max}=250$ MPa. Beregn $\\sigma_m$ og $\\sigma_a$, og bestem sikkerhedsfaktoren $n_f$ mod udmattelsesbrud efter Goodman-kriteriet.",
+
+oversat: "Bøjer du en papirclips frem og tilbage, knækker den &mdash; selvom den aldrig var i nærheden af at knække ved ét enkelt bøj. Det er udmattelse: små revner vokser lidt for hver cyklus. Del (a) har to halvdele. <b>Først</b>: laboratoriets udmattelsesgrænse er målt på en perfekt poleret prøvestang. En rigtig maskindel er grovere og større og belastes anderledes, så grænsen skal justeres ned med korrektionsfaktorer. <b>Dernæst</b>: i virkeligheden svinger spændingen sjældent symmetrisk omkring nul &mdash; der er ofte en fast middelspænding oveni. Goodman-linjen fortæller, hvor meget svingning du kan tåle, når der også er en middelspænding. Del (b) er en direkte anvendelse.",
+kerne: "En fast trækspænding oveni svingningen holder revnerne åbne og æder af den svingning, du kan tåle. Goodman er den rette linje mellem ren svingning ($S_e$) og ren statisk last ($S_{ut}$).",
+
+historie: [
+ {h:"Hvorfor udmattelse overhovedet er et problem",
+  t:"Et emne kan holde til 250 MPa statisk i al evighed og alligevel knække efter en million cyklusser mellem 50 og 250 MPa. Hver cyklus åbner og lukker en mikroskopisk revne ved overfladen, typisk ved en ridse eller et hjørne. Revnen vokser et atomlag ad gangen, indtil restarealet ikke kan bære lasten, og emnet knækker pludseligt &mdash; uden advarsel og uden synlig flydning. Omkring 80&ndash;90 % af alle mekaniske brud i maskiner er udmattelsesbrud."},
+ {h:"Hvor S'ₑ kommer fra, og hvorfor den skal ned",
+  t:"$S'_e$ måles på en roterende bøjeprøve: lille (≈7,6 mm), spejlpoleret, ved stuetemperatur, og tallet er medianen (50 % overlevelse). For stål gælder groft $S'_e\\approx0{,}5S_{ut}$. Din maskindel er ingen af delene. <b>Marin-faktorerne</b> korrigerer for hver forskel: $k_a$ overflade (drejet, smedet, valset → grovere, revner starter lettere), $k_b$ størrelse (større rumfang → flere fejl), $k_c$ belastningstype (aksial last spænder hele tværsnittet, ikke kun yderfibrene), $k_d$ temperatur, $k_e$ pålidelighed (99 % i stedet for 50 %). Alle er ≤ 1."},
+ {h:"Hvorfor middelspændingen betyder noget",
+  t:"En trækmiddelspænding holder revnefladerne adskilt, så hver svingning river mere op. En trykmiddelspænding klemmer dem sammen og <i>hjælper</i>. Det er derfor, man kuglestråler fjedre og aksler (<i>shot peening</i>): det lægger trykspændinger i overfladen. Forsøg viser, at jo større trækmiddelspænding, jo mindre amplitude kan emnet tåle &mdash; og ved $\\sigma_m=S_{ut}$ kan det ikke tåle nogen svingning, for så knækker det statisk."},
+ {h:"Goodman-linjen: den enkleste forbindelse",
+  t:"Plot tilladelig amplitude mod middelspænding. To punkter kender du sikkert: ingen middelspænding → $\\sigma_a=S_e$; ingen svingning → $\\sigma_m=S_{ut}$. Goodman forbinder dem med en <b>ret linje</b>. Forsøgsdata ligger faktisk lidt over linjen (Gerber-parablen passer bedre), så Goodman er en let konservativ, meget praktisk tilnærmelse."}
+],
+analogi: "En sæk, du bærer op ad trapperne: den faste vægt er middelspændingen, dit gyngende skridt er amplituden. Bærer du en tung sæk, kan du tåle mindre gyngen, før du taber den. Bærer du ingenting, kan du gynge så meget du vil op til dit maksimum. Goodman er den rette linje mellem de to yderpunkter.",
+
+plan: [
+ {t:"0&ndash;2 min", k:"warm", w:"Tegn spændingen som funktion af tiden",
+  d:"Sinuskurve mellem $\\sigma_{min}$ og $\\sigma_{max}$. Marker $\\sigma_m$ (midterlinjen) og $\\sigma_a$ (halv svingvidde). Sig: &bdquo;Udmattelse styres af to tal: hvor meget det svinger, og hvor det svinger omkring.&ldquo;"},
+ {t:"2&ndash;5 min", w:"Udmattelsesgrænsen og Marin-faktorerne",
+  d:"$S'_e$ fra roterende bøjeprøve. Gennemgå faktorerne én for én med den fysiske grund: overflade, størrelse, belastning, temperatur, pålidelighed. Alle ≤ 1."},
+ {t:"5&ndash;9 min", w:"Udled Goodman-linjen",
+  d:"Tegn $\\sigma_m$-$\\sigma_a$-diagrammet. Afsæt $(0,S_e)$ og $(S_{ut},0)$, træk linjen: $\\sigma_a/S_e+\\sigma_m/S_{ut}=1$. Indfør lastlinjen fra origo og sikkerhedsfaktoren: $1/n_f=\\sigma_a/S_e+\\sigma_m/S_{ut}$. Vis Gerber og flydelinjen som stiplede alternativer."},
+ {t:"9&ndash;12 min", w:"Regn designopgaven",
+  d:"$\\sigma_m=150$, $\\sigma_a=100$ MPa. $1/n_f=100/200+150/600=0{,}75$ → $n_f=1{,}33$. Marker punktet og skæringen $(200;\\,133)$ på linjen."},
+ {t:"12&ndash;14 min", k:"end", w:"Pointen der viser forståelse",
+  d:"&bdquo;Uden middelspænding ville $n_f=S_e/\\sigma_a=2{,}0$. Middelspændingen på 150 MPa æder en tredjedel af sikkerheden. Og $n_f$ forudsætter, at en overlast øger $\\sigma_a$ og $\\sigma_m$ i samme forhold.&ldquo;"},
+ {t:"14&ndash;20 min", k:"end", w:"Spørgsmål", d:"Se censors sandsynlige spørgsmål nederst."}
+],
+
+trin: [
+ {t:"Beskriv den cykliske spænding med to tal",
+  m:["\\sigma_m=\\frac{\\sigma_{max}+\\sigma_{min}}{2},\\qquad \\sigma_a=\\frac{\\sigma_{max}-\\sigma_{min}}{2}",
+     "R=\\frac{\\sigma_{min}}{\\sigma_{max}},\\qquad A=\\frac{\\sigma_a}{\\sigma_m}"],
+  hvorfor:"Enhver konstant-amplitude-cyklus er fuldt beskrevet af middel og amplitude. $R=-1$ er fuldt vekslende (ren bøjning i en roterende aksel), $R=0$ er pulserende fra nul. De to tal bliver akserne i Goodman-diagrammet.",
+  sig:"Jeg beskriver svingningen med middelspændingen og amplituden. Det er de to akser, jeg skal bruge i Goodman-diagrammet."},
+
+ {t:"Laboratoriets udmattelsesgrænse",
+  m:"S'_e\\approx0{,}5\\,S_{ut}\\quad(\\text{stål},\\ S_{ut}\\le1400\\ \\text{MPa})",
+  hvorfor:"Under $S'_e$ holder en stålprøve i princippet uendeligt (over $10^6$&ndash;$10^7$ cyklusser). Aluminium har ingen ægte grænse &mdash; S-N-kurven fortsætter med at falde. Tallet gælder den polerede standardprøve, ikke din del.",
+  sig:"Laboratoriets udmattelsesgrænse er for stål cirka halvdelen af brudstyrken, målt på en lille poleret prøve i roterende bøjning."},
+
+ {t:"Marin-faktorerne: fra prøvestang til maskindel",
+  m:["S_e=k_a\\,k_b\\,k_c\\,k_d\\,k_e\\,S'_e",
+     "k_a:\\text{overflade}\\quad k_b:\\text{størrelse}\\quad k_c:\\text{belastning}\\quad k_d:\\text{temperatur}\\quad k_e:\\text{pålidelighed}"],
+  hvorfor:"Hver faktor svarer til én forskel mellem prøven og din del. <b>Overflade</b> er ofte den største: en smedet overflade kan halvere grænsen, fordi revner starter i ruheden &mdash; og mere, jo stærkere stålet er. <b>Størrelse</b>: flere fejl i større rumfang. <b>Belastning</b>: ved aksial last er hele tværsnittet højt belastet. <b>Pålidelighed</b>: fra 50 % til fx 99 % overlevelse koster ca. 19 %. Bogen bruger $k_f,k_s,k_r,k_t,k_m$ &mdash; samme idé. Kærvvirkning håndteres typisk ved at gange spændingen med $K_f$.",
+  sig:"Marin-faktorerne korrigerer for forskellen mellem prøvestangen og den rigtige del: overfladeruhed, størrelse, belastningstype, temperatur og pålidelighed. De er alle mindre end én."},
+
+ {t:"Goodman-linjen gennem to kendte punkter",
+  m:["(\\sigma_m,\\sigma_a)=(0,\\,S_e)\\quad\\text{og}\\quad(S_{ut},\\,0)",
+     "\\boxed{\\ \\frac{\\sigma_a}{S_e}+\\frac{\\sigma_m}{S_{ut}}=1\\ }"],
+  hvorfor:"Linjens ligning på akseafskæringsform: $x/a+y/b=1$. Punkt 1 er ren vekselspænding &mdash; præcis sådan $S_e$ er defineret. Punkt 2 er ren statisk last &mdash; så knækker emnet ved brudstyrken. Alle kombinationer under linjen holder (uendelig levetid), over linjen svigter emnet.",
+  sig:"Goodman-linjen går gennem udmattelsesgrænsen på amplitude-aksen og brudstyrken på middelspændingsaksen. Punkter under linjen holder."},
+
+ {t:"Indfør sikkerhedsfaktoren via lastlinjen",
+  m:"\\frac{n_f\\sigma_a}{S_e}+\\frac{n_f\\sigma_m}{S_{ut}}=1\\quad\\Rightarrow\\quad\\boxed{\\ \\frac{1}{n_f}=\\frac{\\sigma_a}{S_e}+\\frac{\\sigma_m}{S_{ut}}\\ }",
+  hvorfor:"Tegn en linje fra origo gennem driftspunktet $(\\sigma_m,\\sigma_a)$. Sikkerhedsfaktoren er, hvor mange gange du kan skalere <b>begge</b> spændinger op, før du rammer Goodman-linjen. Det forudsætter <i>proportional</i> overlast (fx hvis kraften stiger). Stiger kun amplituden (fx fast forspænding), skal man i stedet bevæge sig lodret &mdash; og få en anden $n_f$. Bogens lign. (7.28) har desuden $K_f$ på $\\sigma_a$.",
+  sig:"Sikkerhedsfaktoren er, hvor mange gange jeg kan skalere driftspunktet langs linjen fra origo, før jeg rammer Goodman-linjen."},
+
+ {t:"Hvorfor „modificeret“: flydning og alternativerne",
+  m:["\\text{Gerber: }\\frac{n_f\\sigma_a}{S_e}+\\left(\\frac{n_f\\sigma_m}{S_{ut}}\\right)^2=1\\qquad\\text{Soderberg: }\\frac{\\sigma_a}{S_e}+\\frac{\\sigma_m}{S_y}=\\frac{1}{n_f}",
+     "\\text{Flydelinje (Langer): }\\ \\sigma_a+\\sigma_m=\\sigma_{max}=\\frac{S_y}{n_y}"],
+  hvorfor:"Goodman-linjen går helt ud til $S_{ut}$, men før da flyder emnet allerede på første cyklus. Det <b>modificerede</b> Goodman-diagram kombinerer Goodman-linjen med flydelinjen $\\sigma_a+\\sigma_m=S_y$, så begge brudformer er dækket. Gerber passer bedst med data (parabel), Soderberg er meget konservativ (bruger $S_y$). Goodman er det praktiske mellemstandpunkt.",
+  sig:"Det modificerede diagram kombinerer Goodman-linjen med flydelinjen, så emnet heller ikke må flyde på første cyklus. Gerber passer bedre med forsøg, men Goodman er lineær og let at regne med."}
+],
+
+faldgruber: [
+ {t:"Byt ikke om på σₘ og σₐ", d:"$\\sigma_a$ er <b>halvdelen</b> af svingvidden: $(250-50)/2=100$, ikke $200$. En klassisk fejl, der halverer din sikkerhedsfaktor."},
+ {t:"Brug Sₑ, ikke S'ₑ", d:"Opgaven giver $S_e=200$ MPa, som allerede er modificeret. Ganger du med Marin-faktorer igen, tæller du dem to gange."},
+ {t:"Sikkerhedsfaktoren er ikke Sₑ/σₐ", d:"$S_e/\\sigma_a=2{,}0$ ignorerer middelspændingen og er for optimistisk. Middelspændingen på 150 MPa reducerer $n_f$ til 1,33."},
+ {t:"Tjek også flydning", d:"Goodman alene tjekker ikke første-cyklus-flydning. Med $\\sigma_{max}=250$ MPa skal $S_y>250$ MPa. Er $S_y$ opgivet, så regn $n_y=S_y/\\sigma_{max}$ og tag den mindste."},
+ {t:"Trykmiddelspænding", d:"Goodman-linjen gælder for $\\sigma_m\\ge0$. For trykmiddelspænding sættes typisk $\\sigma_a=S_e/n_f$ (vandret linje) &mdash; tryk skader ikke, men hjælper heller ikke i modellen."}
+],
+
+qa: [
+ {q:"Hvad ville sikkerhedsfaktoren være uden middelspænding?",
+  a:"$n_f=S_e/\\sigma_a=200/100=2{,}0$. Middelspændingen reducerer den med en tredjedel til 1,33. Det viser, hvorfor man aldrig må ignorere en forspænding eller egenlast."},
+ {q:"Hvorfor kuglestråler man fjedre og aksler (shot peening)?",
+  a:"Kuglestråling lægger trykspændinger i overfladen. Det flytter den <i>lokale</i> middelspænding mod venstre i Goodman-diagrammet, hvor den tilladelige amplitude er større. Revner starter ved overfladen, så det er præcis dér, det hjælper."},
+ {q:"Hvad er forskellen på Goodman og Soderberg?",
+  a:"Soderberg forbinder $S_e$ med $S_y$ i stedet for $S_{ut}$. Den er mere konservativ og sikrer automatisk mod flydning, men kasserer meget af materialets reelle kapacitet. Goodman kombineret med en separat flydekontrol er mere økonomisk."},
+ {q:"Hvordan håndteres en kærv, fx en skulder på en aksel?",
+  a:"Med udmattelseskærvfaktoren $K_f=1+q(K_t-1)$, hvor $q$ er kærvfølsomheden. I Hamrock ganges den på amplituden: $K_f\\sigma_a/S_e+\\sigma_m/S_{ut}=1/n_f$. For duktile materialer ofte også på middelspændingen, medmindre der er lokal flydning."},
+ {q:"Hvad sker der, hvis kun amplituden stiger ved overlast?",
+  a:"Så bevæger driftspunktet sig lodret op i diagrammet, ikke langs lastlinjen fra origo. Skæringen med Goodman ligger et andet sted, og sikkerhedsfaktoren skal beregnes som $n_f=S_a/\\sigma_a$ med $S_a=S_e(1-\\sigma_m/S_{ut})$. Her: $S_a=200(1-150/600)=150$ MPa → $n_f=1{,}5$ &mdash; større end 1,33, fordi middelspændingen ikke vokser med. <b>Sikkerhedsfaktoren afhænger altså af, hvordan overlasten opstår</b>, og det skal man sige, når man angiver den."},
+ {q:"Gælder det for aluminium?",
+  a:"Aluminium har ingen ægte udmattelsesgrænse &mdash; S-N-kurven falder hele vejen. Man bruger i stedet en udmattelsesstyrke ved et bestemt antal cyklusser, fx $5\\cdot10^8$, og indsætter den som $S_e$."}
+],
+
+sammenhaeng: "Udmattelse er det mest praktiske spørgsmål i faget, fordi næsten alle maskindele belastes cyklisk. Spændingerne $\\sigma_a$ og $\\sigma_m$ kommer fra bøjning (<b>spm. 3</b>) eller vridning og samles ved flerakset last med von Mises (<b>spm. 5</b>). Akseldimensionering (<b>spm. 9</b>) bruger i virkeligheden Goodman til roterende aksler, hvor bøjningen er fuldt vekslende. Fjedre (<b>spm. 14</b>) og tandhjul (<b>spm. 11</b>) svigter typisk ved udmattelse, og rullelejers levetid (<b>spm. 10</b>) er også et udmattelsesfænomen &mdash; bare i kontaktfladen.",
+
+links: [
+ {k:"SPM 9", t:"Aksler: vekslende bøjning", u:"sp09_akseldesign.html"},
+ {k:"SPM 10", t:"Lejelevetid: overfladeudmattelse", u:"sp10_rulleleje.html"},
+ {k:"SPM 5", t:"von Mises til fleraksede cyklusser", u:"sp05_flydekriterier.html"},
+ {k:"WIDGET", t:"Udmattelse og Goodman", u:"../interaktiv/udmattelse_goodman.html"},
+ {k:"KAP. 7", t:"Formeloverblik (PDF)", u:"../Kapitel07_Overblik.pdf"},
+ {k:"KAP. 7", t:"Quiz", u:"../../../quiz/mem1/Kapitel07_Quiz.html"}
+]
+};
+
+var LAB = {
+w: 720, h: 440,
+intro: "Venstre panel er spændingen som funktion af tiden, højre panel er Goodman-diagrammet. Træk $\\sigma_{min}$ op mod $\\sigma_{max}$ og se amplituden forsvinde, mens punktet glider ud ad middelspændingsaksen. <b>$S_y$ er ikke givet i opgaven</b> &mdash; den bruges kun til at tegne flydelinjen (det &bdquo;modificerede&ldquo; i navnet).",
+preset2: {navn: "Fuldt vekslende: σmin = −100, σmax = 100", v: {smin: -100, smax: 100}},
+
+inputs: [
+ {id:"smin", label:"$\\sigma_{min}$",                min:-200, max:400, step:5,  value:50,  unit:"MPa"},
+ {id:"smax", label:"$\\sigma_{max}$",                min:-100, max:600, step:5,  value:250, unit:"MPa"},
+ {id:"Se",   label:"Udmattelsesgrænse $S_e$",        min:50,   max:500, step:5,  value:200, unit:"MPa"},
+ {id:"Sut",  label:"Brudstyrke $S_{ut}$",            min:200,  max:1200,step:10, value:600, unit:"MPa"},
+ {id:"Sy",   label:"Flydespænding $S_y$ (kun linje)",min:150,  max:1100,step:10, value:450, unit:"MPa"}
+],
+
+compute: function (v) {
+  var hi = Math.max(v.smax, v.smin), lo = Math.min(v.smax, v.smin);
+  var sm = (hi + lo) / 2, sa = (hi - lo) / 2;
+  var inv = sa / v.Se + Math.max(sm, 0) / v.Sut;
+  var nf = inv > 0 ? 1 / inv : Infinity;
+  var ny = hi > 0 ? v.Sy / hi : Infinity;
+  // Gerber: n^2 (sm/Sut)^2 + n (sa/Se) - 1 = 0
+  var a = Math.pow(Math.max(sm,0) / v.Sut, 2), b = sa / v.Se, nG;
+  if (a < 1e-12) nG = b > 0 ? 1 / b : Infinity;
+  else nG = (-b + Math.sqrt(b * b + 4 * a)) / (2 * a);
+  return { hi:hi, lo:lo, sm:sm, sa:sa, nf:nf, ny:ny, nG:nG, R: hi !== 0 ? lo / hi : 0,
+           n0: sa > 0 ? v.Se / sa : Infinity };
+},
+
+readout: function (v, r) {
+  function n(x){ return isFinite(x) ? Eks.num(x,3) : "∞"; }
+  return [
+   {l:"Middelspænding $\\sigma_m$", v:r.sm, dec:1, unit:"MPa"},
+   {l:"Amplitude $\\sigma_a$", v:r.sa, dec:1, unit:"MPa"},
+   {l:"Spændingsforhold $R$", v:r.R, dec:2, unit:""},
+   {l:"$n_f$ Goodman", raw:n(r.nf), unit:"", k: r.nf<1?"warn":"hi"},
+   {l:"$n_f$ uden $\\sigma_m$ ($S_e/\\sigma_a$)", raw:n(r.n0), unit:""},
+   {l:"$n_f$ Gerber (til sml.)", raw:n(r.nG), unit:""},
+   {l:"$n_y$ flydning ($S_y/\\sigma_{max}$)", raw:n(r.ny), unit:"", k: r.ny<1?"warn":""}
+  ];
+},
+
+steps: function (v, r) {
+  var T = Eks.tnum;
+  return [
+   {h:"1 · Middelspænding",
+    m:"\\sigma_m=\\frac{\\sigma_{max}+\\sigma_{min}}{2}=\\frac{"+T(r.hi,0)+"+("+T(r.lo,0)+")}{2}="+T(r.sm,1)+"\\ \\text{MPa}",
+    c:"Niveauet svingningen sker omkring."},
+   {h:"2 · Amplitude",
+    m:"\\sigma_a=\\frac{\\sigma_{max}-\\sigma_{min}}{2}=\\frac{"+T(r.hi,0)+"-("+T(r.lo,0)+")}{2}="+T(r.sa,1)+"\\ \\text{MPa}",
+    c:"Halvdelen af svingvidden &mdash; ikke hele."},
+   {h:"3 · Goodman",
+    m:"\\frac{1}{n_f}=\\frac{\\sigma_a}{S_e}+\\frac{\\sigma_m}{S_{ut}}=\\frac{"+T(r.sa,1)+"}{"+T(v.Se,0)+"}+\\frac{"+T(Math.max(r.sm,0),1)+"}{"+T(v.Sut,0)+"}="+T(r.sa/v.Se,4)+"+"+T(Math.max(r.sm,0)/v.Sut,4)+"="+T(r.sa/v.Se+Math.max(r.sm,0)/v.Sut,4),
+    c: r.sm < 0 ? "Trykmiddelspænding sættes til nul i Goodman (konservativt)." : "Første led er svingningens andel, andet led middelspændingens andel."},
+   {h:"4 · Sikkerhedsfaktor",
+    m:"n_f="+(isFinite(r.nf)?T(r.nf,3):"\\infty")+"\\qquad\\text{skæring: }(S_m,S_a)=n_f(\\sigma_m,\\sigma_a)=("+(isFinite(r.nf)?T(r.nf*Math.max(r.sm,0),1):"-")+";\\ "+(isFinite(r.nf)?T(r.nf*r.sa,1):"-")+")",
+    c:"Punktet på Goodman-linjen, som lastlinjen fra origo rammer."}
+  ];
+},
+
+facit: function (v, r) {
+  if (v.smin===50 && v.smax===250 && v.Se===200 && v.Sut===600) {
+    return {t:"<b>✓ Eksamensopgavens facit:</b> $\\sigma_m=150$ MPa, $\\sigma_a=100$ MPa, $1/n_f=0{,}50+0{,}25=0{,}75$ → $n_f=1{,}33$. Lastlinjen rammer Goodman-linjen i $(200;\\,133{,}3)$ MPa. Uden middelspænding var $n_f=2{,}0$ &mdash; middelspændingen æder en tredjedel af sikkerheden."};
+  }
+  return {off:true, t:"Du har ændret inddata ($S_y$ påvirker ikke Goodman-facit). Tryk på knappen for at komme tilbage til eksamensopgavens tal."};
+},
+
+draw: function (ctx, W, H, v, r, C) {
+  C.grid(ctx, W, H, 40);
+  var CY='#5ec8ff', GR='#00d984', GO='#ffa500', RD='#ff5e5e', PU='#d984ff', DIM='rgba(227,235,243,.45)';
+
+  /* ---------- venstre: sigma(t) ---------- */
+  var tx0=40, tx1=258, ty0=60, ty1=H-60;
+  var smx=Math.max(Math.abs(r.hi), Math.abs(r.lo), 50)*1.15;
+  function TY(s){ return (ty0+ty1)/2 - s/smx*(ty1-ty0)/2; }
+  C.txt(ctx,'Spænding over tid', tx0, 26, DIM, 11);
+  C.line(ctx, tx0, TY(0), tx1, TY(0), DIM, 1.1);
+  C.line(ctx, tx0, ty0-10, tx0, ty1+10, DIM, 1.1);
+  var pts=[];
+  for (var i=0;i<=120;i++){ var t=i/120; pts.push([tx0+t*(tx1-tx0), TY(r.sm + r.sa*Math.sin(t*4*Math.PI))]); }
+  C.poly(ctx, pts, CY, null, 2.4);
+  C.line(ctx, tx0, TY(r.sm), tx1, TY(r.sm), GO, 1.4, [6,4]);
+  C.mono(ctx,'σm='+Eks.num(r.sm,0), tx1+4, TY(r.sm)+4, GO, 10);
+  C.line(ctx, tx0, TY(r.hi), tx1, TY(r.hi), 'rgba(94,200,255,.35)', 1, [2,3]);
+  C.line(ctx, tx0, TY(r.lo), tx1, TY(r.lo), 'rgba(94,200,255,.35)', 1, [2,3]);
+  C.mono(ctx,'σmax='+Eks.num(r.hi,0), tx1+4, TY(r.hi)+4, CY, 10);
+  C.mono(ctx,'σmin='+Eks.num(r.lo,0), tx1+4, TY(r.lo)+4, CY, 10);
+  var ax=tx0+(tx1-tx0)*0.125;
+  C.dim(ctx, ax, TY(r.sm), ax, TY(r.hi), GR, null);
+  C.mono(ctx,'σa', ax+6, (TY(r.sm)+TY(r.hi))/2+4, GR, 11);
+
+  /* ---------- højre: Goodman-diagram ---------- */
+  var gx0=352, gx1=W-22, gy0=40, gy1=H-44;
+  var xm=Math.max(v.Sut, v.Sy, r.sm*1.1)*1.06, ym=Math.max(v.Se, v.Sy, r.sa*1.1)*1.12;
+  function GX(s){ return gx0 + s/xm*(gx1-gx0); }
+  function GY(s){ return gy1 - s/ym*(gy1-gy0); }
+  C.axes(ctx, gx0, gy0-10, gx1, gy1, 'σm', 'σa');
+  // Gerber
+  var gp=[]; for (var k=0;k<=60;k++){ var s=k/60*v.Sut; gp.push([GX(s), GY(v.Se*(1-Math.pow(s/v.Sut,2)))]); }
+  C.poly(ctx, gp, 'rgba(217,132,255,.55)', null, 1.4, [4,4]);
+  // flydelinje (Langer)
+  C.line(ctx, GX(0), GY(v.Sy), GX(v.Sy), GY(0), 'rgba(255,94,94,.7)', 1.4, [7,4]);
+  // Goodman
+  C.line(ctx, GX(0), GY(v.Se), GX(v.Sut), GY(0), GR, 2.6);
+  // sikkert omraade (modificeret: under begge)
+  var xi = (v.Sy - v.Se) / (1 - v.Se / v.Sut);   // skaering Goodman/flydelinje i sm
+  var poly=[[GX(0),GY(0)],[GX(0),GY(Math.min(v.Se,v.Sy))]];
+  if (xi > 0 && xi < v.Sut && v.Sy > v.Se) { poly.push([GX(xi), GY(v.Se*(1-xi/v.Sut))]); poly.push([GX(v.Sy),GY(0)]); }
+  else if (v.Sy <= v.Se) { poly.push([GX(v.Sy),GY(0)]); }
+  else { poly.push([GX(v.Sut),GY(0)]); }
+  C.poly(ctx, poly, null, 'rgba(0,217,132,.08)');
+  C.mono(ctx,'Se='+Eks.num(v.Se,0), GX(0)+6, GY(v.Se)-6, GR, 10);
+  C.mono(ctx,'Sut='+Eks.num(v.Sut,0), GX(v.Sut), gy1+14, GR, 10, 'center');
+  C.mono(ctx,'Sy', GX(v.Sy), gy1+26, RD, 10, 'center');
+  // lastlinje + driftspunkt + skaering
+  var smp=Math.max(r.sm,0);
+  if (isFinite(r.nf)) {
+    C.line(ctx, GX(0), GY(0), GX(smp*r.nf), GY(r.sa*r.nf), GO, 1.4, [5,4]);
+    C.circle(ctx, GX(smp*r.nf), GY(r.sa*r.nf), 5, null, GR);
+    C.mono(ctx,'('+Eks.num(smp*r.nf,0)+'; '+Eks.num(r.sa*r.nf,0)+')', GX(smp*r.nf)+8, GY(r.sa*r.nf)-8, GR, 10);
+  }
+  C.circle(ctx, GX(smp), GY(r.sa), 6, '#fff', GO, 2);
+  C.mono(ctx,'drift', GX(smp)+9, GY(r.sa)+14, GO, 10);
+  C.txt(ctx,'— Goodman', gx0+100, 22, GR, 11, 'left', true);
+  C.txt(ctx,'- - Gerber', gx0+196, 22, PU, 11);
+  C.txt(ctx,'- - flydning', gx0+272, 22, RD, 11);
+  C.txt(ctx,'nf = '+(isFinite(r.nf)?Eks.num(r.nf,2):'∞'), gx1, gy0+20, GO, 14, 'right', true);
+}
+};
+</script>
+<script src="assets/eksamen.js"></script>
+<script>Eks.build();</script>
+</body>
+</html>

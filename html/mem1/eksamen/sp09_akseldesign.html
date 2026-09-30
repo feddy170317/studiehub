@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spm. 9: Akseldesign - MEM1 eksamen</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="assets/eksamen.css">
+</head>
+<body>
+<script>
+var QDATA = {
+nr: 9,
+titel: "Akseldesign ved kombineret bøjning og vridning",
+kapitel: 11,
+kapitelNavn: "Aksler og tilhørende dele",
+mappe: "Spørgsmål 09 - Akseldesign",
+prev: "sp08_trykbeholder.html",
+next: "sp10_rulleleje.html",
+bog: "Kap. 11: §11.2 <i>Design of Shafts for Static Loading</i>, §11.2.1 <i>Bending Moment and Torsion</i>, lign. (11.1)&ndash;(11.6) og MSST/DET-diametrene, s. 265&ndash;266. Bøjning fra lign. (4.45), vridning fra lign. (4.33), hovedspændinger fra lign. (2.16).",
+
+spmA: "Udled det ækvivalente vridningsmoment $T_e=\\sqrt{M^2+T^2}$ og det ækvivalente bøjningsmoment $M_e=\\frac12\\left(M+\\sqrt{M^2+T^2}\\right)$, som bruges ved dimensionering af massive cirkulære aksler under samtidig bøjning og vridning.",
+spmB: "En transmissionsaksel overfører et vridningsmoment $T=300$ N·m og er samtidig udsat for et konstant bøjningsmoment $M=400$ N·m. Den tilladte forskydningsspænding er $\\tau_{till}=50$ MPa. Bestem den mindste nødvendige diameter $d$ for en massiv aksel efter den maksimale forskydningsspændingshypotese.",
+
+oversat: "En aksel overfører moment (vridning) og bærer samtidig tandhjul og remskiver, der bøjer den. Begge dele giver spændinger i det <b>samme punkt</b> på akslens overflade. Du kan ikke bare dimensionere for hver for sig. Spørgsmålet beder dig vise, at man kan pakke de to laster sammen til <b>ét ækvivalent moment</b>: $T_e$ er det rene vridningsmoment, der ville give samme maksimale forskydning; $M_e$ er det rene bøjningsmoment, der ville give samme største normalspænding. Derefter dimensionerer du, som om der kun var én last.",
+kerne: "Bøjning og vridning mødes i akslens yderfiber. Mohrs cirkel lægger dem sammen som kateter i en retvinklet trekant: $T_e=\\sqrt{M^2+T^2}$ er hypotenusen.",
+
+historie: [
+ {h:"Hvor det kritiske punkt er",
+  t:"Bøjningsspændingen $\\sigma=Mc/I$ er størst i yderfiberen (top og bund). Vridningsspændingen $\\tau=Tc/J$ er størst på <i>hele</i> overfladen. Det værste punkt er derfor overfladen i bøjningsplanet, hvor <b>begge</b> er maksimale samtidig. Dér sidder et element med $\\sigma_x$ fra bøjning, $\\tau_{xy}$ fra vridning og $\\sigma_y=0$ &mdash; præcis situationen fra spm. 1."},
+ {h:"Hvorfor 32 og 16",
+  t:"For en massiv cirkel er $I=\\pi d^4/64$ og $J=\\pi d^4/32=2I$. Med $c=d/2$ giver det $\\sigma_x=32M/(\\pi d^3)$ og $\\tau_{xy}=16T/(\\pi d^3)$. Bemærk: $\\sigma_x/2$ og $\\tau_{xy}$ har <b>samme</b> forfaktor $16/(\\pi d^3)$. Det skyldes, at $J=2I$ for en cirkel &mdash; og det er den detalje, der gør hele udledningen så elegant."},
+ {h:"Hvor √(M² + T²) kommer fra",
+  t:"Mohrs cirkel har radius $R=\\sqrt{(\\sigma_x/2)^2+\\tau_{xy}^2}$. Indsæt: $R=\\frac{16}{\\pi d^3}\\sqrt{M^2+T^2}$. Men $\\frac{16}{\\pi d^3}T_e$ er præcis den forskydning, et rent vridningsmoment $T_e$ ville give. Så $\\sqrt{M^2+T^2}$ <i>er</i> et moment &mdash; det, der giver samme $\\tau_{max}$. Pythagoras i Mohrs cirkel bliver til Pythagoras i momenterne."},
+ {h:"Hvad Mₑ er til",
+  t:"$\\sigma_1=\\sigma_x/2+R=\\frac{16}{\\pi d^3}(M+\\sqrt{M^2+T^2})=\\frac{32}{\\pi d^3}M_e$. Så $M_e$ er det rene bøjningsmoment, der giver samme største hovedspænding. Det bruges med <b>normalspændingshypotesen</b> (Rankine) for sprøde materialer som støbejern. For duktilt stål er det $T_e$ og Tresca, der gælder &mdash; det er det, opgaven beder om."}
+],
+analogi: "To personer trækker i en kasse: én mod øst med 400 N, én mod nord med 300 N. Kassen mærker 500 N skråt. Bøjning og vridning trækker i akslens yderfiber i hver sin &bdquo;retning&ldquo; i Mohr-planet, og akslen mærker hypotenusen.",
+
+plan: [
+ {t:"0&ndash;2 min", k:"warm", w:"Tegn akslen og det kritiske punkt",
+  d:"Aksel med $M$ og $T$. Marker punktet på overfladen, hvor bøjningen er størst. Tegn spændingselementet: $\\sigma_x$ og $\\tau_{xy}$, $\\sigma_y=0$."},
+ {t:"2&ndash;5 min", w:"Spændingerne i punktet",
+  d:"$\\sigma_x=Mc/I=32M/(\\pi d^3)$, $\\tau_{xy}=Tc/J=16T/(\\pi d^3)$. Peg på den fælles faktor $16/(\\pi d^3)$."},
+ {t:"5&ndash;9 min", w:"Mohr → Tₑ og Mₑ",
+  d:"Tegn Mohrs cirkel. $R=\\frac{16}{\\pi d^3}\\sqrt{M^2+T^2}$ → $T_e$. $\\sigma_1=\\frac{\\sigma_x}{2}+R=\\frac{32}{\\pi d^3}\\cdot\\frac12(M+\\sqrt{M^2+T^2})$ → $M_e$. Sig hvad hver bruges til: Tresca (duktilt) vs. Rankine (sprødt)."},
+ {t:"9&ndash;12 min", w:"Dimensionér",
+  d:"$T_e=\\sqrt{400^2+300^2}=500$ N·m. $\\tau_{max}=16T_e/(\\pi d^3)\\le50$ MPa → $d\\ge\\sqrt[3]{16\\cdot500\\,000/(\\pi\\cdot50)}=37{,}1$ mm. Rund op til standardmål: 38 eller 40 mm."},
+ {t:"12&ndash;14 min", k:"end", w:"Hæv blikket",
+  d:"&bdquo;I virkeligheden roterer akslen, så bøjningen er fuldt vekslende. Den statiske beregning er et første skøn &mdash; den endelige dimensionering skal være udmattelse med Goodman (spm. 6) og kærvfaktorer ved skuldre og kilespor.&ldquo;"},
+ {t:"14&ndash;20 min", k:"end", w:"Spørgsmål", d:"Se censors sandsynlige spørgsmål nederst."}
+],
+
+trin: [
+ {t:"Spændinger i det kritiske punkt",
+  m:["\\sigma_x=\\frac{Mc}{I}=\\frac{M\\,(d/2)}{\\pi d^4/64}=\\frac{32M}{\\pi d^3},\\qquad \\tau_{xy}=\\frac{Tc}{J}=\\frac{T\\,(d/2)}{\\pi d^4/32}=\\frac{16T}{\\pi d^3}",
+     "\\sigma_y=0"],
+  hvorfor:"Bøjningsformlen fra spm. 3 og vridningsformlen $\\tau=Tr/J$. Punktet ligger på overfladen i bøjningsplanet, hvor begge er maksimale. $\\sigma_y=0$, fordi der ikke er nogen last på tværs af akslens længdeakse (overfladen er fri).",
+  sig:"I yderfiberen har jeg bøjningsspændingen 32 M over pi d i tredje og vridningsspændingen 16 T over pi d i tredje. Tværspændingen er nul."},
+
+ {t:"Mohrs cirkel for punktet",
+  m:"R=\\sqrt{\\left(\\frac{\\sigma_x}{2}\\right)^2+\\tau_{xy}^2}=\\sqrt{\\left(\\frac{16M}{\\pi d^3}\\right)^2+\\left(\\frac{16T}{\\pi d^3}\\right)^2}=\\frac{16}{\\pi d^3}\\sqrt{M^2+T^2}",
+  hvorfor:"Nøgleskridtet: $\\sigma_x/2$ og $\\tau_{xy}$ har samme forfaktor. Derfor kan den sættes uden for kvadratroden, og det, der er tilbage, er et <b>moment</b>. Det er hele tricket.",
+  sig:"Radius i Mohrs cirkel bliver 16 over pi d i tredje gange kvadratroden af M i anden plus T i anden, fordi halvdelen af bøjningsspændingen og vridningsspændingen har samme faktor."},
+
+ {t:"Det ækvivalente vridningsmoment",
+  m:"\\tau_{max}=R=\\frac{16}{\\pi d^3}\\,T_e\\qquad\\text{med}\\qquad\\boxed{\\ T_e=\\sqrt{M^2+T^2}\\ }",
+  hvorfor:"Sammenlign med ren vridning: $\\tau=16T/(\\pi d^3)$. Den kombinerede last giver samme $\\tau_{max}$ som et rent vridningsmoment $T_e$. Man kan nu dimensionere med de velkendte vridningsformler.",
+  sig:"Den maksimale forskydning er den samme, som et rent vridningsmoment Te ville give. Det er det ækvivalente vridningsmoment."},
+
+ {t:"Det ækvivalente bøjningsmoment",
+  m:"\\sigma_1=\\frac{\\sigma_x}{2}+R=\\frac{16}{\\pi d^3}\\left(M+\\sqrt{M^2+T^2}\\right)=\\frac{32}{\\pi d^3}M_e,\\qquad\\boxed{\\ M_e=\\tfrac12\\left(M+\\sqrt{M^2+T^2}\\right)\\ }",
+  hvorfor:"Samme idé for den største normalspænding. $M_e$ er det rene bøjningsmoment, der giver samme $\\sigma_1$. Det passer til normalspændingshypotesen for sprøde materialer. Bemærk: $M_e\\ge M$ altid &mdash; vridningen øger den største trækspænding.",
+  sig:"Den største hovedspænding svarer til et rent bøjningsmoment Me. Det bruges, når materialet er sprødt, og brud styres af trækspændingen."},
+
+ {t:"Dimensionér efter Tresca (MSST)",
+  m:["\\tau_{max}=\\frac{16\\,T_e}{\\pi d^3}\\le\\tau_{till}\\quad\\Rightarrow\\quad\\boxed{\\ d=\\sqrt[3]{\\frac{16\\,T_e}{\\pi\\,\\tau_{till}}}\\ }",
+     "\\text{Med }\\tau_{till}=\\frac{S_y}{2n_s}:\\qquad d=\\left[\\frac{32\\,n_s}{\\pi S_y}\\sqrt{M^2+T^2}\\right]^{1/3}\\quad(\\text{bogens form})"],
+  hvorfor:"Tresca siger, at duktilt materiale flyder, når $\\tau_{max}$ når en grænse (spm. 5). Isolér $d$. Bogen skriver det med $S_y$ og $n_s$ &mdash; det er samme formel, fordi Tresca-flydespændingen i forskydning er $S_y/2$. Med von Mises bliver det $\\sqrt{M^2+\\tfrac34T^2}$ i stedet.",
+  sig:"Med Tresca må den maksimale forskydning ikke overstige den tilladte. Isolerer jeg d, får jeg tredjeroden af 16 Te over pi tau."}
+],
+
+faldgruber: [
+ {t:"Enheder: N·m til N·mm", d:"$T_e=500$ N·m $=500\\,000$ N·mm. Med $\\tau$ i MPa (N/mm²) får du $d$ i mm. Glemmer du 1000, bliver $d=3{,}7$ mm &mdash; en tandstikker."},
+ {t:"Dimensionér ikke for M og T hver for sig", d:"Kun bøjning: $d=34{,}4$ mm (med $\\sigma_{till}=100$ MPa). Kun vridning: $d=31{,}3$ mm. Begge er for små. Kombinationen kræver 37,1 mm."},
+ {t:"Mₑ med Tresca", d:"$M_e$ hører til normalspændingshypotesen (sprødt). Opgaven beder om Tresca → brug $T_e$. Censor spørger næsten altid, hvornår man bruger hvilken."},
+ {t:"Rund op, ikke ned", d:"$37{,}07$ mm er et minimum. Vælg næste standardmål (38 eller 40 mm). Runder du ned til 37, overskrides $\\tau_{till}$ en smule."},
+ {t:"Statisk ≠ roterende", d:"En roterende aksel med konstant $M$ ser en fuldt vekslende bøjningsspænding. Den statiske beregning gælder kun for en stillestående aksel eller som første skøn &mdash; udmattelse (spm. 6) er typisk dimensionerende."}
+],
+
+qa: [
+ {q:"Hvorfor har σₓ/2 og τ samme forfaktor?",
+  a:"Fordi $J=2I$ for et cirkulært tværsnit. $\\sigma_x/2=\\frac12\\cdot\\frac{Mc}{I}=\\frac{Mc}{2I}=\\frac{Mc}{J}$, og $\\tau=\\frac{Tc}{J}$. Samme $c/J$. For et ikke-cirkulært tværsnit gælder det ikke, og så kan man ikke lave et ækvivalent moment så enkelt."},
+ {q:"Hvad giver von Mises i stedet?",
+  a:"$\\sigma_e=\\sqrt{\\sigma_x^2+3\\tau^2}=\\frac{32}{\\pi d^3}\\sqrt{M^2+\\tfrac34T^2}$. Med $S_y/n_s=2\\tau_{till}=100$ MPa giver det $d=36{,}5$ mm &mdash; lidt mindre, fordi von Mises er mindre konservativ end Tresca."},
+ {q:"Hvor på akslen er det kritiske snit?",
+  a:"Hvor $\\sqrt{M^2+T^2}$ er størst &mdash; typisk under et tandhjul eller en remskive, hvor bøjningsmomentet topper, og i den del af akslen, der overfører moment. Men pas på skuldre og kilespor: dér er der kærvvirkning, og et snit med lavere moment kan blive kritisk."},
+ {q:"Hvad sker der, hvis der også er en aksialkraft?",
+  a:"Så lægges $4F/(\\pi d^2)$ til $\\sigma_x$ (§11.2.2). Den har en anden $d$-afhængighed ($1/d^2$ i stedet for $1/d^3$), så man kan ikke længere samle det i ét ækvivalent moment, og $d$ må findes iterativt."},
+ {q:"Hvorfor laver man hule aksler?",
+  a:"Materialet nær centrum bidrager næsten intet til $I$ og $J$ &mdash; hvert arealelement vægtes med afstanden i anden, og tæt på centrum er den lille. En hul aksel med samme ydre diameter vejer meget mindre og er næsten lige så stærk. Det bruges i fly og biler."},
+ {q:"Hvad er effekten, hvis akslen kører 1500 o/min?",
+  a:"$P=T\\omega=300\\cdot2\\pi\\cdot1500/60=47{,}1$ kW. Effekt og omdrejningstal giver vridningsmomentet &mdash; det er typisk sådan, $T$ bestemmes i praksis."}
+],
+
+sammenhaeng: "Det her spørgsmål er <b>syntesen af de første fem</b>: bøjning ($\\sigma=Mc/I$, spm. 3), vridning ($\\tau=Tc/J$), Mohrs cirkel (spm. 1) og Tresca (spm. 5) i én formel. Kan du fortælle den kæde, viser du overblik over hele faget. Lasterne $M$ og $T$ kommer fra tandhjul (<b>spm. 11&ndash;12</b>: $F_t$, $F_r$, $F_a$ giver moment og vridning) og remme (<b>spm. 16</b>: $F_1+F_2$ bøjer akslen), og lejerne (<b>spm. 10</b>) sidder ved akslens ender og bærer reaktionerne. Roterer akslen, skal Goodman (<b>spm. 6</b>) ind.",
+
+links: [
+ {k:"SPM 1", t:"Mohrs cirkel: kilden til √(M²+T²)", u:"sp01_mohr.html"},
+ {k:"SPM 5", t:"Tresca-kriteriet", u:"sp05_flydekriterier.html"},
+ {k:"SPM 6", t:"Roterende aksel: udmattelse", u:"sp06_goodman.html"},
+ {k:"WIDGET", t:"Aksel med kombineret last", u:"../interaktiv/aksel_kombineret.html"},
+ {k:"KAP. 11", t:"Formeloverblik (PDF)", u:"../Kapitel11_Overblik.pdf"},
+ {k:"KAP. 11", t:"Quiz", u:"../../../quiz/mem1/Kapitel11_Quiz.html"}
+]
+};
+
+var LAB = {
+w: 720, h: 440,
+intro: "Til højre er Mohrs cirkel for akslens kritiske punkt, <b>regnet ved den dimensionerede diameter</b>. Læg mærke til, at cirklens top altid rører $\\tau_{till}$-linjen præcis &mdash; det er definitionen på den mindste diameter. Nederst til venstre ses $T_e$ som hypotenusen i en trekant med $M$ og $T$ som kateter.",
+preset2: {navn: "Kun vridning: M = 0", v: {M: 0}},
+
+inputs: [
+ {id:"M",  label:"Bøjningsmoment $M$",        min:0,  max:1500, step:10, value:400, unit:"N·m"},
+ {id:"T",  label:"Vridningsmoment $T$",       min:0,  max:1500, step:10, value:300, unit:"N·m"},
+ {id:"ta", label:"Tilladt $\\tau_{till}$",     min:20, max:200,  step:1,  value:50,  unit:"MPa"}
+],
+
+compute: function (v) {
+  var M = v.M * 1000, T = v.T * 1000;            // N*mm
+  var Te = Math.sqrt(M * M + T * T), Me = 0.5 * (M + Te);
+  var d = Math.cbrt(16 * Te / (Math.PI * v.ta));
+  var dDET = Math.cbrt(32 * Math.sqrt(M * M + 0.75 * T * T) / (Math.PI * 2 * v.ta));
+  var sx = d > 0 ? 32 * M / (Math.PI * Math.pow(d, 3)) : 0, tx = d > 0 ? 16 * T / (Math.PI * Math.pow(d, 3)) : 0;
+  var std = [10,12,15,16,18,20,22,25,28,30,32,35,38,40,42,45,48,50,55,60,65,70,75,80,85,90,95,100,110,120];
+  var ds = std.filter(function (x) { return x >= d - 1e-9; })[0] || Math.ceil(d);
+  return { Te:Te, Me:Me, d:d, dDET:dDET, sx:sx, tx:tx, R:Math.hypot(sx / 2, tx), s1:sx / 2 + Math.hypot(sx / 2, tx), ds:ds,
+           dM: M > 0 ? Math.cbrt(32 * M / (Math.PI * 2 * v.ta)) : 0, dT: T > 0 ? Math.cbrt(16 * T / (Math.PI * v.ta)) : 0 };
+},
+
+readout: function (v, r) {
+  return [
+   {l:"$T_e=\\sqrt{M^2+T^2}$", v:r.Te/1000, dec:1, unit:"N·m", k:"hi"},
+   {l:"$M_e=\\frac12(M+T_e)$", v:r.Me/1000, dec:1, unit:"N·m"},
+   {l:"$d_{min}$ Tresca", v:r.d, dec:2, unit:"mm", k:"hi"},
+   {l:"Standardmål (op)", v:r.ds, dec:0, unit:"mm"},
+   {l:"$d$ von Mises (til sml.)", v:r.dDET, dec:2, unit:"mm"},
+   {l:"$\\sigma_x$ ved $d_{min}$", v:r.sx, dec:1, unit:"MPa"},
+   {l:"$\\tau_{xy}$ ved $d_{min}$", v:r.tx, dec:1, unit:"MPa"},
+   {l:"Kun $M$ / kun $T$", raw: Eks.num(r.dM,1)+" / "+Eks.num(r.dT,1), unit:"mm"}
+  ];
+},
+
+steps: function (v, r) {
+  var T = Eks.tnum;
+  return [
+   {h:"1 · Ækvivalent vridningsmoment",
+    m:"T_e=\\sqrt{M^2+T^2}=\\sqrt{"+T(v.M,0)+"^2+"+T(v.T,0)+"^2}="+T(r.Te/1000,1)+"\\ \\text{N·m}",
+    c:"Hypotenusen i trekanten med $M$ og $T$ som kateter."},
+   {h:"2 · Mindste diameter (Tresca)",
+    m:"d=\\sqrt[3]{\\frac{16\\,T_e}{\\pi\\,\\tau_{till}}}=\\sqrt[3]{\\frac{16\\cdot"+T(r.Te,0)+"}{\\pi\\cdot"+T(v.ta,0)+"}}="+T(r.d,2)+"\\ \\text{mm}",
+    c:"$T_e$ i N·mm og $\\tau$ i MPa giver mm. Vælg standardmål "+r.ds+" mm."},
+   {h:"3 · Kontrol: spændingerne ved d",
+    m:"\\sigma_x=\\frac{32M}{\\pi d^3}="+T(r.sx,1)+",\\quad \\tau_{xy}=\\frac{16T}{\\pi d^3}="+T(r.tx,1)+"\\ \\text{MPa}",
+    c:"Ved præcis $d_{min}$."},
+   {h:"4 · Kontrol med Mohr",
+    m:"\\tau_{max}=\\sqrt{\\left(\\frac{\\sigma_x}{2}\\right)^2+\\tau_{xy}^2}=\\sqrt{"+T(r.sx/2,1)+"^2+"+T(r.tx,1)+"^2}="+T(r.R,1)+"\\ \\text{MPa}=\\tau_{till}\\ \\checkmark",
+    c:"Cirklens radius er præcis den tilladte forskydning."},
+   {h:"5 · Ækvivalent bøjningsmoment (til sprødt materiale)",
+    m:"M_e=\\tfrac12\\left(M+\\sqrt{M^2+T^2}\\right)="+T(r.Me/1000,1)+"\\ \\text{N·m}\\quad\\Rightarrow\\quad\\sigma_1=\\frac{32M_e}{\\pi d^3}="+T(r.s1,1)+"\\ \\text{MPa}",
+    c:"Samme $\\sigma_1$ som Mohr-cirklens højre skæring."}
+  ];
+},
+
+facit: function (v, r) {
+  if (v.M===400 && v.T===300 && v.ta===50) {
+    return {t:"<b>✓ Eksamensopgavens facit:</b> $T_e=\\sqrt{400^2+300^2}=500$ N·m ($M_e=450$ N·m). $d=\\sqrt[3]{16\\cdot500\\,000/(\\pi\\cdot50)}=37{,}07$ mm → vælg <b>38 mm</b> (eller 40 mm). Kontrol: $\\tau_{max}=50{,}0$ MPa ved $d=37{,}07$ mm."};
+  }
+  return {off:true, t:"Du har ændret inddata. Tryk på knappen for at komme tilbage til eksamensopgavens tal."};
+},
+
+draw: function (ctx, W, H, v, r, C) {
+  C.grid(ctx, W, H, 40);
+  var CY='#5ec8ff', GR='#00d984', GO='#ffa500', RD='#ff5e5e', PU='#d984ff', DIM='rgba(227,235,243,.45)';
+
+  /* ---------- akslen ---------- */
+  var ax0=40, ax1=330, ay=104, rad=Math.max(12, Math.min(r.d*0.9, 44));
+  C.txt(ctx,'Aksel, d = '+Eks.num(r.d,1)+' mm', (ax0+ax1)/2, 24, DIM, 11, 'center');
+  ctx.save(); ctx.fillStyle='rgba(94,200,255,.12)'; ctx.strokeStyle=CY; ctx.lineWidth=2;
+  ctx.fillRect(ax0, ay-rad, ax1-ax0, 2*rad); ctx.strokeRect(ax0, ay-rad, ax1-ax0, 2*rad); ctx.restore();
+  C.line(ctx, ax0-12, ay, ax1+12, ay, 'rgba(227,235,243,.25)', 1, [8,4,2,4]);
+  // vridning (buede pile i enderne)
+  function twist(x, dir){ ctx.save(); ctx.strokeStyle=GO; ctx.lineWidth=2.2;
+    ctx.beginPath(); ctx.ellipse(x, ay, 9, rad+10, 0, dir>0?-1.2:1.9, dir>0?1.2:4.4); ctx.stroke(); ctx.restore(); }
+  twist(ax0-2, 1); twist(ax1+2, -1);
+  C.mono(ctx,'T', ax1+18, ay-rad-6, GO, 12);
+  // boejning (pile)
+  C.arrow(ctx, (ax0+ax1)/2, ay+rad+46, (ax0+ax1)/2, ay+rad+6, PU, 2.4);
+  C.mono(ctx,'M', (ax0+ax1)/2+8, ay+rad+40, PU, 12);
+  // kritisk punkt
+  var px=(ax0+ax1)/2, py=ay-rad;
+  C.circle(ctx, px, py, 5, null, RD);
+  C.txt(ctx,'kritisk punkt: σx + τxy', px+10, py-8, RD, 10);
+
+  /* ---------- M-T-trekant ---------- */
+  var tx0=60, ty0=H-40, s=Math.min(200/Math.max(v.M, v.T, 1), 0.35);
+  var Mx=v.M*s, Ty=v.T*s;
+  C.txt(ctx,'Tₑ = √(M² + T²)', tx0, ty0-Ty-38, DIM, 11);
+  C.line(ctx, tx0, ty0, tx0+Mx, ty0, PU, 3);
+  C.line(ctx, tx0+Mx, ty0, tx0+Mx, ty0-Ty, GO, 3);
+  C.line(ctx, tx0, ty0, tx0+Mx, ty0-Ty, GR, 3.2);
+  C.mono(ctx,'M='+Eks.num(v.M,0), tx0+Mx/2, ty0+15, PU, 10, 'center');
+  C.mono(ctx,'T='+Eks.num(v.T,0), tx0+Mx+6, ty0-Ty/2, GO, 10);
+  C.mono(ctx,'Te='+Eks.num(r.Te/1000,0), tx0+Mx/2-8, ty0-Ty/2-10, GR, 11, 'right');
+
+  /* ---------- Mohrs cirkel ved d_min ---------- */
+  var gx0=388, gx1=W-22, cy=H/2+24;
+  C.txt(ctx,'Mohrs cirkel ved d = dmin', gx0, 24, DIM, 11);
+  var span=Math.max(r.s1, v.ta, 1)*1.18, sc=Math.min((gx1-gx0-10)/(span+Math.max(r.R-r.sx/2,0)+5), 150/Math.max(v.ta,r.R,1));
+  var ox=gx0+18+Math.max(r.R-r.sx/2, 0)*sc;
+  C.line(ctx, gx0, cy, gx1, cy, DIM, 1.1);
+  C.line(ctx, ox, cy-175, ox, cy+160, DIM, 1.1);
+  C.txt(ctx,'σ', gx1-4, cy-8, DIM, 12, 'right');
+  C.txt(ctx,'τ', ox+6, cy-162, DIM, 12);
+  var ccx=ox+r.sx/2*sc, R=r.R*sc;
+  C.line(ctx, gx0, cy-v.ta*sc, gx1, cy-v.ta*sc, RD, 1.4, [6,4]);
+  C.mono(ctx,'τtill='+Eks.num(v.ta,0), gx1-4, cy-v.ta*sc-6, RD, 10, 'right');
+  C.circle(ctx, ccx, cy, R, CY, 'rgba(94,200,255,.07)', 2.4);
+  C.circle(ctx, ox+r.sx*sc, cy-r.tx*sc, 4.5, null, GO);
+  C.mono(ctx,'X(σx, τxy)', ox+r.sx*sc+7, cy-r.tx*sc-6, GO, 10);
+  C.circle(ctx, ccx, cy-R, 5, null, RD);
+  C.circle(ctx, ccx+R, cy, 4.5, null, GR);
+  C.mono(ctx,'σ1='+Eks.num(r.s1,0), ccx+R, cy+17, GR, 10, 'center');
+  C.line(ctx, ccx, cy, ccx, cy-R, RD, 1.2, [3,3]);
+  C.mono(ctx,'τmax', ccx+6, cy-R/2, RD, 10);
+}
+};
+</script>
+<script src="assets/eksamen.js"></script>
+<script>Eks.build();</script>
+</body>
+</html>

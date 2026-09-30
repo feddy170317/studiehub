@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spm. 2: Tøjningsenergi - MEM1 eksamen</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="assets/eksamen.css">
+</head>
+<body>
+<script>
+var QDATA = {
+nr: 2,
+titel: "Spændings-tøjningssammenhænge, tøjningsenergi og flydekapacitet",
+kapitel: 3,
+kapitelNavn: "Introduktion til materialer og fremstilling",
+mappe: "Spørgsmål 02 - Tøjningsenergi",
+prev: "sp01_mohr.html",
+next: "sp03_bjaelkespaending.html",
+bog: "Kap. 3: Poissons forhold s. 61&ndash;62 &middot; §3.5.4 <i>Resilience and Toughness</i>, s. 63 &middot; §3.6 <i>Stress-Strain Relationships</i> (generaliseret Hookes lov), s. 67.",
+
+spmA: "Forklar Hookes lov for fleraksede spændingstilstande i 3D inklusive Poissons forhold $\\nu$. Udled udtrykket for den elastiske tøjningsenergitæthed $u=\\frac{\\sigma^2}{2E}$ ved enakset træk, og definer modulus of resilience (elastisk energikapacitet) $u_r=\\frac{S_y^2}{2E}$.",
+spmB: "En stang af konstruktionsstål ($d=20$ mm, $L=1$ m, $E=200$ GPa, $\\nu=0{,}30$, $S_y=250$ MPa) belastes af $F=62{,}83$ kN ($A\\approx314{,}16$ mm²). <b>(1)</b> Beregn $\\sigma_x$, $\\epsilon_x$, tværkontraktionen $\\Delta d$ og sikkerhedsfaktoren $n_y$. <b>(2)</b> Beregn $u$, den samlede energi $U$, $u_r$ og den maksimale elastiske energikapacitet $U_{max}$ før flydning.",
+
+oversat: "To spørgsmål i ét. <b>Første halvdel</b> handler om, at et materiale ikke kun reagerer i den retning, du trækker: trækker du en stang, bliver den også <i>tyndere</i>. Poissons forhold er tallet, der siger hvor meget. I 3D skal alle tre retninger kobles sammen &mdash; det er den generaliserede Hookes lov. <b>Anden halvdel</b> handler om, at et belastet elastisk emne opfører sig som en oprullet fjeder: der er <b>energi</b> gemt i det. Du skal kunne udlede hvor meget, og hvor meget der maksimalt kan gemmes, før materialet flyder.",
+kerne: "Spænding og tøjning er to sider af samme sag &mdash; og arealet mellem dem er energi. Modulus of resilience er arealet helt op til flydegrænsen: materialets evne til at absorbere et stød uden at tage varig skade.",
+
+historie: [
+ {h:"Hvorfor bliver en stang tyndere, når man trækker i den?",
+  t:"Materialets rumfang vil helst være nogenlunde konstant. Strækker du atomerne fra hinanden i længderetningen, trækker de sig lidt sammen på tværs. Forholdet mellem de to er <b>Poissons forhold</b> $\\nu=-\\epsilon_{tvær}/\\epsilon_{længde}$. For de fleste metaller er $\\nu\\approx0{,}3$. Det er et rent geometrisk koblingstal, ikke en styrke."},
+ {h:"Hvorfor 3D-udgaven overhovedet er nødvendig",
+  t:"I en trykbeholder eller under et rullende leje bliver materialet trykket fra flere sider samtidig. Trykket i én retning får materialet til at ville <i>udvide</i> sig i de to andre &mdash; og hvis noget forhindrer det, opstår der spænding uden at nogen har trukket i den retning. Derfor skal de tre retninger kobles: $\\epsilon_x=\\frac{1}{E}\\left[\\sigma_x-\\nu(\\sigma_y+\\sigma_z)\\right]$, og tilsvarende for y og z."},
+ {h:"Hvor energien kommer fra",
+  t:"Når du trækker langsomt i stangen, udfører kraften et arbejde. Er alt elastisk, går intet til spilde &mdash; arbejdet ligger gemt i materialet og kommer tilbage, når du slipper. Præcis som en fjeder. Fordi kraften vokser lineært fra 0 til $F$, er arbejdet <b>halvdelen</b> af slutkraften gange forlængelsen: $W=\\tfrac12 F\\delta$. Det er trekanten under kurven &mdash; deraf 1/2-tallet i alle energiformler."},
+ {h:"Hvad modulus of resilience bruges til",
+  t:"$u_r$ er arealet under kurven <i>helt op til flydegrænsen</i>. Det er den energi pr. kubikmeter, materialet kan sluge og aflevere igen uden varig deformation. Det er derfor fjederstål har høj $S_y$ og relativt lav $E$: $u_r=S_y^2/(2E)$ belønner høj flydespænding og straffer stivhed. En fjeder skal kunne gemme energi &mdash; ikke være stiv."}
+],
+analogi: "Tænk på $u_r$ som størrelsen af en spand. $E$ er, hvor stejlt vandet stiger, og $S_y$ er spandens kant. En stiv, stærk keramik har en høj, men meget smal spand. Fjederstål har en bredere spand &mdash; det er derfor, du laver fjedre af det og ikke af glas.",
+
+plan: [
+ {t:"0&ndash;2 min", k:"warm", w:"Tegn spændings-tøjningskurven",
+  d:"Tegn $\\sigma$ op ad og $\\epsilon$ hen ad. Marker det lineære område, $S_y$, og skravér trekanten nedenunder. Sig: &bdquo;Hældningen er $E$, og arealet er energi pr. rumfang.&ldquo; Hele svaret kan aflæses af den ene tegning."},
+ {t:"2&ndash;6 min", w:"Hookes lov, 1D → 3D",
+  d:"Start med $\\sigma=E\\epsilon$. Indfør $\\nu$ via tværkontraktionen. Skriv så de tre koblede ligninger op og forklar superpositionen: hver spændingskomposant bidrager i sin egen retning og trækker de to andre sammen."},
+ {t:"6&ndash;10 min", w:"Udled energitætheden",
+  d:"$u=\\int\\sigma\\,d\\epsilon$. Indsæt $\\sigma=E\\epsilon$, integrér til $u=\\tfrac12 E\\epsilon^2=\\tfrac{\\sigma^2}{2E}$. Sæt $\\sigma=S_y$ og du har $u_r$. Peg på trekanten på tegningen &mdash; integralet <i>er</i> arealet."},
+ {t:"10&ndash;13 min", w:"Regn designopgaven",
+  d:"$\\sigma=F/A=200$ MPa, $\\epsilon=1{,}0\\cdot10^{-3}$, $\\Delta d=-6{,}0$ µm, $n_y=1{,}25$. Så $u=0{,}10$ MJ/m³, $U=31{,}4$ J, $u_r=0{,}156$ MJ/m³, $U_{max}=49{,}1$ J."},
+ {t:"13&ndash;15 min", k:"end", w:"Den pointe der giver topkarakter",
+  d:"Sig: &bdquo;$U_{max}/U = 1{,}56 = n_y^2$.&ldquo; Energi går med kvadratet på spændingen, så en sikkerhedsfaktor på 1,25 på spænding er en faktor 1,56 på energi. Det er derfor stødbelastning er langt farligere, end folk tror."},
+ {t:"15&ndash;20 min", k:"end", w:"Spørgsmål", d:"Se censors sandsynlige spørgsmål nederst."}
+],
+
+trin: [
+ {t:"Hookes lov i 1D &mdash; udgangspunktet",
+  m:"\\sigma = E\\epsilon \\qquad\\Longleftrightarrow\\qquad \\epsilon=\\frac{\\sigma}{E}",
+  hvorfor:"Gælder kun i det lineære område under flydegrænsen. $E$ (elasticitetsmodulet) er kurvens hældning &mdash; et mål for <b>stivhed</b>, ikke styrke. Stål og fjederstål har næsten samme $E$; det er $S_y$, der adskiller dem.",
+  sig:"Hookes lov siger, at tøjningen er proportional med spændingen, så længe vi er under flydegrænsen. E er hældningen &mdash; materialets stivhed."},
+
+ {t:"Poissons forhold: koblingen på tværs",
+  m:"\\nu = -\\frac{\\epsilon_{\\text{tvær}}}{\\epsilon_{\\text{længde}}} \\qquad\\Rightarrow\\qquad \\epsilon_y=\\epsilon_z=-\\nu\\,\\epsilon_x",
+  hvorfor:"Minustegnet er indbygget, så $\\nu$ bliver et positivt tal. For metaller $\\nu\\approx0{,}27$&ndash;$0{,}33$; gummi nærmer sig $0{,}5$ (næsten konstant rumfang); kork er tæt på $0$. Teoretisk øvre grænse er $0{,}5$.",
+  sig:"Poissons forhold kobler retningerne sammen: trækker jeg i x, trækker materialet sig sammen i y og z. For stål er det cirka 0,3."},
+
+ {t:"Generaliseret Hookes lov i 3D ved superposition",
+  m:["\\epsilon_x=\\frac{1}{E}\\left[\\sigma_x-\\nu(\\sigma_y+\\sigma_z)\\right]",
+     "\\epsilon_y=\\frac{1}{E}\\left[\\sigma_y-\\nu(\\sigma_z+\\sigma_x)\\right],\\qquad \\epsilon_z=\\frac{1}{E}\\left[\\sigma_z-\\nu(\\sigma_x+\\sigma_y)\\right]",
+     "\\gamma_{xy}=\\frac{\\tau_{xy}}{G},\\qquad G=\\frac{E}{2(1+\\nu)}"],
+  hvorfor:"Fordi materialet er lineært, må virkningerne kunne lægges sammen. $\\sigma_x$ giver $+\\sigma_x/E$ i x-retningen; $\\sigma_y$ og $\\sigma_z$ giver hver et <i>negativt</i> bidrag via $\\nu$. Bemærk at $G$ ikke er uafhængig &mdash; et isotropt materiale har kun <b>to</b> uafhængige elastiske konstanter.",
+  sig:"Jeg lægger de tre virkninger sammen. Hver spænding strækker i sin egen retning og klemmer sammen i de to andre. Og forskydningsmodulet G følger af E og ny &mdash; der er kun to uafhængige konstanter."},
+
+ {t:"Arbejdet som lasten udfører",
+  m:"W=\\int_0^{\\delta} F\\,d\\delta' = \\int_0^{\\delta}\\left(\\frac{AE}{L}\\delta'\\right)d\\delta' = \\tfrac{1}{2}F\\delta",
+  hvorfor:"Kraften starter i nul og vokser lineært til $F$, mens emnet forlænges. Derfor er arbejdet <b>trekantens</b> areal, ikke rektanglets &mdash; deraf faktor $\\tfrac12$. Det er den samme halvdel, du kender fra $\\tfrac12 k x^2$ i en fjeder.",
+  sig:"Kraften vokser fra nul til F, mens stangen strækkes. Arbejdet er derfor arealet under en ret linje &mdash; en halv gange kraft gange forlængelse."},
+
+ {t:"Fra arbejde til energitæthed",
+  m:["u=\\frac{U}{V}=\\int_0^{\\epsilon}\\sigma\\,d\\epsilon' = \\int_0^{\\epsilon}E\\epsilon'\\,d\\epsilon' = \\tfrac{1}{2}E\\epsilon^2",
+     "\\boxed{\\ u=\\tfrac{1}{2}\\sigma\\epsilon=\\frac{\\sigma^2}{2E}\\ }"],
+  hvorfor:"Divider arbejdet med rumfanget $V=AL$: $\\frac{\\frac12 F\\delta}{AL}=\\frac12\\cdot\\frac{F}{A}\\cdot\\frac{\\delta}{L}=\\frac12\\sigma\\epsilon$. Energitætheden er altså <b>arealet under spændings-tøjningskurven</b> &mdash; præcis det du skraverede på tegningen.",
+  sig:"Dividerer jeg arbejdet med rumfanget, får jeg energi pr. kubikmeter: en halv gange sigma gange epsilon. Det er arealet under kurven."},
+
+ {t:"Modulus of resilience: spandens kant",
+  m:"\\boxed{\\ u_r=\\frac{S_y^{2}}{2E}\\ }\\qquad U_{max}=u_r\\cdot V",
+  hvorfor:"Sæt simpelthen $\\sigma=S_y$ i formlen for $u$. Det er den størst mulige energi pr. rumfang, der kan lagres <b>og gives tilbage</b>. Går du over, deformeres materialet varigt, og energien forsvinder som varme og plastisk arbejde. Bemærk kvadratet: dobbelt så høj flydespænding giver <b>fire</b> gange energikapacitet.",
+  sig:"Sætter jeg sigma lig flydespændingen, får jeg modulus of resilience &mdash; den maksimale elastiske energi materialet kan gemme. Læg mærke til kvadratet: det belønner høj flydespænding kraftigt."}
+],
+
+faldgruber: [
+ {t:"At blande resilience og toughness sammen", d:"<b>Resilience</b> er arealet op til $S_y$ (elastisk, kommer tilbage). <b>Toughness</b> er arealet under <i>hele</i> kurven helt til brud (inkl. plastisk). Et fjederstål har høj resilience; et sejt konstruktionsstål har høj toughness. Det er et klassisk kontrolspørgsmål."},
+ {t:"At glemme faktor ½", d:"$u=\\sigma\\epsilon$ er forkert. Kraften starter i nul, så det er trekanten: $u=\\tfrac12\\sigma\\epsilon$. Samme fejl koster point i Castigliano-spørgsmålet (spm. 4)."},
+ {t:"Enheder i energitæthed", d:"$u$ i MPa <i>er</i> MJ/m³ &mdash; 1 MPa = 1 MJ/m³. Praktisk, men forvirrende første gang. Tjek altid: $U=u\\cdot V$ skal give joule."},
+ {t:"Fortegn på $\\Delta d$", d:"Tværkontraktionen er <b>negativ</b> ved træk: stangen bliver tyndere. Skriv $\\Delta d=-6{,}0$ µm, ikke $+6{,}0$. Det virker banalt, men det er en fortegnsfejl, censor hæfter sig ved."},
+ {t:"At tro $G$ er uafhængig", d:"$G=E/[2(1+\\nu)]$. For et isotropt materiale er der kun to uafhængige elastiske konstanter &mdash; vælger du $E$ og $\\nu$, er $G$ givet."}
+],
+
+qa: [
+ {q:"Hvad er den fysiske øvre grænse for $\\nu$, og hvorfor?",
+  a:"$\\nu=0{,}5$. Der er rumfanget konstant under deformation (inkompressibelt, som gummi). Over $0{,}5$ ville materialet <i>vokse</i> i rumfang under tryk, hvilket strider mod energibetragtninger. Nogle særlige strukturmaterialer (auxetiske) har negativ $\\nu$ og bliver tykkere, når man trækker i dem."},
+ {q:"Hvorfor er $U_{max}/U$ lige præcis $n_y^2$?",
+  a:"Fordi energi går med kvadratet på spændingen: $U\\propto\\sigma^2$. Er $n_y=S_y/\\sigma=1{,}25$, bliver energiforholdet $1{,}25^2=1{,}5625$. Det er en vigtig praktisk pointe: en beskeden sikkerhedsmargin på spænding giver en meget større margin på energi &mdash; og omvendt er stødbelastninger farligere, end spændingstal alene antyder."},
+ {q:"Hvorfor laver man fjedre af materiale med høj $S_y$ frem for høj $E$?",
+  a:"$u_r=S_y^2/(2E)$. Høj $E$ står i <b>nævneren</b> &mdash; et stivere materiale gemmer mindre energi ved samme spænding, fordi det ikke deformeres nok. Man vil have høj flydespænding og moderat stivhed. Det er præcis kravprofilen for fjederstål, og det kommer igen i spørgsmål 14."},
+ {q:"Hvad ville der ske, hvis stangen var fastholdt i tværretningen?",
+  a:"Så kunne den ikke trække sig sammen, og der ville opstå tværspændinger $\\sigma_y,\\sigma_z$ uden ydre last i de retninger. Materialet ville fremstå stivere end $E$ antyder. Det er samme mekanisme som plan tøjning og forklarer, hvorfor tykke emner opfører sig anderledes end tynde."},
+ {q:"Hvor meget forlænges stangen i opgaven?",
+  a:"$\\Delta L=\\epsilon L = 1{,}0\\cdot10^{-3}\\cdot1000\\ \\text{mm}=1{,}0$ mm. Pænt rundt tal &mdash; brug det som kontrol på, at $\\epsilon$ er regnet rigtigt."},
+ {q:"Gælder $u=\\sigma^2/2E$ også over flydegrænsen?",
+  a:"Nej. Udledningen forudsætter $\\sigma=E\\epsilon$, altså lineær elasticitet. Over $S_y$ skal du integrere det faktiske kurveforløb, og en del af energien er så plastisk arbejde, som ikke kommer tilbage."}
+],
+
+sammenhaeng: "Energibetragtningen her er forarbejdet til <b>spørgsmål 4</b>, hvor Castiglianos sætning bruger nøjagtig samme idé &mdash; bare med bøjningsenergi $U=\\int\\frac{M^2}{2EI}dx$ i stedet for $\\frac{\\sigma^2}{2E}$. Læg mærke til den identiske struktur: (last)² divideret med 2 gange (stivhed). Poissons forhold dukker op igen i <b>spørgsmål 8</b> (tykvæggede cylindre) og i $G$, som du skal bruge i <b>spørgsmål 14</b> (fjedre). Og $u_r$ forklarer, hvorfor fjedermaterialer vælges som de gør.",
+
+links: [
+ {k:"SPM 4", t:"Castigliano bruger samme energiidé", u:"sp04_castigliano.html"},
+ {k:"SPM 14", t:"Fjedre: resilience i praksis", u:"sp14_fjeder.html"},
+ {k:"WIDGET", t:"Spændings-tøjningskurven", u:"../interaktiv/spaendings_toejningskurve.html"},
+ {k:"KAP. 3", t:"Formeloverblik (PDF)", u:"../Kapitel03_Overblik.pdf"},
+ {k:"KAP. 3", t:"Quiz", u:"../../../quiz/mem1/Kapitel03_Quiz.html"},
+ {k:"KAP. 3", t:"Flashcards", u:"../../../flash/mem1/Kapitel03_Flashcards.html"}
+]
+};
+
+var LAB = {
+w: 720, h: 430,
+intro: "Skru på lasten og se, hvordan spandens vandstand stiger. Bemærk at energien vokser med <b>kvadratet</b> på spændingen &mdash; det skraverede areal vokser meget hurtigere end $\\sigma$ gør. Når $\\sigma$ når $S_y$, er spanden fuld: $U=U_{max}$.",
+preset2: {navn: "Kør helt op til flydegrænsen", v: {F: 78.5}},
+
+inputs: [
+ {id:"F",  label:"Aksialkraft $F$",       min:5,   max:100, step:0.5, value:62.83, dec:2, unit:"kN"},
+ {id:"d",  label:"Diameter $d$",          min:10,  max:40,  step:1,   value:20,    unit:"mm"},
+ {id:"L",  label:"Længde $L$",            min:200, max:2000,step:50,  value:1000,  unit:"mm"},
+ {id:"E",  label:"E-modul $E$",           min:70,  max:220, step:5,   value:200,   unit:"GPa"},
+ {id:"nu", label:"Poissons forhold $\\nu$",min:0.1, max:0.49,step:0.01,value:0.30, dec:2, unit:""},
+ {id:"Sy", label:"Flydespænding $S_y$",   min:100, max:600, step:10,  value:250,   unit:"MPa"}
+],
+
+compute: function (v) {
+  var A = Math.PI / 4 * v.d * v.d;          // mm2
+  var sig = v.F * 1000 / A;                  // MPa
+  var E = v.E * 1000;                        // MPa
+  var eps = sig / E;
+  var dd = -v.nu * eps * v.d;                // mm
+  var dL = eps * v.L;                        // mm
+  var ny = v.Sy / sig;
+  var u = sig * sig / (2 * E);               // MPa = MJ/m3
+  var V = A * v.L;                           // mm3
+  var U = u * V / 1000;                      // J   (MPa*mm3 = N*mm = mJ -> /1000 = J)
+  var ur = v.Sy * v.Sy / (2 * E);
+  var Umax = ur * V / 1000;
+  return { A:A, sig:sig, eps:eps, dd:dd, dL:dL, ny:ny, u:u, V:V, U:U, ur:ur, Umax:Umax, E:E,
+           flyder: sig >= v.Sy };
+},
+
+readout: function (v, r) {
+  return [
+   {l:"Areal $A$", v:r.A, dec:2, unit:"mm²"},
+   {l:"Spænding $\\sigma_x$", v:r.sig, dec:1, unit:"MPa", k:r.flyder?"warn":"hi"},
+   {l:"Tøjning $\\epsilon_x$", raw:Eks.num(r.eps*1e6,0), unit:"µε"},
+   {l:"Forlængelse $\\Delta L$", v:r.dL, dec:3, unit:"mm"},
+   {l:"Tværkontraktion $\\Delta d$", raw:Eks.num(r.dd*1000,2), unit:"µm"},
+   {l:"Sikkerhedsfaktor $n_y$", v:r.ny, dec:3, unit:"", k:r.ny<1?"warn":"hi"},
+   {l:"Energitæthed $u$", v:r.u, dec:4, unit:"MJ/m³"},
+   {l:"Samlet energi $U$", v:r.U, dec:2, unit:"J", k:"hi"},
+   {l:"$u_r$ (resilience)", v:r.ur, dec:4, unit:"MJ/m³"},
+   {l:"$U_{max}$ før flydning", v:r.Umax, dec:2, unit:"J"}
+  ];
+},
+
+steps: function (v, r) {
+  var T = Eks.tnum;
+  return [
+   {h:"1 · Spændingen",
+    m:"\\sigma_x=\\frac{F}{A}=\\frac{"+T(v.F*1000,0)+"\\ \\text{N}}{"+T(r.A,2)+"\\ \\text{mm}^2}="+T(r.sig,2)+"\\ \\text{MPa}",
+    c:"$A=\\frac{\\pi}{4}d^2="+Eks.num(r.A,2)+"$ mm²."},
+   {h:"2 · Tøjningen (Hookes lov)",
+    m:"\\epsilon_x=\\frac{\\sigma_x}{E}=\\frac{"+T(r.sig,2)+"}{"+T(r.E,0)+"}="+T(r.eps*1e6,1)+"\\cdot 10^{-6}",
+    c:"Giver forlængelsen $\\Delta L=\\epsilon_x L="+Eks.num(r.dL,3)+"$ mm."},
+   {h:"3 · Tværkontraktionen via Poisson",
+    m:"\\Delta d=-\\nu\\,\\epsilon_x\\,d=-"+T(v.nu,2)+"\\cdot"+T(r.eps*1e6,1)+"\\cdot10^{-6}\\cdot"+T(v.d,0)+"="+T(r.dd*1000,2)+"\\ \\mu\\text{m}",
+    c:"Negativ: stangen bliver <b>tyndere</b>, når du trækker i den."},
+   {h:"4 · Sikkerhedsfaktor mod flydning",
+    m:"n_y=\\frac{S_y}{\\sigma_x}=\\frac{"+T(v.Sy,0)+"}{"+T(r.sig,2)+"}="+T(r.ny,3),
+    c:r.flyder ? "<b style='color:#ff5e5e'>Under 1 &mdash; materialet flyder allerede.</b>" : "Over 1: der er margin til flydning."},
+   {h:"5 · Energitætheden",
+    m:"u=\\frac{\\sigma_x^{2}}{2E}=\\frac{"+T(r.sig,2)+"^{2}}{2\\cdot"+T(r.E,0)+"}="+T(r.u,4)+"\\ \\text{MJ/m}^3",
+    c:"Arealet under den lineære kurve op til den aktuelle spænding."},
+   {h:"6 · Samlet lagret energi",
+    m:"U=u\\,V=u\\cdot A L="+T(r.u,4)+"\\cdot"+T(r.V,0)+"\\ \\text{mm}^3="+T(r.U,2)+"\\ \\text{J}",
+    c:"$V="+Eks.num(r.V,0)+"$ mm³ $="+Eks.num(r.V/1e9,6)+"$ m³."},
+   {h:"7 · Modulus of resilience og kapaciteten",
+    m:"u_r=\\frac{S_y^{2}}{2E}="+T(r.ur,4)+"\\ \\text{MJ/m}^3 \\qquad U_{max}=u_r V="+T(r.Umax,2)+"\\ \\text{J}",
+    c:"Forholdet $U_{max}/U="+Eks.num(r.Umax/r.U,3)+"$ &mdash; sammenlign med $n_y^2="+Eks.num(r.ny*r.ny,3)+"$. De er ens, fordi energi går med kvadratet på spændingen."}
+  ];
+},
+
+facit: function (v, r) {
+  if (Math.abs(v.F-62.83)<0.01 && v.d===20 && v.L===1000 && v.E===200 && Math.abs(v.nu-0.30)<0.001 && v.Sy===250) {
+    return {t:"<b>✓ Eksamensopgavens facit:</b> $\\sigma_x=200$ MPa, $\\epsilon_x=1{,}0\\cdot10^{-3}$, $\\Delta d=-6{,}0$ µm, $n_y=1{,}25$ &mdash; og $u=0{,}100$ MJ/m³, $U=31{,}4$ J, $u_r=0{,}156$ MJ/m³, $U_{max}=49{,}1$ J. <b>Pointen til eksamen:</b> $U_{max}/U=1{,}56=n_y^2$. Energi går med kvadratet på spændingen."};
+  }
+  if (r.flyder) {
+    return {off:true, t:"<b>Over flydegrænsen.</b> $\\sigma_x=" + Eks.num(r.sig,1) + "$ MPa $> S_y$. Formlen $u=\\sigma^2/2E$ gælder ikke længere &mdash; en del af energien er nu plastisk arbejde, som ikke kommer tilbage, når du aflaster."};
+  }
+  return {off:true, t:"Du har ændret inddata. Tryk på knappen for at komme tilbage til eksamensopgavens tal."};
+},
+
+draw: function (ctx, W, H, v, r, C) {
+  C.grid(ctx, W, H, 40);
+  var CY='#5ec8ff', GR='#00d984', GO='#ffa500', RD='#ff5e5e', DIM='rgba(227,235,243,.45)';
+
+  /* ---------- venstre: stangen der strækkes ---------- */
+  var bx=46, by=70, bw=54, bh=250;
+  C.txt(ctx,'Stangen', bx+bw/2, by-38, DIM, 11, 'center');
+  C.hatch(ctx, bx-6, by-12, by+4, DIM, -1);
+  C.line(ctx, bx-6, by-12, bx+bw+8, by-12, DIM, 2);
+  // skaleret deformation (x400 saa den kan ses)
+  var vis = Math.min(r.eps*400*bh, 46);
+  var nw = bw*(1 - v.nu*r.eps*400);
+  ctx.save();
+  ctx.fillStyle='rgba(94,200,255,.13)'; ctx.strokeStyle=CY; ctx.lineWidth=2;
+  ctx.fillRect(bx+(bw-nw)/2, by, nw, bh+vis);
+  ctx.strokeRect(bx+(bw-nw)/2, by, nw, bh+vis);
+  ctx.restore();
+  // original omrids
+  ctx.save(); ctx.setLineDash([4,4]); ctx.strokeStyle='rgba(227,235,243,.25)'; ctx.lineWidth=1;
+  ctx.strokeRect(bx, by, bw, bh); ctx.restore();
+  C.arrow(ctx, bx+bw/2, by+bh+vis+8, bx+bw/2, by+bh+vis+44, GO, 2.6);
+  C.mono(ctx,'F='+Eks.num(v.F,1)+' kN', bx+bw/2, by+bh+vis+60, GO, 11, 'center');
+  C.dim(ctx, bx+bw+16, by, bx+bw+16, by+bh+vis, GR, null);
+  C.mono(ctx,'ΔL='+Eks.num(r.dL,2)+'mm', bx+bw+22, by+bh/2, GR, 10);
+  C.mono(ctx,'Δd='+Eks.num(r.dd*1000,1)+'µm', bx+bw/2, by-22, CY, 10, 'center');
+  C.txt(ctx,'(deformation ×400)', bx+bw/2, by+bh+vis+76, DIM, 9, 'center');
+
+  /* ---------- højre: spændings-tøjningsdiagram med skraveret energi ---------- */
+  var gx0=232, gx1=W-30, gy0=44, gy1=H-58;
+  C.axes(ctx, gx0, gy0, gx1, gy1, 'ε  [‰]', 'σ  [MPa]');
+  var smax = Math.max(v.Sy*1.25, r.sig*1.12);
+  var emax = smax/r.E;
+  function X(e){ return gx0 + e/emax*(gx1-gx0-16); }
+  function Y(s){ return gy1 - s/smax*(gy1-gy0-12); }
+
+  // elastisk linje + plastisk plateau
+  var eY = v.Sy/r.E;
+  C.line(ctx, X(0), Y(0), X(eY), Y(v.Sy), CY, 2.6);
+  C.line(ctx, X(eY), Y(v.Sy), X(emax), Y(v.Sy*1.04), 'rgba(94,200,255,.4)', 2.6, [6,4]);
+
+  // Sy-linje
+  C.line(ctx, gx0, Y(v.Sy), gx1-10, Y(v.Sy), RD, 1.3, [5,4]);
+  C.mono(ctx,'Sy='+Eks.num(v.Sy,0), gx1-12, Y(v.Sy)-6, RD, 10, 'right');
+
+  // u_r = hele trekanten op til Sy (lys)
+  C.poly(ctx, [[X(0),Y(0)],[X(eY),Y(v.Sy)],[X(eY),Y(0)]], null, 'rgba(255,165,0,.12)');
+  // u = trekanten op til aktuel spaending (kraftig)
+  var eNu = Math.min(r.eps, eY);
+  C.poly(ctx, [[X(0),Y(0)],[X(eNu),Y(Math.min(r.sig,v.Sy))],[X(eNu),Y(0)]], null, 'rgba(0,217,132,.35)');
+
+  // aktuelt punkt
+  var px=X(Math.min(r.eps,emax)), py=Y(Math.min(r.sig,smax));
+  C.line(ctx, px, py, px, Y(0), GR, 1.2, [3,3]);
+  C.line(ctx, gx0, py, px, py, GR, 1.2, [3,3]);
+  C.circle(ctx, px, py, 5, null, GR);
+  C.mono(ctx,'σ='+Eks.num(r.sig,0), px+9, py-7, GR, 11);
+
+  // akse-ticks
+  C.mono(ctx, Eks.num(r.eps*1000,2), px, gy1+15, GR, 10, 'center');
+  C.txt(ctx,'Skraveret grønt = u (lagret nu)', gx0+4, gy1+32, GR, 10);
+  C.txt(ctx,'Lyst orange = u_r (kapacitet til Sy)', gx0+4, gy1+46, GO, 10);
+  C.mono(ctx,'E='+Eks.num(v.E,0)+' GPa', gx1-10, gy0+12, DIM, 10, 'right');
+}
+};
+</script>
+<script src="assets/eksamen.js"></script>
+<script>Eks.build();</script>
+</body>
+</html>

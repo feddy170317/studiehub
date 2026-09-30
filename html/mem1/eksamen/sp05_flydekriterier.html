@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spm. 5: Flydekriterier - MEM1 eksamen</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="assets/eksamen.css">
+</head>
+<body>
+<script>
+var QDATA = {
+nr: 5,
+titel: "Fleraksede flydekriterier (von Mises og Tresca)",
+kapitel: 6,
+kapitelNavn: "Brudforudsigelse ved statisk belastning",
+mappe: "Spørgsmål 05 - Flydekriterier",
+prev: "sp04_castigliano.html",
+next: "sp06_goodman.html",
+bog: "Kap. 6: §6.7 <i>Failure Prediction for Multiaxial Stress</i>, §6.7.1 <i>Ductile Materials</i> &mdash; MSST lign. (6.8), DET lign. (6.9)&ndash;(6.12), s. 144&ndash;145 &middot; valg af kriterium §6.7.3, s. 149.",
+
+spmA: "Forklar deformationsenergihypotesen (von Mises) og den maksimale forskydningsspændingshypotese (Tresca) for duktilt brud. Udtryk den ækvivalente von Mises-spænding $\\sigma_e$ ved hovedspændingerne $\\sigma_1$, $\\sigma_2$, $\\sigma_3$.",
+spmB: "En drivstift er udsat for plan spænding med $\\sigma_1=120$ MPa og $\\sigma_2=-40$ MPa. Materialets flydespænding er $S_y=280$ MPa. Beregn sikkerhedsfaktoren mod flydning $n_s$ efter både den maksimale forskydningsspændingshypotese og deformationsenergihypotesen.",
+
+oversat: "Du kender kun materialets flydespænding fra <b>ét</b> forsøg: en trækprøve, hvor der kun er spænding i én retning. Men din drivstift er trukket i én retning og trykket i en anden på samme tid. Flyder den eller ej? Du kan ikke lave et nyt forsøg for hver tænkelig kombination. Et <b>flydekriterium</b> er en regel, der oversætter en vilkårlig spændingstilstand til ét tal, som kan sammenlignes med trækprøven. Tresca og von Mises er to bud på, hvad det tal skal være. Del (b) beder dig regne begge og sammenligne.",
+kerne: "Duktilt metal flyder, fordi atomlag glider &mdash; forskydning, ikke træk. Begge kriterier måler forskydning: Tresca den største forskydningsspænding, von Mises den energi, der går til at ændre form.",
+
+historie: [
+ {h:"Hvorfor ikke bare sammenligne σ₁ med S_y?",
+  t:"Fordi træk og tryk på samme tid er værre end træk alene. Med $\\sigma_1=120$ og $\\sigma_2=-40$ bliver elementet strakt i én retning og klemt i den anden &mdash; det forvrider det kraftigt. Sammenligner du kun $\\sigma_1=120$ med $280$, får du $n=2{,}33$ og overvurderer sikkerheden groft. Omvendt er ligeligt toakset træk ($\\sigma_1=\\sigma_2$) ikke farligere end enakset træk af samme størrelse &mdash; og trækker man lige meget i alle tre retninger (hydrostatisk), flyder materialet slet ikke, fordi elementet kun vokser uden at ændre form."},
+ {h:"Hvad der fysisk sker, når metal flyder",
+  t:"Metal er krystaller. Flydning er atomplaner, der glider over hinanden langs gitterfejl (dislokationer). Glidning drives af <b>forskydningsspænding</b>. Et rent hydrostatisk tryk &mdash; lige meget fra alle sider &mdash; giver ingen forskydning på noget plan og kan derfor ikke få metal til at flyde, uanset hvor stort det er. Det er nøglen til begge kriterier."},
+ {h:"Tresca: den største forskydningsspænding",
+  t:"Den enkleste idé: flydning starter, når den største forskydningsspænding i emnet når den værdi, den havde ved flydning i trækprøven. I trækprøven er $\\tau_{max}=S_y/2$. I emnet er $\\tau_{max}=(\\sigma_{max}-\\sigma_{min})/2$ &mdash; og her skal alle <b>tre</b> hovedspændinger med, også $\\sigma_3=0$ ud af planet."},
+ {h:"von Mises: energien der ændrer form",
+  t:"Den elastiske energi i et element kan deles i to: en del, der ændrer <b>rumfanget</b> (den hydrostatiske del), og en del, der ændrer <b>formen</b> (deformationsenergien). Kun den sidste har med glidning at gøre. von Mises siger: flydning starter, når deformationsenergien når den værdi, den har ved flydning i trækprøven. Resultatet stemmer bedst med forsøg på duktile metaller."}
+],
+analogi: "Tænk på en bunke spillekort. Trykker du ned på bunken (hydrostatisk), sker der intet. Skubber du toppen sidelæns (forskydning), glider kortene. Tresca spørger: hvor hårdt skubber du på det værste lag? von Mises spørger: hvor meget energi har du brugt på at forskyde bunken i alt?",
+
+plan: [
+ {t:"0&ndash;2 min", k:"warm", w:"Sæt problemet op",
+  d:"&bdquo;Vi har $S_y$ fra en enakset trækprøve, men en fleraksial spændingstilstand. Vi skal bruge en regel, der gør dem sammenlignelige.&ldquo; Nævn at duktile metaller flyder ved forskydning, og at hydrostatisk tryk ikke giver flydning."},
+ {t:"2&ndash;5 min", w:"Tresca",
+  d:"$\\tau_{max}=(\\sigma_1-\\sigma_3)/2$ med ordnede hovedspændinger. Ved trækprøven er $\\tau_{max}=S_y/2$. Sæt lig: $\\sigma_1-\\sigma_3=S_y/n_s$. Tegn tre Mohr-cirkler og peg på den største."},
+ {t:"5&ndash;9 min", w:"von Mises: opdel energien",
+  d:"Total energi → hydrostatisk del + deformationsdel. Skriv $u_d=\\frac{1+\\nu}{6E}[(\\sigma_1-\\sigma_2)^2+(\\sigma_2-\\sigma_3)^2+(\\sigma_3-\\sigma_1)^2]$. Sammenlign med trækprøven og isolér $\\sigma_e$."},
+ {t:"9&ndash;11 min", w:"Tegn flydefladerne",
+  d:"$\\sigma_1$-$\\sigma_2$-planet: ellipse (von Mises) og indskrevet sekskant (Tresca). Marker punktet $(120,-40)$ og lastlinjen fra origo. Det tager et minut og gør resten indlysende."},
+ {t:"11&ndash;14 min", k:"end", w:"Regn og konkludér",
+  d:"Tresca: $\\sigma_1-\\sigma_3=160$ → $n_s=1{,}75$. von Mises: $\\sigma_e=144{,}2$ MPa → $n_s=1{,}94$. &bdquo;Tresca er 11 % mere konservativ her, fordi punktet ligger i 4. kvadrant tæt på ren forskydning, hvor de to kriterier afviger mest.&ldquo;"},
+ {t:"14&ndash;20 min", k:"end", w:"Spørgsmål", d:"Se censors sandsynlige spørgsmål nederst."}
+],
+
+trin: [
+ {t:"Ordn hovedspændingerne &mdash; også den tredje",
+  m:"\\text{Plan spænding: }\\ \\{120,\\ -40,\\ 0\\}\\ \\text{MPa}\\quad\\Rightarrow\\quad\\sigma_1=120,\\ \\ \\sigma_2=0,\\ \\ \\sigma_3=-40",
+  hvorfor:"Konventionen er $\\sigma_1\\ge\\sigma_2\\ge\\sigma_3$. Opgaven kalder $-40$ for $\\sigma_2$ og nævner ikke den tredje, men den er der: nul, vinkelret på planet. Når de to planspændinger har <b>modsat</b> fortegn, ligger nul-spændingen i midten, og det ændrer intet. Men havde de begge været positive, var $\\sigma_3=0$ den mindste &mdash; og så var Tresca-resultatet et helt andet.",
+  sig:"Først ordner jeg hovedspændingerne. I plan spænding er den tredje hovedspænding nul, og den skal med i Tresca."},
+
+ {t:"Tresca: sæt største forskydning lig trækprøvens",
+  m:["\\tau_{max}=\\frac{\\sigma_1-\\sigma_3}{2}\\qquad\\text{trækprøve: }\\ \\tau_{max,y}=\\frac{S_y}{2}",
+     "\\boxed{\\ \\sigma_1-\\sigma_3=\\frac{S_y}{n_s}\\ }"],
+  hvorfor:"Den største forskydningsspænding er radius i den største af de tre Mohr-cirkler. I trækprøven ved flydning er $\\sigma_1=S_y$, $\\sigma_2=\\sigma_3=0$, så $\\tau_{max}=S_y/2$. Kriteriet siger: flydning, når de to er ens. Med sikkerhedsfaktor divideres $S_y$ med $n_s$.",
+  sig:"Tresca siger, at flydning starter, når den største forskydningsspænding når halvdelen af flydespændingen &mdash; for det er forskydningen i trækprøven ved flydning."},
+
+ {t:"von Mises: den totale elastiske energi",
+  m:"u=\\frac{1}{2E}\\left[\\sigma_1^2+\\sigma_2^2+\\sigma_3^2-2\\nu(\\sigma_1\\sigma_2+\\sigma_2\\sigma_3+\\sigma_3\\sigma_1)\\right]",
+  hvorfor:"Det er $\\tfrac12\\sum\\sigma_i\\epsilon_i$ med den generaliserede Hookes lov fra spm. 2 indsat. $\\nu$-leddet kommer af, at hver spænding også tøjer i de andre retninger.",
+  sig:"Den samlede energi er en halv gange summen af spænding gange tøjning, med Hookes lov i 3D indsat."},
+
+ {t:"Træk den hydrostatiske del fra",
+  m:["\\sigma_h=\\frac{\\sigma_1+\\sigma_2+\\sigma_3}{3},\\qquad u_v=\\frac{1-2\\nu}{6E}(\\sigma_1+\\sigma_2+\\sigma_3)^2",
+     "u_d=u-u_v=\\frac{1+\\nu}{6E}\\left[(\\sigma_1-\\sigma_2)^2+(\\sigma_2-\\sigma_3)^2+(\\sigma_3-\\sigma_1)^2\\right]"],
+  hvorfor:"$u_v$ er energien fra ren rumfangsændring &mdash; den del, der ikke kan give glidning. Tilbage står deformationsenergien, som kun afhænger af <b>forskellene</b> mellem hovedspændingerne. Læg mærke til det: lægger du samme tal til alle tre, ændrer $u_d$ sig ikke. Hydrostatisk tryk påvirker ikke flydning &mdash; præcis som forsøgene viser.",
+  sig:"Jeg trækker rumfangsdelen fra. Det, der er tilbage, afhænger kun af forskellene mellem hovedspændingerne &mdash; så et hydrostatisk tryk bidrager ikke."},
+
+ {t:"Sammenlign med trækprøven og isolér σₑ",
+  m:["\\text{Trækprøve: }\\sigma_1=S_y,\\ \\sigma_2=\\sigma_3=0\\ \\Rightarrow\\ u_{d,y}=\\frac{1+\\nu}{6E}\\cdot2S_y^2",
+     "\\boxed{\\ \\sigma_e=\\sqrt{\\tfrac12\\left[(\\sigma_1-\\sigma_2)^2+(\\sigma_2-\\sigma_3)^2+(\\sigma_3-\\sigma_1)^2\\right]}=\\frac{S_y}{n_s}\\ }"],
+  hvorfor:"$\\sigma_e$ er den enaksede trækspænding, der ville give <b>samme</b> deformationsenergi som den virkelige tilstand. Det er derfor den kaldes ækvivalent: den gør enhver spændingstilstand sammenlignelig med trækprøven. $E$ og $\\nu$ forkortes ud &mdash; kriteriet er rent geometrisk i spændingsrummet.",
+  sig:"Jeg sætter deformationsenergien lig den ved flydning i trækprøven. E og ny forsvinder, og jeg får den ækvivalente von Mises-spænding."},
+
+ {t:"Plan spænding og geometrien i σ₁-σ₂-planet",
+  m:"\\sigma_3=0:\\quad\\sigma_e=\\sqrt{\\sigma_1^2-\\sigma_1\\sigma_2+\\sigma_2^2}\\qquad(\\text{ellipse})",
+  hvorfor:"I planet er von Mises en <b>ellipse</b> med storakse langs $\\sigma_1=\\sigma_2$, og Tresca er en <b>sekskant</b>, der er indskrevet i den. De rører hinanden i seks punkter (enakset og ligeligt toakset træk/tryk). Størst afstand er ved ren forskydning $\\sigma_2=-\\sigma_1$: Tresca giver $S_{sy}=0{,}5S_y$, von Mises $S_{sy}=0{,}577S_y$ &mdash; 15,5 % forskel.",
+  sig:"I planet er von Mises en ellipse og Tresca en sekskant inde i den. Tresca er altid på den sikre side, og forskellen er størst ved ren forskydning."}
+],
+
+faldgruber: [
+ {t:"At glemme σ₃ = 0", d:"Med $\\sigma_1=\\sigma_2=100$ MPa giver $\\sigma_1-\\sigma_2=0$ nul forskydning &mdash; men $\\tau_{max}=(100-0)/2=50$ MPa ud af planet. Tag altid alle tre hovedspændinger med i Tresca."},
+ {t:"At bruge σ₁ − σ₂ blindt", d:"Her virker $\\sigma_1-\\sigma_2=160$ tilfældigvis, fordi fortegnene er modsatte. Sig højt, at du har tjekket den tredje hovedspænding."},
+ {t:"Kun duktile materialer", d:"Tresca og von Mises forudsætter flydning ved forskydning. Sprøde materialer (støbejern, keramik) svigter ved træk og skal bruge Coulomb&ndash;Mohr eller den modificerede Mohr-teori."},
+ {t:"Fortegn i von Mises-formlen", d:"$\\sigma_1^2-\\sigma_1\\sigma_2+\\sigma_2^2$ med $\\sigma_2=-40$: midterleddet bliver $-120\\cdot(-40)=+4800$. Ikke minus. Regn langsomt."},
+ {t:"$n_s$ er ikke det samme som $\\sigma_e$", d:"$n_s=S_y/\\sigma_e$. Svarer du med $\\sigma_e=144$ MPa uden at dividere, har du ikke besvaret spørgsmålet."}
+],
+
+qa: [
+ {q:"Hvilket kriterium skal man vælge i praksis?",
+  a:"von Mises stemmer bedst med forsøg på duktile metaller og bruges i de fleste FEM-programmer. Tresca er enklere at regne i hånden og altid konservativ (op til 15,5 %), så det bruges ofte ved hurtige overslag og i nogle standarder."},
+ {q:"Hvad betyder det, at hydrostatisk tryk ikke giver flydning?",
+  a:"Lægger du samme spænding $p$ til alle tre hovedspændinger, ændres ingen forskelle, og hverken $\\tau_{max}$ eller $\\sigma_e$ ændres. Metal på bunden af havet flyder ikke af vandtrykket alene. Mohrs cirkler flytter sig bare langs $\\sigma$-aksen uden at ændre størrelse."},
+ {q:"Hvad er flydespændingen i ren forskydning efter de to kriterier?",
+  a:"Ren forskydning er $\\sigma_1=\\tau$, $\\sigma_3=-\\tau$. Tresca: $2\\tau=S_y$ → $S_{sy}=0{,}5S_y$. von Mises: $\\sqrt3\\,\\tau=S_y$ → $S_{sy}=0{,}577S_y$. Det bruges direkte i akseldimensionering (spm. 9) og fjedre (spm. 14)."},
+ {q:"Hvorfor kaldes σₑ også oktaedrisk forskydningsspænding?",
+  a:"Forskydningsspændingen på de otte planer, der hælder lige meget mod alle tre hovedakser, er $\\tau_{oct}=\\frac{\\sqrt2}{3}\\sigma_e$. De to formuleringer er matematisk ækvivalente &mdash; energi og oktaederplan giver samme kriterium."},
+ {q:"Hvor ligger punktet (120, −40) i σ₁-σ₂-planet, og hvorfor betyder det noget?",
+  a:"I 4. kvadrant, hvor fortegnene er modsatte. Her afviger de to kriterier mest, fordi vi nærmer os ren forskydning. Lastlinjen fra origo rammer sekskanten før ellipsen, deraf $1{,}75<1{,}94$."},
+ {q:"Hvordan kobles det til Mohrs cirkel?",
+  a:"$\\sigma_1$ og $\\sigma_2$ er netop resultatet af Mohrs cirkel i spm. 1. Tresca er radius i den største af de tre cirkler. Et flydekriterium er altså sidste led i kæden: last → spændinger → Mohr → hovedspændinger → kriterium → sikkerhedsfaktor."}
+],
+
+sammenhaeng: "Her samles tråden fra de første spørgsmål: laster giver spændinger (spm. 3), Mohrs cirkel giver hovedspændinger (spm. 1), og flydekriteriet omsætter dem til én sikkerhedsfaktor. Tresca-kriteriet er præcis det, der bruges i <b>spm. 9</b> til at udlede $T_e=\\sqrt{M^2+T^2}$ for aksler. Energiopdelingen bygger på Hookes lov i 3D fra <b>spm. 2</b>. Og ved cyklisk belastning (<b>spm. 6</b>) bruges von Mises til at samle fleraksede spændinger til én ækvivalent amplitude og middelspænding.",
+
+links: [
+ {k:"SPM 1", t:"Mohrs cirkel giver σ₁ og σ₂", u:"sp01_mohr.html"},
+ {k:"SPM 9", t:"Tresca bag Tₑ = √(M² + T²)", u:"sp09_akseldesign.html"},
+ {k:"SPM 2", t:"Hookes lov i 3D og energi", u:"sp02_toejningsenergi.html"},
+ {k:"WIDGET", t:"Brudteorier", u:"../interaktiv/brudteori.html"},
+ {k:"KAP. 6", t:"Formeloverblik (PDF)", u:"../Kapitel06_Overblik.pdf"},
+ {k:"KAP. 6", t:"Quiz", u:"../../../quiz/mem1/Kapitel06_Quiz.html"}
+]
+};
+
+var LAB = {
+w: 720, h: 440,
+intro: "Flyt spændingspunktet rundt i $\\sigma_1$-$\\sigma_2$-planet. Den stiplede lastlinje viser, hvor langt lasten kan skaleres op, før hvert kriterium melder flydning. Prøv $\\sigma_1=\\sigma_2$ (kriterierne er enige) og $\\sigma_2=-\\sigma_1$ (ren forskydning, største uenighed). Til højre ses de tre Mohr-cirkler &mdash; Tresca er radius i den største.",
+preset2: {navn: "Ren forskydning: σ₁ = 100, σ₂ = −100", v: {s1: 100, s2: -100}},
+
+inputs: [
+ {id:"s1", label:"$\\sigma_1$ (i planet)", min:-300, max:300, step:5,  value:120, unit:"MPa"},
+ {id:"s2", label:"$\\sigma_2$ (i planet)", min:-300, max:300, step:5,  value:-40, unit:"MPa"},
+ {id:"Sy", label:"Flydespænding $S_y$",    min:100,  max:600, step:10, value:280, unit:"MPa"}
+],
+
+compute: function (v) {
+  var p = [v.s1, v.s2, 0].sort(function (a, b) { return b - a; });
+  var tre = p[0] - p[2];                               // stoerste forskel
+  var vm = Math.sqrt(0.5 * (Math.pow(v.s1 - v.s2, 2) + v.s2 * v.s2 + v.s1 * v.s1));
+  return { p:p, tre:tre, tmax:tre / 2, vm:vm,
+           nT: tre > 0 ? v.Sy / tre : Infinity, nV: vm > 0 ? v.Sy / vm : Infinity };
+},
+
+readout: function (v, r) {
+  function n(x){ return isFinite(x) ? Eks.num(x,3) : "∞"; }
+  return [
+   {l:"Ordnet: $\\sigma_1,\\sigma_2,\\sigma_3$", raw: r.p.map(function(x){return Eks.num(x,0);}).join(" / "), unit:"MPa"},
+   {l:"$\\tau_{max}$ (største cirkel)", v:r.tmax, dec:1, unit:"MPa"},
+   {l:"Tresca: $\\sigma_1-\\sigma_3$", v:r.tre, dec:1, unit:"MPa"},
+   {l:"von Mises $\\sigma_e$", v:r.vm, dec:1, unit:"MPa"},
+   {l:"$n_s$ Tresca", raw:n(r.nT), unit:"", k: r.nT<1?"warn":"hi"},
+   {l:"$n_s$ von Mises", raw:n(r.nV), unit:"", k: r.nV<1?"warn":"hi"},
+   {l:"Forskel (vM/Tresca)", raw: (isFinite(r.nT)&&isFinite(r.nV)) ? Eks.num((r.nV/r.nT-1)*100,1) : "--", unit:"%"}
+  ];
+},
+
+steps: function (v, r) {
+  var T = Eks.tnum;
+  return [
+   {h:"1 · Ordn alle tre hovedspændinger",
+    m:"\\{"+T(v.s1,0)+",\\ "+T(v.s2,0)+",\\ 0\\}\\ \\Rightarrow\\ \\sigma_1="+T(r.p[0],0)+",\\ \\sigma_2="+T(r.p[1],0)+",\\ \\sigma_3="+T(r.p[2],0)+"\\ \\text{MPa}",
+    c:"Nul-spændingen vinkelret på planet skal med."},
+   {h:"2 · Tresca (MSST)",
+    m:"n_s=\\frac{S_y}{\\sigma_1-\\sigma_3}=\\frac{"+T(v.Sy,0)+"}{"+T(r.p[0],0)+"-("+T(r.p[2],0)+")}="+(isFinite(r.nT)?T(r.nT,3):"\\infty"),
+    c:"$\\tau_{max}="+Eks.num(r.tmax,1)+"$ MPa mod $S_y/2="+Eks.num(v.Sy/2,0)+"$ MPa."},
+   {h:"3 · von Mises-spændingen (plan spænding)",
+    m:"\\sigma_e=\\sqrt{\\sigma_1^2-\\sigma_1\\sigma_2+\\sigma_2^2}=\\sqrt{"+T(v.s1,0)+"^2-("+T(v.s1,0)+")("+T(v.s2,0)+")+("+T(v.s2,0)+")^2}="+T(r.vm,2)+"\\ \\text{MPa}",
+    c:"Midterleddet: $-("+Eks.num(v.s1,0)+")\\cdot("+Eks.num(v.s2,0)+")="+Eks.num(-v.s1*v.s2,0)+"$. Pas på fortegnet."},
+   {h:"4 · von Mises (DET)",
+    m:"n_s=\\frac{S_y}{\\sigma_e}=\\frac{"+T(v.Sy,0)+"}{"+T(r.vm,2)+"}="+(isFinite(r.nV)?T(r.nV,3):"\\infty"),
+    c:"Altid ≥ Tresca-værdien: sekskanten ligger inden i ellipsen."}
+  ];
+},
+
+facit: function (v, r) {
+  if (v.s1===120 && v.s2===-40 && v.Sy===280) {
+    return {t:"<b>✓ Eksamensopgavens facit:</b> Tresca: $\\sigma_1-\\sigma_3=160$ MPa → $n_s=280/160=1{,}75$. von Mises: $\\sigma_e=\\sqrt{20\\,800}=144{,}2$ MPa → $n_s=1{,}94$. Tresca er 11 % mere konservativ, fordi punktet ligger i 4. kvadrant, tæt på ren forskydning."};
+  }
+  if (Math.abs(v.s1 + v.s2) < 1e-9 && v.s1 !== 0) {
+    return {off:true, t:"<b>Ren forskydning.</b> Her er kriterierne mest uenige: forholdet $n_{vM}/n_{T}=2/\\sqrt3=1{,}155$. Tresca siger $S_{sy}=0{,}5S_y$, von Mises $0{,}577S_y$."};
+  }
+  if (v.s1 === v.s2) {
+    return {off:true, t:"<b>Ligeligt toakset.</b> $\\sigma_1=\\sigma_2$: de to kriterier er enige, fordi punktet ligger på et af sekskantens hjørner, som også ligger på ellipsen."};
+  }
+  return {off:true, t:"Du har ændret inddata. Tryk på knappen for at komme tilbage til eksamensopgavens tal."};
+},
+
+draw: function (ctx, W, H, v, r, C) {
+  C.grid(ctx, W, H, 40);
+  var CY='#5ec8ff', GR='#00d984', GO='#ffa500', RD='#ff5e5e', PU='#d984ff', DIM='rgba(227,235,243,.45)';
+
+  /* ---------- flydeflader i sigma1-sigma2-planet ---------- */
+  var cx=228, cy=H/2+6, R=150, sc=R/v.Sy*0.95;
+  function P(a,b){ return [cx+a*sc, cy-b*sc]; }
+  var lim=Math.max(v.Sy*1.35, Math.abs(v.s1)*1.1, Math.abs(v.s2)*1.1);
+  sc=Math.min(sc, 190/lim);
+  C.line(ctx, cx-200, cy, cx+200, cy, DIM, 1.1);
+  C.line(ctx, cx, cy-200, cx, cy+200, DIM, 1.1);
+  C.txt(ctx,'σ1', cx+196, cy-8, DIM, 12, 'right');
+  C.txt(ctx,'σ2', cx+8, cy-186, DIM, 12);
+  // von Mises-ellipse
+  var ell=[];
+  for (var i=0;i<=120;i++){ var t=i/120*2*Math.PI;
+    var a=Math.sqrt(2)*v.Sy*Math.cos(t), b=Math.sqrt(2/3)*v.Sy*Math.sin(t);
+    ell.push(P((a+b)/Math.sqrt(2), (a-b)/Math.sqrt(2))); }
+  C.poly(ctx, ell, CY, 'rgba(94,200,255,.07)', 2.2);
+  // Tresca-sekskant
+  var S=v.Sy, hx=[[S,0],[S,S],[0,S],[-S,0],[-S,-S],[0,-S],[S,0]].map(function(q){return P(q[0],q[1]);});
+  C.poly(ctx, hx, GO, 'rgba(255,165,0,.08)', 2.2);
+  // lastlinje og skaeringer
+  var Pt=P(v.s1,v.s2);
+  if (isFinite(r.nV)) {
+    var ev=P(v.s1*r.nV, v.s2*r.nV), et=P(v.s1*r.nT, v.s2*r.nT);
+    C.line(ctx, cx, cy, ev[0], ev[1], PU, 1.4, [5,4]);
+    C.circle(ctx, et[0], et[1], 4.5, null, GO);
+    C.circle(ctx, ev[0], ev[1], 4.5, null, CY);
+  }
+  C.circle(ctx, Pt[0], Pt[1], 6, '#fff', PU, 2);
+  C.mono(ctx,'('+Eks.num(v.s1,0)+', '+Eks.num(v.s2,0)+')', Pt[0]-10, Pt[1]-10, PU, 11, 'right');
+  C.txt(ctx,'von Mises (ellipse)', 16, 22, CY, 11, 'left', true);
+  C.txt(ctx,'Tresca (sekskant)', 16, 38, GO, 11, 'left', true);
+  C.mono(ctx,'Sy='+Eks.num(v.Sy,0), P(v.Sy,0)[0]+4, cy+14, DIM, 10);
+
+  /* ---------- 3D Mohr-cirkler ---------- */
+  var mx0=462, mx1=W-18, my=H/2+20;
+  C.txt(ctx,'Tre Mohr-cirkler (σ3 = 0 med)', mx0, 22, DIM, 11);
+  var mn=Math.min(r.p[2],0), mxv=Math.max(r.p[0],0), span=Math.max(mxv-mn, 10);
+  var ms=(mx1-mx0-20)/span;
+  function MX(s){ return mx0+10+(s-mn)*ms; }
+  C.line(ctx, mx0, my, mx1, my, DIM, 1.1);
+  C.line(ctx, MX(0), my-150, MX(0), my+60, DIM, 1);
+  var cols=[GR, 'rgba(0,217,132,.5)', 'rgba(0,217,132,.5)'];
+  var pairs=[[r.p[0],r.p[2]],[r.p[0],r.p[1]],[r.p[1],r.p[2]]];
+  pairs.forEach(function(pp,k){
+    var c=(pp[0]+pp[1])/2, rr=(pp[0]-pp[1])/2*ms;
+    C.circle(ctx, MX(c), my, rr, cols[k], k===0?'rgba(0,217,132,.08)':null, k===0?2.4:1.4, k===0?null:[4,3]);
+  });
+  var big=(r.p[0]-r.p[2])/2*ms;
+  C.line(ctx, MX((r.p[0]+r.p[2])/2), my, MX((r.p[0]+r.p[2])/2), my-big, RD, 1.4, [3,3]);
+  C.mono(ctx,'τmax='+Eks.num(r.tmax,0), MX((r.p[0]+r.p[2])/2)+6, my-big-6, RD, 10);
+  r.p.forEach(function(s,k){ C.circle(ctx, MX(s), my, 3.5, null, '#e3ebf3');
+    C.mono(ctx,'σ'+(k+1)+'='+Eks.num(s,0), MX(s), my+18+k*13, DIM, 10, 'center'); });
+  C.txt(ctx,'Største cirkel = Tresca', mx0, H-16, GR, 10);
+}
+};
+</script>
+<script src="assets/eksamen.js"></script>
+<script>Eks.build();</script>
+</body>
+</html>
