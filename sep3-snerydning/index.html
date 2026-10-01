@@ -216,6 +216,34 @@ details.tv summary{cursor:pointer;color:var(--ink-2)}
 .limits ul{padding-left:18px;display:grid;gap:4px;font-size:.9rem;color:var(--ink-2);columns:2;column-gap:28px}
 @media (max-width:760px){.limits ul{columns:1}}
 
+/* maskiner og redskaber */
+.subh{margin:26px 0 12px}
+.mcards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:760px){.mcards{grid-template-columns:minmax(0,1fr)}}
+.mcard{padding:16px;display:grid;gap:10px;grid-template-rows:auto auto auto 1fr auto;min-width:0}
+.mcard.wide{grid-column:1/-1}
+.mcard[aria-current="true"]{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc)}
+.mtop{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.tag{font-family:var(--f-mono);font-size:.7rem;padding:2px 8px;border-radius:999px;border:1px solid var(--rule-strong);color:var(--ink-2);white-space:nowrap}
+.illu{display:block;width:100%;max-width:100%;border-radius:6px;background:#e3eaf0}
+.illu.drv,.illu.tl{aspect-ratio:2.33/1}
+.illu.wide{aspect-ratio:4.4/1}
+@media (max-width:760px){.illu.wide{aspect-ratio:2.6/1}}
+.mcard>p{font-size:.92rem;color:var(--ink-2)}
+.pc2{list-style:none;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,auto);grid-auto-flow:column;gap:4px 14px;font-size:.86rem}
+.pc2 li{padding-left:15px;position:relative;min-width:0}
+.pc2 li::before{position:absolute;left:0;font-family:var(--f-mono);font-weight:600}
+.pc2 li.pro::before{content:"+";color:var(--good-text)}
+.pc2 li.con::before{content:"−";color:var(--bad-text)}
+.mfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;border-top:1px solid var(--rule);padding-top:10px}
+/* nærbillede */
+.closeup-row{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:760px){.closeup-row{grid-template-columns:minmax(0,1fr)}}
+.closefig{margin:0;display:grid;gap:4px;min-width:0}
+#closeup{display:block;width:100%;aspect-ratio:16/10;border-radius:6px;background:#20262c}
+.closeinfo{display:grid;gap:10px;min-width:0}
+button.rob{width:100%;text-align:left;cursor:pointer;font:inherit;color:inherit}
+button.rob[aria-pressed="true"]{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc)}
 footer{margin-top:40px}
 footer .panel{padding:16px 20px;display:grid;gap:8px}
 footer ul{padding-left:18px;display:grid;gap:4px;font-size:.84rem;color:var(--ink-2)}
@@ -245,18 +273,31 @@ footer ul{padding-left:18px;display:grid;gap:4px;font-size:.84rem;color:var(--in
 
 <nav class="nav" aria-label="Sektioner">
   <div class="wrap">
-    <a href="#sim"><b>1</b>Simulering</a>
-    <a href="#kombi"><b>2</b>Kombinationer</a>
-    <a href="#glid"><b>3</b>Glider den?</a>
-    <a href="#fart"><b>4</b>Fart og energi</a>
-    <a href="#model"><b>5</b>Model</a>
+    <a href="#maskiner"><b>1</b>Maskiner</a>
+    <a href="#sim"><b>2</b>Simulering</a>
+    <a href="#kombi"><b>3</b>Kombinationer</a>
+    <a href="#glid"><b>4</b>Glider den?</a>
+    <a href="#fart"><b>5</b>Fart og energi</a>
+    <a href="#model"><b>6</b>Model</a>
   </div>
 </nav>
 
 <main>
-<section id="sim" class="wrap sec">
+<section id="maskiner" class="wrap sec">
   <div class="sec-head">
     <span class="sec-num">1</span>
+    <h2>Drivsystemer og redskaber</h2>
+    <p>Tegningerne viser robotten set oppefra og redskaberne set fra siden. Drivsystemerne kører en bane, vender og kører tilbage, så forskellen på at dreje på stedet og at vende i en sløjfe kan ses. Vælg et kort for at bruge det i simulatoren.</p>
+  </div>
+  <h3 class="subh">Sådan vender drivsystemerne</h3>
+  <div class="mcards" id="drive-cards"></div>
+  <h3 class="subh">Sådan virker redskaberne</h3>
+  <div class="mcards" id="tool-cards"></div>
+</section>
+
+<section id="sim" class="wrap sec">
+  <div class="sec-head">
+    <span class="sec-num">2</span>
     <h2>Simulering af en rydning</h2>
     <p>Robotten kører i lige baner som en græsslåmaskine og vender ved enderne. Sneen fjernes, hvor redskabet kører, og lægges der, hvor redskabet kaster eller skubber den hen. Resultatet under simuleringen er beregnet for hele opgaven med det samme. Animationen viser forløbet.</p>
   </div>
@@ -276,10 +317,10 @@ footer ul{padding-left:18px;display:grid;gap:4px;font-size:.84rem;color:var(--in
       </div>
       <canvas id="scene" role="img" aria-label="Arealet set oppefra med sne, ryddede baner og robotter"></canvas>
       <div class="keys" aria-hidden="true">
-        <span class="key"><i style="background:#f4f7fa"></i>Sne</span>
-        <span class="key"><i style="background:#ffffff;border-color:#8fb4d6"></i>Vold eller kastet sne</span>
-        <span class="key"><i style="background:#3d454e"></i>Ryddet</span>
-        <span class="key"><i style="background:#3f5566"></i>Ryddet og saltet</span>
+        <span class="key"><i style="background:#f3f6f9"></i>Uryddet sne</span>
+        <span class="key"><i style="background:linear-gradient(90deg,#a8ceee,#347cbe);border-color:#347cbe"></i>Flyttet sne (kastet eller skubbet)</span>
+        <span class="key"><i style="background:#3a4047"></i>Ryddet asfalt</span>
+        <span class="key"><i style="background:#2b8a91"></i>Ryddet og saltet</span>
         <span class="key"><i class="line"></i>Casens areal (60 × 18 m)</span>
       </div>
       <div class="stats">
@@ -288,11 +329,19 @@ footer ul{padding-left:18px;display:grid;gap:4px;font-size:.84rem;color:var(--in
         <div class="stat"><span class="label">Energi brugt</span><span class="v" id="s-energy">0,0 kWh</span><span class="sub" id="s-energy-sub"></span></div>
         <div class="stat"><span class="label">Sne flyttet</span><span class="v" id="s-snow">0,0 t</span><span class="sub" id="s-snow-sub"></span></div>
       </div>
-      <div class="robots" id="robots"></div>
-      <div class="forcebox">
-        <div class="label" id="f-title">Kraft på robot 1 lige nu</div>
-        <div class="fbar" id="fbar"></div>
-        <div class="flegend" id="flegend"></div>
+      <div class="closeup-row">
+        <figure class="closefig">
+          <canvas id="closeup" role="img" aria-label="Nærbillede, der følger robotten under rydningen"></canvas>
+          <figcaption class="small muted">Nærbilledet følger robotten. Med 2 robotter vælger du, hvilken der følges, i listen ved siden af.</figcaption>
+        </figure>
+        <div class="closeinfo">
+          <div class="robots" id="robots"></div>
+          <div class="forcebox">
+            <div class="label" id="f-title">Kraft på robot 1 lige nu</div>
+            <div class="fbar" id="fbar"></div>
+            <div class="flegend" id="flegend"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -384,7 +433,7 @@ footer ul{padding-left:18px;display:grid;gap:4px;font-size:.84rem;color:var(--in
 
 <section id="kombi" class="wrap sec">
   <div class="sec-head">
-    <span class="sec-num">2</span>
+    <span class="sec-num">3</span>
     <h2>Alle kombinationer</h2>
     <p>Hver kombination af drivsystem og redskab er kørt med samme scenarie og maskindata som ovenfor. En kombination består, når arealet er ryddet og saltet inden for 4 timer inklusive opladning, og robotten ikke glider. Klik på en celle for at se den i simulatoren.</p>
   </div>
@@ -394,7 +443,7 @@ footer ul{padding-left:18px;display:grid;gap:4px;font-size:.84rem;color:var(--in
 
 <section id="glid" class="wrap sec">
   <div class="sec-head">
-    <span class="sec-num">3</span>
+    <span class="sec-num">4</span>
     <h2>Glider den?</h2>
     <p>Trækkraften er friktionskoefficienten gange vægten på de drivende hjul eller bælter. Tabellen viser, hvor stor en del af trækkraften robotten skal bruge for at skubbe redskabet gennem sneen op ad den valgte hældning. Over 100 % spinder hjulene.</p>
   </div>
@@ -404,7 +453,7 @@ footer ul{padding-left:18px;display:grid;gap:4px;font-size:.84rem;color:var(--in
 
 <section id="fart" class="wrap sec">
   <div class="sec-head">
-    <span class="sec-num">4</span>
+    <span class="sec-num">5</span>
     <h2>Hurtigt eller sparsomt?</h2>
     <p>Energien til at flytte sneen afhænger mest af snemængden. Kører robotten langsomt, bruger elektronik, varme og tomgang mere energi i alt. Kører den hurtigt, stiger tabene i batteriet, og redskabet kan begrænse farten. Graferne viser den valgte kombination kørt ved forskellige maksimalhastigheder.</p>
   </div>
@@ -418,7 +467,7 @@ footer ul{padding-left:18px;display:grid;gap:4px;font-size:.84rem;color:var(--in
 
 <section id="model" class="wrap sec">
   <div class="sec-head">
-    <span class="sec-num">5</span>
+    <span class="sec-num">6</span>
     <h2>Model og antagelser</h2>
     <p>Alle tal er antagelser til sammenligning af koncepter og til lastgrundlaget i KF2–KF5. De skal erstattes af målte eller kildebelagte værdier, efterhånden som projektet skrider frem.</p>
   </div>
@@ -458,7 +507,7 @@ footer ul{padding-left:18px;display:grid;gap:4px;font-size:.84rem;color:var(--in
       <ul>
         <li>Banerne overlapper 10 %. Hjul 4WD og bælter drejer på stedet ved baneenden og bakker lidt.</li>
         <li>Halvbælte og knækstyret vender i en pæreformet sløjfe med radius 1,5 og 1,3 m. Det kræver et vendeareal på ca. 5 m i hver ende, som ryddes med ekstra baner til sidst.</li>
-        <li>Saltspreder på 110 W med 60 kg i beholderen. Uden sne spredes der 3 m bredt.</li>
+        <li>Saltspreder på 110 W med 60 kg i beholderen. Tallerkenen spreder ca. 2 m bredt, så banerne overlapper. Uden sne spredes der 3 m bredt.</li>
         <li>Vejsalt (NaCl) virker ned til ca. −7 °C. Ved KF5-B (−15 °C) skal der bruges et andet middel.</li>
       </ul>
     </div>
@@ -769,7 +818,7 @@ function makeGrid(cfg) {
   const M = new Float32Array(nx * ny), m0 = S.rho * (p.depth / 100) * CELL * CELL;
   M.fill(m0);
   const clearMass = S.rho * CLEAR_H * CELL * CELL;
-  return { nx, ny, M, salt: new Uint8Array(nx * ny), m0, clearMass, rho: S.rho, cleared: m0 <= clearMass ? nx * ny : 0, salted: 0, total: nx * ny, outMass: 0, h0: p.depth / 100 };
+  return { nx, ny, M, salt: new Uint8Array(nx * ny), moved: new Uint8Array(nx * ny), m0, clearMass, rho: S.rho, cleared: m0 <= clearMass ? nx * ny : 0, salted: 0, total: nx * ny, outMass: 0, h0: p.depth / 100 };
 }
 function setM(g, i, v) {
   const was = g.M[i] <= g.clearMass, now = v <= g.clearMass;
@@ -843,17 +892,17 @@ function deposit(g, cfg, x1, y1, th1, dis, ds, mass) {
   QB[6] = cx - ux * ha + ax * hc; QB[7] = cy - uy * ha + ay * hc;
   const n = quadCells(g, QB);
   const share = mass / Math.max(n, along * across / (CELL * CELL));
-  for (let j = 0; j < n; j++) setM(g, CB[j], g.M[CB[j]] + share);
+  for (let j = 0; j < n; j++) { setM(g, CB[j], g.M[CB[j]] + share); g.moved[CB[j]] = 1; }
   g.outMass += mass - share * n;
   LAND.x = cxl; LAND.y = cyl;
   return LAND;
 }
 function spreadSalt(g, cfg, x0, y0, th0, x1, y1, th1, ds) {
-  const w = cfg.saltOnly ? cfg.b : cfg.s, back = cfg.D.len / 2;
+  const w = cfg.saltOnly ? cfg.b : 2.0, back = cfg.D.len / 2;
   lineQuadQ(x0 - back * Math.cos(th0), y0 - back * Math.sin(th0), x1 - back * Math.cos(th1), y1 - back * Math.sin(th1), th0, th1, w / 2);
   const n = quadCells(g, QB);
   for (let j = 0; j < n; j++) { const i = CB[j]; if (!g.salt[i] && g.M[i] <= g.clearMass) { g.salt[i] = 1; g.salted++; } }
-  return cfg.p.dose / 1000 * w * ds;
+  return cfg.p.dose / 1000 * (cfg.saltOnly ? w : cfg.s) * ds;
 }
 function cellAt(g, x, y) {
   const ix = Math.floor(x / CELL), iy = Math.floor(y / CELL);
@@ -923,7 +972,7 @@ function step(R, cfg, g) {
       R.snow += got;
     }
     const q = got / ds;
-    const saltOn = p.salt && R.salt > 0 && (sg.mode === 'work' || (cfg.saltOnly && sg.mode === 'turn'));
+    const saltOn = p.salt && R.salt > 0 && (sg.mode === 'work' || sg.mode === 'turn' || (!cfg.saltOnly && sg.mode === 'rev'));
     if (saltOn) { const used = Math.min(R.salt, spreadSalt(g, cfg, x0, y0, th0, x1, y1, th1, ds)); R.salt -= used; R.saltUsed += used; }
     const m = massOf(R, cfg), gr = groundAt(g, cfg, x1, y1);
     const ca = Math.cos(p.slope * Math.PI / 180), sa = Math.sin(p.slope * Math.PI / 180);
@@ -1019,32 +1068,25 @@ function runSim(cfg) {
 /* ---------- tegning af arealet ---------- */
 const scene = $('#scene');
 const MARGIN = 2.5;
-const SC = { snow: [238, 242, 246], deep: [255, 255, 255], pile: [196, 216, 236], thin: [150, 160, 170], clear: [61, 69, 78], salted: [63, 85, 102], edge: '#20262c' };
+const SC = { snow: [243, 246, 249], thin: [150, 160, 170], movedLo: [168, 206, 238], movedHi: [52, 124, 190], clear: [58, 64, 71], salted: [43, 138, 145], edge: '#20262c' };
 let gcv = null, gctx = null, gimg = null;
-const anim = { cfg: null, g: null, robots: [], t: 0, running: false, speed: 150, dirty: true, visible: true, lastStats: 0 };
-
+const anim = { cfg: null, g: null, robots: [], t: 0, running: false, speed: 150, dirty: true, visible: true, lastStats: 0, focus: 0 };
+const mix = (a, b, f) => [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f];
 function paintGrid(g) {
   if (!gcv || gcv.width !== g.nx || gcv.height !== g.ny) {
     gcv = document.createElement('canvas'); gcv.width = g.nx; gcv.height = g.ny;
     gctx = gcv.getContext('2d'); gimg = gctx.createImageData(g.nx, g.ny);
   }
-  const d = gimg.data, A2 = CELL * CELL, h0 = Math.max(g.h0, 0.05);
+  const d = gimg.data, A2 = CELL * CELL;
   for (let iy = 0; iy < g.ny; iy++) {
     const row = (g.ny - 1 - iy) * g.nx;
     for (let ix = 0; ix < g.nx; ix++) {
       const i = iy * g.nx + ix, h = g.M[i] / (g.rho * A2), o = (row + ix) * 4;
       let c;
-      if (g.M[i] <= g.clearMass) {
-        const base = g.salt[i] ? SC.salted : SC.clear, f = Math.min(1, h / CLEAR_H) * 0.35;
-        c = [base[0] + (SC.thin[0] - base[0]) * f, base[1] + (SC.thin[1] - base[1]) * f, base[2] + (SC.thin[2] - base[2]) * f];
-      } else if (h < 0.06) {
-        const f = (h - CLEAR_H) / (0.06 - CLEAR_H);
-        c = [SC.thin[0] + (SC.snow[0] - SC.thin[0]) * f, SC.thin[1] + (SC.snow[1] - SC.thin[1]) * f, SC.thin[2] + (SC.snow[2] - SC.thin[2]) * f];
-      } else if (h <= h0 * 1.15) c = SC.snow;
-      else {
-        const f = Math.min(1, (h - h0 * 1.15) / 0.35);
-        c = f < 0.4 ? SC.deep : [SC.deep[0] + (SC.pile[0] - SC.deep[0]) * (f - 0.4) / 0.6, SC.deep[1] + (SC.pile[1] - SC.deep[1]) * (f - 0.4) / 0.6, SC.deep[2] + (SC.pile[2] - SC.deep[2]) * (f - 0.4) / 0.6];
-      }
+      if (g.M[i] <= g.clearMass) c = mix(g.salt[i] ? SC.salted : SC.clear, SC.thin, Math.min(1, h / CLEAR_H) * 0.25);
+      else if (g.moved[i]) c = mix(SC.movedLo, SC.movedHi, Math.min(1, h / 0.45));
+      else if (h < 0.06) c = mix(SC.thin, SC.snow, (h - CLEAR_H) / (0.06 - CLEAR_H));
+      else c = SC.snow;
       d[o] = c[0]; d[o + 1] = c[1]; d[o + 2] = c[2]; d[o + 3] = 255;
     }
   }
@@ -1144,6 +1186,7 @@ function drawScene() {
     ctx.fillStyle = '#ffffff'; ctx.font = '600 10px "IBM Plex Mono", ui-monospace, monospace';
     ctx.fillText(R.state === 'charge' ? (i + 1) + ' lader' : String(i + 1), px + 10, py - 9);
   });
+  drawCloseup();
 }
 
 /* ---------- animation ---------- */
@@ -1153,6 +1196,7 @@ function resetAnim() {
   anim.robots = planAll(anim.cfg).map((pl, i) => makeRobot(anim.cfg, pl, i));
   anim.robots.forEach(R => { const c = anim.cfg, m = massOf(R, c); R.last.Ftr = muOf(c.D.tr, c.p.ground, c.p.chains) * c.D.fd * m * G; R.last.Frr = CRR[c.D.tr][c.p.ground] * m * G; R.last.util = R.last.Frr / R.last.Ftr; });
   anim.t = 0; anim.dirty = true;
+  if ((anim.focus || 0) >= anim.robots.length) anim.focus = 0;
   updateLive(true);
 }
 function animDone() { return anim.robots.every(R => R.done); }
@@ -1208,17 +1252,19 @@ function updateLive(force) {
   const box = $('#robots');
   if (box.children.length !== rs.length) {
     box.replaceChildren();
-    rs.forEach(() => { const r = mk('div', 'rob'); r.append(mk('b'), mk('span'), mk('span', 'small muted')); box.appendChild(r); });
+    rs.forEach((_, i) => { const r = mk('button', 'rob'); r.type = 'button'; r.append(mk('b'), mk('span'), mk('span', 'small muted')); r.addEventListener('click', () => { anim.focus = i; anim.dirty = true; updateLive(true); }); box.appendChild(r); });
   }
   rs.forEach((R, i) => {
     const el = box.children[i], sg = R.plan.segs[Math.min(R.si, R.plan.segs.length - 1)];
+    el.setAttribute('aria-pressed', String((anim.focus || 0) === i));
     const st = R.state === 'charge' ? 'charge' : R.done ? 'done' : (R.last.slip ? 'slip' : sg.mode);
     el.children[0].textContent = 'Robot ' + (i + 1);
     el.children[1].textContent = (st === 'slip' ? 'Glider' : (STATE_TXT[st] || 'Rydder')) + (R.state === 'work' && !R.done ? ' · ' + nf(R.last.v, 2) + ' m/s' : '');
     const soc = R.state === 'charge' ? R.chargeFrom + (0.9 - R.chargeFrom) * Math.min(1, (anim.t - R.chargeStart) / Math.max(1, R.busyUntil - R.chargeStart)) : R.soc;
     el.children[2].textContent = 'batteri ' + nf(Math.max(0, soc) * 100, 0) + ' % · ' + nf(R.Pnow / 1000, 1) + ' kW';
   });
-  drawForce(rs[0]);
+  drawForce(rs[Math.min(anim.focus || 0, rs.length - 1)]);
+  $('#f-title').textContent = 'Kraft på robot ' + (Math.min(anim.focus || 0, rs.length - 1) + 1) + ' lige nu';
 }
 function drawForce(R) {
   const L = R.last, box = $('#fbar'), lg = $('#flegend');
@@ -1235,6 +1281,489 @@ function drawForce(R) {
   lg.replaceChildren();
   parts.forEach(([n, v, c]) => { const s = mk('span'); const i = mk('i'); i.style.background = 'var(--' + c + ')'; s.append(i, n + ' ' + nf(v, 0) + ' N'); lg.appendChild(s); });
   const s2 = mk('span'); const i2 = mk('i'); i2.style.cssText = 'width:2px;height:12px;background:var(--ink)'; s2.append(i2, 'Trækkraft ' + nf(L.Ftr, 0) + ' N (' + nf(L.util * 100, 0) + ' % brugt)'); lg.appendChild(s2);
+}
+
+/* ---------- tegninger: maskiner set oppefra og nærbillede ---------- */
+const COL = {
+  body: '#e8742a', line: '#111418', tire: '#1b1f24', tread: '#4a545e', tool: '#2b3036', toolHi: '#5b656f',
+  metal: '#b9c2ca', joint: '#c8843f', bristle: '#7a6236', bristleHi: '#b08f55', snow: '#f3f6f9', snowEdge: '#c9d3dc',
+  moved: '#8fc1ea', clear: '#3a4047', salted: '#2b8a91', air: '#e3eaf0', ink: '#1b1f24', arrow: '#ffcf33'
+};
+function rrp(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(x, y, w, h, Math.min(r, w / 2, h / 2)); else ctx.rect(x, y, w, h);
+}
+function arrowHead(ctx, x, y, ang, size) {
+  ctx.beginPath(); ctx.moveTo(x, y);
+  ctx.lineTo(x - size * Math.cos(ang - 0.5), y - size * Math.sin(ang - 0.5));
+  ctx.lineTo(x - size * Math.cos(ang + 0.5), y - size * Math.sin(ang + 0.5));
+  ctx.closePath(); ctx.fill();
+}
+/* redskab set oppefra; origo i redskabets midte, x fremad, y til venstre; side = -1 kaster til højre */
+function drawToolTop(ctx, tk, b, ph, s, side) {
+  side = side || -1;
+  const lw = 1.1 / s, edge = () => { ctx.lineWidth = lw; ctx.strokeStyle = COL.line; ctx.stroke(); };
+  ctx.lineCap = 'round'; ctx.lineWidth = 0.06; ctx.strokeStyle = COL.tool;
+  ctx.beginPath(); ctx.moveTo(-0.44, 0.2); ctx.lineTo(-0.1, 0.2); ctx.moveTo(-0.44, -0.2); ctx.lineTo(-0.1, -0.2); ctx.stroke();
+  ctx.lineCap = 'butt';
+  if (tk === 'plov') {
+    ctx.save(); ctx.rotate(side < 0 ? -0.52 : 0.52);
+    const L = b / Math.cos(0.52);
+    rrp(ctx, -0.05, -L / 2, 0.1, L, 0.03); ctx.fillStyle = COL.tool; ctx.fill(); edge();
+    ctx.beginPath(); ctx.moveTo(0.05, -L / 2 + 0.03); ctx.lineTo(0.05, L / 2 - 0.03); ctx.lineWidth = 0.03; ctx.strokeStyle = COL.metal; ctx.stroke();
+    ctx.restore();
+  } else if (tk === 'borste') {
+    rrp(ctx, -0.22, -b / 2, 0.44, b, 0.06); ctx.fillStyle = COL.tool; ctx.fill(); edge();
+    ctx.save(); rrp(ctx, -0.16, -b / 2 + 0.04, 0.32, b - 0.08, 0.04); ctx.clip();
+    ctx.fillStyle = COL.bristle; ctx.fillRect(-0.2, -b / 2, 0.4, b);
+    ctx.beginPath(); const p = 0.06, off = (((ph * 0.9) % p) + p) % p;
+    for (let x = -0.16 - p + off; x < 0.17; x += p) { ctx.moveTo(x, -b / 2); ctx.lineTo(x, b / 2); }
+    ctx.lineWidth = 0.02; ctx.strokeStyle = COL.bristleHi; ctx.stroke(); ctx.restore();
+  } else if (tk === 'fraes1' || tk === 'fraes2') {
+    const two = tk === 'fraes2', d = two ? 0.5 : 0.38, x0 = two ? -0.26 : -0.2;
+    rrp(ctx, x0, -b / 2, d, b, 0.06); ctx.fillStyle = COL.tool; ctx.fill(); edge();
+    const ax0 = x0 + d - 0.26, ax1 = x0 + d - 0.04, half = b / 2 - 0.03;
+    ctx.save(); rrp(ctx, ax0, -half, ax1 - ax0, 2 * half, 0.03); ctx.clip();
+    ctx.fillStyle = '#3c444d'; ctx.fillRect(ax0, -b / 2, ax1 - ax0, b);
+    ctx.beginPath();
+    const p = 0.1, off = (((ph * 0.5) % p) + p) % p;
+    for (let y = half + p - off; y > -0.02; y -= p) { ctx.moveTo(ax0, y); ctx.lineTo(ax1, y - 0.07); ctx.moveTo(ax0, -y); ctx.lineTo(ax1, -y + 0.07); }
+    ctx.lineWidth = 0.028; ctx.strokeStyle = COL.metal; ctx.stroke(); ctx.restore();
+    const cx = x0 + (two ? 0.13 : 0.1);
+    if (two) {
+      ctx.beginPath(); ctx.arc(cx, 0, 0.15, 0, 2 * Math.PI); ctx.fillStyle = COL.toolHi; ctx.fill(); edge();
+      ctx.beginPath();
+      for (let k = 0; k < 4; k++) { const a = ph * 9 + k * Math.PI / 2; ctx.moveTo(cx, 0); ctx.lineTo(cx + 0.13 * Math.cos(a), 0.13 * Math.sin(a)); }
+      ctx.lineWidth = 0.028; ctx.strokeStyle = COL.metal; ctx.stroke();
+    }
+    ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx - 0.02, side * (two ? 0.38 : 0.3));
+    ctx.lineWidth = 0.09; ctx.strokeStyle = COL.metal; ctx.stroke(); ctx.lineCap = 'butt';
+    ctx.beginPath(); ctx.arc(cx, 0, 0.075, 0, 2 * Math.PI); ctx.fillStyle = COL.metal; ctx.fill(); edge();
+  }
+}
+/* saltspreder bag på robotten; xr = robottens bagkant */
+function drawSpreader(ctx, xr, ph, s, active) {
+  rrp(ctx, xr, -0.22, 0.3, 0.44, 0.04); ctx.fillStyle = '#e8edf1'; ctx.fill(); ctx.lineWidth = 1.1 / s; ctx.strokeStyle = COL.line; ctx.stroke();
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(xr + 0.05, -0.16, 0.2, 0.32);
+  const cx = xr - 0.16;
+  if (active) { ctx.beginPath(); ctx.moveTo(cx, 0); ctx.arc(cx, 0, 1.45, Math.PI - 1.05, Math.PI + 1.05); ctx.closePath(); ctx.fillStyle = 'rgba(43,138,145,0.25)'; ctx.fill(); }
+  ctx.beginPath(); ctx.arc(cx, 0, 0.12, 0, 2 * Math.PI); ctx.fillStyle = COL.metal; ctx.fill(); ctx.lineWidth = 1.1 / s; ctx.strokeStyle = COL.line; ctx.stroke();
+  ctx.beginPath();
+  for (let k = 0; k < 3; k++) { const a = ph * 12 + k * 2.094; ctx.moveTo(cx, 0); ctx.lineTo(cx + 0.11 * Math.cos(a), 0.11 * Math.sin(a)); }
+  ctx.lineWidth = 0.022; ctx.strokeStyle = COL.tool; ctx.stroke();
+}
+/* hele maskinen set oppefra i verdenskoordinater (y op) */
+function drawMachine(ctx, o) {
+  const D = DRIVES[o.dk], s = o.s, lw = 1.2 / s, b = o.b || 0.8, ph = o.phase || 0, tr = o.tread || 0;
+  const fs = fill => { ctx.fillStyle = fill; ctx.fill(); ctx.lineWidth = lw; ctx.strokeStyle = COL.line; ctx.stroke(); };
+  const wheel = (x, y, l, w, ang) => {
+    ctx.save(); ctx.translate(x, y); if (ang) ctx.rotate(ang);
+    rrp(ctx, -l / 2, -w / 2, l, w, w * 0.3); fs(COL.tire);
+    ctx.beginPath(); const p = l / 5, off = ((tr % p) + p) % p;
+    for (let k = -l / 2 + off; k < l / 2; k += p) { ctx.moveTo(-k, -w / 2 + 0.02); ctx.lineTo(-k, w / 2 - 0.02); }
+    ctx.lineWidth = 0.9 / s; ctx.strokeStyle = COL.tread; ctx.stroke();
+    ctx.restore();
+  };
+  const track = (x0, x1, y, w) => {
+    rrp(ctx, x0, y - w / 2, x1 - x0, w, w / 2); fs(COL.tire);
+    ctx.save(); rrp(ctx, x0, y - w / 2, x1 - x0, w, w / 2); ctx.clip();
+    ctx.beginPath(); const p = 0.09, off = ((tr % p) + p) % p;
+    for (let x = x1 + p - off; x > x0 - p; x -= p) { ctx.moveTo(x, y - w / 2); ctx.lineTo(x, y + w / 2); }
+    ctx.lineWidth = 1.4 / s; ctx.strokeStyle = COL.tread; ctx.stroke(); ctx.restore();
+    [x0 + w / 2, x1 - w / 2].forEach(cx => { ctx.beginPath(); ctx.arc(cx, y, w * 0.3, 0, 2 * Math.PI); ctx.fillStyle = COL.metal; ctx.fill(); });
+  };
+  const chevron = x => { ctx.beginPath(); ctx.moveTo(x + 0.13, 0); ctx.lineTo(x - 0.04, 0.11); ctx.lineTo(x - 0.04, -0.11); ctx.closePath(); ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.fill(); };
+  const xt = D.len / 2 + 0.3, tk = o.tk && o.tk !== 'none' ? o.tk : null;
+  ctx.save(); ctx.translate(o.x, o.y); ctx.rotate(o.th); ctx.lineJoin = 'round';
+  if (o.dk === 'K') {
+    const g = o.steer || 0;
+    ctx.save(); ctx.rotate(-g / 2);
+    wheel(-0.42, 0.42, 0.34, 0.15, 0); wheel(-0.42, -0.42, 0.34, 0.15, 0);
+    rrp(ctx, -0.7, -0.32, 0.6, 0.64, 0.07); fs(COL.body);
+    if (o.salt) drawSpreader(ctx, -0.7, ph, s, o.spreading);
+    ctx.restore();
+    ctx.save(); ctx.rotate(g / 2);
+    wheel(0.42, 0.42, 0.34, 0.15, 0); wheel(0.42, -0.42, 0.34, 0.15, 0);
+    rrp(ctx, 0.1, -0.32, 0.6, 0.64, 0.07); fs(COL.body); chevron(0.42);
+    if (tk) { ctx.save(); ctx.translate(xt, 0); drawToolTop(ctx, tk, b, ph, s, o.side); ctx.restore(); }
+    ctx.restore();
+    ctx.beginPath(); ctx.arc(0, 0, 0.1, 0, 2 * Math.PI); fs(COL.joint);
+  } else {
+    if (o.dk === 'H') {
+      [[0.32, 0.42], [0.32, -0.42], [-0.32, 0.42], [-0.32, -0.42]].forEach(([x, y]) => wheel(x, y, 0.38, 0.16, 0));
+      rrp(ctx, -0.6, -0.34, 1.2, 0.68, 0.08); fs(COL.body); chevron(0.3);
+    } else if (o.dk === 'B') {
+      track(-0.6, 0.6, 0.37, 0.2); track(-0.6, 0.6, -0.37, 0.2);
+      rrp(ctx, -0.54, -0.26, 1.08, 0.52, 0.08); fs(COL.body); chevron(0.3);
+    } else {
+      track(-0.68, 0.02, 0.37, 0.2); track(-0.68, 0.02, -0.37, 0.2);
+      wheel(0.46, 0.37, 0.32, 0.14, o.steer || 0); wheel(0.46, -0.37, 0.32, 0.14, o.steer || 0);
+      rrp(ctx, -0.64, -0.26, 1.28, 0.52, 0.08); fs(COL.body); chevron(0.34);
+    }
+    if (o.salt) drawSpreader(ctx, -D.len / 2, ph, s, o.spreading);
+    if (tk) { ctx.save(); ctx.translate(xt, 0); drawToolTop(ctx, tk, b, ph, s, o.side); ctx.restore(); }
+  }
+  if (o.pivot) {
+    const dir = o.pivot;
+    ctx.lineWidth = 0.06; ctx.strokeStyle = COL.arrow; ctx.fillStyle = COL.arrow; ctx.lineCap = 'round';
+    [[0.66, -dir], [-0.66, dir]].forEach(([y, sx]) => { ctx.beginPath(); ctx.moveTo(-0.28 * sx, y); ctx.lineTo(0.22 * sx, y); ctx.stroke(); arrowHead(ctx, 0.3 * sx, y, sx > 0 ? 0 : Math.PI, 0.16); });
+    const r = 1.0, a0 = dir > 0 ? 0.35 : -0.35, a1 = dir > 0 ? 1.35 : -1.35;
+    ctx.beginPath(); ctx.arc(0, 0, r, a0, a1, dir < 0); ctx.stroke();
+    arrowHead(ctx, r * Math.cos(a1), r * Math.sin(a1), a1 + dir * Math.PI / 2, 0.18);
+    ctx.lineCap = 'butt';
+  }
+  ctx.restore();
+}
+
+/* ---------- nærbillede i simulatoren ---------- */
+const closeCv = $('#closeup');
+function fitCanvas(cv) {
+  const w = cv.clientWidth, h = cv.clientHeight, dpr = window.devicePixelRatio || 1;
+  if (!w || !h) return null;
+  if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+  return { ctx: cv.getContext('2d'), w, h, dpr };
+}
+function sideOf(th, dis) { return dis ? (Math.cos(th) * dis.y - Math.sin(th) * dis.x > 0 ? 1 : -1) : -1; }
+function steerFor(dk, sg) {
+  if (!sg || sg.type !== 'A') return 0;
+  const k = Math.sign(sg.sw) / sg.r;
+  if (dk === 'K') return clamp(2 * Math.atan(0.42 * k), -0.75, 0.75);
+  if (dk === 'HB') return clamp(Math.atan(0.9 * k), -0.6, 0.6);
+  return 0;
+}
+function drawCloseup() {
+  const cfg = anim.cfg, g = anim.g;
+  if (!cfg || !g || !gcv || !closeCv) return;
+  const f = fitCanvas(closeCv);
+  if (!f) return;
+  const { ctx, w, h, dpr } = f, A = cfg.A;
+  const R = anim.robots[Math.min(anim.focus || 0, anim.robots.length - 1)];
+  const VW = 9, s = w / VW, VH = h / s, cx = R.x, cy = R.y;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.fillStyle = SC.edge; ctx.fillRect(0, 0, w, h);
+  const wx0 = Math.max(0, cx - VW / 2), wx1 = Math.min(A.L, cx + VW / 2), wy0 = Math.max(0, cy - VH / 2), wy1 = Math.min(A.W, cy + VH / 2);
+  if (wx1 > wx0 && wy1 > wy0) {
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(gcv, wx0 / CELL, (A.W - wy1) / CELL, (wx1 - wx0) / CELL, (wy1 - wy0) / CELL, (wx0 - (cx - VW / 2)) * s, ((cy + VH / 2) - wy1) * s, (wx1 - wx0) * s, (wy1 - wy0) * s);
+  }
+  ctx.setTransform(s * dpr, 0, 0, -s * dpr, (VW / 2 - cx) * s * dpr, (VH / 2 + cy) * s * dpr);
+  ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.lineWidth = 2 / s; ctx.strokeRect(0, 0, A.L, A.W);
+  if (cfg.p.area === 'design') {
+    ctx.setLineDash([6 / s, 5 / s]); ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 1.4 / s;
+    ctx.strokeRect((A.L - CASE.L) / 2, (A.W - CASE.W) / 2, CASE.L, CASE.W); ctx.setLineDash([]);
+  }
+  if (R.thr && R.state === 'work') {
+    const mx = (R.thr.ax + R.thr.bx) / 2, my = (R.thr.ay + R.thr.by) / 2, dx = R.thr.bx - R.thr.ax, dy = R.thr.by - R.thr.ay;
+    ctx.setLineDash([4 / s, 4 / s]); ctx.lineWidth = 2 / s; ctx.strokeStyle = 'rgba(255,255,255,0.95)';
+    ctx.beginPath(); ctx.moveTo(R.thr.ax, R.thr.ay); ctx.quadraticCurveTo(mx - dy * 0.15 + dx * 0.05, my + dx * 0.15, R.thr.bx, R.thr.by); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  const sg = R.plan.segs[Math.min(R.si, R.plan.segs.length - 1)];
+  R.steerVis = (R.steerVis || 0) + (steerFor(cfg.p.drive, sg) - (R.steerVis || 0)) * 0.3;
+  const pivot = sg && sg.type === 'P' && R.state === 'work' && !R.done ? Math.sign(sg.dth) : 0;
+  drawMachine(ctx, { dk: cfg.p.drive, tk: cfg.toolKey, x: R.x, y: R.y, th: R.th, s, steer: R.steerVis, phase: anim.t * 0.25, b: cfg.b, salt: cfg.p.salt, spreading: cfg.p.salt && R.state === 'work' && !R.done && R.last.mode === 'work', side: sg ? sideOf(R.th, sg.dis) : -1, pivot, tread: R.dist });
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const x0 = 12, y0 = h - 12;
+  ctx.fillStyle = 'rgba(17,20,24,0.65)'; ctx.fillRect(x0 - 6, y0 - 22, s + 12, 28);
+  ctx.beginPath(); ctx.moveTo(x0, y0 - 5); ctx.lineTo(x0, y0); ctx.lineTo(x0 + s, y0); ctx.lineTo(x0 + s, y0 - 5);
+  ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.fillStyle = '#ffffff'; ctx.font = '500 10px "IBM Plex Mono", ui-monospace, monospace'; ctx.fillText('1 m', x0 + 4, y0 - 8);
+  const st = R.state === 'charge' ? 'Lader' : R.done ? 'Færdig' : R.last.slip ? 'Glider' : (STATE_TXT[sg ? sg.mode : 'work'] || 'Rydder');
+  const label = 'Robot ' + ((anim.focus || 0) + 1) + ' · ' + st;
+  ctx.font = '600 11px "IBM Plex Sans", system-ui, sans-serif';
+  const tw = ctx.measureText(label).width;
+  ctx.fillStyle = 'rgba(17,20,24,0.7)'; ctx.fillRect(8, 8, tw + 14, 22);
+  ctx.fillStyle = '#ffffff'; ctx.fillText(label, 15, 23);
+}
+
+/* ---------- kort: drivsystemer og redskaber ---------- */
+const DRIVE_INFO = {
+  H: { tag: 'Drejer på stedet', txt: 'Fire drevne hjul. Robotten drejer ved at køre de to sider hver sin vej, så hjulene skrider sidelæns.', pro: ['Drejer på stedet, lille vendeareal', 'Enkel og billig drivlinje'], con: ['Skrid i drej koster energi', 'Glider på is uden kæder'] },
+  B: { tag: 'Drejer på stedet', txt: 'Et gummibælte i hver side. Drejer som hjul 4WD, men med en større flade mod underlaget.', pro: ['Bedst trækkraft i sne og pakket sne', 'Lavt marktryk'], con: ['Tungere og større rulletab', 'Glider også på is uden pigge'] },
+  HB: { tag: 'Vender i sløjfe', txt: 'Bælterne bagpå trækker, og forhjulene styrer som på en bil.', pro: ['God trækkraft fra bælterne', 'Styrer som en bil'], con: ['Kan ikke dreje på stedet', 'Kun ca. 65 % af vægten på bælterne'] },
+  K: { tag: 'Vender i sløjfe', txt: 'To chassisdele med et led i midten. Begge aksler trækker, og leddet knækker for at dreje.', pro: ['Alle fire hjul trækker', 'Baghjulene følger forhjulenes spor'], con: ['Kan ikke dreje på stedet', 'Mere mekanik i leddet'] }
+};
+const TOOL_INFO = {
+  plov: { tag: 'Skubber', txt: 'Et skråtstillet blad skubber sneen ud til siden i en vold, mens robotten kører.', pro: ['Ingen motor i redskabet', 'Enkel og robust'], con: ['Kræver stor trækkraft', 'Volden vokser for hver bane'] },
+  borste: { tag: 'Fejer', txt: 'En roterende børste fejer sneen frem og ud til siden. Bedst til tynde lag.', pro: ['Fejer helt ned til asfalten', 'Lille skubbekraft'], con: ['Tager kun ca. 12 cm pr. tur', 'Kaster sneen kort'] },
+  fraes1: { tag: 'Kaster ca. 5 m', txt: 'En snegl griber sneen og kaster den direkte op gennem skorstenen og ud til siden.', pro: ['Simpel og let', 'Lav tomgangseffekt'], con: ['Kort kast, så sneen skal tages flere gange', 'Har svært ved våd og dyb sne'] },
+  fraes2: { tag: 'Kaster ca. 10 m', txt: 'Sneglen fører sneen ind til en blæser, der kaster den højt op gennem skorstenen og langt ud til siden.', pro: ['Klarer dyb og våd sne', 'Langt kast, lidt genhåndtering'], con: ['Tungest og dyrest', 'Kræver mest effekt'] },
+  salt: { tag: 'Spreder 15–20 g/m²', txt: 'En doseringssnegl fører salt fra beholderen ned på en roterende tallerken, der spreder det i en vifte bag robotten. Den bruges sammen med alle redskaber og alene ved isslag (KF20).', pro: ['Bruges med alle redskaber', 'Virker alene ved isslag'], con: ['Vejsalt virker kun ned til ca. −7 °C'] }
+};
+function miniPath(dk) {
+  const D = DRIVES[dk], xt = D.len / 2 + 0.3, s = 0.72, segs = [], x0 = -5.4, xe = -2.2;
+  segL(segs, x0, 0, xe, 0, { tool: true, mode: 'work', dis: { x: 0, y: -1 } });
+  if (D.pivot) turnPivot(segs, xe, 0, 1, s, xt, { x: 0, y: 1 }, false);
+  else turnLoop(segs, xe, 0, 1, s, xt, D.R, { x: 0, y: 1 });
+  const last = segs[segs.length - 1], e = segPose(last, segLen(last));
+  segL(segs, e.x, e.y, x0, e.y, { tool: true, mode: 'work', dis: { x: 0, y: 1 } });
+  let t = 0;
+  const items = segs.map(sg => {
+    const dur = sg.type === 'P' ? Math.abs(sg.dth) / 1.3 : sg.mode === 'rev' ? sg.len / 0.8 : sg.mode === 'turn' ? sg.len / 1.4 : sg.len / 1.3;
+    const it = { sg, t0: t, dur }; t += dur; return it;
+  });
+  return { segs, items, total: t };
+}
+function poseAt(mp, tt) {
+  let acc = 0;
+  for (const it of mp.items) {
+    if (tt <= it.t0 + it.dur || it === mp.items[mp.items.length - 1]) {
+      const f = clamp((tt - it.t0) / it.dur, 0, 1), sg = it.sg, p = segPose(sg, segLen(sg) * f);
+      return { p, sg, dist: acc + (sg.type === 'P' ? 0 : sg.len * f), pivot: sg.type === 'P' && f < 1 ? Math.sign(sg.dth) : 0 };
+    }
+    acc += it.sg.type === 'P' ? 0 : it.sg.len;
+  }
+  return null;
+}
+function haloText(ctx, txt, x, y, align) {
+  ctx.font = '600 11px "IBM Plex Sans", system-ui, sans-serif'; ctx.textAlign = align || 'left';
+  ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,255,255,0.92)'; ctx.strokeText(txt, x, y);
+  ctx.fillStyle = COL.ink; ctx.fillText(txt, x, y); ctx.textAlign = 'left';
+}
+function scaleBar(ctx, s, h, light) {
+  const x0 = 10, y0 = h - 10;
+  ctx.beginPath(); ctx.moveTo(x0, y0 - 5); ctx.lineTo(x0, y0); ctx.lineTo(x0 + s, y0); ctx.lineTo(x0 + s, y0 - 5);
+  ctx.strokeStyle = light ? '#ffffff' : COL.ink; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.fillStyle = light ? '#ffffff' : COL.ink; ctx.font = '500 10px "IBM Plex Mono", ui-monospace, monospace'; ctx.fillText('1 m', x0 + 4, y0 - 7);
+}
+function view(f, X0, X1, Y0, Y1) {
+  const s = Math.min(f.w / (X1 - X0), f.h / (Y1 - Y0));
+  const ox = (f.w - (X1 - X0) * s) / 2, oy = (f.h - (Y1 - Y0) * s) / 2;
+  return { s, ox, oy, X0, Y1, toS: (x, y) => [ox + (x - X0) * s, oy + (Y1 - y) * s], world: ctx => ctx.setTransform(s * f.dpr, 0, 0, -s * f.dpr, (ox - X0 * s) * f.dpr, (oy + Y1 * s) * f.dpr) };
+}
+/* drivsystem: robot kører en bane, vender og kører tilbage */
+function drawDriveCard(it, t) {
+  const f = fitCanvas(it.cv); if (!f) return;
+  const { ctx, w, h, dpr } = f, V = view(f, -6.3, 4.9, -2.05, 2.75);
+  if (!it.mp) it.mp = miniPath(it.key);
+  const mp = it.mp, total = mp.total + 1.4, tt = ((t % total) + total) % total;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.fillStyle = COL.snow; ctx.fillRect(0, 0, w, h);
+  V.world(ctx);
+  const D = DRIVES[it.key], xt = D.len / 2 + 0.3, b = 0.8;
+  ctx.lineCap = 'butt'; ctx.lineJoin = 'round'; ctx.strokeStyle = COL.clear; ctx.lineWidth = b;
+  ctx.beginPath();
+  let started = false;
+  for (const m of mp.items) {
+    if (m.t0 > tt) break;
+    const sg = m.sg;
+    if (sg.type === 'P' || !sg.tool) { started = false; continue; }
+    const f2 = clamp((tt - m.t0) / m.dur, 0, 1), L = sg.len * f2, n = Math.max(1, Math.ceil(L / 0.12));
+    for (let j = 0; j <= n; j++) {
+      const p = segPose(sg, L * j / n), x = p.x + xt * Math.cos(p.th), y = p.y + xt * Math.sin(p.th);
+      if (!started) { ctx.moveTo(x, y); started = true; } else ctx.lineTo(x, y);
+    }
+  }
+  ctx.stroke();
+  ctx.setLineDash([0.12, 0.1]); ctx.lineWidth = 1.2 / V.s; ctx.strokeStyle = '#8a97a4'; ctx.beginPath();
+  mp.segs.forEach((sg, k) => { if (sg.type === 'P') return; const n = sg.type === 'A' ? 16 : 1; for (let j = 0; j <= n; j++) { const p = segPose(sg, sg.len * j / n); if (k === 0 && j === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); } });
+  ctx.stroke(); ctx.setLineDash([]);
+  const cur = poseAt(mp, tt);
+  it.steer = (it.steer || 0) + (steerFor(it.key, cur.sg) - (it.steer || 0)) * 0.25;
+  drawMachine(ctx, { dk: it.key, tk: 'fraes2', x: cur.p.x, y: cur.p.y, th: cur.p.th, s: V.s, steer: it.steer, phase: t, b, salt: true, spreading: false, side: 1, pivot: cur.pivot, tread: cur.dist });
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  if (D.pivot) { const [sx, sy] = V.toS(-2.2 + 0.2, 1.5); haloText(ctx, 'Drejer på stedet', sx, sy); }
+  else { const [sx, sy] = V.toS(1.6, 2.35); haloText(ctx, 'Vender i sløjfe, R ≈ ' + nf(D.R, 1) + ' m', sx, sy, 'center'); }
+  scaleBar(ctx, V.s, h, false);
+}
+/* side- og topvisninger af redskaberne */
+function drawRobotSide(ctx, s, t) {
+  rrp(ctx, -1.62, 0.1, 1.2, 0.48, 0.06); ctx.fillStyle = COL.body; ctx.fill(); ctx.lineWidth = 1.2 / s; ctx.strokeStyle = COL.line; ctx.stroke();
+  ctx.fillStyle = COL.tool; ctx.fillRect(-0.66, 0.58, 0.05, 0.16); ctx.beginPath(); ctx.arc(-0.635, 0.78, 0.06, 0, 2 * Math.PI); ctx.fill();
+  [-1.32, -0.72].forEach(x => {
+    ctx.beginPath(); ctx.arc(x, 0.15, 0.15, 0, 2 * Math.PI); ctx.fillStyle = COL.tire; ctx.fill();
+    ctx.beginPath(); ctx.arc(x, 0.15, 0.06, 0, 2 * Math.PI); ctx.fillStyle = COL.metal; ctx.fill();
+    ctx.beginPath(); for (let k = 0; k < 3; k++) { const a = -t * 2 + k * 2.094; ctx.moveTo(x, 0.15); ctx.lineTo(x + 0.12 * Math.cos(a), 0.15 + 0.12 * Math.sin(a)); }
+    ctx.lineWidth = 0.02; ctx.strokeStyle = COL.metal; ctx.stroke();
+  });
+  ctx.lineWidth = 0.05; ctx.strokeStyle = COL.tool; ctx.beginPath(); ctx.moveTo(-0.42, 0.3); ctx.lineTo(-0.22, 0.3); ctx.stroke();
+}
+function snowFace(ctx, s, t, front, X1) {
+  const hs = 0.17, v = 0.3;
+  ctx.beginPath(); ctx.moveTo(front, 0); ctx.lineTo(front, hs * 0.8);
+  for (let x = front; x <= X1 + 0.06; x += 0.04) ctx.lineTo(x, hs + 0.012 * Math.sin((x + v * t) * 9));
+  ctx.lineTo(X1 + 0.06, 0); ctx.closePath();
+  ctx.fillStyle = COL.snow; ctx.fill(); ctx.lineWidth = 1 / s; ctx.strokeStyle = COL.snowEdge; ctx.stroke();
+}
+function flake(ctx, x, y, r, a) { ctx.globalAlpha = a; ctx.beginPath(); ctx.arc(x, y, r, 0, 2 * Math.PI); ctx.fillStyle = '#ffffff'; ctx.fill(); ctx.lineWidth = 0.008; ctx.strokeStyle = '#7d8a96'; ctx.stroke(); ctx.globalAlpha = 1; }
+const rnd = k => { const x = Math.sin(k * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+function drawSideCard(it, t) {
+  const f = fitCanvas(it.cv); if (!f) return;
+  const { ctx, w, h, dpr } = f, V = view(f, -1.75, 2.5, -0.2, 1.62), s = V.s, k = it.key, two = k === 'fraes2', brush = k === 'borste';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.fillStyle = COL.air; ctx.fillRect(0, 0, w, h);
+  V.world(ctx);
+  ctx.fillStyle = COL.clear; ctx.fillRect(-1.8, -0.25, 4.4, 0.25);
+  const front = brush ? 0.3 : two ? 0.46 : 0.4;
+  snowFace(ctx, s, t, front, 2.5);
+  drawRobotSide(ctx, s, t);
+  const lbl = [];
+  if (brush) {
+    const c = { x: 0.04, y: 0.27 }, r = 0.26;
+    ctx.beginPath(); ctx.arc(c.x, c.y, r + 0.09, Math.PI * 0.1, Math.PI * 0.95); ctx.lineWidth = 0.05; ctx.strokeStyle = COL.tool; ctx.stroke();
+    ctx.beginPath(); ctx.arc(c.x, c.y, r, 0, 2 * Math.PI); ctx.fillStyle = COL.bristle; ctx.fill();
+    ctx.beginPath(); for (let j = 0; j < 16; j++) { const a = t * 5 + j * Math.PI / 8; ctx.moveTo(c.x + 0.06 * Math.cos(a), c.y + 0.06 * Math.sin(a)); ctx.lineTo(c.x + r * Math.cos(a), c.y + r * Math.sin(a)); }
+    ctx.lineWidth = 0.018; ctx.strokeStyle = COL.bristleHi; ctx.stroke();
+    ctx.beginPath(); ctx.arc(c.x, c.y, 0.06, 0, 2 * Math.PI); ctx.fillStyle = COL.metal; ctx.fill();
+    ctx.lineWidth = 0.03; ctx.strokeStyle = COL.tool; ctx.beginPath(); ctx.moveTo(-0.22, 0.3); ctx.lineTo(c.x, c.y); ctx.stroke();
+    for (let j = 0; j < 16; j++) {
+      const P0 = 1.0, tau = (((t + j * P0 / 16) % P0) + P0) % P0, tl = tau * 0.85;
+      const vx = 1.5 + 0.7 * rnd(j), vy = 1.5 + 0.8 * rnd(j + 9), x = 0.3 + vx * tl, y = 0.06 + vy * tl - 4.9 * tl * tl;
+      if (y > 0.16 || tl < 0.3) flake(ctx, x, y, 0.022, 1 - tau);
+    }
+    lbl.push(['Roterende børste', c.x, c.y + r + 0.16, 'center'], ['Sneen fejes frem og ud til siden', 1.35, 1.0, 'center']);
+  } else {
+    const A = two ? { x: 0.22, y: 0.24 } : { x: 0.14, y: 0.22 }, ar = two ? 0.17 : 0.19;
+    const backX = two ? -0.42 : -0.24, top = two ? 0.6 : 0.5, lipX = two ? 0.48 : 0.42;
+    ctx.beginPath(); ctx.moveTo(lipX, 0.04); ctx.lineTo(lipX - 0.02, top - 0.06); ctx.quadraticCurveTo(lipX - 0.06, top, lipX - 0.16, top); ctx.lineTo(backX + 0.06, top);
+    ctx.quadraticCurveTo(backX, top, backX, top - 0.06); ctx.lineTo(backX, 0.02); ctx.lineTo(lipX, 0.02);
+    ctx.fillStyle = 'rgba(43,48,54,0.18)'; ctx.fill(); ctx.lineWidth = 0.035; ctx.strokeStyle = COL.tool; ctx.stroke();
+    ctx.beginPath(); ctx.arc(A.x, A.y, ar, 0, 2 * Math.PI); ctx.fillStyle = 'rgba(185,194,202,0.25)'; ctx.fill();
+    ctx.beginPath(); for (let j = 0; j < 3; j++) { const a = t * 4 + j * 2.094; ctx.moveTo(A.x, A.y); ctx.quadraticCurveTo(A.x + ar * 0.7 * Math.cos(a + 0.5), A.y + ar * 0.7 * Math.sin(a + 0.5), A.x + ar * Math.cos(a), A.y + ar * Math.sin(a)); }
+    ctx.lineWidth = 0.035; ctx.strokeStyle = COL.metal; ctx.stroke();
+    ctx.beginPath(); ctx.arc(A.x, A.y, 0.045, 0, 2 * Math.PI); ctx.fillStyle = COL.tool; ctx.fill();
+    let I = null;
+    if (two) {
+      I = { x: -0.18, y: 0.3 };
+      ctx.beginPath(); ctx.arc(I.x, I.y, 0.21, 0, 2 * Math.PI); ctx.fillStyle = 'rgba(91,101,111,0.35)'; ctx.fill(); ctx.lineWidth = 0.03; ctx.strokeStyle = COL.tool; ctx.stroke();
+      ctx.beginPath(); for (let j = 0; j < 4; j++) { const a = t * 9 + j * Math.PI / 2; ctx.moveTo(I.x, I.y); ctx.lineTo(I.x + 0.19 * Math.cos(a), I.y + 0.19 * Math.sin(a)); }
+      ctx.lineWidth = 0.035; ctx.strokeStyle = COL.metal; ctx.stroke();
+    }
+    const chX = two ? -0.18 : 0.0, chTop = two ? 1.3 : 1.05;
+    rrp(ctx, chX - 0.07, top - 0.02, 0.14, chTop - top + 0.02, 0.03); ctx.fillStyle = COL.metal; ctx.fill(); ctx.lineWidth = 1 / s; ctx.strokeStyle = COL.line; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(chX - 0.07, chTop); ctx.quadraticCurveTo(chX, chTop + 0.12, chX + 0.2, chTop + 0.06); ctx.lineWidth = 0.05; ctx.strokeStyle = COL.toolHi; ctx.stroke();
+    const N = two ? 18 : 13, P0 = two ? 1.5 : 1.3;
+    for (let j = 0; j < N; j++) {
+      const tau = (((t + j * P0 / N) % P0) + P0) % P0 / P0;
+      let x, y, a = 1;
+      const ent = { x: lipX + 0.12, y: 0.07 + 0.08 * rnd(j) };
+      if (!two) {
+        if (tau < 0.25) { const u = tau / 0.25; x = ent.x + (A.x + ar * 0.9 - ent.x) * u; y = ent.y + (A.y - 0.12 - ent.y) * u; }
+        else if (tau < 0.5) { const u = (tau - 0.25) / 0.25, an = -0.6 + u * 2.2; x = A.x + ar * 0.85 * Math.cos(an); y = A.y + ar * 0.85 * Math.sin(an); }
+        else if (tau < 0.78) { const u = (tau - 0.5) / 0.28; x = chX + 0.03 * Math.sin(j); y = top + (chTop - top) * u; }
+        else { const u = (tau - 0.78) / 0.22; x = chX + 0.2 + 0.9 * u; y = chTop + 0.1 + 0.25 * u - 0.2 * u * u; a = 1 - u; }
+      } else {
+        if (tau < 0.18) { const u = tau / 0.18; x = ent.x + (A.x + ar - ent.x) * u; y = ent.y + (A.y - 0.1 - ent.y) * u; }
+        else if (tau < 0.36) { const u = (tau - 0.18) / 0.18, an = -0.5 + u * 2.6; x = A.x + ar * 0.85 * Math.cos(an); y = A.y + ar * 0.85 * Math.sin(an); }
+        else if (tau < 0.44) { const u = (tau - 0.36) / 0.08; x = A.x - 0.1 + (I.x + 0.15 - A.x + 0.1) * u; y = A.y + 0.12 + (I.y - A.y - 0.12) * u; }
+        else if (tau < 0.6) { const u = (tau - 0.44) / 0.16, an = -0.2 + u * 1.9; x = I.x + 0.15 * Math.cos(an); y = I.y + 0.15 * Math.sin(an); }
+        else if (tau < 0.8) { const u = (tau - 0.6) / 0.2; x = chX + 0.03 * Math.sin(j); y = top + (chTop - top) * u; }
+        else { const u = (tau - 0.8) / 0.2; x = chX + 0.2 + 1.6 * u; y = chTop + 0.1 + 0.35 * u - 0.25 * u * u; a = 1 - u; }
+      }
+      flake(ctx, x, y, 0.022, a);
+    }
+    lbl.push(['Snegl', A.x + 0.25, A.y - 0.32, 'left'], ['Skorsten', chX + 0.12, (top + chTop) / 2, 'left']);
+    if (two) lbl.push(['Blæser', I.x - 0.05, I.y - 0.34, 'center']);
+    lbl.push([two ? 'Kastes op til ca. 10 m ud til siden' : 'Kastes ca. 5 m ud til siden', chX + 1.05, chTop + 0.25, 'center']);
+  }
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  lbl.forEach(([txt, x, y, al]) => { const [sx, sy] = V.toS(x, y); haloText(ctx, txt, sx, sy, al); });
+  scaleBar(ctx, s, h, false);
+}
+function drawPlowCard(it, t) {
+  const f = fitCanvas(it.cv); if (!f) return;
+  const { ctx, w, h, dpr } = f, V = view(f, -2.4, 2.3, -1.0, 1.0), s = V.s, b = 0.8, tan = Math.tan(0.52);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.fillStyle = COL.snow; ctx.fillRect(0, 0, w, h);
+  V.world(ctx);
+  ctx.fillStyle = '#d5dde4';
+  for (let j = 0; j < 70; j++) { const x = ((rnd(j) * 4.7 - 0.3 * t) % 4.7 + 4.7) % 4.7 - 2.4, y = rnd(j + 50) * 2 - 1; if (x > y * tan) { ctx.beginPath(); ctx.arc(x, y, 0.018, 0, 2 * Math.PI); ctx.fill(); } }
+  ctx.beginPath(); ctx.moveTo(-2.5, b / 2); ctx.lineTo(b / 2 * tan, b / 2); ctx.lineTo(-b / 2 * tan, -b / 2); ctx.lineTo(-2.5, -b / 2); ctx.closePath(); ctx.fillStyle = COL.clear; ctx.fill();
+  ctx.beginPath(); ctx.moveTo(-2.5, -b / 2 - 0.04); ctx.lineTo(-b / 2 * tan - 0.1, -b / 2 - 0.04); ctx.lineTo(-b / 2 * tan - 0.3, -b / 2 - 0.42); ctx.lineTo(-2.5, -b / 2 - 0.42); ctx.closePath(); ctx.fillStyle = COL.moved; ctx.fill();
+  drawMachine(ctx, { dk: 'H', tk: 'plov', x: -0.9, y: 0, th: 0, s, phase: t, b, salt: false, side: -1, tread: t * 0.3 });
+  for (let j = 0; j < 12; j++) {
+    const P0 = 2.4, tau = (((t + j * P0 / 12) % P0) + P0) % P0 / P0, y0 = -0.32 + 0.66 * rnd(j + 3);
+    let x, y;
+    const bx = y0 * tan;
+    if (tau < 0.45) { const u = tau / 0.45; x = 2.3 + (bx + 0.08 - 2.3) * u; y = y0; }
+    else if (tau < 0.8) { const u = (tau - 0.45) / 0.35, ye = -b / 2 - 0.08; y = y0 + (ye - y0) * u; x = y * tan + 0.08; }
+    else { const u = (tau - 0.8) / 0.2; x = -b / 2 * tan - 0.15 - 1.2 * u; y = -b / 2 - 0.2; }
+    flake(ctx, x, y, 0.035, 1);
+  }
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  [['Blad på skrå (30°)', 0.55, 0.62, 'left'], ['Vold af skubbet sne', -1.0, -0.66, 'center'], ['Ryddet bane', -2.35, 0.05, 'left'], ['Sne', 1.6, 0.7, 'center']].forEach(([txt, x, y, al]) => { const [sx, sy] = V.toS(x, y); haloText(ctx, txt, sx, sy, al); });
+  scaleBar(ctx, s, h, false);
+}
+function drawSaltCard(it, t) {
+  const f = fitCanvas(it.cv); if (!f) return;
+  const { ctx, w, h, dpr } = f, V = view(f, -6.6, 3.6, -1.15, 1.15), s = V.s;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.fillStyle = COL.clear; ctx.fillRect(0, 0, w, h);
+  V.world(ctx);
+  const rx = 0.6, back = rx - 0.6 - 0.16;
+  ctx.fillStyle = COL.snow; ctx.fillRect(rx + 1.2, -1.2, 3, 2.4);
+  ctx.fillStyle = '#d5dde4';
+  for (let j = 0; j < 40; j++) { const x = rx + 1.25 + ((rnd(j) * 2.5 - 0.35 * t) % 2.5 + 2.5) % 2.5, y = rnd(j + 77) * 2.3 - 1.15; ctx.beginPath(); ctx.arc(x, y, 0.02, 0, 2 * Math.PI); ctx.fill(); }
+  const grd = ctx.createLinearGradient(back, 0, back - 2.4, 0);
+  grd.addColorStop(0, 'rgba(43,138,145,0.35)'); grd.addColorStop(0.35, COL.salted); grd.addColorStop(1, COL.salted);
+  ctx.fillStyle = grd; ctx.fillRect(-6.7, -1.15, back + 6.7, 2.3);
+  ctx.fillStyle = 'rgba(255,255,255,0.75)';
+  for (let j = 0; j < 90; j++) { const x = back - ((rnd(j) * 7 + 0.35 * t) % 7), y = rnd(j + 200) * 2.2 - 1.1; ctx.fillRect(x, y, 0.03, 0.03); }
+  for (let j = 0; j < 30; j++) {
+    const P0 = 0.8, tau = (((t + j * P0 / 30) % P0) + P0) % P0 / P0, an = Math.PI + (rnd(j) - 0.5) * 2.1, sp = 1.4 + 0.9 * rnd(j + 5), d = sp * tau;
+    ctx.globalAlpha = 1 - tau * 0.6; ctx.fillStyle = '#ffffff'; ctx.fillRect(back + d * Math.cos(an) - 0.02, d * Math.sin(an) - 0.02, 0.045, 0.045); ctx.globalAlpha = 1;
+  }
+  drawMachine(ctx, { dk: 'H', tk: 'fraes2', x: rx, y: 0, th: 0, s, phase: t, b: 0.8, salt: true, spreading: false, side: 1, tread: t * 0.35 });
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  [['Sne', rx + 2.4, 0.85, 'center'], ['Saltbeholder', rx - 0.45, -0.62, 'center'], ['Spredetallerken', back - 0.2, 0.62, 'center'], ['Saltet asfalt', -4.6, 0.8, 'center']].forEach(([txt, x, y, al]) => { const [sx, sy] = V.toS(x, y); haloText(ctx, txt, sx, sy, al); });
+  scaleBar(ctx, s, h, true);
+}
+const illus = [];
+function drawIllu(it, t) {
+  if (it.group === 'drive') drawDriveCard(it, t);
+  else if (it.key === 'plov') drawPlowCard(it, t);
+  else if (it.key === 'salt') drawSaltCard(it, t);
+  else drawSideCard(it, t);
+}
+function buildCards() {
+  const dbox = $('#drive-cards'), tbox = $('#tool-cards');
+  if (!dbox || !tbox) return;
+  const card = (group, k, title, info, extra) => {
+    const a = mk('article', 'panel mcard' + (k === 'salt' ? ' wide' : '')); a.dataset.k = k; a.dataset.group = group;
+    const top = mk('div', 'mtop'); top.append(mk('h3', null, title), mk('span', 'tag', info.tag));
+    const cv = mk('canvas', 'illu' + (k === 'salt' ? ' wide' : group === 'drive' ? ' drv' : ' tl'));
+    cv.setAttribute('role', 'img'); cv.setAttribute('aria-label', title + ': ' + info.txt);
+    const ul = mk('ul', 'pc2');
+    info.pro.forEach(t => ul.appendChild(mk('li', 'pro', t))); info.con.forEach(t => ul.appendChild(mk('li', 'con', t)));
+    const foot = mk('div', 'mfoot');
+    foot.appendChild(mk('span', 'small muted', extra || ''));
+    const btn = mk('button', 'btn', k === 'salt' ? 'Slå saltning til eller fra' : 'Vælg i simulatoren'); btn.type = 'button';
+    btn.addEventListener('click', () => {
+      if (k === 'salt') P.salt = !P.salt;
+      else if (group === 'drive') P.drive = k;
+      else { P.tool = k; if (P.depth === 0) { P.depth = 15; P.preset = 'custom'; } }
+      recompute();
+    });
+    foot.appendChild(btn);
+    a.append(top, cv, mk('p', null, info.txt), ul, foot);
+    illus.push({ cv, group, key: k, off: rnd(illus.length + 1) * 5, drawn: false, visible: true });
+    return a;
+  };
+  DRIVE_KEYS.forEach(k => {
+    const D = DRIVES[k], dh = headDepth(D, D.len / 2 + 0.3, 0.72);
+    dbox.appendChild(card('drive', k, D.long, DRIVE_INFO[k], 'Vendeareal ca. ' + nf(dh, 1) + ' m i hver ende'));
+  });
+  ['plov', 'borste', 'fraes1', 'fraes2'].forEach(k => tbox.appendChild(card('tool', k, TOOLS[k].name, TOOL_INFO[k], k === 'plov' ? 'Ingen motor' : 'Motor ' + nf(P.toolkw[k], 1) + ' kW som standard')));
+  tbox.appendChild(card('tool', 'salt', 'Saltspreder', TOOL_INFO.salt, '110 W, 60 kg salt i beholderen'));
+  if (window.IntersectionObserver) {
+    const io = new IntersectionObserver(es => es.forEach(e => { const it = illus.find(x => x.cv === e.target); if (it) it.visible = e.isIntersecting; }));
+    illus.forEach(it => io.observe(it.cv));
+  }
+  if (window.ResizeObserver) { const ro = new ResizeObserver(() => illus.forEach(it => { it.drawn = false; })); illus.forEach(it => ro.observe(it.cv)); }
+}
+function syncCards() {
+  $$('.mcard').forEach(c => {
+    const k = c.dataset.k, on = c.dataset.group === 'drive' ? P.drive === k : k === 'salt' ? P.salt : (P.depth > 0 && P.tool === k);
+    c.setAttribute('aria-current', String(on));
+  });
+}
+let lastIllu = 0;
+function illuLoop(now) {
+  if (now - lastIllu > 33) {
+    lastIllu = now;
+    const t = now / 1000;
+    illus.forEach(it => {
+      if (reduced) { if (!it.drawn) { drawIllu(it, it.group === 'drive' ? (it.mp ? it.mp.items[1].t0 + 1 : 4.5) : 0.6); it.drawn = true; } }
+      else if (it.visible || !it.drawn) { drawIllu(it, t + it.off); it.drawn = true; }
+    });
+  }
+  requestAnimationFrame(illuLoop);
 }
 
 /* ---------- resultat for hele opgaven ---------- */
@@ -1525,6 +2054,7 @@ function syncUI() {
   if (tkw != null) { $('#toolkw').value = String(tkw); $('#toolkw-o').textContent = nf(tkw, 1) + ' kW'; }
   $$('#tool button').forEach(b => { b.disabled = P.depth === 0; });
   $$('#strategy button').forEach(b => { b.disabled = P.machines === 2; });
+  syncCards();
   $('#chains').checked = P.chains; $('#salt').checked = P.salt; $('#showpath').checked = P.showpath;
   const sel = $('#preset');
   sel.querySelector('option[value="custom"]').hidden = P.preset !== 'custom';
@@ -1567,6 +2097,7 @@ if (window.ResizeObserver) new ResizeObserver(() => { anim.dirty = true; }).obse
 window.addEventListener('scroll', hideTip, { passive: true });
 
 /* ---------- start ---------- */
+buildCards();
 syncUI();
 resetAnim();
 setPlay(false);
@@ -1575,6 +2106,7 @@ renderTraction();
 renderCoef();
 runBatch();
 requestAnimationFrame(frame);
+requestAnimationFrame(illuLoop);
 
 })();
 </script>
