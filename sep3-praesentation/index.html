@@ -1,0 +1,1053 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<!--ARTIFACT-HEAD-START-->
+<title>Snerydningsrobot peer feedback</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: ét 16:9-felt pr. slide, skaleret med --u (1 % af feltets bredde), scroll-snap mellem slides; under 760 px flyder slides som en almindelig side.
+   Farverne kommer fra snerydningssimulatoren: sne, skubbet sne (blå), ryddet asfalt (grå), saltet (petrol) og vejservice-orange til ploven. */
+:root{
+  color-scheme: light;
+  --snow:#F4F7FA; --frost:#E6ECF1; --card:#FCFDFE; --rule:#D3DBE2;
+  --ink:#1B2127; --ink-2:#44505B; --ink-3:#5B6772;
+  --asphalt:#1A2026; --asphalt-2:#262E36; --asphalt-3:#36414B; --on-dark:#EEF2F5; --on-dark-2:#B4BEC8; --on-dark-3:#9AA6B1;
+  --signal:#B5470B; --signal-hi:#F2924F; --signal-bg:#A8430D; --on-signal:#FFF5ED;
+  --salt:#2B8A91; --moved:#5C9BD6; --cleared:#3A4047; --snowfill:#E9EFF4;
+  --ok:#1C6A70; --ok-bg:#DCEFEF; --bad:#A3271F; --bad-bg:#F6E1DF;
+  --panel:#12171C; --on-panel:#E8EDF1; --on-panel-2:#AEB9C3;
+  --display:'Barlow Condensed','Arial Narrow',Arial,sans-serif;
+  --body:'IBM Plex Sans',system-ui,'Segoe UI',Arial,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+  --u:min(0.92vw,1.67vh);
+  --fs-xs:calc(1.2*var(--u)); --fs-s:calc(1.42*var(--u)); --fs-b:calc(1.78*var(--u)); --fs-l:calc(2.45*var(--u));
+  --fs-h3:calc(2.35*var(--u)); --fs-h2:calc(4.1*var(--u)); --fs-num:calc(4.8*var(--u)); --fs-h1:calc(6.8*var(--u));
+  --sp-1:calc(.8*var(--u)); --sp-2:calc(1.6*var(--u)); --sp-3:calc(2.4*var(--u)); --sp-4:calc(3.4*var(--u)); --r:calc(.8*var(--u));
+  --dot:#44505B;
+}
+*{box-sizing:border-box}
+html{scroll-snap-type:y mandatory}
+body{margin:0;background:var(--snow);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased}
+
+/* ---------- slides ---------- */
+.slide{position:relative;min-height:100vh;min-height:100svh;display:grid;place-items:center;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:var(--snow);color:var(--ink)}
+.bg-frost{background:var(--frost)}
+.bg-asphalt{--ink:var(--on-dark);--ink-2:var(--on-dark-2);--ink-3:var(--on-dark-3);--card:var(--asphalt-2);--rule:var(--asphalt-3);--signal:var(--signal-hi);background:var(--asphalt);color:var(--on-dark)}
+.bg-signal{--ink:var(--on-signal);--ink-2:#FFE6D6;--ink-3:#FFE0CC;--signal:var(--on-signal);--rule:#C9693A;background:var(--signal-bg);color:var(--on-signal)}
+.frame{position:relative;width:calc(100*var(--u));height:calc(56.25*var(--u));padding:calc(4*var(--u)) calc(4.6*var(--u)) calc(3*var(--u));display:flex;flex-direction:column;gap:var(--sp-3)}
+.frame p,.frame li,.frame td,.frame th{font-size:var(--fs-b);line-height:1.42;margin:0}
+.head{display:flex;flex-direction:column;gap:calc(.9*var(--u))}
+/* indholdet centreres mellem overskrift og fod: den frie plads deles mellem to auto-marginer */
+.frame > .head:first-child + *{margin-top:auto}
+.cover .cover-lot{margin-top:auto}
+.eyebrow{display:flex;flex-wrap:wrap;gap:0 .9em;font:600 var(--fs-xs)/1.2 var(--body)!important;letter-spacing:.14em;text-transform:uppercase;color:var(--signal)}
+.eyebrow .who{color:var(--ink-3)}
+h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;color:var(--ink);text-wrap:balance}
+h1{font-size:var(--fs-h1);line-height:.98;letter-spacing:.005em}
+h2{font-size:var(--fs-h2);line-height:1.04}
+h3{font-size:var(--fs-h3);font-weight:600;line-height:1.12}
+.lead{font-size:var(--fs-l)!important;line-height:1.3!important;color:var(--ink-2)}
+.muted{color:var(--ink-2)}
+.small{font-size:var(--fs-s)!important}
+.mono{font-family:var(--mono)}
+b,strong{font-weight:600;color:var(--ink)}
+.foot{margin-top:auto;display:flex;justify-content:space-between;align-items:baseline;gap:var(--sp-3);font-size:var(--fs-xs);color:var(--ink-3)}
+.foot .pg{font-family:var(--mono);white-space:nowrap}
+.hint{font-size:var(--fs-s)!important;color:var(--ink-3)}
+
+.cards3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-3)}
+.cols2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-3)}
+.card{background:var(--card);border-radius:var(--r);padding:var(--sp-3);display:flex;flex-direction:column;gap:var(--sp-1);min-width:0}
+.card.top{border-top:calc(.5*var(--u)) solid var(--signal)}
+.card.top.grey{border-top-color:var(--ink-3)}
+.card ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:calc(.4*var(--u))}
+.band{display:flex;gap:var(--sp-3);align-items:baseline;background:var(--asphalt);color:var(--on-dark);border-radius:var(--r);padding:var(--sp-2) var(--sp-3)}
+.band .lbl{font:600 var(--fs-xs)/1.2 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--signal-hi);white-space:nowrap}
+.band p{color:var(--on-dark)}
+
+.points{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--sp-2)}
+.points li{display:grid;grid-template-columns:calc(2.3*var(--u)) minmax(0,1fr);gap:var(--sp-1);align-items:baseline}
+.mark{font:600 var(--fs-b)/1 var(--mono);color:var(--signal);text-align:center}
+
+/* ---------- forside ---------- */
+.cover h1{color:var(--on-dark)}
+.cover-lot{display:grid;grid-template-columns:minmax(0,1fr) calc(21*var(--u));gap:var(--sp-3);align-items:end}
+#lot{display:block;width:100%;aspect-ratio:160/54;border-radius:calc(.4*var(--u));background:var(--asphalt-2)}
+.lot-side{display:flex;flex-direction:column;gap:var(--sp-2)}
+.legend{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:calc(.5*var(--u))}
+.legend li{display:flex;align-items:center;gap:calc(.7*var(--u));font-size:var(--fs-s)!important;color:var(--on-dark-2)}
+.legend i{width:calc(1.3*var(--u));height:calc(1.3*var(--u));border-radius:2px;flex:none}
+.sw-snow{background:var(--snowfill)} .sw-moved{background:var(--moved)} .sw-clear{background:var(--cleared);outline:1px solid var(--on-dark-3)} .sw-salt{background:var(--salt)}
+.meta{display:flex;flex-direction:column;gap:calc(.2*var(--u))}
+.meta .k{font:600 var(--fs-xs)/1.2 var(--body)!important;letter-spacing:.14em;text-transform:uppercase;color:var(--on-dark-3)}
+.meta .v{font-size:var(--fs-s)!important;color:var(--on-dark)}
+
+/* ---------- problemformulering ---------- */
+.pf{background:var(--card);border-left:calc(.6*var(--u)) solid var(--signal);border-radius:calc(.5*var(--u));padding:var(--sp-3) var(--sp-4);display:flex;flex-direction:column;gap:var(--sp-1)}
+.pf .q{font-size:var(--fs-l)!important;line-height:1.3!important;color:var(--ink)}
+.kicker{font:600 var(--fs-xs)/1.2 var(--body)!important;letter-spacing:.14em;text-transform:uppercase;color:var(--signal)}
+.sub{margin:0;padding-left:1.4em;display:flex;flex-direction:column;gap:calc(.5*var(--u));color:var(--ink-2)}
+
+/* ---------- krav ---------- */
+.krav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-2)}
+.kf{background:var(--card);border-radius:var(--r);padding:var(--sp-2) var(--sp-3);display:flex;flex-direction:column;gap:calc(.5*var(--u));min-width:0;border:1px solid transparent;text-align:left;font:inherit;color:inherit}
+.kf .id{font:500 var(--fs-xs)/1 var(--mono);color:var(--ink-3)}
+.kf .val{font:700 calc(3.4*var(--u))/1 var(--display);color:var(--ink)}
+.kf .lbl{font-size:var(--fs-s)!important;line-height:1.35!important;color:var(--ink-2)}
+.kf.change{border:2px solid var(--signal);cursor:pointer}
+.kf .old{font:500 var(--fs-s)/1 var(--mono);color:var(--ink-3);text-decoration:line-through;margin-left:.5em}
+.tag{font:500 var(--fs-xs)/1.2 var(--mono);color:var(--signal)}
+
+/* ---------- tabeller ---------- */
+.tbl{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.tbl th{background:var(--ink);color:var(--snow);text-align:left;font-weight:600;padding:calc(.8*var(--u)) calc(1.2*var(--u))}
+.tbl td{padding:calc(.8*var(--u)) calc(1.2*var(--u));border-bottom:1px solid var(--rule);vertical-align:top}
+.tbl tr:nth-child(even) td{background:var(--card)}
+.frame .tbl.compact th,.frame .tbl.compact td{font-size:var(--fs-s);padding-top:calc(.6*var(--u));padding-bottom:calc(.6*var(--u))}
+
+/* ---------- metode ---------- */
+.grid4{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-2)}
+
+/* ---------- kombinationsmatrix ---------- */
+.mx-layout{display:grid;grid-template-columns:minmax(0,1fr) calc(22*var(--u));gap:var(--sp-3);align-items:start}
+.scen{display:flex;flex-wrap:wrap;gap:calc(.5*var(--u))}
+.scen span{font:500 var(--fs-xs)/1 var(--mono);color:var(--ink-2);background:var(--frost);border-radius:99px;padding:calc(.45*var(--u)) calc(.8*var(--u))}
+.mx-scroll{overflow-x:auto}
+.mx{width:100%;border-collapse:separate;border-spacing:calc(.45*var(--u))}
+.frame .mx th{font:500 var(--fs-xs)/1.2 var(--mono);color:var(--ink-3);text-align:left;padding:0 calc(.3*var(--u))}
+.frame .mx th[scope=row]{font:600 var(--fs-s)/1.2 var(--body);color:var(--ink);white-space:nowrap;padding-right:calc(.8*var(--u))}
+.frame .mx td{padding:0}
+.cell{width:100%;display:flex;flex-direction:column;gap:calc(.45*var(--u));text-align:left;border:1px solid var(--rule);background:var(--card);border-radius:calc(.6*var(--u));padding:calc(.7*var(--u)) calc(.65*var(--u));font:inherit;color:inherit;cursor:pointer}
+.cell:hover{border-color:var(--signal)}
+.cell.best{border:2px solid var(--ok);background:var(--ok-bg)}
+.cell .v{font:500 var(--fs-xs)/1.2 var(--mono);color:var(--ink-2);white-space:nowrap}
+.chip{display:inline-flex;align-self:flex-start;align-items:center;gap:.35em;font:600 var(--fs-xs)/1 var(--body);padding:.4em .65em;border-radius:99px;white-space:nowrap}
+.chip.ok{background:var(--ok-bg);color:var(--ok)} .chip.bad{background:var(--bad-bg);color:var(--bad)}
+.cell.best .chip.ok{background:var(--ok);color:var(--ok-bg)}
+.actions{display:flex;flex-wrap:wrap;gap:var(--sp-1);align-items:center}
+.btn{display:inline-flex;align-items:center;gap:.4em;font:500 var(--fs-s)/1 var(--body);color:var(--ink);background:var(--card);border:1px solid var(--rule);border-radius:99px;padding:calc(.7*var(--u)) calc(1.2*var(--u));cursor:pointer;text-decoration:none}
+.btn:hover{border-color:var(--signal)}
+
+/* ---------- konceptretning ---------- */
+.concept{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--sp-4);align-items:center}
+.concept svg{display:block;width:100%;height:auto;border-radius:var(--r)}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-2)}
+.kpi{display:flex;flex-direction:column;gap:calc(.35*var(--u));text-align:left;background:var(--card);border:1px solid var(--rule);border-radius:var(--r);padding:var(--sp-2) var(--sp-3);font:inherit;color:inherit;cursor:pointer}
+.kpi:hover{border-color:var(--signal)}
+.kpi .num{font:700 var(--fs-num)/1 var(--display);color:var(--ink)}
+.kpi .lbl{font-size:var(--fs-s);line-height:1.3;color:var(--ink-2)}
+.kpi .tag{margin-top:calc(.2*var(--u))}
+
+/* ---------- tidsplan ---------- */
+.phases{display:flex;gap:calc(.4*var(--u))}
+.ph{border-radius:calc(.6*var(--u));padding:var(--sp-1) var(--sp-2);display:flex;flex-direction:column;gap:calc(.2*var(--u));min-width:0;background:var(--card);border:1px solid var(--rule)}
+.ph b{font-size:var(--fs-b)}
+.ph span{font-size:var(--fs-xs);color:var(--ink-2)}
+.ph.done{background:var(--ink);border-color:var(--ink)} .ph.done b,.ph.done span{color:var(--snow)}
+.ph.now{background:var(--signal);border-color:var(--signal)} .ph.now b,.ph.now span{color:var(--on-signal)}
+.miles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--sp-1)}
+.mile{display:flex;flex-direction:column;gap:calc(.3*var(--u));border-top:2px solid var(--rule);padding-top:calc(.6*var(--u))}
+.mile .w{font:700 var(--fs-l)/1 var(--display);color:var(--signal)}
+.frame .mile p{font-size:var(--fs-xs);line-height:1.35;color:var(--ink-2)}
+
+/* ---------- feedback ---------- */
+.qs{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:var(--sp-2)}
+.frame .qs li{font-size:var(--fs-l);line-height:1.3;padding-left:.3em}
+.qs li::marker{font-family:var(--display);font-weight:700}
+
+.backup .eyebrow{color:var(--ink-3)}
+
+/* ---------- navigation, noter og modal ---------- */
+#dots{position:fixed;right:max(14px,1.1vw);top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:9px;z-index:20}
+#dots button{width:12px;height:12px;border-radius:50%;border:2px solid var(--dot);background:transparent;padding:0;cursor:pointer}
+#dots button.on{background:var(--dot)}
+#dots button.bk{width:8px;height:8px;border-width:1.5px}
+#ctl{position:fixed;left:max(14px,1.1vw);bottom:calc(12px + env(safe-area-inset-bottom,0px));display:flex;gap:8px;z-index:20;opacity:.45;transition:opacity .2s}
+#ctl:hover,#ctl:focus-within{opacity:1}
+#ctl button{font:500 12px/1 var(--body);color:var(--dot);background:transparent;border:1px solid var(--dot);border-radius:99px;padding:6px 10px;cursor:pointer}
+body.tone-dark{--dot:#B4BEC8} body.tone-signal{--dot:#FFE0CC}
+body.notes-open #ctl{bottom:calc(38vh + 10px)}
+
+#notes{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--panel);color:var(--on-panel);padding:14px clamp(16px,3vw,44px) calc(16px + env(safe-area-inset-bottom,0px));max-height:36vh;overflow:auto;font:16px/1.55 var(--body);box-shadow:0 -10px 30px rgba(0,0,0,.28)}
+#notes header{display:flex;flex-wrap:wrap;gap:4px 18px;align-items:baseline;margin-bottom:8px;font:500 13px/1.3 var(--mono);color:var(--on-panel-2)}
+#notes .n-who{font:700 15px/1.3 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--signal-hi)}
+#notes .n-clock{margin-left:auto;font-variant-numeric:tabular-nums}
+#notes .n-clock.over{color:var(--signal-hi)}
+#notes .n-txt p{margin:0 0 .45em;max-width:95ch}
+
+#backdrop{position:fixed;inset:0;background:rgba(10,14,18,.62);z-index:40}
+#modal{position:fixed;z-index:41;left:50%;top:50%;transform:translate(-50%,-50%);width:min(1080px,calc(100vw - 32px));max-height:calc(100vh - 40px);overflow:auto;background:var(--snow);color:var(--ink);border-radius:12px;padding:clamp(18px,2.4vw,34px);font-size:clamp(15px,1.05vw,18px);line-height:1.5;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+#modal h2{font-size:2em;margin:0 2.6em .35em 0}
+#modal p,#modal li{margin:0 0 .6em;max-width:75ch}
+#modal ul{padding-left:1.2em;margin:0 0 .8em}
+#modal .tbl{font-size:.95em;margin:.4em 0 .8em}
+#modal .tbl th,#modal .tbl td{padding:.5em .8em}
+#modal .note{font-size:.88em;color:var(--ink-3)}
+#modal img{display:block;width:100%;height:auto;border-radius:8px;border:1px solid var(--rule);margin-bottom:.8em}
+#modal .x{position:absolute;top:12px;right:12px;font:500 14px/1 var(--body);color:var(--ink);background:var(--card);border:1px solid var(--rule);border-radius:99px;padding:8px 12px;cursor:pointer}
+#modal .ok{color:var(--ok);font-weight:600} #modal .bad{color:var(--bad);font-weight:600}
+.ebar{display:grid;grid-template-columns:9em minmax(0,1fr);gap:.4em .8em;align-items:center;margin:.6em 0}
+.ebar .track{display:flex;height:1.6em;border-radius:3px;overflow:hidden;background:var(--frost)}
+.ebar .track i{display:block;height:100%}
+.ebar .lab{font-size:.9em}
+.ebar .tot{grid-column:2;font:500 .85em/1 var(--mono);color:var(--ink-2)}
+.axis{grid-column:2;display:flex;justify-content:space-between;font:400 .78em/1 var(--mono);color:var(--ink-3)}
+.elegend{display:flex;flex-wrap:wrap;gap:.4em 1.2em;font-size:.88em;margin:.4em 0 .8em}
+.elegend i{display:inline-block;width:.9em;height:.9em;border-radius:2px;margin-right:.35em;vertical-align:-.1em}
+.e-drive{background:#44505B} .e-tool{background:#B5470B} .e-salt{background:#2B8A91} .e-base{background:#8C99A5} .e-loss{background:#C9D3DC}
+
+:focus-visible{outline:3px solid var(--signal);outline-offset:3px}
+.bg-asphalt :focus-visible{outline-color:var(--signal-hi)}
+
+@media (max-width:760px){
+  :root{--u:10px}
+  html{scroll-snap-type:none}
+  .slide{min-height:0;display:block;overflow:visible}
+  .frame{width:auto;height:auto;padding:36px 16px 30px}
+  .cards3,.cols2,.krav,.grid4,.kpis,.concept,.mx-layout,.cover-lot,.miles{grid-template-columns:minmax(0,1fr)}
+  .phases{flex-wrap:wrap} .ph{flex:1 1 40%!important}
+  .band{flex-direction:column;gap:6px}
+  #dots,#ctl .fs{display:none}
+  body.notes-open #ctl{bottom:calc(36vh + 10px)}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+<!--ARTIFACT-HEAD-END-->
+</head>
+<body>
+<!--ARTIFACT-BODY-START-->
+
+<!-- ============ 1. FORSIDE ============ -->
+<section class="slide bg-asphalt" id="forside" data-tone="dark" data-title="Forside" data-who="Frederik" data-time="0:20">
+  <div class="frame cover">
+    <p class="eyebrow">SEP3 · Projektbeskrivelse · 5. oktober 2026</p>
+    <div class="head">
+      <h1>Autonom snerydning og saltning</h1>
+      <p class="lead">Drivlinjen til en snerydningsrobot på et lukket industriareal hos Terma</p>
+    </div>
+    <div class="cover-lot">
+      <canvas id="lot" role="img" aria-label="Animation set oppefra: en robot rydder og salter arealet bane for bane og skubber sneen i en vold langs kanten"></canvas>
+      <div class="lot-side">
+        <p class="mono small" style="color:var(--on-dark-2);white-space:nowrap">2.000 m² · 80 × 25 m</p>
+        <ul class="legend">
+          <li><i class="sw-snow"></i>Sne</li>
+          <li><i class="sw-moved"></i>Skubbet sne</li>
+          <li><i class="sw-clear"></i>Ryddet asfalt</li>
+          <li><i class="sw-salt"></i>Saltet</li>
+        </ul>
+        <div class="meta"><span class="k">Gruppe</span><span class="v">Frederik, Simon og Thomas</span></div>
+        <div class="meta"><span class="k">Vejleder</span><span class="v">Jens Obel Jepsen</span></div>
+      </div>
+    </div>
+    <footer class="foot"><span>Mellemrum eller ↓ for næste · N for talernoter · F for fuld skærm</span><span class="pg">1 / 11</span></footer>
+  </div>
+  <template class="notes">
+    <p>Goddag. Vi er Frederik, Simon og Thomas, og vores projekt handler om autonom snerydning og saltning på et lukket industriareal hos Terma.</p>
+    <p>Jeg starter med problemet og vores problemformulering. Thomas fortæller om afgrænsning, krav og regler. Simon tager metoden, vores første konceptvalg, tidsplanen og risiciene. Til sidst har vi fire spørgsmål, vi gerne vil have jeres feedback på.</p>
+    <p>(Animationen er robotten set oppefra. Den rydder bane for bane: grå er ryddet, blå er skubbet sne, og petrol er saltet.)</p>
+  </template>
+</section>
+
+<!-- ============ 2. PROBLEMFELT ============ -->
+<section class="slide" id="problemfelt" data-tone="light" data-title="Problemfelt" data-who="Frederik" data-time="1:00">
+  <div class="frame">
+    <div class="head">
+      <p class="eyebrow"><span>01 · Problemfelt</span><span class="who">Frederik</span></p>
+      <h2>Sne og is ryddes i dag i hånden, uden for arbejdstid</h2>
+    </div>
+    <div class="cards3">
+      <div class="card"><h3>Lovpligtigt</h3><p class="muted">Arbejdsgiveren skal holde arealerne sikre. Glide- og faldulykker er blandt de hyppigste arbejdsulykker i Europa.</p></div>
+      <div class="card"><h3>Ressourcekrævende</h3><p class="muted">Rydning og saltning sker manuelt om aftenen og natten og afhænger af vejret.</p></div>
+      <div class="card"><h3>Ingen løsning til industrien</h3><p class="muted">Robotter som Yarbo er lavet til små arealer. Lukkede industriarealer med Maskindirektivets krav er ikke dækket.</p></div>
+    </div>
+    <div class="band"><span class="lbl">Case</span><p>Terma A/S: antenneproduktionsarealet er plant, asfalteret og lukket med hegn og port. Det ryddes og saltes manuelt i dag.</p></div>
+    <footer class="foot"><span>Kilder: EU-OSHA Factsheet 14 · Dansk Erhverv (2026) · Yarbo</span><span class="pg">2 / 11</span></footer>
+  </div>
+  <template class="notes">
+    <p>Vores problemfelt er vintervedligehold af udendørs industriarealer.</p>
+    <p>Arbejdsgiveren har pligt til at holde arealerne sikre, og glide- og faldulykker er blandt de hyppigste arbejdsulykker i Europa.</p>
+    <p>I dag foregår rydning og saltning i hånden, ofte om aftenen og natten, og det afhænger af vejret.</p>
+    <p>Der findes robotter som Yarbo, men de er lavet til private indkørsler og små arealer. De dækker ikke lukkede industriarealer, hvor Maskindirektivet stiller krav til sikkerhed og dokumentation.</p>
+    <p>Vores case er Terma. Antenneproduktionsarealet er plant, asfalteret og lukket med hegn og port, og det ryddes og saltes manuelt i dag.</p>
+  </template>
+</section>
+
+<!-- ============ 3. PROBLEMFORMULERING ============ -->
+<section class="slide bg-frost" id="problemformulering" data-tone="light" data-title="Problemformulering" data-who="Frederik" data-time="1:00">
+  <div class="frame">
+    <div class="head">
+      <p class="eyebrow"><span>02 · Problemformulering</span><span class="who">Frederik</span></p>
+      <h2>Problemformulering</h2>
+    </div>
+    <div class="pf">
+      <p class="kicker">Hovedspørgsmål</p>
+      <p class="q">Hvordan kan snerydning og saltning af et lukket industriareal hos Terma A/S automatiseres med en robotteknisk løsning, der kan operere pålideligt under danske vintervejrforhold, inden for virksomhedens driftsmæssige tidsrammer?</p>
+    </div>
+    <div class="head">
+      <p class="kicker">Underspørgsmål</p>
+      <ol class="sub">
+        <li>Hvilke krav stiller areal, tidsramme og vintervejrforhold til en automatiseret løsning?</li>
+        <li>Hvilke sikkerhedsmæssige og regulatoriske rammer skal løsningen designes og dokumenteres efter?</li>
+        <li>Hvordan kan løsningen realiseres teknisk, og hvilket delsystem er mest afgørende at designe korrekt inden for tidsrammen?</li>
+      </ol>
+    </div>
+    <footer class="foot"><span>SEP3 · Autonom snerydning og saltning</span><span class="pg">3 / 11</span></footer>
+  </div>
+  <template class="notes">
+    <p>Vores hovedspørgsmål er: (læs spørgsmålet højt).</p>
+    <p>Vi har tre underspørgsmål, som følger projektets rækkefølge. Først: hvilke krav stiller areal, tid og vejr? Dernæst: hvilke sikkerhedsmæssige og regulatoriske rammer skal vi designe og dokumentere efter? Og til sidst: hvordan kan løsningen laves teknisk, og hvilket delsystem er vigtigst at designe korrekt?</p>
+    <p>Svaret på det sidste spørgsmål er drivlinjen, og det fører os videre til afgrænsningen. Thomas?</p>
+  </template>
+</section>
+
+<!-- ============ 4. AFGRÆNSNING ============ -->
+<section class="slide" id="afgraensning" data-tone="light" data-title="Afgrænsning" data-who="Thomas" data-time="0:50">
+  <div class="frame">
+    <div class="head">
+      <p class="eyebrow"><span>03 · Afgrænsning</span><span class="who">Thomas</span></p>
+      <h2>Vi designer kun drivlinjen</h2>
+    </div>
+    <div class="cols2">
+      <div class="card top">
+        <h3>Designes af os</h3>
+        <ul>
+          <li>Drivlinje-koncept: hjul, bælter, halvbælte eller knækstyret</li>
+          <li>Motor og gear</li>
+          <li>Motorstyring</li>
+          <li>Elektrisk sikkerhedskæde: nødstop og STO</li>
+        </ul>
+      </div>
+      <div class="card top grey">
+        <h3>Indgår kun som krav og laster</h3>
+        <ul>
+          <li>Rydningsredskab og saltspreder</li>
+          <li>Ladestation og batterimontage</li>
+          <li>Karosseri og navigationssensorer</li>
+          <li>Styringen, som beskrives funktionelt i en styringsbeskrivelse</li>
+        </ul>
+      </div>
+    </div>
+    <p>Ingen fuld CE-mærkning. Vi laver dokumentationsgrundlaget efter Maskindirektivet.</p>
+    <p class="hint">En vinkelplov er passiv. For drivlinjen er den derfor kun en skubbekraft, som skal med i trækkraftberegningen.</p>
+    <footer class="foot"><span>SEP3 · Autonom snerydning og saltning</span><span class="pg">4 / 11</span></footer>
+  </div>
+  <template class="notes">
+    <p>Vi har valgt at designe én ting grundigt: drivlinjen. Det er konceptet, altså hjul, bælter, halvbælte eller knækstyret, og så motor, gear, motorstyring og den elektriske sikkerhedskæde med nødstop og STO.</p>
+    <p>Resten af robotten indgår kun som krav og laster: redskab, saltspreder, ladestation, karosseri og sensorer. Vi ser os selv som en del af et større udviklingsteam, der har ansvaret for drivlinjen.</p>
+    <p>Styringen beskriver vi funktionelt i en styringsbeskrivelse. Det var Jens' anbefaling på første vejledermøde. Vi laver ikke fuld CE-mærkning, men dokumentationsgrundlaget efter Maskindirektivet.</p>
+    <p>Det passer med den konceptretning, Simon viser om lidt: en vinkelplov er passiv, så for drivlinjen er den bare en skubbekraft.</p>
+  </template>
+</section>
+
+<!-- ============ 5. KRAV ============ -->
+<section class="slide bg-frost" id="krav" data-tone="light" data-title="Krav" data-who="Thomas" data-time="1:10">
+  <div class="frame">
+    <div class="head">
+      <p class="eyebrow"><span>04 · Krav</span><span class="who">Thomas</span></p>
+      <h2>Krav fra casen og vintervejret</h2>
+    </div>
+    <div class="krav">
+      <div class="kf"><span class="id">KF3 · Kapacitet</span><span class="val">2.000 m²</span><span class="lbl">ryddet og saltet på 4 timer, inklusive opladning</span></div>
+      <button type="button" class="kf change" data-pop="tpl-kf4" aria-label="KF4 snelast: se hvorfor vi foreslår at ændre den">
+        <span class="id">KF4 · Snelast</span>
+        <span class="val">5 cm<span class="old">15 cm</span></span>
+        <span class="lbl">let snefald som dimensionerende snelast</span>
+        <span class="tag">Foreslået ændring · klik for detaljer</span>
+      </button>
+      <div class="kf"><span class="id">KF21 · Arbejdsområde</span><span class="val">60 × 18 m</span><span class="lbl">Termas antenneproduktionsareal, plant og asfalteret</span></div>
+      <div class="kf"><span class="id">KF6 · Temperatur</span><span class="val">−15 til +5 °C</span><span class="lbl">i drift</span></div>
+      <div class="kf"><span class="id">KF2 · Trækkraft</span><span class="val">μ 0,05–0,15</span><span class="lbl">op ad maks. hældning på våd, saltet is</span></div>
+      <div class="kf"><span class="id">KF5 · Batteri</span><span class="val">A og B</span><span class="lbl">A: −1 til 0 °C og maks. snelast. B: −15 °C uden nyt snefald.</span></div>
+    </div>
+    <p class="small muted">Vi dimensionerer til 2.000 m², indtil arealet hos Terma (ca. 1.080 m²) er målt op.</p>
+    <footer class="foot"><span>Kilder: DMI (varslingskriterier) · Weatherspark (Lystrup) · gruppens kravforslag</span><span class="pg">5 / 11</span></footer>
+  </div>
+  <template class="notes">
+    <p>Kravene kommer fra casen og fra vejret. Robotten skal rydde og salte 2.000 m² på 4 timer, inklusive opladning, på et plant og asfalteret areal hos Terma.</p>
+    <p>Her har vi ændret noget siden udkastet. KF4 var 15 cm sne på 6 timer, som er DMI's kriterium for kraftigt snefald. Vi foreslår nu at dimensionere efter let snefald, 5 cm, og lade traktoren tage de få dage med kraftigt snefald. Det kommer Simon tilbage til, og det er et af vores spørgsmål til jer.</p>
+    <p>Robotten skal køre fra −15 til +5 grader, og på is skal den kunne køre op ad den maksimale hældning med en friktion helt ned til 0,05.</p>
+    <p>Energien dokumenterer vi for to worst cases, som vi holder adskilt, fordi ekstrem kulde og kraftigt snefald sjældent kommer samtidig: A er omkring 0 grader med maksimal snelast, B er −15 grader uden nyt snefald.</p>
+    <p>(Klik på KF4, hvis nogen spørger, hvorfor den er ændret.)</p>
+  </template>
+</section>
+
+<!-- ============ 6. REGLER ============ -->
+<section class="slide" id="regler" data-tone="light" data-title="Regler og standarder" data-who="Thomas" data-time="0:45">
+  <div class="frame">
+    <div class="head">
+      <p class="eyebrow"><span>05 · Regler og standarder</span><span class="who">Thomas</span></p>
+      <h2>Maskindirektivet er den retlige ramme</h2>
+    </div>
+    <table class="tbl">
+      <thead><tr><th style="width:36%">Retsakt eller standard</th><th>Betydning for drivlinjen</th></tr></thead>
+      <tbody>
+        <tr><td>Maskindirektivet 2006/42/EF</td><td>Gælder nu. Maskinforordningen 2023/1230 afløser det fra januar 2027.</td></tr>
+        <tr><td>EN ISO 12100</td><td>Risikovurdering af drivlinjen (KF9)</td></tr>
+        <tr><td>EN ISO 13849-1 og -2</td><td>Performance Level for nødstop og STO (KF11)</td></tr>
+        <tr><td>EN ISO 13850</td><td>Nødstop med manuel nulstilling (KF10)</td></tr>
+        <tr><td>EN 60204-1</td><td>Elektrisk udstyr: batteri og motorstyring</td></tr>
+      </tbody>
+    </table>
+    <p>Arealet er lukket med hegn og port, så færdselsloven gælder ikke. Det har vejlederen bekræftet.</p>
+    <footer class="foot"><span>Kilder: EUR-Lex · gruppens standardoversigt</span><span class="pg">6 / 11</span></footer>
+  </div>
+  <template class="notes">
+    <p>Den retlige ramme er Maskindirektivet. Maskinforordningen afløser det fra januar 2027. Den præcise dato er vi ved at afklare.</p>
+    <p>Til drivlinjen bruger vi EN ISO 12100 til risikovurderingen, EN ISO 13849 til nødstop og STO med et Performance Level, EN ISO 13850 til selve nødstoppet og EN 60204-1 til det elektriske udstyr.</p>
+    <p>Arealet er lukket med hegn og port, så færdselsloven gælder ikke. Det har vores vejleder bekræftet.</p>
+    <p>Så giver jeg ordet til Simon.</p>
+  </template>
+</section>
+
+<!-- ============ 7. METODE ============ -->
+<section class="slide bg-frost" id="metode" data-tone="light" data-title="Metode" data-who="Simon" data-time="0:40">
+  <div class="frame">
+    <div class="head">
+      <p class="eyebrow"><span>06 · Metode</span><span class="who">Simon</span></p>
+      <h2>Fire spor i metoden</h2>
+    </div>
+    <div class="grid4">
+      <div class="card"><h3>Viden og data</h3><p class="muted">Standarder og retsakter, vejrdata fra DMI og Weatherspark og en opmåling hos Terma.</p></div>
+      <div class="card"><h3>Analyse og beregning</h3><p class="muted">Simulering af rydning og saltning. Fritlegemer for trækkraft, friktion og stopdistance. Energibudget for de to worst cases.</p></div>
+      <div class="card"><h3>Design og dokumentation</h3><p class="muted">Beslutningsmatrix til konceptvalget, CAD og teknisk dokumentation.</p></div>
+      <div class="card"><h3>Planlægning</h3><p class="muted">Fælles git-repo, digital tidslinje med 51 opgaver og løbende vejledermøder.</p></div>
+    </div>
+    <p class="hint">AI bruger vi til idéer og første udkast til beregninger. Vi regner efter selv og tilføjer kilder fra pensum.</p>
+    <footer class="foot"><span>SEP3 · Autonom snerydning og saltning</span><span class="pg">7 / 11</span></footer>
+  </div>
+  <template class="notes">
+    <p>Vores metode har fire spor.</p>
+    <p>Vi indsamler viden og data: standarder, vejrdata og en opmåling hos Terma. Vi analyserer og regner: en simulering af rydning og saltning, fritlegemer for trækkraft, friktion og stopdistance og et energibudget for de to worst cases. Konceptet vælger vi med en beslutningsmatrix, og til sidst laver vi CAD og teknisk dokumentation. Vi planlægger i et fælles git-repo og en digital tidslinje med 51 opgaver.</p>
+    <p>AI bruger vi til idéer og til første udkast af beregningerne. Vi regner dem efter selv og tilføjer kilder fra pensum.</p>
+  </template>
+</section>
+
+<!-- ============ 8. KOMBINATIONER ============ -->
+<section class="slide" id="kombinationer" data-tone="light" data-title="16 kombinationer" data-who="Simon" data-time="1:10">
+  <div class="frame">
+    <div class="head">
+      <p class="eyebrow"><span>07 · Første konceptscreening</span><span class="who">Simon</span></p>
+      <h2>16 kombinationer ved let snefald</h2>
+    </div>
+    <div class="mx-layout">
+      <div class="head" style="gap:var(--sp-2);min-width:0">
+        <div class="scen" aria-label="Scenarie"><span>5 cm tør nysne</span><span>−8 °C</span><span>asfalt</span><span>2.000 m²</span><span>1 robot</span><span>0,6 m/s</span><span>18 kWh</span></div>
+        <div class="mx-scroll"><table class="mx" id="mx"><caption class="small muted" style="caption-side:bottom;text-align:left;padding-top:var(--sp-1)">Klik på en celle for detaljer. Består = ryddet og saltet på højst 4 timer uden at glide.</caption></table></div>
+      </div>
+      <div class="head" style="gap:var(--sp-3)">
+        <ul class="points">
+          <li><span class="mark">✓</span><span><b>12 af 16 består.</b> Alle fire med børste rydder kun ca. 82 %.</span></li>
+          <li><span class="mark">◷</span><span><b>Samme tid for de fleste:</b> 1 t 30 min, fordi farten er sat til 0,6 m/s.</span></li>
+          <li><span class="mark">↓</span><span><b>Lavest energi:</b> 4WD med vinkelplov bruger 0,6 kWh. Fræser 2-trins bruger 1,9 kWh.</span></li>
+        </ul>
+        <div class="actions">
+          <button type="button" class="btn" data-pop="lightbox">⛶ Skærmbillede</button>
+          <a class="btn" href="https://feddy170317.github.io/studiehub/sep3-snerydning/" target="_blank" rel="noopener">Åbn simulatoren ↗</a>
+        </div>
+      </div>
+    </div>
+    <footer class="foot"><span>Kilde: gruppens snerydningssimulator. Alle koefficienter er antagelser.</span><span class="pg">8 / 11</span></footer>
+  </div>
+  <template class="notes">
+    <p>For at vælge koncept har vi lavet en simulator, der rydder og salter 2.000 m² bane for bane.</p>
+    <p>Her har vi kørt alle 16 kombinationer af drivsystem og redskab i scenariet let snefald: 5 cm tør nysne ved −8 grader.</p>
+    <p>12 af de 16 består. Børsten rydder kun omkring 82 procent, så den falder fra. De fleste bruger 1 time og 30 minutter, fordi farten er sat til 0,6 meter i sekundet.</p>
+    <p>Forskellen er energien. Firehjulstræk med vinkelplov bruger 0,6 kWh, og en fræser 2-trins bruger 1,9 kWh, altså omkring tre gange så meget.</p>
+    <p>(Klik på en celle for detaljer, eller vis skærmbilledet fra simulatoren.)</p>
+  </template>
+</section>
+
+<!-- ============ 9. KONCEPTRETNING ============ -->
+<section class="slide bg-asphalt" id="konceptretning" data-tone="dark" data-title="Konceptretning" data-who="Simon" data-time="1:00">
+  <div class="frame">
+    <div class="head">
+      <p class="eyebrow"><span>08 · Foreløbig konceptretning</span><span class="who">Simon</span></p>
+      <h2>4WD med vinkelplov til let snefald</h2>
+    </div>
+    <div class="concept">
+      <svg viewBox="0 0 460 230" role="img" aria-label="Robotten set oppefra: firehjulstræk med en motor ved hvert hjul, batteri i midten, vinkelplov foran på skrå og saltspreder bagpå. Ploven skubber sneen i en vold til siden.">
+        <rect x="0" y="0" width="460" height="230" fill="#26313A"/>
+        <rect x="0" y="0" width="460" height="70" fill="#2F6168"/>
+        <rect x="0" y="168" width="460" height="62" fill="#E9EFF4"/>
+        <polygon points="0,70 301,70 259,150 0,150" fill="#3A4047"/>
+        <polygon points="128,101 128,119 0,150 0,70" fill="#2B8A91" opacity=".55"/>
+        <polygon points="301,70 460,70 460,150 259,150" fill="#E9EFF4"/>
+        <path d="M0 150 L262 150 L268 157 Q205 176 130 170 Q70 166 0 173 Z" fill="#5C9BD6"/>
+        <g fill="#8FD0D4">
+          <circle cx="112" cy="96" r="1.6"/><circle cx="104" cy="118" r="1.6"/><circle cx="95" cy="88" r="1.6"/><circle cx="88" cy="128" r="1.6"/><circle cx="80" cy="106" r="1.6"/><circle cx="72" cy="82" r="1.6"/><circle cx="66" cy="138" r="1.6"/><circle cx="58" cy="97" r="1.6"/><circle cx="50" cy="122" r="1.6"/><circle cx="42" cy="78" r="1.6"/><circle cx="36" cy="142" r="1.6"/><circle cx="28" cy="104" r="1.6"/><circle cx="20" cy="86" r="1.6"/><circle cx="14" cy="128" r="1.6"/><circle cx="118" cy="110" r="1.6"/><circle cx="100" cy="104" r="1.6"/>
+          <circle cx="40" cy="22" r="1.6"/><circle cx="120" cy="48" r="1.6"/><circle cx="210" cy="16" r="1.6"/><circle cx="300" cy="54" r="1.6"/><circle cx="380" cy="30" r="1.6"/><circle cx="440" cy="58" r="1.6"/>
+        </g>
+        <line x1="250" y1="93" x2="287" y2="97" stroke="#8794A0" stroke-width="3"/>
+        <line x1="250" y1="127" x2="270" y2="129" stroke="#8794A0" stroke-width="3"/>
+        <g fill="#0F1317"><rect x="156" y="70" width="30" height="13" rx="3"/><rect x="214" y="70" width="30" height="13" rx="3"/><rect x="156" y="137" width="30" height="13" rx="3"/><rect x="214" y="137" width="30" height="13" rx="3"/></g>
+        <rect x="150" y="82" width="100" height="56" rx="8" fill="#4A5662" stroke="#8794A0" stroke-width="2"/>
+        <rect x="172" y="96" width="56" height="28" rx="3" fill="#2B333B" stroke="#9AA6B1"/>
+        <text x="200" y="114" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#DDE3E8">BATTERI</text>
+        <g fill="none" stroke="#F2924F" stroke-width="2"><circle cx="171" cy="76.5" r="4.5"/><circle cx="229" cy="76.5" r="4.5"/><circle cx="171" cy="143.5" r="4.5"/><circle cx="229" cy="143.5" r="4.5"/></g>
+        <line x1="301" y1="68" x2="258" y2="152" stroke="#F2924F" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="139" cy="110" r="11" fill="#2B8A91" stroke="#9FD3D6" stroke-width="2"/>
+        <g stroke="#44505B" stroke-width="2" fill="#44505B"><line x1="335" y1="112" x2="398" y2="112"/><polygon points="398,106 410,112 398,118"/></g>
+        <text x="335" y="102" font-family="IBM Plex Sans, sans-serif" font-size="12" fill="#44505B">Kørselsretning</text>
+        <g stroke="#B4BEC8" stroke-width="1" fill="none"><path d="M70 46 L136 99"/><path d="M196 46 L173 72"/><path d="M318 46 L300 66"/></g>
+        <g font-family="IBM Plex Sans, sans-serif" font-size="12.5" fill="#EEF2F5">
+          <text x="10" y="40">Saltspreder, 60 kg salt</text>
+          <text x="150" y="40">4 hjulmotorer (idé)</text>
+          <text x="300" y="40">Vinkelplov 0,8 m, 30°</text>
+          <text x="452" y="18" text-anchor="end" font-size="11" fill="#B4BEC8">Ryddet og saltet bane</text>
+        </g>
+        <g font-family="IBM Plex Sans, sans-serif" font-size="12.5" fill="#2B333B">
+          <path d="M70 188 L80 168" stroke="#2B333B" stroke-width="1"/>
+          <text x="10" y="204">Vold af skubbet sne</text>
+          <text x="452" y="204" text-anchor="end">Sne</text>
+        </g>
+      </svg>
+      <ul class="points">
+        <li><span class="mark">✓</span><span><b>Simpel maskine.</b> Ploven er passiv og bruger ingen energi selv.</span></li>
+        <li><span class="mark">◷</span><span><b>God på de fleste vinterdage.</b> De få dage med kraftigt snefald klares med traktor som i dag.</span></li>
+        <li><span class="mark">!</span><span><b>Vægt giver trækkraft.</b> Robotten skal være tung nok til at skubbe sat sne. Et tungere batteri kan være ballasten.</span></li>
+      </ul>
+    </div>
+    <div class="kpis">
+      <button type="button" class="kpi" data-pop="tpl-energi"><span class="num">0,6 kWh</span><span class="lbl">hele arealet ryddet og saltet</span><span class="tag">Hvor går energien hen? →</span></button>
+      <button type="button" class="kpi" data-pop="tpl-vaegt"><span class="num">222 kg</span><span class="lbl">med 2 kWh batteri og 60 kg salt</span><span class="tag">Hvad kræver grebet? →</span></button>
+      <button type="button" class="kpi" data-pop="tpl-dybde"><span class="num">11 cm</span><span class="lbl">mest tør nysne, før robotten glider</span><span class="tag">Hvor går grænsen? →</span></button>
+    </div>
+    <footer class="foot"><span>Foreløbigt valg. Vi dokumenterer det med en beslutningsmatrix og tager det op med Jens.</span><span class="pg">9 / 11</span></footer>
+  </div>
+  <template class="notes">
+    <p>Vores foreløbige konceptretning er derfor firehjulstræk med vinkelplov, dimensioneret til let snefald.</p>
+    <p>Det er en simpel maskine. Ploven er passiv og bruger ingen energi selv, så hele arealet kan ryddes og saltes for 0,6 kWh.</p>
+    <p>Vi vil hellere have en robot, der er god på de fleste vinterdage, end en, der er bedst på de få dage med kraftigt snefald. De dage klarer traktoren som i dag.</p>
+    <p>Simuleringen viser også, hvad det kræver: vægt giver trækkraft. Med et lille batteri på 2 kWh vejer robotten 222 kg. Den klarer tør nysne op til 11 cm, men glider allerede ved 5 cm, hvis sneen er sat. Med 50 kg ekstra, fx et tungere batteri, klarer den det. På pakket sne skal den have pigge.</p>
+    <p>En idé til drivlinjen er fire mindre motorer, én ved hvert hjul. Når robotten kun salter, kan den køre på to af dem.</p>
+    <p>Valget er foreløbigt. Vi dokumenterer det med en beslutningsmatrix og tager det op med Jens efter i dag.</p>
+  </template>
+</section>
+
+<!-- ============ 10. TIDSPLAN OG RISICI ============ -->
+<section class="slide bg-frost" id="tidsplan" data-tone="light" data-title="Tidsplan og risici" data-who="Simon" data-time="0:50">
+  <div class="frame">
+    <div class="head">
+      <p class="eyebrow"><span>09 · Tidsplan og risici</span><span class="who">Simon</span></p>
+      <h2>12 uger i fire faser</h2>
+    </div>
+    <div class="phases">
+      <div class="ph done" style="flex:3"><b>Analyse</b><span>Uge 1–3 · færdig</span></div>
+      <div class="ph now" style="flex:2"><b>Koncept</b><span>Uge 4–5 · nu</span></div>
+      <div class="ph" style="flex:4"><b>Dimensionering</b><span>Uge 6–9</span></div>
+      <div class="ph" style="flex:3"><b>Dokumentation</b><span>Uge 10–12</span></div>
+    </div>
+    <div class="miles">
+      <div class="mile"><span class="w">Uge 5</span><p>Projektbeskrivelse og konceptvalg</p></div>
+      <div class="mile"><span class="w">Uge 8</span><p>Præsentation med peer feedback</p></div>
+      <div class="mile"><span class="w">Uge 9</span><p>Hovedkomponenter dimensioneret</p></div>
+      <div class="mile"><span class="w">Uge 10</span><p>Individuel portfolio-rapport</p></div>
+      <div class="mile"><span class="w">Uge 12</span><p>Aflevering af rapport, bilag og poster</p></div>
+    </div>
+    <table class="tbl compact">
+      <thead><tr><th style="width:42%">Største risici</th><th style="width:14%">S × K</th><th>Tiltag</th></tr></thead>
+      <tbody>
+        <tr><td>Data fra Terma mangler eller kommer sent</td><td>3 × 4 = 12</td><td>Regn på 2.000 m², opdatér når data kommer</td></tr>
+        <tr><td>Formel bekræftelse fra Terma udebliver</td><td>2 × 5 = 10</td><td>Forbered en fallback-case</td></tr>
+        <tr><td>Forkert estimat af arbejdsbyrden</td><td>3 × 3 = 9</td><td>Sammenlign planlagt og faktisk tid løbende</td></tr>
+        <tr><td>Simulatorens koefficienter er antagelser</td><td>Ny</td><td>Regn trækkraften (KF2) efter i hånden med kilder fra pensum</td></tr>
+      </tbody>
+    </table>
+    <footer class="foot"><span>275 timer pr. studerende · 825 timer i alt · S = sandsynlighed, K = konsekvens, skala 1–5</span><span class="pg">10 / 11</span></footer>
+  </div>
+  <template class="notes">
+    <p>Projektet løber over 12 uger i fire faser. Vi er i uge 5, i konceptfasen, hvor konceptvalget skal dokumenteres. Uge 6 til 9 er dimensionering, og uge 10 til 12 er dokumentation med aflevering af rapport, bilag og poster. Hver af os har 275 timer, så vi er 825 timer i alt.</p>
+    <p>De største risici handler om Terma. Kommer data om arealet sent, regner vi videre på 2.000 m². Kommer den formelle bekræftelse ikke, har vi en fallback-case.</p>
+    <p>Og simulatorens tal bygger på antagelser, så vi regner trækkraften efter i hånden med kilder fra pensum.</p>
+    <p>Frederik slutter af.</p>
+  </template>
+</section>
+
+<!-- ============ 11. FEEDBACK ============ -->
+<section class="slide bg-signal" id="feedback" data-tone="signal" data-title="Feedback" data-who="Frederik" data-time="0:45">
+  <div class="frame">
+    <div class="head">
+      <p class="eyebrow"><span>10 · Feedback</span><span class="who">Frederik</span></p>
+      <h2>Det vil vi gerne have feedback på</h2>
+    </div>
+    <ol class="qs">
+      <li>Er det dybt nok kun at designe drivlinjen?</li>
+      <li>Må vi dimensionere efter let snefald og lade traktoren tage de få dage med kraftigt snefald?</li>
+      <li>Passer problemformuleringen til afgrænsningen, eller er den for bred?</li>
+      <li>Hvilken beslutningsmodel vil I anbefale til at dokumentere konceptvalget: vægtet matrix, Pugh eller AHP?</li>
+    </ol>
+    <footer class="foot"><span>Tak for opmærksomheden</span><span class="pg">11 / 11</span></footer>
+  </div>
+  <template class="notes">
+    <p>Vi vil gerne have jeres feedback på fire ting.</p>
+    <p>Er det dybt nok kun at designe drivlinjen?</p>
+    <p>Må vi dimensionere efter let snefald og lade traktoren tage de få dage med kraftigt snefald?</p>
+    <p>Passer problemformuleringen til afgrænsningen, eller er den for bred?</p>
+    <p>Og hvilken beslutningsmodel vil I anbefale til at dokumentere konceptvalget: vægtet matrix, Pugh eller AHP?</p>
+    <p>Tak for opmærksomheden.</p>
+    <p>(Under feedbacken skriver den, der ikke svarer, noter. De lægges i Moeder/2026-10-05_feedback_projektbeskrivelse.md.)</p>
+  </template>
+</section>
+
+<!-- ============ BACKUP A ============ -->
+<section class="slide backup" id="backup-spoergsmaal" data-tone="light" data-title="Backup: forventede spørgsmål" data-who="Alle" data-time="">
+  <div class="frame">
+    <div class="head">
+      <p class="eyebrow"><span>Backup A · vises kun ved spørgsmål</span></p>
+      <h2>Forventede spørgsmål og vores svar</h2>
+    </div>
+    <table class="tbl compact">
+      <thead><tr><th style="width:30%">Spørgsmål</th><th>Svar</th></tr></thead>
+      <tbody>
+        <tr><td>Hvorfor kun drivlinjen?</td><td>Dybde frem for bredde. Drivlinjen bærer kravene til trækkraft, energi og sikkerhed. Jens anbefalede en funktionel styringsbeskrivelse for resten.</td></tr>
+        <tr><td>Hvordan verificerer I uden prototype?</td><td>Med beregning og simulering mod kravene. Vejlederen forventer en mekanisk færdig dokumentation, ikke en fuld prototype.</td></tr>
+        <tr><td>Hvorfor ikke en fræser?</td><td>Den bruger ca. 3 gange så meget energi ved let snefald og har egen motor og styring. Den vinder først ved kraftigt snefald.</td></tr>
+        <tr><td>Hvor skal sneen hen?</td><td>Ploven lægger den i en vold langs kanten. Hvor volden må ligge, afklarer vi med Terma.</td></tr>
+        <tr><td>Hvorfor 2.000 m², når arealet er ca. 1.080 m²?</td><td>Areal og hældning er ikke målt op endnu. 2.000 m² er en bevidst margin, som rettes efter opmåling.</td></tr>
+        <tr><td>Hvorfor ikke Maskinforordningen?</td><td>Den gælder først fra januar 2027. Vi følger Maskindirektivet og noterer overgangen.</td></tr>
+      </tbody>
+    </table>
+    <footer class="foot"><span>Backup</span><span class="pg">A</span></footer>
+  </div>
+  <template class="notes"><p>Backup-slide. Brug den kun, hvis spørgsmålene kommer i feedbackrunden.</p></template>
+</section>
+
+<!-- ============ BACKUP B ============ -->
+<section class="slide bg-frost backup" id="backup-problemformulering" data-tone="light" data-title="Backup: skarpere problemformulering" data-who="Alle" data-time="">
+  <div class="frame">
+    <div class="head">
+      <p class="eyebrow"><span>Backup B · vises kun ved spørgsmål</span></p>
+      <h2>Forslag til en skarpere problemformulering</h2>
+    </div>
+    <div class="pf">
+      <p class="q">Hvordan skal drivlinjen til en autonom snerydnings- og saltningsrobot med vinkelplov dimensioneres og dokumenteres, så den kan rydde og salte 2.000 m² hos Terma på 4 timer ved let snefald og opfylde Maskindirektivets krav?</p>
+    </div>
+    <p class="muted">Bruges kun, hvis feedbacken peger på, at problemformuleringen er bredere end afgrænsningen.</p>
+    <footer class="foot"><span>Backup</span><span class="pg">B</span></footer>
+  </div>
+  <template class="notes"><p>Backup-slide. Vis den, hvis vejlederen eller peer-gruppen siger, at problemformuleringen spørger bredere, end projektet svarer.</p></template>
+</section>
+
+<!-- ============ BACKUP C ============ -->
+<section class="slide backup" id="backup-ai" data-tone="light" data-title="Backup: brug af AI" data-who="Alle" data-time="">
+  <div class="frame">
+    <div class="head">
+      <p class="eyebrow"><span>Backup C · vises kun ved spørgsmål</span></p>
+      <h2>Sådan bruger vi AI</h2>
+    </div>
+    <ul class="points">
+      <li><span class="mark">→</span><span><b>Idéfasen:</b> AI giver et hurtigt udgangspunkt, fx simulatoren og første udkast til beregninger.</span></li>
+      <li><span class="mark">✓</span><span><b>Vi gennemgår selv hver beregning</b> og skal kunne forklare den uden hjælp.</span></li>
+      <li><span class="mark">!</span><span><b>Kilder fra pensum mangler i dag.</b> De tilføjes til alle beregninger, før de bruges i rapporten.</span></li>
+    </ul>
+    <footer class="foot"><span>Backup</span><span class="pg">C</span></footer>
+  </div>
+  <template class="notes"><p>Backup-slide. Brug den, hvis nogen spørger til, hvordan vi har brugt AI.</p></template>
+</section>
+
+<!-- ============ POPUP-INDHOLD ============ -->
+<template id="tpl-kf4">
+  <h2>KF4 Snelast: forslag til ændring</h2>
+  <p>I udkastet er KF4 15 cm sne på 6 timer, som er DMI's kriterium for kraftigt snefald. I simulatoren kan en vinkelplov ikke klare det, heller ikke med 250 kg ballast. Vi foreslår derfor:</p>
+  <ul>
+    <li>Dimensionerende snelast: 5 cm let snefald.</li>
+    <li>En fast grænse på ca. 10 cm, hvor rydningen overgår til traktor som i dag.</li>
+    <li>KF5-A (maks. snelast ved 0 °C) følger samme grænse.</li>
+  </ul>
+  <table class="tbl">
+    <thead><tr><th>Sne</th><th>Redskab</th><th>Robotmasse</th><th>Resultat</th></tr></thead>
+    <tbody>
+      <tr><td>5 cm tør nysne</td><td>Vinkelplov</td><td>222 kg</td><td><span class="ok">✓</span> 1 t 33 min · 0,6 kWh</td></tr>
+      <tr><td>11 cm tør nysne</td><td>Vinkelplov</td><td>222 kg</td><td><span class="ok">✓</span> 1 t 42 min · 0,9 kWh</td></tr>
+      <tr><td>12 cm tør nysne</td><td>Vinkelplov</td><td>222 kg</td><td><span class="bad">✕</span> glider, 96,5 % ryddet</td></tr>
+      <tr><td>15 cm sat sne (KF4)</td><td>Vinkelplov</td><td>354 kg</td><td><span class="bad">✕</span> glider, 55,5 % ryddet</td></tr>
+      <tr><td>15 cm sat sne (KF4)</td><td>Vinkelplov</td><td>op til 604 kg</td><td><span class="bad">✕</span> også med 250 kg ballast</td></tr>
+      <tr><td>15 cm sat sne (KF4)</td><td>Fræser 2-trins</td><td>389 kg</td><td><span class="ok">✓</span> 3 t 13 min · 10,1 kWh</td></tr>
+    </tbody>
+  </table>
+  <p class="note">Mangler: DMI-data for, hvor mange dage om året sneen er over 5 cm. Kilde: gruppens snerydningssimulator, 2.000 m², 1 robot, maks. 0,6 m/s. Koefficienterne er antagelser.</p>
+</template>
+
+<template id="tpl-energi">
+  <h2>Hvor går energien hen?</h2>
+  <p>Let snefald, 5 cm tør nysne, 2.000 m² ryddet og saltet med firehjulstræk. Ploven skubber sneen med drivlinjens kraft. Fræseren har sin egen motor, og den bruger mest energi.</p>
+  <div class="ebar">
+    <span class="lab">Vinkelplov</span>
+    <span class="track" title="Vinkelplov: 0,62 kWh"><i class="e-drive" style="width:15.5%"></i><i class="e-salt" style="width:7.5%"></i><i class="e-base" style="width:7.5%"></i><i class="e-loss" style="width:.5%"></i></span>
+    <span class="tot">0,62 kWh</span>
+    <span class="lab">Fræser 2-trins</span>
+    <span class="track" title="Fræser 2-trins: 1,87 kWh"><i class="e-drive" style="width:12%"></i><i class="e-tool" style="width:63%"></i><i class="e-salt" style="width:7.5%"></i><i class="e-base" style="width:7.5%"></i><i class="e-loss" style="width:3%"></i></span>
+    <span class="tot">1,87 kWh</span>
+    <span class="axis"><span>0</span><span>0,5</span><span>1,0</span><span>1,5</span><span>2,0 kWh</span></span>
+  </div>
+  <div class="elegend"><span><i class="e-drive"></i>Kørsel</span><span><i class="e-tool"></i>Redskab</span><span><i class="e-salt"></i>Salt</span><span><i class="e-base"></i>Elektronik og varme</span><span><i class="e-loss"></i>Tab i batteri</span></div>
+  <table class="tbl">
+    <thead><tr><th></th><th>Kørsel</th><th>Redskab</th><th>Salt</th><th>Elektronik og varme</th><th>Tab</th><th>I alt</th></tr></thead>
+    <tbody>
+      <tr><td>Vinkelplov</td><td>0,31</td><td>0</td><td>0,15</td><td>0,15</td><td>0,01</td><td><b>0,62 kWh</b></td></tr>
+      <tr><td>Fræser 2-trins</td><td>0,24</td><td>1,26</td><td>0,15</td><td>0,15</td><td>0,06</td><td><b>1,87 kWh</b></td></tr>
+    </tbody>
+  </table>
+  <p class="note">Kilde: gruppens snerydningssimulator, 18 kWh batteri, maks. 0,6 m/s. Koefficienterne er antagelser.</p>
+</template>
+
+<template id="tpl-vaegt">
+  <h2>Vægt giver trækkraft</h2>
+  <p>Trækkraften er friktionen gange vægten på hjulene. Derfor afgør robotmassen, om ploven kan skubbe sneen. 222 kg er chassis 110 kg, plov 35 kg, batteri 2 kWh (17 kg) og salt 60 kg.</p>
+  <table class="tbl">
+    <thead><tr><th>Sne og underlag</th><th>Robotmasse</th><th>Resultat</th></tr></thead>
+    <tbody>
+      <tr><td>5 cm tør nysne på asfalt</td><td>222 kg</td><td><span class="ok">✓</span> 1 t 33 min · 0,6 kWh</td></tr>
+      <tr><td>5 cm sat sne på asfalt</td><td>222 kg</td><td><span class="bad">✕</span> glider på 3,3 % af banerne</td></tr>
+      <tr><td>5 cm sat sne på asfalt, +50 kg ballast</td><td>272 kg</td><td><span class="ok">✓</span> 1 t 36 min · 0,9 kWh</td></tr>
+      <tr><td>5 cm tør nysne, pakket sne under</td><td>222 kg</td><td><span class="bad">✕</span> glider på 3,7 % af banerne</td></tr>
+      <tr><td>Samme med pigge</td><td>222 kg</td><td><span class="ok">✓</span> 1 t 30 min · 0,6 kWh</td></tr>
+      <tr><td>Samme med pigge ved 5,4 km/t</td><td>222 kg</td><td><span class="ok">✓</span> 41 min · 0,4 kWh</td></tr>
+    </tbody>
+  </table>
+  <p class="note">Et tungere batteri kan være ballasten. Kilde: gruppens snerydningssimulator, 2.000 m², 1 robot. Koefficienterne er antagelser og regnes efter i hånden (KF2).</p>
+</template>
+
+<template id="tpl-dybde">
+  <h2>Hvor meget sne kan den klare?</h2>
+  <p>Firehjulstræk med vinkelplov, 222 kg, tør nysne ved −8 °C på asfalt. Jo dybere sne, jo større skubbekraft, indtil hjulene glider.</p>
+  <table class="tbl">
+    <thead><tr><th>Snedybde</th><th>Resultat</th><th>Tid</th><th>Energi</th></tr></thead>
+    <tbody>
+      <tr><td>5 cm</td><td><span class="ok">✓ Består</span></td><td>1 t 33 min</td><td>0,6 kWh</td></tr>
+      <tr><td>7 cm</td><td><span class="ok">✓ Består</span></td><td>1 t 36 min</td><td>0,7 kWh</td></tr>
+      <tr><td>9 cm</td><td><span class="ok">✓ Består</span></td><td>1 t 38 min</td><td>0,8 kWh</td></tr>
+      <tr><td>11 cm</td><td><span class="ok">✓ Består</span></td><td>1 t 42 min</td><td>0,9 kWh</td></tr>
+      <tr><td>12 cm</td><td><span class="bad">✕ Glider</span></td><td colspan="2">96,5 % ryddet</td></tr>
+      <tr><td>15 cm</td><td><span class="bad">✕ Glider</span></td><td colspan="2">64,8 % ryddet</td></tr>
+    </tbody>
+  </table>
+  <p class="note">I sat sne glider den allerede ved 5 cm uden ekstra vægt. Kilde: gruppens snerydningssimulator, 2.000 m², 1 robot, maks. 0,6 m/s. Koefficienterne er antagelser.</p>
+</template>
+
+<!-- ============ NAVIGATION, NOTER, MODAL ============ -->
+<nav id="dots" aria-label="Slides"></nav>
+<div id="ctl"><button type="button" id="b-notes" aria-pressed="false">Talernoter · N</button><button type="button" class="fs" id="b-fs">Fuld skærm · F</button></div>
+<aside id="notes" hidden aria-live="polite">
+  <header><span class="n-who"></span><span class="n-title"></span><span class="n-target"></span><span class="n-clock">0:00 / 10:00</span></header>
+  <div class="n-txt"></div>
+</aside>
+<div id="backdrop" hidden></div>
+<div id="modal" role="dialog" aria-modal="true" aria-label="Detaljer" hidden>
+  <button type="button" class="x" id="m-close">Luk · Esc</button>
+  <div id="m-body"></div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var narrow = window.matchMedia ? window.matchMedia('(max-width: 760px)') : { matches: false };
+  var slides = $$('.slide');
+
+  /* ---------- kombinationsmatrix (fra snerydningssimulatoren, scenariet let snefald) ---------- */
+  // [består, tid, kWh, ryddet %, masse kg, overkørsel %, genhåndtering, salt kg]
+  var MX = {"H|plov":[1,"1 t 30 min","0,6","99,9",354,24,"2,31",32],"H|borste":[0,"1 t 30 min","1,6","81,7",364,24,"1,98",32],"H|fraes1":[1,"1 t 30 min","1,5","99,9",369,24,"1,17",32],"H|fraes2":[1,"1 t 30 min","1,9","99,9",389,24,"0,90",32],"B|plov":[1,"1 t 30 min","0,8","99,9",379,24,"2,31",32],"B|borste":[0,"1 t 30 min","1,9","81,7",389,24,"1,98",32],"B|fraes1":[1,"1 t 30 min","1,7","99,9",394,24,"1,17",32],"B|fraes2":[1,"1 t 30 min","2,1","99,9",414,24,"0,90",32],"HB|plov":[1,"1 t 41 min","0,8","99,5",369,36,"2,39",36],"HB|borste":[0,"1 t 41 min","1,9","82,6",379,36,"2,08",36],"HB|fraes1":[1,"1 t 41 min","1,7","99,7",384,36,"1,18",36],"HB|fraes2":[1,"1 t 41 min","2,1","99,7",404,36,"0,90",36],"K|plov":[1,"1 t 39 min","0,7","99,5",369,33,"2,37",35],"K|borste":[0,"1 t 38 min","1,8","82,4",379,33,"2,06",35],"K|fraes1":[1,"1 t 38 min","1,6","99,7",384,33,"1,18",35],"K|fraes2":[1,"1 t 38 min","2,0","99,7",404,33,"0,90",35]};
+  var DRIVES = [['H', 'Hjul 4WD'], ['B', 'Bælter'], ['HB', 'Halvbælte'], ['K', 'Knækstyret']];
+  var TOOLS = [['plov', 'Vinkelplov'], ['borste', 'Børste'], ['fraes1', 'Fræser 1-trins'], ['fraes2', 'Fræser 2-trins']];
+  var BEST = 'H|plov';
+  (function buildMatrix() {
+    var t = $('#mx'); if (!t) return;
+    var h = '<thead><tr><th scope="col">Drivsystem</th>';
+    TOOLS.forEach(function (tl) { h += '<th scope="col">' + tl[1] + '</th>'; });
+    h += '</tr></thead><tbody>';
+    DRIVES.forEach(function (d) {
+      h += '<tr><th scope="row">' + d[1] + '</th>';
+      TOOLS.forEach(function (tl) {
+        var k = d[0] + '|' + tl[0], r = MX[k], best = k === BEST;
+        var chip = r[0] ? '<span class="chip ok">✓ ' + (best ? 'Bedst' : 'Består') + '</span>' : '<span class="chip bad">✕ Rydder ' + Math.round(parseFloat(r[3].replace(',', '.'))) + ' %</span>';
+        h += '<td><button type="button" class="cell' + (best ? ' best' : '') + '" data-combo="' + k + '" aria-label="' + d[1] + ' med ' + tl[1].toLowerCase() + '">' + chip + '<span class="v">' + r[1].replace(' min', '') + ' · ' + r[2] + ' kWh</span></button></td>';
+      });
+      h += '</tr>';
+    });
+    t.insertAdjacentHTML('beforeend', h + '</tbody>');
+  })();
+  function comboHTML(k) {
+    var r = MX[k], p = k.split('|');
+    var dn = DRIVES.filter(function (d) { return d[0] === p[0]; })[0][1];
+    var tn = TOOLS.filter(function (t) { return t[0] === p[1]; })[0][1];
+    var res = r[0] ? '<span class="ok">✓ ' + (k === BEST ? 'Består med lavest energi' : 'Består') + '</span>' : '<span class="bad">✕ Rydder kun ' + r[3] + ' %</span>';
+    return '<h2>' + dn + ' med ' + tn.toLowerCase() + '</h2>' +
+      '<table class="tbl"><tbody>' +
+      '<tr><td>Resultat</td><td>' + res + '</td></tr>' +
+      '<tr><td>Tid i alt</td><td>' + r[1] + '</td></tr>' +
+      '<tr><td>Energi fra batteriet</td><td>' + r[2] + ' kWh</td></tr>' +
+      '<tr><td>Ryddet</td><td>' + r[3] + ' %</td></tr>' +
+      '<tr><td>Robotmasse</td><td>' + r[4] + ' kg (18 kWh batteri og 60 kg salt)</td></tr>' +
+      '<tr><td>Ekstra kørt strækning</td><td>+' + r[5] + ' % fra vendinger og overlap</td></tr>' +
+      '<tr><td>Genhåndtering af sne</td><td>' + r[6] + ' ×</td></tr>' +
+      '<tr><td>Salt brugt</td><td>' + r[7] + ' kg</td></tr>' +
+      '</tbody></table><p class="note">Scenariet let snefald: 5 cm tør nysne, −8 °C, asfalt, 2.000 m², 1 robot, maks. 0,6 m/s. Kilde: gruppens snerydningssimulator. Koefficienterne er antagelser.</p>';
+  }
+
+  /* ---------- modal ---------- */
+  var modal = $('#modal'), backdrop = $('#backdrop'), mBody = $('#m-body'), lastFocus = null;
+  function openModal(html, label) {
+    lastFocus = document.activeElement;
+    mBody.innerHTML = html;
+    modal.setAttribute('aria-label', label || 'Detaljer');
+    modal.hidden = false; backdrop.hidden = false; modal.scrollTop = 0;
+    document.documentElement.style.overflow = 'hidden';
+    $('#m-close').focus();
+  }
+  function closeModal() {
+    if (modal.hidden) return;
+    modal.hidden = true; backdrop.hidden = true; mBody.innerHTML = '';
+    document.documentElement.style.overflow = '';
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  function isOpen() { return !modal.hidden; }
+  document.addEventListener('click', function (e) {
+    var c = e.target.closest('[data-combo]');
+    if (c) { openModal(comboHTML(c.getAttribute('data-combo'))); return; }
+    var p = e.target.closest('[data-pop]');
+    if (!p) return;
+    var id = p.getAttribute('data-pop');
+    if (id === 'lightbox') {
+      openModal('<img src="assets/kombi_let.png" alt="Skærmbillede af kombinationsmatricen i snerydningssimulatoren" onerror="this.outerHTML=\'<p class=&quot;note&quot;>Billedet blev ikke fundet.</p>\'">' +
+        '<p>Skærmbillede fra snerydningssimulatoren, scenariet let snefald. Laveste energi blandt dem, der består: hjul 4WD med vinkelplov, 1 t 30 min og 0,6 kWh. 12 af 16 kombinationer består.</p>', 'Skærmbillede fra simulatoren');
+      return;
+    }
+    var tpl = document.getElementById(id);
+    if (tpl) openModal(tpl.innerHTML);
+  });
+  $('#m-close').addEventListener('click', closeModal);
+  backdrop.addEventListener('click', closeModal);
+  // Frys deck-navigation mens modalen er åben (capture-fasen)
+  var NAVKEYS = { ArrowDown: 1, ArrowUp: 1, ArrowLeft: 1, ArrowRight: 1, PageDown: 1, PageUp: 1, Home: 1, End: 1, ' ': 1, n: 1, N: 1, f: 1, F: 1 };
+  document.addEventListener('keydown', function (e) {
+    if (!isOpen()) return;
+    if (e.key === 'Escape') { e.preventDefault(); closeModal(); return; }
+    if (e.key === 'Tab') { // hold fokus i modalen
+      var f = $$('button, a[href], [tabindex]:not([tabindex="-1"])', modal);
+      if (!f.length) return;
+      if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+      else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+      return;
+    }
+    if (NAVKEYS[e.key]) { e.stopImmediatePropagation(); if (e.key !== ' ' || e.target === document.body) e.preventDefault(); }
+  }, true);
+  document.addEventListener('wheel', function (e) { if (isOpen()) e.stopImmediatePropagation(); }, { capture: true, passive: true });
+
+  /* ---------- dot-nav og navigation ---------- */
+  var dots = $('#dots'), cur = 0;
+  slides.forEach(function (s, i) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    if (s.classList.contains('backup')) b.className = 'bk';
+    b.setAttribute('aria-label', (i + 1) + ': ' + (s.getAttribute('data-title') || ''));
+    b.title = s.getAttribute('data-title') || '';
+    b.addEventListener('click', function () { go(i); });
+    dots.appendChild(b);
+  });
+  function nearest() {
+    var best = 0, bd = Infinity;
+    slides.forEach(function (s, i) { var d = Math.abs(s.getBoundingClientRect().top); if (d < bd) { bd = d; best = i; } });
+    return best;
+  }
+  function go(i) {
+    if (i < 0 || i >= slides.length) return;
+    startClock();
+    slides[i].scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+  }
+  function setCurrent(i) {
+    cur = i;
+    $$('button', dots).forEach(function (b, j) { b.classList.toggle('on', j === i); if (j === i) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current'); });
+    var tone = slides[i].getAttribute('data-tone') || 'light';
+    document.body.classList.toggle('tone-dark', tone === 'dark');
+    document.body.classList.toggle('tone-signal', tone === 'signal');
+    renderNotes();
+    lot.setActive(i === 0);
+  }
+  var ticking = false;
+  window.addEventListener('scroll', function () {
+    if (ticking) return; ticking = true;
+    requestAnimationFrame(function () { ticking = false; var n = nearest(); if (n !== cur) setCurrent(n); });
+  }, { passive: true });
+
+  function toggleFullscreen() {
+    try {
+      if (!document.fullscreenElement) { var p = document.documentElement.requestFullscreen(); if (p && p.catch) p.catch(function () {}); }
+      else { var q = document.exitFullscreen(); if (q && q.catch) q.catch(function () {}); }
+    } catch (err) { /* fuld skærm er ikke tilladt her */ }
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    var tag = e.target && e.target.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+    if ((e.key === ' ' || e.key === 'Enter') && (tag === 'BUTTON' || tag === 'A')) return;
+    switch (e.key) {
+      case 'ArrowDown': case 'ArrowRight': case 'PageDown': case ' ':
+        e.preventDefault(); go(nearest() + 1); break;
+      case 'ArrowUp': case 'ArrowLeft': case 'PageUp':
+        e.preventDefault(); go(nearest() - 1); break;
+      case 'Home': e.preventDefault(); go(0); break;
+      case 'End': e.preventDefault(); go(slides.length - 1); break;
+      case 'f': case 'F': e.preventDefault(); toggleFullscreen(); break;
+      case 'n': case 'N': e.preventDefault(); toggleNotes(); break;
+      case 'r': case 'R': if (!notes.hidden) { e.preventDefault(); t0 = null; startClock(); } break;
+    }
+  });
+  // Én slide pr. hjul-bevægelse på store skærme
+  var wheelLock = false;
+  document.addEventListener('wheel', function (e) {
+    if (narrow.matches || isOpen()) return;
+    if (e.target.closest && e.target.closest('#notes, .mx-scroll')) return;
+    if (wheelLock) { e.preventDefault(); return; }
+    if (Math.abs(e.deltaY) < 25) return;
+    e.preventDefault(); wheelLock = true;
+    setTimeout(function () { wheelLock = false; }, 750);
+    go(nearest() + (e.deltaY > 0 ? 1 : -1));
+  }, { passive: false });
+  $('#b-fs').addEventListener('click', toggleFullscreen);
+
+  /* ---------- talernoter og ur ---------- */
+  var notes = $('#notes'), t0 = null, clockTimer = null;
+  function startClock() {
+    if (t0 === null) t0 = Date.now();
+    if (!clockTimer) clockTimer = setInterval(tick, 1000);
+    tick();
+  }
+  function fmt(s) { var m = Math.floor(s / 60), r = s % 60; return m + ':' + (r < 10 ? '0' : '') + r; }
+  function tick() {
+    var el = $('.n-clock', notes);
+    var s = t0 === null ? 0 : Math.floor((Date.now() - t0) / 1000);
+    el.textContent = fmt(s) + ' / 10:00';
+    el.classList.toggle('over', s > 600);
+  }
+  function renderNotes() {
+    if (notes.hidden) return;
+    var s = slides[cur], tpl = $('template.notes', s);
+    $('.n-who', notes).textContent = s.getAttribute('data-who') || '';
+    $('.n-title', notes).textContent = (cur + 1) + ' · ' + (s.getAttribute('data-title') || '');
+    var tt = s.getAttribute('data-time');
+    $('.n-target', notes).textContent = tt ? 'ca. ' + tt + ' min' : '';
+    $('.n-txt', notes).innerHTML = tpl ? tpl.innerHTML : '';
+    tick();
+  }
+  function toggleNotes() {
+    notes.hidden = !notes.hidden;
+    document.body.classList.toggle('notes-open', !notes.hidden);
+    $('#b-notes').setAttribute('aria-pressed', String(!notes.hidden));
+    if (!notes.hidden) { startClock(); renderNotes(); }
+  }
+  $('#b-notes').addEventListener('click', toggleNotes);
+
+  /* ---------- forside: robotten rydder arealet bane for bane ---------- */
+  var lot = (function () {
+    var cv = $('#lot');
+    if (!cv || !cv.getContext) return { setActive: function () {} };
+    var ctx = cv.getContext('2d');
+    var C = 160, R = 50, EXTRA = 4, LANES = 10, LH = R / LANES, V = 105; // celler à 0,5 m; banerne er tegnet bredere end i virkeligheden
+    var off = document.createElement('canvas'); off.width = C; off.height = R + EXTRA;
+    var octx = off.getContext('2d'), img = octx.createImageData(C, R + EXTRA);
+    var snow, salt, lane, x, dir, hold, last = 0, active = true, raf = 0;
+    var COL = { snow: [233, 239, 244], moved: [92, 155, 214], movedLo: [168, 206, 238], clear: [58, 64, 71], salt: [43, 138, 145], bg: [38, 46, 54] };
+    function reset() {
+      snow = new Float32Array(C * (R + EXTRA)); salt = new Uint8Array(C * (R + EXTRA));
+      for (var i = 0; i < C * R; i++) snow[i] = 1;
+      lane = 0; dir = 1; x = -4; hold = 0;
+    }
+    function plowColumn(c) {
+      if (c < 0 || c >= C) return;
+      var top = lane * LH, take = 0;
+      for (var r = top; r < top + LH; r++) { take += snow[r * C + c]; snow[r * C + c] = 0; }
+      var tr = lane < LANES - 1 ? top + LH : R; // vold i næste bane eller langs kanten
+      snow[tr * C + c] += take * 0.6; snow[(tr + 1) * C + c] += take * 0.4;
+    }
+    function saltColumn(c) {
+      if (c < 0 || c >= C) return;
+      for (var r = lane * LH; r < lane * LH + LH; r++) salt[r * C + c] = 1;
+    }
+    var prevFront = null, prevRear = null;
+    function step(dt) {
+      if (hold > 0) { hold -= dt; if (hold <= 0) reset(); return; }
+      var nx = x + dir * V * dt, front = Math.round(nx + dir * 3);
+      if (prevFront === null) prevFront = Math.round(x + dir * 3);
+      for (var c = prevFront; dir > 0 ? c <= front : c >= front; c += dir) plowColumn(c);
+      prevFront = front;
+      x = nx;
+      var rear = Math.round(x - dir * 4);
+      if (prevRear === null) prevRear = rear;
+      for (var c2 = prevRear; dir > 0 ? c2 <= rear : c2 >= rear; c2 += dir) saltColumn(c2);
+      prevRear = rear;
+      if ((dir > 0 && x > C + 5) || (dir < 0 && x < -5)) {
+        lane++; dir = -dir; prevFront = null; prevRear = null;
+        if (lane >= LANES) { lane = LANES - 1; hold = 2.2; }
+      }
+    }
+    function paint() {
+      var d = img.data;
+      for (var r = 0; r < R + EXTRA; r++) for (var c = 0; c < C; c++) {
+        var i = r * C + c, s = snow[i], col;
+        if (r >= R) col = s > 0.05 ? mix(COL.movedLo, COL.moved, Math.min(1, s / 12)) : COL.bg;
+        else if (s > 1.05) col = mix(COL.movedLo, COL.moved, Math.min(1, (s - 1) / 10));
+        else if (s > 0.05) col = COL.snow;
+        else col = salt[i] ? COL.salt : COL.clear;
+        d[i * 4] = col[0]; d[i * 4 + 1] = col[1]; d[i * 4 + 2] = col[2]; d[i * 4 + 3] = 255;
+      }
+      octx.putImageData(img, 0, 0);
+      var W = cv.width, H = cv.height, sx = W / C, sy = H / (R + EXTRA);
+      ctx.imageSmoothingEnabled = true;
+      ctx.clearRect(0, 0, W, H);
+      ctx.drawImage(off, 0, 0, W, H);
+      // arealets kant
+      ctx.strokeStyle = 'rgba(238,242,245,.55)'; ctx.lineWidth = Math.max(1, W / 700);
+      ctx.strokeRect(0.5, 0.5, W - 1, R * sy - 1);
+      if (hold > 0) return;
+      // robotten
+      var cy = (lane * LH + LH / 2) * sy, cx = x * sx, L2 = 3 * sx, W2 = LH * 0.36 * sy;
+      ctx.save(); ctx.translate(cx, cy); ctx.scale(dir, 1);
+      ctx.fillStyle = '#0F1317';
+      [[-L2 * 0.7, -W2 - sy * 0.35], [L2 * 0.25, -W2 - sy * 0.35], [-L2 * 0.7, W2 - sy * 0.2], [L2 * 0.25, W2 - sy * 0.2]].forEach(function (p) { ctx.fillRect(p[0], p[1], L2 * 0.45, sy * 0.55); });
+      ctx.fillStyle = '#4A5662'; ctx.fillRect(-L2, -W2, 2 * L2 * 0.82, 2 * W2);
+      ctx.strokeStyle = '#F2924F'; ctx.lineWidth = Math.max(2, sy * 0.45); ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(L2 * 1.05, -LH * 0.5 * sy); ctx.lineTo(L2 * 0.6, LH * 0.5 * sy); ctx.stroke();
+      ctx.fillStyle = '#2B8A91'; ctx.beginPath(); ctx.arc(-L2 * 1.05, 0, W2 * 0.45, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    }
+    function mix(a, b, f) { return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f]; }
+    function size() {
+      var dpr = Math.min(2, window.devicePixelRatio || 1);
+      var w = Math.round(cv.clientWidth * dpr), h = Math.round(cv.clientHeight * dpr);
+      if (w && h && (cv.width !== w || cv.height !== h)) { cv.width = w; cv.height = h; }
+    }
+    function frame(t) {
+      raf = 0;
+      var dt = last ? Math.min(0.05, (t - last) / 1000) : 0; last = t;
+      step(dt); paint();
+      if (active && !document.hidden) raf = requestAnimationFrame(frame); else last = 0;
+    }
+    reset(); size();
+    if (reduced) { // stillbillede: halvvejs ryddet
+      for (var k = 0; k < 160; k++) step(0.05);
+      paint();
+    } else { raf = requestAnimationFrame(frame); }
+    window.addEventListener('resize', function () { size(); paint(); });
+    document.addEventListener('visibilitychange', function () { if (!document.hidden && active && !reduced && !raf) raf = requestAnimationFrame(frame); });
+    return {
+      setActive: function (on) {
+        active = on;
+        if (on && !reduced && !raf) raf = requestAnimationFrame(frame);
+      }
+    };
+  })();
+
+  setCurrent(nearest());
+})();
+</script>
+<!--ARTIFACT-BODY-END-->
+</body>
+</html>
