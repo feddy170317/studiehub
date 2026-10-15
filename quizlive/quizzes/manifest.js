@@ -25,6 +25,20 @@ window.QUIZ_MANIFEST = [
     file: 'quizzes/hvad_koster_det.js',
     count: 20,
     mode: 'estimate'
+  },
+  {
+    id: 'hvad_koster_det_fjollet',
+    title: '💰 Hvad koster det? Det fjollede',
+    file: 'quizzes/hvad_koster_det_fjollet.js',
+    count: 20,
+    mode: 'estimate'
+  },
+  {
+    id: 'hvad_koster_det_svaer',
+    title: '💰 Hvad koster det? Aner det ikke (svær)',
+    file: 'quizzes/hvad_koster_det_svaer.js',
+    count: 20,
+    mode: 'estimate'
   }
 ];
 /* "Dansk Almen Viden" og "Verdens Almenviden" er nu auto-genererede quizzer,
