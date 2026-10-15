@@ -37,6 +37,25 @@ window.QL_I18N = {
     'question.timeUp': 'Tiden er udløbet! ⏰',
     'progress.label': 'Spørgsmål {{n}}/{{total}}',
 
+    /* --- "Hvad koster det?" (prisgæt) --- */
+    'est.hostHint': '📱 Skriv dit bud i kroner på mobilen. Tættest på vinder!',
+    'est.placeholder': 'Dit bud',
+    'est.submit': 'Send bud',
+    'est.invalid': 'Skriv et beløb med tal',
+    'est.sentMsg': 'Bud sendt: {{guess}} ✔ Vent på prisen...',
+    'est.exact': 'præcis!',
+    'est.noGuesses': 'Ingen bud nåede frem i tide',
+    'est.revealTitle': 'Den rigtige pris var …',
+    'est.sourceLink': 'Se annoncen på DBA ↗',
+    'est.noTiebreakers': 'Der er ikke flere reserve-genstande, så førstepladsen deles.',
+    'est.sdRound': 'Prisgæt-afgørelse · runde {{n}}',
+    'est.closest': '🎯 TÆTTEST PÅ! +{{pts}}',
+    'est.points': '+{{pts}} point',
+    'est.noPoints': 'For langt fra · 0 point',
+    'est.noGuess': 'Intet bud · 0 point',
+    'est.detail': 'Prisen: {{answer}}<br>Dit bud: {{guess}} ({{pct}})',
+    'est.priceWas': 'Prisen var {{answer}}',
+
     /* --- Reveal (player) --- */
     'reveal.totalScoreLabel': 'Din totalscore',
     'reveal.waitingNext': 'Venter på næste spørgsmål...',
@@ -177,6 +196,25 @@ window.QL_I18N = {
     'question.answeredMsg': 'Answer sent! ✔ Waiting for the result...',
     'question.timeUp': "Time's up! ⏰",
     'progress.label': 'Question {{n}}/{{total}}',
+
+    /* --- "What does it cost?" (price guess) --- */
+    'est.hostHint': '📱 Type your guess in kroner on your phone. Closest wins!',
+    'est.placeholder': 'Your guess',
+    'est.submit': 'Send guess',
+    'est.invalid': 'Enter an amount in numbers',
+    'est.sentMsg': 'Guess sent: {{guess}} ✔ Waiting for the price...',
+    'est.exact': 'exact!',
+    'est.noGuesses': 'No guesses arrived in time',
+    'est.revealTitle': 'The real price was …',
+    'est.sourceLink': 'See the listing on DBA ↗',
+    'est.noTiebreakers': 'No more reserve items, so first place is shared.',
+    'est.sdRound': 'Price-guess decider · round {{n}}',
+    'est.closest': '🎯 CLOSEST! +{{pts}}',
+    'est.points': '+{{pts}} points',
+    'est.noPoints': 'Too far off · 0 points',
+    'est.noGuess': 'No guess · 0 points',
+    'est.detail': 'Price: {{answer}}<br>Your guess: {{guess}} ({{pct}})',
+    'est.priceWas': 'The price was {{answer}}',
 
     /* --- Reveal (player) --- */
     'reveal.totalScoreLabel': 'Your total score',

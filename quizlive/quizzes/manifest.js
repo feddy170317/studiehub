@@ -18,6 +18,13 @@ window.QUIZ_MANIFEST = [
     title: 'Almen viden · 3.–5. klasse',
     file: 'quizzes/almen_3_5_klasse.js',
     count: 20
+  },
+  {
+    id: 'hvad_koster_det',
+    title: '💰 Hvad koster det? (DBA-prisgæt)',
+    file: 'quizzes/hvad_koster_det.js',
+    count: 20,
+    mode: 'estimate'
   }
 ];
 /* "Dansk Almen Viden" og "Verdens Almenviden" er nu auto-genererede quizzer,

@@ -39,6 +39,7 @@
     quizId: '',
     quiz: null,
     timerSec: 20,
+    qTimerSec: 20,          // tid for DET AKTUELLE spørgsmål (prisgæt får min. 30 s til at taste)
     qIndex: 0,
     serverTimeOffset: 0,
     timerInterval: null,
@@ -646,6 +647,7 @@
 
   function filterQuizByDifficulty(quiz, difficulty) {
     if (!difficulty || difficulty === 'random') return quiz;
+    if (quiz.mode === 'estimate') return quiz; // prisgæt har ingen sværhedsgrader
     var filtered = quiz.questions.filter(function (q) { return normalizeLevel(q.level) === difficulty; });
     if (filtered.length === 0) return null;
     return { title: quiz.title, questions: filtered };
@@ -870,6 +872,7 @@
 
   /* --- Runtime-shuffle af svarmuligheder (korrekt svar må ikke kunne gættes på position) --- */
   function shuffleQuestion(q) {
+    if (isEstimate(q)) return Object.assign({}, q); // prisgæt har ingen svarmuligheder at blande
     var order = [0, 1, 2, 3];
     for (var i = order.length - 1; i > 0; i--) {
       var j = Math.floor(Math.random() * (i + 1));
@@ -893,13 +896,11 @@
     g.autoAdvanced = false;
     revealDone = false;
     var q = shuffleQuestion(g.quiz.questions[qIdx]);
+    var est = isEstimate(q);
+    g.qTimerSec = est ? Math.max(g.timerSec, EST_MIN_TIMER) : g.timerSec;
 
-    // Publicér spørgsmål UDEN correct-index (anti-cheat)
-    g.gameRef.child('question').set({
-      text: q.q,
-      options: q.options,
-      level: q.level
-    });
+    // Publicér spørgsmål UDEN correct-index / rigtig pris (anti-cheat)
+    g.gameRef.child('question').set(publicQuestion(q));
 
     // Opdatér state
     g.gameRef.child('state').update({
@@ -907,7 +908,9 @@
       qIndex: qIdx,
       totalQ: g.quiz.questions.length,
       questionStartAt: firebase.database.ServerValue.TIMESTAMP,
-      timerSec: g.timerSec,
+      timerSec: g.qTimerSec,
+      qType: est ? 'estimate' : 'mc',
+      estAnswer: null,
       correctChoice: -1,
       lastPts: 0
     }).then(function () {
@@ -926,11 +929,15 @@
       t('progress.label', { n: qIdx + 1, total: total });
     setProgressBadge(t('progress.label', { n: qIdx + 1, total: total }));
     document.getElementById('q-text').textContent = q.q;
+    var est = isEstimate(q);
+    document.getElementById('screen-q').classList.toggle('estimate-mode', est);
+    document.getElementById('q-item').textContent = est ? (q.item || '') : '';
 
-    // Spørgsmålsbillede (kun vist på host — publiceres ikke til spillerne)
+    // Spørgsmålsbillede (quiz-billeder vises kun på host; prisgæt-billeder er
+    // offentlige URL'er og vises også på mobilen)
     var qImgWrap = document.getElementById('q-img-wrap');
     var qImgEl = document.getElementById('q-img');
-    var qImgUrl = imgSrc(q.img);
+    var qImgUrl = est ? (q.imgUrl || null) : imgSrc(q.img);
     if (qImgUrl) {
       qImgEl.src = qImgUrl;
       qImgWrap.classList.add('show');
@@ -948,7 +955,7 @@
     // Svarmuligheder
     var optionsEl = document.getElementById('q-options');
     optionsEl.innerHTML = '';
-    q.options.forEach(function (opt, i) {
+    (q.options || []).forEach(function (opt, i) {
       var card = document.createElement('div');
       card.className = 'option-card ' + SHAPE_CLASSES[i];
       var optImgUrl = imgSrc(q.optImgs ? q.optImgs[i] : '');
@@ -963,7 +970,7 @@
     document.getElementById('q-answer-count').textContent = t('host.answerCount', { n: 0, total: g.playerCount });
 
     // Start timer
-    startHostTimer(g.questionStartAt, g.timerSec, qIdx, q);
+    startHostTimer(g.questionStartAt, g.qTimerSec, qIdx, q);
 
     // Lyt på svar
     listenForAnswers(qIdx, q);
@@ -1052,9 +1059,10 @@
      (ikke kun dem der svarede på dette spørgsmål), så en spiller der springer
      over/tiden løber ud får streaken nulstillet korrekt. */
   function computeAndReveal(qIdx, q) {
+    if (isEstimate(q)) { computeEstimateReveal(qIdx, q); return; }
     var correctIdx = q.correct;
     var pts = LEVEL_POINTS[q.level] || 100;
-    var deadline = g.questionStartAt + (g.timerSec + 1) * 1000; // +1s grace
+    var deadline = g.questionStartAt + (g.qTimerSec + 1) * 1000; // +1s grace
 
     // Læs alle svar
     g.gameRef.child('answers/' + qIdx).once('value', function (snap) {
@@ -1110,6 +1118,8 @@
 
   /* --- Reveal-skærm (host) --- */
   function showRevealHost(qIdx, q, correctIdx, pts) {
+    document.getElementById('screen-reveal-host').classList.remove('estimate-mode');
+    document.getElementById('reveal-item').textContent = '';
     document.getElementById('reveal-q-text').textContent = q.q;
     document.getElementById('reveal-why').textContent = q.why || '';
 
@@ -1143,7 +1153,7 @@
     // Bar-chart: læs svar-fordeling
     g.gameRef.child('answers/' + qIdx).once('value', function (snap) {
       var counts = [0, 0, 0, 0];
-      var deadline = g.questionStartAt + (g.timerSec + 1) * 1000;
+      var deadline = g.questionStartAt + (g.qTimerSec + 1) * 1000;
       if (snap.exists()) {
         snap.forEach(function (child) {
           var ans = child.val();
@@ -1426,6 +1436,7 @@
   }
 
   function runSuddenDeathRound() {
+    if (g.quiz.mode === 'estimate') { runEstimateSdRound(); return; }
     var level = sdLevelForRound(g.sd.round);
     drawSuddenDeathQuestion(level, function (err, qObj) {
       if (err || !qObj) {
@@ -1545,6 +1556,9 @@
 
   /* --- Sudden Death-skærm (host) --- */
   function showSdQuestion(shuffled, round, participantPids) {
+    document.getElementById('screen-sd').classList.remove('estimate-mode');
+    document.getElementById('sd-img-wrap').classList.remove('show');
+    document.getElementById('sd-item').textContent = '';
     document.getElementById('sd-progress').textContent = t('sd.roundLabel', { n: round + 1, level: (LEVEL_LABELS[shuffled.level] || shuffled.level) });
     document.getElementById('sd-participants').textContent =
       participantPids.map(function (pid) { return (g.players[pid] && g.players[pid].name) || '?'; }).join(' 🆚 ');
@@ -1579,6 +1593,229 @@
     var status = document.getElementById('sd-status');
     status.innerHTML = lines.join('<br>');
     status.style.display = 'block';
+  }
+
+  /* ================================================================
+     "Hvad koster det?" — prisgæt-tilstand (question.type === 'estimate')
+     Spillerne skriver et beløb i stedet for at vælge mellem 4 svar.
+     Point pr. spørgsmål:
+       • Tættest på (mindste afstand i kr., delt ved uafgjort): +200
+       • Præcision (symmetrisk forhold bud/pris, så halv pris og dobbelt
+         pris tæller lige meget): ≤10 % → 100, ≤25 % → 75, ≤50 % → 50,
+         ≤ faktor 2 → 25, ellers 0
+       • Streak-bonus som normalt, når man er tættest på flere gange i træk
+     Den rigtige pris publiceres først ved reveal (state.estAnswer).
+     ================================================================ */
+  var EST_MIN_TIMER = 30;      // sekunder — man skal nå at taste et beløb
+  var EST_CLOSEST_PTS = 200;
+
+  function isEstimate(q) { return !!q && q.type === 'estimate'; }
+
+  function publicQuestion(q) {
+    if (isEstimate(q)) {
+      return { type: 'estimate', text: q.q, item: q.item || '', imgUrl: q.imgUrl || '', unit: q.unit || 'kr' };
+    }
+    return { type: 'mc', text: q.q, options: q.options, level: q.level };
+  }
+
+  function estPrecisionPts(guess, answer) {
+    if (!(guess > 0) || !(answer > 0)) return guess === answer ? 100 : 0;
+    var ratio = Math.max(guess / answer, answer / guess);
+    if (ratio <= 1.1) return 100;
+    if (ratio <= 1.25) return 75;
+    if (ratio <= 1.5) return 50;
+    if (ratio <= 2) return 25;
+    return 0;
+  }
+
+  function fmtKr(n, unit) {
+    return Number(n).toLocaleString('da-DK') + ' ' + (unit || 'kr');
+  }
+
+  function fmtDiffPct(guess, answer) {
+    if (!(answer > 0)) return '';
+    var pct = Math.round(((guess - answer) / answer) * 100);
+    if (pct === 0) return t('est.exact');
+    return (pct > 0 ? '+' : '') + pct + ' %';
+  }
+
+  /* Gyldige bud (afgivet inden deadline) → sorteret efter afstand til prisen */
+  function rankGuesses(answersMap, pids, deadline, answer) {
+    var list = [];
+    pids.forEach(function (pid) {
+      var a = answersMap[pid];
+      if (!a || typeof a.guess !== 'number' || !(a.at <= deadline)) return;
+      list.push({ pid: pid, guess: a.guess, diff: Math.abs(a.guess - answer) });
+    });
+    list.sort(function (x, y) { return x.diff - y.diff; });
+    var bestDiff = list.length ? list[0].diff : null;
+    list.forEach(function (r) { r.closest = r.diff === bestDiff; });
+    return list;
+  }
+
+  function computeEstimateReveal(qIdx, q) {
+    var answer = q.answer;
+    var deadline = g.questionStartAt + (g.qTimerSec + 1) * 1000;
+    g.gameRef.child('answers/' + qIdx).once('value', function (snap) {
+      var answersMap = snap.val() || {};
+      var ranked = rankGuesses(answersMap, Object.keys(g.players), deadline, answer);
+      var byPid = {};
+      ranked.forEach(function (r) { byPid[r.pid] = r; });
+
+      var updates = {};
+      var base = 'games/' + g.pin + '/players/';
+      Object.keys(g.players).forEach(function (pid) {
+        var p = g.players[pid];
+        var r = byPid[pid];
+        var closest = !!r && r.closest;
+        var precision = r ? estPrecisionPts(r.guess, answer) : 0;
+        var newStreak = closest ? (p.streak || 0) + 1 : 0;
+        var bonus = newStreak >= 2 ? (newStreak - 1) * STREAK_BONUS_STEP : 0;
+        var gained = precision + (closest ? EST_CLOSEST_PTS : 0) + bonus;
+        if (closest) {
+          p.correctCount = (p.correctCount || 0) + 1;
+          updates[base + pid + '/correctCount'] = p.correctCount;
+        }
+        p.score = (p.score || 0) + gained;
+        p.streak = newStreak;
+        if (r) r.pts = gained;
+        updates[base + pid + '/score'] = p.score;
+        updates[base + pid + '/streak'] = newStreak;
+        updates[base + pid + '/lastBonus'] = bonus;
+        updates[base + pid + '/lastPts'] = gained;
+        updates[base + pid + '/lastClosest'] = closest;
+      });
+
+      updates['games/' + g.pin + '/state/phase'] = 'reveal';
+      updates['games/' + g.pin + '/state/estAnswer'] = answer;
+      updates['games/' + g.pin + '/state/correctChoice'] = -1;
+
+      db.ref().update(updates).then(function () {
+        showEstimateRevealHost(q, ranked);
+      });
+    });
+  }
+
+  function renderGuessRows(container, ranked, unit, answer, showPts) {
+    container.innerHTML = '';
+    if (ranked.length === 0) {
+      container.innerHTML = '<div class="est-row"><div></div><div>' + escHtml(t('est.noGuesses')) + '</div><div></div><div></div></div>';
+      return;
+    }
+    ranked.slice(0, 8).forEach(function (r, i) {
+      var row = document.createElement('div');
+      row.className = 'est-row' + (r.closest ? ' best' : '');
+      var name = (g.players[r.pid] && g.players[r.pid].name) || '?';
+      row.innerHTML =
+        '<div>' + (r.closest ? '🎯' : (i + 1) + '.') + '</div>' +
+        '<div>' + escHtml(name) + ' <span class="est-diff">' + escHtml(fmtDiffPct(r.guess, answer)) + '</span></div>' +
+        '<div>' + escHtml(fmtKr(r.guess, unit)) + '</div>' +
+        '<div class="est-pts">' + (showPts ? '+' + (r.pts || 0) : '') + '</div>';
+      container.appendChild(row);
+    });
+  }
+
+  function showEstimateRevealHost(q, ranked) {
+    document.getElementById('screen-reveal-host').classList.add('estimate-mode');
+    document.getElementById('reveal-q-text').textContent = t('est.revealTitle');
+    document.getElementById('reveal-item').textContent = q.item || '';
+    var imgWrap = document.getElementById('reveal-img-wrap');
+    var imgEl = document.getElementById('reveal-img');
+    if (q.imgUrl) { imgEl.src = q.imgUrl; imgWrap.classList.add('show'); }
+    else { imgEl.src = ''; imgWrap.classList.remove('show'); }
+    document.getElementById('reveal-est-answer').textContent = fmtKr(q.answer, q.unit);
+    renderGuessRows(document.getElementById('reveal-est-guesses'), ranked, q.unit, q.answer, true);
+    document.getElementById('reveal-options').innerHTML = '';
+    document.getElementById('reveal-chart').innerHTML = '';
+    var why = document.getElementById('reveal-why');
+    why.innerHTML = escHtml(q.why || '') +
+      (q.source ? '<div class="est-source mt8"><a href="' + escHtml(q.source) + '" target="_blank" rel="noopener">' + escHtml(t('est.sourceLink')) + '</a></div>' : '');
+    showScreen('screen-reveal-host');
+  }
+
+  /* --- Sudden Death i prisgæt: én reserve-genstand pr. runde (quiz.tiebreakers).
+     Tættest på blandt de uafgjorte vinder; lige tæt igen → næste reserve. --- */
+  function runEstimateSdRound() {
+    var pool = g.quiz.tiebreakers || [];
+    if (g.sd.round >= pool.length) {
+      alert(t('est.noTiebreakers'));
+      g.sd.active = false;
+      showPodiumHost(null);
+      return;
+    }
+    var q = pool[g.sd.round];
+    var roundKey = 'r' + g.sd.round;
+    g.gameRef.child('question').set(publicQuestion(q));
+    g.gameRef.child('state').update({
+      phase: 'suddendeath',
+      questionStartAt: firebase.database.ServerValue.TIMESTAMP,
+      timerSec: EST_MIN_TIMER,
+      qType: 'estimate',
+      estAnswer: null,
+      correctChoice: -1,
+      sdParticipantIds: g.sd.candidatePids,
+      sdRound: g.sd.round
+    }).then(function () {
+      g.gameRef.child('state/questionStartAt').once('value', function (snap) {
+        var startAt = snap.val() || serverNow();
+        document.getElementById('screen-sd').classList.add('estimate-mode');
+        document.getElementById('sd-progress').textContent = t('est.sdRound', { n: g.sd.round + 1 });
+        document.getElementById('sd-participants').textContent =
+          g.sd.candidatePids.map(function (pid) { return (g.players[pid] && g.players[pid].name) || '?'; }).join(' 🆚 ');
+        document.getElementById('sd-q-text').textContent = q.q;
+        document.getElementById('sd-item').textContent = q.item || '';
+        document.getElementById('sd-est-answer').textContent = '';
+        var imgWrap = document.getElementById('sd-img-wrap');
+        var imgEl = document.getElementById('sd-img');
+        if (q.imgUrl) { imgEl.src = q.imgUrl; imgWrap.classList.add('show'); }
+        else { imgEl.src = ''; imgWrap.classList.remove('show'); }
+        document.getElementById('sd-options').innerHTML = '';
+        document.getElementById('sd-status').style.display = 'none';
+        showScreen('screen-sd');
+
+        var settled = false;
+        var offAnswers = function () {};
+        var resolve = function () {
+          if (settled) return;
+          settled = true;
+          sdClearTimer();
+          offAnswers();
+          resolveEstimateSdRound(q, startAt, roundKey);
+        };
+        offAnswers = sdListenForAnswers(roundKey, g.sd.candidatePids, resolve);
+        sdStartTimer(startAt, EST_MIN_TIMER, resolve);
+      });
+    });
+  }
+
+  function resolveEstimateSdRound(q, startAt, roundKey) {
+    g.gameRef.child('sdAnswers/' + roundKey).once('value', function (snap) {
+      var answers = snap.val() || {};
+      var deadline = startAt + (EST_MIN_TIMER + 1) * 1000;
+      var ranked = rankGuesses(answers, g.sd.candidatePids, deadline, q.answer);
+      var survivors = ranked.filter(function (r) { return r.closest; }).map(function (r) { return r.pid; });
+
+      g.gameRef.child('state/estAnswer').set(q.answer);
+      document.getElementById('sd-est-answer').textContent = fmtKr(q.answer, q.unit);
+      var status = document.getElementById('sd-status');
+      var rows = document.createElement('div');
+      rows.style.cssText = 'display:flex; flex-direction:column; gap:6px;';
+      renderGuessRows(rows, ranked, q.unit, q.answer, false);
+      status.innerHTML = '';
+      status.appendChild(rows);
+      status.style.display = 'block';
+
+      setTimeout(function () {
+        if (survivors.length === 1) {
+          finishSuddenDeath(survivors[0]);
+        } else {
+          // Ingen bud, eller flere lige tæt på → (de lige tætte) går videre til næste reserve
+          if (survivors.length > 1) g.sd.candidatePids = survivors;
+          g.sd.round++;
+          runSuddenDeathRound();
+        }
+      }, 5000);
+    });
   }
 
   /* --- HTML-escape hjælper --- */

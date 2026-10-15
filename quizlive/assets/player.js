@@ -37,7 +37,8 @@
     timerSec: 20,
     stateRef: null,
     stateListener: null,
-    sdRound: 0        // aktiv Sudden Death-runde (0-baseret) — bruges som DB-svar-nøgle
+    sdRound: 0,       // aktiv Sudden Death-runde (0-baseret) — bruges som DB-svar-nøgle
+    estLoadedKey: null // hvilket spørgsmål prisgæt-panelet sidst er udfyldt til
   };
 
   /* --- Skærm-hjælper --- */
@@ -329,20 +330,32 @@
     var sdBanner = document.getElementById('sd-player-banner');
     if (sdBanner) sdBanner.style.display = (state.currentPhase === 'suddendeath') ? 'block' : 'none';
 
+    // Prisgæt ("Hvad koster det?") viser billede + talfelt i stedet for de 4 knapper
+    var isEst = stateData.qType === 'estimate';
+    document.getElementById('answer-grid').style.display = isEst ? 'none' : '';
+    document.getElementById('estimate-panel').style.display = isEst ? 'flex' : 'none';
+    if (isEst) loadEstimateQuestion();
+
     // Nulstil knapper
     var btns = document.querySelectorAll('.answer-btn');
     btns.forEach(function (b) {
-      b.disabled = false;
       b.style.opacity = '';
     });
+    setInputsLocked(false);
     var answeredMsg = document.getElementById('answered-msg');
     answeredMsg.style.display = 'none';
     answeredMsg.textContent = t('question.answeredMsg');
 
     if (state.hasAnswered) {
       // Allerede besvaret — vis locked state
-      btns.forEach(function (b) { b.disabled = true; });
-      document.getElementById('answered-msg').style.display = 'block';
+      setInputsLocked(true);
+      if (isEst && state.lastGuessText) answeredMsg.textContent = t('est.sentMsg', { guess: state.lastGuessText });
+      answeredMsg.style.display = 'block';
+    }
+    // Sudden Death-prisgæt: vis prisen, når hosten har afgjort runden
+    if (isEst && state.currentPhase === 'suddendeath' && typeof stateData.estAnswer === 'number') {
+      answeredMsg.textContent = t('est.priceWas', { answer: fmtKr(stateData.estAnswer) });
+      answeredMsg.style.display = 'block';
     }
 
     // Timer — brug spørgsmålets EGEN tid, hvis den er publiceret (Sudden
@@ -385,7 +398,7 @@
         // Lås knapperne — for sene svar tæller alligevel ikke hos hosten
         if (!state.hasAnswered) {
           state.hasAnswered = true;
-          document.querySelectorAll('.answer-btn').forEach(function (b) { b.disabled = true; });
+          setInputsLocked(true);
           var msg = document.getElementById('answered-msg');
           msg.textContent = t('question.timeUp');
           msg.style.display = 'block';
@@ -403,6 +416,77 @@
       state.timerInterval = null;
     }
   }
+
+  /* --- Lås/oplås alle svar-input (4 knapper + prisgæt-felt) --- */
+  function setInputsLocked(locked) {
+    document.querySelectorAll('.answer-btn').forEach(function (b) { b.disabled = locked; });
+    var inp = document.getElementById('est-input');
+    var sub = document.getElementById('est-submit');
+    if (inp) inp.disabled = locked;
+    if (sub) sub.disabled = locked;
+  }
+
+  function fmtKr(n) {
+    return Number(n).toLocaleString('da-DK') + ' kr';
+  }
+
+  /* Svar-sti: Sudden Death bruger sdAnswers/{round}, ellers answers/{qIndex} */
+  function answerRefFor() {
+    if (state.currentPhase === 'suddendeath') {
+      return db.ref('games/' + state.pin + '/sdAnswers/r' + (state.sdRound || 0) + '/' + state.playerId);
+    }
+    return db.ref('games/' + state.pin + '/answers/' + state.currentQIndex + '/' + state.playerId);
+  }
+
+  /* --- Prisgæt: hent billede + genstand for det aktuelle spørgsmål (én gang pr. spørgsmål) --- */
+  function loadEstimateQuestion() {
+    var key = String(state.currentQIndex);
+    if (state.estLoadedKey === key) return;
+    state.estLoadedKey = key;
+    var img = document.getElementById('est-img');
+    var input = document.getElementById('est-input');
+    img.setAttribute('src', '');
+    document.getElementById('est-item').textContent = '';
+    if (!state.hasAnswered) input.value = '';
+    db.ref('games/' + state.pin + '/question').once('value', function (snap) {
+      var q = snap.val() || {};
+      if (state.estLoadedKey !== key) return; // nyt spørgsmål er kommet i mellemtiden
+      img.setAttribute('src', q.imgUrl || '');
+      document.getElementById('est-item').textContent = q.item || '';
+      document.getElementById('est-unit').textContent = q.unit || 'kr';
+    });
+  }
+
+  /* Tusindtals-punktummer mens man taster (1000000 → 1.000.000) */
+  var estInput = document.getElementById('est-input');
+  estInput.addEventListener('input', function () {
+    var digits = estInput.value.replace(/\D/g, '').replace(/^0+(?=\d)/, '').slice(0, 10);
+    estInput.value = digits ? Number(digits).toLocaleString('da-DK') : '';
+  });
+
+  document.getElementById('est-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (state.hasAnswered || !state.pin || !state.playerId) return;
+    if (state.currentPhase !== 'question' && state.currentPhase !== 'suddendeath') return;
+    var digits = estInput.value.replace(/\D/g, '');
+    var form = this;
+    if (!digits) {
+      form.classList.remove('shake');
+      void form.offsetWidth;
+      form.classList.add('shake');
+      estInput.placeholder = t('est.invalid');
+      return;
+    }
+    var guess = parseInt(digits, 10);
+    state.hasAnswered = true;
+    state.lastGuessText = fmtKr(guess);
+    setInputsLocked(true);
+    estInput.blur();
+    var msg = document.getElementById('answered-msg');
+    msg.textContent = t('est.sentMsg', { guess: state.lastGuessText });
+    msg.style.display = 'block';
+    answerRefFor().set({ guess: guess, at: firebase.database.ServerValue.TIMESTAMP });
+  });
 
   /* --- Svar-knapper klik --- */
   document.querySelectorAll('.answer-btn').forEach(function (btn) {
@@ -422,13 +506,7 @@
       // Skriv svar til databasen — Sudden Death bruger en separat sti
       // (sdAnswers/{round}), så den aldrig kan kollidere med det almindelige
       // spørgsmåls svar-node.
-      var answerRef;
-      if (state.currentPhase === 'suddendeath') {
-        answerRef = db.ref('games/' + state.pin + '/sdAnswers/r' + (state.sdRound || 0) + '/' + state.playerId);
-      } else {
-        answerRef = db.ref('games/' + state.pin + '/answers/' + state.currentQIndex + '/' + state.playerId);
-      }
-      answerRef.set({
+      answerRefFor().set({
         choice: choice,
         at: firebase.database.ServerValue.TIMESTAMP
       });
@@ -459,6 +537,13 @@
         // Vi bruger i stedet: host sætter state.phase='reveal' og vi læser players score.
         // Sammenlign: vi gemte scoren inden reveal — men det er komplekst.
         // Løsning: host skriver state.correctChoice ved reveal.
+        var estDetail = document.getElementById('est-detail');
+        estDetail.style.display = 'none';
+        if (stateData.qType === 'estimate') {
+          showEstimateReveal(stateData, aSnap.exists() ? aSnap.val() : null, players[state.playerId] || {}, myScore, placement, total);
+          return;
+        }
+
         var correctChoice = stateData.correctChoice;
         var myAnswer = aSnap.exists() ? aSnap.val().choice : -1;
         var isCorrect = (myAnswer === correctChoice) && (myAnswer !== -1) && (correctChoice !== undefined);
@@ -496,6 +581,58 @@
         showScreen('screen-reveal');
       });
     });
+  }
+
+  /* --- Reveal for prisgæt: prisen, eget bud, point --- */
+  function showEstimateReveal(stateData, myAns, me, myScore, placement, total) {
+    var feedbackBox = document.getElementById('feedback-box');
+    var estDetail = document.getElementById('est-detail');
+    var answer = stateData.estAnswer;
+    var hasGuess = !!myAns && typeof myAns.guess === 'number';
+    var pts = me.lastPts || 0;
+
+    if (typeof answer !== 'number') {
+      feedbackBox.textContent = t('reveal.waiting');
+      feedbackBox.className = 'feedback-box mb16';
+    } else if (!hasGuess) {
+      feedbackBox.textContent = t('est.noGuess');
+      feedbackBox.className = 'feedback-box wrong mb16';
+    } else if (me.lastClosest) {
+      feedbackBox.textContent = t('est.closest', { pts: pts });
+      feedbackBox.className = 'feedback-box correct mb16';
+    } else if (pts > 0) {
+      feedbackBox.textContent = t('est.points', { pts: pts });
+      feedbackBox.className = 'feedback-box correct mb16';
+    } else {
+      feedbackBox.textContent = t('est.noPoints');
+      feedbackBox.className = 'feedback-box wrong mb16';
+    }
+
+    if (typeof answer === 'number') {
+      if (hasGuess) {
+        var pct = answer > 0 ? Math.round(((myAns.guess - answer) / answer) * 100) : 0;
+        var pctTxt = pct === 0 ? t('est.exact') : (pct > 0 ? '+' : '') + pct + ' %';
+        estDetail.innerHTML = t('est.detail', { answer: fmtKr(answer), guess: fmtKr(myAns.guess), pct: pctTxt });
+      } else {
+        estDetail.textContent = t('est.priceWas', { answer: fmtKr(answer) });
+      }
+      estDetail.style.display = 'block';
+    }
+
+    var streakEl = document.getElementById('streak-badge');
+    if (streakEl) {
+      var streak = me.streak || 0;
+      if (me.lastClosest && streak >= 2) {
+        streakEl.textContent = t('reveal.streakBonus', { n: streak, bonus: me.lastBonus || 0 });
+        streakEl.style.display = 'block';
+      } else {
+        streakEl.style.display = 'none';
+      }
+    }
+
+    document.getElementById('reveal-score').textContent = myScore;
+    document.getElementById('reveal-placement').textContent = t('reveal.placement', { n: placement, total: total });
+    showScreen('screen-reveal');
   }
 
   /* --- Podiet-skærm --- */
