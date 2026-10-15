@@ -1600,9 +1600,9 @@
      Spillerne skriver et beløb i stedet for at vælge mellem 4 svar.
      Point pr. spørgsmål:
        • Tættest på (mindste afstand i kr., delt ved uafgjort): +200
-       • Præcision (symmetrisk forhold bud/pris, så halv pris og dobbelt
-         pris tæller lige meget): ≤10 % → 100, ≤25 % → 75, ≤50 % → 50,
-         ≤ faktor 2 → 25, ellers 0
+       • Præcision (symmetrisk forhold bud/pris, så for lavt og for højt
+         tæller lige meget): ≤2,5 % → 100, ≤5 % → 80, ≤10 % → 60,
+         ≤25 % → 40, ≤50 % → 20, ellers 0
        • Streak-bonus som normalt, når man er tættest på flere gange i træk
      Den rigtige pris publiceres først ved reveal (state.estAnswer).
      ================================================================ */
@@ -1621,10 +1621,11 @@
   function estPrecisionPts(guess, answer) {
     if (!(guess > 0) || !(answer > 0)) return guess === answer ? 100 : 0;
     var ratio = Math.max(guess / answer, answer / guess);
-    if (ratio <= 1.1) return 100;
-    if (ratio <= 1.25) return 75;
-    if (ratio <= 1.5) return 50;
-    if (ratio <= 2) return 25;
+    if (ratio <= 1.025) return 100;
+    if (ratio <= 1.05) return 80;
+    if (ratio <= 1.1) return 60;
+    if (ratio <= 1.25) return 40;
+    if (ratio <= 1.5) return 20;
     return 0;
   }
 
