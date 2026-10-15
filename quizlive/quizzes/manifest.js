@@ -12,6 +12,12 @@ window.QUIZ_MANIFEST = [
     file: 'quizzes/demo_en.js',
     count: 8,
     language: 'en'
+  },
+  {
+    id: 'almen_3_5_klasse',
+    title: 'Almen viden · 3.–5. klasse',
+    file: 'quizzes/almen_3_5_klasse.js',
+    count: 20
   }
 ];
 /* "Dansk Almen Viden" og "Verdens Almenviden" er nu auto-genererede quizzer,
