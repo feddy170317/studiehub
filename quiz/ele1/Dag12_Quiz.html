@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="da"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz — ELE1 Dag 12</title>
+<style>
+  :root{--bg:#0f1b2d;--card:#16263d;--acc:#2E86C1;--good:#2ecc71;--bad:#e74c3c;--txt:#e8eef5;--dim:#9fb3c8;--gold:#f1c40f}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:linear-gradient(160deg,#0f1b2d,#0a1220);color:var(--txt);min-height:100vh}
+  .wrap{max-width:720px;margin:0 auto;padding:24px 18px 60px}
+  header{text-align:center;margin-bottom:18px}
+  h1{font-size:1.3rem;margin:.2em 0;color:#fff}
+  .sub{color:var(--dim);font-size:.9rem}
+  .hud{display:flex;justify-content:space-between;align-items:center;background:var(--card);border-radius:12px;padding:10px 16px;margin-bottom:16px;font-size:.9rem}
+  .hud b{color:var(--gold);font-size:1.1rem}.combo{color:var(--acc)}
+  .bar{height:6px;background:#0a1220;border-radius:4px;overflow:hidden;margin-bottom:18px}
+  .bar>div{height:100%;background:var(--acc);width:0;transition:width .3s}
+  .card{background:var(--card);border-radius:14px;padding:22px;box-shadow:0 6px 20px rgba(0,0,0,.3)}
+  .tag{display:inline-block;font-size:.72rem;padding:2px 9px;border-radius:20px;margin-bottom:10px;font-weight:600}
+  .let{background:#1e4620;color:#8ef0a0}.mid{background:#4a3a17;color:#f4d47a}.svaer{background:#4a1e1e;color:#f4a0a0}
+  .q{font-size:1.08rem;line-height:1.5;margin-bottom:16px}
+  .opts{display:grid;gap:10px}
+  .opt{background:#0f1e33;border:1.5px solid #26405f;border-radius:10px;padding:12px 14px;cursor:pointer;text-align:left;color:var(--txt);font-size:.98rem;transition:.15s}
+  .opt:hover{border-color:var(--acc)}.opt.correct{border-color:var(--good);background:#123020}
+  .opt.wrong{border-color:var(--bad);background:#301616}.opt:disabled{cursor:default}
+  .exp{margin-top:16px;padding:12px 14px;border-radius:10px;background:#0f1e33;font-size:.9rem;line-height:1.5;display:none}
+  .exp .ref{color:var(--gold);font-weight:600}
+  .next{margin-top:16px;width:100%;padding:13px;border:0;border-radius:10px;background:var(--acc);color:#fff;font-size:1rem;font-weight:600;cursor:pointer;display:none}
+  .end{text-align:center}.end .score{font-size:2.6rem;color:var(--gold);font-weight:700}
+  .grade{font-size:1.3rem;margin:8px 0}
+  .retry{margin-top:18px;padding:12px 26px;border:0;border-radius:10px;background:var(--acc);color:#fff;font-weight:600;cursor:pointer;font-size:1rem}
+</style></head><body><script src="../../assets/path-report.js"></script><script src="../../assets/quiz-result-ceremony.js"></script><div class="wrap">
+  <header><h1>Dag 12: Opsamling & eksamensforberedelse</h1><div class="sub">ELE1-A26 · Dag 12 · Test dig selv</div></header>
+  <div class="hud"><span>Spg. <b id="qnum">1</b>/<span id="qtot">10</span></span>
+    <span class="combo">Combo ×<span id="combo">1</span></span>
+    <span>Score <b id="score">0</b></span></div>
+  <div class="bar"><div id="prog"></div></div>
+  <div id="stage"></div></div>
+<script>
+const QUIZ_POOL = [{"d": "let", "q": "En modstand på 100 Ω har 10 V over sig. Hvad er effekten?", "o": ["1 W", "10 W", "0,1 W", "1000 W"], "a": 0, "e": "P = V²/R = 100/100 = 1 W. <span class='ref'>[Dag 2]</span>"}, {"d": "mid", "q": "Omregn −3 + j4 til polær form.", "o": ["5∠126,9°", "5∠−53,1°", "5∠53,1°", "7∠126,9°"], "a": 0, "e": "r = 5. Punktet ligger i anden kvadrant, så −53,1° + 180° = 126,9°. <span class='ref'>[Dag 3]</span>"}, {"d": "let", "q": "Hvad er topværdien af 230 V RMS?", "o": ["≈ 325 V", "≈ 163 V", "230 V", "≈ 400 V"], "a": 0, "e": "Topværdi = √2·230 ≈ 325 V. <span class='ref'>[Dag 4]</span>"}, {"d": "mid", "q": "Hvad er impedansen af 100 µF ved 50 Hz?", "o": ["−j31,8 Ω", "j31,8 Ω", "−j0,031 Ω", "−j3,18 Ω"], "a": 0, "e": "Z_C = −j/(ωC) = −j/(314·10⁻⁴) ≈ −j31,8 Ω. <span class='ref'>[Dag 5]</span>"}, {"d": "mid", "q": "Hvad er effektfaktoren for en rent induktiv last?", "o": ["0", "1", "0,707", "−1"], "a": 0, "e": "θ = 90°, så pf = cos 90° = 0. <span class='ref'>[Dag 6]</span>"}, {"d": "mid", "q": "S = 800 + j600 VA. Hvilken type last er det?", "o": ["Induktiv", "Kapacitiv", "Rent resistiv", "Kortsluttet"], "a": 0, "e": "Q > 0 betyder induktiv last med haltende effektfaktor. <span class='ref'>[Dag 7]</span>"}, {"d": "mid", "q": "En 2-polet motor kører 2940 o/min ved 50 Hz. Hvad er slippet?", "o": ["2 %", "4 %", "1 %", "98 %"], "a": 0, "e": "n_s = 3000 o/min, s = 60/3000 = 0,02. <span class='ref'>[Dag 8]</span>"}, {"d": "svaer", "q": "20 A ved 3 × 400 V og pf 0,9. Hvad er effekten?", "o": ["≈ 12,5 kW", "≈ 21,6 kW", "≈ 7,2 kW", "≈ 14,4 kW"], "a": 0, "e": "P = √3·400·20·0,9 ≈ 12,5 kW. <span class='ref'>[Dag 9]</span>"}, {"d": "mid", "q": "Direkte start giver 90 A. Hvad giver stjerne-trekant-start?", "o": ["30 A", "52 A", "45 A", "90 A"], "a": 0, "e": "Startstrømmen falder til en tredjedel. <span class='ref'>[Dag 10]</span>"}, {"d": "let", "q": "Hvad beskytter en 30 mA RCD?", "o": ["Mennesker mod elektrisk stød", "Kablet mod overbelastning", "Motoren mod overophedning", "Nettet mod spændingsdyk"], "a": 0, "e": "RCD'en reagerer på en lille strøm til jord og beskytter mennesker. <span class='ref'>[Dag 11]</span>"}, {"d": "svaer", "q": "Hvilken fejl er den mest almindelige ved komplekse tal?", "o": ["Forkert kvadrant ved tan⁻¹", "At bruge kartesisk form ved addition", "At gange længder ved multiplikation", "At bruge radianer i Euler"], "a": 0, "e": "tan⁻¹ giver kun −90° til 90°; ligger punktet til venstre for aksen, skal der lægges 180° til. <span class='ref'>[Dag 3 og 12]</span>"}, {"d": "mid", "q": "Hvorfor må fasorer ved forskellige frekvenser ikke lægges sammen?", "o": ["Faktoren e^{jωt} er ikke den samme", "De har forskellig amplitude", "De er altid i fase", "Fasorer kan kun ganges"], "a": 0, "e": "Fasoren forudsætter samme ω. Ellers bruges superposition og summering i tidsdomænet. <span class='ref'>[Dag 4]</span>"}];
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const QUIZ = shuffle(QUIZ_POOL.slice()).slice(0, Math.min(10, QUIZ_POOL.length));
+QUIZ.forEach(it=>{const p=it.o.map((t,idx)=>({t,c:idx===it.a}));shuffle(p);it.o=p.map(x=>x.t);it.a=p.findIndex(x=>x.c);});
+const PTS={let:100,mid:150,svaer:200};
+let i=0,score=0,combo=1,best=1;
+const $=id=>document.getElementById(id);
+$('qtot').textContent=QUIZ.length;
+function render(){
+  const it=QUIZ[i];$('qnum').textContent=i+1;$('prog').style.width=(i/QUIZ.length*100)+'%';
+  const dn={let:'LET · 100p',mid:'MIDDEL · 150p',svaer:'SVÆR · 200p'}[it.d];
+  let h=`<div class="card"><span class="tag ${it.d}">${dn}</span><div class="q">${it.q}</div><div class="opts">`;
+  it.o.forEach((o,k)=>h+=`<button class="opt" onclick="answer(${k})">${o}</button>`);
+  h+=`</div><div class="exp" id="exp">${it.e}</div><button class="next" id="next" onclick="next()">${i<QUIZ.length-1?'Næste →':'Se resultat →'}</button></div>`;
+  $('stage').innerHTML=h;
+}
+function answer(k){
+  const it=QUIZ[i];const btns=document.querySelectorAll('.opt');
+  btns.forEach((b,j)=>{b.disabled=true;if(j===it.a)b.classList.add('correct');});
+  if(k===it.a){btns[k].classList.add('correct');score+=PTS[it.d]*combo;combo++;if(combo>best)best=combo;}
+  else{btns[k].classList.add('wrong');combo=1;}
+  $('score').textContent=score;$('combo').textContent=combo;
+  $('exp').style.display='block';$('next').style.display='block';
+}
+function next(){i++;if(i<QUIZ.length)render();else end();}
+function end(){
+  $('prog').style.width='100%';
+  const maxS=(function(){let s=0,c=1;for(const q of QUIZ){s+=PTS[q.d]*c;c++;}return s;})();
+  const ratio=score/maxS;if(window.reportPathQuiz)reportPathQuiz(ratio,score);let gr;
+  if(ratio>=.85)gr='🏆 Fremragende!';else if(ratio>=.6)gr='👍 Godt gået';else if(ratio>=.35)gr='📚 Ikke dårligt';else gr='🔁 Læs kapitlet igen';
+  $('stage').innerHTML=`<div class="card end"><div class="grade">${gr}</div><div class="score">${score}</div><div class="sub">point · længste combo ×${best}</div><button class="retry" onclick="location.reload()">Prøv igen</button></div>`;if(window.renderPathResultBanner)document.getElementById('stage').insertAdjacentHTML('beforeend',renderPathResultBanner(ratio));
+}
+render();
+</script></body></html>
