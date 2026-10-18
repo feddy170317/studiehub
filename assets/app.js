@@ -189,16 +189,55 @@ function renderCourse(eduId, semNum, courseId) {
           </button>
         `).join('') : '<div class="empty-state"><p>📖 Ingen lektioner endnu</p></div>'}
       </nav>
+      ${archiveOf(course).length > 0 ? `
+      <button class="btn-lesson" style="margin-top:1.5rem;opacity:.7" onclick="navigate('edu/${eduId}/sem${semNum}/${courseId}/arkiv')">
+        📁 ${(course.archive && course.archive.title) || 'Arkiv'} (${archiveOf(course).length})
+      </button>` : ''}
     </div>
   `;
 }
 
-function renderLesson(eduId, semNum, courseId, lessonId) {
+// Valgfri undermappe pr. fag: course.archive = { title, description, lessons: [...] }.
+// Arkiverede lektioner vises kun på arkivsiden (…/<fag>/arkiv) og ikke i "Spil stien".
+function archiveOf(course) {
+  return (course && course.archive && course.archive.lessons) || [];
+}
+
+function renderArchive(eduId, semNum, courseId) {
   const app = document.getElementById('app');
   const edu = content.educations.find(e => e.id === eduId);
   const sem = edu && edu.semesters.find(s => s.number === semNum);
   const course = sem && sem.courses.find(c => c.id === courseId);
-  const lesson = course && course.lessons.find(l => l.id === lessonId);
+  const lessons = archiveOf(course);
+
+  if (!course || lessons.length === 0) {
+    renderError('Arkiv ikke fundet');
+    return;
+  }
+
+  app.innerHTML = `
+    <div class="view">
+      <button class="btn-back" onclick="navigate('edu/${eduId}/sem${semNum}/${courseId}')">← Tilbage</button>
+      <h1>📁 ${course.code}: ${course.archive.title || 'Arkiv'}</h1>
+      <p class="meta">${course.archive.description || ''}</p>
+      <nav class="lessons">
+        ${lessons.map(l => `
+          <button class="btn-lesson" onclick="navigate('edu/${eduId}/sem${semNum}/${courseId}/arkiv/${l.id}')">
+            ${l.label || 'Lektion ' + l.number}: ${l.title}
+          </button>
+        `).join('')}
+      </nav>
+    </div>
+  `;
+}
+
+function renderLesson(eduId, semNum, courseId, lessonId, inArchive) {
+  const app = document.getElementById('app');
+  const edu = content.educations.find(e => e.id === eduId);
+  const sem = edu && edu.semesters.find(s => s.number === semNum);
+  const course = sem && sem.courses.find(c => c.id === courseId);
+  const lesson = course && (inArchive ? archiveOf(course) : course.lessons).find(l => l.id === lessonId);
+  const backHash = `edu/${eduId}/sem${semNum}/${courseId}` + (inArchive ? '/arkiv' : '');
 
   if (!lesson) {
     renderError('Lektion ikke fundet');
@@ -207,7 +246,7 @@ function renderLesson(eduId, semNum, courseId, lessonId) {
 
   app.innerHTML = `
     <div class="view">
-      <button class="btn-back" onclick="navigate('edu/${eduId}/sem${semNum}/${courseId}')">← Tilbage</button>
+      <button class="btn-back" onclick="navigate('${backHash}')">← Tilbage</button>
       <h1>${lesson.label || 'Lektion ' + lesson.number}: ${lesson.title}</h1>
       <p class="meta">${lesson.summary || ''}</p>
       <section class="materials">
@@ -276,7 +315,12 @@ function router() {
     } else if (parts.length === 5) {
       // edu/:id/sem:n/:courseId/:lessonId
       const semNum = parseInt(parts[2].replace('sem', ''));
-      renderLesson(parts[1], semNum, parts[3], parts[4]);
+      if (parts[4] === 'arkiv') renderArchive(parts[1], semNum, parts[3]);
+      else renderLesson(parts[1], semNum, parts[3], parts[4]);
+    } else if (parts.length === 6 && parts[4] === 'arkiv') {
+      // edu/:id/sem:n/:courseId/arkiv/:lessonId
+      const semNum = parseInt(parts[2].replace('sem', ''));
+      renderLesson(parts[1], semNum, parts[3], parts[5], true);
     }
   }
 }
