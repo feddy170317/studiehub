@@ -185,7 +185,7 @@ function renderCourse(eduId, semNum, courseId) {
       <nav class="lessons">
         ${course.lessons && course.lessons.length > 0 ? course.lessons.map(l => `
           <button class="btn-lesson" onclick="navigate('edu/${eduId}/sem${semNum}/${courseId}/${l.id}')">
-            Lektion ${l.number}: ${l.title}
+            ${l.label || 'Lektion ' + l.number}: ${l.title}
           </button>
         `).join('') : '<div class="empty-state"><p>📖 Ingen lektioner endnu</p></div>'}
       </nav>
@@ -208,7 +208,7 @@ function renderLesson(eduId, semNum, courseId, lessonId) {
   app.innerHTML = `
     <div class="view">
       <button class="btn-back" onclick="navigate('edu/${eduId}/sem${semNum}/${courseId}')">← Tilbage</button>
-      <h1>Lektion ${lesson.number}: ${lesson.title}</h1>
+      <h1>${lesson.label || 'Lektion ' + lesson.number}: ${lesson.title}</h1>
       <p class="meta">${lesson.summary || ''}</p>
       <section class="materials">
         <h2>Materiale</h2>

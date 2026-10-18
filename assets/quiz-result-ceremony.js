@@ -12,7 +12,7 @@
   }
 
   function detectCourse() {
-    var m = location.pathname.match(/quiz\/(dyn2|ele1|mem1)\/Kapitel(\d+)_Quiz\.html/i);
+    var m = location.pathname.match(/quiz\/(dyn2|ele1|mem1)\/(?:Kapitel|Dag)(\d+)_Quiz\.html/i);
     return m ? m[1] : null;
   }
 

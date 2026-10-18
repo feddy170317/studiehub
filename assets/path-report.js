@@ -4,9 +4,11 @@
   var KEY = 'sh_path_progress_v1';
 
   function detect() {
-    var m = location.pathname.match(/quiz\/(dyn2|ele1|mem1)\/Kapitel(\d+)_Quiz\.html/i);
+    var m = location.pathname.match(/quiz\/(dyn2|ele1|mem1)\/(Kapitel|Dag)(\d+)_Quiz\.html/i);
     if (!m) return null;
-    return { course: m[1], chapter: parseInt(m[2], 10) };
+    // Dag-quizzer (undervisningsdage) får egen nøgle 'dN', så de ikke kolliderer med KapitelNN
+    var n = parseInt(m[3], 10);
+    return { course: m[1], chapter: /^dag$/i.test(m[2]) ? 'd' + n : n };
   }
 
   function load() {

@@ -12,7 +12,7 @@ let patched = 0, skipped = 0;
 
 for (const course of courses) {
   const dir = path.join(root, course);
-  const files = fs.readdirSync(dir).filter(f => /^Kapitel\d+_Quiz\.html$/.test(f));
+  const files = fs.readdirSync(dir).filter(f => /^(Kapitel|Dag)\d+_Quiz\.html$/.test(f));
   for (const file of files) {
     const fp = path.join(dir, file);
     let html = fs.readFileSync(fp, 'utf8');

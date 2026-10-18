@@ -1,5 +1,5 @@
 // Auto-increment version: updated on each deploy
-const CACHE_VERSION = '20260804-001'; // Format: YYYYMMDD-NNN
+const CACHE_VERSION = '20261018-001'; // Format: YYYYMMDD-NNN
 const CACHE_NAME = `studiehub-${CACHE_VERSION}`;
 const urlsToCache = [
   '/',

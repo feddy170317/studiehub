@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="da"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz — ELE1 Dag 3</title>
+<style>
+  :root{--bg:#0f1b2d;--card:#16263d;--acc:#2E86C1;--good:#2ecc71;--bad:#e74c3c;--txt:#e8eef5;--dim:#9fb3c8;--gold:#f1c40f}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:linear-gradient(160deg,#0f1b2d,#0a1220);color:var(--txt);min-height:100vh}
+  .wrap{max-width:720px;margin:0 auto;padding:24px 18px 60px}
+  header{text-align:center;margin-bottom:18px}
+  h1{font-size:1.3rem;margin:.2em 0;color:#fff}
+  .sub{color:var(--dim);font-size:.9rem}
+  .hud{display:flex;justify-content:space-between;align-items:center;background:var(--card);border-radius:12px;padding:10px 16px;margin-bottom:16px;font-size:.9rem}
+  .hud b{color:var(--gold);font-size:1.1rem}.combo{color:var(--acc)}
+  .bar{height:6px;background:#0a1220;border-radius:4px;overflow:hidden;margin-bottom:18px}
+  .bar>div{height:100%;background:var(--acc);width:0;transition:width .3s}
+  .card{background:var(--card);border-radius:14px;padding:22px;box-shadow:0 6px 20px rgba(0,0,0,.3)}
+  .tag{display:inline-block;font-size:.72rem;padding:2px 9px;border-radius:20px;margin-bottom:10px;font-weight:600}
+  .let{background:#1e4620;color:#8ef0a0}.mid{background:#4a3a17;color:#f4d47a}.svaer{background:#4a1e1e;color:#f4a0a0}
+  .q{font-size:1.08rem;line-height:1.5;margin-bottom:16px}
+  .opts{display:grid;gap:10px}
+  .opt{background:#0f1e33;border:1.5px solid #26405f;border-radius:10px;padding:12px 14px;cursor:pointer;text-align:left;color:var(--txt);font-size:.98rem;transition:.15s}
+  .opt:hover{border-color:var(--acc)}.opt.correct{border-color:var(--good);background:#123020}
+  .opt.wrong{border-color:var(--bad);background:#301616}.opt:disabled{cursor:default}
+  .exp{margin-top:16px;padding:12px 14px;border-radius:10px;background:#0f1e33;font-size:.9rem;line-height:1.5;display:none}
+  .exp .ref{color:var(--gold);font-weight:600}
+  .next{margin-top:16px;width:100%;padding:13px;border:0;border-radius:10px;background:var(--acc);color:#fff;font-size:1rem;font-weight:600;cursor:pointer;display:none}
+  .end{text-align:center}.end .score{font-size:2.6rem;color:var(--gold);font-weight:700}
+  .grade{font-size:1.3rem;margin:8px 0}
+  .retry{margin-top:18px;padding:12px 26px;border:0;border-radius:10px;background:var(--acc);color:#fff;font-weight:600;cursor:pointer;font-size:1rem}
+</style></head><body><script src="../../assets/path-report.js"></script><script src="../../assets/quiz-result-ceremony.js"></script><div class="wrap">
+  <header><h1>Dag 3: Komplekse tal, kondensator & spole</h1><div class="sub">ELE1-A26 · Dag 3 · Test dig selv</div></header>
+  <div class="hud"><span>Spg. <b id="qnum">1</b>/<span id="qtot">10</span></span>
+    <span class="combo">Combo ×<span id="combo">1</span></span>
+    <span>Score <b id="score">0</b></span></div>
+  <div class="bar"><div id="prog"></div></div>
+  <div id="stage"></div></div>
+<script>
+const QUIZ_POOL = [{"d": "let", "q": "Omregn A = 3 + j4 til polær form.", "o": ["5∠53,13°", "7∠53,13°", "5∠36,87°", "25∠53,13°"], "a": 0, "e": "r = √(3² + 4²) = 5 og θ = tan⁻¹(4/3) = 53,13°. <span class='ref'>[Day 3, s. 10]</span>"}, {"d": "mid", "q": "Omregn A = 4∠−60° til kartesisk form.", "o": ["2 − j3,46", "3,46 − j2", "2 + j3,46", "−2 − j3,46"], "a": 0, "e": "a = 4cos(−60°) = 2 og b = 4sin(−60°) = −2√3 ≈ −3,46. <span class='ref'>[Day 3, s. 10]</span>"}, {"d": "let", "q": "Hvad er j²?", "o": ["−1", "1", "j", "−j"], "a": 0, "e": "Den imaginære enhed er defineret ved j² = −1. <span class='ref'>[Day 3, s. 5]</span>"}, {"d": "mid", "q": "Z = 7,75∠π/2 og I = 2∠−π/4. Hvad er V = Z·I?", "o": ["15,5∠π/4", "15,5∠3π/4", "9,75∠π/4", "3,875∠3π/4"], "a": 0, "e": "Gang modulus (7,75·2 = 15,5) og læg vinklerne sammen (π/2 − π/4 = π/4). <span class='ref'>[Day 3, s. 12–13]</span>"}, {"d": "mid", "q": "V = 30∠45° og Z = 5∠82°. Hvad er I = V/Z?", "o": ["6∠−37°", "6∠127°", "150∠127°", "25∠−37°"], "a": 0, "e": "Del modulus (30/5 = 6) og træk vinklerne fra hinanden (45° − 82° = −37°). <span class='ref'>[Day 3, s. 12–13]</span>"}, {"d": "let", "q": "Hvordan opfører en ideel kondensator sig ved DC i steady state?", "o": ["Som en afbrydelse", "Som en kortslutning", "Som en modstand", "Som en spændingskilde uden grænse"], "a": 0, "e": "i = C·dv/dt = 0, når spændingen er konstant – kondensatoren er åben for DC. <span class='ref'>[Day 3, s. 17]</span>"}, {"d": "let", "q": "Hvordan opfører en ideel spole sig ved DC i steady state?", "o": ["Som en kortslutning", "Som en afbrydelse", "Som en kondensator", "Som en strømkilde"], "a": 0, "e": "v = L·di/dt = 0 ved konstant strøm – spolen er en kortslutning for DC. <span class='ref'>[Day 3, s. 27]</span>"}, {"d": "mid", "q": "To kondensatorer på 4 µF og 4 µF kobles i serie. Hvad er C<sub>EQ</sub>?", "o": ["2 µF", "8 µF", "4 µF", "16 µF"], "a": 0, "e": "Kondensatorer i serie kombineres som modstande i parallel: 1/C = 1/4 + 1/4 ⇒ C = 2 µF. <span class='ref'>[Day 3, s. 20]</span>"}, {"d": "svaer", "q": "En strøm på 2 mA løber i 3 ms ind i en 1 µF kondensator, der starter på 0 V. Hvad er spændingen bagefter?", "o": ["6 V", "0,6 V", "2 V", "6 mV"], "a": 0, "e": "v = (i/C)·T = (2·10⁻³/10⁻⁶)·0,003 = 2000 V/s · 0,003 s = 6 V – og den bliver liggende efter pulsen. <span class='ref'>[Day 3, s. 24]</span>"}, {"d": "svaer", "q": "Strømmen i en 10 H spole stiger lineært med 0,1 mA på 4 ms. Hvad er spændingen over spolen imens?", "o": ["0,25 V", "0,025 V", "2,5 V", "0 V"], "a": 0, "e": "v = L·di/dt = 10 · (0,1·10⁻³/4·10⁻³) = 10 · 0,025 = 0,25 V. <span class='ref'>[Day 3, s. 31]</span>"}, {"d": "mid", "q": "Hvilken form er nemmest, når to komplekse tal skal <b>lægges sammen</b>?", "o": ["Kartesisk form", "Polær form", "Eksponentiel form", "Det er lige meget"], "a": 0, "e": "Ved addition lægges real- og imaginærdele sammen hver for sig. Polær form er bedst til gange og division. <span class='ref'>[Day 3, s. 12]</span>"}];
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const QUIZ = shuffle(QUIZ_POOL.slice()).slice(0, Math.min(10, QUIZ_POOL.length));
+QUIZ.forEach(it=>{const p=it.o.map((t,idx)=>({t,c:idx===it.a}));shuffle(p);it.o=p.map(x=>x.t);it.a=p.findIndex(x=>x.c);});
+const PTS={let:100,mid:150,svaer:200};
+let i=0,score=0,combo=1,best=1;
+const $=id=>document.getElementById(id);
+$('qtot').textContent=QUIZ.length;
+function render(){
+  const it=QUIZ[i];$('qnum').textContent=i+1;$('prog').style.width=(i/QUIZ.length*100)+'%';
+  const dn={let:'LET · 100p',mid:'MIDDEL · 150p',svaer:'SVÆR · 200p'}[it.d];
+  let h=`<div class="card"><span class="tag ${it.d}">${dn}</span><div class="q">${it.q}</div><div class="opts">`;
+  it.o.forEach((o,k)=>h+=`<button class="opt" onclick="answer(${k})">${o}</button>`);
+  h+=`</div><div class="exp" id="exp">${it.e}</div><button class="next" id="next" onclick="next()">${i<QUIZ.length-1?'Næste →':'Se resultat →'}</button></div>`;
+  $('stage').innerHTML=h;
+}
+function answer(k){
+  const it=QUIZ[i];const btns=document.querySelectorAll('.opt');
+  btns.forEach((b,j)=>{b.disabled=true;if(j===it.a)b.classList.add('correct');});
+  if(k===it.a){btns[k].classList.add('correct');score+=PTS[it.d]*combo;combo++;if(combo>best)best=combo;}
+  else{btns[k].classList.add('wrong');combo=1;}
+  $('score').textContent=score;$('combo').textContent=combo;
+  $('exp').style.display='block';$('next').style.display='block';
+}
+function next(){i++;if(i<QUIZ.length)render();else end();}
+function end(){
+  $('prog').style.width='100%';
+  const maxS=(function(){let s=0,c=1;for(const q of QUIZ){s+=PTS[q.d]*c;c++;}return s;})();
+  const ratio=score/maxS;if(window.reportPathQuiz)reportPathQuiz(ratio,score);let gr;
+  if(ratio>=.85)gr='🏆 Fremragende!';else if(ratio>=.6)gr='👍 Godt gået';else if(ratio>=.35)gr='📚 Ikke dårligt';else gr='🔁 Læs kapitlet igen';
+  $('stage').innerHTML=`<div class="card end"><div class="grade">${gr}</div><div class="score">${score}</div><div class="sub">point · længste combo ×${best}</div><button class="retry" onclick="location.reload()">Prøv igen</button></div>`;if(window.renderPathResultBanner)document.getElementById('stage').insertAdjacentHTML('beforeend',renderPathResultBanner(ratio));
+}
+render();
+</script></body></html>

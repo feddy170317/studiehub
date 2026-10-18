@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="da"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz — ELE1 Dag 2</title>
+<style>
+  :root{--bg:#0f1b2d;--card:#16263d;--acc:#2E86C1;--good:#2ecc71;--bad:#e74c3c;--txt:#e8eef5;--dim:#9fb3c8;--gold:#f1c40f}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:linear-gradient(160deg,#0f1b2d,#0a1220);color:var(--txt);min-height:100vh}
+  .wrap{max-width:720px;margin:0 auto;padding:24px 18px 60px}
+  header{text-align:center;margin-bottom:18px}
+  h1{font-size:1.3rem;margin:.2em 0;color:#fff}
+  .sub{color:var(--dim);font-size:.9rem}
+  .hud{display:flex;justify-content:space-between;align-items:center;background:var(--card);border-radius:12px;padding:10px 16px;margin-bottom:16px;font-size:.9rem}
+  .hud b{color:var(--gold);font-size:1.1rem}.combo{color:var(--acc)}
+  .bar{height:6px;background:#0a1220;border-radius:4px;overflow:hidden;margin-bottom:18px}
+  .bar>div{height:100%;background:var(--acc);width:0;transition:width .3s}
+  .card{background:var(--card);border-radius:14px;padding:22px;box-shadow:0 6px 20px rgba(0,0,0,.3)}
+  .tag{display:inline-block;font-size:.72rem;padding:2px 9px;border-radius:20px;margin-bottom:10px;font-weight:600}
+  .let{background:#1e4620;color:#8ef0a0}.mid{background:#4a3a17;color:#f4d47a}.svaer{background:#4a1e1e;color:#f4a0a0}
+  .q{font-size:1.08rem;line-height:1.5;margin-bottom:16px}
+  .opts{display:grid;gap:10px}
+  .opt{background:#0f1e33;border:1.5px solid #26405f;border-radius:10px;padding:12px 14px;cursor:pointer;text-align:left;color:var(--txt);font-size:.98rem;transition:.15s}
+  .opt:hover{border-color:var(--acc)}.opt.correct{border-color:var(--good);background:#123020}
+  .opt.wrong{border-color:var(--bad);background:#301616}.opt:disabled{cursor:default}
+  .exp{margin-top:16px;padding:12px 14px;border-radius:10px;background:#0f1e33;font-size:.9rem;line-height:1.5;display:none}
+  .exp .ref{color:var(--gold);font-weight:600}
+  .next{margin-top:16px;width:100%;padding:13px;border:0;border-radius:10px;background:var(--acc);color:#fff;font-size:1rem;font-weight:600;cursor:pointer;display:none}
+  .end{text-align:center}.end .score{font-size:2.6rem;color:var(--gold);font-weight:700}
+  .grade{font-size:1.3rem;margin:8px 0}
+  .retry{margin-top:18px;padding:12px 26px;border:0;border-radius:10px;background:var(--acc);color:#fff;font-weight:600;cursor:pointer;font-size:1rem}
+</style></head><body><script src="../../assets/path-report.js"></script><script src="../../assets/quiz-result-ceremony.js"></script><div class="wrap">
+  <header><h1>Dag 2: Ohms lov, effekt, KCL & KVL</h1><div class="sub">ELE1-A26 · Dag 2 · Test dig selv</div></header>
+  <div class="hud"><span>Spg. <b id="qnum">1</b>/<span id="qtot">10</span></span>
+    <span class="combo">Combo ×<span id="combo">1</span></span>
+    <span>Score <b id="score">0</b></span></div>
+  <div class="bar"><div id="prog"></div></div>
+  <div id="stage"></div></div>
+<script>
+const QUIZ_POOL = [{"d": "let", "q": "En 12 V-kilde er forbundet til 500 Ω. Hvor stor er strømmen?", "o": ["24 mA", "6 A", "2,4 mA", "41,7 mA"], "a": 0, "e": "I = V/R = 12/500 = 0,024 A = 24 mA. <span class='ref'>[Day 2, s. 9]</span>"}, {"d": "let", "q": "Hvilket udtryk for effekt er <b>forkert</b>?", "o": ["P = R/I²", "P = V·I", "P = V²/R", "P = I²·R"], "a": 0, "e": "P = VI = V²/R = I²R. R/I² har ikke enheden watt. <span class='ref'>[Day 2, s. 7–8]</span>"}, {"d": "mid", "q": "Strømmen gennem en modstand fordobles. Hvad sker der med effekten?", "o": ["Den firdobles", "Den fordobles", "Den halveres", "Den er uændret"], "a": 0, "e": "P = I²R – effekten vokser med kvadratet på strømmen (Joules lov). <span class='ref'>[Day 2, s. 6]</span>"}, {"d": "let", "q": "Hvad er en maske (mesh)?", "o": ["En løkke uden andre løkker indeni", "Et forbindelsespunkt mellem grene", "En vilkårlig lukket vej", "En komponent med to terminaler"], "a": 0, "e": "En maske er en løkke, der ikke indeholder andre løkker. <span class='ref'>[Day 2, s. 10]</span>"}, {"d": "let", "q": "Kirchhoffs strømlov (KCL) bygger på …", "o": ["ladningsbevarelse", "energibevarelse", "Ohms lov", "effektbalance"], "a": 0, "e": "Ladning ophobes ikke i en knude: summen af strømme ind og ud er nul. <span class='ref'>[Day 2, s. 12]</span>"}, {"d": "mid", "q": "Et kredsløb har 3 knuder inklusive ground. Hvor mange ubekendte knudespændinger skal du løse for?", "o": ["2", "3", "1", "4"], "a": 0, "e": "Antal ubekendte = antal knuder − 1 (referenceknuden er 0 V). <span class='ref'>[Day 2, s. 14]</span>"}, {"d": "svaer", "q": "I KCL-eksemplet giver løsningen v₁ = 35 V og v₂ = 10 V. Hvad er strømmen gennem R₂ = 2 kΩ mellem knuderne?", "o": ["12,5 mA", "17,5 mA", "5 mA", "2,5 mA"], "a": 0, "e": "I = (v₁ − v₂)/R₂ = 25 V / 2 kΩ = 12,5 mA. <span class='ref'>[Day 2, s. 16]</span>"}, {"d": "mid", "q": "I maskemetoden bærer en modstand, der deles af maske 1 og 2, strømmen …", "o": ["i₁ − i₂", "i₁ + i₂", "kun i₁", "(i₁ + i₂)/2"], "a": 0, "e": "Set fra maske 1 løber nettostrømmen i₁ − i₂ gennem den fælles modstand. <span class='ref'>[Day 2, s. 20]</span>"}, {"d": "svaer", "q": "Maskematricen R = [[11, −8, −3], [−8, 14, −6], [−3, −6, 13]]. Hvad betyder −8?", "o": ["Den fælles modstand 8 Ω mellem maske 1 og 2", "Spændingskilden i maske 2", "Summen af modstande i maske 1", "Den negative maskestrøm i₂"], "a": 0, "e": "Uden for diagonalen står −(fælles modstand). R₂ = 8 Ω deles af maske 1 og 2. <span class='ref'>[Day 2, s. 21]</span>"}, {"d": "mid", "q": "LTspice viser en negativ strøm gennem en modstand. Hvad betyder det?", "o": ["Strømmen løber modsat referenceretningen", "Der er en simuleringsfejl", "Modstanden afgiver effekt", "Kredsløbet mangler ground"], "a": 0, "e": "Fortegnet afhænger af den valgte referenceretning – minus betyder bare den modsatte retning. <span class='ref'>[Day 2, s. 17, 22]</span>"}];
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const QUIZ = shuffle(QUIZ_POOL.slice()).slice(0, Math.min(10, QUIZ_POOL.length));
+QUIZ.forEach(it=>{const p=it.o.map((t,idx)=>({t,c:idx===it.a}));shuffle(p);it.o=p.map(x=>x.t);it.a=p.findIndex(x=>x.c);});
+const PTS={let:100,mid:150,svaer:200};
+let i=0,score=0,combo=1,best=1;
+const $=id=>document.getElementById(id);
+$('qtot').textContent=QUIZ.length;
+function render(){
+  const it=QUIZ[i];$('qnum').textContent=i+1;$('prog').style.width=(i/QUIZ.length*100)+'%';
+  const dn={let:'LET · 100p',mid:'MIDDEL · 150p',svaer:'SVÆR · 200p'}[it.d];
+  let h=`<div class="card"><span class="tag ${it.d}">${dn}</span><div class="q">${it.q}</div><div class="opts">`;
+  it.o.forEach((o,k)=>h+=`<button class="opt" onclick="answer(${k})">${o}</button>`);
+  h+=`</div><div class="exp" id="exp">${it.e}</div><button class="next" id="next" onclick="next()">${i<QUIZ.length-1?'Næste →':'Se resultat →'}</button></div>`;
+  $('stage').innerHTML=h;
+}
+function answer(k){
+  const it=QUIZ[i];const btns=document.querySelectorAll('.opt');
+  btns.forEach((b,j)=>{b.disabled=true;if(j===it.a)b.classList.add('correct');});
+  if(k===it.a){btns[k].classList.add('correct');score+=PTS[it.d]*combo;combo++;if(combo>best)best=combo;}
+  else{btns[k].classList.add('wrong');combo=1;}
+  $('score').textContent=score;$('combo').textContent=combo;
+  $('exp').style.display='block';$('next').style.display='block';
+}
+function next(){i++;if(i<QUIZ.length)render();else end();}
+function end(){
+  $('prog').style.width='100%';
+  const maxS=(function(){let s=0,c=1;for(const q of QUIZ){s+=PTS[q.d]*c;c++;}return s;})();
+  const ratio=score/maxS;if(window.reportPathQuiz)reportPathQuiz(ratio,score);let gr;
+  if(ratio>=.85)gr='🏆 Fremragende!';else if(ratio>=.6)gr='👍 Godt gået';else if(ratio>=.35)gr='📚 Ikke dårligt';else gr='🔁 Læs kapitlet igen';
+  $('stage').innerHTML=`<div class="card end"><div class="grade">${gr}</div><div class="score">${score}</div><div class="sub">point · længste combo ×${best}</div><button class="retry" onclick="location.reload()">Prøv igen</button></div>`;if(window.renderPathResultBanner)document.getElementById('stage').insertAdjacentHTML('beforeend',renderPathResultBanner(ratio));
+}
+render();
+</script></body></html>

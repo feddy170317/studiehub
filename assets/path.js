@@ -91,6 +91,8 @@
     if (q && q.url) {
       var m = q.url.match(/Kapitel(\d+)_Quiz\.html/i);
       if (m) return parseInt(m[1], 10);
+      var d = q.url.match(/Dag(\d+)_Quiz\.html/i);
+      if (d) return 'd' + parseInt(d[1], 10);
     }
     return lesson.number;
   }
@@ -167,7 +169,7 @@
       html += '  <button class="path-node ' + cls + '" data-idx="' + i + '" ' + (st.locked ? 'disabled' : '') + '>';
       html += '    <span class="path-node-inner">' + icon + '</span>';
       html += '  </button>';
-      html += '  <div class="path-node-label">Kap. ' + ch.number + '</div>';
+      html += '  <div class="path-node-label">' + (ch.label || 'Kap. ' + ch.number) + '</div>';
       html += '</div>';
     });
     html += '</div>';
@@ -213,7 +215,7 @@
     var quizLocked = !topicsDone;
 
     var html = '<button class="path-modal-close" id="pathModalClose">✕</button>';
-    html += '<div class="path-modal-head"><span class="path-modal-badge">Kapitel ' + ch.number + '</span>';
+    html += '<div class="path-modal-head"><span class="path-modal-badge">' + (ch.label || 'Kapitel ' + ch.number) + '</span>';
     html += '<h2>' + ch.title + '</h2>';
     if (ch.summary) html += '<p class="path-modal-summary">' + ch.summary + '</p>';
     html += '</div>';
