@@ -15,7 +15,12 @@ window.QUIZZES['hvad_koster_det_fjollet'] = {
       "answer": 10,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/14423985",
-      "why": "Annoncens titel: \"Protese tandbørste\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Protese tandbørste\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Sundhed og personlig pleje › Tandpleje",
+        "🏷️ Stand: Ny / ubrugt",
+        "💬 Fra annoncen: »Tandbørste specielt til rengøring af gebis og tandproteser.«"
+      ]
     },
     {
       "type": "estimate",
@@ -25,7 +30,12 @@ window.QUIZZES['hvad_koster_det_fjollet'] = {
       "answer": 162250,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/21111086",
-      "why": "Annoncens titel: \"Kongeaa U5 - 320 | Toiletvogn med 5 urinal | 2.000 kg\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Kongeaa U5 - 320 | Toiletvogn med 5 urinal | 2.000 kg\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Trailere › Cargotrailere",
+        "🏷️ Mærke: Kongeaa",
+        "💬 Fra annoncen: »Kongeaa U5-320 toiletvogn med 5 urinaler. Totalvægt 2.000 kg.«"
+      ]
     },
     {
       "type": "estimate",
@@ -35,7 +45,12 @@ window.QUIZZES['hvad_koster_det_fjollet'] = {
       "answer": 60,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/25845558",
-      "why": "Annoncens titel: \"Avokado kostume\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Avokado kostume\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Mode og skønhed › Kostumer",
+        "🏷️ Stand: Ny / ubrugt",
+        "💬 Fra annoncen: »Avocado kostume i str 7-12 år, unisex model. Huller til arme, hoved og i bunden. Kun brugt 2 gange.«"
+      ]
     },
     {
       "type": "estimate",
@@ -45,7 +60,12 @@ window.QUIZZES['hvad_koster_det_fjollet'] = {
       "answer": 250,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/25821572",
-      "why": "Annoncens titel: \"Udstoppet krokodillehoved, alligatorunge, til dekoration eller samling\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Udstoppet krokodillehoved, alligatorunge, til dekoration eller samling\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Samlerobjekter › Andre samlerobjekter",
+        "🏷️ Stand: Brugt",
+        "💬 Fra annoncen: »Udstoppet hoved af en lille alligatorunge med åben mund og tænder.«"
+      ]
     },
     {
       "type": "estimate",
@@ -55,7 +75,11 @@ window.QUIZZES['hvad_koster_det_fjollet'] = {
       "answer": 35,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/2165476",
-      "why": "Annoncens titel: \"Ølhjelm/ølhat/drikkehjelm/drikkehat\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Ølhjelm/ølhat/drikkehjelm/drikkehat\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Dekoration og pyntegenstande › Andet pynt",
+        "💬 Fra annoncen: »Ølhjelm/ølhat/drikkehjelm/drikkehat, Fire ølhjelme (den gule er solgt), der kan justeres i størrelsen. Perfekt til fester, festival og studenternes …«"
+      ]
     },
     {
       "type": "estimate",
@@ -65,7 +89,11 @@ window.QUIZZES['hvad_koster_det_fjollet'] = {
       "answer": 21000,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/23241844",
-      "why": "Annoncens titel: \"Mobilt urinal til 6 personer\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Mobilt urinal til 6 personer\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Trailere › Cargotrailere",
+        "💬 Fra annoncen: »Effektiv toilet-løsning til store arrangementer. Det mobile urinal til 6 personer er den ideelle løsning til dig, der ønsker en funktionel og praktisk …«"
+      ]
     },
     {
       "type": "estimate",
@@ -75,7 +103,11 @@ window.QUIZZES['hvad_koster_det_fjollet'] = {
       "answer": 400,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/25808749",
-      "why": "Annoncens titel: \"Udstoppet kuglefisk\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Udstoppet kuglefisk\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Dyr og udstyr › Fisk",
+        "💬 Fra annoncen: »Dekorativ pindsvinefisk med lange pigge, mørke aftegninger og kunstige øjne. En sjov og anderledes genstand til samlingen eller som dekoration. Måler …«"
+      ]
     },
     {
       "type": "estimate",
@@ -85,7 +117,12 @@ window.QUIZZES['hvad_koster_det_fjollet'] = {
       "answer": 500,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/24370232",
-      "why": "Annoncens titel: \"Elvis Presley papfigur med guitar\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Elvis Presley papfigur med guitar\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Samlerobjekter › Skilte og plakater",
+        "🏷️ Stand: Brugt",
+        "💬 Fra annoncen: »Stor Elvis papfigur med rød guitar og sort tøj. Fint som pynt i musikrum eller til fest. Lang 100 cm. Bred 42 cm.«"
+      ]
     },
     {
       "type": "estimate",
@@ -95,7 +132,12 @@ window.QUIZZES['hvad_koster_det_fjollet'] = {
       "answer": 600,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/25769548",
-      "why": "Annoncens titel: \"Anatomisk skelet torso på stander\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Anatomisk skelet torso på stander\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Kunst › Skulpturer",
+        "🏷️ Stand: Brugt",
+        "💬 Fra annoncen: »Smukt anatomisk skelet torso på træstativ med firkantet fodplade. Viser rygsøjle, ribben og bækken, og er samlet med metalstænger og skruer …«"
+      ]
     },
     {
       "type": "estimate",
@@ -105,7 +147,12 @@ window.QUIZZES['hvad_koster_det_fjollet'] = {
       "answer": 65,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/25053011",
-      "why": "Annoncens titel: \"Kinesisk feng shui amulet med ægte skorpion i resin / kuriositet\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Kinesisk feng shui amulet med ægte skorpion i resin / kuriositet\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Samlerobjekter › Andre samlerobjekter",
+        "🏷️ Stand: Ny / ubrugt",
+        "💬 Fra annoncen: »Flot og markant kinesisk lykkeamulet / ophæng med en ægte skorpion indkapslet i fuldstændig klar kunstharpiks (resin).Amuletten er dekoreret med den …«"
+      ]
     },
     {
       "type": "estimate",
@@ -115,7 +162,12 @@ window.QUIZZES['hvad_koster_det_fjollet'] = {
       "answer": 8500,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/20978068",
-      "why": "Annoncens titel: \"Whitetail Hjort\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Whitetail Hjort\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Jagt, fiskeri og friluftsliv",
+        "🏷️ Stand: Ny / ubrugt",
+        "💬 Fra annoncen: »Professionelt udstoppet hjort (White-tailed Deer). Imponerende 10-takker gevinst fra Michigan, USA.«"
+      ]
     },
     {
       "type": "estimate",
@@ -125,7 +177,12 @@ window.QUIZZES['hvad_koster_det_fjollet'] = {
       "answer": 175,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/18883773",
-      "why": "Annoncens titel: \"Regndragt formydogs str 10 heldragt hundetøj\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Regndragt formydogs str 10 heldragt hundetøj\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Dyr og udstyr › Hundeudstyr",
+        "🏷️ Stand: Ny / ubrugt",
+        "💬 Fra annoncen: »Passer lille chihuahua fx. Regndragt med farverigt mønster på overkroppen og sorte ben med pink kanter. Dragten dækker krop og ben og har elastik i …«"
+      ]
     },
     {
       "type": "estimate",
@@ -135,7 +192,12 @@ window.QUIZZES['hvad_koster_det_fjollet'] = {
       "answer": 750,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/6819987",
-      "why": "Annoncens titel: \"Sjældent Dukkehoved I Porcelæn, Royal Copenhagen\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Sjældent Dukkehoved I Porcelæn, Royal Copenhagen\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Dekoration og pyntegenstande › Andet pynt",
+        "🏷️ Mærke: Royal Copenhagen",
+        "💬 Fra annoncen: »Sjældent dukkehoved i porcelæn fra Royal Copenhagen. Dukkehovedet er fra omkring 1978, hvor man genudgav en …«"
+      ]
     },
     {
       "type": "estimate",
@@ -145,7 +207,12 @@ window.QUIZZES['hvad_koster_det_fjollet'] = {
       "answer": 149,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/25724518",
-      "why": "Annoncens titel: \"Dame mannequin hoveder til paryk eller udstilling\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Dame mannequin hoveder til paryk eller udstilling\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Butik og varepartier › Andet butiksinventar",
+        "🏷️ Stand: Brugt",
+        "💬 Fra annoncen: »6 stk. sælges enkeltvis. Mannequinhoveder med skulder, gode til parykker, hatte eller butik. Neutrale hudfarver.«"
+      ]
     },
     {
       "type": "estimate",
@@ -155,7 +222,12 @@ window.QUIZZES['hvad_koster_det_fjollet'] = {
       "answer": 140,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/22406239",
-      "why": "Annoncens titel: \"Havenisse med tromme og trommestikker rød bluse gul hat figur skulptur\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Havenisse med tromme og trommestikker rød bluse gul hat figur skulptur\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Dekoration og pyntegenstande › Andet pynt",
+        "🏷️ Stand: Brugt",
+        "💬 Fra annoncen: »Havenisse med tromme og trommestikker rød bluse gul hat ca 14 cm m skøn patina figur skulptur. Kitsch pynt til kolonihavehus kolonihave sommerhus …«"
+      ]
     },
     {
       "type": "estimate",
@@ -165,7 +237,12 @@ window.QUIZZES['hvad_koster_det_fjollet'] = {
       "answer": 300,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/25827390",
-      "why": "Annoncens titel: \"Tuborg Julebryg hæklet bøllehat blå\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Tuborg Julebryg hæklet bøllehat blå\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Sport og friluftsliv › Fanartikler",
+        "🏷️ Stand: Ny / ubrugt",
+        "💬 Fra annoncen: »Hæklet blå og hvid bøllehat med stort Tuborg Julebryg-mærke foran. Sjov hue til samleren eller til julefrokosten eller J-dag.«"
+      ]
     },
     {
       "type": "estimate",
@@ -175,7 +252,12 @@ window.QUIZZES['hvad_koster_det_fjollet'] = {
       "answer": 600,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/25702295",
-      "why": "Annoncens titel: \"Pissoir - Urinal - mærket Ditmar fra ca 1950\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Pissoir - Urinal - mærket Ditmar fra ca 1950\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Badeværelse › Badeværelsestilbehør",
+        "🏷️ Stand: Brugt",
+        "💬 Fra annoncen: »Sælger dette gamle Ditmar Pissior i hvidt porcelæn. Et spændende stykke sanitets- og designhistorie fra midt i 1900-tallet, som kan være interessant …«"
+      ]
     },
     {
       "type": "estimate",
@@ -185,7 +267,11 @@ window.QUIZZES['hvad_koster_det_fjollet'] = {
       "answer": 1295,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/12727230",
-      "why": "Annoncens titel: \"⭐️- Ældre udstoppet mink af konservator Aaboe Sørensen\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"⭐️- Ældre udstoppet mink af konservator Aaboe Sørensen\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Have og renovering › Værktøj",
+        "💬 Fra annoncen: »Ældre, udstoppet mink af konservator Aage Sørensen. Sjældent og ældre eksemplar af en udstoppet mink, udført af konservator Aage Sørensen fra …«"
+      ]
     },
     {
       "type": "estimate",
@@ -195,7 +281,12 @@ window.QUIZZES['hvad_koster_det_fjollet'] = {
       "answer": 500,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/15585925",
-      "why": "Annoncens titel: \"Retro gummiand, Anders and\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Retro gummiand, Anders and\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Kunst og antik › Andre antikviteter",
+        "🏷️ Stand: Brugt",
+        "💬 Fra annoncen: »Sjov retro gummi and Anders and fra ca 1962.«"
+      ]
     },
     {
       "type": "estimate",
@@ -205,7 +296,12 @@ window.QUIZZES['hvad_koster_det_fjollet'] = {
       "answer": 75,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/25793572",
-      "why": "Annoncens titel: \"Halloween økse og skelet-hånd\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Halloween økse og skelet-hånd\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Forældre og børn › Andet forældre og børn",
+        "🏷️ Stand: Brugt",
+        "💬 Fra annoncen: »Sjov halloween legetøjsøkse i plastik (har ikke batterier) og skelet-hånd på skaft med plads til slik. sælges samlet.«"
+      ]
     }
   ],
   "tiebreakers": [
@@ -217,7 +313,12 @@ window.QUIZZES['hvad_koster_det_fjollet'] = {
       "answer": 125,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/25707985",
-      "why": "Annoncens titel: \"Sort vampyr paryk med hvide striber til mand\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Sort vampyr paryk med hvide striber til mand\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Mode og skønhed › Kostumer",
+        "🏷️ Stand: Brugt",
+        "💬 Fra annoncen: »Sort, langhåret paryk med hvide striber. Perfekt til vampyr- eller halloween-udklædning.«"
+      ]
     },
     {
       "type": "estimate",
@@ -227,7 +328,12 @@ window.QUIZZES['hvad_koster_det_fjollet'] = {
       "answer": 100,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/25817342",
-      "why": "Annoncens titel: \"OYOY MINI Baby Elvis leopardbamse\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"OYOY MINI Baby Elvis leopardbamse\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Legetøj › Bamser, dukker og figurer",
+        "🏷️ Stand: Ny / ubrugt",
+        "💬 Fra annoncen: »OYOY MINI Baby Elvis Leopard-bamse i multifarvet strik. Fejlfri og i flot stand. Lavet i 100 % bomuld med blødt fiberfyld. Måler ca. H27 x L33 x B12 …«"
+      ]
     }
   ]
 };

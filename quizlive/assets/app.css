@@ -668,13 +668,13 @@ select:focus { border-color: var(--accent); }
 
 /* --- Host layout (16:9 desktop) --- */
 @media (min-width: 900px) {
-  .host-layout {
+  /* Kun den AKTIVE skærm — ellers overtrumfer display:grid .screen{display:none},
+     og Sudden Death-skærmen ligger usynligt under alle andre host-skærme. */
+  .screen.active.host-layout {
     display: grid;
     grid-template-rows: auto 1fr auto;
     height: 100vh;
     overflow: hidden;
-  }
-  .screen.active.host-layout {
     min-height: unset;
     padding: 20px 40px;
     justify-content: flex-start;
@@ -743,3 +743,27 @@ textarea.invalid { border-color: #f87171; }
 .est-form.shake { animation: est-shake 0.35s; }
 @keyframes est-shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
 .est-detail { background: var(--bg-card); border-radius: var(--radius-sm); padding: 10px 14px; text-align: center; font-weight: 700; line-height: 1.5; }
+
+/* --- Prisgæt på mobilen: løbende ledetråde + bud-oversigt (2026-10-18) --- */
+.est-img { transition: filter 0.8s ease; }
+.est-img.est-blur { filter: blur(16px) saturate(0.7); }
+.estimate-panel.has-clues .est-img { max-height: 28vh; }
+.est-clues-p { width: 100%; display: flex; flex-direction: column; gap: 5px; }
+.est-clues-p:empty { display: none; }
+.est-clues-p .est-clue { background: var(--bg-card); border-radius: var(--radius-sm); padding: 6px 10px;
+  font-size: 0.85rem; font-weight: 600; line-height: 1.35; animation: est-clue-in 0.5s ease; }
+.est-clues-p .est-clue.newest { box-shadow: 0 0 0 2px #fde68a; }
+@keyframes est-clue-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.est-meter-p { font-size: 0.9rem; font-weight: 800; color: #fde68a; text-align: center; }
+.est-meter-p:empty { display: none; }
+.bids-p { width: 100%; max-width: 520px; background: var(--bg-card); border-radius: var(--radius-sm); padding: 10px 12px; }
+.bids-p .bids-title { font-weight: 800; margin-bottom: 6px; text-align: center; }
+.bids-p .bids-list { display: flex; flex-direction: column; gap: 4px; max-height: 38vh; overflow-y: auto; }
+.bids-p .bid-row { display: grid; grid-template-columns: 1.8rem 1fr auto; gap: 8px; align-items: center;
+  padding: 6px 8px; border-radius: 8px; background: rgba(255,255,255,0.05); font-size: 0.9rem; font-weight: 700; }
+.bids-p .bid-row.best { background: linear-gradient(135deg, #15803d, #166534); }
+.bids-p .bid-row.me { box-shadow: 0 0 0 2px #fde68a; }
+.bids-p .bid-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bids-p .bid-sub { display: block; color: var(--text-muted); font-size: 0.75rem; font-weight: 600; }
+.bids-p .bid-guess { text-align: right; white-space: nowrap; }
+.bids-p .bid-pts { display: block; color: #fde68a; font-size: 0.75rem; }

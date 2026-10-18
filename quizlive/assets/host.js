@@ -39,7 +39,8 @@
     quizId: '',
     quiz: null,
     timerSec: 20,
-    qTimerSec: 20,          // tid for DET AKTUELLE spørgsmål (prisgæt får min. 30 s til at taste)
+    qTimerSec: 20,          // tid for DET AKTUELLE spørgsmål (prisgæt får min. 40 s — ledetrådene skal nå at komme)
+    est: null,              // aktivt prisgæt-spørgsmåls ledetråds-trin, se buildEstSteps()
     qIndex: 0,
     serverTimeOffset: 0,
     timerInterval: null,
@@ -898,9 +899,12 @@
     var q = shuffleQuestion(g.quiz.questions[qIdx]);
     var est = isEstimate(q);
     g.qTimerSec = est ? Math.max(g.timerSec, EST_MIN_TIMER) : g.timerSec;
+    g.est = est ? buildEstSteps(q, qIdx, g.qTimerSec) : null;
 
-    // Publicér spørgsmål UDEN correct-index / rigtig pris (anti-cheat)
+    // Publicér spørgsmål UDEN correct-index / rigtig pris (anti-cheat).
+    // Prisgæt: kun trin 0 (sløret billede) — resten publiceres løbende af hostens timer.
     g.gameRef.child('question').set(publicQuestion(q));
+    g.gameRef.child('bids').remove();
 
     // Opdatér state
     g.gameRef.child('state').update({
@@ -931,13 +935,17 @@
     document.getElementById('q-text').textContent = q.q;
     var est = isEstimate(q);
     document.getElementById('screen-q').classList.toggle('estimate-mode', est);
-    document.getElementById('q-item').textContent = est ? (q.item || '') : '';
+    document.getElementById('q-item').textContent = '';
+    document.getElementById('q-clues').innerHTML = '';
+    document.getElementById('q-est-meter').innerHTML = '';
 
     // Spørgsmålsbillede (quiz-billeder vises kun på host; prisgæt-billeder er
     // offentlige URL'er og vises også på mobilen)
     var qImgWrap = document.getElementById('q-img-wrap');
     var qImgEl = document.getElementById('q-img');
     var qImgUrl = est ? (q.imgUrl || null) : imgSrc(q.img);
+    qImgEl.classList.toggle('est-blur', est);
+    qImgEl.style.maxHeight = '';
     if (qImgUrl) {
       qImgEl.src = qImgUrl;
       qImgWrap.classList.add('show');
@@ -945,6 +953,7 @@
       qImgEl.src = '';
       qImgWrap.classList.remove('show');
     }
+    if (est && g.est) renderEstStep(0);
 
     // Level-badge
     var badge = document.getElementById('q-level-badge');
@@ -990,6 +999,7 @@
       bar.style.width = pct + '%';
       var secs = Math.ceil(remaining);
       numEl.textContent = secs;
+      if (g.est && g.est.qIdx === qIdx && remaining > 0) estTick(elapsed);
 
       if (remaining <= 5) {
         bar.classList.add('urgent');
@@ -1606,14 +1616,132 @@
        • Streak-bonus som normalt, når man er tættest på flere gange i træk
      Den rigtige pris publiceres først ved reveal (state.estAnswer).
      ================================================================ */
-  var EST_MIN_TIMER = 30;      // sekunder — man skal nå at taste et beløb
+  var EST_MIN_TIMER = 40;      // sekunder — ledetrådene skal nå at komme, og man skal nå at taste
+  var EST_SD_TIMER = 30;       // Sudden Death-prisgæt: alt vises med det samme
   var EST_CLOSEST_PTS = 200;
+  var EST_MIN_FACTOR = 0.5;    // et bud ved sidste ledetråd giver stadig halvdelen af pointene
+  var EST_STEP_GRACE_MS = 400; // et bud lige efter et trinskifte tæller for det forrige trin (latens)
+
+  /* --- Løbende ledetråde ---
+     Spørgsmålets tid deles i n lige lange trin. Hvert trin afslører mere:
+       0: sløret billede + kategori (clues[0])
+       1: skarpt billede + genstandens navn
+       2…: resten af q.clues (stand/mærke, citat fra annoncen)
+       sidst: antal cifre i prisen
+     Point for et bud ganges med trinnets faktor: 100 % i trin 0, faldende
+     lineært til EST_MIN_FACTOR i sidste trin. Et godt bud giver altså
+     stadig flere point end et dårligt, men hurtighed betaler sig.
+     Streak-bonussen er flad og påvirkes ikke af faktoren. */
+  function buildEstSteps(q, qIdx, timerSec) {
+    var clues = Array.isArray(q.clues) ? q.clues : [];
+    var steps = [{ clue: clues[0] || null, blur: true, showItem: false }];
+    steps.push({ clue: null, blur: false, showItem: true });
+    clues.slice(1).forEach(function (c) { steps.push({ clue: c, blur: false, showItem: true }); });
+    steps.push({ clue: estDigitsHint(q.answer, q.unit || 'kr'), blur: false, showItem: true });
+    return { qIdx: qIdx, q: q, steps: steps, n: steps.length, step: 0,
+             stepMs: (timerSec * 1000) / steps.length };
+  }
+
+  function estDigitsHint(answer, unit) {
+    var n = String(Math.max(1, Math.floor(answer))).length;
+    if (n === 1) return t('est.digits1', { unit: unit });
+    return t('est.digits', { n: n, unit: unit,
+      lo: Math.pow(10, n - 1).toLocaleString('da-DK'),
+      hi: (Math.pow(10, n) - 1).toLocaleString('da-DK') });
+  }
+
+  function estFactor(step, n) {
+    if (n <= 1) return 1;
+    return Math.round((1 - (1 - EST_MIN_FACTOR) * step / (n - 1)) * 100) / 100;
+  }
+
+  function estStepForAnswer(at) {
+    var k = Math.floor((at - g.questionStartAt - EST_STEP_GRACE_MS) / g.est.stepMs);
+    return Math.max(0, Math.min(g.est.n - 1, k));
+  }
+
+  function estRevealedClues(k) {
+    return g.est.steps.slice(0, k + 1).map(function (st) { return st.clue; }).filter(Boolean);
+  }
+
+  /* Kaldes fra host-timerens tick: skift trin + opdatér pointmåleren */
+  function estTick(elapsedSec) {
+    var k = Math.min(g.est.n - 1, Math.floor((elapsedSec * 1000) / g.est.stepMs));
+    if (k > g.est.step) {
+      g.est.step = k;
+      renderEstStep(k);
+      g.gameRef.child('question').update({
+        step: k,
+        item: k >= 1 ? (g.est.q.item || '') : '',
+        clues: estRevealedClues(k)
+      });
+    }
+    var meter = document.getElementById('q-est-meter');
+    var pct = Math.round(estFactor(g.est.step, g.est.n) * 100);
+    var stepLbl = '<span class="est-step">' + escHtml(t('est.clueStep', { n: g.est.step + 1, total: g.est.n })) + '</span>';
+    if (g.est.step < g.est.n - 1) {
+      var s = Math.max(1, Math.ceil(((g.est.step + 1) * g.est.stepMs - elapsedSec * 1000) / 1000));
+      meter.innerHTML = stepLbl + escHtml(t('est.meterNext', { pct: pct, s: s }));
+    } else {
+      meter.innerHTML = stepLbl + escHtml(t('est.meterLast', { pct: pct }));
+    }
+  }
+
+  function renderEstStep(k) {
+    var st = g.est.steps[k];
+    document.getElementById('q-img').classList.toggle('est-blur', !!st.blur);
+    document.getElementById('q-item').textContent = st.showItem ? (g.est.q.item || '') : t('est.unknownItem');
+    var clues = estRevealedClues(k);
+    renderClueList(document.getElementById('q-clues'), clues, true);
+    // Billedet krymper for hver ny ledetråd, så alt kan være på projektoren uden at scrolle
+    document.getElementById('q-img').style.maxHeight = Math.max(22, 44 - 6 * clues.length) + 'vh';
+  }
+
+  function renderClueList(container, clues, markNewest) {
+    // Tilføj kun nye ledetråde, så de eksisterende ikke animeres igen
+    var have = container.children.length;
+    if (have > clues.length) { container.innerHTML = ''; have = 0; }
+    Array.prototype.forEach.call(container.children, function (el) { el.classList.remove('newest'); });
+    for (var i = have; i < clues.length; i++) {
+      var div = document.createElement('div');
+      div.className = 'est-clue' + (markNewest && i === clues.length - 1 ? ' newest' : '');
+      div.textContent = clues[i];
+      container.appendChild(div);
+    }
+  }
+
+  /* Bud-oversigten publiceres til spillernes mobiler (games/{pin}/bids),
+     så alle kan se hele budrunden — ikke kun på projektoren. */
+  function bidsPayload(ranked, q) {
+    return {
+      answer: q.answer,
+      unit: q.unit || 'kr',
+      rows: ranked.map(function (r) {
+        return {
+          pid: r.pid,
+          name: (g.players[r.pid] && g.players[r.pid].name) || '?',
+          guess: r.guess,
+          pct: fmtDiffPct(r.guess, q.answer),
+          closest: !!r.closest,
+          pts: typeof r.pts === 'number' ? r.pts : null,
+          factor: typeof r.factor === 'number' ? Math.round(r.factor * 100) : null
+        };
+      })
+    };
+  }
 
   function isEstimate(q) { return !!q && q.type === 'estimate'; }
 
-  function publicQuestion(q) {
+  function publicQuestion(q, full) {
+    if (isEstimate(q) && full) {
+      // Sudden Death: alt på én gang (der er ingen point at tjene på at være hurtig)
+      return { type: 'estimate', text: q.q, item: q.item || '', imgUrl: q.imgUrl || '', unit: q.unit || 'kr',
+               progressive: false, clues: q.clues || [] };
+    }
     if (isEstimate(q)) {
-      return { type: 'estimate', text: q.q, item: q.item || '', imgUrl: q.imgUrl || '', unit: q.unit || 'kr' };
+      return { type: 'estimate', text: q.q, item: '', imgUrl: q.imgUrl || '', unit: q.unit || 'kr',
+               progressive: true, step: 0, stepCount: g.est.n, stepMs: g.est.stepMs,
+               clues: estRevealedClues(0) };
     }
     return { type: 'mc', text: q.q, options: q.options, level: q.level };
   }
@@ -1646,9 +1774,9 @@
     pids.forEach(function (pid) {
       var a = answersMap[pid];
       if (!a || typeof a.guess !== 'number' || !(a.at <= deadline)) return;
-      list.push({ pid: pid, guess: a.guess, diff: Math.abs(a.guess - answer) });
+      list.push({ pid: pid, guess: a.guess, at: a.at, diff: Math.abs(a.guess - answer) });
     });
-    list.sort(function (x, y) { return x.diff - y.diff; });
+    list.sort(function (x, y) { return (x.diff - y.diff) || ((x.at || 0) - (y.at || 0)); }); // lige tæt: tidligste bud først
     var bestDiff = list.length ? list[0].diff : null;
     list.forEach(function (r) { r.closest = r.diff === bestDiff; });
     return list;
@@ -1670,9 +1798,13 @@
         var r = byPid[pid];
         var closest = !!r && r.closest;
         var precision = r ? estPrecisionPts(r.guess, answer) : 0;
+        // Tidsfaktor: jo tidligere (færre ledetråde), jo større andel af pointene
+        var step = (r && g.est) ? estStepForAnswer(r.at) : 0;
+        var factor = (r && g.est) ? estFactor(step, g.est.n) : 1;
+        if (r) { r.factor = factor; r.step = step; }
         var newStreak = closest ? (p.streak || 0) + 1 : 0;
         var bonus = newStreak >= 2 ? (newStreak - 1) * STREAK_BONUS_STEP : 0;
-        var gained = precision + (closest ? EST_CLOSEST_PTS : 0) + bonus;
+        var gained = Math.round((precision + (closest ? EST_CLOSEST_PTS : 0)) * factor) + bonus;
         if (closest) {
           p.correctCount = (p.correctCount || 0) + 1;
           updates[base + pid + '/correctCount'] = p.correctCount;
@@ -1685,8 +1817,11 @@
         updates[base + pid + '/lastBonus'] = bonus;
         updates[base + pid + '/lastPts'] = gained;
         updates[base + pid + '/lastClosest'] = closest;
+        updates[base + pid + '/lastFactor'] = r ? Math.round(factor * 100) : null;
+        updates[base + pid + '/lastStep'] = r ? step + 1 : null;
       });
 
+      updates['games/' + g.pin + '/bids'] = bidsPayload(ranked, q);
       updates['games/' + g.pin + '/state/phase'] = 'reveal';
       updates['games/' + g.pin + '/state/estAnswer'] = answer;
       updates['games/' + g.pin + '/state/correctChoice'] = -1;
@@ -1709,7 +1844,9 @@
       var name = (g.players[r.pid] && g.players[r.pid].name) || '?';
       row.innerHTML =
         '<div>' + (r.closest ? '🎯' : (i + 1) + '.') + '</div>' +
-        '<div>' + escHtml(name) + ' <span class="est-diff">' + escHtml(fmtDiffPct(r.guess, answer)) + '</span></div>' +
+        '<div>' + escHtml(name) + ' <span class="est-diff">' + escHtml(fmtDiffPct(r.guess, answer)) +
+          (showPts && typeof r.factor === 'number' ? ' · ' + escHtml(t('est.factorTag', { pct: Math.round(r.factor * 100) })) : '') +
+          '</span></div>' +
         '<div>' + escHtml(fmtKr(r.guess, unit)) + '</div>' +
         '<div class="est-pts">' + (showPts ? '+' + (r.pts || 0) : '') + '</div>';
       container.appendChild(row);
@@ -1746,11 +1883,12 @@
     }
     var q = pool[g.sd.round];
     var roundKey = 'r' + g.sd.round;
-    g.gameRef.child('question').set(publicQuestion(q));
+    g.gameRef.child('question').set(publicQuestion(q, true));
+    g.gameRef.child('bids').remove();
     g.gameRef.child('state').update({
       phase: 'suddendeath',
       questionStartAt: firebase.database.ServerValue.TIMESTAMP,
-      timerSec: EST_MIN_TIMER,
+      timerSec: EST_SD_TIMER,
       qType: 'estimate',
       estAnswer: null,
       correctChoice: -1,
@@ -1765,6 +1903,9 @@
           g.sd.candidatePids.map(function (pid) { return (g.players[pid] && g.players[pid].name) || '?'; }).join(' 🆚 ');
         document.getElementById('sd-q-text').textContent = q.q;
         document.getElementById('sd-item').textContent = q.item || '';
+        var sdClues = document.getElementById('sd-clues');
+        sdClues.innerHTML = '';
+        renderClueList(sdClues, q.clues || [], false);
         document.getElementById('sd-est-answer').textContent = '';
         var imgWrap = document.getElementById('sd-img-wrap');
         var imgEl = document.getElementById('sd-img');
@@ -1784,7 +1925,7 @@
           resolveEstimateSdRound(q, startAt, roundKey);
         };
         offAnswers = sdListenForAnswers(roundKey, g.sd.candidatePids, resolve);
-        sdStartTimer(startAt, EST_MIN_TIMER, resolve);
+        sdStartTimer(startAt, EST_SD_TIMER, resolve);
       });
     });
   }
@@ -1792,12 +1933,17 @@
   function resolveEstimateSdRound(q, startAt, roundKey) {
     g.gameRef.child('sdAnswers/' + roundKey).once('value', function (snap) {
       var answers = snap.val() || {};
-      var deadline = startAt + (EST_MIN_TIMER + 1) * 1000;
+      var deadline = startAt + (EST_SD_TIMER + 1) * 1000;
       var ranked = rankGuesses(answers, g.sd.candidatePids, deadline, q.answer);
       var survivors = ranked.filter(function (r) { return r.closest; }).map(function (r) { return r.pid; });
 
-      g.gameRef.child('state/estAnswer').set(q.answer);
+      // Bud + pris i ét atomisk skriv, så mobilerne kan vise budrunden med det samme
+      var sdUpd = {};
+      sdUpd['games/' + g.pin + '/bids'] = bidsPayload(ranked, q);
+      sdUpd['games/' + g.pin + '/state/estAnswer'] = q.answer;
+      db.ref().update(sdUpd);
       document.getElementById('sd-est-answer').textContent = fmtKr(q.answer, q.unit);
+      document.getElementById('sd-clues').innerHTML = ''; // giv plads til budlisten
       var status = document.getElementById('sd-status');
       var rows = document.createElement('div');
       rows.style.cssText = 'display:flex; flex-direction:column; gap:6px;';

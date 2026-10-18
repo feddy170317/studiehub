@@ -14,7 +14,12 @@ window.QUIZZES['hvad_koster_det'] = {
       "answer": 20,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/25834751",
-      "why": "Annoncens titel: \"Gummistøvler med foring\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Gummistøvler med foring\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Børnesko › Gummistøvler",
+        "🏷️ Stand: Brugt · Mærke: Bisgaard",
+        "💬 Fra annoncen: »Fine gummistøvler str. 27. Let slidte. Med foring.«"
+      ]
     },
     {
       "type": "estimate",
@@ -24,7 +29,12 @@ window.QUIZZES['hvad_koster_det'] = {
       "answer": 100000,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/25251802",
-      "why": "Annoncens titel: \"Rolex Yacht-Master 40 126622 - 10/2023\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Rolex Yacht-Master 40 126622 - 10/2023\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Mode og skønhed › Ure",
+        "🏷️ Stand: Ny / ubrugt · Mærke: Rolex",
+        "💬 Fra annoncen: »Rolex Yacht-Master 40, ref. 126622, oprindeligt solgt i oktober 2023. En moderne Yacht-Master i Rolesium, hvor rustfrit Oystersteel kombineres med …«"
+      ]
     },
     {
       "type": "estimate",
@@ -34,7 +44,11 @@ window.QUIZZES['hvad_koster_det'] = {
       "answer": 1000,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/25851882",
-      "why": "Annoncens titel: \"Sød Hermelin Kanin\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Sød Hermelin Kanin\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Dyr og udstyr › Gnavere og kaniner",
+        "💬 Fra annoncen: »Vi er nødt til at skille af os med vores nylige indkøbte sødeste hermelin kanin.«"
+      ]
     },
     {
       "type": "estimate",
@@ -44,7 +58,12 @@ window.QUIZZES['hvad_koster_det'] = {
       "answer": 75,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/25832359",
-      "why": "Annoncens titel: \"Lærebog for Hærens Menige 1. del – militær bog 1951\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Lærebog for Hærens Menige 1. del – militær bog 1951\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Bøger og magasiner › Faglitteratur",
+        "🏷️ Stand: Brugt",
+        "💬 Fra annoncen: »Ældre militær lærebog: 'Lærebog for Hærens Menige 1. del'. Hardback med mørk forside, guldtryk og håndskrevne noter på første side, trykt i København …«"
+      ]
     },
     {
       "type": "estimate",
@@ -54,7 +73,12 @@ window.QUIZZES['hvad_koster_det'] = {
       "answer": 14400,
       "unit": "kr",
       "source": "https://www.dba.dk/mobility/item/25846863",
-      "why": "Annoncens titel: \"VW New Beetle 1,9 TDi 105 Highline Cabriolet 2D\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"VW New Beetle 1,9 TDi 105 Highline Cabriolet 2D\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Biler › Cabriolet",
+        "🏷️ Stand: Brugt · Mærke: VW",
+        "💬 Fra annoncen: »VW New Beetle 1,9 TDi 105 Highline Cabriolet 2D.«"
+      ]
     },
     {
       "type": "estimate",
@@ -64,7 +88,11 @@ window.QUIZZES['hvad_koster_det'] = {
       "answer": 738,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/11628787",
-      "why": "Annoncens titel: \"vidaXL stående tøjdyr enhjørning plysstof XXL hvid og lyserød\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"vidaXL stående tøjdyr enhjørning plysstof XXL hvid og lyserød\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Legetøj › Bamser, dukker og figurer",
+        "💬 Fra annoncen: »Legen bliver meget sjovere med denne naturtro plysenhjørning, som barnet kan sidde på! Denne bløde og nuttede enhjørning med flotte detaljer består …«"
+      ]
     },
     {
       "type": "estimate",
@@ -74,7 +102,12 @@ window.QUIZZES['hvad_koster_det'] = {
       "answer": 45000,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/25798645",
-      "why": "Annoncens titel: \"Jukebox Wurlitzer 1015 OMT cd/100\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Jukebox Wurlitzer 1015 OMT cd/100\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Musikinstrumenter › Lydudstyr",
+        "🏷️ Stand: Brugt",
+        "💬 Fra annoncen: »Flot jukebox med farvede lysrør og klassisk front med kromdetaljer. Har CD-afspiller og betjeningspanel foran til valg af numre. Wurlitzer 1015 OMT  …«"
+      ]
     },
     {
       "type": "estimate",
@@ -84,7 +117,11 @@ window.QUIZZES['hvad_koster_det'] = {
       "answer": 35,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/25302188",
-      "why": "Annoncens titel: \"Må jeg kigge i din ble?\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Må jeg kigge i din ble?\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Forældre og børn › Børnebøger",
+        "💬 Fra annoncen: »Må jeg kigge i din ble? Af Guido Van Genechten. Fra 2020. Genre: Børnebog.«"
+      ]
     },
     {
       "type": "estimate",
@@ -94,7 +131,12 @@ window.QUIZZES['hvad_koster_det'] = {
       "answer": 7500,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/25847886",
-      "why": "Annoncens titel: \"Pokemon kort Lugia V PSA 10 japansk\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Pokemon kort Lugia V PSA 10 japansk\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Samlerobjekter › Samlekort",
+        "🏷️ Stand: Graderet PSA 10 (perfekt) · Mærke: Pokémon",
+        "💬 Fra annoncen: »Japansk Lugia V-kort, graderet og forseglet i PSA-etui med karakteren 10.«"
+      ]
     },
     {
       "type": "estimate",
@@ -104,7 +146,12 @@ window.QUIZZES['hvad_koster_det'] = {
       "answer": 1050,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/25567788",
-      "why": "Annoncens titel: \"Toiletsæde, ME by starck med softclose. Mathvid. Ubrugt. ( annonce 551 C )\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Toiletsæde, ME by starck med softclose. Mathvid. Ubrugt. ( annonce 551 C )\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Badeværelse › Toiletter",
+        "🏷️ Stand: Ny / ubrugt",
+        "💬 Fra annoncen: »Mat hvid toiletsæde fra Duravit Me by starck compact med softclose og aftagelig. Leverandørens varenummer 0020193200. annonce 551 C.«"
+      ]
     },
     {
       "type": "estimate",
@@ -114,7 +161,12 @@ window.QUIZZES['hvad_koster_det'] = {
       "answer": 21500,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/17510447",
-      "why": "Annoncens titel: \"Gottlieb thunder Flipperspil\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Gottlieb thunder Flipperspil\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Underholdning og hobby › Anden underholdning og hobby",
+        "🏷️ Stand: Brugt",
+        "💬 Fra annoncen: »Gottlieb Thunderdome flipperspil med farverigt spillebord og klassisk arkadespil-design. Flipperspillet har flere bumpers, ramper og lysfunktioner …«"
+      ]
     },
     {
       "type": "estimate",
@@ -124,7 +176,12 @@ window.QUIZZES['hvad_koster_det'] = {
       "answer": 100,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/25391658",
-      "why": "Annoncens titel: \"Ble spand\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Ble spand\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Forældre og børn › Børnetilbehør og sikkerhed",
+        "🏷️ Stand: Ny / ubrugt",
+        "💬 Fra annoncen: »Praktisk blespand med rundt låg og bærehank. Nem at åbne og lukke og passer fint ved puslebordet eller på badeværelset.«"
+      ]
     },
     {
       "type": "estimate",
@@ -134,7 +191,12 @@ window.QUIZZES['hvad_koster_det'] = {
       "answer": 5000,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/25793014",
-      "why": "Annoncens titel: \"Commodore Amiga CD32 spillekonsol med original emballage\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Commodore Amiga CD32 spillekonsol med original emballage\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Videospil og konsoller › Spillekonsoller",
+        "🏷️ Stand: Brugt",
+        "💬 Fra annoncen: »Commodore Amiga CD32 spillekonsol sælges med original kasse og det originale tilbehør. Selve konsollen er blevet professionelt recapped og fremstår i …«"
+      ]
     },
     {
       "type": "estimate",
@@ -144,7 +206,12 @@ window.QUIZZES['hvad_koster_det'] = {
       "answer": 800,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/15937791",
-      "why": "Annoncens titel: \"Vintage metal juletræsfod med figurer\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Vintage metal juletræsfod med figurer\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Kunst og antik › Andre antikviteter",
+        "🏷️ Stand: Brugt",
+        "💬 Fra annoncen: »Vintage metal juletræsfod med figurer af mennesker, trekantet form og er malet i flere farver, viser tegn på brug og alder. 40x40x40 cm. Højde ca. 25 …«"
+      ]
     },
     {
       "type": "estimate",
@@ -154,7 +221,12 @@ window.QUIZZES['hvad_koster_det'] = {
       "answer": 35000,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/25839614",
-      "why": "Annoncens titel: \"Adria campingvogn med køkken og gasblus\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Adria campingvogn med køkken og gasblus\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Bil-, båd- og motorcykeludstyr › Campingvogn og autocamperdele",
+        "🏷️ Stand: Brugt",
+        "💬 Fra annoncen: »Vognen er gas og fugttestet 10 marts 2026. Campingvognen er synet 30. april 2024. Der medfølger næsten nyt Isabella Capri fortelt. Kun brugt 2 gange …«"
+      ]
     },
     {
       "type": "estimate",
@@ -164,7 +236,12 @@ window.QUIZZES['hvad_koster_det'] = {
       "answer": 950,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/17752469",
-      "why": "Annoncens titel: \"Pink Floyd The Wall LP vinylplade\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Pink Floyd The Wall LP vinylplade\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Musik og film › LP'er og EP'er",
+        "🏷️ Stand: Brugt",
+        "💬 Fra annoncen: »Pink Floyd The Wall LP vinylplade med cover og indhold. Pladenerne er som ubrugte, 1. optryk.«"
+      ]
     },
     {
       "type": "estimate",
@@ -174,7 +251,11 @@ window.QUIZZES['hvad_koster_det'] = {
       "answer": 5976,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/25849010",
-      "why": "Annoncens titel: \"Antonio Ruiz López - - Klassisk guitar - Spanien - 1967\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Antonio Ruiz López - - Klassisk guitar - Spanien - 1967\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Musikinstrumenter › Guitarer",
+        "💬 Fra annoncen: »Klassisk guitar bygget af luthier Antonio Ruiz López i Spanien, 1967.«"
+      ]
     },
     {
       "type": "estimate",
@@ -184,7 +265,12 @@ window.QUIZZES['hvad_koster_det'] = {
       "answer": 5000,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/16317959",
-      "why": "Annoncens titel: \"Tex Tan Westernsadel tilsalg\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Tex Tan Westernsadel tilsalg\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Heste- og rideudstyr › Sadler",
+        "🏷️ Stand: Brugt",
+        "💬 Fra annoncen: »Jeg sælger min gamle amerikanske westernsadel da jeg ikke længere får fokuseret på western ridning nok. Den er i fin stand, før jeg købte den har den …«"
+      ]
     },
     {
       "type": "estimate",
@@ -194,7 +280,12 @@ window.QUIZZES['hvad_koster_det'] = {
       "answer": 35500,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/25851443",
-      "why": "Annoncens titel: \"Husqvarna Combi 316SXAWD. Have traktor. Ny model. plæneklipper\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Husqvarna Combi 316SXAWD. Have traktor. Ny model. plæneklipper\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Have og gårdhave › Plæneklippere",
+        "🏷️ Stand: Brugt",
+        "💬 Fra annoncen: »Husqvarna frontrider med Combi 94 klippebord sælges. God siddekomfort med justerbart sæde og nem betjening fra pladsen med rat og pedaler.kørt 590 …«"
+      ]
     },
     {
       "type": "estimate",
@@ -204,7 +295,11 @@ window.QUIZZES['hvad_koster_det'] = {
       "answer": 26900,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/10597507",
-      "why": "Annoncens titel: \"Erik Jørgensen sofa model 315 ny polstret i due blå camira uld\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Erik Jørgensen sofa model 315 ny polstret i due blå camira uld\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Sofaer og lænestole › Sofaer",
+        "💬 Fra annoncen: »Erik Jørgensens tre personers sofa model 315. Sofaen er ny polstret i en flot due blå Camira uld. Benene er nypudsede bøgeben. Minimal brugsslitage …«"
+      ]
     }
   ],
   "tiebreakers": [
@@ -216,7 +311,12 @@ window.QUIZZES['hvad_koster_det'] = {
       "answer": 40,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/24993796",
-      "why": "Annoncens titel: \"Melvis 2 tegneseriehæfte – Det er bare våd ble, mand!\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Melvis 2 tegneseriehæfte – Det er bare våd ble, mand!\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Bøger og magasiner › Tegneserier",
+        "🏷️ Stand: Brugt",
+        "💬 Fra annoncen: »Melvis 2 tegneseriehæfte: Det er bare våd ble, mand! Interrpresse. Stand very fine.«"
+      ]
     },
     {
       "type": "estimate",
@@ -226,7 +326,12 @@ window.QUIZZES['hvad_koster_det'] = {
       "answer": 575,
       "unit": "kr",
       "source": "https://www.dba.dk/recommerce/forsale/item/25851614",
-      "why": "Annoncens titel: \"Stor LEGO DUPLO togpakke med masser af skinner og tilbehør\". Prisen er sælgerens udbudspris på DBA, oktober 2026."
+      "why": "Annoncens titel: \"Stor LEGO DUPLO togpakke med masser af skinner og tilbehør\". Prisen er sælgerens udbudspris på DBA, oktober 2026.",
+      "clues": [
+        "📂 Kategori: Legetøj › LEGO og DUPLO",
+        "🏷️ Stand: Brugt · Mærke: LEGO",
+        "💬 Fra annoncen: »Sælger en stor samling LEGO DUPLO med masser af togskinner, buede skinner, sporskifter, bomme, vogne, klodser og andet tilbehør. Der medfølger også …«"
+      ]
     }
   ]
 };

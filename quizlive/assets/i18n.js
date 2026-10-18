@@ -38,7 +38,7 @@ window.QL_I18N = {
     'progress.label': 'Spørgsmål {{n}}/{{total}}',
 
     /* --- "Hvad koster det?" (prisgæt) --- */
-    'est.hostHint': '📱 Skriv dit bud i kroner på mobilen. Tættest på vinder!',
+    'est.hostHint': '📱 Skriv dit bud på mobilen. Der kommer flere ledetråde undervejs — men jo før du gætter, jo flere point!',
     'est.placeholder': 'Dit bud',
     'est.submit': 'Send bud',
     'est.invalid': 'Skriv et beløb med tal',
@@ -55,6 +55,19 @@ window.QL_I18N = {
     'est.noGuess': 'Intet bud · 0 point',
     'est.detail': 'Prisen: {{answer}}<br>Dit bud: {{guess}} ({{pct}})',
     'est.priceWas': 'Prisen var {{answer}}',
+    'est.unknownItem': '❓ Hvad mon det er …',
+    'est.clueStep': 'Ledetråd {{n}}/{{total}}',
+    'est.meterNext': '💰 Gæt nu: {{pct}} % af pointene · næste ledetråd om {{s}} s',
+    'est.meterLast': '💰 Gæt nu: {{pct}} % af pointene · sidste ledetråd',
+    'est.meterShort': '💰 Gæt nu: {{pct}} % point · ny ledetråd om {{s}} s',
+    'est.meterShortLast': '💰 Gæt nu: {{pct}} % point · sidste ledetråd',
+    'est.lockedFactor': 'Bud sendt: {{guess}} ✔ Du gættede ved ledetråd {{n}} → {{pct}} % af pointene',
+    'est.digits1': '🔢 Prisen er et 1-cifret beløb (1–9 {{unit}})',
+    'est.digits': '🔢 Prisen har {{n}} cifre ({{lo}}–{{hi}} {{unit}})',
+    'est.factorTag': '⏱ {{pct}} %',
+    'est.bidsTitle': '📋 Alle bud',
+    'est.you': 'dig',
+    'est.detailFactor': 'Gættet ved ledetråd {{n}} → {{pct}} % af pointene',
 
     /* --- Reveal (player) --- */
     'reveal.totalScoreLabel': 'Din totalscore',
@@ -198,7 +211,7 @@ window.QL_I18N = {
     'progress.label': 'Question {{n}}/{{total}}',
 
     /* --- "What does it cost?" (price guess) --- */
-    'est.hostHint': '📱 Type your guess in kroner on your phone. Closest wins!',
+    'est.hostHint': '📱 Type your guess on your phone. More clues appear as time runs — but the sooner you guess, the more points!',
     'est.placeholder': 'Your guess',
     'est.submit': 'Send guess',
     'est.invalid': 'Enter an amount in numbers',
@@ -215,6 +228,19 @@ window.QL_I18N = {
     'est.noGuess': 'No guess · 0 points',
     'est.detail': 'Price: {{answer}}<br>Your guess: {{guess}} ({{pct}})',
     'est.priceWas': 'The price was {{answer}}',
+    'est.unknownItem': '❓ What could it be …',
+    'est.clueStep': 'Clue {{n}}/{{total}}',
+    'est.meterNext': '💰 Guess now: {{pct}} % of the points · next clue in {{s}} s',
+    'est.meterLast': '💰 Guess now: {{pct}} % of the points · final clue',
+    'est.meterShort': '💰 Guess now: {{pct}} % points · new clue in {{s}} s',
+    'est.meterShortLast': '💰 Guess now: {{pct}} % points · final clue',
+    'est.lockedFactor': 'Guess sent: {{guess}} ✔ You guessed at clue {{n}} → {{pct}} % of the points',
+    'est.digits1': '🔢 The price is a 1-digit amount (1–9 {{unit}})',
+    'est.digits': '🔢 The price has {{n}} digits ({{lo}}–{{hi}} {{unit}})',
+    'est.factorTag': '⏱ {{pct}} %',
+    'est.bidsTitle': '📋 All guesses',
+    'est.you': 'you',
+    'est.detailFactor': 'Guessed at clue {{n}} → {{pct}} % of the points',
 
     /* --- Reveal (player) --- */
     'reveal.totalScoreLabel': 'Your total score',

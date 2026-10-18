@@ -38,7 +38,10 @@
     stateRef: null,
     stateListener: null,
     sdRound: 0,       // aktiv Sudden Death-runde (0-baseret) — bruges som DB-svar-nøgle
-    estLoadedKey: null // hvilket spørgsmål prisgæt-panelet sidst er udfyldt til
+    estLoadedKey: null, // hvilket spørgsmål prisgæt-panelet sidst er udfyldt til
+    estQ: null,         // seneste /question-data for prisgæt (ledetråde publiceres løbende af hosten)
+    estQRef: null,
+    estQListener: null
   };
 
   /* --- Skærm-hjælper --- */
@@ -225,6 +228,7 @@
     }
     state.stateRef = null;
     state.stateListener = null;
+    stopEstimateListener();
     clearTimer();
     clearSession();
     state.pin = '';
@@ -266,8 +270,10 @@
 
   function handlePhase(phase, stateData) {
     stateData = stateData || {};
+    state.lastStateData = stateData;
     var prevPhase = state.currentPhase;
     state.currentPhase = phase;
+    if (phase !== 'question' && phase !== 'suddendeath') stopEstimateListener();
 
     if (phase === 'lobby') {
       hideProgressBadge();
@@ -278,6 +284,7 @@
       if (qIndex !== state.currentQIndex) {
         state.currentQIndex = qIndex;
         state.hasAnswered = false;
+        state.lastGuessMsg = null;
       }
       if (stateData.totalQ) updateProgressBadge(qIndex + 1, stateData.totalQ);
       showQuestionScreen(stateData);
@@ -309,6 +316,7 @@
         if (sdKey !== state.currentQIndex) {
           state.currentQIndex = sdKey;
           state.hasAnswered = false;
+          state.lastGuessMsg = null;
         }
         showQuestionScreen(stateData);
       } else {
@@ -349,13 +357,17 @@
     if (state.hasAnswered) {
       // Allerede besvaret — vis locked state
       setInputsLocked(true);
-      if (isEst && state.lastGuessText) answeredMsg.textContent = t('est.sentMsg', { guess: state.lastGuessText });
+      if (isEst && state.lastGuessMsg) answeredMsg.textContent = state.lastGuessMsg;
       answeredMsg.style.display = 'block';
     }
-    // Sudden Death-prisgæt: vis prisen, når hosten har afgjort runden
+    // Sudden Death-prisgæt: vis prisen + alle bud, når hosten har afgjort runden
+    var qBids = document.getElementById('q-bids');
     if (isEst && state.currentPhase === 'suddendeath' && typeof stateData.estAnswer === 'number') {
       answeredMsg.textContent = t('est.priceWas', { answer: fmtKr(stateData.estAnswer) });
       answeredMsg.style.display = 'block';
+      showBids(qBids);
+    } else {
+      qBids.style.display = 'none';
     }
 
     // Timer — brug spørgsmålets EGEN tid, hvis den er publiceret (Sudden
@@ -372,6 +384,9 @@
         return (players[pid] && players[pid].name) || '?';
       });
       document.getElementById('sd-spectator-names').textContent = names.join(' 🆚 ');
+      var specBids = document.getElementById('sd-spectator-bids');
+      if (stateData.qType === 'estimate' && typeof stateData.estAnswer === 'number') showBids(specBids);
+      else specBids.style.display = 'none';
       showScreen('screen-sd-spectator');
     });
   }
@@ -393,6 +408,7 @@
       } else {
         bar.classList.remove('urgent');
       }
+      updateEstMeter(elapsed);
       if (remaining <= 0) {
         clearTimer();
         // Lås knapperne — for sene svar tæller alligevel ikke hos hosten
@@ -438,23 +454,112 @@
     return db.ref('games/' + state.pin + '/answers/' + state.currentQIndex + '/' + state.playerId);
   }
 
-  /* --- Prisgæt: hent billede + genstand for det aktuelle spørgsmål (én gang pr. spørgsmål) --- */
+  /* --- Prisgæt: lyt på det aktuelle spørgsmål. Hosten publicerer ledetrådene
+     løbende (sløret billede → skarpt + navn → stand/mærke → citat → antal
+     cifre), så vi abonnerer i stedet for at læse én gang. --- */
   function loadEstimateQuestion() {
     var key = String(state.currentQIndex);
     if (state.estLoadedKey === key) return;
+    stopEstimateListener();
     state.estLoadedKey = key;
+    state.estQ = null;
     var img = document.getElementById('est-img');
     var input = document.getElementById('est-input');
     img.setAttribute('src', '');
+    img.classList.remove('est-blur');
     document.getElementById('est-item').textContent = '';
+    document.getElementById('est-clues').innerHTML = '';
+    document.getElementById('est-meter').textContent = '';
     if (!state.hasAnswered) input.value = '';
-    db.ref('games/' + state.pin + '/question').once('value', function (snap) {
-      var q = snap.val() || {};
+    state.estQRef = db.ref('games/' + state.pin + '/question');
+    state.estQListener = function (snap) {
       if (state.estLoadedKey !== key) return; // nyt spørgsmål er kommet i mellemtiden
-      img.setAttribute('src', q.imgUrl || '');
-      document.getElementById('est-item').textContent = q.item || '';
+      var q = snap.val() || {};
+      state.estQ = q;
+      if (img.getAttribute('src') !== (q.imgUrl || '')) img.setAttribute('src', q.imgUrl || '');
+      img.classList.toggle('est-blur', !!q.progressive && (q.step || 0) === 0);
+      document.getElementById('est-item').textContent = q.item || (q.progressive ? t('est.unknownItem') : '');
       document.getElementById('est-unit').textContent = q.unit || 'kr';
+      var clues = q.clues || [];
+      renderClueList(document.getElementById('est-clues'), clues, !!q.progressive);
+      document.getElementById('estimate-panel').classList.toggle('has-clues', clues.length > 0);
+    };
+    state.estQRef.on('value', state.estQListener);
+  }
+
+  function stopEstimateListener() {
+    if (state.estQRef && state.estQListener) state.estQRef.off('value', state.estQListener);
+    state.estQRef = null;
+    state.estQListener = null;
+    state.estLoadedKey = null;
+  }
+
+  function renderClueList(container, clues, markNewest) {
+    var have = container.children.length;
+    if (have > clues.length) { container.innerHTML = ''; have = 0; }
+    Array.prototype.forEach.call(container.children, function (el) { el.classList.remove('newest'); });
+    for (var i = have; i < clues.length; i++) {
+      var div = document.createElement('div');
+      div.className = 'est-clue' + (markNewest && i === clues.length - 1 ? ' newest' : '');
+      div.textContent = clues[i];
+      container.appendChild(div);
+    }
+  }
+
+  /* Samme trin-/faktor-regel som host.js's estFactor() — kun til visning;
+     hosten beregner de rigtige point ud fra svarets server-tidsstempel. */
+  function estFactorLocal(step, n) {
+    if (n <= 1) return 1;
+    return 1 - 0.5 * step / (n - 1);
+  }
+  function estStepAt(elapsedSec) {
+    var q = state.estQ;
+    if (!q || !q.progressive || !q.stepCount || !q.stepMs) return null;
+    return Math.max(0, Math.min(q.stepCount - 1, Math.floor((elapsedSec * 1000) / q.stepMs)));
+  }
+
+  function updateEstMeter(elapsedSec) {
+    var el = document.getElementById('est-meter');
+    if (!el) return;
+    var q = state.estQ;
+    var k = estStepAt(elapsedSec);
+    if (k === null || state.hasAnswered || state.currentPhase !== 'question') { el.textContent = ''; return; }
+    var pct = Math.round(estFactorLocal(k, q.stepCount) * 100);
+    if (k < q.stepCount - 1) {
+      var s = Math.max(1, Math.ceil(((k + 1) * q.stepMs - elapsedSec * 1000) / 1000));
+      el.textContent = t('est.meterShort', { pct: pct, s: s });
+    } else {
+      el.textContent = t('est.meterShortLast', { pct: pct });
+    }
+  }
+
+  /* --- "Alle bud": hele budrunden på mobilen (skrevet af hosten til games/{pin}/bids) --- */
+  function showBids(container) {
+    db.ref('games/' + state.pin + '/bids').once('value', function (snap) {
+      var b = snap.val();
+      var rows = (b && b.rows) || [];
+      if (!rows.length) { container.style.display = 'none'; return; }
+      var html = '<div class="bids-title">' + escHtml(t('est.bidsTitle')) + '</div><div class="bids-list">';
+      rows.forEach(function (r, i) {
+        var me = r.pid === state.playerId;
+        var sub = escHtml(r.pct || '') + (typeof r.factor === 'number' ? ' · ' + escHtml(t('est.factorTag', { pct: r.factor })) : '');
+        html += '<div class="bid-row' + (r.closest ? ' best' : '') + (me ? ' me' : '') + '">' +
+          '<div>' + (r.closest ? '🎯' : (i + 1) + '.') + '</div>' +
+          '<div class="bid-name">' + escHtml(r.name || '?') + (me ? ' (' + escHtml(t('est.you')) + ')' : '') +
+            '<span class="bid-sub">' + sub + '</span></div>' +
+          '<div class="bid-guess">' + escHtml(fmtKr(r.guess)) +
+            (typeof r.pts === 'number' ? '<span class="bid-pts">+' + r.pts + '</span>' : '') + '</div>' +
+          '</div>';
+      });
+      container.innerHTML = html + '</div>';
+      container.style.display = 'block';
+      var myRow = container.querySelector('.bid-row.me');
+      if (myRow && myRow.scrollIntoView) myRow.scrollIntoView({ block: 'nearest' });
     });
+  }
+
+  function escHtml(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
   /* Tusindtals-punktummer mens man taster (1000000 → 1.000.000) */
@@ -484,6 +589,14 @@
     estInput.blur();
     var msg = document.getElementById('answered-msg');
     msg.textContent = t('est.sentMsg', { guess: state.lastGuessText });
+    var sAt = state.currentPhase === 'question' && state.lastStateData ? state.lastStateData.questionStartAt : null;
+    var k = sAt ? estStepAt((serverNow() - sAt) / 1000) : null;
+    if (k !== null) {
+      msg.textContent = t('est.lockedFactor', { guess: state.lastGuessText, n: k + 1,
+        pct: Math.round(estFactorLocal(k, state.estQ.stepCount) * 100) });
+    }
+    state.lastGuessMsg = msg.textContent;
+    document.getElementById('est-meter').textContent = '';
     msg.style.display = 'block';
     answerRefFor().set({ guess: guess, at: firebase.database.ServerValue.TIMESTAMP });
   });
@@ -539,6 +652,7 @@
         // Løsning: host skriver state.correctChoice ved reveal.
         var estDetail = document.getElementById('est-detail');
         estDetail.style.display = 'none';
+        document.getElementById('reveal-bids').style.display = 'none';
         if (stateData.qType === 'estimate') {
           showEstimateReveal(stateData, aSnap.exists() ? aSnap.val() : null, players[state.playerId] || {}, myScore, placement, total);
           return;
@@ -612,7 +726,10 @@
       if (hasGuess) {
         var pct = answer > 0 ? Math.round(((myAns.guess - answer) / answer) * 100) : 0;
         var pctTxt = pct === 0 ? t('est.exact') : (pct > 0 ? '+' : '') + pct + ' %';
-        estDetail.innerHTML = t('est.detail', { answer: fmtKr(answer), guess: fmtKr(myAns.guess), pct: pctTxt });
+        estDetail.innerHTML = t('est.detail', { answer: fmtKr(answer), guess: fmtKr(myAns.guess), pct: pctTxt }) +
+          (typeof me.lastFactor === 'number' && me.lastStep
+            ? '<br><span class="text-muted">' + escHtml(t('est.detailFactor', { n: me.lastStep, pct: me.lastFactor })) + '</span>'
+            : '');
       } else {
         estDetail.textContent = t('est.priceWas', { answer: fmtKr(answer) });
       }
@@ -629,6 +746,8 @@
         streakEl.style.display = 'none';
       }
     }
+
+    if (typeof answer === 'number') showBids(document.getElementById('reveal-bids'));
 
     document.getElementById('reveal-score').textContent = myScore;
     document.getElementById('reveal-placement').textContent = t('reveal.placement', { n: placement, total: total });
