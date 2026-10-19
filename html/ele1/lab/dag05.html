@@ -16,7 +16,7 @@
     <a href="../../../index.html#edu/maskiningenioer/sem3/ele1/dag05">← Studiehub</a>
   </div>
 </header>
-<div class="howto"><b>Sådan bruges laben:</b> Hver opgave starter med opgavens egne tal. Regn først selv, skriv svaret under <b>Prøv selv først</b>, og tjek det. Skru derefter på værdierne, især frekvensen, og se impedansen ændre sig. <b>Løsning trin for trin</b> følger altid de værdier, der står i indstillingerne lige nu.</div>
+<div class="howto"><b>Sådan bruges laben:</b> Hver opgave starter med opgavens egne tal. Regn først selv, skriv svaret under <b>Prøv selv først</b>, og tjek det. Skru derefter på værdierne, især frekvensen, og se impedansen ændre sig. <b>Løsning trin for trin</b> følger altid de værdier, der står i indstillingerne lige nu.<br><b>Om øvelse 2–10:</b> Underviseren henviser til opgave 4.1, 4.20, 4.29 osv. i 1. udgave af bogen. Laben bruger opgaverne med samme numre i kapitel 3 i Rizzoni og Kearns (2022), 2. udgave (3.1, 3.20, 3.29 osv.), hvor stoffet ligger. Tjek, at opgaveteksten svarer til den opgave, I har fået; ellers kan tallene stilles om med skyderne.</div>
 <nav class="tasknav" id="tasknav"></nav>
 <main id="tasks"></main>
 <footer>ELE1-A26 · Øvelseslab til dag 5 · opgaverne svarer til studienoten · <a href="../../../index.html#edu/maskiningenioer/sem3/ele1">Studiehub</a></footer>
@@ -143,6 +143,328 @@
         'Serie, læg sammen i kartesisk form: <span class="f">Z_EQ = ' + fmt(p.R1) + ' + ' + Lab.fc(s.zl, '', 4) + ' + ' + Lab.fc(s.zp, '', 4) + '</span> = <span class="res">' + Lab.fc(s.z, 'Ω', 4) + ' = ' + Lab.fp(s.z, 'Ω', 4) + '</span>',
         (s.z.im > 0 ? 'Imaginærdelen er positiv: kredsløbet er <b>induktivt</b>, og strømmen halter ' : 'Imaginærdelen er negativ: kredsløbet er <b>kapacitivt</b>, og strømmen fører ') + fmt(Math.abs(deg(Cx.arg(s.z))), 3) + '° i forhold til spændingen (se tidsplottet).',
         'I LTspice: <span class="f">SINE(0 12 ' + fmt(p.w / 2 / PI, 6).replace(',', '.').replace(/ /g, '') + ')</span>, strømamplitude ≈ ' + fu(12 / Cx.abs(s.z), 'A') + '.'];
+    });
+    T.ready();
+  })();
+})();
+</script>
+<script>
+/* ===== Øvelse 2-10: bogens opgaver (Rizzoni og Kearns 2022, kap. 3) ===== */
+(function () {
+  var fu = Lab.fu, fmt = Lab.fmt, C = Lab.COL, Cx = Lab.Cx, deg = Lab.deg, rad = Lab.rad, PI = Math.PI;
+  var P = Lab.C, pol = Cx.polar;
+
+  /* ---------- Øvelse 2: opgave 3.1 ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse 2', title: 'Opgave 3.1 (4.1): spændingen over en spole', short: 'Opg. 3.1',
+      text: 'Strømmen gennem en spole på 0,8 H er i_L(t) = sin(100t + π/4) A. Find spændingen over spolen.',
+      learn: 'spændingen er L gange hældningen af strømmen. Den er derfor 90° foran strømmen, og amplituden er ωL gange strømmens amplitude. Fordobl ω, og spændingen fordobles.' });
+    Lab.slider(T, { key: 'L', label: 'Induktans L', min: 0.1, max: 2, step: 0.05, value: 0.8, unit: 'H', noPrefix: true });
+    Lab.slider(T, { key: 'A', label: 'Strømamplitude', min: 0.1, max: 5, step: 0.1, value: 1, unit: 'A', noPrefix: true });
+    Lab.slider(T, { key: 'w', label: 'ω', min: 10, max: 1000, step: 10, value: 100, unit: 'rad/s', noPrefix: true });
+    Lab.slider(T, { key: 'ph', label: 'Fase i sinus (π/4 = 45°)', min: -180, max: 180, step: 1, value: 45, unit: '°', noPrefix: true });
+    var cvT = Lab.canvas(T.stage, 0.36), cvP = Lab.canvas(T.stage, 0.42);
+    var out = Lab.readout(T, [{ key: 'i', label: 'i_L som cosinus', color: C.red }, { key: 'v', label: 'v_L(t)', color: C.green }, { key: 'X', label: 'ωL', color: C.gold }]);
+    T.on(function (p) {
+      var Vm = p.w * p.L * p.A, Tp = 2 * PI / p.w * 1000;
+      Lab.plot(cvT, { x: [0, 2 * Tp], xlabel: 't [ms]', ylabel: 'i [A] · v [V]', series: [
+        { fn: function (t) { return p.A * Math.sin(p.w * t / 1000 + rad(p.ph)); }, color: C.red, label: 'i_L(t)' },
+        { fn: function (t) { return Vm * Math.cos(p.w * t / 1000 + rad(p.ph)); }, color: C.green, label: 'v_L(t)' }] });
+      Lab.phasor(cvP, [{ z: pol(1, rad(p.ph - 90)), color: C.red, label: 'I_L' }, { z: pol(1, rad(p.ph)), color: C.green, label: 'V_L' }], { max: 1, note: 'Normeret længde: V_L er altid 90° foran I_L.' });
+      out({ i: fmt(p.A) + '·cos(' + fmt(p.w) + 't ' + (p.ph - 90 < 0 ? '− ' : '+ ') + fmt(Math.abs(p.ph - 90)) + '°) A', v: fmt(Vm, 4) + '·cos(' + fmt(p.w) + 't ' + (p.ph < 0 ? '− ' : '+ ') + fmt(Math.abs(p.ph)) + '°) V', X: fu(p.w * p.L, 'Ω') });
+    });
+    Lab.check(T, [{ q: 'Amplituden af v_L(t)', unit: 'V', answer: function (p) { return p.w * p.L * p.A; } },
+      { q: 'Fasen af v_L(t) skrevet som cosinus, i grader', unit: '°', tol: 0.01, answer: function (p) { return p.ph; } }]);
+    Lab.steps(T, function (p) {
+      return ['Spolens ligning: <span class="f">v_L = L·di_L/dt</span>',
+        'Differentiér: <span class="f">d/dt [' + fmt(p.A) + '·sin(' + fmt(p.w) + 't + ' + fmt(p.ph) + '°)] = ' + fmt(p.A * p.w) + '·cos(' + fmt(p.w) + 't + ' + fmt(p.ph) + '°)</span>',
+        'Gang med L: <span class="res">v_L(t) = ' + fmt(p.L * p.A * p.w, 4) + '·cos(' + fmt(p.w) + 't + ' + fmt(p.ph) + '°) V</span>',
+        'Med fasorer: strømmen er <span class="f">' + fmt(p.A) + '∠' + fmt(p.ph - 90) + '°</span> (sinus = cosinus − 90°), og <span class="f">V = jωL·I = ' + fmt(p.w * p.L, 4) + '∠90° · ' + fmt(p.A) + '∠' + fmt(p.ph - 90) + '°</span> = ' + fmt(p.w * p.L * p.A, 4) + '∠' + fmt(p.ph) + '°. Samme resultat.'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Øvelse 3: opgave 3.20 ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse 3', title: 'Opgave 3.20 (4.20): strømmen i en spole ud fra spændingen', short: 'Opg. 3.20',
+      text: 'Spændingen over en spole på 10 mH er +5 V fra 0 til 2 s, 0 V fra 2 til 4 s og −5 V fra 4 til 5 s (figur P3.20). Find strømmen i_L(t), når i_L(0) = 0 A.',
+      learn: 'strømmen er integralet af spændingen divideret med L: konstant spænding giver en ret linje, nul spænding giver vandret strøm. Strømmen kan ikke springe, selvom spændingen gør. Bemærk de store tal: 10 mH er en lille induktans.' });
+    Lab.slider(T, { key: 'L', label: 'Induktans L', min: 1, max: 100, step: 1, value: 10, unit: 'mH', noPrefix: true });
+    Lab.slider(T, { key: 'V', label: 'Spændingsniveau', min: 1, max: 10, step: 0.5, value: 5, unit: 'V', noPrefix: true });
+    Lab.slider(T, { key: 'I0', label: 'Startstrøm i_L(0)', min: -500, max: 500, step: 50, value: 0, unit: 'A', noPrefix: true });
+    var cv1 = Lab.canvas(T.stage, 0.3), cv2 = Lab.canvas(T.stage, 0.36);
+    var out = Lab.readout(T, [{ key: 'a', label: 'i_L(2 s)', color: C.red }, { key: 'b', label: 'i_L(4 s)', color: C.red }, { key: 'c', label: 'i_L(t ≥ 5 s)', color: C.red }]);
+    function iL(p, t) { var k = p.V / (p.L / 1000); return t <= 2 ? p.I0 + k * t : t <= 4 ? p.I0 + 2 * k : t <= 5 ? p.I0 + 2 * k - k * (t - 4) : p.I0 + k; }
+    T.on(function (p) {
+      Lab.plot(cv1, { x: [0, 6], y: [-p.V * 1.3, p.V * 1.3], xlabel: 't [s]', ylabel: 'v_L [V]', series: [{ pts: [[0, p.V], [2, p.V], [2, 0], [4, 0], [4, -p.V], [5, -p.V], [5, 0], [6, 0]], color: C.green, label: 'v_L(t)' }] });
+      Lab.plot(cv2, { x: [0, 6], xlabel: 't [s]', ylabel: 'i_L [A]', series: [{ fn: function (t) { return iL(p, t); }, color: C.red, label: 'i_L(t)' }] });
+      out({ a: fu(iL(p, 2), 'A'), b: fu(iL(p, 4), 'A'), c: fu(iL(p, 6), 'A') });
+    });
+    Lab.check(T, [{ q: 'Strømmen ved t = 2 s', unit: 'A', answer: function (p) { return iL(p, 2); } }, { q: 'Strømmen efter t = 5 s', unit: 'A', answer: function (p) { return iL(p, 6); } }]);
+    Lab.steps(T, function (p) {
+      var k = p.V / (p.L / 1000);
+      return ['Integralformen: <span class="f">i_L(t) = (1/L)·∫v_L dt + i_L(0)</span>. Hældningen er <span class="f">v_L/L = ' + fmt(p.V) + '/' + fmt(p.L / 1000) + '</span> = ' + fmt(k, 4) + ' A/s.',
+        '0–2 s: <span class="f">i_L = ' + fmt(p.I0) + ' + ' + fmt(k, 4) + '·t</span>, så i_L(2) = <span class="res">' + fu(iL(p, 2), 'A') + '</span>',
+        '2–4 s: v_L = 0, så strømmen er konstant ' + fu(iL(p, 4), 'A') + '.',
+        '4–5 s: hældningen er −' + fmt(k, 4) + ' A/s, så i_L(5) = <span class="res">' + fu(iL(p, 5), 'A') + '</span>, og derefter konstant.'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Øvelse 4: opgave 3.29 (og 3.28) ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse 4', title: 'Opgave 3.29 (4.29): styret ensretter og halv effekt', short: 'Opg. 3.29',
+      text: 'En styret ensretter klipper en sinus på 110 V RMS: udgangen følger sinussen fra 0 til tændvinklen θ og fra 2π − θ til 2π, og er nul imellem (figur P3.28). Find den vinkel θ, der giver præcis halvdelen af den effekt, den fulde sinus ville give i en modstand.',
+      learn: 'effekten er proportional med RMS-værdien i anden, så det er arealet under v² der tæller. Skru på θ, til den grønne kurve rammer 50 %.' });
+    Lab.slider(T, { key: 'th', label: 'Tændvinkel θ', min: 0, max: 180, step: 1, value: 120, unit: '°', noPrefix: true });
+    Lab.slider(T, { key: 'Vr', label: 'Indgang (RMS)', min: 50, max: 240, step: 5, value: 110, unit: 'V', noPrefix: true });
+    var cv1 = Lab.canvas(T.stage, 0.36), cv2 = Lab.canvas(T.stage, 0.32);
+    var out = Lab.readout(T, [{ key: 'avg', label: 'Middelværdi af udgang', color: C.cyan }, { key: 'rms', label: 'RMS af udgang', color: C.gold }, { key: 'fr', label: 'Effekt i % af fuld sinus', color: C.green }]);
+    function frac(thd) { var t = rad(thd); return (t - Math.sin(2 * t) / 2) / PI; }
+    function vout(p, x) { var t = rad(p.th), Vp = p.Vr * Math.SQRT2; x = ((x % (2 * PI)) + 2 * PI) % (2 * PI); return (x <= t || x >= 2 * PI - t) ? Vp * Math.sin(x) : 0; }
+    T.on(function (p) {
+      var Vp = p.Vr * Math.SQRT2, f = frac(p.th);
+      Lab.plot(cv1, { x: [0, 360], y: [-Vp * 1.1, Vp * 1.1], xlabel: 'ωt [°]', ylabel: 'v [V]', series: [
+        { fn: function (x) { return Vp * Math.sin(rad(x)); }, color: C.dim, label: 'indgang', width: 1.2, dash: true },
+        { fn: function (x) { return vout(p, rad(x)); }, color: C.gold, label: 'udgang' }], vlines: [{ x: p.th }, { x: 360 - p.th }] });
+      Lab.plot(cv2, { x: [0, 180], y: [0, 105], xlabel: 'θ [°]', ylabel: 'effekt [%]', series: [{ fn: function (x) { return 100 * frac(x); }, color: C.green, label: 'P_ud/P_ind' }],
+        hlines: [{ y: 50, color: C.purple, label: '50 %' }], markers: [{ x: p.th, y: 100 * f }] });
+      out({ avg: '0 V (symmetrisk)', rms: fu(p.Vr * Math.sqrt(f), 'V'), fr: fmt(100 * f, 3) + ' %' });
+    });
+    Lab.check(T, [{ q: 'Den tændvinkel θ, der giver halv effekt (grader)', unit: '°', tol: 0.01, answer: function () { return 90; } },
+      { q: 'RMS-værdien af udgangen ved den valgte θ', unit: 'V', answer: function (p) { return p.Vr * Math.sqrt(frac(p.th)); } }]);
+    Lab.steps(T, function (p) {
+      return ['Effekt i en modstand er proportional med <span class="f">V_rms²</span>. Fuld sinus: <span class="f">∫₀^{2π} sin²x dx = π</span>.',
+        'Udgangen indeholder stykkerne 0..θ og 2π−θ..2π, som er lige store: <span class="f">2·∫₀^θ sin²x dx = θ − ½·sin 2θ</span>',
+        'Forhold: <span class="f">P_ud/P_ind = (θ − ½ sin 2θ)/π</span>. Ved θ = ' + fmt(p.th) + '° er det ' + fmt(100 * frac(p.th), 4) + ' %.',
+        'Halv effekt: <span class="f">θ − ½ sin 2θ = π/2</span>. Med θ = π/2 er sin 2θ = sin π = 0, så ligningen går op: <span class="res">θ = π/2 = 90°</span>',
+        'Opgave 3.28: middelværdien er 0 (det positive og negative stykke er lige store), og <span class="f">V_rms,ud = V_rms,ind·√((θ − ½ sin 2θ)/π)</span> = ' + fu(p.Vr * Math.sqrt(frac(p.th)), 'V') + '.'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Øvelse 5: opgave 3.37 ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse 5', title: 'Opgave 3.37 (4.37): fasorform af funktioner', short: 'Opg. 3.37',
+      text: 'Find fasorformen af: a) 155·cos(377t − 25°) V, b) 5·sin(1000t − 40°) V, c) 10·cos(10t + 63°) + 15·cos(10t − 42°) A, d) 460·cos(500πt − 25°) − 220·sin(500πt + 15°) A. Vælg delopgave med knapperne.',
+      learn: 'en sinus skal først laves om til cosinus (fasen −90°). To led med samme frekvens lægges sammen som vektorer. Et minus foran et led drejer dets fasor 180°.' });
+    Lab.slider(T, { key: 'A1', label: 'Led 1: amplitude', min: 0, max: 500, step: 1, value: 155 });
+    Lab.select(T, { key: 'f1', label: 'Led 1: funktion', options: [['cos', 'cos'], ['sin', 'sin']], value: 'cos' });
+    Lab.slider(T, { key: 'p1', label: 'Led 1: fase', min: -180, max: 180, step: 1, value: -25, unit: '°', noPrefix: true });
+    Lab.select(T, { key: 'sg', label: 'Fortegn foran led 2', options: [['+', '+'], ['-', '−']], value: '+' });
+    Lab.slider(T, { key: 'A2', label: 'Led 2: amplitude (0 = intet led)', min: 0, max: 500, step: 1, value: 0 });
+    Lab.select(T, { key: 'f2', label: 'Led 2: funktion', options: [['cos', 'cos'], ['sin', 'sin']], value: 'cos' });
+    Lab.slider(T, { key: 'p2', label: 'Led 2: fase', min: -180, max: 180, step: 1, value: 0, unit: '°', noPrefix: true });
+    Lab.presets(T, [{ label: 'a', v: { A1: 155, f1: 'cos', p1: -25, A2: 0 } }, { label: 'b', v: { A1: 5, f1: 'sin', p1: -40, A2: 0 } },
+      { label: 'c', v: { A1: 10, f1: 'cos', p1: 63, sg: '+', A2: 15, f2: 'cos', p2: -42 } }, { label: 'd', v: { A1: 460, f1: 'cos', p1: -25, sg: '-', A2: 220, f2: 'sin', p2: 15 } }]);
+    var cvP = Lab.canvas(T.stage, 0.5), cvT = Lab.canvas(T.stage, 0.32);
+    var out = Lab.readout(T, [{ key: 'z1', label: 'Led 1 som fasor', color: C.cyan }, { key: 'z2', label: 'Led 2 som fasor (med fortegn)', color: C.purple }, { key: 's', label: 'Resultat', color: C.green }]);
+    function ph(p) {
+      var z1 = pol(p.A1, rad(p.p1 - (p.f1 === 'sin' ? 90 : 0))), z2 = pol(p.A2 * (p.sg === '-' ? -1 : 1), rad(p.p2 - (p.f2 === 'sin' ? 90 : 0)));
+      return { z1: z1, z2: z2, s: Cx.add(z1, z2) };
+    }
+    T.on(function (p) {
+      var r = ph(p);
+      Lab.phasor(cvP, [{ z: r.z1, color: C.cyan, label: 'led 1' }, { z: r.z2, from: r.z1, color: C.purple, label: p.A2 ? 'led 2' : '', dash: true, width: 2 }, { z: r.s, color: C.green, label: 'sum' }]);
+      Lab.plot(cvT, { x: [0, 720], xlabel: 'ωt [°]', ylabel: 'værdi', series: [{ fn: function (x) { return Cx.abs(r.s) * Math.cos(rad(x) + Cx.arg(r.s)); }, color: C.green, label: 'resultat i tid' }] });
+      out({ z1: Lab.fp(r.z1), z2: p.A2 ? Lab.fp(r.z2) : '–', s: Lab.fp(r.s) + ' = ' + Lab.fc(r.s) });
+    });
+    Lab.check(T, [{ q: 'Resultatets amplitude', unit: '', answer: function (p) { return Cx.abs(ph(p).s); } }, { q: 'Resultatets fase i grader', unit: '°', tol: 0.01, answer: function (p) { return deg(Cx.arg(ph(p).s)); } }]);
+    Lab.steps(T, function (p) {
+      var r = ph(p), s = ['Skriv alle led som cosinus: <span class="f">sin(x) = cos(x − 90°)</span>. Led 1: ' + Lab.fp(r.z1, '', 4) + '.'];
+      if (p.A2) {
+        s.push('Led 2' + (p.sg === '-' ? ' med minus foran (drejer 180°)' : '') + ': ' + Lab.fp(r.z2, '', 4) + '.');
+        s.push('Læg sammen i kartesisk form: ' + Lab.fc(r.z1, '', 4) + ' + (' + Lab.fc(r.z2, '', 4) + ') = ' + Lab.fc(r.s, '', 4));
+      }
+      s.push('Fasorform: <span class="res">' + Lab.fp(r.s, '', 4) + '</span>');
+      return s;
+    });
+    T.ready();
+  })();
+
+  /* ---------- Øvelse 6: opgave 3.45 ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse 6', title: 'Opgave 3.45 (4.45): aflæs en sinus fra en graf', short: 'Opg. 3.45',
+      text: 'Figur P3.45 viser en strøm med topværdi 8 mA og periode T = 4 ms. Minimum ligger ved ωt = −π/4. Skriv kurven som i(t) = A·cos(ωt + φ) og som fasor. Ram den grå kurve med skyderne.',
+      learn: 'amplituden aflæses som topværdien, ω findes af perioden (ω = 2π/T), og fasen af hvor maksimum ligger: maksimum ved ωt = x betyder φ = −x.' });
+    Lab.slider(T, { key: 'A', label: 'Dit gæt: amplitude A', min: 1, max: 12, step: 0.5, value: 5, unit: 'mA', noPrefix: true });
+    Lab.slider(T, { key: 'ph', label: 'Dit gæt: fase φ', min: -180, max: 180, step: 5, value: 0, unit: '°', noPrefix: true });
+    var cv = Lab.canvas(T.stage, 0.42);
+    var out = Lab.readout(T, [{ key: 'w', label: 'ω = 2π/T', color: C.cyan }, { key: 'm', label: 'Passer kurverne?', color: C.green }]);
+    T.on(function (p) {
+      var ok = Math.abs(p.A - 8) < 0.01 && Math.abs(((p.ph + 135 + 540) % 360) - 180) < 0.01;
+      Lab.plot(cv, { x: [-180, 180], y: [-10, 10], xlabel: 'ωt [°]', ylabel: 'i [mA]', series: [
+        { fn: function (x) { return 8 * Math.cos(rad(x) - 3 * PI / 4); }, color: C.dim, label: 'figur P3.45', width: 4 },
+        { fn: function (x) { return p.A * Math.cos(rad(x + p.ph)); }, color: C.gold, label: 'dit gæt' }] });
+      out({ w: fmt(2 * PI / 0.004, 5) + ' rad/s', m: ok ? '<span class="pill ind">Ja, de ligger oven i hinanden</span>' : '<span class="pill warn">Ikke endnu</span>' });
+    });
+    Lab.check(T, [{ q: 'Amplituden A', unit: 'mA', answer: function () { return 8; } }, { q: 'Fasen φ i grader (−180° til 180°)', unit: '°', tol: 0.01, answer: function () { return -135; } }, { q: 'Vinkelfrekvensen ω', unit: 'rad/s', answer: function () { return 2 * PI / 0.004; } }]);
+    Lab.steps(T, function () {
+      return ['Amplitude: topværdien er <span class="res">8 mA</span>.',
+        'Periode T = 4 ms, så <span class="f">ω = 2π/T = 2π/0,004</span> = <span class="res">1571 rad/s</span>.',
+        'Minimum ved ωt = −π/4 betyder maksimum en halv periode senere, ved ωt = 3π/4. En cosinus har maksimum, hvor ωt + φ = 0, så <span class="res">φ = −3π/4 = −135°</span>.',
+        'Tidsdomæne: <span class="res">i(t) = 8·cos(1571t − 3π/4) mA</span>. Fasor: <span class="res">8∠−135° mA</span> (RMS-fasor 5,66∠−135° mA).'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Øvelse 7: opgave 3.48 (og 3.47) ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse 7', title: 'Opgave 3.48 (4.48): ækvivalent impedans og strømme i R₁ og R₂', short: 'Opg. 3.48',
+      text: 'Find den impedans, kilden v_S ser i figur P3.47, når v_S(t) = 5·cos(1000t + 30°) V, R₁ = 300 Ω, R₂ = 300 Ω, L = 100 mH og C = 50 nF. (Bogen har en trykfejl med "300 mH, Ω"; det er 300 Ω.) Simulér også, og se strømmene gennem R₁ og R₂.',
+      learn: 'de tre grene står parallelt med kilden, så hver gren får kildens spænding. Strømmen i R₁ er i fase med spændingen, mens strømmen i R₂-L-grenen halter. Skift til opgave 3.47 med knappen.' });
+    Lab.slider(T, { key: 'V', label: 'Amplitude v_S', min: 1, max: 20, step: 0.5, value: 5, unit: 'V', noPrefix: true });
+    Lab.slider(T, { key: 'phv', label: 'Fase v_S', min: -90, max: 90, step: 1, value: 30, unit: '°', noPrefix: true });
+    Lab.slider(T, { key: 'w', label: 'ω', min: 100, max: 10000, step: 100, value: 1000, unit: 'rad/s', noPrefix: true });
+    Lab.slider(T, { key: 'R1', label: 'R₁', min: 50, max: 2000, step: 10, value: 300, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'R2', label: 'R₂', min: 50, max: 2000, step: 10, value: 300, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'L', label: 'L', min: 10, max: 500, step: 10, value: 100, unit: 'mH', noPrefix: true });
+    Lab.slider(T, { key: 'C', label: 'C', min: 10, max: 500, step: 5, value: 50, unit: 'nF', noPrefix: true });
+    Lab.presets(T, [{ label: 'Opgave 3.48', v: { V: 5, phv: 30, w: 1000, R1: 300, R2: 300, L: 100, C: 50 } }, { label: 'Opgave 3.47', v: { V: 10, phv: 60, w: 4000, R1: 800, R2: 500, L: 200, C: 70 } }], 'Vælg opgave');
+    var ckt = Lab.circuit(T, [
+      { t: 'AC', a: [60, 190], b: [60, 50], label: 'v_S', side: 'l' }, { t: 'w', pts: [[60, 50], [430, 50]] }, { t: 'w', pts: [[60, 190], [430, 190]] },
+      { t: 'R', a: [180, 50], b: [180, 190], label: 'R₁', id: 'lR1' }, { t: 'R', a: [300, 50], b: [300, 120], label: 'R₂', id: 'lR2' }, { t: 'L', a: [300, 120], b: [300, 190], label: 'L', id: 'lL' },
+      { t: 'C', a: [430, 50], b: [430, 190], label: 'C', id: 'lC' }, { t: 'node', at: [180, 50] }, { t: 'node', at: [300, 50] }, { t: 'node', at: [180, 190] }, { t: 'node', at: [300, 190] }
+    ], '0 0 520 215', 210);
+    var cvT = Lab.canvas(T.stage, 0.36);
+    var out = Lab.readout(T, [{ key: 'z', label: 'Z_EQ', color: C.gold }, { key: 'zp', label: 'Z_EQ polær', color: C.gold }, { key: 'i1', label: 'Strøm i R₁', color: C.cyan }, { key: 'i2', label: 'Strøm i R₂ (og L)', color: C.purple }, { key: 'is', label: 'Kildestrøm', color: C.red }]);
+    function calc(p) {
+      var Vs = pol(p.V, rad(p.phv)), z1 = P(p.R1, 0), z2 = P(p.R2, p.w * p.L / 1000), zc = P(0, -1 / (p.w * p.C * 1e-9));
+      var Y = Cx.add(Cx.add(Cx.div(P(1, 0), z1), Cx.div(P(1, 0), z2)), Cx.div(P(1, 0), zc)), Z = Cx.div(P(1, 0), Y);
+      return { Vs: Vs, Z: Z, z2: z2, zc: zc, I1: Cx.div(Vs, z1), I2: Cx.div(Vs, z2), Is: Cx.div(Vs, Z) };
+    }
+    T.on(function (p) {
+      var c = calc(p);
+      ckt.set('lR1', 'R₁ = ' + fmt(p.R1) + ' Ω'); ckt.set('lR2', 'R₂ = ' + fmt(p.R2) + ' Ω'); ckt.set('lL', 'L = ' + fmt(p.L) + ' mH'); ckt.set('lC', 'C = ' + fmt(p.C) + ' nF');
+      var Tp = 2 * PI / p.w * 1000, k = 1000;
+      Lab.plot(cvT, { x: [0, 2 * Tp], xlabel: 't [ms]', ylabel: 'i [mA]', series: [
+        { fn: function (t) { return k * Cx.abs(c.I1) * Math.cos(p.w * t / 1000 + Cx.arg(c.I1)); }, color: C.cyan, label: 'i_R1(t)' },
+        { fn: function (t) { return k * Cx.abs(c.I2) * Math.cos(p.w * t / 1000 + Cx.arg(c.I2)); }, color: C.purple, label: 'i_R2(t)' }] });
+      out({ z: Lab.fc(c.Z, 'Ω'), zp: Lab.fp(c.Z, 'Ω'), i1: Lab.fp(Cx.scale(c.I1, 1000), 'mA'), i2: Lab.fp(Cx.scale(c.I2, 1000), 'mA'), is: Lab.fp(Cx.scale(c.Is, 1000), 'mA') });
+    });
+    Lab.check(T, [{ q: '|Z_EQ|', unit: 'Ω', answer: function (p) { return Cx.abs(calc(p).Z); } }, { q: 'Vinklen af Z_EQ i grader', unit: '°', tol: 0.02, answer: function (p) { return deg(Cx.arg(calc(p).Z)); } }]);
+    Lab.steps(T, function (p) {
+      var c = calc(p);
+      return ['Tre grene parallelt: <span class="f">Z_EQ = R₁ ∥ (R₂ + jωL) ∥ 1/(jωC)</span>. Nemmest med admittanser: <span class="f">Y = 1/Z₁ + 1/Z₂ + 1/Z₃</span>.',
+        'Grenene: Z₁ = ' + fmt(p.R1) + ' Ω, Z₂ = ' + Lab.fc(c.z2, 'Ω', 4) + ', Z₃ = ' + Lab.fc(c.zc, 'Ω', 4),
+        '<span class="f">Y = ' + Lab.fc(Cx.div(P(1, 0), c.Z), 'S', 4) + '</span>, så <span class="res">Z_EQ = 1/Y = ' + Lab.fc(c.Z, 'Ω', 4) + ' = ' + Lab.fp(c.Z, 'Ω', 4) + '</span>',
+        'Strømme (hver gren har kildespændingen ' + Lab.fp(c.Vs, 'V') + '): I_R1 = ' + Lab.fp(Cx.scale(c.I1, 1000), 'mA', 4) + ', I_R2 = ' + Lab.fp(Cx.scale(c.I2, 1000), 'mA', 4) + '.',
+        'LTspice: brug <span class="f">SINE(0 ' + fmt(p.V).replace(',', '.') + ' ' + fmt(p.w / 2 / PI, 5).replace(',', '.').replace(/ /g, '') + ' 0 0 ' + fmt(p.phv) + ')</span> og plot I(R1) og I(R2).'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Øvelse 8: opgave 3.51 ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse 8', title: 'Opgave 3.51 (4.51): spændingen over R₂', short: 'Opg. 3.51',
+      text: 'i(t) = 20·cos(533,33t) A, R₁ = 8 Ω, R₂ = 16 Ω, L = 15 mH og C = 117 µF (figur P3.51). Find v₂(t) over R₂.',
+      learn: 'strømmen deler sig mellem R₁ og grenen med L og (R₂ ∥ C). Ved netop denne frekvens ophæver spolen og kondensatoren hinandens reaktans i grenen, så grenen ser ud som en ren modstand. Skru på ω og se det ændre sig.' });
+    Lab.slider(T, { key: 'I', label: 'Kildestrøm (amplitude)', min: 1, max: 40, step: 1, value: 20, unit: 'A', noPrefix: true });
+    Lab.slider(T, { key: 'w', label: 'ω', min: 100, max: 2000, step: 0.01, value: 533.33, unit: 'rad/s', noPrefix: true, sig: 5 });
+    Lab.slider(T, { key: 'R1', label: 'R₁', min: 1, max: 40, step: 1, value: 8, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'R2', label: 'R₂', min: 1, max: 40, step: 1, value: 16, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'L', label: 'L', min: 1, max: 50, step: 1, value: 15, unit: 'mH', noPrefix: true });
+    Lab.slider(T, { key: 'C', label: 'C', min: 10, max: 500, step: 1, value: 117, unit: 'µF', noPrefix: true });
+    var ckt = Lab.circuit(T, [
+      { t: 'R', a: [60, 50], b: [60, 190], label: 'R₁', id: 'lR1', side: 'l' }, { t: 'I', a: [160, 190], b: [160, 50], label: 'i(t)', id: 'lI' },
+      { t: 'w', pts: [[60, 50], [230, 50]] }, { t: 'L', a: [230, 50], b: [340, 50], label: 'L', id: 'lL', side: 't' },
+      { t: 'w', pts: [[340, 50], [440, 50]] }, { t: 'R', a: [340, 50], b: [340, 190], label: 'R₂  v₂', id: 'lR2', side: 'l' }, { t: 'C', a: [440, 50], b: [440, 190], label: 'C', id: 'lC' },
+      { t: 'w', pts: [[60, 190], [440, 190]] }, { t: 'node', at: [160, 50] }, { t: 'node', at: [340, 50] }, { t: 'node', at: [160, 190] }, { t: 'node', at: [340, 190] }
+    ], '0 0 520 215', 210);
+    var out = Lab.readout(T, [{ key: 'zp', label: 'R₂ ∥ C', color: C.purple }, { key: 'zb', label: 'Gren: jωL + R₂∥C', color: C.gold }, { key: 'ib', label: 'Strøm i grenen', color: C.red }, { key: 'v2', label: 'V₂', color: C.green }]);
+    function calc(p) {
+      var zc = P(0, -1 / (p.w * p.C * 1e-6)), zp = Cx.par(P(p.R2, 0), zc), zb = Cx.add(P(0, p.w * p.L / 1000), zp);
+      var Ib = Cx.mul(P(p.I, 0), Cx.div(P(p.R1, 0), Cx.add(P(p.R1, 0), zb)));
+      return { zc: zc, zp: zp, zb: zb, Ib: Ib, V2: Cx.mul(Ib, zp) };
+    }
+    T.on(function (p) {
+      var c = calc(p);
+      ckt.set('lR1', 'R₁ = ' + fmt(p.R1) + ' Ω'); ckt.set('lI', fmt(p.I) + ' A'); ckt.set('lL', 'L = ' + fmt(p.L) + ' mH'); ckt.set('lR2', 'R₂ = ' + fmt(p.R2) + ' Ω, v₂'); ckt.set('lC', 'C = ' + fmt(p.C) + ' µF');
+      out({ zp: Lab.fc(c.zp, 'Ω'), zb: Lab.fc(c.zb, 'Ω'), ib: Lab.fp(c.Ib, 'A'), v2: Lab.fp(c.V2, 'V') });
+    });
+    Lab.check(T, [{ q: 'Amplituden af v₂', unit: 'V', answer: function (p) { return Cx.abs(calc(p).V2); } }, { q: 'Fasen af v₂ i grader', unit: '°', tol: 0.02, answer: function (p) { return deg(Cx.arg(calc(p).V2)); } }]);
+    Lab.steps(T, function (p) {
+      var c = calc(p);
+      return ['Impedanser: <span class="f">Z_L = jωL = j' + fmt(p.w * p.L / 1000, 4) + ' Ω</span>, <span class="f">Z_C = ' + Lab.fc(c.zc, 'Ω', 4) + '</span>',
+        '<span class="f">R₂ ∥ Z_C = ' + Lab.fc(c.zp, 'Ω', 4) + '</span>, og grenen: <span class="f">Z_g = Z_L + R₂∥Z_C = ' + Lab.fc(c.zb, 'Ω', 4) + '</span>',
+        'Strømdeler mellem R₁ og grenen: <span class="f">I_g = I·R₁/(R₁ + Z_g)</span> = ' + Lab.fp(c.Ib, 'A', 4),
+        '<span class="f">V₂ = I_g·(R₂∥Z_C)</span> = ' + Lab.fp(c.V2, 'V', 4) + ', så <span class="res">v₂(t) = ' + fmt(Cx.abs(c.V2), 4) + '·cos(' + fmt(p.w, 5) + 't ' + (Cx.arg(c.V2) < 0 ? '− ' : '+ ') + fmt(Math.abs(deg(Cx.arg(c.V2))), 4) + '°) V</span>'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Øvelse 9: opgave 3.59 ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse 9', title: 'Opgave 3.59 (4.59): strømmen gennem modstanden', short: 'Opg. 3.59',
+      text: 'i_S(t) = 1·cos(200πt) A løber i en strømkilde, der står parallelt med C = 100 µF og R = 100 Ω (figur P3.59). Find i_R(t). I figuren peger kildens pil nedad, og i_R er defineret nedad gennem R.',
+      learn: 'strømmen deler sig efter strømdelerreglen; den mindste impedans får mest strøm. Ved 100 Hz er kondensatoren meget mindre end 100 Ω, så det meste går gennem C. Vend kildens pil, og se fasen skifte 180°.' });
+    Lab.slider(T, { key: 'I', label: 'Kildestrøm (amplitude)', min: 0.1, max: 5, step: 0.1, value: 1, unit: 'A', noPrefix: true });
+    Lab.slider(T, { key: 'f', label: 'Frekvens f (200π rad/s = 100 Hz)', min: 1, max: 1000, log: true, value: 100, unit: 'Hz' });
+    Lab.slider(T, { key: 'C', label: 'C', min: 1, max: 500, step: 1, value: 100, unit: 'µF', noPrefix: true });
+    Lab.slider(T, { key: 'R', label: 'R', min: 1, max: 500, step: 1, value: 100, unit: 'Ω', noPrefix: true });
+    Lab.select(T, { key: 'dir', label: 'Kildens pil', options: [['ned', 'Nedad (som i figuren)'], ['op', 'Opad']], value: 'ned' });
+    var ckt = Lab.circuit(T, [
+      { t: 'I', a: [70, 50], b: [70, 190], label: 'i_S', id: 'lI', side: 'l' }, { t: 'w', pts: [[70, 50], [360, 50]] }, { t: 'w', pts: [[70, 190], [360, 190]] },
+      { t: 'C', a: [220, 50], b: [220, 190], label: 'C', id: 'lC' }, { t: 'R', a: [360, 50], b: [360, 190], label: 'R', id: 'lR' },
+      { t: 'iarrow', at: [385, 100], dir: 'd' }, { t: 'txt', at: [395, 90], s: 'i_R', color: C.gold, anchor: 'start' }
+    ], '0 0 480 215', 210);
+    var out = Lab.readout(T, [{ key: 'zc', label: 'Z_C', color: C.purple }, { key: 'iR', label: 'I_R (nedad)', color: C.gold }, { key: 'iC', label: 'Strøm i C', color: C.purple }]);
+    function calc(p) {
+      var w = 2 * PI * p.f, zc = P(0, -1 / (w * p.C * 1e-6)), s = p.dir === 'ned' ? -1 : 1;
+      var Is = P(p.I * s, 0), IR = Cx.mul(Is, Cx.div(zc, Cx.add(P(p.R, 0), zc)));
+      return { zc: zc, IR: IR, IC: Cx.sub(Is, IR) };
+    }
+    T.on(function (p) {
+      var c = calc(p);
+      ckt.set('lI', 'i_S = ' + fmt(p.I) + ' A'); ckt.set('lC', 'C = ' + fmt(p.C) + ' µF'); ckt.set('lR', 'R = ' + fmt(p.R) + ' Ω');
+      out({ zc: Lab.fc(c.zc, 'Ω'), iR: Lab.fp(c.IR, 'A'), iC: Lab.fp(c.IC, 'A') });
+    });
+    Lab.check(T, [{ q: 'Amplituden af i_R', unit: 'A', answer: function (p) { return Cx.abs(calc(p).IR); } }, { q: 'Fasen af i_R i grader', unit: '°', tol: 0.02, answer: function (p) { return deg(Cx.arg(calc(p).IR)); } }]);
+    Lab.steps(T, function (p) {
+      var c = calc(p), w = 2 * PI * p.f;
+      return ['<span class="f">ω = 2π·' + fmt(p.f) + ' = ' + fmt(w, 4) + ' rad/s</span>, <span class="f">Z_C = −j/(ωC) = ' + Lab.fc(c.zc, 'Ω', 4) + '</span>',
+        'Strømdeler: strømmen gennem R er <span class="f">I_S·Z_C/(R + Z_C)</span>.',
+        p.dir === 'ned' ? 'Kildens pil peger nedad, så kilden sender strømmen op gennem R og C. Med i_R defineret nedad får den et minus: <span class="f">I_R = −I_S·Z_C/(R + Z_C)</span>' : 'Kildens pil peger opad, så strømmen løber ned gennem R i samme retning som i_R.',
+        '<span class="res">I_R = ' + Lab.fp(c.IR, 'A', 4) + '</span>, dvs. i_R(t) = ' + fmt(Cx.abs(c.IR), 4) + '·cos(' + fmt(w, 4) + 't ' + (Cx.arg(c.IR) < 0 ? '− ' : '+ ') + fmt(Math.abs(deg(Cx.arg(c.IR))), 4) + '°) A',
+        'Ignoreres pilenes retning, fås samme amplitude, men en fase der er 180° anderledes. Skriv derfor altid, hvilken retning strømmen er defineret i.'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Øvelse 10: opgave 3.61 ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse 10', title: 'Opgave 3.61 (4.61): impedans af et sammensat net', short: 'Opg. 3.61',
+      text: 'Find impedansen Z i figur P3.61, når ω = 2 rad/s, R₁ = R₂ = 2 Ω, C = 0,25 F og L = 1 H. R₁ står over klemmerne; parallelt med den sidder (R₂ ∥ C) i serie med L.',
+      learn: 'regn indefra og ud: først R₂ ∥ C, så læg L til, og til sidst parallelt med R₁. Ved ω = 2 rad/s ophæver C og L hinanden i den indre gren.' });
+    Lab.slider(T, { key: 'w', label: 'ω', min: 0.2, max: 10, step: 0.1, value: 2, unit: 'rad/s', noPrefix: true });
+    Lab.slider(T, { key: 'R1', label: 'R₁', min: 0.5, max: 10, step: 0.5, value: 2, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'R2', label: 'R₂', min: 0.5, max: 10, step: 0.5, value: 2, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'C', label: 'C', min: 0.05, max: 2, step: 0.05, value: 0.25, unit: 'F', noPrefix: true });
+    Lab.slider(T, { key: 'L', label: 'L', min: 0.1, max: 5, step: 0.1, value: 1, unit: 'H', noPrefix: true });
+    var ckt = Lab.circuit(T, [
+      { t: 'w', pts: [[40, 50], [200, 50]] }, { t: 'w', pts: [[40, 190], [420, 190]] }, { t: 'node', at: [40, 50] }, { t: 'node', at: [40, 190] },
+      { t: 'txt', at: [30, 125], s: 'Z →', color: C.gold, anchor: 'end' },
+      { t: 'R', a: [120, 50], b: [120, 190], label: 'R₁', id: 'lR1' },
+      { t: 'w', pts: [[200, 50], [200, 25]] }, { t: 'w', pts: [[200, 50], [200, 80]] }, { t: 'R', a: [200, 25], b: [320, 25], label: 'R₂', id: 'lR2', side: 't' }, { t: 'C', a: [200, 80], b: [320, 80], label: 'C', id: 'lC' },
+      { t: 'w', pts: [[320, 25], [320, 80]] }, { t: 'w', pts: [[320, 50], [420, 50]] }, { t: 'L', a: [420, 50], b: [420, 190], label: 'L', id: 'lL' }
+    ], '0 0 520 215', 210);
+    var cv = Lab.canvas(T.stage, 0.34);
+    var out = Lab.readout(T, [{ key: 'a', label: 'R₂ ∥ C', color: C.purple }, { key: 'b', label: '+ jωL', color: C.green }, { key: 'z', label: 'Z = R₁ ∥ (…)', color: C.gold }]);
+    function calc(p) { var zc = P(0, -1 / (p.w * p.C)), a = Cx.par(P(p.R2, 0), zc), b = Cx.add(a, P(0, p.w * p.L)); return { zc: zc, a: a, b: b, z: Cx.par(P(p.R1, 0), b) }; }
+    T.on(function (p) {
+      var c = calc(p);
+      ckt.set('lR1', 'R₁ = ' + fmt(p.R1) + ' Ω'); ckt.set('lR2', 'R₂ = ' + fmt(p.R2) + ' Ω'); ckt.set('lC', 'C = ' + fmt(p.C) + ' F'); ckt.set('lL', 'L = ' + fmt(p.L) + ' H');
+      Lab.plot(cv, { x: [0.2, 10], xlabel: 'ω [rad/s]', ylabel: 'Z [Ω]', series: [{ fn: function (w) { return calc({ w: w, R1: p.R1, R2: p.R2, C: p.C, L: p.L }).z.re; }, color: C.cyan, label: 'Re Z' },
+        { fn: function (w) { return calc({ w: w, R1: p.R1, R2: p.R2, C: p.C, L: p.L }).z.im; }, color: C.green, label: 'Im Z' }], vlines: [{ x: p.w, color: C.gold }] });
+      out({ a: Lab.fc(c.a, 'Ω'), b: Lab.fc(c.b, 'Ω'), z: Lab.fc(c.z, 'Ω') + ' = ' + Lab.fp(c.z, 'Ω') });
+    });
+    Lab.check(T, [{ q: 'Realdelen af Z', unit: 'Ω', answer: function (p) { return calc(p).z.re; } }, { q: 'Imaginærdelen af Z', unit: 'Ω', answer: function (p) { return calc(p).z.im; } }]);
+    Lab.steps(T, function (p) {
+      var c = calc(p);
+      return ['<span class="f">Z_C = 1/(jωC) = ' + Lab.fc(c.zc, 'Ω', 4) + '</span>',
+        '<span class="f">R₂ ∥ Z_C = R₂·Z_C/(R₂ + Z_C)</span> = ' + Lab.fc(c.a, 'Ω', 4),
+        'Læg spolen til: <span class="f">+ jωL = + j' + fmt(p.w * p.L, 4) + '</span> giver ' + Lab.fc(c.b, 'Ω', 4),
+        'Parallelt med R₁: <span class="f">Z = R₁·Z_b/(R₁ + Z_b)</span> = <span class="res">' + Lab.fc(c.z, 'Ω', 4) + '</span>'];
     });
     T.ready();
   })();

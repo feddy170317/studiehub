@@ -88,5 +88,108 @@
   })();
 })();
 </script>
+<script>
+/* ===== Øvelse 2 (gruppeaflevering): underviserens eksempel 7.1-7.3 = Rizzoni og Kearns (2022) eksempel 6.1-6.3 ===== */
+(function () {
+  var fu = Lab.fu, fmt = Lab.fmt, C = Lab.COL, Cx = Lab.Cx, deg = Lab.deg, rad = Lab.rad, PI = Math.PI, P = Lab.C;
+
+  /* ---------- Eksempel 7.1 / 6.1 ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse 2a', title: 'Eksempel 7.1 (bogens 6.1): RL-last, momentan og middeleffekt', short: 'Eks. 7.1',
+      text: 'v(t) = 14,14·sin(377t) V forsyner en last med R = 4 Ω i serie med L = 8 mH. Find middeleffekten og den momentane effekt.',
+      learn: 'spolen optager ingen middeleffekt, så hele middeleffekten afsættes i R. p(t) svinger med dobbelt frekvens og bliver kortvarigt negativ, fordi spolen afleverer energi tilbage.' });
+    Lab.slider(T, { key: 'Vp', label: 'Topværdi af v', min: 1, max: 50, step: 0.01, value: 14.14, unit: 'V', noPrefix: true, sig: 4 });
+    Lab.slider(T, { key: 'R', label: 'R', min: 0.5, max: 20, step: 0.5, value: 4, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'L', label: 'L', min: 0, max: 50, step: 0.5, value: 8, unit: 'mH', noPrefix: true });
+    var ckt = Lab.circuit(T, [{ t: 'AC', a: [70, 180], b: [70, 50], label: 'v(t)', side: 'l' }, { t: 'R', a: [70, 50], b: [260, 50], label: 'R', id: 'lR', side: 't' },
+      { t: 'w', pts: [[260, 50], [360, 50]] }, { t: 'L', a: [360, 50], b: [360, 180], label: 'L', id: 'lL' }, { t: 'w', pts: [[70, 180], [360, 180]] }], '0 0 480 205', 190);
+    var cv = Lab.canvas(T.stage, 0.45);
+    var out = Lab.readout(T, [{ key: 'z', label: 'Z = R + jωL', color: C.gold }, { key: 'i', label: 'Ĩ (RMS)', color: C.red }, { key: 'P', label: 'P_avg', color: C.green }, { key: 'pf', label: 'Effektfaktor', color: C.purple }]);
+    function calc(p) { var w = 377, z = P(p.R, w * p.L / 1000), V = Cx.polar(p.Vp / Math.SQRT2, -PI / 2), I = Cx.div(V, z); return { z: z, V: V, I: I, P: Cx.abs(I) * Cx.abs(I) * p.R }; }
+    T.on(function (p) {
+      var c = calc(p), Im = Cx.abs(c.I) * Math.SQRT2, th = Cx.arg(c.I);
+      ckt.set('lR', 'R = ' + fmt(p.R) + ' Ω'); ckt.set('lL', 'L = ' + fmt(p.L) + ' mH');
+      Lab.plot(cv, { x: [0, 35], xlabel: 't [ms]', ylabel: 'v [V], i [A], p [W]', series: [
+        { fn: function (t) { return p.Vp * Math.sin(0.377 * t); }, color: C.cyan, label: 'v(t)', width: 1.5 },
+        { fn: function (t) { return Im * Math.cos(0.377 * t + th); }, color: C.red, label: 'i(t)', width: 1.5 },
+        { fn: function (t) { return p.Vp * Math.sin(0.377 * t) * Im * Math.cos(0.377 * t + th); }, color: C.green, label: 'p(t)', width: 2.4 }],
+        hlines: [{ y: c.P, color: C.gold, label: 'P_avg' }] });
+      out({ z: Lab.fc(c.z, 'Ω') + ' = ' + Lab.fp(c.z, 'Ω'), i: Lab.fp(c.I, 'A', 3, true), P: fu(c.P, 'W'), pf: fmt(Math.cos(Cx.arg(c.z)), 3) + ' haltende' });
+    });
+    Lab.check(T, [{ q: 'Middeleffekten P_avg', unit: 'W', answer: function (p) { return calc(p).P; } }, { q: 'RMS-strømmen', unit: 'A', answer: function (p) { return Cx.abs(calc(p).I); } }]);
+    Lab.steps(T, function (p) {
+      var c = calc(p);
+      return ['Skriv som cosinus: <span class="f">sin(377t) = cos(377t − π/2)</span>, så <span class="f">Ṽ = ' + fmt(p.Vp / Math.SQRT2, 4) + '∠−π/2 V RMS</span>',
+        '<span class="f">Z = R + jωL = ' + Lab.fc(c.z, 'Ω', 4) + ' = ' + Lab.fp(c.z, 'Ω', 4) + '</span>',
+        '<span class="f">Ĩ = Ṽ/Z</span> = ' + Lab.fp(c.I, 'A', 4, true),
+        '<span class="f">P_avg = Ṽ·Ĩ·cos θ_Z = Ĩ²·R</span> = <span class="res">' + fu(c.P, 'W') + '</span> (spolen bidrager med 0 W)',
+        '<span class="f">p(t) = v(t)·i(t) = ' + fmt(p.Vp, 4) + '·sin(377t) · ' + fmt(Cx.abs(c.I) * Math.SQRT2, 4) + '·cos(377t ' + fmt(Cx.arg(c.I), 4) + ') W</span>'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Eksempel 7.2 / 6.2 ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse 2b', title: 'Eksempel 7.2 (bogens 6.2): last med R ∥ C og kildemodstand', short: 'Eks. 7.2',
+      text: 'Ṽ_S = 110∠0° V RMS med indre modstand R_S = 2 Ω forsyner en last R_o = 16 Ω parallelt med C = 100 µF ved ω = 377 rad/s. Find middeleffekten i lasten (og i R_S).',
+      learn: 'lasten er kapacitiv (negativ vinkel). Spændingsdelingen mellem R_S og lasten bestemmer lastspændingen, og kun R_o optager effekt i lasten.' });
+    Lab.slider(T, { key: 'V', label: 'Ṽ_S (RMS)', min: 10, max: 240, step: 5, value: 110, unit: 'V', noPrefix: true });
+    Lab.slider(T, { key: 'Rs', label: 'R_S', min: 0, max: 10, step: 0.5, value: 2, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'Ro', label: 'R_o', min: 1, max: 50, step: 1, value: 16, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'C', label: 'C', min: 1, max: 500, step: 1, value: 100, unit: 'µF', noPrefix: true });
+    var ckt = Lab.circuit(T, [{ t: 'AC', a: [60, 180], b: [60, 50], label: 'Ṽ_S', side: 'l' }, { t: 'R', a: [60, 50], b: [220, 50], label: 'R_S', id: 'lRs', side: 't' },
+      { t: 'w', pts: [[220, 50], [400, 50]] }, { t: 'R', a: [300, 50], b: [300, 180], label: 'R_o', id: 'lRo' }, { t: 'C', a: [400, 50], b: [400, 180], label: 'C', id: 'lC' },
+      { t: 'w', pts: [[60, 180], [400, 180]] }, { t: 'node', at: [300, 50] }, { t: 'node', at: [300, 180] }], '0 0 480 205', 190);
+    var out = Lab.readout(T, [{ key: 'zo', label: 'Z_o = R_o ∥ Z_C', color: C.gold }, { key: 'vo', label: 'Ṽ_o', color: C.cyan }, { key: 'is', label: 'Ĩ_S', color: C.red }, { key: 'P', label: 'P i lasten', color: C.green }, { key: 'Ps', label: 'P i R_S', color: C.purple }]);
+    function calc(p) { var w = 377, zo = Cx.div(P(p.Ro, 0), P(1, w * p.C * 1e-6 * p.Ro)), Vs = P(p.V, 0), Is = Cx.div(Vs, Cx.add(P(p.Rs, 0), zo)), Vo = Cx.mul(Is, zo), Vm = Cx.abs(Vo);
+      return { zo: zo, Vo: Vo, Is: Is, P: Vm * Vm / p.Ro, Ps: Cx.abs(Is) * Cx.abs(Is) * p.Rs }; }
+    T.on(function (p) {
+      var c = calc(p);
+      ckt.set('lRs', 'R_S = ' + fmt(p.Rs) + ' Ω'); ckt.set('lRo', 'R_o = ' + fmt(p.Ro) + ' Ω'); ckt.set('lC', 'C = ' + fmt(p.C) + ' µF');
+      out({ zo: Lab.fp(c.zo, 'Ω', 3, true), vo: Lab.fp(c.Vo, 'V', 3, true), is: Lab.fp(c.Is, 'A', 3, true), P: fu(c.P, 'W'), Ps: fu(c.Ps, 'W') });
+    });
+    Lab.check(T, [{ q: 'Middeleffekten i lasten', unit: 'W', answer: function (p) { return calc(p).P; } }, { q: 'Middeleffekten i R_S', unit: 'W', answer: function (p) { return calc(p).Ps; } }]);
+    Lab.steps(T, function (p) {
+      var c = calc(p);
+      return ['<span class="f">Z_o = R_o/(1 + jωCR_o)</span> = ' + Lab.fp(c.zo, 'Ω', 4, true) + ' (kapacitiv)',
+        'Spændingsdeling: <span class="f">Ṽ_o = Ṽ_S·Z_o/(R_S + Z_o)</span> = ' + Lab.fp(c.Vo, 'V', 4, true),
+        '<span class="f">P = |Ṽ_o|²/|Z_o|·cos θ = |Ṽ_o|²/R_o</span> = <span class="res">' + fu(c.P, 'W') + '</span>',
+        'Kildestrøm <span class="f">Ĩ_S = Ṽ_o/Z_o</span> = ' + Lab.fp(c.Is, 'A', 4, true) + ', og tabet i R_S er <span class="f">Ĩ_S²·R_S</span> = ' + fu(c.Ps, 'W') + '.'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Eksempel 7.3 / 6.3 ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse 2c', title: 'Eksempel 7.3 (bogens 6.3): (R + jωL) parallelt med C', short: 'Eks. 7.3',
+      text: 'Ṽ_S = 110∠0 V RMS, R = 10 Ω, L = 0,05 H og C = 470 µF ved ω = 377 rad/s. Lasten er (R + jωL) parallelt med C. Find lastens impedans og middeleffekt.',
+      learn: 'ved 377 rad/s dominerer kondensatoren, så lasten er kapacitiv. Kurven viser, ved hvilken frekvens imaginærdelen bliver nul; under den er lasten induktiv, over den kapacitiv.' });
+    Lab.slider(T, { key: 'V', label: 'Ṽ_S (RMS)', min: 10, max: 240, step: 5, value: 110, unit: 'V', noPrefix: true });
+    Lab.slider(T, { key: 'R', label: 'R', min: 1, max: 50, step: 1, value: 10, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'L', label: 'L', min: 0.005, max: 0.2, step: 0.005, value: 0.05, unit: 'H', noPrefix: true });
+    Lab.slider(T, { key: 'C', label: 'C', min: 10, max: 1000, step: 10, value: 470, unit: 'µF', noPrefix: true });
+    Lab.slider(T, { key: 'w', label: 'ω', min: 10, max: 2000, step: 1, value: 377, unit: 'rad/s', noPrefix: true });
+    var cv = Lab.canvas(T.stage, 0.36);
+    var out = Lab.readout(T, [{ key: 'z', label: 'Z_o', color: C.gold }, { key: 'zp', label: 'Z_o polær', color: C.gold }, { key: 'P', label: 'P_avg', color: C.green }, { key: 'typ', label: 'Type', color: C.txt }]);
+    function Z(p, w) { var a = P(p.R, w * p.L), b = P(0, -1 / (w * p.C * 1e-6)); return Cx.par(a, b); }
+    T.on(function (p) {
+      var z = Z(p, p.w), Pw = p.V * p.V / Cx.abs(z) * Math.cos(Cx.arg(z));
+      Lab.plot(cv, { x: [10, 2000], xlabel: 'ω [rad/s]', ylabel: 'Im Z_o [Ω]', y: [-15, 15], series: [{ fn: function (w) { return Z(p, w).im; }, color: C.gold, label: 'Im Z_o(ω)' }],
+        hlines: [{ y: 0, color: C.dim, label: 'resistiv' }], markers: [{ x: p.w, y: z.im }] });
+      out({ z: Lab.fc(z, 'Ω'), zp: Lab.fp(z, 'Ω', 3, true), P: fu(Pw, 'W'), typ: z.im > 0 ? '<span class="pill ind">induktiv</span>' : '<span class="pill cap">kapacitiv</span>' });
+    });
+    Lab.check(T, [{ q: 'Realdelen af Z_o', unit: 'Ω', answer: function (p) { return Z(p, p.w).re; } }, { q: 'Imaginærdelen af Z_o', unit: 'Ω', answer: function (p) { return Z(p, p.w).im; } },
+      { q: 'Middeleffekten', unit: 'W', answer: function (p) { var z = Z(p, p.w); return p.V * p.V / Cx.abs(z) * Math.cos(Cx.arg(z)); } }]);
+    Lab.steps(T, function (p) {
+      var z = Z(p, p.w);
+      return ['<span class="f">Z_o = (R + jωL) ∥ 1/(jωC) = (R + jωL)/(1 − ω²LC + jωCR)</span>',
+        'Indsat: R + jωL = ' + Lab.fc(P(p.R, p.w * p.L), 'Ω', 4) + ', 1 − ω²LC = ' + fmt(1 - p.w * p.w * p.L * p.C * 1e-6, 4) + ', ωCR = ' + fmt(p.w * p.C * 1e-6 * p.R, 4),
+        '<span class="res">Z_o = ' + Lab.fc(z, 'Ω', 4) + ' = ' + Lab.fp(z, 'Ω', 4, true) + '</span>' + (z.im < 0 ? ' (negativ imaginærdel: kapacitiv)' : ' (positiv imaginærdel: induktiv)'),
+        '<span class="f">P_avg = |Ṽ_S|²/|Z_o|·cos θ = ' + fmt(p.V) + '²/' + fmt(Cx.abs(z), 4) + '·cos(' + fmt(Cx.arg(z), 3) + ')</span> = <span class="res">' + fu(p.V * p.V / Cx.abs(z) * Math.cos(Cx.arg(z)), 'W') + '</span>'];
+    });
+    T.ready();
+  })();
+})();
+</script>
 </body>
 </html>

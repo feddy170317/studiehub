@@ -48,11 +48,17 @@ var Lab = (function () {
     }
     return fmt(x / 1e-9, sig) + ' n' + unit;
   }
+  function clean(z) { // afrundingsstøj (< 10⁻⁵ af længden) vises som 0
+    var m = Cx.abs(z), e = 1e-5 * m;
+    return C(Math.abs(z.re) < e ? 0 : z.re, Math.abs(z.im) < e ? 0 : z.im);
+  }
   function fc(z, unit, sig) { // kartesisk
+    z = clean(z);
     var im = z.im, sgn = im < 0 ? ' − j' : ' + j';
     return fmt(z.re, sig) + sgn + fmt(Math.abs(im), sig) + (unit ? ' ' + unit : '');
   }
   function fp(z, unit, sig, inRad) { // polær
+    z = clean(z);
     var a = Cx.arg(z);
     return fmt(Cx.abs(z), sig) + '∠' + (inRad ? fmt(a, 3) + ' rad' : fmt(deg(a), 3) + '°') + (unit ? ' ' + unit : '');
   }
@@ -117,7 +123,7 @@ var Lab = (function () {
     function toVal(v) { return log ? o.min * Math.pow(o.max / o.min, v / 1000) : Number(v); }
     function toPos(x) { return log ? 1000 * Math.log(x / o.min) / Math.log(o.max / o.min) : x; }
     function show(x) { valEl.textContent = o.fmt ? o.fmt(x) : (o.unit !== undefined ? (o.noPrefix ? fmt(x, o.sig) + ' ' + o.unit : fu(x, o.unit, o.sig)) : fmt(x, o.sig)); }
-    var S = { def: o.value, set: function (x) { inp.value = toPos(x); T.p[o.key] = log ? x : Number(inp.value); show(T.p[o.key]); } };
+    var S = { key: o.key, def: o.value, set: function (x) { inp.value = toPos(x); T.p[o.key] = log ? x : Number(inp.value); show(T.p[o.key]); } };
     inp.addEventListener('input', function () { T.p[o.key] = toVal(inp.value); show(T.p[o.key]); T.update(); });
     S.set(o.value); T.sliders.push(S);
     return S;
@@ -128,7 +134,23 @@ var Lab = (function () {
     row.appendChild(s); T.controls.appendChild(row);
     T.p[o.key] = o.value || o.options[0][0]; s.value = T.p[o.key];
     s.addEventListener('change', function () { T.p[o.key] = s.value; T.update(); });
-    T.sliders.push({ def: T.p[o.key], set: function (v) { s.value = v; T.p[o.key] = v; } });
+    T.sliders.push({ key: o.key, def: T.p[o.key], set: function (v) { s.value = v; T.p[o.key] = v; } });
+  }
+  /* presets: knapper der sætter flere skydere på én gang, fx delopgave a-d eller bogens eksempeltal.
+     list: [{label, v:{key:værdi}}] */
+  function presets(T, list, title) {
+    var box = el('div', 'sel-row', title || 'Vælg delopgave');
+    var row = el('div', 'btn-row'); row.style.cssText = 'display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.3rem';
+    list.forEach(function (ps) {
+      var b = el('button', 'btn sec', ps.label); b.style.padding = '.35rem .6rem';
+      b.onclick = function () {
+        T.sliders.forEach(function (s) { if (s.key in ps.v) s.set(ps.v[s.key]); });
+        row.querySelectorAll('button').forEach(function (x) { x.style.outline = ''; }); b.style.outline = '2px solid #5ec8ff';
+        T.update();
+      };
+      row.appendChild(b);
+    });
+    box.appendChild(row); T.controls.insertBefore(box, T.controls.children[1] || null);
   }
   function hint(T, html) { T.controls.appendChild(el('p', 'note', html)); }
 
@@ -413,6 +435,6 @@ var Lab = (function () {
   }
 
   return { COL: COL, C: C, Cx: Cx, deg: deg, rad: rad, fmt: fmt, fu: fu, fc: fc, fp: fp,
-           task: task, slider: slider, select: select, hint: hint, readout: readout, check: check, steps: steps,
+           task: task, slider: slider, select: select, presets: presets, hint: hint, readout: readout, check: check, steps: steps,
            canvas: canvas, plot: plot, phasor: phasor, circuit: circuit, solve: solve, matHtml: matHtml, animate: animate, el: el };
 })();

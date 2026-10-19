@@ -75,6 +75,8 @@
     Lab.slider(T, { key: 'pf2', label: 'Ønsket effektfaktor', min: 0.5, max: 1, step: 0.01, value: 0.95 });
     Lab.slider(T, { key: 'V', label: 'Spænding Ṽ (RMS)', min: 100, max: 500, step: 5, value: 230, unit: 'V', noPrefix: true });
     Lab.select(T, { key: 'f', label: 'Netfrekvens', options: [['50', '50 Hz (Danmark)'], ['60', '60 Hz (USA, bogen)']], value: '50' });
+    Lab.presets(T, [{ label: 'Øvelse: motor i Danmark', v: { P: 2000, pf1: 0.8, pf2: 0.95, V: 230, f: '50' } },
+      { label: 'Eksempel: bogens 6.10', v: { P: 100000, pf1: 0.7, pf2: 1, V: 480, f: '60' } }], 'Vælg opgave');
     var cv = Lab.canvas(T.stage, 0.5);
     var out = Lab.readout(T, [{ key: 'Q1', label: 'Q før', color: C.purple }, { key: 'Q2', label: 'Q efter', color: C.cyan }, { key: 'QC', label: 'Kondensatoren leverer', color: C.green },
       { key: 'C', label: 'Kapacitans C', color: C.gold }, { key: 'I1', label: 'Strøm før', color: C.red }, { key: 'I2', label: 'Strøm efter', color: C.green }]);
@@ -132,6 +134,37 @@
     });
     T.ready();
   })();
+})();
+</script>
+<script>
+/* ===== Eksempel: seriemotor (Rizzoni og Kearns 2022, eksempel 13.6) ===== */
+(function () {
+  var fu = Lab.fu, fmt = Lab.fmt, C = Lab.COL, PI = Math.PI;
+  var T = Lab.task({ tag: 'Eksempel', title: 'Seriemotoren: moment vokser med strømmen i anden (bogens eksempel 13.6)', short: 'Seriemotor',
+    text: 'En seriemotor på 10 hk (7460 W) og 115 V kører 1800 o/min ved fuld last og trækker da 40 A. Find momentet, når strømmen stiger til 60 A.',
+    learn: 'i en seriemotor er fluxen proportional med strømmen, så momentet går med I². 50 % mere strøm giver 125 % mere moment; derfor bruges seriemotorer, hvor der kræves stort startmoment.' });
+  Lab.slider(T, { key: 'P', label: 'Mærkeeffekt', min: 1, max: 20, step: 0.01, value: 7.46, unit: 'kW', noPrefix: true, sig: 4 });
+  Lab.slider(T, { key: 'n', label: 'Hastighed ved fuld last', min: 300, max: 3000, step: 10, value: 1800, unit: 'o/min', noPrefix: true });
+  Lab.slider(T, { key: 'I1', label: 'Strøm ved fuld last', min: 5, max: 100, step: 1, value: 40, unit: 'A', noPrefix: true });
+  Lab.slider(T, { key: 'I2', label: 'Ny strøm', min: 5, max: 150, step: 1, value: 60, unit: 'A', noPrefix: true });
+  var cv = Lab.canvas(T.stage, 0.42);
+  var out = Lab.readout(T, [{ key: 'T1', label: 'Moment ved fuld last', color: C.cyan }, { key: 'K', label: 'K = T/I²', color: C.gold }, { key: 'T2', label: 'Moment ved ny strøm', color: C.green }, { key: 'r', label: 'Ændring', color: C.purple }]);
+  function calc(p) { var w = 2 * PI * p.n / 60, T1 = p.P * 1000 / w, K = T1 / (p.I1 * p.I1); return { w: w, T1: T1, K: K, T2: K * p.I2 * p.I2 }; }
+  T.on(function (p) {
+    var c = calc(p);
+    Lab.plot(cv, { x: [0, 150], xlabel: 'ankerstrøm I_a [A]', ylabel: 'T [N·m]', series: [{ fn: function (i) { return c.K * i * i; }, color: C.cyan, label: 'T = K·I_a²' }],
+      markers: [{ x: p.I1, y: c.T1, color: C.gold, label: 'fuld last' }, { x: p.I2, y: c.T2, color: C.red, label: 'ny strøm' }] });
+    out({ T1: fu(c.T1, 'N·m'), K: fmt(c.K, 4) + ' N·m/A²', T2: fu(c.T2, 'N·m'), r: 'strøm ×' + fmt(p.I2 / p.I1, 3) + ', moment ×' + fmt(c.T2 / c.T1, 3) });
+  });
+  Lab.check(T, [{ q: 'Momentet ved den nye strøm', unit: 'N·m', answer: function (p) { return calc(p).T2; } }]);
+  Lab.steps(T, function (p) {
+    var c = calc(p);
+    return ['Vinkelhastighed: <span class="f">ω = 2π·' + fmt(p.n) + '/60</span> = ' + fmt(c.w, 4) + ' rad/s',
+      'Moment ved fuld last: <span class="f">T = P/ω = ' + fmt(p.P * 1000) + '/' + fmt(c.w, 4) + '</span> = ' + fu(c.T1, 'N·m'),
+      'Seriemotor: <span class="f">T = K·I_a²</span>, så <span class="f">K = ' + fmt(c.T1, 4) + '/' + fmt(p.I1) + '²</span> = ' + fmt(c.K, 4) + ' N·m/A²',
+      'Ny strøm: <span class="f">T = ' + fmt(c.K, 4) + ' · ' + fmt(p.I2) + '²</span> = <span class="res">' + fu(c.T2, 'N·m') + '</span>'];
+  });
+  T.ready();
 })();
 </script>
 </body>
