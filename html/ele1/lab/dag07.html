@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Øvelseslab: Dag 7 · ELE1</title>
+<link rel="stylesheet" href="assets/lab.css">
+</head>
+<body>
+<header>
+  <h1>Øvelseslab · Dag 7</h1>
+  <p>Kompleks effekt, effektfaktorkorrektion og jævnstrømsmotoren</p>
+  <div class="toplinks">
+    <a href="../dag/Dag07_Studienote.pdf" target="_blank">📖 Studienote</a>
+    <a href="../../../quiz/ele1/Dag07_Quiz.html" target="_blank">📝 Quiz</a>
+    <a href="../../../index.html#edu/maskiningenioer/sem3/ele1/dag07">← Studiehub</a>
+  </div>
+</header>
+<div class="howto"><b>Sådan bruges laben:</b> Hver opgave starter med opgavens egne tal. Regn først selv, skriv svaret under <b>Prøv selv først</b>, og tjek det. Skru derefter på værdierne og se, hvad der sker. <b>Løsning trin for trin</b> følger altid de værdier, der står i indstillingerne lige nu.</div>
+<nav class="tasknav" id="tasknav"></nav>
+<main id="tasks"></main>
+<footer>ELE1-A26 · Øvelseslab til dag 7 · opgaverne svarer til studienoten · <a href="../../../index.html#edu/maskiningenioer/sem3/ele1">Studiehub</a></footer>
+<script src="assets/lab.js"></script>
+<script>
+(function () {
+  var fu = Lab.fu, fmt = Lab.fmt, C = Lab.COL, Cx = Lab.Cx, deg = Lab.deg, rad = Lab.rad, PI = Math.PI;
+
+  /* ---------- Kompleks effekt og effekttrekant ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Eksempel', title: 'Kompleks effekt og effekttrekant (bogens eksempel 6.7)', short: 'S = P + jQ',
+      text: 'R = 3 Ω, jX_L = j9 Ω og jX_C = −j5 Ω i serie på Ṽ = 60∠0 V (RMS). Find P, Q, |S| og effektfaktoren.',
+      learn: 'spolen og kondensatoren har reaktiv effekt med modsat fortegn, og de trækkes fra hinanden. Gør X_C lige så stor som X_L: så forsvinder Q, og effektfaktoren bliver 1.' });
+    Lab.slider(T, { key: 'V', label: 'Ṽ (RMS)', min: 10, max: 240, step: 5, value: 60, unit: 'V', noPrefix: true });
+    Lab.slider(T, { key: 'R', label: 'R', min: 1, max: 20, step: 0.5, value: 3, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'XL', label: 'X_L', min: 0, max: 20, step: 0.5, value: 9, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'XC', label: 'X_C (størrelse)', min: 0, max: 20, step: 0.5, value: 5, unit: 'Ω', noPrefix: true });
+    var ckt = Lab.circuit(T, [
+      { t: 'AC', a: [60, 180], b: [60, 50], label: 'Ṽ', id: 'lV', side: 'l' }, { t: 'R', a: [60, 50], b: [190, 50], label: 'R', id: 'lR', side: 't' },
+      { t: 'L', a: [190, 50], b: [320, 50], label: 'jX_L', id: 'lL', side: 't' }, { t: 'w', pts: [[320, 50], [380, 50]] },
+      { t: 'C', a: [380, 50], b: [380, 180], label: '−jX_C', id: 'lC' }, { t: 'w', pts: [[60, 180], [380, 180]] }
+    ], '0 0 480 210', 200);
+    var cv = Lab.canvas(T.stage, 0.5);
+    var out = Lab.readout(T, [{ key: 'I', label: 'Ĩ', color: C.red }, { key: 'S', label: 'S = Ṽ·Ĩ*', color: C.gold }, { key: 'P', label: 'P', color: C.green }, { key: 'Q', label: 'Q = Q_L + Q_C', color: C.purple }, { key: 'pf', label: 'Effektfaktor', color: C.cyan }]);
+    function calc(p) {
+      var z = Lab.C(p.R, p.XL - p.XC), I = Cx.div(Lab.C(p.V, 0), z), S = Cx.mul(Lab.C(p.V, 0), Cx.conj(I)), i2 = Cx.abs(I) * Cx.abs(I);
+      return { z: z, I: I, S: S, QL: i2 * p.XL, QC: -i2 * p.XC };
+    }
+    T.on(function (p) {
+      var c = calc(p);
+      ckt.set('lV', 'Ṽ = ' + fmt(p.V) + '∠0 V'); ckt.set('lR', 'R = ' + fmt(p.R) + ' Ω'); ckt.set('lL', 'j' + fmt(p.XL) + ' Ω'); ckt.set('lC', '−j' + fmt(p.XC) + ' Ω');
+      Lab.phasor(cv, [{ z: Lab.C(c.S.re, 0), color: C.green, label: 'P', width: 2 }, { z: Lab.C(0, c.QL), from: Lab.C(c.S.re, 0), color: C.cyan, label: 'Q_L', width: 2 },
+        { z: Lab.C(0, c.QC), from: Lab.C(c.S.re, c.QL), color: C.purple, label: 'Q_C', width: 2 }, { z: c.S, color: C.gold, label: 'S' }], { note: 'Effekttrekant: S er summen af P, Q_L og Q_C.' });
+      out({ I: Lab.fp(c.I, 'A'), S: Lab.fc(c.S, 'VA'), P: fu(c.S.re, 'W'), Q: fmt(c.QL, 4) + ' + (' + fmt(c.QC, 4) + ') = ' + fmt(c.S.im, 4) + ' VAR', pf: fmt(c.S.re / Cx.abs(c.S), 3) + (c.S.im > 0 ? ' haltende' : c.S.im < 0 ? ' førende' : '') });
+    });
+    Lab.check(T, [{ q: 'Den aktive effekt P', unit: 'W', answer: function (p) { return calc(p).S.re; } }, { q: 'Den reaktive effekt Q', unit: 'VAR', answer: function (p) { return calc(p).S.im; } },
+      { q: 'Effektfaktoren', unit: '', answer: function (p) { var s = calc(p).S; return s.re / Cx.abs(s); } }]);
+    Lab.steps(T, function (p) {
+      var c = calc(p);
+      return ['Lastens impedans: <span class="f">Z = ' + fmt(p.R) + ' + j' + fmt(p.XL) + ' − j' + fmt(p.XC) + '</span> = ' + Lab.fc(c.z, 'Ω') + ' = ' + Lab.fp(c.z, 'Ω', 4),
+        'Strøm: <span class="f">Ĩ = Ṽ/Z = ' + fmt(p.V) + '∠0 / ' + Lab.fp(c.z, '', 4) + '</span> = ' + Lab.fp(c.I, 'A', 4),
+        'Kompleks effekt: <span class="f">S = Ṽ·Ĩ* = ' + fmt(p.V) + '∠0 · ' + Lab.fp(Cx.conj(c.I), '', 4) + '</span> = <span class="res">' + Lab.fc(c.S, 'VA', 4) + '</span>',
+        'Altså <span class="res">P = ' + fu(c.S.re, 'W') + '</span> og <span class="res">Q = ' + fmt(c.S.im, 4) + ' VAR</span>, pf = P/|S| = ' + fmt(c.S.re / Cx.abs(c.S), 4) + '.',
+        'Kontrol: <span class="f">Q_L = Ĩ²·X_L = ' + fmt(c.QL, 4) + '</span>, <span class="f">Q_C = −Ĩ²·X_C = ' + fmt(c.QC, 4) + '</span>, sum = ' + fmt(c.QL + c.QC, 4) + ' VAR ✓'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Effektfaktorkorrektion ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse', title: 'Effektfaktorkorrektion med en parallel kondensator', short: 'pf-korrektion',
+      text: 'En enfaset motor optager P = 2,0 kW ved 230 V og 50 Hz med effektfaktor 0,80 haltende. Find den kondensator, der hæver effektfaktoren til 0,95, og se strømmen falde. (Bogens eksempel 6.10: 100 kW, pf 0,7 → 1, 480 V, 60 Hz kan indstilles med skyderne.)',
+      learn: 'P er uændret, men Q og dermed |S| og strømmen bliver mindre. At gå helt til pf = 1 kræver en meget større kondensator for en lille ekstra gevinst.' });
+    Lab.slider(T, { key: 'P', label: 'Aktiv effekt P', min: 500, max: 120000, log: true, value: 2000, unit: 'W' });
+    Lab.slider(T, { key: 'pf1', label: 'Effektfaktor før', min: 0.4, max: 0.99, step: 0.01, value: 0.8 });
+    Lab.slider(T, { key: 'pf2', label: 'Ønsket effektfaktor', min: 0.5, max: 1, step: 0.01, value: 0.95 });
+    Lab.slider(T, { key: 'V', label: 'Spænding Ṽ (RMS)', min: 100, max: 500, step: 5, value: 230, unit: 'V', noPrefix: true });
+    Lab.select(T, { key: 'f', label: 'Netfrekvens', options: [['50', '50 Hz (Danmark)'], ['60', '60 Hz (USA, bogen)']], value: '50' });
+    var cv = Lab.canvas(T.stage, 0.5);
+    var out = Lab.readout(T, [{ key: 'Q1', label: 'Q før', color: C.purple }, { key: 'Q2', label: 'Q efter', color: C.cyan }, { key: 'QC', label: 'Kondensatoren leverer', color: C.green },
+      { key: 'C', label: 'Kapacitans C', color: C.gold }, { key: 'I1', label: 'Strøm før', color: C.red }, { key: 'I2', label: 'Strøm efter', color: C.green }]);
+    function calc(p) {
+      var pf2 = Math.max(p.pf2, p.pf1), Q1 = p.P * Math.tan(Math.acos(p.pf1)), Q2 = p.P * Math.tan(Math.acos(pf2)), w = 2 * PI * Number(p.f);
+      return { Q1: Q1, Q2: Q2, C: (Q1 - Q2) / (w * p.V * p.V), I1: p.P / (p.pf1 * p.V), I2: p.P / (pf2 * p.V), pf2: pf2 };
+    }
+    T.on(function (p) {
+      var c = calc(p);
+      Lab.phasor(cv, [{ z: Lab.C(p.P, c.Q1), color: C.purple, label: 'S før' }, { z: Lab.C(p.P, c.Q2), color: C.cyan, label: 'S efter' }, { z: Lab.C(p.P, 0), color: C.green, label: 'P', width: 2 },
+        { z: Lab.C(0, c.Q2 - c.Q1), from: Lab.C(p.P, c.Q1), color: C.gold, label: 'Q_C', dash: true, width: 2 }], { note: 'Kondensatoren trækker Q ned; P er uændret.' });
+      out({ Q1: fu(c.Q1, 'VAR'), Q2: fu(c.Q2, 'VAR'), QC: fu(c.Q2 - c.Q1, 'VAR'), C: fu(c.C, 'F'), I1: fu(c.I1, 'A'), I2: fu(c.I2, 'A') + ' (−' + fmt(100 * (1 - c.I2 / c.I1), 3) + ' %)' });
+    });
+    Lab.check(T, [{ q: 'Den nødvendige kapacitans', unit: 'µF', answer: function (p) { return calc(p).C * 1e6; } }, { q: 'Strømmen efter korrektion', unit: 'A', answer: function (p) { return calc(p).I2; } }]);
+    Lab.steps(T, function (p) {
+      var c = calc(p), w = 2 * PI * Number(p.f);
+      return ['Reaktiv effekt før: <span class="f">Q₁ = P·tan(cos⁻¹ ' + fmt(p.pf1) + ') = ' + fmt(p.P) + ' · ' + fmt(Math.tan(Math.acos(p.pf1)), 4) + '</span> = ' + fu(c.Q1, 'VAR'),
+        'Ønsket: <span class="f">Q₂ = P·tan(cos⁻¹ ' + fmt(c.pf2) + ')</span> = ' + fu(c.Q2, 'VAR'),
+        'Kondensatoren skal levere <span class="f">Q_C = Q₂ − Q₁</span> = ' + fu(c.Q2 - c.Q1, 'VAR'),
+        '<span class="f">C = (Q₁ − Q₂)/(ω·Ṽ²) = ' + fmt(c.Q1 - c.Q2, 4) + '/(' + fmt(w, 4) + ' · ' + fmt(p.V) + '²)</span> = <span class="res">' + fu(c.C, 'F') + '</span>',
+        'Strøm: <span class="f">Ĩ = P/(pf·Ṽ)</span>: før ' + fu(c.I1, 'A') + ', efter <span class="res">' + fu(c.I2, 'A') + '</span>. Ledningstabet falder med ' + fmt(100 * (1 - Math.pow(c.I2 / c.I1, 2)), 3) + ' %.'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- PM-jævnstrømsmotor ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse', title: 'PM-jævnstrømsmotoren: moment, hastighed og virkningsgrad', short: 'DC-motor',
+      text: 'En PM-motor har V_s = 24 V, R_a = 0,5 Ω og motorkonstanten k = 0,1 V·s/rad. Find tomgangshastigheden, det stillestående moment og driftspunktet ved belastningsmomentet 1 N·m.',
+      learn: 'kurven er en ret linje fra tomgangshastigheden til det stillestående moment. Mere belastning giver mere strøm, større spændingsfald i R_a og lavere hastighed. Højere spænding parallelforskyder linjen opad.' });
+    Lab.slider(T, { key: 'V', label: 'Forsyningsspænding V_s', min: 6, max: 48, step: 1, value: 24, unit: 'V', noPrefix: true });
+    Lab.slider(T, { key: 'Ra', label: 'Ankermodstand R_a', min: 0.1, max: 3, step: 0.05, value: 0.5, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'k', label: 'Motorkonstant k', min: 0.02, max: 0.3, step: 0.005, value: 0.1, unit: 'V·s/rad', noPrefix: true });
+    Lab.slider(T, { key: 'TL', label: 'Belastningsmoment T', min: 0, max: 5, step: 0.05, value: 1, unit: 'N·m', noPrefix: true });
+    var cv = Lab.canvas(T.stage, 0.45);
+    var out = Lab.readout(T, [{ key: 'w0', label: 'Tomgang ω₀ = V/k', color: C.cyan }, { key: 'T0', label: 'Stillestående moment T₀', color: C.red }, { key: 'w', label: 'Driftshastighed', color: C.green },
+      { key: 'Ia', label: 'Ankerstrøm I_a = T/k', color: C.gold }, { key: 'Pm', label: 'P_mek / P_el', color: C.purple }, { key: 'eta', label: 'Virkningsgrad η', color: C.green }]);
+    function op(p) { var Ia = p.TL / p.k, w = p.V / p.k - p.Ra * p.TL / (p.k * p.k); return { Ia: Ia, w: w, Eb: p.V - Ia * p.Ra, Pm: p.TL * w, Pe: p.V * Ia }; }
+    T.on(function (p) {
+      var o = op(p), w0 = p.V / p.k, T0 = p.V / p.Ra * p.k;
+      Lab.plot(cv, { x: [0, Math.max(T0, 0.1) * 1.05], y: [0, w0 * 1.1], xlabel: 'Moment T [N·m]', ylabel: 'ω [rad/s]',
+        series: [{ fn: function (t) { return w0 - p.Ra * t / (p.k * p.k); }, color: C.cyan, label: 'ω(T) = V/k − R_a·T/k²' }],
+        markers: o.w > 0 ? [{ x: p.TL, y: o.w, color: C.red, label: 'driftspunkt' }] : [] });
+      out({ w0: fmt(w0, 4) + ' rad/s (' + fmt(w0 * 60 / 2 / PI, 4) + ' o/min)', T0: fu(T0, 'N·m'), w: o.w > 0 ? fmt(o.w, 4) + ' rad/s (' + fmt(o.w * 60 / 2 / PI, 4) + ' o/min)' : '<span class="pill warn">motoren går i stå</span>',
+        Ia: fu(o.Ia, 'A'), Pm: fu(Math.max(o.Pm, 0), 'W') + ' / ' + fu(o.Pe, 'W'), eta: o.Pe > 0 && o.w > 0 ? fmt(100 * o.Pm / o.Pe, 3) + ' %' : '–' });
+    });
+    Lab.check(T, [{ q: 'Hastigheden i driftspunktet', unit: 'rad/s', answer: function (p) { return op(p).w; } }, { q: 'Det stillestående moment T₀', unit: 'N·m', answer: function (p) { return p.V / p.Ra * p.k; } }]);
+    Lab.steps(T, function (p) {
+      var o = op(p);
+      return ['Tomgang: <span class="f">ω₀ = V_s/k = ' + fmt(p.V) + '/' + fmt(p.k) + '</span> = ' + fmt(p.V / p.k, 4) + ' rad/s. Stilstand: <span class="f">T₀ = (V_s/R_a)·k</span> = ' + fu(p.V / p.Ra * p.k, 'N·m'),
+        'Ankerstrøm i driftspunktet: <span class="f">I_a = T/k = ' + fmt(p.TL) + '/' + fmt(p.k) + '</span> = ' + fu(o.Ia, 'A'),
+        'Modspænding: <span class="f">E_b = V_s − R_a·I_a = ' + fmt(p.V) + ' − ' + fmt(p.Ra) + '·' + fmt(o.Ia, 4) + '</span> = ' + fu(o.Eb, 'V'),
+        'Hastighed: <span class="f">ω = E_b/k</span> = <span class="res">' + fmt(o.w, 4) + ' rad/s</span> (' + fmt(o.w * 60 / 2 / PI, 4) + ' o/min)',
+        'Effekt: P_mek = T·ω = ' + fu(o.Pm, 'W') + ', P_el = V_s·I_a = ' + fu(o.Pe, 'W') + ', tab i ankeret R_a·I_a² = ' + fu(p.Ra * o.Ia * o.Ia, 'W') + ', η = ' + fmt(100 * o.Pm / o.Pe, 3) + ' %.'];
+    });
+    T.ready();
+  })();
+})();
+</script>
+</body>
+</html>

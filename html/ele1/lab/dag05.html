@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Øvelseslab: Dag 5 · ELE1</title>
+<link rel="stylesheet" href="assets/lab.css">
+</head>
+<body>
+<header>
+  <h1>Øvelseslab · Dag 5</h1>
+  <p>Impedans: kompleks modstand, der afhænger af frekvensen</p>
+  <div class="toplinks">
+    <a href="../dag/Dag05_Studienote.pdf" target="_blank">📖 Studienote</a>
+    <a href="../../../quiz/ele1/Dag05_Quiz.html" target="_blank">📝 Quiz</a>
+    <a href="../../../index.html#edu/maskiningenioer/sem3/ele1/dag05">← Studiehub</a>
+  </div>
+</header>
+<div class="howto"><b>Sådan bruges laben:</b> Hver opgave starter med opgavens egne tal. Regn først selv, skriv svaret under <b>Prøv selv først</b>, og tjek det. Skru derefter på værdierne, især frekvensen, og se impedansen ændre sig. <b>Løsning trin for trin</b> følger altid de værdier, der står i indstillingerne lige nu.</div>
+<nav class="tasknav" id="tasknav"></nav>
+<main id="tasks"></main>
+<footer>ELE1-A26 · Øvelseslab til dag 5 · opgaverne svarer til studienoten · <a href="../../../index.html#edu/maskiningenioer/sem3/ele1">Studiehub</a></footer>
+<script src="assets/lab.js"></script>
+<script>
+(function () {
+  var fu = Lab.fu, fmt = Lab.fmt, C = Lab.COL, Cx = Lab.Cx, deg = Lab.deg, rad = Lab.rad, PI = Math.PI;
+  function pill(z) { var x = z.im; return Math.abs(x) < 1e-9 * Math.max(1, Cx.abs(z)) ? '<span class="pill res">resistiv</span>' : x > 0 ? '<span class="pill ind">induktiv</span>' : '<span class="pill cap">kapacitiv</span>'; }
+
+  /* ---------- Impedans af R, L og C ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Teori', title: 'Impedansen af R, L og C', short: 'Z for R, L, C',
+      text: 'Vælg en komponent og en frekvens. Kurven viser impedansens størrelse |Z| som funktion af frekvensen, og fasordiagrammet viser spænding og strøm.',
+      learn: 'modstanden er uafhængig af frekvensen og i fase. Spolens |Z| = ωL vokser med frekvensen, og strømmen halter 90°. Kondensatorens |Z| = 1/(ωC) falder med frekvensen, og strømmen fører 90° (ELI the ICE man).' });
+    Lab.select(T, { key: 'k', label: 'Komponent', options: [['R', 'Modstand R'], ['L', 'Spole L'], ['C', 'Kondensator C']], value: 'L' });
+    Lab.slider(T, { key: 'R', label: 'R', min: 1, max: 1000, log: true, value: 100, unit: 'Ω' });
+    Lab.slider(T, { key: 'L', label: 'L', min: 1e-4, max: 1, log: true, value: 0.01, unit: 'H' });
+    Lab.slider(T, { key: 'Cap', label: 'C', min: 1e-8, max: 1e-3, log: true, value: 10e-6, unit: 'F' });
+    Lab.slider(T, { key: 'f', label: 'Frekvens f', min: 1, max: 100000, log: true, value: 1591.55, unit: 'Hz' });
+    var cvF = Lab.canvas(T.stage, 0.36), cvP = Lab.canvas(T.stage, 0.42);
+    var out = Lab.readout(T, [{ key: 'w', label: 'ω = 2πf', color: C.dim }, { key: 'Z', label: 'Z (kartesisk)', color: C.gold }, { key: 'Zp', label: 'Z (polær)', color: C.gold }, { key: 'typ', label: 'Type', color: C.txt }]);
+    function Z(p, f) { var w = 2 * PI * f; return p.k === 'R' ? Lab.C(p.R, 0) : p.k === 'L' ? Lab.C(0, w * p.L) : Lab.C(0, -1 / (w * p.Cap)); }
+    T.on(function (p) {
+      var z = Z(p, p.f), V = Lab.C(1, 0), I = Cx.div(V, z);
+      Lab.plot(cvF, { x: [1, 100000], logx: true, xunit: 'Hz', xlabel: 'Frekvens f (log)', ylabel: '|Z| [Ω]', y: [0, Math.min(Cx.abs(z) * 3 + 1, 1e6)],
+        series: [{ fn: function (f) { return Cx.abs(Z(p, f)); }, color: C.gold, label: '|Z(f)|' }], markers: [{ x: p.f, y: Cx.abs(z) }] });
+      Lab.phasor(cvP, [{ z: V, color: C.cyan, label: 'V' }, { z: Cx.scale(I, 0.75 / Cx.abs(I)), color: C.red, label: 'I' }], { max: 1, note: 'Længderne er normeret; vinklen mellem V og I er impedansens vinkel.' });
+      out({ w: fmt(2 * PI * p.f, 4) + ' rad/s', Z: Lab.fc(z, 'Ω'), Zp: Lab.fp(z, 'Ω'), typ: pill(z) });
+    });
+    Lab.check(T, [{ q: 'Størrelsen |Z| ved den valgte frekvens', unit: 'Ω', answer: function (p) { return Cx.abs(Z(p, p.f)); } }]);
+    Lab.steps(T, function (p) {
+      var w = 2 * PI * p.f, z = Z(p, p.f);
+      var f = p.k === 'R' ? '<span class="f">Z_R = R</span> = ' + fu(p.R, 'Ω') + ', uanset frekvensen.' :
+        p.k === 'L' ? '<span class="f">Z_L = jωL = j · ' + fmt(w, 4) + ' · ' + fmt(p.L, 3) + '</span> = j' + fmt(z.im, 4) + ' Ω' :
+        '<span class="f">Z_C = 1/(jωC) = −j/(' + fmt(w, 4) + ' · ' + fmt(p.Cap, 3) + ')</span> = −j' + fmt(-z.im, 4) + ' Ω';
+      return ['Vinkelfrekvens: <span class="f">ω = 2πf = ' + fmt(w, 4) + ' rad/s</span>', f, 'Størrelse: <span class="res">|Z| = ' + fu(Cx.abs(z), 'Ω') + '</span>, vinkel ' + fmt(deg(Cx.arg(z)), 3) + '°.'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Praktisk kondensator ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Eksempel', title: 'Den praktiske kondensator (bogens eksempel 3.12)', short: 'Praktisk C',
+      text: 'En kondensator C₁ = 0,001 µF parallelt med en lækmodstand R₁ = 1 MΩ. Find Z₁ ved ω = 377 rad/s (60 Hz) og ved 800 kHz, og sammenlign med kondensatoren alene.',
+      learn: 'ved lav frekvens opfører kombinationen sig næsten som modstanden (vinkel nær 0°). Ved høj frekvens dominerer kondensatoren (vinkel nær −90°), og lækmodstanden er uden betydning.' });
+    Lab.slider(T, { key: 'C1', label: 'C₁', min: 1e-10, max: 1e-6, log: true, value: 1e-9, unit: 'F' });
+    Lab.slider(T, { key: 'R1', label: 'R₁ (læk)', min: 1e4, max: 1e8, log: true, value: 1e6, unit: 'Ω' });
+    Lab.slider(T, { key: 'f', label: 'Frekvens f', min: 1, max: 1e7, log: true, value: 60, unit: 'Hz' });
+    var ckt = Lab.circuit(T, [
+      { t: 'w', pts: [[200, 20], [200, 45], [130, 45]] }, { t: 'w', pts: [[200, 45], [270, 45]] },
+      { t: 'R', a: [130, 45], b: [130, 165], label: 'R₁', id: 'lR', side: 'l' }, { t: 'C', a: [270, 45], b: [270, 165], label: 'C₁', id: 'lC' },
+      { t: 'w', pts: [[130, 165], [270, 165]] }, { t: 'w', pts: [[200, 165], [200, 190]] }, { t: 'node', at: [200, 20] }, { t: 'node', at: [200, 190] },
+      { t: 'txt', at: [300, 200], s: 'Z₁', id: 'lZ', color: C.gold, anchor: 'start' }
+    ], '0 0 480 210', 200);
+    var cv = Lab.canvas(T.stage, 0.36);
+    var out = Lab.readout(T, [{ key: 'w', label: 'ω', color: C.dim }, { key: 'z1', label: 'Z₁ = R₁ ∥ Z_C', color: C.gold }, { key: 'zc', label: 'Z_C alene', color: C.purple }, { key: 'fc', label: 'Knæk ved f = 1/(2πR₁C₁)', color: C.cyan }]);
+    function Z1(p, f) { var w = 2 * PI * f; return Cx.div(Lab.C(p.R1, 0), Lab.C(1, w * p.C1 * p.R1)); }
+    T.on(function (p) {
+      var w = 2 * PI * p.f, z1 = Z1(p, p.f), zc = Lab.C(0, -1 / (w * p.C1));
+      ckt.set('lR', 'R₁ = ' + fu(p.R1, 'Ω')); ckt.set('lC', 'C₁ = ' + fu(p.C1, 'F')); ckt.set('lZ', 'Z₁ = ' + Lab.fp(z1, 'Ω'));
+      Lab.plot(cv, { x: [1, 1e7], logx: true, xunit: 'Hz', y: [-95, 5], xlabel: 'Frekvens f (log)', ylabel: 'vinkel [°]',
+        series: [{ fn: function (f) { return deg(Cx.arg(Z1(p, f))); }, color: C.gold, label: 'vinkel af Z₁' }],
+        hlines: [{ y: -90, color: C.purple, label: 'ren kondensator (−90°)' }, { y: 0, color: C.cyan, label: 'ren modstand (0°)' }], markers: [{ x: p.f, y: deg(Cx.arg(z1)) }] });
+      out({ w: fmt(w, 4) + ' rad/s', z1: Lab.fp(z1, 'Ω'), zc: Lab.fp(zc, 'Ω'), fc: fu(1 / (2 * PI * p.R1 * p.C1), 'Hz') });
+    });
+    Lab.check(T, [{ q: 'Størrelsen |Z₁| ved den valgte frekvens', unit: 'Ω', answer: function (p) { return Cx.abs(Z1(p, p.f)); } },
+      { q: 'Vinklen af Z₁ i grader', unit: '°', tol: 0.02, answer: function (p) { return deg(Cx.arg(Z1(p, p.f))); } }]);
+    Lab.steps(T, function (p) {
+      var w = 2 * PI * p.f, k = w * p.C1 * p.R1, z1 = Z1(p, p.f);
+      return ['Parallelkobling af R og C: <span class="f">Z₁ = R₁/(1 + jωC₁R₁)</span>',
+        'Beregn først <span class="f">ωC₁R₁ = ' + fmt(w, 4) + ' · ' + fmt(p.C1, 3) + ' · ' + fmt(p.R1, 3) + '</span> = ' + fmt(k, 4),
+        '<span class="f">Z₁ = ' + fmt(p.R1, 3) + '/(1 + j' + fmt(k, 4) + ')</span> = <span class="res">' + Lab.fp(z1, 'Ω', 4) + '</span>',
+        'Kondensatoren alene: <span class="f">Z_C = 1/(ωC₁)</span> = ' + fu(1 / (w * p.C1), 'Ω') + '∠−90°.',
+        k < 0.3 ? 'ωC₁R₁ er lille: lækmodstanden betyder meget, og Z₁ ligner mest en modstand.' : k > 10 ? 'ωC₁R₁ er stor: kondensatoren dominerer, og lækmodstanden kan ignoreres.' : 'Her er de to sammenlignelige, og begge har betydning.'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Kombineret kredsløb ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Eksempel + Øvelse 1', title: 'Ækvivalent impedans af et kombineret kredsløb (bogens eksempel 3.14)', short: 'Kombineret Z',
+      text: 'R₁ = 100 Ω og L = 10 mH i serie med (R₂ = 50 Ω parallelt med C = 10 µF), ω = 10⁴ rad/s. Find Z_EQ, og vis om kredsløbet er induktivt eller kapacitivt. Kilden er 12 V amplitude som i LTspice-øvelsen.',
+      learn: 'ved lav frekvens dominerer kondensatoren (kapacitivt, strømmen fører), ved høj frekvens dominerer spolen (induktivt, strømmen halter). Find frekvensen, hvor reaktansen skifter fortegn.' });
+    Lab.slider(T, { key: 'R1', label: 'R₁', min: 10, max: 300, step: 5, value: 100, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'L', label: 'L', min: 1, max: 50, step: 1, value: 10, unit: 'mH', noPrefix: true });
+    Lab.slider(T, { key: 'R2', label: 'R₂', min: 10, max: 300, step: 5, value: 50, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'C', label: 'C', min: 1, max: 100, step: 1, value: 10, unit: 'µF', noPrefix: true });
+    Lab.slider(T, { key: 'w', label: 'ω', min: 100, max: 1e6, log: true, value: 1e4, fmt: function (x) { return fmt(x, 3) + ' rad/s (' + fu(x / 2 / PI, 'Hz') + ')'; } });
+    var ckt = Lab.circuit(T, [
+      { t: 'AC', a: [60, 200], b: [60, 30], label: 'v_s', side: 'l' }, { t: 'w', pts: [[60, 30], [150, 30]] },
+      { t: 'R', a: [150, 30], b: [260, 30], label: 'R₁', id: 'lR1', side: 't' }, { t: 'L', a: [260, 30], b: [370, 30], label: 'L', id: 'lL', side: 't' },
+      { t: 'w', pts: [[370, 30], [400, 30], [400, 70], [350, 70]] }, { t: 'w', pts: [[400, 70], [450, 70]] },
+      { t: 'R', a: [350, 70], b: [350, 180], label: 'R₂', id: 'lR2', side: 'l' }, { t: 'C', a: [450, 70], b: [450, 180], label: 'C', id: 'lC' },
+      { t: 'w', pts: [[350, 180], [450, 180]] }, { t: 'w', pts: [[400, 180], [400, 200], [60, 200]] }
+    ], '0 0 540 225', 230);
+    var cvP = Lab.canvas(T.stage, 0.42), cvX = Lab.canvas(T.stage, 0.34), cvT = Lab.canvas(T.stage, 0.34);
+    var out = Lab.readout(T, [{ key: 'zp', label: 'Z_∥ = R₂ ∥ Z_C', color: C.purple }, { key: 'zl', label: 'Z_L = jωL', color: C.green }, { key: 'z', label: 'Z_EQ', color: C.gold }, { key: 'zpol', label: 'Z_EQ polær', color: C.gold }, { key: 'typ', label: 'Type', color: C.txt }, { key: 'I', label: 'Strømamplitude 12 V/|Z|', color: C.red }]);
+    function Zs(p, w) {
+      var zc = Lab.C(0, -1 / (w * p.C * 1e-6)), zp = Cx.par(Lab.C(p.R2, 0), zc), zl = Lab.C(0, w * p.L / 1000);
+      return { zp: zp, zl: zl, z: Cx.add(Cx.add(Lab.C(p.R1, 0), zl), zp) };
+    }
+    T.on(function (p) {
+      var s = Zs(p, p.w);
+      ckt.set('lR1', 'R₁ = ' + fmt(p.R1) + ' Ω'); ckt.set('lL', 'L = ' + fmt(p.L) + ' mH'); ckt.set('lR2', 'R₂ = ' + fmt(p.R2) + ' Ω'); ckt.set('lC', 'C = ' + fmt(p.C) + ' µF');
+      Lab.phasor(cvP, [{ z: Lab.C(p.R1, 0), color: C.cyan, label: 'R₁', width: 2 }, { z: s.zl, from: Lab.C(p.R1, 0), color: C.green, label: 'jωL', width: 2 },
+        { z: s.zp, from: Cx.add(Lab.C(p.R1, 0), s.zl), color: C.purple, label: 'Z_∥', width: 2 }, { z: s.z, color: C.gold, label: 'Z_EQ' }], { note: 'Impedanserne lægges sammen som vektorer (hoved til hale).' });
+      Lab.plot(cvX, { x: [100, 1e6], logx: true, xunit: 'rad/s', xlabel: 'ω (log)', ylabel: 'Im Z_EQ [Ω]', y: [-60, 200],
+        series: [{ fn: function (w) { return Zs(p, w).z.im; }, color: C.gold, label: 'reaktans X(ω)' }], hlines: [{ y: 0, color: C.dim, label: 'X = 0: resistivt' }], markers: [{ x: p.w, y: s.z.im }] });
+      var Im = 12 / Cx.abs(s.z), ph = -Cx.arg(s.z), Tper = 2 * PI / p.w * 1000;
+      Lab.plot(cvT, { x: [0, 2 * Tper], xlabel: 't [ms]', ylabel: 'v [V], i·100 [A]', y: [-13, 13],
+        series: [{ fn: function (t) { return 12 * Math.cos(p.w * t / 1000); }, color: C.cyan, label: 'v_s(t)' }, { fn: function (t) { return 100 * Im * Math.cos(p.w * t / 1000 + ph); }, color: C.red, label: '100·i(t)' }] });
+      out({ zp: Lab.fc(s.zp, 'Ω'), zl: Lab.fc(s.zl, 'Ω'), z: Lab.fc(s.z, 'Ω'), zpol: Lab.fp(s.z, 'Ω') + ' = ' + fmt(Cx.arg(s.z), 3) + ' rad', typ: pill(s.z), I: fu(Im, 'A') });
+    });
+    Lab.check(T, [
+      { q: 'Realdelen af Z_EQ', unit: 'Ω', answer: function (p) { return Zs(p, p.w).z.re; } },
+      { q: 'Imaginærdelen (reaktansen) af Z_EQ', unit: 'Ω', answer: function (p) { return Zs(p, p.w).z.im; } },
+      { q: 'Vinklen af Z_EQ i grader', unit: '°', tol: 0.02, answer: function (p) { return deg(Cx.arg(Zs(p, p.w).z)); } }
+    ]);
+    Lab.steps(T, function (p) {
+      var s = Zs(p, p.w), k = p.w * p.C * 1e-6 * p.R2;
+      return ['Indefra og ud. Parallelleddet: <span class="f">Z_∥ = R₂/(1 + jωCR₂)</span>, hvor ωCR₂ = ' + fmt(p.w, 4) + ' · ' + fmt(p.C) + '·10⁻⁶ · ' + fmt(p.R2) + ' = ' + fmt(k, 4) + '.',
+        '<span class="f">Z_∥ = ' + fmt(p.R2) + '/(1 + j' + fmt(k, 4) + ')</span> = ' + Lab.fc(s.zp, 'Ω', 4),
+        'Spolen: <span class="f">Z_L = jωL = j · ' + fmt(p.w, 4) + ' · ' + fmt(p.L / 1000, 3) + '</span> = ' + Lab.fc(s.zl, 'Ω', 4),
+        'Serie, læg sammen i kartesisk form: <span class="f">Z_EQ = ' + fmt(p.R1) + ' + ' + Lab.fc(s.zl, '', 4) + ' + ' + Lab.fc(s.zp, '', 4) + '</span> = <span class="res">' + Lab.fc(s.z, 'Ω', 4) + ' = ' + Lab.fp(s.z, 'Ω', 4) + '</span>',
+        (s.z.im > 0 ? 'Imaginærdelen er positiv: kredsløbet er <b>induktivt</b>, og strømmen halter ' : 'Imaginærdelen er negativ: kredsløbet er <b>kapacitivt</b>, og strømmen fører ') + fmt(Math.abs(deg(Cx.arg(s.z))), 3) + '° i forhold til spændingen (se tidsplottet).',
+        'I LTspice: <span class="f">SINE(0 12 ' + fmt(p.w / 2 / PI, 6).replace(',', '.').replace(/ /g, '') + ')</span>, strømamplitude ≈ ' + fu(12 / Cx.abs(s.z), 'A') + '.'];
+    });
+    T.ready();
+  })();
+})();
+</script>
+</body>
+</html>

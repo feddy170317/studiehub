@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Øvelseslab: Dag 4 · ELE1</title>
+<link rel="stylesheet" href="assets/lab.css">
+</head>
+<body>
+<header>
+  <h1>Øvelseslab · Dag 4</h1>
+  <p>Energi i C og L, middel- og RMS-værdi, fasorer og superposition</p>
+  <div class="toplinks">
+    <a href="../dag/Dag04_Studienote.pdf" target="_blank">📖 Studienote</a>
+    <a href="../../../quiz/ele1/Dag04_Quiz.html" target="_blank">📝 Quiz</a>
+    <a href="../../../index.html#edu/maskiningenioer/sem3/ele1/dag04">← Studiehub</a>
+  </div>
+</header>
+<div class="howto"><b>Sådan bruges laben:</b> Hver opgave starter med opgavens egne tal. Regn først selv, skriv svaret under <b>Prøv selv først</b>, og tjek det. Skru derefter på værdierne og se, hvad der sker. <b>Løsning trin for trin</b> følger altid de værdier, der står i indstillingerne lige nu. Animationer kan sættes på pause.</div>
+<nav class="tasknav" id="tasknav"></nav>
+<main id="tasks"></main>
+<footer>ELE1-A26 · Øvelseslab til dag 4 · opgaverne svarer til studienoten · <a href="../../../index.html#edu/maskiningenioer/sem3/ele1">Studiehub</a></footer>
+<script src="assets/lab.js"></script>
+<script>
+(function () {
+  var fu = Lab.fu, fmt = Lab.fmt, C = Lab.COL, Cx = Lab.Cx, deg = Lab.deg, rad = Lab.rad, PI = Math.PI;
+
+  /* ---------- Energi i C og L ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Eksempel', title: 'Energi lagret i kondensator og spole', short: 'Energi',
+      text: 'Underviserens LTspice-eksempler: en kondensator på 2000 µF opladet til 400 V og en spole på 500 mH med 2 A.',
+      learn: 'energien vokser med kvadratet på spændingen (kondensator) eller strømmen (spole). Halvér spændingen, og energien falder til en fjerdedel.' });
+    Lab.slider(T, { key: 'C', label: 'Kapacitans C', min: 10, max: 5000, step: 10, value: 2000, unit: 'µF', noPrefix: true });
+    Lab.slider(T, { key: 'V', label: 'Spænding v_C', min: 0, max: 500, step: 5, value: 400, unit: 'V', noPrefix: true });
+    Lab.slider(T, { key: 'L', label: 'Induktans L', min: 10, max: 2000, step: 10, value: 500, unit: 'mH', noPrefix: true });
+    Lab.slider(T, { key: 'I', label: 'Strøm i_L', min: 0, max: 10, step: 0.1, value: 2, unit: 'A', noPrefix: true });
+    var cv1 = Lab.canvas(T.stage, 0.34), cv2 = Lab.canvas(T.stage, 0.34);
+    var out = Lab.readout(T, [{ key: 'wc', label: 'W_C = ½·C·v²', color: C.cyan }, { key: 'wl', label: 'W_L = ½·L·i²', color: C.purple }]);
+    T.on(function (p) {
+      var Cf = p.C * 1e-6, Lh = p.L / 1000, wc = 0.5 * Cf * p.V * p.V, wl = 0.5 * Lh * p.I * p.I;
+      Lab.plot(cv1, { x: [0, 500], xlabel: 'v_C [V]', ylabel: 'W_C [J]', series: [{ fn: function (v) { return 0.5 * Cf * v * v; }, color: C.cyan, label: 'W_C(v)' }], markers: [{ x: p.V, y: wc }] });
+      Lab.plot(cv2, { x: [0, 10], xlabel: 'i_L [A]', ylabel: 'W_L [J]', series: [{ fn: function (i) { return 0.5 * Lh * i * i; }, color: C.purple, label: 'W_L(i)' }], markers: [{ x: p.I, y: wl }] });
+      out({ wc: fu(wc, 'J'), wl: fu(wl, 'J') });
+    });
+    Lab.check(T, [
+      { q: 'Energien i kondensatoren', unit: 'J', answer: function (p) { return 0.5 * p.C * 1e-6 * p.V * p.V; } },
+      { q: 'Energien i spolen', unit: 'J', answer: function (p) { return 0.5 * p.L / 1000 * p.I * p.I; } }
+    ]);
+    Lab.steps(T, function (p) {
+      return ['Kondensator: <span class="f">W_C = ½·C·v² = ½ · ' + fmt(p.C) + '·10⁻⁶ · ' + fmt(p.V) + '²</span> = <span class="res">' + fu(0.5 * p.C * 1e-6 * p.V * p.V, 'J') + '</span>',
+        'Spole: <span class="f">W_L = ½·L·i² = ½ · ' + fmt(p.L / 1000) + ' · ' + fmt(p.I) + '²</span> = <span class="res">' + fu(0.5 * p.L / 1000 * p.I * p.I, 'J') + '</span>',
+        'Husk enhederne: µF skal ganges med 10⁻⁶ og mH med 10⁻³, før der regnes.'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Middel- og RMS-værdi ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Eksempel', title: 'Middelværdi og RMS-værdi', short: 'RMS',
+      text: 'RMS betyder: tag signalet i anden (Square), find middelværdien (Mean), og tag kvadratroden (Root). Vælg en kurveform og se, hvordan RMS-værdien opstår.',
+      learn: 'for en sinus er middelværdien 0, men RMS-værdien er topværdien/√2 ≈ 0,707·topværdien. Andre kurveformer har en anden faktor: firkant 1, trekant 1/√3.' });
+    Lab.select(T, { key: 'w', label: 'Kurveform', options: [['sin', 'Sinus'], ['sq', 'Firkant'], ['tri', 'Trekant'], ['half', 'Halvbølge-ensrettet sinus'], ['dc', 'Sinus + DC-forskydning']], value: 'sin' });
+    Lab.slider(T, { key: 'A', label: 'Amplitude (topværdi)', min: 1, max: 400, step: 1, value: 325, unit: 'V', noPrefix: true });
+    var cv1 = Lab.canvas(T.stage, 0.36), cv2 = Lab.canvas(T.stage, 0.36);
+    var out = Lab.readout(T, [{ key: 'avg', label: 'Middelværdi ⟨x⟩', color: C.cyan }, { key: 'ms', label: 'Middelværdi af x²', color: C.purple }, { key: 'rms', label: 'RMS = √⟨x²⟩', color: C.green }, { key: 'k', label: 'RMS / topværdi', color: C.gold }]);
+    function wave(w, A, ph) {
+      var s = Math.sin(2 * PI * ph);
+      if (w === 'sin') return A * s;
+      if (w === 'sq') return ph < 0.5 ? A : -A;
+      if (w === 'tri') return ph < 0.25 ? 4 * A * ph : ph < 0.75 ? A * (2 - 4 * ph) : A * (4 * ph - 4);
+      if (w === 'half') return s > 0 ? A * s : 0;
+      return A * 0.5 + A * 0.5 * s;
+    }
+    function stats(p) {
+      var N = 4000, s = 0, s2 = 0;
+      for (var k = 0; k < N; k++) { var x = wave(p.w, p.A, (k + 0.5) / N); s += x; s2 += x * x; }
+      return { avg: s / N, ms: s2 / N, rms: Math.sqrt(s2 / N) };
+    }
+    T.on(function (p) {
+      var st = stats(p);
+      Lab.plot(cv1, { x: [0, 40], xlabel: 't [ms] (50 Hz)', ylabel: 'x(t) [V]', y: [-p.A * 1.15, p.A * 1.15],
+        series: [{ fn: function (t) { return wave(p.w, p.A, (t / 20) % 1); }, color: C.cyan, label: 'x(t)' }],
+        hlines: [{ y: st.rms, color: C.green, label: 'RMS' }, { y: st.avg, color: C.gold, label: 'middelværdi' }] });
+      Lab.plot(cv2, { x: [0, 40], xlabel: 't [ms]', ylabel: 'x² [V²]', y: [0, p.A * p.A * 1.1],
+        series: [{ fn: function (t) { var x = wave(p.w, p.A, (t / 20) % 1); return x * x; }, color: C.purple, label: 'x²(t)' }],
+        hlines: [{ y: st.ms, color: C.green, label: 'middelværdi af x²' }] });
+      out({ avg: fu(st.avg, 'V'), ms: fmt(st.ms, 4) + ' V²', rms: fu(st.rms, 'V'), k: fmt(st.rms / p.A, 4) });
+    });
+    Lab.check(T, [{ q: 'RMS-værdien for den valgte kurveform', unit: 'V', answer: function (p) { return stats(p).rms; } }]);
+    Lab.steps(T, function (p) {
+      var st = stats(p), f = { sin: 'Topværdi/√2', sq: 'Topværdi · 1', tri: 'Topværdi/√3', half: 'Topværdi/2', dc: '√(⅜)·topværdi' }[p.w];
+      return ['Definition: <span class="f">x_rms = √( (1/T)·∫ x²(t) dt )</span>',
+        'Middelværdien af x² over en periode (lilla kurve, grøn linje) er ' + fmt(st.ms, 4) + ' V².',
+        'Kvadratroden giver <span class="res">x_rms = ' + fu(st.rms, 'V') + '</span>, svarende til ' + f + '.',
+        p.w === 'sin' ? 'For en sinus: cos² = ½ + ½·cos(2ωt), og cosinusleddet integrerer til nul. Derfor er x_rms = A/√2. Stikkontakten: 325 V top = 230 V RMS.' : 'Formlen A/√2 gælder kun for sinus. For andre kurveformer skal definitionen bruges.'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Fasoreksempel 1 + Øvelse 1 ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Eksempel 1 + Øvelse 1', title: 'Fasorer: to spændingskilder i serie', short: 'Fasoraddition',
+      text: 'v₁(t) = 15·cos(377t + π/4) V og v₂(t) = 15·cos(377t + π/12) V sidder i serie. Find v_S(t) = v₁(t) + v₂(t). Fasorerne roterer i slowmotion; deres projektion på den reelle akse er spændingen i tidsplottet.',
+      learn: 'summen af to sinusser med samme frekvens er en ny sinus med samme frekvens. Fasorerne lægges sammen som vektorer, og hele billedet drejer rundt i takt.' });
+    Lab.slider(T, { key: 'A1', label: 'Amplitude v₁', min: 0, max: 30, step: 0.5, value: 15, unit: 'V', noPrefix: true });
+    Lab.slider(T, { key: 't1', label: 'Fase v₁', min: -180, max: 180, step: 1, value: 45, unit: '°', noPrefix: true });
+    Lab.slider(T, { key: 'A2', label: 'Amplitude v₂', min: 0, max: 30, step: 0.5, value: 15, unit: 'V', noPrefix: true });
+    Lab.slider(T, { key: 't2', label: 'Fase v₂', min: -180, max: 180, step: 1, value: 15, unit: '°', noPrefix: true });
+    var cvP = Lab.canvas(T.stage, 0.55), cvT = Lab.canvas(T.stage, 0.36);
+    var out = Lab.readout(T, [{ key: 'v1', label: 'V₁ kartesisk', color: C.cyan }, { key: 'v2', label: 'V₂ kartesisk', color: C.purple }, { key: 'vs', label: 'V_S = V₁ + V₂', color: C.green }]);
+    var w = 377, period = 2 * PI / w * 1000;
+    function sum(p) { return Cx.add(Cx.polar(p.A1, rad(p.t1)), Cx.polar(p.A2, rad(p.t2))); }
+    T.on(function (p) { var vs = sum(p); out({ v1: Lab.fc(Cx.polar(p.A1, rad(p.t1)), 'V'), v2: Lab.fc(Cx.polar(p.A2, rad(p.t2)), 'V'), vs: Lab.fp(vs, 'V') }); });
+    Lab.animate(T, function (tt) {
+      var p = T.p, ang = 2 * PI * 0.2 * tt, rot = Cx.polar(1, ang), V1 = Cx.mul(Cx.polar(p.A1, rad(p.t1)), rot), V2 = Cx.mul(Cx.polar(p.A2, rad(p.t2)), rot), VS = Cx.add(V1, V2);
+      Lab.phasor(cvP, [{ z: V1, color: C.cyan, label: 'V₁' }, { z: V2, from: V1, color: C.purple, label: '', dash: true, width: 2 }, { z: V2, color: C.purple, label: 'V₂', width: 1.5 }, { z: VS, color: C.green, label: 'V_S' }], { max: 30 });
+      var tNow = (ang / (2 * PI)) * period % (2 * period);
+      var vs = sum(p);
+      Lab.plot(cvT, { x: [0, 2 * period], y: [-31, 31], xlabel: 't [ms]', ylabel: 'v [V]',
+        series: [{ fn: function (t) { return p.A1 * Math.cos(w * t / 1000 + rad(p.t1)); }, color: C.cyan, label: 'v₁(t)' },
+                 { fn: function (t) { return p.A2 * Math.cos(w * t / 1000 + rad(p.t2)); }, color: C.purple, label: 'v₂(t)' },
+                 { fn: function (t) { return Cx.abs(vs) * Math.cos(w * t / 1000 + Cx.arg(vs)); }, color: C.green, label: 'v_S(t)', width: 3 }],
+        vlines: [{ x: tNow, color: C.gold }] });
+    });
+    Lab.check(T, [
+      { q: 'Amplituden af v_S', unit: 'V', answer: function (p) { return Cx.abs(sum(p)); } },
+      { q: 'Fasen af v_S i grader', unit: '°', tol: 0.01, answer: function (p) { return deg(Cx.arg(sum(p))); } }
+    ]);
+    Lab.steps(T, function (p) {
+      var V1 = Cx.polar(p.A1, rad(p.t1)), V2 = Cx.polar(p.A2, rad(p.t2)), vs = Cx.add(V1, V2);
+      return ['Begge kilder har ω = 377 rad/s, så fasorerne må lægges sammen.',
+        'Omregn til kartesisk form: <span class="f">V₁ = ' + Lab.fc(V1, 'V', 4) + '</span>, <span class="f">V₂ = ' + Lab.fc(V2, 'V', 4) + '</span>',
+        'Læg sammen: <span class="f">V_S = ' + Lab.fc(vs, 'V', 4) + '</span>',
+        'Tilbage til polær form: <span class="res">V_S = ' + Lab.fp(vs, 'V', 4) + '</span> (= ' + fmt(Cx.arg(vs), 4) + ' rad)',
+        'Tidsdomæne: <span class="res">v_S(t) = ' + fmt(Cx.abs(vs), 4) + '·cos(377t + ' + fmt(Cx.arg(vs), 4) + ') V</span>'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Fasoreksempel 2: superposition ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Eksempel 2 + Øvelse 2', title: 'Superposition med to frekvenser', short: 'Superposition',
+      text: 'i_S(t) = 0,5·cos(2π·100t) A og v_S(t) = 20·cos(2π·1000t) V. R₁ = 150 Ω står parallelt med strømkilden, R₂ = 50 Ω forbinder til spændingskilden. Find v_R1(t) og v_R2(t).',
+      learn: 'kilderne har forskellig frekvens, så hver kilde regnes for sig, og bidragene lægges sammen i tid. Slå én kilde fra (sæt den til 0), og se dens bidrag forsvinde.' });
+    Lab.slider(T, { key: 'Is', label: 'Strømkilde i_S (amplitude)', min: 0, max: 1, step: 0.05, value: 0.5, unit: 'A', noPrefix: true });
+    Lab.slider(T, { key: 'Vs', label: 'Spændingskilde v_S (amplitude)', min: 0, max: 40, step: 1, value: 20, unit: 'V', noPrefix: true });
+    Lab.slider(T, { key: 'R1', label: 'R₁', min: 10, max: 300, step: 5, value: 150, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'R2', label: 'R₂', min: 10, max: 300, step: 5, value: 50, unit: 'Ω', noPrefix: true });
+    var ckt = Lab.circuit(T, [
+      { t: 'I', a: [60, 170], b: [60, 50], label: 'i_S', id: 'li', side: 'l' }, { t: 'w', pts: [[60, 50], [190, 50]] },
+      { t: 'R', a: [190, 50], b: [190, 170], label: 'R₁', id: 'lR1' },
+      { t: 'R', a: [190, 50], b: [350, 50], label: 'R₂', id: 'lR2', side: 't' },
+      { t: 'AC', a: [350, 170], b: [350, 50], label: 'v_S', id: 'lv' },
+      { t: 'w', pts: [[60, 170], [350, 170]] }, { t: 'node', at: [190, 50] }, { t: 'node', at: [190, 170] }
+    ], '0 0 460 200', 210);
+    var cv1 = Lab.canvas(T.stage, 0.36), cv2 = Lab.canvas(T.stage, 0.36);
+    var out = Lab.readout(T, [{ key: 'a', label: 'v_R1: 100 Hz-del', color: C.cyan }, { key: 'b', label: 'v_R1: 1000 Hz-del', color: C.purple }, { key: 'c', label: 'v_R2: 100 Hz-del', color: C.cyan }, { key: 'd', label: 'v_R2: 1000 Hz-del', color: C.purple }]);
+    function parts(p) {
+      var s = p.R1 + p.R2;
+      return { a: p.Is * p.R2 / s * p.R1, b: p.Vs * p.R1 / s, c: p.Is * p.R1 / s * p.R2, d: -p.Vs * p.R2 / s };
+    }
+    T.on(function (p) {
+      var q = parts(p), w1 = 2 * PI * 100, w2 = 2 * PI * 1000;
+      ckt.set('li', 'i_S = ' + fmt(p.Is) + ' A, 100 Hz'); ckt.set('lv', 'v_S = ' + fmt(p.Vs) + ' V, 1 kHz'); ckt.set('lR1', 'R₁ = ' + fmt(p.R1) + ' Ω'); ckt.set('lR2', 'R₂ = ' + fmt(p.R2) + ' Ω');
+      Lab.plot(cv1, { x: [0, 20], xlabel: 't [ms]', ylabel: 'v_R1 [V]', n: 1500,
+        series: [{ fn: function (t) { return q.a * Math.cos(w1 * t / 1000); }, color: C.cyan, label: 'bidrag fra i_S', width: 1.3, dash: true },
+                 { fn: function (t) { return q.a * Math.cos(w1 * t / 1000) + q.b * Math.cos(w2 * t / 1000); }, color: C.green, label: 'v_R1(t) i alt', width: 1.8 }] });
+      Lab.plot(cv2, { x: [0, 20], xlabel: 't [ms]', ylabel: 'v_R2 [V]', n: 1500,
+        series: [{ fn: function (t) { return q.c * Math.cos(w1 * t / 1000); }, color: C.cyan, label: 'bidrag fra i_S', width: 1.3, dash: true },
+                 { fn: function (t) { return q.c * Math.cos(w1 * t / 1000) + q.d * Math.cos(w2 * t / 1000); }, color: C.red, label: 'v_R2(t) i alt', width: 1.8 }] });
+      out({ a: fu(q.a, 'V'), b: fu(q.b, 'V'), c: fu(q.c, 'V'), d: fu(q.d, 'V') + (q.d < 0 ? ' (= fase π)' : '') });
+    });
+    Lab.check(T, [
+      { q: 'v_R1: amplituden af 100 Hz-delen (fra strømkilden)', unit: 'V', answer: function (p) { return parts(p).a; } },
+      { q: 'v_R1: amplituden af 1000 Hz-delen (fra spændingskilden)', unit: 'V', answer: function (p) { return parts(p).b; } }
+    ]);
+    Lab.steps(T, function (p) {
+      var q = parts(p), s = p.R1 + p.R2;
+      return ['Kun strømkilden (v_S kortsluttes): R₁ og R₂ står parallelt, og strømmen deler sig. Strøm i R₁: <span class="f">i_S·R₂/(R₁+R₂)</span>.',
+        '<span class="f">V_R1 = ' + fmt(p.Is) + ' · ' + fmt(p.R2) + '/' + fmt(s) + ' · ' + fmt(p.R1) + '</span> = ' + fu(q.a, 'V') + ' og V_R2 = ' + fu(q.c, 'V') + ' (100 Hz)',
+        'Kun spændingskilden (i_S afbrydes): R₁ og R₂ i serie, spændingsdeling: <span class="f">V_R1 = ' + fmt(p.Vs) + ' · ' + fmt(p.R1) + '/' + fmt(s) + '</span> = ' + fu(q.b, 'V') + ' og V_R2 = −' + fu(-q.d, 'V') + ' (1000 Hz, minus pga. referenceretningen)',
+        'Læg sammen i tid: <span class="res">v_R1(t) = ' + fmt(q.a, 4) + '·cos(2π·100t) + ' + fmt(q.b, 4) + '·cos(2π·1000t) V</span>',
+        '<span class="res">v_R2(t) = ' + fmt(q.c, 4) + '·cos(2π·100t) + ' + fmt(-q.d, 4) + '·cos(2π·1000t + π) V</span>',
+        'Det er præcis funktionerne fra MathCad-øvelsen på dag 1.'];
+    });
+    T.ready();
+  })();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Øvelseslab: Dag 9 · ELE1</title>
+<link rel="stylesheet" href="assets/lab.css">
+</head>
+<body>
+<header>
+  <h1>Øvelseslab · Dag 9</h1>
+  <p>Trefaseeffekt: stjerne, trekant og 3 × 400/230 V</p>
+  <div class="toplinks">
+    <a href="../dag/Dag09_Studienote.pdf" target="_blank">📖 Studienote</a>
+    <a href="../../../quiz/ele1/Dag09_Quiz.html" target="_blank">📝 Quiz</a>
+    <a href="../../../index.html#edu/maskiningenioer/sem3/ele1/dag09">← Studiehub</a>
+  </div>
+</header>
+<div class="howto"><b>Sådan bruges laben:</b> Hver opgave starter med opgavens egne tal. Regn først selv, skriv svaret under <b>Prøv selv først</b>, og tjek det. Skru derefter på værdierne og se, hvad der sker. <b>Løsning trin for trin</b> følger altid de værdier, der står i indstillingerne lige nu. Animationer kan sættes på pause.</div>
+<nav class="tasknav" id="tasknav"></nav>
+<main id="tasks"></main>
+<footer>ELE1-A26 · Øvelseslab til dag 9 · opgaverne svarer til studienoten · <a href="../../../index.html#edu/maskiningenioer/sem3/ele1">Studiehub</a></footer>
+<script src="assets/lab.js"></script>
+<script>
+(function () {
+  var fu = Lab.fu, fmt = Lab.fmt, C = Lab.COL, Cx = Lab.Cx, deg = Lab.deg, rad = Lab.rad, PI = Math.PI, S3 = Math.sqrt(3);
+
+  /* ---------- Fase- og linjespændinger ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Teori', title: 'Tre faser og linjespændingen', short: 'Fase/linje',
+      text: 'Tre fasespændinger med 120° imellem. Linjespændingen mellem fase a og b er forskellen V_an − V_bn. I Danmark er fasespændingen 230 V.',
+      learn: 'de tre fasorer summer til nul, og linjespændingen er √3 gange længere end fasespændingen: 230 V bliver til 400 V.' });
+    Lab.slider(T, { key: 'V', label: 'Fasespænding Ṽ (RMS)', min: 50, max: 300, step: 5, value: 230, unit: 'V', noPrefix: true });
+    var cvP = Lab.canvas(T.stage, 0.55), cvT = Lab.canvas(T.stage, 0.34);
+    var out = Lab.readout(T, [{ key: 'VL', label: 'Linjespænding √3·Ṽ', color: C.gold }, { key: 'pk', label: 'Topværdi af fasespænding', color: C.cyan }, { key: 'sum', label: 'Summen af de tre faser', color: C.green }]);
+    T.on(function (p) { out({ VL: fu(S3 * p.V, 'V'), pk: fu(p.V * Math.SQRT2, 'V'), sum: '0 V (balance)' }); });
+    Lab.animate(T, function (tt) {
+      var p = T.p, rot = Cx.polar(1, 2 * PI * 0.15 * tt), a = Cx.mul(Cx.polar(p.V, 0), rot), b = Cx.mul(Cx.polar(p.V, rad(-120)), rot), c = Cx.mul(Cx.polar(p.V, rad(120)), rot);
+      Lab.phasor(cvP, [{ z: a, color: C.cyan, label: 'V_an' }, { z: b, color: C.red, label: 'V_bn' }, { z: c, color: C.green, label: 'V_cn' }, { z: Cx.sub(a, b), from: b, color: C.gold, label: 'V_ab', dash: true, width: 2 }], { max: p.V * 1.1 });
+      var ph = (0.15 * tt) % 1 * 20, A = p.V * Math.SQRT2;
+      Lab.plot(cvT, { x: [0, 20], y: [-A * 1.8, A * 1.8], xlabel: 't [ms] (50 Hz)', ylabel: 'v [V]',
+        series: [{ fn: function (t) { return A * Math.cos(2 * PI * t / 20); }, color: C.cyan, label: 'v_an' }, { fn: function (t) { return A * Math.cos(2 * PI * t / 20 - 2 * PI / 3); }, color: C.red, label: 'v_bn' },
+                 { fn: function (t) { return A * Math.cos(2 * PI * t / 20 + 2 * PI / 3); }, color: C.green, label: 'v_cn' }, { fn: function (t) { return S3 * A * Math.cos(2 * PI * t / 20 + PI / 6); }, color: C.gold, label: 'v_ab', dash: true }],
+        vlines: [{ x: ph }] });
+    });
+    Lab.check(T, [{ q: 'Linjespændingen', unit: 'V', answer: function (p) { return S3 * p.V; } }]);
+    Lab.steps(T, function (p) {
+      return ['Fasorer: <span class="f">V_an = ' + fmt(p.V) + '∠0°, V_bn = ' + fmt(p.V) + '∠−120°, V_cn = ' + fmt(p.V) + '∠120°</span>',
+        'Linjespænding: <span class="f">V_ab = V_an − V_bn</span>. Forskellen mellem to lige lange fasorer med 120° imellem er √3 gange længere og drejet 30°.',
+        '<span class="res">Ṽ_L = √3 · ' + fmt(p.V) + ' = ' + fu(S3 * p.V, 'V') + '</span>'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Stjerne og trekant ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse', title: 'Samme impedanser i stjerne og i trekant', short: 'Y og Δ',
+      text: 'Tre ens impedanser Z = 16 + j12 Ω tilsluttes 3 × 400/230 V. Find linjestrøm og samlet effekt i stjerne og i trekant.',
+      learn: 'i trekant får hver impedans linjespændingen (√3 gange mere), så både linjestrøm og effekt bliver præcis 3 gange større end i stjerne. Det bruges ved stjerne-trekant-start på dag 10.' });
+    Lab.slider(T, { key: 'Z', label: '|Z| pr. fase', min: 2, max: 100, step: 1, value: 20, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'th', label: 'Impedansvinkel θ', min: -90, max: 90, step: 0.01, value: 36.87, unit: '°', noPrefix: true, sig: 4 });
+    Lab.slider(T, { key: 'V', label: 'Fasespænding Ṽ', min: 100, max: 300, step: 5, value: 230, unit: 'V', noPrefix: true });
+    var cv = Lab.canvas(T.stage, 0.38);
+    var out = Lab.readout(T, [{ key: 'IY', label: 'Stjerne: linjestrøm', color: C.cyan }, { key: 'PY', label: 'Stjerne: P i alt', color: C.cyan }, { key: 'Iph', label: 'Trekant: strøm i hver impedans', color: C.gold },
+      { key: 'ID', label: 'Trekant: linjestrøm', color: C.gold }, { key: 'PD', label: 'Trekant: P i alt', color: C.gold }, { key: 'r', label: 'Forhold Δ/Y', color: C.green }]);
+    function calc(p) { var pf = Math.cos(rad(p.th)), VL = S3 * p.V, IY = p.V / p.Z, Iph = VL / p.Z, ID = S3 * Iph; return { pf: pf, VL: VL, IY: IY, PY: 3 * p.V * IY * pf, Iph: Iph, ID: ID, PD: 3 * VL * Iph * pf }; }
+    T.on(function (p) {
+      var c = calc(p);
+      Lab.plot(cv, { x: [0, 3], y: [0, Math.max(c.PD, 1) * 1.15 / 1000], xlabel: '', ylabel: 'P [kW]', zero: true,
+        series: [{ pts: [[0.4, 0], [0.4, c.PY / 1000], [1.2, c.PY / 1000], [1.2, 0]], color: C.cyan, label: 'stjerne', width: 3 }, { pts: [[1.8, 0], [1.8, c.PD / 1000], [2.6, c.PD / 1000], [2.6, 0]], color: C.gold, label: 'trekant', width: 3 }] });
+      out({ IY: fu(c.IY, 'A'), PY: fu(c.PY, 'W'), Iph: fu(c.Iph, 'A'), ID: fu(c.ID, 'A'), PD: fu(c.PD, 'W'), r: fmt(c.PD / c.PY, 3) + ' ×' });
+    });
+    Lab.check(T, [{ q: 'Stjerne: samlet effekt', unit: 'kW', answer: function (p) { return calc(p).PY / 1000; } }, { q: 'Trekant: linjestrøm', unit: 'A', answer: function (p) { return calc(p).ID; } }]);
+    Lab.steps(T, function (p) {
+      var c = calc(p);
+      return ['Effektfaktor: <span class="f">cos θ = cos ' + fmt(p.th, 4) + '°</span> = ' + fmt(c.pf, 4) + '. Linjespænding: ' + fu(c.VL, 'V'),
+        'Stjerne: hver impedans får fasespændingen. <span class="f">Ĩ_L = Ṽ/|Z| = ' + fmt(p.V) + '/' + fmt(p.Z) + '</span> = ' + fu(c.IY, 'A') + ', <span class="f">P = 3·Ṽ·Ĩ·cos θ</span> = <span class="res">' + fu(c.PY, 'W') + '</span>',
+        'Trekant: hver impedans får linjespændingen. <span class="f">Ĩ_fase = Ṽ_L/|Z|</span> = ' + fu(c.Iph, 'A') + ', <span class="f">Ĩ_L = √3·Ĩ_fase</span> = <span class="res">' + fu(c.ID, 'A') + '</span>',
+        '<span class="f">P = √3·Ṽ_L·Ĩ_L·cos θ</span> = ' + fu(c.PD, 'W') + ': præcis 3 gange stjerne, fordi Z_Δ = 3·Z_Y.'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Pr.-fase-beregning (eksempel 6.16) ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Eksempel', title: 'Pr.-fase-beregning af en stjernebelastning (bogens eksempel 6.16)', short: 'Pr. fase',
+      text: 'En balanceret kilde med Ṽ_an = 480∠0 V forsyner en stjernebelastning Z_Y = 2 + j4 Ω gennem ledninger med R_line = 2 Ω. Find effekten i belastningen.',
+      learn: 'ved balance fører nullederen ingen strøm, så én fase kan regnes som et enfaset kredsløb og ganges med tre. Kun belastningens resistans indgår i belastningens effekt.' });
+    Lab.slider(T, { key: 'V', label: 'Fasespænding Ṽ_an', min: 100, max: 600, step: 10, value: 480, unit: 'V', noPrefix: true });
+    Lab.slider(T, { key: 'Rl', label: 'Ledningsmodstand R_line', min: 0, max: 10, step: 0.5, value: 2, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'R', label: 'Belastning R_o', min: 0.5, max: 20, step: 0.5, value: 2, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'X', label: 'Belastning X_o', min: -10, max: 10, step: 0.5, value: 4, unit: 'Ω', noPrefix: true });
+    var ckt = Lab.circuit(T, [
+      { t: 'AC', a: [60, 170], b: [60, 50], label: 'Ṽ_an', id: 'lV', side: 'l' }, { t: 'R', a: [60, 50], b: [210, 50], label: 'R_line', id: 'lRl', side: 't' },
+      { t: 'w', pts: [[210, 50], [330, 50]] }, { t: 'Z', a: [330, 50], b: [330, 170], label: 'Z_Y', id: 'lZ' }, { t: 'w', pts: [[60, 170], [330, 170]] },
+      { t: 'txt', at: [195, 195], s: 'én fase af det balancerede system (nullederen fører ingen strøm)', color: C.dim, size: 11 }
+    ], '0 0 470 210', 200);
+    var out = Lab.readout(T, [{ key: 'I', label: '|Ĩ_a|', color: C.gold }, { key: 'Pa', label: 'P i én fase = Ĩ²·R_o', color: C.cyan }, { key: 'P', label: 'P belastning (3 faser)', color: C.green }, { key: 'L', label: 'Tab i ledninger (3 faser)', color: C.red }]);
+    function calc(p) { var I = p.V / Math.hypot(p.R + p.Rl, p.X); return { I: I, Pa: I * I * p.R, P: 3 * I * I * p.R, L: 3 * I * I * p.Rl }; }
+    T.on(function (p) {
+      var c = calc(p);
+      ckt.set('lV', 'Ṽ_an = ' + fmt(p.V) + '∠0 V'); ckt.set('lRl', 'R_line = ' + fmt(p.Rl) + ' Ω'); ckt.set('lZ', 'Z_Y = ' + fmt(p.R) + (p.X < 0 ? ' − j' : ' + j') + fmt(Math.abs(p.X)) + ' Ω');
+      out({ I: fu(c.I, 'A'), Pa: fu(c.Pa, 'W'), P: fu(c.P, 'W'), L: fu(c.L, 'W') });
+    });
+    Lab.check(T, [{ q: 'Strømmen |Ĩ_a|', unit: 'A', answer: function (p) { return calc(p).I; } }, { q: 'Effekten i belastningen (3 faser)', unit: 'kW', answer: function (p) { return calc(p).P / 1000; } }]);
+    Lab.steps(T, function (p) {
+      var c = calc(p), z = Lab.C(p.R + p.Rl, p.X);
+      return ['Balance ⇒ ingen strøm i nullederen ⇒ regn én fase.',
+        'Samlet impedans i fasen: <span class="f">Z = R_line + Z_Y = ' + Lab.fc(z, 'Ω') + ' = ' + Lab.fp(z, 'Ω', 4) + '</span>',
+        '<span class="f">|Ĩ_a| = ' + fmt(p.V) + '/' + fmt(Cx.abs(z), 4) + '</span> = <span class="res">' + fu(c.I, 'A') + '</span>',
+        '<span class="f">P_a = |Ĩ_a|²·R_o = ' + fmt(c.I, 4) + '² · ' + fmt(p.R) + '</span> = ' + fu(c.Pa, 'W') + ', og <span class="res">P = 3·P_a = ' + fu(c.P, 'W') + '</span>'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Strøm til en trefaset motor ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse', title: 'Strøm til en trefaset motor', short: 'Motorstrøm',
+      text: 'En motor afgiver 11 kW på akslen ved 3 × 400 V. Virkningsgraden er 90 %, og effektfaktoren er 0,85. Find linjestrømmen.',
+      learn: 'typeskiltets effekt er den mekaniske. Den elektriske effekt er større (P/η), og lav effektfaktor giver større strøm for samme effekt.' });
+    Lab.slider(T, { key: 'P', label: 'Mekanisk effekt', min: 0.5, max: 50, step: 0.5, value: 11, unit: 'kW', noPrefix: true });
+    Lab.slider(T, { key: 'eta', label: 'Virkningsgrad η', min: 0.6, max: 0.98, step: 0.01, value: 0.9 });
+    Lab.slider(T, { key: 'pf', label: 'Effektfaktor', min: 0.5, max: 1, step: 0.01, value: 0.85 });
+    Lab.slider(T, { key: 'VL', label: 'Linjespænding Ṽ_L', min: 200, max: 690, step: 10, value: 400, unit: 'V', noPrefix: true });
+    var out = Lab.readout(T, [{ key: 'Pe', label: 'Elektrisk effekt P/η', color: C.cyan }, { key: 'S', label: 'Tilsyneladende effekt', color: C.purple }, { key: 'I', label: 'Linjestrøm', color: C.gold }]);
+    function calc(p) { var Pe = p.P * 1000 / p.eta; return { Pe: Pe, S: Pe / p.pf, I: Pe / (S3 * p.VL * p.pf) }; }
+    T.on(function (p) { var c = calc(p); out({ Pe: fu(c.Pe, 'W'), S: fu(c.S, 'VA'), I: fu(c.I, 'A') }); });
+    Lab.check(T, [{ q: 'Linjestrømmen', unit: 'A', answer: function (p) { return calc(p).I; } }]);
+    Lab.steps(T, function (p) {
+      var c = calc(p);
+      return ['Elektrisk effekt: <span class="f">P_el = P_mek/η = ' + fmt(p.P * 1000) + '/' + fmt(p.eta) + '</span> = ' + fu(c.Pe, 'W'),
+        'Isolér strømmen i <span class="f">P = √3·Ṽ_L·Ĩ_L·cos θ</span>: <span class="f">Ĩ_L = ' + fmt(c.Pe, 5) + '/(√3 · ' + fmt(p.VL) + ' · ' + fmt(p.pf) + ')</span>',
+        '<span class="res">Ĩ_L = ' + fu(c.I, 'A') + '</span>'];
+    });
+    T.ready();
+  })();
+})();
+</script>
+</body>
+</html>

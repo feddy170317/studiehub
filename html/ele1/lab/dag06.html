@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Øvelseslab: Dag 6 · ELE1</title>
+<link rel="stylesheet" href="assets/lab.css">
+</head>
+<body>
+<header>
+  <h1>Øvelseslab · Dag 6</h1>
+  <p>Effekt i vekselstrømskredsløb og effektfaktor</p>
+  <div class="toplinks">
+    <a href="../dag/Dag06_Studienote.pdf" target="_blank">📖 Studienote</a>
+    <a href="../../../quiz/ele1/Dag06_Quiz.html" target="_blank">📝 Quiz</a>
+    <a href="../../../index.html#edu/maskiningenioer/sem3/ele1/dag06">← Studiehub</a>
+  </div>
+</header>
+<div class="howto"><b>Sådan bruges laben:</b> Hver opgave starter med opgavens egne tal. Regn først selv, skriv svaret under <b>Prøv selv først</b>, og tjek det. Skru derefter på værdierne, især fasevinklen, og se effekten ændre sig. <b>Løsning trin for trin</b> følger altid de værdier, der står i indstillingerne lige nu.</div>
+<nav class="tasknav" id="tasknav"></nav>
+<main id="tasks"></main>
+<footer>ELE1-A26 · Øvelseslab til dag 6 · opgaverne svarer til studienoten · <a href="../../../index.html#edu/maskiningenioer/sem3/ele1">Studiehub</a></footer>
+<script src="assets/lab.js"></script>
+<script>
+(function () {
+  var fu = Lab.fu, fmt = Lab.fmt, C = Lab.COL, Cx = Lab.Cx, deg = Lab.deg, rad = Lab.rad, PI = Math.PI;
+
+  /* ---------- Øvelse 1: momentan effekt og middeleffekt ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse 1', title: 'Momentan effekt og middeleffekt', short: 'p(t) og P',
+      text: 'v(t) = 325·cos(314t) V og i(t) = 2·cos(314t − π/3) A. Plot spænding, strøm, momentan effekt p(t) og middeleffekten. Gentag med RMS-værdier.',
+      learn: 'p(t) svinger med dobbelt frekvens omkring middeleffekten. Ved θ = 0 er p(t) altid positiv; jo større θ, jo mere af tiden sender lasten energi tilbage (p < 0), og ved θ = 90° er middeleffekten nul.' });
+    Lab.slider(T, { key: 'V', label: 'Spænding, topværdi V', min: 10, max: 400, step: 5, value: 325, unit: 'V', noPrefix: true });
+    Lab.slider(T, { key: 'I', label: 'Strøm, topværdi I', min: 0.1, max: 5, step: 0.1, value: 2, unit: 'A', noPrefix: true });
+    Lab.slider(T, { key: 'th', label: 'Faseforskel θ (strømmen halter)', min: -90, max: 90, step: 1, value: 60, unit: '°', noPrefix: true });
+    var cv = Lab.canvas(T.stage, 0.5);
+    var out = Lab.readout(T, [{ key: 'P', label: 'Middeleffekt P = (VI/2)·cos θ', color: C.gold }, { key: 'pmx', label: 'p(t) maks', color: C.green }, { key: 'pmn', label: 'p(t) min', color: C.red },
+      { key: 'rms', label: 'Ṽ og Ĩ (RMS)', color: C.cyan }, { key: 'pf', label: 'Effektfaktor cos θ', color: C.purple }, { key: 'Z', label: 'Last |Z|∠θ', color: C.txt }]);
+    T.on(function (p) {
+      var w = 314, th = rad(p.th), P = p.V * p.I / 2 * Math.cos(th), A = p.V * p.I / 2, sc = p.V / p.I / 1.2;
+      Lab.plot(cv, { x: [0, 40], xlabel: 't [ms]', ylabel: 'v [V] · p [W]', n: 800,
+        series: [{ fn: function (t) { return p.V * Math.cos(w * t / 1000); }, color: C.cyan, label: 'v(t)', width: 1.6 },
+                 { fn: function (t) { return sc * p.I * Math.cos(w * t / 1000 - th); }, color: C.red, label: 'i(t) (skaleret)', width: 1.6 },
+                 { fn: function (t) { return p.V * Math.cos(w * t / 1000) * p.I * Math.cos(w * t / 1000 - th); }, color: C.green, label: 'p(t) = v·i', width: 2.6 }],
+        hlines: [{ y: P, color: C.gold, label: 'middeleffekt P' }] });
+      out({ P: fu(P, 'W'), pmx: fu(P + A, 'W'), pmn: fu(P - A, 'W'), rms: fmt(p.V / Math.SQRT2, 4) + ' V · ' + fmt(p.I / Math.SQRT2, 4) + ' A', pf: fmt(Math.cos(th), 3) + (p.th > 0 ? ' haltende' : p.th < 0 ? ' førende' : ''), Z: fmt(p.V / p.I, 4) + ' Ω∠' + fmt(p.th) + '°' });
+    });
+    Lab.check(T, [
+      { q: 'Middeleffekten P', unit: 'W', answer: function (p) { return p.V * p.I / 2 * Math.cos(rad(p.th)); } },
+      { q: 'Den mindste værdi af p(t)', unit: 'W', answer: function (p) { return p.V * p.I / 2 * (Math.cos(rad(p.th)) - 1); } }
+    ]);
+    Lab.steps(T, function (p) {
+      var th = rad(p.th), A = p.V * p.I / 2, P = A * Math.cos(th), Vr = p.V / Math.SQRT2, Ir = p.I / Math.SQRT2;
+      return ['Aflæs: V = ' + fmt(p.V) + ' V, I = ' + fmt(p.I) + ' A, θ = ' + fmt(p.th) + '° (strømmens fase er −θ).',
+        'Momentan effekt: <span class="f">p(t) = (VI/2)·cos θ + (VI/2)·cos(2ωt − θ) = ' + fmt(P, 4) + ' + ' + fmt(A, 4) + '·cos(628t − ' + fmt(th, 3) + ') W</span>',
+        'Middeleffekt: <span class="f">P = (VI/2)·cos θ = ' + fmt(A, 4) + ' · ' + fmt(Math.cos(th), 3) + '</span> = <span class="res">' + fu(P, 'W') + '</span>',
+        'p(t) svinger mellem ' + fu(P - A, 'W') + ' og ' + fu(P + A, 'W') + '.',
+        'Med RMS: <span class="f">Ṽ = ' + fmt(Vr, 4) + ' V, Ĩ = ' + fmt(Ir, 4) + ' A, P = Ṽ·Ĩ·cos θ = ' + fmt(Vr * Ir * Math.cos(th), 4) + ' W</span>. Samme resultat, uden faktoren ½.'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Impedanstrekant og effektfaktor ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Teori', title: 'Impedanstrekanten og effektfaktoren', short: 'Impedanstrekant',
+      text: 'En last med resistans R og reaktans X tilsluttes 230 V (RMS). Find |Z|, vinklen θ, effektfaktoren, strømmen og middeleffekten.',
+      learn: 'kun resistansen R omsætter effekt. Øg reaktansen, og se strømmen falde, vinklen vokse og effektfaktoren falde mod 0.' });
+    Lab.slider(T, { key: 'R', label: 'Resistans R', min: 0, max: 200, step: 1, value: 81, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'X', label: 'Reaktans X (+ induktiv, − kapacitiv)', min: -200, max: 200, step: 1, value: 141, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'V', label: 'Spænding Ṽ (RMS)', min: 10, max: 400, step: 5, value: 230, unit: 'V', noPrefix: true });
+    var cv = Lab.canvas(T.stage, 0.5);
+    var out = Lab.readout(T, [{ key: 'Z', label: '|Z|', color: C.gold }, { key: 'th', label: 'Vinkel θ', color: C.gold }, { key: 'pf', label: 'Effektfaktor', color: C.purple }, { key: 'I', label: 'Ĩ = Ṽ/|Z|', color: C.red }, { key: 'P', label: 'P = Ĩ²·R', color: C.green }]);
+    T.on(function (p) {
+      var z = Lab.C(Math.max(p.R, 1e-9), p.X), I = p.V / Cx.abs(z);
+      Lab.phasor(cv, [{ z: Lab.C(p.R, 0), color: C.cyan, label: 'R', width: 2 }, { z: Lab.C(0, p.X), from: Lab.C(p.R, 0), color: p.X >= 0 ? C.green : C.purple, label: 'jX', width: 2 }, { z: z, color: C.gold, label: '|Z|' }]);
+      out({ Z: fu(Cx.abs(z), 'Ω'), th: fmt(deg(Cx.arg(z)), 3) + '°', pf: fmt(Math.cos(Cx.arg(z)), 3) + (p.X > 0 ? ' haltende' : p.X < 0 ? ' førende' : ''), I: fu(I, 'A'), P: fu(I * I * p.R, 'W') });
+    });
+    Lab.check(T, [{ q: 'Effektfaktoren cos θ', unit: '', answer: function (p) { return p.R / Math.hypot(p.R, p.X); } },
+      { q: 'Middeleffekten P', unit: 'W', answer: function (p) { var I = p.V / Math.hypot(p.R, p.X); return I * I * p.R; } }]);
+    Lab.steps(T, function (p) {
+      var Z = Math.hypot(p.R, p.X), th = Math.atan2(p.X, p.R), I = p.V / Z;
+      return ['<span class="f">|Z| = √(R² + X²) = √(' + fmt(p.R) + '² + ' + fmt(p.X) + '²)</span> = ' + fu(Z, 'Ω'),
+        '<span class="f">θ = tan⁻¹(X/R)</span> = ' + fmt(deg(th), 4) + '°, og <span class="f">pf = cos θ = R/|Z|</span> = <span class="res">' + fmt(Math.cos(th), 4) + '</span>',
+        '<span class="f">Ĩ = Ṽ/|Z| = ' + fmt(p.V) + '/' + fmt(Z, 4) + '</span> = ' + fu(I, 'A'),
+        '<span class="f">P = Ṽ·Ĩ·cos θ = Ĩ²·R</span> = <span class="res">' + fu(I * I * p.R, 'W') + '</span>'];
+    });
+    T.ready();
+  })();
+})();
+</script>
+</body>
+</html>

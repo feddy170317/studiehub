@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Øvelseslab: Dag 8 · ELE1</title>
+<link rel="stylesheet" href="assets/lab.css">
+</head>
+<body>
+<header>
+  <h1>Øvelseslab · Dag 8</h1>
+  <p>Transformere og vekselstrømsmotorer</p>
+  <div class="toplinks">
+    <a href="../dag/Dag08_Studienote.pdf" target="_blank">📖 Studienote</a>
+    <a href="../../../quiz/ele1/Dag08_Quiz.html" target="_blank">📝 Quiz</a>
+    <a href="../../../index.html#edu/maskiningenioer/sem3/ele1/dag08">← Studiehub</a>
+  </div>
+</header>
+<div class="howto"><b>Sådan bruges laben:</b> Hver opgave starter med opgavens egne tal. Regn først selv, skriv svaret under <b>Prøv selv først</b>, og tjek det. Skru derefter på værdierne og se, hvad der sker. <b>Løsning trin for trin</b> følger altid de værdier, der står i indstillingerne lige nu.</div>
+<nav class="tasknav" id="tasknav"></nav>
+<main id="tasks"></main>
+<footer>ELE1-A26 · Øvelseslab til dag 8 · opgaverne svarer til studienoten · <a href="../../../index.html#edu/maskiningenioer/sem3/ele1">Studiehub</a></footer>
+<script src="assets/lab.js"></script>
+<script>
+(function () {
+  var fu = Lab.fu, fmt = Lab.fmt, C = Lab.COL, PI = Math.PI;
+
+  /* ---------- Transformer ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse', title: 'Den ideelle transformer: 230 V til 12 V-belysning', short: 'Transformer',
+      text: 'En transformer forsyner en 24 W-lampe på 12 V fra nettets 230 V. Find omsætningsforholdet, strømmene og den modstand, nettet ser på primærsiden. (Bogens eksempel 6.12: 120 V → 24 V, n₁ = 3000, 500 mA.)',
+      learn: 'spændingen transformeres med N, strømmen med 1/N, og effekten er den samme på begge sider. En lille modstand på sekundærsiden ser stor ud fra primærsiden, fordi den divideres med N².' });
+    Lab.slider(T, { key: 'V1', label: 'Primærspænding Ṽ₁', min: 50, max: 400, step: 1, value: 230, unit: 'V', noPrefix: true });
+    Lab.slider(T, { key: 'n1', label: 'Vindinger n₁', min: 100, max: 5000, step: 50, value: 1000 });
+    Lab.slider(T, { key: 'n2', label: 'Vindinger n₂', min: 10, max: 5000, step: 1, value: 52 });
+    Lab.slider(T, { key: 'R', label: 'Belastning R₂', min: 1, max: 200, step: 0.5, value: 6, unit: 'Ω', noPrefix: true });
+    var ckt = Lab.circuit(T, [
+      { t: 'AC', a: [50, 170], b: [50, 50], label: 'Ṽ₁', id: 'lV1', side: 'l' }, { t: 'w', pts: [[50, 50], [170, 50], [170, 70]] }, { t: 'w', pts: [[50, 170], [170, 170], [170, 150]] },
+      { t: 'L', a: [170, 70], b: [170, 150] }, { t: 'w', pts: [[195, 60], [195, 160]] }, { t: 'w', pts: [[205, 60], [205, 160]] },
+      { t: 'L', a: [230, 150], b: [230, 70] }, { t: 'w', pts: [[230, 70], [230, 50], [350, 50]] }, { t: 'w', pts: [[230, 150], [230, 170], [350, 170]] },
+      { t: 'R', a: [350, 50], b: [350, 170], label: 'R₂', id: 'lR' },
+      { t: 'txt', at: [150, 113], s: 'n₁', id: 'ln1', anchor: 'end' }, { t: 'txt', at: [250, 113], s: 'n₂', id: 'ln2', anchor: 'start' },
+      { t: 'txt', at: [110, 40], s: 'Ĩ₁', id: 'lI1', color: C.gold }, { t: 'txt', at: [290, 40], s: 'Ĩ₂', id: 'lI2', color: C.gold },
+      { t: 'txt', at: [200, 200], s: '', id: 'lN', color: C.cyan }
+    ], '0 0 470 215', 220);
+    var out = Lab.readout(T, [{ key: 'N', label: 'N = n₂/n₁', color: C.cyan }, { key: 'V2', label: 'Ṽ₂ = N·Ṽ₁', color: C.green }, { key: 'I2', label: 'Ĩ₂ = Ṽ₂/R₂', color: C.gold },
+      { key: 'I1', label: 'Ĩ₁ = N·Ĩ₂', color: C.gold }, { key: 'S', label: 'Effekt S₁ = S₂', color: C.purple }, { key: 'R1', label: 'R set fra primær = R₂/N²', color: C.red }]);
+    function calc(p) { var N = p.n2 / p.n1, V2 = N * p.V1, I2 = V2 / p.R; return { N: N, V2: V2, I2: I2, I1: N * I2, R1: p.R / (N * N) }; }
+    T.on(function (p) {
+      var c = calc(p);
+      ckt.set('lV1', 'Ṽ₁ = ' + fmt(p.V1) + ' V'); ckt.set('ln1', 'n₁ = ' + fmt(p.n1)); ckt.set('ln2', 'n₂ = ' + fmt(p.n2)); ckt.set('lR', 'R₂ = ' + fmt(p.R) + ' Ω');
+      ckt.set('lI1', 'Ĩ₁ = ' + fu(c.I1, 'A')); ckt.set('lI2', 'Ĩ₂ = ' + fu(c.I2, 'A')); ckt.set('lN', c.N > 1 ? 'optransformer (N > 1)' : 'nedtransformer (N < 1)');
+      out({ N: fmt(c.N, 4), V2: fu(c.V2, 'V'), I2: fu(c.I2, 'A'), I1: fu(c.I1, 'A'), S: fu(p.V1 * c.I1, 'VA') + ' = ' + fu(c.V2 * c.I2, 'VA'), R1: fu(c.R1, 'Ω') });
+    });
+    Lab.check(T, [{ q: 'Sekundærspændingen Ṽ₂', unit: 'V', answer: function (p) { return calc(p).V2; } }, { q: 'Primærstrømmen Ĩ₁', unit: 'mA', answer: function (p) { return calc(p).I1 * 1000; } },
+      { q: 'Modstanden set fra primærsiden', unit: 'Ω', answer: function (p) { return calc(p).R1; } }]);
+    Lab.steps(T, function (p) {
+      var c = calc(p);
+      return ['Omsætningsforhold: <span class="f">N = n₂/n₁ = ' + fmt(p.n2) + '/' + fmt(p.n1) + '</span> = ' + fmt(c.N, 4),
+        'Spænding: <span class="f">Ṽ₂ = N·Ṽ₁</span> = <span class="res">' + fu(c.V2, 'V') + '</span>. Strøm i lasten: <span class="f">Ĩ₂ = Ṽ₂/R₂</span> = ' + fu(c.I2, 'A'),
+        'Primærstrøm: <span class="f">Ĩ₁ = N·Ĩ₂</span> = <span class="res">' + fu(c.I1, 'A') + '</span> (strømmen transformeres omvendt af spændingen)',
+        'Kontrol: S₁ = ' + fu(p.V1 * c.I1, 'VA') + ' = S₂ = ' + fu(c.V2 * c.I2, 'VA') + ' ✓',
+        'Set fra primærsiden: <span class="f">R₁ = R₂/N²</span> = <span class="res">' + fu(c.R1, 'Ω') + '</span> (kontrol: Ṽ₁/Ĩ₁ = ' + fu(p.V1 / c.I1, 'Ω') + ')'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Transmissionstab ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse', title: 'Hvorfor el transmitteres ved høj spænding', short: 'Transmissionstab',
+      text: 'Der skal overføres 1 MW gennem en ledning med modstanden 2 Ω (forenklet enfaset regning). Sammenlign tabet ved forskellige spændinger.',
+      learn: 'tabet I²R falder med kvadratet på spændingen. Ved 400 V er overførslen umulig (tabet er større end effekten); ved 10 kV tabes kun 2 %.' });
+    Lab.slider(T, { key: 'P', label: 'Effekt P', min: 1e4, max: 1e7, log: true, value: 1e6, unit: 'W' });
+    Lab.slider(T, { key: 'V', label: 'Spænding V', min: 230, max: 400000, log: true, value: 10000, unit: 'V' });
+    Lab.slider(T, { key: 'R', label: 'Ledningsmodstand R', min: 0.1, max: 20, step: 0.1, value: 2, unit: 'Ω', noPrefix: true });
+    var cv = Lab.canvas(T.stage, 0.42);
+    var out = Lab.readout(T, [{ key: 'I', label: 'Strøm I = P/V', color: C.gold }, { key: 'L', label: 'Tab I²R', color: C.red }, { key: 'pct', label: 'Tab i % af P', color: C.red }]);
+    T.on(function (p) {
+      var I = p.P / p.V, L = I * I * p.R;
+      Lab.plot(cv, { x: [230, 400000], logx: true, xunit: 'V', xlabel: 'Spænding (log)', ylabel: 'tab [% af P]', y: [0, 100],
+        series: [{ fn: function (v) { return 100 * Math.pow(p.P / v, 2) * p.R / p.P; }, color: C.red, label: 'tab i %' }], markers: [{ x: p.V, y: Math.min(100 * L / p.P, 100) }] });
+      out({ I: fu(I, 'A'), L: fu(L, 'W'), pct: L > p.P ? '<span class="pill warn">' + fmt(100 * L / p.P, 3) + ' %: umuligt</span>' : fmt(100 * L / p.P, 3) + ' %' });
+    });
+    Lab.check(T, [{ q: 'Tabet i ledningen', unit: 'kW', answer: function (p) { var I = p.P / p.V; return I * I * p.R / 1000; } }]);
+    Lab.steps(T, function (p) {
+      var I = p.P / p.V;
+      return ['Strøm: <span class="f">I = P/V = ' + fmt(p.P) + '/' + fmt(p.V) + '</span> = ' + fu(I, 'A'),
+        'Tab: <span class="f">P_tab = I²·R = ' + fmt(I, 4) + '² · ' + fmt(p.R) + '</span> = <span class="res">' + fu(I * I * p.R, 'W') + '</span> = ' + fmt(100 * I * I * p.R / p.P, 3) + ' % af effekten',
+        'Fordobles spændingen, halveres strømmen, og tabet falder til en fjerdedel. Derfor sættes spændingen op med transformere ved kraftværket.'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Induktionsmotor ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse', title: 'Induktionsmotoren: synkron hastighed, slip og moment', short: 'Induktionsmotor',
+      text: 'En 4-polet induktionsmotor på 7,5 kW tilsluttes 50 Hz og kører 1440 o/min ved fuld last. Find den synkrone hastighed, slippet, rotorfrekvensen og momentet. (Bogens eksempel 13.12 bruger 60 Hz og 1725 o/min.)',
+      learn: 'den synkrone hastighed bestemmes kun af frekvens og polantal. Rotoren kører lidt langsommere (slip), og kurven viser, hvorfor den kun kan arbejde på den stejle del tæt på n_s. Kurven er en principkurve, ikke data for en bestemt motor.' });
+    Lab.select(T, { key: 'f', label: 'Frekvens', options: [['50', '50 Hz'], ['60', '60 Hz']], value: '50' });
+    Lab.select(T, { key: 'pol', label: 'Antal poler', options: [['2', '2 poler'], ['4', '4 poler'], ['6', '6 poler'], ['8', '8 poler']], value: '4' });
+    Lab.slider(T, { key: 'n', label: 'Rotorens hastighed (pct. af n_s)', min: 85, max: 99.9, step: 0.1, value: 96, unit: '%', noPrefix: true });
+    Lab.slider(T, { key: 'P', label: 'Mekanisk effekt P', min: 0.5, max: 30, step: 0.5, value: 7.5, unit: 'kW', noPrefix: true });
+    var cv = Lab.canvas(T.stage, 0.45);
+    var out = Lab.readout(T, [{ key: 'ns', label: 'n_s = 120f/p', color: C.cyan }, { key: 'n', label: 'Rotorhastighed n', color: C.green }, { key: 's', label: 'Slip s', color: C.gold },
+      { key: 'fr', label: 'Rotorfrekvens f_R = s·f', color: C.purple }, { key: 'T', label: 'Moment T = P/ω', color: C.red }]);
+    function calc(p) { var ns = 120 * Number(p.f) / Number(p.pol), n = ns * p.n / 100, s = (ns - n) / ns, w = 2 * PI * n / 60; return { ns: ns, n: n, s: s, fR: s * Number(p.f), T: p.P * 1000 / w }; }
+    T.on(function (p) {
+      var c = calc(p), sk = 0.25, Tk = 2.5;
+      var kloss = function (n) { var s = (c.ns - n) / c.ns; return s <= 0 ? 0 : 2 * Tk * s * sk / (s * s + sk * sk); };
+      var Tn = kloss(c.n);
+      Lab.plot(cv, { x: [0, c.ns * 1.03], y: [0, 2.8], xlabel: 'n [o/min]', ylabel: 'T / T_rated (princip)',
+        series: [{ fn: kloss, color: C.cyan, label: 'moment-hastighedskurve (princip)' }], vlines: [{ x: c.ns, color: C.gold }], markers: [{ x: c.n, y: Tn, color: C.red, label: 'driftspunkt' }] });
+      out({ ns: fmt(c.ns) + ' o/min', n: fmt(c.n, 4) + ' o/min', s: fmt(c.s, 3) + ' (' + fmt(100 * c.s, 3) + ' %)', fr: fu(c.fR, 'Hz'), T: fu(c.T, 'N·m') });
+    });
+    Lab.check(T, [{ q: 'Den synkrone hastighed', unit: 'o/min', answer: function (p) { return calc(p).ns; } }, { q: 'Slippet s (som decimaltal)', unit: '', answer: function (p) { return calc(p).s; } },
+      { q: 'Momentet på akslen', unit: 'N·m', answer: function (p) { return calc(p).T; } }]);
+    Lab.steps(T, function (p) {
+      var c = calc(p), w = 2 * PI * c.n / 60;
+      return ['Synkron hastighed: <span class="f">n_s = 120·f/p = 120·' + p.f + '/' + p.pol + '</span> = <span class="res">' + fmt(c.ns) + ' o/min</span>',
+        'Slip: <span class="f">s = (n_s − n)/n_s = (' + fmt(c.ns) + ' − ' + fmt(c.n, 4) + ')/' + fmt(c.ns) + '</span> = <span class="res">' + fmt(c.s, 4) + '</span>',
+        'Rotorfrekvens: <span class="f">f_R = s·f</span> = ' + fu(c.fR, 'Hz'),
+        'Vinkelhastighed: <span class="f">ω = 2π·n/60</span> = ' + fmt(w, 4) + ' rad/s. Moment: <span class="f">T = P/ω = ' + fmt(p.P * 1000) + '/' + fmt(w, 4) + '</span> = <span class="res">' + fu(c.T, 'N·m') + '</span>'];
+    });
+    T.ready();
+  })();
+})();
+</script>
+</body>
+</html>

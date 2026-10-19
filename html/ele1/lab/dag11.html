@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Øvelseslab: Dag 11 · ELE1</title>
+<link rel="stylesheet" href="assets/lab.css">
+</head>
+<body>
+<header>
+  <h1>Øvelseslab · Dag 11</h1>
+  <p>Boliginstallationer, elsikkerhed og ledningstab</p>
+  <div class="toplinks">
+    <a href="../dag/Dag11_Studienote.pdf" target="_blank">📖 Studienote</a>
+    <a href="../../../quiz/ele1/Dag11_Quiz.html" target="_blank">📝 Quiz</a>
+    <a href="../../../index.html#edu/maskiningenioer/sem3/ele1/dag11">← Studiehub</a>
+  </div>
+</header>
+<div class="howto"><b>Sådan bruges laben:</b> Hver opgave starter med opgavens egne tal. Regn først selv, skriv svaret under <b>Prøv selv først</b>, og tjek det. Skru derefter på værdierne og se, hvad der sker. <b>Løsning trin for trin</b> følger altid de værdier, der står i indstillingerne lige nu.</div>
+<nav class="tasknav" id="tasknav"></nav>
+<main id="tasks"></main>
+<footer>ELE1-A26 · Øvelseslab til dag 11 · kilder: Rizzoni og Kearns (2022), Sikkerhedsstyrelsen · <a href="../../../index.html#edu/maskiningenioer/sem3/ele1">Studiehub</a></footer>
+<script src="assets/lab.js"></script>
+<script>
+(function () {
+  var fu = Lab.fu, fmt = Lab.fmt, C = Lab.COL, S3 = Math.sqrt(3);
+
+  /* ---------- Én fase eller tre faser ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse', title: 'Et komfur på én fase eller tre faser', short: 'Ledningstab',
+      text: 'Et komfur optager 10 kW (resistivt). Hver leder i kablet har modstanden 0,05 Ω. Sammenlign strømmen og tabet i kablet ved enfaset tilslutning (230 V) og trefaset tilslutning (3 × 400 V, balanceret).',
+      learn: 'trefaset giver en tredjedel af strømmen pr. leder, og nullederen fører ingen strøm ved balance. Tabet bliver ca. 6 gange mindre, og kablet kan være tyndere.' });
+    Lab.slider(T, { key: 'P', label: 'Effekt P', min: 1, max: 30, step: 0.5, value: 10, unit: 'kW', noPrefix: true });
+    Lab.slider(T, { key: 'R', label: 'Modstand pr. leder', min: 0.01, max: 0.3, step: 0.005, value: 0.05, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'V', label: 'Fasespænding', min: 200, max: 250, step: 1, value: 230, unit: 'V', noPrefix: true });
+    var cv = Lab.canvas(T.stage, 0.36);
+    var out = Lab.readout(T, [{ key: 'I1', label: 'Enfaset strøm', color: C.red }, { key: 'L1', label: 'Enfaset tab (fase + nul)', color: C.red }, { key: 'I3', label: 'Trefaset linjestrøm', color: C.green }, { key: 'L3', label: 'Trefaset tab (3 faser)', color: C.green }, { key: 'r', label: 'Forhold', color: C.gold }]);
+    function calc(p) { var P = p.P * 1000, I1 = P / p.V, I3 = P / (S3 * S3 * p.V); return { I1: I1, L1: 2 * I1 * I1 * p.R, I3: I3, L3: 3 * I3 * I3 * p.R }; }
+    T.on(function (p) {
+      var c = calc(p);
+      Lab.plot(cv, { x: [0, 2], y: [0, c.L1 * 1.15], xlabel: 'enfaset · trefaset', ylabel: 'tab i kablet [W]',
+        series: [{ pts: [[0.3, 0], [0.3, c.L1], [0.8, c.L1], [0.8, 0]], color: C.red, label: 'enfaset', width: 3 }, { pts: [[1.2, 0], [1.2, c.L3], [1.7, c.L3], [1.7, 0]], color: C.green, label: 'trefaset', width: 3 }] });
+      out({ I1: fu(c.I1, 'A'), L1: fu(c.L1, 'W'), I3: fu(c.I3, 'A'), L3: fu(c.L3, 'W'), r: fmt(c.L1 / c.L3, 3) + ' gange mindre tab' });
+    });
+    Lab.check(T, [{ q: 'Tabet ved enfaset tilslutning', unit: 'W', answer: function (p) { return calc(p).L1; } }, { q: 'Tabet ved trefaset tilslutning', unit: 'W', answer: function (p) { return calc(p).L3; } }]);
+    Lab.steps(T, function (p) {
+      var c = calc(p), VL = S3 * p.V;
+      return ['Enfaset: <span class="f">I = P/V = ' + fmt(p.P * 1000) + '/' + fmt(p.V) + '</span> = ' + fu(c.I1, 'A') + '. Strømmen løber ud i fasen og tilbage i nul, så to ledere har tab:',
+        '<span class="f">P_tab = 2·I²·R = 2 · ' + fmt(c.I1, 4) + '² · ' + fmt(p.R) + '</span> = <span class="res">' + fu(c.L1, 'W') + '</span>',
+        'Trefaset: <span class="f">I_L = P/(√3·V_L) = ' + fmt(p.P * 1000) + '/(√3 · ' + fmt(VL, 4) + ')</span> = ' + fu(c.I3, 'A') + '. Ingen strøm i nul ved balance, så tre ledere har tab:',
+        '<span class="f">P_tab = 3·I_L²·R</span> = <span class="res">' + fu(c.L3, 'W') + '</span>, dvs. ' + fmt(c.L1 / c.L3, 3) + ' gange mindre.'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Berøringsstrøm og RCD ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Eksempel', title: 'Strøm gennem kroppen ved en isolationsfejl', short: 'RCD',
+      text: 'Et apparat har en isolationsfejl, så kabinettet får fasespændingen. En person rører kabinettet. Find strømmen gennem kroppen, og se hvad sikring, beskyttelsesleder og RCD gør.',
+      learn: 'våd hud giver lav modstand og livsfarlig strøm. Sikringen reagerer ikke på så små strømme, men en 30 mA RCD gør. Med en intakt beskyttelsesleder går fejlstrømmen gennem PE i stedet for gennem personen.' });
+    Lab.slider(T, { key: 'V', label: 'Spænding på kabinettet', min: 12, max: 400, step: 1, value: 230, unit: 'V', noPrefix: true });
+    Lab.slider(T, { key: 'Rb', label: 'Kroppens og overgangenes modstand', min: 500, max: 100000, log: true, value: 1000, unit: 'Ω' });
+    Lab.select(T, { key: 'rcd', label: 'Fejlstrømsafbryder', options: [['30', 'RCD 30 mA (krav i nye boliger)'], ['300', 'RCD 300 mA (brandbeskyttelse)'], ['0', 'Ingen RCD']], value: '30' });
+    Lab.select(T, { key: 'pe', label: 'Beskyttelsesleder (PE)', options: [['nej', 'Ingen eller afbrudt PE'], ['ja', 'Intakt PE']], value: 'nej' });
+    Lab.hint(T, 'Virkningerne er omtrentlige grænser aflæst af Rizzoni og Kearns (2022, fig. 6.62, s. 347). Kravene til RCD er fra Sikkerhedsstyrelsen.');
+    var cv = Lab.canvas(T.stage, 0.3);
+    var out = Lab.readout(T, [{ key: 'I', label: 'Strøm gennem kroppen', color: C.gold }, { key: 'eff', label: 'Virkning', color: C.red }, { key: 'res', label: 'Hvad sker der?', color: C.green }]);
+    function eff(I) { return I < 0.001 ? 'mærkes ikke' : I < 0.01 ? 'kan mærkes, smertefuldt' : I < 0.1 ? 'kan ikke give slip, alvorligt stød' : I < 1 ? 'hjerteflimmer, livsfarligt' : 'forbrændinger, vejrtrækningslammelse'; }
+    T.on(function (p) {
+      var I = p.V / p.Rb, lim = Number(p.rcd) / 1000, pe = p.pe === 'ja';
+      var res = pe ? '<span class="pill ind">Fejlstrømmen går gennem PE; RCD/sikring kobler ud, før nogen rører kabinettet</span>' :
+        lim > 0 && I > lim ? '<span class="pill ind">RCD kobler ud (' + p.rcd + ' mA overskredet)</span>' :
+        lim > 0 ? '<span class="pill warn">RCD reagerer ikke: strømmen er under ' + p.rcd + ' mA</span>' : '<span class="pill warn">Intet afbryder: sikringen reagerer først ved mange ampere</span>';
+      var lg = function (x) { return Math.log10(x); };
+      Lab.plot(cv, { x: [-4, 0.5], y: [0, 1], xlabel: 'strøm gennem kroppen (log₁₀ af ampere): −3 = 1 mA, −2 = 10 mA, −1 = 100 mA', ylabel: '', zero: false,
+        series: [{ pts: [[-4, 0.5], [0.5, 0.5]], color: C.dim, width: 1 }],
+        vlines: [{ x: -3, color: C.green }, { x: -2, color: C.gold }, { x: -1, color: C.red }].concat(lim > 0 ? [{ x: lg(lim), color: C.cyan }] : []),
+        markers: [{ x: Math.max(Math.min(lg(I), 0.5), -4), y: 0.5, color: pe ? C.green : C.red, label: 'strøm ved fejl' }] });
+      out({ I: fu(I, 'A'), eff: pe ? 'ingen: personen er beskyttet' : eff(I), res: res });
+    });
+    Lab.check(T, [{ q: 'Strømmen gennem kroppen (uden PE)', unit: 'mA', answer: function (p) { return p.V / p.Rb * 1000; } }]);
+    Lab.steps(T, function (p) {
+      var I = p.V / p.Rb;
+      return ['Ohms lov: <span class="f">I = V/R = ' + fmt(p.V) + '/' + fmt(p.Rb) + '</span> = <span class="res">' + fu(I, 'A') + '</span>',
+        'Sammenlign med grænserne: ca. 1 mA mærkes, ca. 10 mA kan man ikke give slip, ca. 100 mA kan give hjerteflimmer. Her: ' + eff(I) + '.',
+        'En sikring på fx 10 A reagerer ikke på ' + fu(I, 'A') + '; den beskytter kablet mod overstrøm.',
+        'RCD\'en sammenligner strømmen i fase og nul. ' + fu(I, 'A') + ' kommer ikke tilbage i nullederen, så en 30 mA RCD kobler ud, hvis I > 30 mA.',
+        'Med intakt PE løber fejlstrømmen gennem beskyttelseslederen til jord, og afbryderen kobler ud, før personen rører kabinettet.'];
+    });
+    T.ready();
+  })();
+})();
+</script>
+</body>
+</html>

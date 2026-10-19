@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Øvelseslab: Dag 10 · ELE1</title>
+<link rel="stylesheet" href="assets/lab.css">
+</head>
+<body>
+<header>
+  <h1>Øvelseslab · Dag 10</h1>
+  <p>Ubalance, lasttyper og motorstart</p>
+  <div class="toplinks">
+    <a href="../dag/Dag10_Studienote.pdf" target="_blank">📖 Studienote</a>
+    <a href="../../../quiz/ele1/Dag10_Quiz.html" target="_blank">📝 Quiz</a>
+    <a href="../../../index.html#edu/maskiningenioer/sem3/ele1/dag10">← Studiehub</a>
+  </div>
+</header>
+<div class="howto"><b>Sådan bruges laben:</b> Hver opgave starter med opgavens egne tal. Regn først selv, skriv svaret under <b>Prøv selv først</b>, og tjek det. Skru derefter på værdierne og se, hvad der sker. <b>Løsning trin for trin</b> følger altid de værdier, der står i indstillingerne lige nu.</div>
+<nav class="tasknav" id="tasknav"></nav>
+<main id="tasks"></main>
+<footer>ELE1-A26 · Øvelseslab til dag 10 · opgaverne svarer til studienoten (kilder: Rizzoni og Kearns 2022; ABB 2025) · <a href="../../../index.html#edu/maskiningenioer/sem3/ele1">Studiehub</a></footer>
+<script src="assets/lab.js"></script>
+<script>
+(function () {
+  var fu = Lab.fu, fmt = Lab.fmt, C = Lab.COL, Cx = Lab.Cx, deg = Lab.deg, rad = Lab.rad, PI = Math.PI, S3 = Math.sqrt(3);
+
+  /* ---------- Strøm i nullederen ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse', title: 'Strøm i nullederen ved ubalanceret belastning', short: 'Nulleder',
+      text: 'I en bolig på 3 × 400/230 V belastes L1 med 10 A, L2 med 5 A og L3 med 0 A, alle resistivt. Find strømmen i nullederen.',
+      learn: 'strømmene lægges sammen som fasorer, ikke som tal. Sæt alle tre faser til samme strøm, og nullederstrømmen bliver 0.' });
+    Lab.slider(T, { key: 'I1', label: 'Strøm i L1', min: 0, max: 20, step: 0.5, value: 10, unit: 'A', noPrefix: true });
+    Lab.slider(T, { key: 'I2', label: 'Strøm i L2', min: 0, max: 20, step: 0.5, value: 5, unit: 'A', noPrefix: true });
+    Lab.slider(T, { key: 'I3', label: 'Strøm i L3', min: 0, max: 20, step: 0.5, value: 0, unit: 'A', noPrefix: true });
+    Lab.slider(T, { key: 'th', label: 'Lastvinkel (samme for alle, 0 = resistiv)', min: 0, max: 60, step: 1, value: 0, unit: '°', noPrefix: true });
+    var cv = Lab.canvas(T.stage, 0.55);
+    var out = Lab.readout(T, [{ key: 'In', label: '|Ĩ_n|', color: C.gold }, { key: 'kart', label: 'Ĩ_n kartesisk', color: C.gold }, { key: 'naiv', label: 'Forkert: tal lagt sammen', color: C.red }]);
+    function cur(p) {
+      var t = rad(-p.th), a = Cx.polar(p.I1, t), b = Cx.polar(p.I2, rad(-120) + t), c = Cx.polar(p.I3, rad(120) + t);
+      return { a: a, b: b, c: c, n: Cx.add(Cx.add(a, b), c) };
+    }
+    T.on(function (p) {
+      var s = cur(p), ab = Cx.add(s.a, s.b);
+      Lab.phasor(cv, [{ z: s.a, color: C.cyan, label: 'I₁' }, { z: s.b, color: C.red, label: 'I₂' }, { z: s.c, color: C.green, label: 'I₃' },
+        { z: s.b, from: s.a, color: C.red, dash: true, width: 1.5 }, { z: s.c, from: ab, color: C.green, dash: true, width: 1.5 }, { z: s.n, color: C.gold, label: 'I_n', width: 4 }],
+        { max: 20, note: 'Stiplet: strømmene lagt efter hinanden (hoved til hale). Guld: summen = strømmen i nullederen.' });
+      out({ In: fu(Cx.abs(s.n), 'A'), kart: Lab.fc(s.n, 'A'), naiv: fmt(p.I1 + p.I2 + p.I3) + ' A' });
+    });
+    Lab.check(T, [{ q: 'Strømmen i nullederen', unit: 'A', answer: function (p) { return Cx.abs(cur(p).n); } }]);
+    Lab.steps(T, function (p) {
+      var s = cur(p);
+      return ['Fasorer (resistiv last: strømmen i fase med sin fasespænding): <span class="f">Ĩ₁ = ' + fmt(p.I1) + '∠0°, Ĩ₂ = ' + fmt(p.I2) + '∠−120°, Ĩ₃ = ' + fmt(p.I3) + '∠120°</span>' + (p.th ? ' (alle drejet ' + fmt(-p.th) + '°)' : ''),
+        'Kartesisk: Ĩ₁ = ' + Lab.fc(s.a, '', 4) + ', Ĩ₂ = ' + Lab.fc(s.b, '', 4) + ', Ĩ₃ = ' + Lab.fc(s.c, '', 4),
+        'KCL i nulpunktet: <span class="f">Ĩ_n = Ĩ₁ + Ĩ₂ + Ĩ₃</span> = ' + Lab.fc(s.n, 'A', 4),
+        '<span class="res">|Ĩ_n| = ' + fu(Cx.abs(s.n), 'A') + '</span> (ikke ' + fmt(p.I1 + p.I2 + p.I3) + ' A)'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Motorstart ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse', title: 'Startmetoder: strøm og moment ved start', short: 'Motorstart',
+      text: 'Motoren fra dag 9 (11 kW, I_n = 20,8 A, 1460 o/min). Ved direkte start antages 7 × I_n og 2,2 × T_n. Sammenlign startstrøm og startmoment for de fire metoder, og se om motoren kan starte lasten.',
+      learn: 'stjerne-trekant deler både strøm og moment med 3. En softstarter sænker spændingen, så strømmen falder lineært og momentet med kvadratet. En frekvensomformer giver mærkemoment ved lav strøm. Vælg et transportbånd og se, hvilke metoder der ikke kan starte det.' });
+    Lab.slider(T, { key: 'In', label: 'Mærkestrøm I_n', min: 2, max: 100, step: 0.1, value: 20.8, unit: 'A', noPrefix: true });
+    Lab.slider(T, { key: 'kI', label: 'Startstrøm ved DOL (× I_n)', min: 4, max: 8, step: 0.1, value: 7, unit: '× I_n', noPrefix: true });
+    Lab.slider(T, { key: 'kT', label: 'Startmoment ved DOL (× T_n)', min: 1, max: 3, step: 0.1, value: 2.2, unit: '× T_n', noPrefix: true });
+    Lab.slider(T, { key: 'lim', label: 'Softstarterens strømgrænse (× I_n)', min: 2, max: 5, step: 0.1, value: 3, unit: '× I_n', noPrefix: true });
+    Lab.select(T, { key: 'load', label: 'Last ved start', options: [['0.3', 'Pumpe/ventilator (kvadratisk, ca. 0,3·T_n)'], ['1.0', 'Fuldt lastet transportbånd (ca. 1,0·T_n)']], value: '0.3' });
+    Lab.hint(T, 'Lastens startbehov er illustrative tal. Faktorerne for DOL er antagelser i området fra Rizzoni og Kearns (2022, s. 696).');
+    var cvI = Lab.canvas(T.stage, 0.34), cvT = Lab.canvas(T.stage, 0.34);
+    var out = Lab.readout(T, [{ key: 'dol', label: 'DOL', color: C.red }, { key: 'yd', label: 'Stjerne-trekant', color: C.gold }, { key: 'soft', label: 'Softstarter', color: C.cyan }, { key: 'vfd', label: 'Frekvensomformer', color: C.green }]);
+    function calc(p) {
+      var Id = p.kI * p.In, Td = p.kT, Is = Math.min(p.lim, p.kI) * p.In, Ts = Td * Math.pow(Is / Id, 2);
+      return [{ n: 'DOL', I: Id, T: Td, col: C.red }, { n: 'Y-Δ', I: Id / 3, T: Td / 3, col: C.gold }, { n: 'Soft', I: Is, T: Ts, col: C.cyan }, { n: 'VFD', I: p.In, T: 1, col: C.green }];
+    }
+    function bars(list, key) { return list.map(function (m, i) { var x0 = 0.3 + i, x1 = x0 + 0.5, v = m[key]; return { pts: [[x0, 0], [x0, v], [x1, v], [x1, 0]], color: m.col, label: m.n, width: 3 }; }); }
+    T.on(function (p) {
+      var L = calc(p), need = Number(p.load);
+      Lab.plot(cvI, { x: [0, 4], y: [0, p.kI * p.In * 1.15], xlabel: 'DOL · Y-Δ · softstarter · VFD', ylabel: 'startstrøm [A]', series: bars(L, 'I'), hlines: [{ y: p.In, color: C.dim, label: 'I_n' }] });
+      Lab.plot(cvT, { x: [0, 4], y: [0, Math.max(p.kT, 1.2) * 1.15], xlabel: 'DOL · Y-Δ · softstarter · VFD', ylabel: 'startmoment [× T_n]', series: bars(L, 'T'), hlines: [{ y: need, color: C.purple, label: 'lastens behov' }] });
+      var f = function (m) { return fu(m.I, 'A') + ' · ' + fmt(m.T, 3) + '×T_n ' + (m.T >= need ? '<span class="pill ind">starter</span>' : '<span class="pill warn">for svag</span>'); };
+      out({ dol: f(L[0]), yd: f(L[1]), soft: f(L[2]), vfd: f(L[3]) });
+    });
+    Lab.check(T, [{ q: 'Startstrømmen ved stjerne-trekant', unit: 'A', answer: function (p) { return p.kI * p.In / 3; } }, { q: 'Startmomentet ved stjerne-trekant (× T_n)', unit: '× T_n', answer: function (p) { return p.kT / 3; } }]);
+    Lab.steps(T, function (p) {
+      var Id = p.kI * p.In;
+      return ['Direkte start: <span class="f">I = ' + fmt(p.kI) + ' · ' + fmt(p.In) + '</span> = ' + fu(Id, 'A') + ' og T = ' + fmt(p.kT) + '·T_n.',
+        'Stjerne-trekant: viklingsspændingen falder med √3, og linjestrømmen samlet til 1/3: <span class="f">I_Y = ' + fmt(Id, 4) + '/3</span> = <span class="res">' + fu(Id / 3, 'A') + '</span>',
+        'Momentet går med spændingen i anden: <span class="f">T_Y = ' + fmt(p.kT) + '/3</span> = <span class="res">' + fmt(p.kT / 3, 3) + '·T_n</span>',
+        'Softstarter med strømgrænse ' + fmt(p.lim) + '·I_n: spændingen er sænket til ' + fmt(Math.min(p.lim / p.kI, 1) * 100, 3) + ' %, så momentet bliver ' + fmt(p.kT * Math.pow(Math.min(p.lim / p.kI, 1), 2), 3) + '·T_n.',
+        'Frekvensomformer: mærkemoment ved ca. 1·I_n (ABB 2025, s. 14).',
+        'En pumpe kræver lidt moment ved start, så alle metoder virker. Et fuldt lastet transportbånd kræver ca. 100 % moment fra stilstand.'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Frekvensomformer og pumpe ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse', title: 'Frekvensomformer: hastighed, U/f og energi på en pumpe', short: 'Frekvensomformer',
+      text: 'En 4-polet motor til 400 V og 50 Hz driver en centrifugalpumpe gennem en frekvensomformer. Find den synkrone hastighed og spændingen ved 25 Hz, og pumpens effekt ved 80 % hastighed.',
+      learn: 'frekvensen styrer hastigheden direkte (n_s = 120f/p), og spændingen følger med, så U/f er konstant. Pumpens effekt falder med hastigheden i tredje: 80 % hastighed kræver kun ca. 51 % effekt.' });
+    Lab.slider(T, { key: 'f', label: 'Frekvens f', min: 5, max: 50, step: 0.5, value: 25, unit: 'Hz', noPrefix: true });
+    Lab.select(T, { key: 'pol', label: 'Antal poler', options: [['2', '2 poler'], ['4', '4 poler'], ['6', '6 poler']], value: '4' });
+    Lab.slider(T, { key: 'Un', label: 'Mærkespænding ved 50 Hz', min: 200, max: 690, step: 10, value: 400, unit: 'V', noPrefix: true });
+    var cv = Lab.canvas(T.stage, 0.42);
+    var out = Lab.readout(T, [{ key: 'ns', label: 'n_s = 120f/p', color: C.cyan }, { key: 'U', label: 'U = (U_n/50)·f', color: C.gold }, { key: 'Uf', label: 'U/f', color: C.dim }, { key: 'P', label: 'Pumpeeffekt (n/n_n)³', color: C.green }]);
+    T.on(function (p) {
+      var ns = 120 * p.f / Number(p.pol), U = p.Un / 50 * p.f, r = p.f / 50;
+      Lab.plot(cv, { x: [0, 50], y: [0, 105], xlabel: 'frekvens f [Hz]', ylabel: '[% af nominel]',
+        series: [{ fn: function (f) { return 100 * f / 50; }, color: C.cyan, label: 'hastighed og spænding' }, { fn: function (f) { return 100 * Math.pow(f / 50, 3); }, color: C.green, label: 'pumpens effekt ∝ n³' }],
+        markers: [{ x: p.f, y: 100 * Math.pow(r, 3) }] });
+      out({ ns: fmt(ns, 4) + ' o/min', U: fu(U, 'V'), Uf: fmt(p.Un / 50, 3) + ' V/Hz', P: fmt(100 * Math.pow(r, 3), 3) + ' %' });
+    });
+    Lab.check(T, [{ q: 'Spændingen til motoren ved den valgte frekvens', unit: 'V', answer: function (p) { return p.Un / 50 * p.f; } }, { q: 'Pumpens effekt i % af fuld effekt', unit: '%', answer: function (p) { return 100 * Math.pow(p.f / 50, 3); } }]);
+    Lab.steps(T, function (p) {
+      var r = p.f / 50;
+      return ['Synkron hastighed: <span class="f">n_s = 120·' + fmt(p.f) + '/' + p.pol + '</span> = <span class="res">' + fmt(120 * p.f / Number(p.pol), 4) + ' o/min</span>',
+        'Konstant U/f: <span class="f">' + fmt(p.Un) + '/50 = ' + fmt(p.Un / 50, 3) + ' V/Hz</span>, så <span class="f">U = ' + fmt(p.Un / 50, 3) + ' · ' + fmt(p.f) + '</span> = <span class="res">' + fu(p.Un / 50 * p.f, 'V') + '</span>',
+        'Pumpen (kvadratisk last): <span class="f">T ∝ n², P = T·ω ∝ n³</span>. Hastighed ' + fmt(100 * r, 3) + ' % ⇒ effekt <span class="res">' + fmt(100 * Math.pow(r, 3), 3) + ' %</span>.'];
+    });
+    T.ready();
+  })();
+})();
+</script>
+</body>
+</html>

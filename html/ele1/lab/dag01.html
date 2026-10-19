@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Øvelseslab: Dag 1 · ELE1</title>
+<link rel="stylesheet" href="assets/lab.css">
+</head>
+<body>
+<header>
+  <h1>Øvelseslab · Dag 1</h1>
+  <p>Sinusfunktioner, spændingsdeleren og den første LTspice-simulering</p>
+  <div class="toplinks">
+    <a href="../dag/Dag01_Studienote.pdf" target="_blank">📖 Studienote</a>
+    <a href="../../../quiz/ele1/Dag01_Quiz.html" target="_blank">📝 Quiz</a>
+    <a href="../../../index.html#edu/maskiningenioer/sem3/ele1/dag01">← Studiehub</a>
+  </div>
+</header>
+<div class="howto"><b>Sådan bruges laben:</b> Hver opgave starter med opgavens egne tal. Regn først selv, skriv svaret under <b>Prøv selv først</b>, og tjek det. Skru derefter på værdierne og se, hvad der sker. <b>Løsning trin for trin</b> følger altid de værdier, der står i indstillingerne lige nu.</div>
+<nav class="tasknav" id="tasknav"></nav>
+<main id="tasks"></main>
+<footer>ELE1-A26 · Øvelseslab til dag 1 · opgaverne svarer til studienoten · <a href="../../../index.html#edu/maskiningenioer/sem3/ele1">Studiehub</a></footer>
+<script src="assets/lab.js"></script>
+<script>
+(function () {
+  var fu = Lab.fu, fmt = Lab.fmt, C = Lab.COL, PI = Math.PI;
+
+  /* ---------- Øvelse 1: to sinussummer ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse 1', title: 'MathCad-tjek: to sinussummer', short: 'Sinussummer',
+      text: 'Plot v<sub>R1</sub>(t) = A·cos(ω₁t) + B·cos(ω₂t) og v<sub>R2</sub>(t) = A·cos(ω₁t) + C·cos(ω₂t + π) i samme diagram. I opgaven er A = 18,75 V, B = 15 V, C = 5 V, ω₁ = 200π rad/s og ω₂ = 2000π rad/s.',
+      learn: 'hver kurve er en langsom svingning med en hurtig krusning ovenpå. Fasen π vender den hurtige del om. Skru ω₂ ned mod ω₁, og se de to svingninger smelte sammen.' });
+    Lab.slider(T, { key: 'A', label: 'A (langsom del)', min: 0, max: 30, step: 0.25, value: 18.75, unit: 'V', noPrefix: true, sig: 4 });
+    Lab.slider(T, { key: 'B', label: 'B (hurtig del i v_R1)', min: 0, max: 30, step: 0.5, value: 15, unit: 'V', noPrefix: true });
+    Lab.slider(T, { key: 'Cc', label: 'C (hurtig del i v_R2)', min: 0, max: 30, step: 0.5, value: 5, unit: 'V', noPrefix: true });
+    Lab.slider(T, { key: 'w1', label: 'ω₁ / π', min: 20, max: 1000, step: 10, value: 200, fmt: function (x) { return fmt(x) + 'π rad/s (' + fmt(x / 2) + ' Hz)'; } });
+    Lab.slider(T, { key: 'w2', label: 'ω₂ / π', min: 200, max: 4000, step: 50, value: 2000, fmt: function (x) { return fmt(x) + 'π rad/s (' + fmt(x / 2) + ' Hz)'; } });
+    var cv = Lab.canvas(T.stage, 0.48);
+    var out = Lab.readout(T, [{ key: 'f1', label: 'f₁ = ω₁/2π', color: C.cyan }, { key: 'T1', label: 'T₁ = 1/f₁', color: C.cyan },
+      { key: 'f2', label: 'f₂ = ω₂/2π', color: C.purple }, { key: 'mx', label: 'Største værdi af v_R1', color: C.gold }]);
+    T.on(function (p) {
+      var w1 = p.w1 * PI, w2 = p.w2 * PI, f1 = w1 / 2 / PI, f2 = w2 / 2 / PI;
+      Lab.plot(cv, { x: [0, 20], xlabel: 't [ms]', ylabel: 'v [V]', n: 1500,
+        series: [{ fn: function (t) { t /= 1000; return p.A * Math.cos(w1 * t) + p.B * Math.cos(w2 * t); }, color: C.cyan, label: 'v_R1(t)', width: 1.8 },
+                 { fn: function (t) { t /= 1000; return p.A * Math.cos(w1 * t) + p.Cc * Math.cos(w2 * t + PI); }, color: C.red, label: 'v_R2(t)', width: 1.8 }] });
+      out({ f1: fu(f1, 'Hz'), T1: fu(1 / f1, 's'), f2: fu(f2, 'Hz'), mx: fu(p.A + p.B, 'V') });
+    });
+    Lab.check(T, [
+      { q: 'Frekvensen f₁ i Hz', unit: 'Hz', answer: function (p) { return p.w1 / 2; } },
+      { q: 'Periodetiden T₂ for den hurtige svingning', unit: 'ms', answer: function (p) { return 1000 / (p.w2 / 2); } },
+      { q: 'Største værdi af v_R1 (ved t = 0)', unit: 'V', answer: function (p) { return p.A + p.B; } }
+    ]);
+    Lab.steps(T, function (p) {
+      var f1 = p.w1 / 2, f2 = p.w2 / 2;
+      return ['Frekvens af vinkelfrekvens: <span class="f">f = ω/2π</span>. Så <span class="f">f₁ = ' + fmt(p.w1) + 'π/2π</span> = <span class="res">' + fmt(f1) + ' Hz</span> og f₂ = <span class="res">' + fmt(f2) + ' Hz</span>.',
+        'Periode: <span class="f">T = 1/f</span>: T₁ = ' + fu(1 / f1, 's') + ' og <span class="res">T₂ = ' + fu(1 / f2, 's') + '</span>. Et vindue på 0 til 20 ms viser ' + fmt(0.02 * f1, 3) + ' perioder af den langsomme svingning.',
+        'Ved t = 0 er alle cosinusser lig 1, så <span class="f">v_R1(0) = A + B</span> = <span class="res">' + fu(p.A + p.B, 'V') + '</span>.',
+        'Fasen π i v_R2 giver <span class="f">cos(x + π) = −cos(x)</span>, så den hurtige del trækkes fra: v_R2(0) = A − C = ' + fu(p.A - p.Cc, 'V') + '.',
+        'I MathCad: definér konstanter med enheder, lav <span class="f">t := 0 ms, 0.01 ms .. 20 ms</span>, og plot begge funktioner mod t med enhederne ms og V på akserne.'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Øvelse 3-4: spændingsdeler ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse 3–4', title: 'Spændingsdeleren', short: 'Spændingsdeler',
+      text: 'To modstande i serie deler kildens spænding. Vælg DC eller en sinuskilde som i LTspice-videoen.',
+      learn: 'den største spænding ligger over den største modstand. Med en sinuskilde er udgangen en sinus med samme frekvens og fase, bare mindre.' });
+    Lab.select(T, { key: 'mode', label: 'Kilde', options: [['dc', 'DC (som .op)'], ['ac', 'Sinus 50 Hz (som .tran)']], value: 'dc' });
+    Lab.slider(T, { key: 'Vin', label: 'v_ind (DC eller amplitude)', min: 1, max: 24, step: 0.5, value: 10, unit: 'V', noPrefix: true });
+    Lab.slider(T, { key: 'R1', label: 'R₁', min: 100, max: 10000, log: true, value: 1000, unit: 'Ω' });
+    Lab.slider(T, { key: 'R2', label: 'R₂', min: 100, max: 10000, log: true, value: 1000, unit: 'Ω' });
+    var ckt = Lab.circuit(T, [
+      { t: 'V', a: [70, 180], b: [70, 50], label: 'v_ind', id: 'lV', side: 'l' },
+      { t: 'R', a: [70, 50], b: [250, 50], label: 'R₁', id: 'lR1', side: 't' }, { t: 'w', pts: [[250, 50], [330, 50]] },
+      { t: 'R', a: [330, 50], b: [330, 180], label: 'R₂', id: 'lR2' }, { t: 'w', pts: [[70, 180], [330, 180]] },
+      { t: 'node', at: [330, 50] }, { t: 'w', pts: [[330, 50], [400, 50]] }, { t: 'txt', at: [405, 45], s: 'v_ud', id: 'lo', color: C.green, anchor: 'start' },
+      { t: 'gnd', at: [200, 180] }
+    ], '0 0 500 215', 230);
+    var cv = Lab.canvas(T.stage, 0.38);
+    var out = Lab.readout(T, [{ key: 'vo', label: 'v_ud = v_ind·R₂/(R₁+R₂)', color: C.green }, { key: 'I', label: 'I = v_ind/(R₁+R₂)', color: C.gold }, { key: 'v1', label: 'Spænding over R₁', color: C.cyan }]);
+    T.on(function (p) {
+      var k = p.R2 / (p.R1 + p.R2), vo = p.Vin * k, I = p.Vin / (p.R1 + p.R2);
+      ckt.set('lV', 'v_ind = ' + fu(p.Vin, 'V')); ckt.set('lR1', 'R₁ = ' + fu(p.R1, 'Ω')); ckt.set('lR2', 'R₂ = ' + fu(p.R2, 'Ω')); ckt.set('lo', 'v_ud = ' + fu(vo, 'V'));
+      out({ vo: fu(vo, 'V'), I: fu(I, 'A'), v1: fu(p.Vin - vo, 'V') });
+      var ac = p.mode === 'ac';
+      Lab.plot(cv, { x: [0, 40], xlabel: 't [ms]', ylabel: 'v [V]', y: [ac ? -p.Vin * 1.1 : 0, p.Vin * 1.15],
+        series: [{ fn: function (t) { return ac ? p.Vin * Math.sin(2 * PI * 50 * t / 1000) : p.Vin; }, color: C.cyan, label: 'v_ind' },
+                 { fn: function (t) { return ac ? vo * Math.sin(2 * PI * 50 * t / 1000) : vo; }, color: C.green, label: 'v_ud' }] });
+    });
+    Lab.check(T, [
+      { q: 'Udgangsspændingen v_ud (DC eller amplitude)', unit: 'V', answer: function (p) { return p.Vin * p.R2 / (p.R1 + p.R2); } },
+      { q: 'Strømmen I (DC eller amplitude)', unit: 'mA', answer: function (p) { return p.Vin / (p.R1 + p.R2) * 1000; } }
+    ]);
+    Lab.steps(T, function (p) {
+      var k = p.R2 / (p.R1 + p.R2);
+      return ['Samme strøm løber gennem begge modstande (serie): <span class="f">I = v_ind/(R₁ + R₂) = ' + fmt(p.Vin) + '/' + fmt(p.R1 + p.R2) + '</span> = <span class="res">' + fu(p.Vin / (p.R1 + p.R2), 'A') + '</span>',
+        'Spændingen over R₂: <span class="f">v_ud = I·R₂ = v_ind·R₂/(R₁+R₂)</span> = ' + fmt(p.Vin) + '·' + fmt(k, 3) + ' = <span class="res">' + fu(p.Vin * k, 'V') + '</span>',
+        'Kontrol med KVL: ' + fu(p.Vin - p.Vin * k, 'V') + ' + ' + fu(p.Vin * k, 'V') + ' = ' + fu(p.Vin, 'V') + ' ✓',
+        'I LTspice: ground i bunden, <span class="f">.op</span> giver DC-værdien, <span class="f">.tran</span> giver kurven over tid.'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Øvelse 5: diode + kondensator + modstand ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse 5', title: 'Sinus-transient med diode og kondensator', short: 'Diode + C',
+      text: 'En sinuskilde SINE(0 10 50) i serie med en diode, en kondensator på 10 µF og en modstand på 100 Ω. Simuleret 0,2 s som med <span class="f">.tran 0.2</span>. Mål spændingen over R og kondensatorens spænding.',
+      learn: 'strømmen kommer kun som få pulser i starten. Når kondensatoren er ladet op til omtrent topværdien minus diodens spændingsfald, løber der ingen strøm mere: en opladet kondensator blokerer jævnstrøm.' });
+    Lab.slider(T, { key: 'Vp', label: 'Amplitude', min: 2, max: 20, step: 0.5, value: 10, unit: 'V', noPrefix: true });
+    Lab.slider(T, { key: 'f', label: 'Frekvens', min: 10, max: 200, step: 5, value: 50, unit: 'Hz', noPrefix: true });
+    Lab.slider(T, { key: 'C', label: 'C', min: 1e-6, max: 100e-6, log: true, value: 10e-6, unit: 'F' });
+    Lab.slider(T, { key: 'R', label: 'R', min: 10, max: 2000, log: true, value: 100, unit: 'Ω' });
+    Lab.slider(T, { key: 'Vf', label: 'Diodens spændingsfald', min: 0, max: 1, step: 0.05, value: 0.7, unit: 'V', noPrefix: true });
+    Lab.hint(T, 'Dioden er modelleret som en ideel ventil med et fast spændingsfald. En rigtig diode i LTspice giver en lidt blødere kurve.');
+    var cv1 = Lab.canvas(T.stage, 0.36), cv2 = Lab.canvas(T.stage, 0.36);
+    var out = Lab.readout(T, [{ key: 'vc', label: 'v_C ved t = 0,2 s', color: C.green }, { key: 'ip', label: 'Største strømpuls', color: C.gold }, { key: 'tau', label: 'τ = R·C', color: C.cyan }]);
+    function sim(p) {
+      var tEnd = 0.2, N = 20000, dt = tEnd / N, vc = 0, out = [], ipk = 0;
+      for (var k = 0; k <= N; k++) {
+        var t = k * dt, vs = p.Vp * Math.sin(2 * PI * p.f * t), drive = vs - vc - p.Vf, i = drive > 0 ? drive / p.R : 0;
+        ipk = Math.max(ipk, i);
+        if (k % 20 === 0) out.push([t * 1000, vs, vc, i * p.R]);
+        vc += i / p.C * dt;
+      }
+      return { pts: out, vc: vc, ipk: ipk };
+    }
+    T.on(function (p) {
+      var s = sim(p);
+      Lab.plot(cv1, { x: [0, 200], y: [-p.Vp * 1.1, p.Vp * 1.15], xlabel: 't [ms]', ylabel: 'v [V]',
+        series: [{ pts: s.pts.map(function (q) { return [q[0], q[1]]; }), color: C.dim, label: 'kilde v_s(t)', width: 1.3 },
+                 { pts: s.pts.map(function (q) { return [q[0], q[2]]; }), color: C.green, label: 'kondensator v_C(t)' }] });
+      Lab.plot(cv2, { x: [0, 200], xlabel: 't [ms]', ylabel: 'v_R [V]',
+        series: [{ pts: s.pts.map(function (q) { return [q[0], q[3]]; }), color: C.gold, label: 'v_R(t) = R·i(t)' }] });
+      out({ vc: fu(s.vc, 'V'), ip: fu(s.ipk, 'A'), tau: fu(p.R * p.C, 's') });
+    });
+    Lab.check(T, [{ q: 'Omtrent hvilken spænding ender kondensatoren på? (topværdi minus diodefald)', unit: 'V', tol: 0.05, answer: function (p) { return p.Vp - p.Vf; } }]);
+    Lab.steps(T, function (p) {
+      return ['Dioden leder kun, når kildens spænding er større end <span class="f">v_C + ' + fmt(p.Vf) + ' V</span>.',
+        'I de første positive halvperioder løber der en strøm <span class="f">i = (v_s − v_C − V_f)/R</span>, som lader kondensatoren op (<span class="f">dv_C/dt = i/C</span>).',
+        'Tidskonstanten <span class="f">τ = RC = ' + fu(p.R * p.C, 's') + '</span> afgør, hvor hurtigt det sker, sammenlignet med en periode på ' + fu(1 / p.f, 's') + '.',
+        'Når v_C når <span class="f">V_p − V_f = ' + fmt(p.Vp) + ' − ' + fmt(p.Vf) + '</span> = <span class="res">' + fu(p.Vp - p.Vf, 'V') + '</span>, kan kilden ikke drive strøm frem mere, og dioden spærrer resten af tiden.',
+        'Derfor ser du kun pulser i v_R i starten og derefter 0 V: kondensatoren blokerer jævnstrøm, når den er ladet op (dag 3).'];
+    });
+    T.ready();
+  })();
+})();
+</script>
+</body>
+</html>

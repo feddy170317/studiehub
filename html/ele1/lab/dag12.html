@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Øvelseslab: Dag 12 · ELE1</title>
+<link rel="stylesheet" href="assets/lab.css">
+<style>
+  .trainer{max-width:1150px;margin:1rem auto;padding:0 1rem}
+  .tbox{background:var(--card);border-radius:10px;padding:1.2rem;box-shadow:0 4px 8px rgba(0,0,0,.3)}
+  .tbar{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin-bottom:1rem}
+  .tbar select{background:var(--bg);color:var(--txt);border:1px solid var(--border);border-radius:6px;padding:.45rem}
+  .score{margin-left:auto;font-family:Consolas,monospace;color:var(--gold)}
+  .prob{background:var(--card2);border-radius:8px;padding:1rem 1.1rem;font-size:1.05rem;margin-bottom:1rem}
+  .prob .day{font-size:.78rem;color:var(--dim);display:block;margin-bottom:.3rem}
+  .ans{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin-bottom:1rem}
+  .ans input{width:9rem;background:var(--bg);color:var(--txt);border:1px solid var(--border);border-radius:5px;padding:.45rem;font-family:Consolas,monospace;font-size:1rem}
+  .sol{display:none;background:var(--card2);border-radius:8px;padding:.9rem 1.1rem}
+  .sol.show{display:block}
+  .sol li{margin:.35rem 0 .35rem 1.2rem}
+  .sol .f{font-family:Consolas,monospace;color:var(--gold)} .sol .res{color:var(--green);font-weight:600}
+</style>
+</head>
+<body>
+<header>
+  <h1>Øvelseslab · Dag 12</h1>
+  <p>Eksamenstræner: blandede opgaver fra hele kurset med nye tal hver gang</p>
+  <div class="toplinks">
+    <a href="../dag/Dag12_Studienote.pdf" target="_blank">📖 Studienote</a>
+    <a href="../../../quiz/ele1/Dag12_Quiz.html" target="_blank">📝 Quiz</a>
+    <a href="../../../index.html#edu/maskiningenioer/sem3/ele1/dag12">← Studiehub</a>
+  </div>
+</header>
+<div class="howto"><b>Sådan bruges træneren:</b> Vælg et emne eller "Alle", tryk <b>Ny opgave</b>, regn på papir, og skriv svaret i den angivne enhed. Tallene er nye hver gang, så de samme opgavetyper kan øves igen og igen. Løsningen viser fremgangsmåden; den interaktive udgave af hver opgavetype ligger i laben for den pågældende dag.</div>
+<div class="trainer"><div class="tbox">
+  <div class="tbar">
+    <select id="topic"></select>
+    <button class="btn" id="new">Ny opgave</button>
+    <span class="score" id="score">0 rigtige af 0</span>
+  </div>
+  <div class="prob" id="prob"></div>
+  <div class="ans"><input type="text" id="inp" placeholder="dit svar"><span class="unit" id="unit"></span><button class="btn" id="chk">Tjek</button><button class="btn sec" id="show">Vis løsning</button><span class="fb" id="fb"></span></div>
+  <div class="sol" id="sol"></div>
+</div></div>
+<footer>ELE1-A26 · Øvelseslab til dag 12 · <a href="../../../index.html#edu/maskiningenioer/sem3/ele1">Studiehub</a></footer>
+<script src="assets/lab.js"></script>
+<script>
+(function () {
+  var fmt = Lab.fmt, fu = Lab.fu, PI = Math.PI, S3 = Math.sqrt(3), deg = Lab.deg;
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function F(s) { return '<span class="f">' + s + '</span>'; }
+  function Rz(s) { return '<span class="res">' + s + '</span>'; }
+
+  var GEN = [
+    { day: 2, name: 'Ohms lov', g: function () { var V = pick([5, 9, 12, 24, 48]), R = pick([100, 220, 470, 1000, 2200]), I = V / R * 1000;
+      return { t: 'En spænding på ' + V + ' V ligger over en modstand på ' + fu(R, 'Ω') + '. Hvor stor er strømmen?', u: 'mA', a: I, s: [F('I = V/R = ' + V + '/' + R) + ' = ' + Rz(fmt(I, 4) + ' mA')] }; } },
+    { day: 2, name: 'Effekt', g: function () { var I = pick([0.5, 1, 2, 3, 5]), R = pick([2, 4, 10, 22, 47]), P = I * I * R;
+      return { t: 'En strøm på ' + fmt(I) + ' A løber gennem ' + R + ' Ω. Hvor stor effekt afsættes i modstanden?', u: 'W', a: P, s: [F('P = I²·R = ' + fmt(I) + '² · ' + R) + ' = ' + Rz(fmt(P, 4) + ' W')] }; } },
+    { day: 1, name: 'Spændingsdeler', g: function () { var V = pick([5, 10, 12, 24]), R1 = pick([1, 2.2, 4.7, 10]), R2 = pick([1, 3.3, 4.7, 6.8]), vo = V * R2 / (R1 + R2);
+      return { t: 'En spændingsdeler har v_ind = ' + V + ' V, R₁ = ' + fmt(R1) + ' kΩ og R₂ = ' + fmt(R2) + ' kΩ. Find v_ud over R₂.', u: 'V', a: vo, s: [F('v_ud = v_ind·R₂/(R₁+R₂) = ' + V + '·' + fmt(R2) + '/' + fmt(R1 + R2)) + ' = ' + Rz(fmt(vo, 4) + ' V')] }; } },
+    { day: 3, name: 'Polær vinkel', g: function () { var a = pick([-6, -4, -3, -1, 2, 3, 5]), b = pick([-5, -4, 2, 3, 4, 6]), th = deg(Math.atan2(b, a));
+      return { t: 'Find vinklen θ (i grader, mellem −180° og 180°) for A = ' + fmt(a) + (b < 0 ? ' − j' : ' + j') + Math.abs(b) + '.', u: '°', a: th, tol: 0.01,
+        s: [F('tan⁻¹(b/a) = tan⁻¹(' + b + '/' + a + ') = ' + fmt(deg(Math.atan(b / a)), 4) + '°'), a < 0 ? 'a < 0: punktet ligger til venstre for aksen, så der lægges 180° til (eller trækkes fra).' : 'a > 0: vinklen kan bruges direkte.', Rz('θ = ' + fmt(th, 4) + '°')] }; } },
+    { day: 3, name: 'Kondensator og strømpuls', g: function () { var i = pick([1, 2, 5]), T = pick([1, 2, 3, 4]), Cc = pick([1, 2, 10]), v = i / Cc * T;
+      return { t: 'En konstant strøm på ' + i + ' mA løber i ' + T + ' ms ind i en uopladet kondensator på ' + Cc + ' µF. Hvad er spændingen bagefter?', u: 'V', a: v, s: [F('v = (i/C)·T = (' + i + '·10⁻³/' + Cc + '·10⁻⁶)·' + T + '·10⁻³') + ' = ' + Rz(fmt(v, 4) + ' V')] }; } },
+    { day: 4, name: 'RMS', g: function () { var up = Math.random() < 0.5, x = up ? pick([100, 230, 325, 400]) : pick([10, 50, 120, 325]);
+      return up ? { t: 'En sinusspænding har RMS-værdien ' + x + ' V. Hvad er topværdien?', u: 'V', a: x * Math.SQRT2, s: [F('V_top = √2·V_rms = √2·' + x) + ' = ' + Rz(fmt(x * Math.SQRT2, 4) + ' V')] }
+                : { t: 'En sinusstrøm har topværdien ' + x + ' A. Hvad er RMS-værdien?', u: 'A', a: x / Math.SQRT2, s: [F('I_rms = I/√2 = ' + x + '/√2') + ' = ' + Rz(fmt(x / Math.SQRT2, 4) + ' A')] }; } },
+    { day: 5, name: 'Impedans', g: function () { var f = pick([50, 100, 1000]); if (Math.random() < 0.5) { var L = pick([10, 50, 100, 200]), z = 2 * PI * f * L / 1000;
+        return { t: 'Find |Z| for en spole på ' + L + ' mH ved ' + f + ' Hz.', u: 'Ω', a: z, s: [F('|Z_L| = ωL = 2π·' + f + '·' + L + '·10⁻³') + ' = ' + Rz(fmt(z, 4) + ' Ω')] }; }
+      var Cc = pick([1, 10, 47, 100]), zc = 1 / (2 * PI * f * Cc * 1e-6);
+      return { t: 'Find |Z| for en kondensator på ' + Cc + ' µF ved ' + f + ' Hz.', u: 'Ω', a: zc, s: [F('|Z_C| = 1/(ωC) = 1/(2π·' + f + '·' + Cc + '·10⁻⁶)') + ' = ' + Rz(fmt(zc, 4) + ' Ω')] }; } },
+    { day: 6, name: 'Middeleffekt', g: function () { var V = 230, I = pick([2, 5, 8, 10]), th = pick([0, 25, 30, 37, 45, 60]), P = V * I * Math.cos(th * PI / 180);
+      return { t: 'En last trækker ' + I + ' A (RMS) ved 230 V (RMS). Strømmen halter ' + th + '° efter spændingen. Find middeleffekten.', u: 'W', a: P, s: [F('P = Ṽ·Ĩ·cos θ = 230·' + I + '·cos ' + th + '°') + ' = ' + Rz(fmt(P, 4) + ' W')] }; } },
+    { day: 7, name: 'Effektfaktorkorrektion', g: function () { var P = pick([1000, 2000, 3000, 5000]), pf1 = pick([0.7, 0.75, 0.8]), pf2 = pick([0.9, 0.95]),
+        Q1 = P * Math.tan(Math.acos(pf1)), Q2 = P * Math.tan(Math.acos(pf2)), Cc = (Q1 - Q2) / (2 * PI * 50 * 230 * 230) * 1e6;
+      return { t: 'En last på ' + fmt(P) + ' W ved 230 V, 50 Hz har pf = ' + fmt(pf1) + ' haltende. Hvilken parallel kondensator giver pf = ' + fmt(pf2) + '?', u: 'µF', a: Cc,
+        s: [F('Q₁ = P·tan(cos⁻¹ ' + fmt(pf1) + ') = ' + fmt(Q1, 4) + ' VAR'), F('Q₂ = P·tan(cos⁻¹ ' + fmt(pf2) + ') = ' + fmt(Q2, 4) + ' VAR'), F('C = (Q₁ − Q₂)/(ω·V²) = ' + fmt(Q1 - Q2, 4) + '/(314,16·230²)') + ' = ' + Rz(fmt(Cc, 4) + ' µF')] }; } },
+    { day: 8, name: 'Transformer', g: function () { var V1 = pick([230, 400, 10000]), n1 = pick([500, 1000, 2000]), n2 = pick([25, 50, 100, 4000]), V2 = V1 * n2 / n1;
+      return { t: 'En ideel transformer har n₁ = ' + n1 + ' og n₂ = ' + n2 + ' vindinger. Primærsiden får ' + fmt(V1) + ' V. Find sekundærspændingen.', u: 'V', a: V2, s: [F('N = n₂/n₁ = ' + fmt(n2 / n1, 4)), F('Ṽ₂ = N·Ṽ₁') + ' = ' + Rz(fmt(V2, 4) + ' V')] }; } },
+    { day: 8, name: 'Slip', g: function () { var p = pick([2, 4, 6]), ns = 6000 / p, s = pick([0.02, 0.03, 0.04, 0.05]), n = Math.round(ns * (1 - s));
+      return { t: 'En ' + p + '-polet induktionsmotor ved 50 Hz kører ' + n + ' o/min. Find slippet i procent.', u: '%', a: 100 * (ns - n) / ns, s: [F('n_s = 120·50/' + p + ' = ' + ns + ' o/min'), F('s = (n_s − n)/n_s = (' + ns + ' − ' + n + ')/' + ns) + ' = ' + Rz(fmt(100 * (ns - n) / ns, 4) + ' %')] }; } },
+    { day: 9, name: 'Trefaseeffekt', g: function () { var I = pick([10, 16, 20, 32]), pf = pick([0.8, 0.85, 0.9, 1]), P = S3 * 400 * I * pf / 1000;
+      return { t: 'En balanceret trefaset last trækker ' + I + ' A ved 3 × 400 V med pf = ' + fmt(pf) + '. Find effekten.', u: 'kW', a: P, s: [F('P = √3·Ṽ_L·Ĩ_L·cos θ = √3·400·' + I + '·' + fmt(pf)) + ' = ' + Rz(fmt(P, 4) + ' kW')] }; } },
+    { day: 10, name: 'Stjerne-trekant', g: function () { var I = pick([60, 90, 120, 150, 210]);
+      return { t: 'En motor har en startstrøm på ' + I + ' A ved direkte start. Hvad bliver startstrømmen ved stjerne-trekant-start?', u: 'A', a: I / 3, s: ['Viklingsspændingen falder med √3, og linjestrømmen samlet til en tredjedel.', F('I_Y = ' + I + '/3') + ' = ' + Rz(fmt(I / 3, 4) + ' A') + '. Startmomentet falder også til en tredjedel.'] }; } },
+    { day: 10, name: 'Nulleder', g: function () { var a = pick([4, 6, 8, 10, 12]), b = pick([0, 2, 4, 6]), c = pick([0, 2, 5]), n = Lab.Cx.add(Lab.Cx.add(Lab.Cx.polar(a, 0), Lab.Cx.polar(b, -2 * PI / 3)), Lab.Cx.polar(c, 2 * PI / 3));
+      return { t: 'Resistive laster: L1 = ' + a + ' A, L2 = ' + b + ' A, L3 = ' + c + ' A. Find strømmen i nullederen.', u: 'A', a: Lab.Cx.abs(n), s: [F('Ĩ_n = ' + a + '∠0° + ' + b + '∠−120° + ' + c + '∠120°'), 'Kartesisk: ' + Lab.fc(n, 'A', 4), Rz('|Ĩ_n| = ' + fmt(Lab.Cx.abs(n), 4) + ' A')] }; } },
+    { day: 11, name: 'Strøm gennem kroppen', g: function () { var V = pick([50, 120, 230]), R = pick([1000, 2000, 5000, 10000]);
+      return { t: 'En person med kropsmodstand ' + fu(R, 'Ω') + ' rører et kabinet med ' + V + ' V. Hvor stor bliver strømmen? Kobler en 30 mA RCD ud?', u: 'mA', a: V / R * 1000, s: [F('I = V/R = ' + V + '/' + R) + ' = ' + Rz(fmt(V / R * 1000, 4) + ' mA'), V / R > 0.03 ? 'Over 30 mA: RCD\'en kobler ud.' : 'Under 30 mA: RCD\'en kobler ikke ud.'] }; } }
+  ];
+
+  var sel = document.getElementById('topic');
+  [['all', 'Alle emner']].concat(GEN.map(function (g, i) { return [String(i), 'Dag ' + g.day + ': ' + g.name]; })).forEach(function (o) { var e = document.createElement('option'); e.value = o[0]; e.textContent = o[1]; sel.appendChild(e); });
+  var cur = null, right = 0, tries = 0, counted = false;
+  var $ = function (id) { return document.getElementById(id); };
+  function next() {
+    var g = sel.value === 'all' ? pick(GEN) : GEN[Number(sel.value)];
+    cur = g.g(); cur.day = g.day; counted = false;
+    $('prob').innerHTML = '<span class="day">Dag ' + g.day + ' · ' + g.name + ' · <a style="color:#5ec8ff" href="dag' + (g.day < 10 ? '0' : '') + g.day + '.html">interaktiv udgave</a></span>' + cur.t;
+    $('unit').textContent = cur.u; $('inp').value = ''; $('fb').textContent = ''; $('sol').classList.remove('show'); $('show').textContent = 'Vis løsning';
+    $('sol').innerHTML = '<ol>' + cur.s.map(function (s) { return '<li>' + s + '</li>'; }).join('') + '</ol>';
+    $('inp').focus();
+  }
+  function check() {
+    var x = parseFloat($('inp').value.replace(/\s/g, '').replace(',', '.').replace('−', '-')), fb = $('fb');
+    if (isNaN(x)) { fb.className = 'fb bad'; fb.textContent = 'Skriv et tal'; return; }
+    var err = Math.abs(cur.a) > 1e-12 ? Math.abs((x - cur.a) / cur.a) : Math.abs(x - cur.a), ok = err <= (cur.tol || 0.02);
+    if (!counted) { tries++; if (ok) right++; counted = true; }
+    fb.className = 'fb ' + (ok ? 'ok' : err < 0.1 ? 'near' : 'bad');
+    fb.textContent = ok ? '✓ Rigtigt (' + fmt(cur.a, 4) + ' ' + cur.u + ')' : err < 0.1 ? '≈ Tæt på, tjek afrunding' : '✗ Ikke rigtigt. Prøv igen eller se løsningen';
+    $('score').textContent = right + ' rigtige af ' + tries;
+  }
+  $('new').onclick = next; $('chk').onclick = check; sel.onchange = next;
+  $('inp').addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+  $('show').onclick = function () { var s = $('sol'); s.classList.toggle('show'); this.textContent = s.classList.contains('show') ? 'Skjul løsning' : 'Vis løsning'; };
+  next();
+})();
+</script>
+</body>
+</html>

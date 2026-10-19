@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Øvelseslab: Dag 2 · ELE1</title>
+<link rel="stylesheet" href="assets/lab.css">
+</head>
+<body>
+<header>
+  <h1>Øvelseslab · Dag 2</h1>
+  <p>Ohms lov, effekt, Kirchhoffs strømlov og spændingslov</p>
+  <div class="toplinks">
+    <a href="../dag/Dag02_Studienote.pdf" target="_blank">📖 Studienote</a>
+    <a href="../../../quiz/ele1/Dag02_Quiz.html" target="_blank">📝 Quiz</a>
+    <a href="../../../index.html#edu/maskiningenioer/sem3/ele1/dag02">← Studiehub</a>
+  </div>
+</header>
+<div class="howto"><b>Sådan bruges laben:</b> Hver opgave starter med opgavens egne tal. Regn først selv, skriv svaret under <b>Prøv selv først</b>, og tjek det. Skru derefter på værdierne og se, hvordan kredsløbet reagerer. <b>Løsning trin for trin</b> følger altid de værdier, der står i indstillingerne lige nu.</div>
+<nav class="tasknav" id="tasknav"></nav>
+<main id="tasks"></main>
+<footer>ELE1-A26 · Øvelseslab til dag 2 · opgaverne svarer til studienoten · <a href="../../../index.html#edu/maskiningenioer/sem3/ele1">Studiehub</a></footer>
+<script src="assets/lab.js"></script>
+<script>
+(function () {
+  var fu = Lab.fu, fmt = Lab.fmt, C = Lab.COL;
+
+  /* ---------- Opgave 1: Ohms lov og effekt ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse 1', title: 'Ohms lov og effekt', short: 'Ohm og effekt',
+      text: 'En spændingskilde er forbundet til én modstand. Find strømmen I og effekten P.',
+      learn: 'strømmen falder, når modstanden stiger (I = V/R), og effekten følger V²/R. Dobbelt spænding giver fire gange effekt.' });
+    Lab.slider(T, { key: 'V', label: 'Spænding V', min: 1, max: 24, step: 0.5, value: 12, unit: 'V' });
+    Lab.slider(T, { key: 'R', label: 'Modstand R', min: 10, max: 10000, log: true, value: 500, unit: 'Ω' });
+    var ckt = Lab.circuit(T, [
+      { t: 'V', a: [70, 170], b: [70, 50], label: 'V', id: 'lV', side: 'l' },
+      { t: 'w', pts: [[70, 50], [330, 50]] }, { t: 'w', pts: [[70, 170], [330, 170]] },
+      { t: 'R', a: [330, 50], b: [330, 170], label: 'R', id: 'lR' },
+      { t: 'iarrow', at: [200, 50], dir: 'r' }, { t: 'txt', at: [200, 36], s: 'I', id: 'lI', color: C.gold },
+      { t: 'gnd', at: [200, 170] }
+    ], '0 0 440 210', 230);
+    var cv = Lab.canvas(T.stage, 0.42);
+    var out = Lab.readout(T, [{ key: 'I', label: 'Strøm I = V/R', color: C.gold }, { key: 'P', label: 'Effekt P = V²/R', color: C.green }]);
+    T.on(function (p) {
+      var I = p.V / p.R, P = p.V * p.V / p.R;
+      ckt.set('lV', fu(p.V, 'V')); ckt.set('lR', fu(p.R, 'Ω')); ckt.set('lI', 'I = ' + fu(I, 'A'));
+      out({ I: fu(I, 'A'), P: fu(P, 'W') });
+      Lab.plot(cv, { x: [10, 10000], logx: true, xunit: 'Ω', xlabel: 'Modstand R (logaritmisk akse)', ylabel: 'P [W]',
+        series: [{ fn: function (r) { return p.V * p.V / r; }, color: C.green, label: 'P = V²/R' }],
+        markers: [{ x: p.R, y: P, color: C.red, label: 'dit kredsløb' }], y: [0, p.V * p.V / 10 * 1.05] });
+    });
+    Lab.check(T, [
+      { q: 'Hvor stor er strømmen I?', unit: 'mA', answer: function (p) { return p.V / p.R * 1000; } },
+      { q: 'Hvor stor er effekten P?', unit: 'W', answer: function (p) { return p.V * p.V / p.R; } }
+    ]);
+    Lab.steps(T, function (p) {
+      var I = p.V / p.R;
+      return ['Der er kun én løkke, så modstanden har hele kildens spænding: V<sub>R</sub> = ' + fu(p.V, 'V') + '.',
+        'Ohms lov: <span class="f">I = V/R = ' + fmt(p.V) + ' / ' + fmt(p.R) + '</span> = <span class="res">' + fu(I, 'A') + '</span>',
+        'Effekt: <span class="f">P = V²/R = ' + fmt(p.V) + '² / ' + fmt(p.R) + '</span> = <span class="res">' + fu(p.V * p.V / p.R, 'W') + '</span>',
+        'Kontrol: <span class="f">P = V·I = ' + fmt(p.V) + ' · ' + fmt(I, 4) + '</span> = ' + fu(p.V * I, 'W') + ' ✓'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Opgave 2: KCL-eksemplet (knudepunktsmetoden) ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Eksempel', title: 'Knudepunktsmetoden (KCL)', short: 'KCL',
+      text: 'To strømkilder og fire modstande. Find knudespændingerne v<sub>1</sub> og v<sub>2</sub> og strømmene i modstandene. Modstande i kΩ og strømme i mA, så spændinger kommer ud i V.',
+      learn: 'G-matricen ændrer sig live: diagonalen er summen af konduktanser i knuden, og uden for diagonalen står minus konduktansen mellem knuderne. KCL går altid op i begge knuder.' });
+    Lab.slider(T, { key: 'I1', label: 'I₁ (ind i knude 1)', min: 0, max: 100, step: 1, value: 50, unit: 'mA', noPrefix: true });
+    Lab.slider(T, { key: 'I2', label: 'I₂ (ud af knude 2)', min: 0, max: 50, step: 1, value: 10, unit: 'mA', noPrefix: true });
+    Lab.slider(T, { key: 'R1', label: 'R₁', min: 0.5, max: 10, step: 0.5, value: 1, unit: 'kΩ', noPrefix: true });
+    Lab.slider(T, { key: 'R2', label: 'R₂', min: 0.5, max: 10, step: 0.5, value: 2, unit: 'kΩ', noPrefix: true });
+    Lab.slider(T, { key: 'R3', label: 'R₃', min: 1, max: 20, step: 1, value: 10, unit: 'kΩ', noPrefix: true });
+    Lab.slider(T, { key: 'R4', label: 'R₄', min: 0.5, max: 10, step: 0.5, value: 2, unit: 'kΩ', noPrefix: true });
+    var ckt = Lab.circuit(T, [
+      { t: 'I', a: [50, 200], b: [50, 80], label: 'I₁', id: 'lI1', side: 'l' },
+      { t: 'w', pts: [[50, 80], [170, 80]] },
+      { t: 'R', a: [170, 80], b: [170, 200], label: 'R₁', id: 'lR1', side: 'l' },
+      { t: 'R', a: [170, 80], b: [330, 80], label: 'R₂', id: 'lR2' },
+      { t: 'w', pts: [[170, 80], [170, 30]] }, { t: 'R', a: [170, 30], b: [330, 30], label: 'R₃', id: 'lR3', side: 't' }, { t: 'w', pts: [[330, 30], [330, 80]] },
+      { t: 'R', a: [330, 80], b: [330, 200], label: 'R₄', id: 'lR4' },
+      { t: 'w', pts: [[330, 80], [450, 80]] }, { t: 'I', a: [450, 80], b: [450, 200], label: 'I₂', id: 'lI2' },
+      { t: 'w', pts: [[50, 200], [450, 200]] }, { t: 'gnd', at: [250, 200] },
+      { t: 'node', at: [170, 80] }, { t: 'node', at: [330, 80] },
+      { t: 'txt', at: [160, 72], s: 'v₁', id: 'v1', color: C.cyan, anchor: 'end' }, { t: 'txt', at: [340, 72], s: 'v₂', id: 'v2', color: C.cyan, anchor: 'start' },
+      { t: 'iarrow', at: [180, 150], dir: 'd', id: 'a1' }, { t: 'txt', at: [190, 175], s: '', id: 'i1', color: C.gold, anchor: 'start' },
+      { t: 'iarrow', at: [340, 150], dir: 'd', id: 'a4' }, { t: 'txt', at: [350, 175], s: '', id: 'i4', color: C.gold, anchor: 'start' }
+    ], '0 0 500 240', 260);
+    var out = Lab.readout(T, [{ key: 'v1', label: 'v₁', color: C.cyan }, { key: 'v2', label: 'v₂', color: C.cyan },
+      { key: 'i2', label: 'I(R₂) fra 1 til 2', color: C.gold }, { key: 'i3', label: 'I(R₃) fra 1 til 2', color: C.gold }, { key: 'kcl', label: 'KCL-kontrol knude 1', color: C.green }]);
+    var mat = Lab.el('div', 'note'); T.stage.appendChild(mat);
+    function solveP(p) {
+      var g1 = 1 / p.R1, g2 = 1 / p.R2, g3 = 1 / p.R3, g4 = 1 / p.R4;
+      var G = [[g1 + g2 + g3, -(g2 + g3)], [-(g2 + g3), g2 + g3 + g4]], b = [p.I1, -p.I2];
+      var v = Lab.solve(G, b); return { G: G, b: b, v: v };
+    }
+    T.on(function (p) {
+      var s = solveP(p), v1 = s.v[0], v2 = s.v[1];
+      var iR1 = v1 / p.R1, iR2 = (v1 - v2) / p.R2, iR3 = (v1 - v2) / p.R3, iR4 = v2 / p.R4;
+      ckt.set('lI1', 'I₁ = ' + fmt(p.I1) + ' mA'); ckt.set('lI2', 'I₂ = ' + fmt(p.I2) + ' mA');
+      ckt.set('lR1', 'R₁ = ' + fmt(p.R1) + ' kΩ'); ckt.set('lR2', 'R₂ = ' + fmt(p.R2) + ' kΩ'); ckt.set('lR3', 'R₃ = ' + fmt(p.R3) + ' kΩ'); ckt.set('lR4', 'R₄ = ' + fmt(p.R4) + ' kΩ');
+      ckt.set('v1', 'v₁ = ' + fmt(v1, 3) + ' V'); ckt.set('v2', 'v₂ = ' + fmt(v2, 3) + ' V');
+      ckt.set('i1', fmt(Math.abs(iR1), 3) + ' mA'); ckt.set('i4', fmt(Math.abs(iR4), 3) + ' mA'); ckt.dir('a1', iR1); ckt.dir('a4', iR4);
+      out({ v1: fmt(v1, 4) + ' V', v2: fmt(v2, 4) + ' V', i2: fmt(iR2, 3) + ' mA', i3: fmt(iR3, 3) + ' mA',
+        kcl: fmt(p.I1, 3) + ' = ' + fmt(iR1 + iR2 + iR3, 4) + ' mA' });
+      mat.innerHTML = '<b>Matrixform G·v = i</b> (mS, V, mA):' + Lab.matHtml(s.G, s.b, ['v₁', 'v₂']);
+    });
+    Lab.check(T, [
+      { q: 'Knudespændingen v₁', unit: 'V', answer: function (p) { return solveP(p).v[0]; } },
+      { q: 'Knudespændingen v₂', unit: 'V', answer: function (p) { return solveP(p).v[1]; } },
+      { q: 'Strømmen gennem R₂ fra knude 1 til 2', unit: 'mA', answer: function (p) { var v = solveP(p).v; return (v[0] - v[1]) / p.R2; } }
+    ]);
+    Lab.steps(T, function (p) {
+      var s = solveP(p), v1 = s.v[0], v2 = s.v[1];
+      return ['Den nederste knude er reference (0 V). To ubekendte: v₁ og v₂.',
+        'KCL i knude 1 (ind = ud): <span class="f">I₁ = v₁/R₁ + (v₁−v₂)/R₂ + (v₁−v₂)/R₃</span>',
+        'KCL i knude 2: <span class="f">(v₁−v₂)/R₂ + (v₁−v₂)/R₃ = v₂/R₄ + I₂</span>',
+        'Saml på matrixform. Diagonal: <span class="f">1/R₁+1/R₂+1/R₃ = ' + fmt(s.G[0][0], 3) + ' mS</span> og <span class="f">1/R₂+1/R₃+1/R₄ = ' + fmt(s.G[1][1], 3) + ' mS</span>. Uden for: <span class="f">−(1/R₂+1/R₃) = ' + fmt(s.G[0][1], 3) + ' mS</span>.' + Lab.matHtml(s.G, s.b, ['v₁', 'v₂']),
+        'Løs (fx i MathCad med G⁻¹·i): <span class="res">v₁ = ' + fmt(v1, 4) + ' V, v₂ = ' + fmt(v2, 4) + ' V</span>',
+        'Strømme med Ohms lov: I(R₁) = ' + fmt(v1 / p.R1, 3) + ' mA, I(R₂) = ' + fmt((v1 - v2) / p.R2, 3) + ' mA, I(R₃) = ' + fmt((v1 - v2) / p.R3, 3) + ' mA, I(R₄) = ' + fmt(v2 / p.R4, 3) + ' mA.',
+        'Kontrol i knude 1: ' + fmt(p.I1) + ' mA ind = ' + fmt(v1 / p.R1 + (v1 - v2) / p.R2 + (v1 - v2) / p.R3, 4) + ' mA ud ✓'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Opgave 3: KVL-eksemplet (maskemetoden) ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Eksempel', title: 'Maskemetoden (KVL)', short: 'KVL',
+      text: 'Tre masker med maskestrømme med uret. Find i<sub>1</sub>, i<sub>2</sub> og i<sub>3</sub>. Bemærk, at V₂ har plus nederst.',
+      learn: 'R-matricen er symmetrisk: diagonalen er summen af modstande i masken, uden for står minus den fælles modstand. Strømmen i R₄ er lig i₃, fordi R₄ kun ligger i maske 3.' });
+    Lab.slider(T, { key: 'V1', label: 'V₁', min: 0, max: 24, step: 0.5, value: 12, unit: 'V', noPrefix: true });
+    Lab.slider(T, { key: 'V2', label: 'V₂', min: 0, max: 24, step: 0.5, value: 6, unit: 'V', noPrefix: true });
+    Lab.slider(T, { key: 'R1', label: 'R₁', min: 1, max: 20, step: 1, value: 3, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'R2', label: 'R₂', min: 1, max: 20, step: 1, value: 8, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'R3', label: 'R₃', min: 1, max: 20, step: 1, value: 6, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'R4', label: 'R₄', min: 1, max: 20, step: 1, value: 4, unit: 'Ω', noPrefix: true });
+    var ckt = Lab.circuit(T, [
+      { t: 'V', a: [50, 210], b: [50, 120], label: 'V₁', id: 'lV1', side: 'l' },
+      { t: 'R', a: [50, 120], b: [230, 120], label: 'R₁', id: 'lR1' },
+      { t: 'R', a: [230, 120], b: [410, 120], label: 'R₃', id: 'lR3' },
+      { t: 'V', a: [410, 120], b: [410, 210], label: 'V₂', id: 'lV2' },
+      { t: 'R', a: [230, 120], b: [230, 210], label: 'R₂', id: 'lR2' },
+      { t: 'w', pts: [[50, 210], [410, 210]] },
+      { t: 'w', pts: [[50, 120], [50, 40]] }, { t: 'R', a: [50, 40], b: [410, 40], label: 'R₄', id: 'lR4', side: 't' }, { t: 'w', pts: [[410, 40], [410, 120]] },
+      { t: 'node', at: [230, 120] }, { t: 'node', at: [50, 120] }, { t: 'node', at: [410, 120] },
+      { t: 'txt', at: [130, 180], s: 'i₁', id: 'm1', color: C.red }, { t: 'txt', at: [340, 180], s: 'i₂', id: 'm2', color: C.red }, { t: 'txt', at: [230, 92], s: 'i₃', id: 'm3', color: C.red },
+      { t: 'txt', at: [130, 198], s: '↻', color: C.red, size: 16 }, { t: 'txt', at: [340, 198], s: '↻', color: C.red, size: 16 }, { t: 'txt', at: [292, 92], s: '↻', color: C.red, size: 16 }
+    ], '0 0 470 240', 260);
+    var out = Lab.readout(T, [{ key: 'i1', label: 'i₁', color: C.red }, { key: 'i2', label: 'i₂', color: C.red }, { key: 'i3', label: 'i₃', color: C.red }, { key: 'iR2', label: 'Strøm ned i R₂ = i₁ − i₂', color: C.gold }]);
+    var mat = Lab.el('div', 'note'); T.stage.appendChild(mat);
+    function solveP(p) {
+      var R = [[p.R1 + p.R2, -p.R2, -p.R1], [-p.R2, p.R2 + p.R3, -p.R3], [-p.R1, -p.R3, p.R1 + p.R3 + p.R4]], v = [p.V1, p.V2, 0];
+      return { R: R, v: v, i: Lab.solve(R, v) };
+    }
+    T.on(function (p) {
+      var s = solveP(p);
+      ['1', '2', '3', '4'].forEach(function (k) { ckt.set('lR' + k, 'R' + '₁₂₃₄'[k - 1] + ' = ' + fmt(p['R' + k]) + ' Ω'); });
+      ckt.set('lV1', 'V₁ = ' + fmt(p.V1) + ' V'); ckt.set('lV2', 'V₂ = ' + fmt(p.V2) + ' V');
+      ckt.set('m1', 'i₁ = ' + fmt(s.i[0], 3) + ' A'); ckt.set('m2', 'i₂ = ' + fmt(s.i[1], 3) + ' A'); ckt.set('m3', 'i₃ = ' + fmt(s.i[2], 3) + ' A');
+      out({ i1: fmt(s.i[0], 4) + ' A', i2: fmt(s.i[1], 4) + ' A', i3: fmt(s.i[2], 4) + ' A', iR2: fmt(s.i[0] - s.i[1], 3) + ' A' });
+      mat.innerHTML = '<b>Matrixform R·i = v</b> (Ω, A, V):' + Lab.matHtml(s.R, s.v, ['i₁', 'i₂', 'i₃']);
+    });
+    Lab.check(T, [
+      { q: 'Maskestrømmen i₁', unit: 'A', answer: function (p) { return solveP(p).i[0]; } },
+      { q: 'Maskestrømmen i₂', unit: 'A', answer: function (p) { return solveP(p).i[1]; } },
+      { q: 'Maskestrømmen i₃', unit: 'A', answer: function (p) { return solveP(p).i[2]; } }
+    ]);
+    Lab.steps(T, function (p) {
+      var s = solveP(p);
+      return ['Ingen strømkilder, så alle tre maskestrømme er ukendte. Gå rundt med uret; kilder er stigninger (+), modstande er fald (−).',
+        'Maske 1: <span class="f">V₁ − R₁(i₁−i₃) − R₂(i₁−i₂) = 0</span>',
+        'Maske 2: <span class="f">−R₂(i₂−i₁) − R₃(i₂−i₃) + V₂ = 0</span> (V₂ har plus nederst, så den er en stigning i strømmens retning)',
+        'Maske 3: <span class="f">−R₁(i₃−i₁) − R₄·i₃ − R₃(i₃−i₂) = 0</span>',
+        'Matrixform:' + Lab.matHtml(s.R, s.v, ['i₁', 'i₂', 'i₃']),
+        'Løsning: <span class="res">i₁ = ' + fmt(s.i[0], 4) + ' A, i₂ = ' + fmt(s.i[1], 4) + ' A, i₃ = ' + fmt(s.i[2], 4) + ' A</span>',
+        'Kontrol i maske 3: ' + fmt(-p.R1 * (s.i[2] - s.i[0]) - p.R4 * s.i[2] - p.R3 * (s.i[2] - s.i[1]), 3) + ' ≈ 0 ✓'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Opgave 4: Øvelse 4 (knudepunktsmetoden) ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse 4', title: 'Knudepunktsmetoden med to strømkilder', short: 'Øvelse 4',
+      text: 'En strømkilde I<sub>A</sub> fører strøm op i knude a; en strømkilde I<sub>B</sub> trækker strøm ned ud af knude b. Find i₁ (ned gennem R₁) og i₂ (ned gennem R₃).',
+      learn: 'når I<sub>B</sub> er større end I<sub>A</sub>, bliver begge strømme negative: de løber opad, fordi den manglende strøm må komme fra ground. Pilene vender sig, når fortegnet skifter.' });
+    Lab.slider(T, { key: 'IA', label: 'I_A (op i knude a)', min: 0, max: 5, step: 0.1, value: 1, unit: 'A', noPrefix: true });
+    Lab.slider(T, { key: 'IB', label: 'I_B (ud af knude b)', min: 0, max: 5, step: 0.1, value: 2, unit: 'A', noPrefix: true });
+    Lab.slider(T, { key: 'R1', label: 'R₁', min: 0.5, max: 10, step: 0.5, value: 3, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'R2', label: 'R₂', min: 0.5, max: 10, step: 0.5, value: 1, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'R3', label: 'R₃', min: 0.5, max: 10, step: 0.5, value: 6, unit: 'Ω', noPrefix: true });
+    var ckt = Lab.circuit(T, [
+      { t: 'I', a: [50, 200], b: [50, 70], label: 'I_A', id: 'lA', side: 'l' }, { t: 'w', pts: [[50, 70], [170, 70]] },
+      { t: 'R', a: [170, 70], b: [170, 200], label: 'R₁', id: 'lR1', side: 'l' },
+      { t: 'R', a: [170, 70], b: [330, 70], label: 'R₂', id: 'lR2', side: 't' },
+      { t: 'R', a: [330, 70], b: [330, 200], label: 'R₃', id: 'lR3' },
+      { t: 'w', pts: [[330, 70], [450, 70]] }, { t: 'I', a: [450, 70], b: [450, 200], label: 'I_B', id: 'lB' },
+      { t: 'w', pts: [[50, 200], [450, 200]] }, { t: 'gnd', at: [250, 200] }, { t: 'node', at: [170, 70] }, { t: 'node', at: [330, 70] },
+      { t: 'txt', at: [160, 58], s: 'a', id: 'va', color: C.cyan, anchor: 'end' }, { t: 'txt', at: [340, 58], s: 'b', id: 'vb', color: C.cyan, anchor: 'start' },
+      { t: 'iarrow', at: [180, 150], dir: 'd', id: 'a1' }, { t: 'txt', at: [190, 175], s: 'i₁', id: 'i1', color: C.gold, anchor: 'start' },
+      { t: 'iarrow', at: [340, 150], dir: 'd', id: 'a2' }, { t: 'txt', at: [350, 175], s: 'i₂', id: 'i2', color: C.gold, anchor: 'start' }
+    ], '0 0 500 240', 260);
+    var out = Lab.readout(T, [{ key: 'va', label: 'v_a', color: C.cyan }, { key: 'vb', label: 'v_b', color: C.cyan }, { key: 'i1', label: 'i₁ (ned i R₁)', color: C.gold }, { key: 'i2', label: 'i₂ (ned i R₃)', color: C.gold }]);
+    function solveP(p) { var g1 = 1 / p.R1, g2 = 1 / p.R2, g3 = 1 / p.R3; return Lab.solve([[g1 + g2, -g2], [-g2, g2 + g3]], [p.IA, -p.IB]); }
+    T.on(function (p) {
+      var v = solveP(p), i1 = v[0] / p.R1, i2 = v[1] / p.R3;
+      ckt.set('lA', 'I_A = ' + fmt(p.IA) + ' A'); ckt.set('lB', 'I_B = ' + fmt(p.IB) + ' A');
+      ckt.set('lR1', 'R₁ = ' + fmt(p.R1) + ' Ω'); ckt.set('lR2', 'R₂ = ' + fmt(p.R2) + ' Ω'); ckt.set('lR3', 'R₃ = ' + fmt(p.R3) + ' Ω');
+      ckt.set('va', 'a: ' + fmt(v[0], 3) + ' V'); ckt.set('vb', 'b: ' + fmt(v[1], 3) + ' V');
+      ckt.set('i1', fmt(Math.abs(i1), 3) + ' A'); ckt.set('i2', fmt(Math.abs(i2), 3) + ' A'); ckt.dir('a1', i1); ckt.dir('a2', i2);
+      out({ va: fmt(v[0], 4) + ' V', vb: fmt(v[1], 4) + ' V', i1: fmt(i1, 4) + ' A', i2: fmt(i2, 4) + ' A' });
+    });
+    Lab.check(T, [
+      { q: 'i₁ (positiv nedad gennem R₁)', unit: 'A', answer: function (p) { return solveP(p)[0] / p.R1; } },
+      { q: 'i₂ (positiv nedad gennem R₃)', unit: 'A', answer: function (p) { return solveP(p)[1] / p.R3; } }
+    ]);
+    Lab.steps(T, function (p) {
+      var v = solveP(p);
+      return ['Ground i bunden. Ubekendte: v_a og v_b.',
+        'Knude a: <span class="f">I_A = v_a/R₁ + (v_a − v_b)/R₂</span>',
+        'Knude b: <span class="f">(v_a − v_b)/R₂ = v_b/R₃ + I_B</span>',
+        'Løsning: <span class="res">v_a = ' + fmt(v[0], 4) + ' V, v_b = ' + fmt(v[1], 4) + ' V</span>',
+        'Ohms lov: <span class="res">i₁ = v_a/R₁ = ' + fmt(v[0] / p.R1, 4) + ' A, i₂ = v_b/R₃ = ' + fmt(v[1] / p.R3, 4) + ' A</span>',
+        'Kontrol: strøm til ground i₁ + i₂ = ' + fmt(v[0] / p.R1 + v[1] / p.R3, 4) + ' A = I_A − I_B = ' + fmt(p.IA - p.IB, 4) + ' A ✓'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Opgave 5: Øvelse 5 (maskemetoden) ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse 5', title: 'Maskemetoden med to batterier', short: 'Øvelse 5',
+      text: 'To batterier med plus øverst og tre modstande. Find maskestrømmene i₁ og i₂ (med uret).',
+      learn: 'batteriet til højre driver strøm mod uret i maske 2, så i₂ bliver negativ. Gør V₂ lille og se fortegnet skifte.' });
+    Lab.slider(T, { key: 'V1', label: 'V₁ (venstre)', min: 0, max: 12, step: 0.5, value: 1, unit: 'V', noPrefix: true });
+    Lab.slider(T, { key: 'V2', label: 'V₂ (højre)', min: 0, max: 12, step: 0.5, value: 2, unit: 'V', noPrefix: true });
+    Lab.slider(T, { key: 'Ra', label: 'R_a (øverst venstre)', min: 0.5, max: 10, step: 0.5, value: 1, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'Rm', label: 'R_m (midten, fælles)', min: 0.5, max: 10, step: 0.5, value: 3, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'Rc', label: 'R_c (øverst højre)', min: 0.5, max: 10, step: 0.5, value: 2, unit: 'Ω', noPrefix: true });
+    var ckt = Lab.circuit(T, [
+      { t: 'bat', a: [60, 70], b: [60, 200], label: 'V₁', id: 'lV1', side: 'l' },
+      { t: 'R', a: [60, 70], b: [240, 70], label: 'R_a', id: 'lRa', side: 't' },
+      { t: 'R', a: [240, 70], b: [420, 70], label: 'R_c', id: 'lRc', side: 't' },
+      { t: 'bat', a: [420, 70], b: [420, 200], label: 'V₂', id: 'lV2' },
+      { t: 'R', a: [240, 70], b: [240, 200], label: 'R_m', id: 'lRm' },
+      { t: 'w', pts: [[60, 200], [420, 200]] }, { t: 'node', at: [240, 70] }, { t: 'node', at: [240, 200] },
+      { t: 'txt', at: [150, 108], s: 'i₁', id: 'm1', color: C.red }, { t: 'txt', at: [340, 108], s: 'i₂', id: 'm2', color: C.red },
+      { t: 'txt', at: [150, 128], s: '↻', color: C.red, size: 16 }, { t: 'txt', at: [340, 128], s: '↻', color: C.red, size: 16 }
+    ], '0 0 480 230', 250);
+    var out = Lab.readout(T, [{ key: 'i1', label: 'i₁', color: C.red }, { key: 'i2', label: 'i₂', color: C.red }, { key: 'im', label: 'Strøm ned i R_m', color: C.gold }, { key: 'vm', label: 'Spænding over R_m', color: C.cyan }]);
+    function solveP(p) { return Lab.solve([[p.Ra + p.Rm, -p.Rm], [-p.Rm, p.Rm + p.Rc]], [p.V1, -p.V2]); }
+    T.on(function (p) {
+      var i = solveP(p);
+      ckt.set('lV1', 'V₁ = ' + fmt(p.V1) + ' V'); ckt.set('lV2', 'V₂ = ' + fmt(p.V2) + ' V');
+      ckt.set('lRa', 'R_a = ' + fmt(p.Ra) + ' Ω'); ckt.set('lRm', 'R_m = ' + fmt(p.Rm) + ' Ω'); ckt.set('lRc', 'R_c = ' + fmt(p.Rc) + ' Ω');
+      ckt.set('m1', 'i₁ = ' + fmt(i[0], 3) + ' A'); ckt.set('m2', 'i₂ = ' + fmt(i[1], 3) + ' A');
+      out({ i1: fmt(i[0], 4) + ' A', i2: fmt(i[1], 4) + ' A', im: fmt(i[0] - i[1], 4) + ' A', vm: fmt((i[0] - i[1]) * p.Rm, 4) + ' V' });
+    });
+    Lab.check(T, [
+      { q: 'Maskestrømmen i₁', unit: 'A', answer: function (p) { return solveP(p)[0]; } },
+      { q: 'Maskestrømmen i₂', unit: 'A', answer: function (p) { return solveP(p)[1]; } }
+    ]);
+    Lab.steps(T, function (p) {
+      var i = solveP(p);
+      return ['Maske 1 (med uret): V₁ er en stigning. <span class="f">V₁ − R_a·i₁ − R_m(i₁ − i₂) = 0</span>',
+        'Maske 2 (med uret): strømmen løber ned gennem V₂ fra plus til minus, et fald. <span class="f">−R_m(i₂ − i₁) − R_c·i₂ − V₂ = 0</span>',
+        'Ordnet: <span class="f">' + fmt(p.Ra + p.Rm) + '·i₁ − ' + fmt(p.Rm) + '·i₂ = ' + fmt(p.V1) + '</span> og <span class="f">−' + fmt(p.Rm) + '·i₁ + ' + fmt(p.Rm + p.Rc) + '·i₂ = ' + fmt(-p.V2) + '</span>',
+        'Løsning: <span class="res">i₁ = ' + fmt(i[0], 4) + ' A, i₂ = ' + fmt(i[1], 4) + ' A</span>',
+        'Kontrol: midterknuden ligger på R_m(i₁ − i₂) = ' + fmt((i[0] - i[1]) * p.Rm, 4) + ' V, og fra venstre V₁ − R_a·i₁ = ' + fmt(p.V1 - p.Ra * i[0], 4) + ' V ✓'];
+    });
+    T.ready();
+  })();
+})();
+</script>
+</body>
+</html>
