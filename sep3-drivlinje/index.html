@@ -1,0 +1,3262 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Snerydder 3D-model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Grundregler */
+:root { color-scheme: light; padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px); }
+body { margin: 0; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+
+/* Layout: tegningsark. 3D-modellen er selve arket; panelet ved siden af er tegningshoved,
+   lasttilfælde og stykliste. Positionsnumre i modellen svarer til styklisten. */
+:root {
+  --paper: #edf0f0;
+  --sheet: #f9fbfb;
+  --scene-a: #dfe6ea;
+  --scene-b: #f3f6f7;
+  --ink: #121a1f;
+  --ink-2: #44525b;
+  --ink-3: #6f7d86;
+  --rule: #cbd4d9;
+  --rule-2: #e0e6e9;
+  --accent: #c94f0c;
+  --accent-soft: #fbe6d8;
+  --accent-ink: #ffffff;
+  --sel: #f0bd00;
+  --sel-ink: #1a1500;
+  --focus: #0a6fc2;
+  --ok: #0b7a0b;
+  --ok-fill: #0ca30c;
+  --crit: #c22f2f;
+  --crit-fill: #d03b3b;
+  --warn-fill: #fab219;
+  --f-last: #2a78d6;
+  --f-driv: #008300;
+  --f-reak: #e87ba4;
+  --f-g: #36434b;
+  --c-plov: #2a78d6;
+  --c-rul: #eb6834;
+  --c-stig: #8a969e;
+  --edge: #10181d;
+  --edge-ghost: #5a6871;
+  --grid: #c3cdd3;
+  --grid-2: #a3b0b8;
+  --snow-edge: #8ea7b8;
+  --shadow: 0 1px 2px rgba(18, 26, 31, .08), 0 6px 18px rgba(18, 26, 31, .08);
+  --font-display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", "Helvetica Neue", sans-serif;
+  --font-body: "Barlow", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #11161a;
+    --sheet: #192025;
+    --scene-a: #2c373f;
+    --scene-b: #1b2329;
+    --ink: #eef3f5;
+    --ink-2: #b6c2c9;
+    --ink-3: #8896a0;
+    --rule: #344048;
+    --rule-2: #252e34;
+    --accent: #ff8a47;
+    --accent-soft: #3a2517;
+    --accent-ink: #1a0e05;
+    --sel: #ffd43b;
+    --sel-ink: #1a1500;
+    --focus: #6cc0ff;
+    --ok: #3ccf3c;
+    --ok-fill: #0ca30c;
+    --crit: #ff7b7b;
+    --crit-fill: #d03b3b;
+    --warn-fill: #fab219;
+    --f-last: #3987e5;
+    --f-driv: #008300;
+    --f-reak: #d55181;
+    --f-g: #c9d3d9;
+    --c-plov: #3987e5;
+    --c-rul: #d95926;
+    --c-stig: #7d8992;
+    --edge: #070b0e;
+    --edge-ghost: #8b99a3;
+    --grid: #3a464e;
+    --grid-2: #505e68;
+    --snow-edge: #9fb6c6;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 22px rgba(0, 0, 0, .35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #11161a;
+  --sheet: #192025;
+  --scene-a: #2c373f;
+  --scene-b: #1b2329;
+  --ink: #eef3f5;
+  --ink-2: #b6c2c9;
+  --ink-3: #8896a0;
+  --rule: #344048;
+  --rule-2: #252e34;
+  --accent: #ff8a47;
+  --accent-soft: #3a2517;
+  --accent-ink: #1a0e05;
+  --sel: #ffd43b;
+  --sel-ink: #1a1500;
+  --focus: #6cc0ff;
+  --ok: #3ccf3c;
+  --ok-fill: #0ca30c;
+  --crit: #ff7b7b;
+  --crit-fill: #d03b3b;
+  --warn-fill: #fab219;
+  --f-last: #3987e5;
+  --f-driv: #008300;
+  --f-reak: #d55181;
+  --f-g: #c9d3d9;
+  --c-plov: #3987e5;
+  --c-rul: #d95926;
+  --c-stig: #7d8992;
+  --edge: #070b0e;
+  --edge-ghost: #8b99a3;
+  --grid: #3a464e;
+  --grid-2: #505e68;
+  --snow-edge: #9fb6c6;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 22px rgba(0, 0, 0, .35);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.45;
+  -webkit-text-size-adjust: 100%;
+}
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+sub { font-size: .72em; line-height: 0; }
+
+/* ---------- ramme ---------- */
+.app {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 10px;
+  padding-inline: 16px;
+  padding-block: 10px 12px;
+  max-width: 1760px;
+  margin: 0 auto;
+}
+.head {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  border: 1px solid var(--rule);
+  background: var(--sheet);
+  min-width: 0;
+}
+.head > div { padding: 6px 12px 7px; border-right: 1px solid var(--rule); min-width: 0; }
+.head > div:last-child { border-right: 0; }
+.head .lbl {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.head .val { display: block; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.head .name { flex: 1 1 auto; }
+.head h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 25px;
+  line-height: 1.1;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.head .mono { font-family: var(--font-data); font-size: 13px; }
+
+.stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 420px);
+  gap: 12px;
+  min-height: 0;
+}
+.left { display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: 8px; min-height: 0; min-width: 0; }
+
+/* ---------- 3D-ark ---------- */
+.sheet3d {
+  position: relative;
+  min-height: 0;
+  border: 1px solid var(--rule);
+  background: linear-gradient(180deg, var(--scene-a) 0%, var(--scene-b) 100%);
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+#gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; outline: none; cursor: grab; }
+#gl.drag { cursor: grabbing; }
+#labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.tag {
+  position: absolute; left: 0; top: 0;
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 1px 6px 1px 5px;
+  border: 1px solid var(--rule);
+  background: var(--sheet);
+  color: var(--ink);
+  font-family: var(--font-data);
+  font-size: 11.5px;
+  line-height: 1.5;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .12);
+  will-change: transform;
+}
+.tag i { width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--f-g); }
+.tag sub { font-size: .78em; }
+.tag[data-k="last"] i { background: var(--f-last); }
+.tag[data-k="driv"] i { background: var(--f-driv); }
+.tag[data-k="reak"] i { background: var(--f-reak); }
+.tag b { font-weight: 500; color: var(--ink-2); }
+.tag.dim { border-color: var(--ink-2); padding: 0 5px; }
+.tag.dim i { display: none; }
+.tag.dim em { font-style: normal; font-family: var(--font-body); font-size: .95em; color: var(--ink-2); }
+.balloon {
+  position: absolute; left: 0; top: 0;
+  width: 24px; height: 24px; margin: -12px 0 0 -12px;
+  display: grid; place-items: center;
+  border: 1.5px solid var(--ink);
+  border-radius: 50%;
+  background: var(--sheet);
+  color: var(--ink);
+  font-family: var(--font-data);
+  font-size: 11.5px; font-weight: 500;
+  padding: 0;
+  pointer-events: auto;
+  will-change: transform;
+}
+.balloon::before { content: ""; position: absolute; inset: -9px; }
+.balloon[aria-pressed="true"] { background: var(--sel); border-color: var(--ink); color: var(--sel-ink); }
+.balloon.h { font-size: 10px; }
+
+.hud { position: absolute; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; pointer-events: none; }
+.hud > * { pointer-events: auto; }
+.hud-tl { left: 10px; top: 10px; right: 10px; }
+.hud-bl { left: 10px; bottom: 10px; right: 10px; justify-content: space-between; align-items: flex-end; }
+.seg {
+  display: inline-flex;
+  border: 1px solid var(--rule);
+  background: var(--sheet);
+  box-shadow: var(--shadow);
+}
+.seg button {
+  border: 0; background: transparent;
+  padding: 6px 12px;
+  font-family: var(--font-display);
+  font-size: 17px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--ink-2);
+  border-right: 1px solid var(--rule);
+  min-height: 36px;
+}
+.seg button:last-child { border-right: 0; }
+.seg button[aria-pressed="true"], .seg button[aria-selected="true"] { background: var(--ink); color: var(--sheet); }
+.iconbtn {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid var(--rule); background: var(--sheet); box-shadow: var(--shadow);
+  min-height: 36px; padding: 6px 11px;
+  font-family: var(--font-display); font-size: 16px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2);
+}
+.iconbtn svg { width: 16px; height: 16px; flex: none; }
+.legend {
+  display: flex; flex-wrap: wrap; gap: 2px 12px;
+  padding: 5px 9px;
+  border: 1px solid var(--rule); background: var(--sheet);
+  font-size: 12.5px; color: var(--ink-2);
+  max-width: 100%;
+}
+.legend span { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.legend i { width: 14px; height: 4px; border-radius: 2px; background: var(--f-g); }
+.legend .l i { background: var(--f-last); }
+.legend .d i { background: var(--f-driv); }
+.legend .r i { background: var(--f-reak); }
+.legend .short { display: none; }
+.selchip { display: none; }
+.hint { font-size: 12.5px; color: var(--ink-3); padding: 2px 0; text-shadow: 0 0 6px var(--scene-b); }
+.tip {
+  position: absolute; left: 0; top: 0; z-index: 4;
+  padding: 3px 8px; background: var(--ink); color: var(--sheet);
+  font-size: 12.5px; white-space: nowrap; pointer-events: none;
+}
+.fail {
+  position: absolute; inset: 0; display: grid; place-items: center; padding: 64px 24px; text-align: center; color: var(--ink-2); pointer-events: none;
+}
+
+/* ---------- betjening under arket ---------- */
+.ctrl {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 8px 18px;
+  padding: 9px 12px 10px;
+  border: 1px solid var(--rule);
+  background: var(--sheet);
+  min-width: 0;
+}
+.slider { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; min-width: 0; }
+.slider label, .chips .cap, .lc .cap {
+  font-family: var(--font-display); font-size: 15px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); white-space: nowrap;
+}
+.slider output { font-family: var(--font-data); font-size: 12.5px; min-width: 9.5ch; text-align: right; color: var(--ink); white-space: nowrap; }
+input[type="range"] { width: 100%; min-width: 0; accent-color: var(--accent); height: 24px; margin: 0; }
+.chips { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px 6px; align-items: center; }
+.chips .sp { flex: 1 1 12px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  border: 1px solid var(--rule); background: transparent;
+  padding: 5px 11px 5px 9px; min-height: 32px;
+  font-size: 14px; font-weight: 500; color: var(--ink-2);
+}
+.chip::before { content: ""; width: 10px; height: 10px; border: 1.5px solid var(--ink-3); background: transparent; flex: none; }
+.chip[aria-pressed="true"] { color: var(--ink); border-color: var(--ink-2); }
+.chip[aria-pressed="true"]::before { background: var(--accent); border-color: var(--accent); }
+.lc { display: inline-flex; align-items: center; gap: 8px; }
+.lc .seg { box-shadow: none; }
+.lc .seg button { font-size: 16px; padding: 4px 11px; min-height: 32px; }
+
+/* ---------- panel ---------- */
+.panel {
+  display: grid; grid-template-rows: auto minmax(0, 1fr);
+  border: 1px solid var(--rule); background: var(--sheet);
+  min-height: 0; min-width: 0;
+}
+.tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-bottom: 1px solid var(--rule); }
+.tabs button {
+  border: 0; border-right: 1px solid var(--rule); background: transparent;
+  padding: 9px 6px 8px;
+  font-family: var(--font-display); font-size: 17px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-3);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  box-shadow: inset 0 -3px 0 transparent;
+}
+.tabs button:last-child { border-right: 0; }
+.tabs button[aria-selected="true"] { color: var(--ink); box-shadow: inset 0 -3px 0 var(--accent); }
+.pane { overflow: auto; padding: 14px 16px 22px; min-height: 0; overscroll-behavior: contain; }
+.pane > * + *, .stack > * + * { margin-top: 16px; }
+
+h2 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 29px; line-height: 1.08; letter-spacing: .01em; text-wrap: balance; }
+h3 {
+  margin: 0; padding-bottom: 4px; border-bottom: 1px solid var(--rule);
+  font-family: var(--font-display); font-weight: 600; font-size: 16px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2);
+}
+p { margin: 0; max-width: 62ch; }
+.lead { color: var(--ink-2); }
+.small { font-size: 13.5px; color: var(--ink-2); }
+.sec > * + * { margin-top: 8px; }
+
+.pos { display: flex; align-items: center; gap: 10px; }
+.pos .no {
+  flex: none; min-width: 34px; height: 34px; padding: 0 6px; display: grid; place-items: center;
+  border: 1.5px solid var(--ink); border-radius: 17px; font-family: var(--font-data); font-size: 14px; font-weight: 500;
+}
+.kind { display: flex; flex-wrap: wrap; gap: 4px 6px; }
+.kind span { border: 1px solid var(--rule); padding: 0 7px; font-size: 12.5px; color: var(--ink-2); white-space: nowrap; }
+.kind span.egen { border-color: var(--accent); color: var(--accent); }
+
+.kv { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0; }
+.kv > div { display: contents; }
+.kv dt, .kv dd { margin: 0; padding: 4px 0; border-bottom: 1px solid var(--rule-2); }
+.kv dt { color: var(--ink-2); padding-right: 12px; }
+.kv dd { font-family: var(--font-data); font-size: 13.5px; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.kv .sub dt { padding-left: 12px; font-size: 13.5px; }
+ul.calc { margin: 0; padding: 0; list-style: none; }
+ul.calc li { padding: 4px 0 4px 16px; position: relative; border-bottom: 1px solid var(--rule-2); max-width: 62ch; }
+ul.calc li::before { content: ""; position: absolute; left: 2px; top: .78em; width: 6px; height: 1.5px; background: var(--ink-3); }
+ul.calc code, .f { font-family: var(--font-data); font-size: 13px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--ink); background: transparent; padding: 6px 12px; min-height: 34px;
+  font-family: var(--font-display); font-weight: 600; font-size: 16px; letter-spacing: .07em; text-transform: uppercase;
+}
+.btn:hover { background: var(--ink); color: var(--sheet); }
+.btnrow { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn[aria-pressed="true"] { background: var(--ink); color: var(--sheet); }
+ol.path { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 0; align-items: center; }
+ol.path li { display: inline-flex; align-items: center; }
+ol.path li + li::before { content: "→"; color: var(--ink-3); padding: 0 6px; }
+ol.path button { border: 1px solid var(--rule); background: transparent; padding: 3px 8px; font-size: 14px; min-height: 30px; }
+ol.path button:hover { border-color: var(--ink); }
+.note { border: 1px solid var(--rule); padding: 8px 10px; font-size: 13.5px; color: var(--ink-2); }
+.note b { color: var(--ink); font-weight: 600; }
+
+/* skydere i lasttilfælde */
+.inputs { display: grid; gap: 6px; }
+.inputs .slider { grid-template-columns: 9.2em minmax(0, 1fr) 10.5ch; }
+.inputs .slider label { font-family: var(--font-body); font-size: 14px; font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--ink); }
+.inputs .slider small { display: block; font-size: 12px; color: var(--ink-3); font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* trækkraft-diagram */
+.viz { display: grid; gap: 8px; }
+.verdict { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.verdict .ic { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-size: 12px; line-height: 1; flex: none; background: var(--ok-fill); }
+.verdict.bad .ic { background: var(--crit-fill); }
+.verdict.mid .ic { background: var(--warn-fill); color: #1b1300; }
+.bar { position: relative; padding: 20px 0 20px; }
+.track { position: relative; height: 18px; background: var(--rule-2); display: flex; gap: 2px; }
+.track .s { height: 100%; min-width: 0; border: 0; padding: 0; }
+.track .s:last-of-type { border-radius: 0 4px 4px 0; }
+.track .s.plov { background: var(--c-plov); }
+.track .s.rul { background: var(--c-rul); }
+.track .s.stig { background: var(--c-stig); }
+.track .s:hover, .track .s:focus-visible { filter: brightness(1.15); }
+.mark { position: absolute; top: 0; bottom: 0; width: 0; border-left: 1.5px solid var(--ink); }
+.mark span { position: absolute; left: 4px; font-size: 12px; white-space: nowrap; color: var(--ink-2); line-height: 1.2; }
+.mark.m4 span { top: 2px; }
+.mark.m2 span { bottom: 2px; }
+.mark.flip span { left: auto; right: 5px; }
+.axis { display: flex; justify-content: space-between; font-family: var(--font-data); font-size: 11.5px; color: var(--ink-3); border-top: 1px solid var(--rule); padding-top: 3px; }
+.bartip { position: absolute; z-index: 3; padding: 3px 8px; background: var(--ink); color: var(--sheet); font-size: 12.5px; white-space: nowrap; pointer-events: none; transform: translate(-50%, -130%); }
+.bartip b { font-family: var(--font-data); font-weight: 500; }
+.keyed dt { display: flex; align-items: center; gap: 8px; }
+.keyed dt i { width: 12px; height: 12px; flex: none; background: var(--c-stig); }
+.keyed .plov i { background: var(--c-plov); }
+.keyed .rul i { background: var(--c-rul); }
+.keyed .lim i { width: 0; height: 12px; border-left: 1.5px solid var(--ink); margin: 0 5px 0 6px; background: none; }
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { padding: 5px 6px; border-bottom: 1px solid var(--rule-2); text-align: left; vertical-align: top; }
+th { font-family: var(--font-display); font-weight: 600; font-size: 14px; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-3); border-bottom-color: var(--rule); white-space: nowrap; }
+td.n, th.n { text-align: right; font-family: var(--font-data); font-size: 13px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+th.n { font-family: var(--font-display); font-size: 14px; }
+.tw { overflow-x: auto; }
+tr.row { cursor: pointer; }
+tr.row:hover td { background: var(--rule-2); }
+tr.row.is-sel td { background: var(--accent-soft); }
+td.c-no { width: 1%; }
+td .no {
+  display: inline-grid; place-items: center; min-width: 24px; height: 24px; padding: 0 4px; border: 1.5px solid var(--ink); border-radius: 12px;
+  font-family: var(--font-data); font-size: 11.5px; font-weight: 500;
+}
+tr.grp td { padding-top: 14px; font-family: var(--font-display); font-weight: 600; font-size: 15px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); border-bottom-color: var(--rule); }
+td .t2 { display: block; font-size: 12.5px; color: var(--ink-3); }
+tr.row button { all: unset; cursor: pointer; display: block; width: 100%; }
+tr.row button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+details > summary { cursor: pointer; font-family: var(--font-display); font-weight: 600; font-size: 16px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); padding: 4px 0; }
+details[open] > summary { margin-bottom: 6px; }
+
+/* ---------- smal skærm ---------- */
+@media (max-width: 960px) {
+  html, body { height: auto; }
+  .app { height: auto; display: block; padding-block: 8px 20px; }
+  .app > * + * { margin-top: 8px; }
+  .stage { display: block; }
+  .stage > * + * { margin-top: 8px; }
+  .left { display: block; }
+  .left > * + * { margin-top: 8px; }
+  .sheet3d { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 6; height: 50vh; height: 50svh; min-height: 300px; box-shadow: 0 6px 14px -8px rgba(0, 0, 0, .35); }
+  .ctrl { grid-template-columns: minmax(0, 1fr); }
+  .panel { display: block; scroll-margin-top: calc(50vh + 8px); scroll-margin-top: calc(50svh + 8px); }
+  .hud-bl { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .selchip:not([hidden]) {
+    display: inline-flex; align-items: center; gap: 8px; max-width: 100%;
+    border: 1.5px solid var(--ink); background: var(--sel); color: var(--sel-ink);
+    padding: 3px 10px 3px 4px; min-height: 34px; font-weight: 600; font-size: 14.5px; box-shadow: var(--shadow);
+  }
+  .selchip .no { display: inline-grid; place-items: center; min-width: 24px; height: 24px; padding: 0 4px; border: 1.5px solid var(--sel-ink); border-radius: 12px; font-family: var(--font-data); font-size: 11.5px; font-weight: 500; }
+  .selchip .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pane { overflow: visible; }
+  .head .opt { display: none; }
+  .head h1 { font-size: 21px; white-space: normal; text-wrap: balance; }
+  .seg button { padding: 6px 11px; font-size: 16px; }
+  .hint { display: none; }
+  .legend { font-size: 11.5px; padding: 3px 7px; gap: 0 9px; }
+  .legend .long { display: none; }
+  .legend .short { display: inline; }
+  .iconbtn span { display: none; }
+  .iconbtn { padding: 6px 8px; }
+  .hud-tl { justify-content: space-between; }
+  .tag { font-size: 10.5px; padding: 0 5px 0 4px; gap: 4px; }
+  .tag i { width: 7px; height: 7px; }
+  .balloon { width: 22px; height: 22px; margin: -11px 0 0 -11px; font-size: 10.5px; }
+  .balloon.h { font-size: 9px; }
+  .tabs button { font-size: 16px; letter-spacing: .06em; }
+}
+@media (max-width: 420px) {
+  .inputs .slider { grid-template-columns: 7.6em minmax(0, 1fr) 9.5ch; }
+  .slider { gap: 8px; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="head" aria-label="Tegningshoved">
+    <div class="name"><span class="lbl">Benævnelse</span><h1>Snerydder · drivlinje og plov</h1></div>
+    <div class="opt"><span class="lbl">Koncept</span><span class="val">4WD, én motor pr. side</span></div>
+    <div class="opt"><span class="lbl">Udveksling</span><span class="val mono">5 × 4 × 2 = 40</span></div>
+    <div class="opt"><span class="lbl">Plov</span><span class="val mono">1,40 m · ±40°</span></div>
+    <div><span class="lbl">Projekt</span><span class="val">SEP3</span></div>
+  </header>
+
+  <main class="stage">
+    <div class="left">
+      <section class="sheet3d" id="sheet" aria-label="3D-model af snerydderen">
+        <canvas id="gl" tabindex="0" aria-label="3D-model. Træk for at dreje, rul eller knib for at zoome, tryk på en del for at vælge den."></canvas>
+        <div id="labels"></div>
+        <div class="hud hud-tl">
+          <div class="seg" role="group" aria-label="Visning">
+            <button type="button" id="sc-maskine" data-scene="maskine" aria-pressed="true">Maskine</button>
+            <button type="button" id="sc-drivlinje" data-scene="drivlinje" aria-pressed="false">Drivlinje</button>
+            <button type="button" id="sc-plov" data-scene="plov" aria-pressed="false">Plov</button>
+          </div>
+          <button type="button" class="iconbtn" id="btn-home" title="Tilbage til udgangsvisningen" aria-label="Nulstil visningen"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8a5.5 5.5 0 1 0 1.7-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M2 2.2v3.4h3.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Nulstil</span></button>
+        </div>
+        <div class="hud hud-bl">
+          <button type="button" class="selchip" id="selchip" hidden></button>
+          <div class="legend" id="legend" aria-label="Farver på kraftpile">
+            <span class="l"><i></i>Last</span>
+            <span class="d"><i></i>Drivkraft</span>
+            <span class="r"><i></i>Reaktion</span>
+            <span><i></i><span class="long">Tyngde og normalkraft</span><span class="short">Tyngde</span></span>
+          </div>
+          <div class="hint">Træk for at dreje · rul eller knib for at zoome · højreklik eller to fingre flytter · tryk på en del</div>
+        </div>
+        <div class="tip" id="tip" hidden></div>
+      </section>
+
+      <section class="ctrl" aria-label="Betjening">
+        <div class="slider">
+          <label for="in-ang">Plovvinkel</label>
+          <input type="range" id="in-ang" min="-40" max="40" step="1" value="30">
+          <output id="out-ang" for="in-ang">30° højre</output>
+        </div>
+        <div class="slider">
+          <label for="in-ex">Sprængskitse</label>
+          <input type="range" id="in-ex" min="0" max="100" step="1" value="0">
+          <output id="out-ex" for="in-ex">samlet</output>
+        </div>
+        <div class="chips">
+          <button type="button" class="chip" id="tg-forces" aria-pressed="true">Kræfter</button>
+          <button type="button" class="chip" id="tg-nums" aria-pressed="true">Numre</button>
+          <button type="button" class="chip" id="tg-dims" aria-pressed="false">Mål</button>
+          <button type="button" class="chip" id="tg-xray" aria-pressed="false">Røntgen</button>
+          <button type="button" class="chip" id="tg-cut" aria-pressed="false">Snit</button>
+          <button type="button" class="chip" id="tg-snow" aria-pressed="true">Sne</button>
+          <button type="button" class="chip" id="tg-run" aria-pressed="false">Kør</button>
+          <button type="button" class="chip" id="tg-lift" aria-pressed="false">Løft plov</button>
+          <span class="sp"></span>
+          <span class="lc"><span class="cap">Last</span>
+            <span class="seg" role="group" aria-label="Lasttilfælde">
+              <button type="button" id="lc-ryd" data-lc="ryd" aria-pressed="true">Rydning</button>
+              <button type="button" id="lc-kant" data-lc="kant" aria-pressed="false">Kantsten</button>
+            </span>
+          </span>
+        </div>
+      </section>
+    </div>
+
+    <aside class="panel" id="panel" aria-label="Oplysninger">
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" id="tab-del" aria-controls="pane-del" aria-selected="true">Valgt del</button>
+        <button type="button" role="tab" id="tab-last" aria-controls="pane-last" aria-selected="false">Laster</button>
+        <button type="button" role="tab" id="tab-liste" aria-controls="pane-liste" aria-selected="false">Stykliste</button>
+      </div>
+      <div class="pane" role="tabpanel" id="pane-del" aria-labelledby="tab-del"></div>
+      <div class="pane" role="tabpanel" id="pane-last" aria-labelledby="tab-last" hidden>
+        <div class="sec">
+          <h3>Forudsætninger</h3>
+          <div class="inputs">
+            <div class="slider"><label for="in-h">Snedybde<small>foran ploven</small></label><input type="range" id="in-h" min="0" max="15" step="0.5" value="5"><output id="out-h" for="in-h"></output></div>
+            <div class="slider"><label for="in-rho">Snetype<small id="sm-rho">sat sne</small></label><input type="range" id="in-rho" min="80" max="500" step="10" value="250"><output id="out-rho" for="in-rho"></output></div>
+            <div class="slider"><label for="in-mu">Underlag<small id="sm-mu">pakket sne</small></label><input type="range" id="in-mu" min="0.01" max="0.8" step="0.01" value="0.25"><output id="out-mu" for="in-mu"></output></div>
+            <div class="slider"><label for="in-slope">Stigning<small id="sm-slope">plant</small></label><input type="range" id="in-slope" min="0" max="15" step="0.5" value="0"><output id="out-slope" for="in-slope"></output></div>
+            <div class="slider"><label for="in-v">Hastighed<small id="sm-v">2,2 km/t</small></label><input type="range" id="in-v" min="0.3" max="2" step="0.05" value="0.6"><output id="out-v" for="in-v"></output></div>
+            <div class="slider"><label for="in-m">Maskinmasse<small>uden plov</small></label><input type="range" id="in-m" min="200" max="500" step="10" value="300"><output id="out-m" for="in-m"></output></div>
+          </div>
+        </div>
+        <div id="last-out" class="stack"></div>
+      </div>
+      <div class="pane" role="tabpanel" id="pane-liste" aria-labelledby="tab-liste" hidden></div>
+    </aside>
+  </main>
+</div>
+
+<!-- three.js r128 (MIT). Ligger lokalt, saa siden virker uden internet; hentes ellers fra cdnjs. -->
+<script src="three.min.js"></script>
+<script>
+/* <fysik> lastmodellen: konstanter og beregninger. regnetjek.js laeser denne blok. */
+/* ============================================================
+   Konstanter og beregningsmotor.
+   Koordinater: x frem, y op, z mod højre. Nulpunkt på jorden midt mellem akslerne.
+   Alle mål i meter, kg, N, Nm, Pa.
+   ============================================================ */
+(function (root) {
+  'use strict';
+  var PI = Math.PI;
+  function rad(d) { return d * PI / 180; }
+
+  function chainLen(a, R1, R2) {
+    var b = Math.asin((R2 - R1) / a);
+    return 2 * a * Math.cos(b) + R1 * (PI - 2 * b) + R2 * (PI + 2 * b);
+  }
+  function solveCenter(R1, R2, len) {
+    var lo = 0.15, hi = 0.8;
+    for (var i = 0; i < 60; i++) {
+      var mid = (lo + hi) / 2;
+      if (chainLen(mid, R1, R2) < len) lo = mid; else hi = mid;
+    }
+    return (lo + hi) / 2;
+  }
+
+  var C = {};
+  C.g = 9.81;
+
+  /* Hjul */
+  C.rw = 0.20; C.wheelW = 0.16; C.track = 0.90; C.axY = 0.20;
+
+  /* Kædetræk 08B-1 */
+  C.pitch = 0.0127; C.rollerD = 0.00851; C.zk1 = 15; C.zk2 = 30; C.links = 80; C.chainBreak = 17800;
+  C.Rk1 = C.pitch / (2 * Math.sin(PI / C.zk1));
+  C.Rk2 = C.pitch / (2 * Math.sin(PI / C.zk2));
+  C.a = solveCenter(C.Rk1, C.Rk2, C.links * C.pitch);
+  C.L = 2 * C.a;
+  C.gamma = Math.asin((C.Rk2 - C.Rk1) / C.a);
+
+  /* Tandhjulstrin */
+  C.mod = 0.002; C.z1 = 18; C.z2 = 72; C.alpha = rad(20); C.bGear = 0.022;
+  C.aGear = C.mod * (C.z1 + C.z2) / 2;
+  C.iP = 5; C.iG = C.z2 / C.z1; C.iK = C.zk2 / C.zk1;
+  C.iTot = C.iP * C.iG * C.iK;
+  C.eta = { p: 0.94, g: 0.97, k: 0.96, el: 0.85 };
+
+  /* Stationer langs z i højre drivmodul */
+  C.zs = {
+    wallIn: 0.320, wallOut: 0.326,
+    motor0: -0.104, motor1: -0.004,
+    gh0: -0.004, gh1: 0.052,
+    brk0: 0.052, brk1: 0.058,
+    cpB0: 0.060, cpB1: 0.082,
+    sp0: 0.082, sp1: 0.096,
+    cpA0: 0.096, cpA1: 0.120,
+    plateB: 0.130, gear: 0.170, plateA: 0.218,
+    chainR: 0.243, chainF: 0.263,
+    axInner: 0.290, axOuter: 0.385,
+    tube0: 0.276, tube1: 0.397,
+    hub: 0.410, wheel: 0.450
+  };
+
+  /* Plov og hydraulik */
+  C.plow = {
+    B: 1.40, H: 0.46, pf: 0.12, mass: 48,
+    hinge: { x: 0.575, y: 0.17, z: 0.21 },
+    pivot: { x: 1.05, y: 0.17 },
+    cg: { x: 1.04, y: 0.22 },
+    contactX: 1.16,
+    cylA: { x: -0.45, y: 0.215, z: 0.18 },
+    cylB: { x: 0.02, y: 0.215, z: 0.16 },
+    bore: 0.032, rod: 0.018,
+    liftT: { x: 0.615, y: 0.53 },
+    liftL: { x: 0.86, y: 0.215 },
+    liftBore: 0.025, liftRod: 0.014,
+    liftMax: rad(12), angMax: 40,
+    pShock: 150e5, pRelief: 120e5, swingTime: 4, hoseId: 0.0063, etaPump: 0.8
+  };
+  C.snow = { muG: 0.5, muB: 0.15, muE: 0.4, repose: rad(40), compact: 1.5, rhoMin: 300, rhoMax: 550 };
+  C.veh = {
+    cgX: -0.10, cgY: 0.31, crr: 0.035, muDry: 0.8,
+    /* overrun: ekstra strækning til vendinger og overlap; snowRate: 15 cm på 6 timer */
+    Jm: 5e-4, Jw: 0.12, overrun: 1.24, snowRate: 0.025, aux: 60, area: 2000, L10h: 5000
+  };
+
+  /* ---------- geometri for vinkelcylindre (vandret plan, relativt til drejetap) ---------- */
+  function cylGeom(psi, side) {
+    var P = C.plow, c = Math.cos(psi), s = Math.sin(psi);
+    var ax = P.cylA.x, az = side * P.cylA.z;
+    var bx0 = P.cylB.x, bz0 = side * P.cylB.z;
+    var bx = bx0 * c + bz0 * s, bz = -bx0 * s + bz0 * c;
+    var dx = bx - ax, dz = bz - az, len = Math.sqrt(dx * dx + dz * dz);
+    var ux = dx / len, uz = dz / len;
+    /* moment om y pr. enhed trykkraft i cylinderen (kraft på plov i B langs +u) */
+    var arm = bz * ux - bx * uz;
+    return { ax: ax, az: az, bx: bx, bz: bz, len: len, ux: ux, uz: uz, arm: arm };
+  }
+  C.cylGeom = cylGeom;
+  (function () {
+    var m = rad(C.plow.angMax);
+    var a = cylGeom(m, 1).len, b = cylGeom(-m, 1).len;
+    C.plow.cylMin = Math.min(a, b); C.plow.cylMax = Math.max(a, b);
+    C.plow.stroke = C.plow.cylMax - C.plow.cylMin;
+    C.plow.cylMid = cylGeom(0, 1).len;
+  })();
+
+  /* ---------- løftecylinder (lodret plan) ---------- */
+  function liftGeom(phi) {
+    var P = C.plow, c = Math.cos(phi), s = Math.sin(phi);
+    var lx = P.liftL.x - P.hinge.x, ly = P.liftL.y - P.hinge.y;
+    var x = P.hinge.x + lx * c - ly * s, y = P.hinge.y + lx * s + ly * c;
+    var dx = x - P.liftT.x, dy = y - P.liftT.y, len = Math.sqrt(dx * dx + dy * dy);
+    var ux = dx / len, uy = dy / len;
+    var rx = x - P.hinge.x, ry = y - P.hinge.y;
+    var arm = Math.abs(rx * uy - ry * ux);
+    return { x: x, y: y, len: len, ux: ux, uy: uy, arm: arm };
+  }
+  C.liftGeom = liftGeom;
+  C.plow.liftLen0 = liftGeom(0).len;
+  C.plow.liftLen1 = liftGeom(C.plow.liftMax).len;
+
+  /* ============================================================
+     compute(inp)
+     inp: ang [grader, + = kaster til højre], lift [bool], h [m], rho [kg/m3],
+          mu [-], slope [-], v [m/s], m [kg], lc ['ryd' | 'kant']
+     ============================================================ */
+  function compute(inp) {
+    var g = C.g, P = C.plow, S = C.snow, V = C.veh, Z = C.zs;
+    var th = rad(Math.abs(inp.ang)), sg = inp.ang >= 0 ? 1 : -1;
+    var psi = -sg * th;
+    var cp = Math.cos(psi), sp = Math.sin(psi);
+    var al = Math.atan(inp.slope), sa = Math.sin(al), ca = Math.cos(al);
+    var lifted = !!inp.lift;
+    var mp = P.mass, Wp = mp * g, W = inp.m * g;
+    function toVeh(xl, y, zl) { return { x: P.pivot.x + xl * cp + zl * sp, y: y, z: -xl * sp + zl * cp }; }
+
+    var o = { inp: inp, C: C, psi: psi, sg: sg };
+
+    /* ---------- sne foran skæret ---------- */
+    var db = Math.atan(S.muB);
+    var slide = Math.sin(th) - S.muB * Math.cos(th);
+    var rhoC = Math.max(inp.rho, Math.min(Math.max(inp.rho * S.compact, S.rhoMin), S.rhoMax));
+    var Amax = P.H * P.H / (2 * Math.tan(S.repose));
+    var lamMax = rhoC * Amax;
+    var inflow = inp.rho * inp.h * Math.cos(th);
+    var B = P.B, mPrism = 0, sc = B / 2, sStar = 0, k = Infinity, full = false;
+    if (inp.h <= 0 || lifted) {
+      mPrism = 0; sStar = B; k = 0;
+    } else if (slide <= 1e-3) {
+      mPrism = lamMax * B; sc = B / 2; sStar = 0; full = true;
+    } else {
+      k = inflow / slide;
+      sStar = lamMax / k;
+      if (sStar >= B) { mPrism = k * B * B / 2; sc = 2 * B / 3; sStar = B; }
+      else {
+        mPrism = k * sStar * sStar / 2 + lamMax * (B - sStar);
+        sc = (k * sStar * sStar * sStar / 3 + lamMax * (B * B - sStar * sStar) / 2) / mPrism;
+        full = true;
+      }
+    }
+    /* skærets kapacitet: største snedybde, kilen kan flytte til siden uden at løbe over */
+    var hMax = slide > 1e-3 ? lamMax * slide / (inp.rho * B * Math.cos(th)) : 0;
+    var util = (inp.h > 0 && !lifted) ? (hMax > 0 ? inp.h / hMax : Infinity) : 0;
+    var beta = Math.max(0, th - db);
+    var Rfric = S.muG * mPrism * g;
+    var Rin = (inp.h > 0 && !lifted)
+      ? (slide > 1e-3 ? inp.rho * inp.h * B * inp.v * inp.v * Math.pow(Math.cos(th), 2) / Math.cos(db)
+        : inp.rho * inp.h * B * inp.v * inp.v * Math.cos(th))
+      : 0;
+    var R = Rfric + Rin;
+    var Fsx = -R * Math.cos(beta), Fsz = -sg * R * Math.sin(beta);
+    /* snekilens højde ved tyngdepunktet -> angrebshøjde */
+    var lamC = Math.min(isFinite(k) ? k * sc : lamMax, lamMax);
+    var hPrismC = Math.sqrt(2 * (lamC / rhoC) * Math.tan(S.repose));
+    var ys = Math.max(inp.h / 2, hPrismC / 3);
+    var zlC = sg * (sc - B / 2);
+    var Pc = toVeh(P.pf, ys, zlC);
+    o.snow = {
+      slide: slide, rhoC: rhoC, Amax: Amax, lamMax: lamMax, k: k, sStar: sStar, full: full,
+      mPrism: mPrism, sc: sc, zlC: zlC, R: R, Rfric: Rfric, Rin: Rin, beta: beta,
+      Fx: Fsx, Fz: Fsz, p: Pc, ys: ys, uRel: Math.max(0, slide), hMax: hMax, util: util
+    };
+
+    /* ---------- plovens egen ligevægt om hængslet (flydestilling) ---------- */
+    var xh = P.hinge.x, yh = P.hinge.y, xc = P.cg.x, yc = P.cg.y, xs = P.contactX;
+    var Ns = 0, Fe = 0;
+    if (!lifted) {
+      Ns = ((xc - xh) * Wp * ca - (yc - yh) * Wp * sa + (yh - ys) * (-Fsx)) / ((xs - xh) - S.muE * yh);
+      if (Ns < 0) Ns = 0;
+      Fe = S.muE * Ns;
+    }
+    var bladeC = toVeh(P.pf, 0, 0);
+    var contact = { x: bladeC.x, y: 0, z: bladeC.z };
+    o.plow = { Ns: Ns, Fe: Fe, Wp: Wp, contact: contact, Fx: -Fsx + Fe, Fz: Fsz };
+
+    /* ---------- hele køretøjet ---------- */
+    var ext = [];
+    ext.push({ p: { x: V.cgX, y: V.cgY, z: 0 }, f: { x: -W * sa, y: -W * ca, z: 0 } });
+    ext.push({ p: { x: xc, y: yc, z: 0 }, f: { x: -Wp * sa, y: -Wp * ca, z: 0 } });
+    if (!lifted) {
+      ext.push({ p: Pc, f: { x: Fsx, y: 0, z: Fsz } });
+      ext.push({ p: contact, f: { x: -Fe, y: Ns, z: 0 } });
+    }
+    var L = C.L, xr = -L / 2, T = C.track;
+    var sFx = 0, sFy = 0, sFz = 0, Mpitch = 0, Myaw = 0, Mroll = 0;
+    ext.forEach(function (e) {
+      sFx += e.f.x; sFy += e.f.y; sFz += e.f.z;
+      Mpitch += (e.p.x - xr) * e.f.y - e.p.y * e.f.x;
+      Myaw += e.p.z * e.f.x - e.p.x * e.f.z;
+      Mroll += e.p.y * e.f.z - e.p.z * e.f.y;
+    });
+    var Ntot = -sFy;
+    var Nf = -Mpitch / L, Nr = Ntot - Nf;
+    var Stot = -sFz;
+    var Sf = (Stot + 2 * Myaw / L) / 2, Sr = (Stot - 2 * Myaw / L) / 2;
+    var dN = Mroll / T;
+    var Frr = V.crr * Ntot;
+    var Fgrade = (inp.m + mp) * g * sa;
+    var Fplow = -Fsx + Fe;
+    var Fdrv = Fplow + Frr + Fgrade;
+    var Fmax4 = inp.mu * Ntot, Fmax2 = inp.mu * Math.max(0, Nr);
+    var shF = Nf / Ntot, shR = Nr / Ntot;
+    var utilF = Math.sqrt(Math.pow(Fdrv * shF, 2) + Sf * Sf) / (inp.mu * Math.max(1, Nf));
+    var utilR = Math.sqrt(Math.pow(Fdrv * shR, 2) + Sr * Sr) / (inp.mu * Math.max(1, Nr));
+    o.veh = {
+      W: W, Ntot: Ntot, Nf: Nf, Nr: Nr, Sf: Sf, Sr: Sr, dN: dN,
+      NfR: Nf / 2 + dN * shF, NfL: Nf / 2 - dN * shF, NrR: Nr / 2 + dN * shR, NrL: Nr / 2 - dN * shR,
+      Frr: Frr, Fgrade: Fgrade, Fplow: Fplow, Fdrv: Fdrv, Fmax4: Fmax4, Fmax2: Fmax2,
+      shF: shF, shR: shR, utilF: utilF, utilR: utilR, util: Fdrv / Fmax4, util2: Fdrv / Math.max(1, Fmax2),
+      Myaw: Myaw, alpha: al, L: L, T: T
+    };
+
+    /* ---------- drivlinje (pr. side) ---------- */
+    var Fside = Fdrv / 2;
+    var Twf = Fside * shF * C.rw, Twr = Fside * shR * C.rw;
+    var Fkf = Twf / C.Rk2, Fkr = Twr / C.Rk2;
+    var T2 = (Twf + Twr) / (C.iK * C.eta.k);
+    var r2 = C.mod * C.z2 / 2;
+    var Ft = T2 / r2, Frad = Ft * Math.tan(C.alpha);
+    var T1 = T2 / (C.iG * C.eta.g), Tm = T1 / (C.iP * C.eta.p);
+    var nw = inp.v / (2 * PI * C.rw) * 60, n2 = nw * C.iK, n1 = n2 * C.iG, nm = n1 * C.iP;
+    var Pw = Fside * inp.v, Pm = Tm * nm * 2 * PI / 60, Pel = Pm / C.eta.el;
+    /* største moment drivlinjen kan se statisk: hjulspin på tør asfalt */
+    var TsideMax = V.muDry * (Ntot / 2) * C.rw;
+    var T2max = TsideMax / (C.iK * C.eta.k), T1max = T2max / (C.iG * C.eta.g), TmMax = T1max / (C.iP * C.eta.p);
+    var FkMax = V.muDry * (Math.max(Nf, Nr) / 2) * C.rw / C.Rk2;
+    o.drv = {
+      Fside: Fside, Twf: Twf, Twr: Twr, Tw: Twf + Twr, Fkf: Fkf, Fkr: Fkr, T2: T2, Ft: Ft, Frad: Frad,
+      Fn: Ft / Math.cos(C.alpha), T1: T1, Tm: Tm, nw: nw, n2: n2, n1: n1, nm: nm, Pw: Pw, Pm: Pm, Pel: Pel,
+      TsideMax: TsideMax, T2max: T2max, T1max: T1max, TmMax: TmMax, FkMax: FkMax,
+      FtMax: T2max / r2, vChain: 2 * PI * C.Rk1 * n2 / 60, chainS: C.chainBreak / Math.max(1, FkMax)
+    };
+
+    /* mellemaksel: kræfter i x,y ved stationer langs z (højre modul, fremad) */
+    var cg_ = Math.cos(C.gamma), sgm = Math.sin(C.gamma);
+    var loads = [
+      { z: Z.gear, x: Frad, y: Ft },
+      { z: Z.chainF, x: Fkf * cg_, y: -Fkf * sgm },
+      { z: Z.chainR, x: -Fkr * cg_, y: Fkr * sgm }
+    ];
+    var zA = Z.plateA, zB = Z.plateB, RBx = 0, RBy = 0, sx = 0, sy = 0;
+    loads.forEach(function (l) { RBx -= l.x * (l.z - zA) / (zB - zA); RBy -= l.y * (l.z - zA) / (zB - zA); sx += l.x; sy += l.y; });
+    var RAx = -sx - RBx, RAy = -sy - RBy;
+    /* bøjningsmoment ved tandhjul (fra B) og ved leje A (fra udhænget) */
+    var MgX = RBx * (Z.gear - zB), MgY = RBy * (Z.gear - zB);
+    var MaX = loads[1].x * (Z.chainF - zA) + loads[2].x * (Z.chainR - zA);
+    var MaY = loads[1].y * (Z.chainF - zA) + loads[2].y * (Z.chainR - zA);
+    var Mg = Math.sqrt(MgX * MgX + MgY * MgY), Ma = Math.sqrt(MaX * MaX + MaY * MaY);
+    var RA = Math.sqrt(RAx * RAx + RAy * RAy), RB = Math.sqrt(RBx * RBx + RBy * RBy);
+    var Pbear = Math.max(RA, RB);
+    o.mid = {
+      loads: loads, RAx: RAx, RAy: RAy, RBx: RBx, RBy: RBy, RA: RA, RB: RB, Mg: Mg, Ma: Ma, Mb: Math.max(Mg, Ma),
+      Cmin: Pbear * Math.pow(V.L10h * 60 * Math.max(n2, 1) / 1e6, 1 / 3),
+      keyF: 2 * T2 / 0.028, houseM: T1 + T2, brkM: T1 - Tm
+    };
+
+    /* hjulaksel (for, højre) */
+    var Nw = o.veh.NfR, Fxw = Fside * shF, Sw = Nf > 1 ? Sf * (o.veh.NfR / Nf) : 0;
+    var zo = Z.axOuter, zi = Z.axInner, zw = Z.wheel, zk = Z.chainF;
+    var ky = Fkf * sgm, kx = -Fkf * cg_;
+    var Mcouple = -C.rw * Sw;
+    var Riy = -(Nw * (zw - zo) + ky * (zk - zo) - Mcouple) / (zi - zo);
+    var Roy = -(Nw + ky) - Riy;
+    var Rix = -(Fxw * (zw - zo) + kx * (zk - zo)) / (zi - zo);
+    var Rox = -(Fxw + kx) - Rix;
+    var MbAx = Math.sqrt(Math.pow(Nw * (zw - zo) + C.rw * Math.abs(Sw), 2) + Math.pow(Fxw * (zw - zo), 2));
+    o.axle = {
+      N: Nw, Fx: Fxw, S: Sw, T: Twf, Fk: Fkf, Rix: Rix, Riy: Riy, Rox: Rox, Roy: Roy,
+      Ri: Math.sqrt(Rix * Rix + Riy * Riy), Ro: Math.sqrt(Rox * Rox + Roy * Roy), Mb: MbAx,
+      TMax: V.muDry * (Math.max(Nf, Nr) / 2) * C.rw
+    };
+
+    /* ---------- vinkelcylindre og drejetap ---------- */
+    var Ap = PI / 4 * P.bore * P.bore, Ar = Ap - PI / 4 * P.rod * P.rod;
+    var gR = cylGeom(psi, 1), gL = cylGeom(psi, -1);
+    function relPivot(p) { return { x: p.x - P.pivot.x, z: p.z }; }
+    var hz = { ryd: null, kant: null };
+    /* rydning */
+    (function () {
+      var My = 0, fx = 0, fz = 0;
+      if (!lifted) {
+        var r1 = relPivot(Pc); My += r1.z * Fsx - r1.x * Fsz; fx += Fsx; fz += Fsz;
+        var r2_ = relPivot(contact); My += r2_.z * (-Fe); fx += -Fe;
+      }
+      var need = -My;
+      var use = (need * gR.arm > 0) ? gR : gL, side = (use === gR) ? 1 : -1;
+      var F = Math.abs(use.arm) > 1e-6 ? need / use.arm : 0;
+      if (Math.abs(need) < 1e-9) F = 0;
+      hz.ryd = {
+        M: Math.abs(My), Msign: My, side: side, F: F, arm: Math.abs(use.arm), p: F / Ap,
+        cyl: use, Rx: -(fx + F * use.ux), Rz: -(fz + F * use.uz)
+      };
+      hz.ryd.R = Math.sqrt(hz.ryd.Rx * hz.ryd.Rx + hz.ryd.Rz * hz.ryd.Rz);
+    })();
+    /* hjørne mod kantsten: chokventilen sætter grænsen */
+    (function () {
+      var tipL = -sg * B / 2;
+      var tip = toVeh(P.pf, 0, tipL);
+      var rt = relPivot(tip);
+      var mTip = -rt.z; /* moment om y pr. N i retning -x */
+      var use = (mTip * gR.arm < 0) ? gR : gL, side = (use === gR) ? 1 : -1;
+      var Fc = P.pShock * Ap;
+      var Mmax = Fc * Math.abs(use.arm);
+      var Fcorner = Mmax / Math.max(0.05, Math.abs(rt.z));
+      var Ek = 0.5 * (inp.m + mp) * inp.v * inp.v;
+      hz.kant = {
+        tip: tip, side: side, cyl: use, F: Fc, M: Mmax, Fcorner: Fcorner, arm: Math.abs(use.arm), lever: Math.abs(rt.z),
+        Ek: Ek, ds: Ek / Fc, Rx: -(-Fcorner + Fc * use.ux), Rz: -(Fc * use.uz), p: P.pShock
+      };
+      hz.kant.R = Math.sqrt(hz.kant.Rx * hz.kant.Rx + hz.kant.Rz * hz.kant.Rz);
+    })();
+    var Q = (Ap + Ar) * P.stroke / P.swingTime;
+    var lg = liftGeom(lifted ? P.liftMax : 0);
+    var cgRx = (xc - xh) * Math.cos(lifted ? P.liftMax : 0) - (yc - yh) * Math.sin(lifted ? P.liftMax : 0);
+    var Flift = Wp * cgRx / lg.arm;
+    var ArL = PI / 4 * (P.liftBore * P.liftBore - P.liftRod * P.liftRod);
+    var pneuA = Math.abs(hz.ryd.F) / 6e5;
+    o.hyd = {
+      Ap: Ap, Ar: Ar, gR: gR, gL: gL, ryd: hz.ryd, kant: hz.kant, Q: Q,
+      Ppump: P.pRelief * Q / P.etaPump, Pdrift: Math.max(hz.ryd.p, 5e5) * Q / P.etaPump,
+      vHose: Q / (PI / 4 * P.hoseId * P.hoseId),
+      Flift: Flift, pLift: Flift / ArL, liftArm: lg.arm, lg: lg,
+      pneuD: Math.sqrt(4 * pneuA / PI), pneuDshock: Math.sqrt(4 * (hz.kant.F / 6e5) / PI)
+    };
+
+    /* ---------- dynamik, kapacitet, energi ---------- */
+    var mRed = inp.m + mp + 4 * V.Jw / (C.rw * C.rw) + 2 * V.Jm * C.iTot * C.iTot / (C.rw * C.rw);
+    var aMax = Math.max(0, Fmax4 - Fdrv) / mRed;
+    var wClear = B * Math.cos(th);
+    var cap = wClear * inp.v / V.overrun;
+    var tPass = V.area / cap;
+    var dPass = V.snowRate * tPass / 3600;
+    var PelTot = 2 * Pel + V.aux;
+    o.dyn = { mRed: mRed, mRot: mRed - inp.m - mp, aMax: aMax, tAcc: aMax > 1e-6 ? inp.v / aMax : Infinity };
+    o.cap = {
+      wClear: wClear, wMachine: C.track + C.wheelW, cap: cap * 3600, tPass: tPass,
+      dPass: dPass, dUtil: hMax > 0 ? dPass / hMax : Infinity, PelTot: PelTot, E4: PelTot * 4 / 1000
+    };
+    return o;
+  }
+
+  var api = { C: C, compute: compute, rad: rad, chainLen: chainLen };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  root.SR = api;
+})(typeof window !== 'undefined' ? window : globalThis);
+/* </fysik> */
+
+/* Resten kraever three.js og startes foerst, naar biblioteket er hentet. */
+function startModel() {
+/* ============================================================
+   Fælles hjælpefunktioner: materialer, geometri, dele
+   ============================================================ */
+var T = window.THREE, C = SR.C;
+var PI = Math.PI, HALF = PI / 2, TAU = PI * 2;
+function v3(x, y, z) { return new T.Vector3(x, y, z); }
+function srgb(hex) { return new T.Color(hex).convertSRGBToLinear(); }
+function deg(d) { return d * PI / 180; }
+
+/* ---------- materialer ---------- */
+var MAT = {};
+function defMat(name, hex, o) {
+  o = o || {};
+  var m = new T.MeshStandardMaterial({
+    color: srgb(hex),
+    metalness: o.metal === undefined ? 0 : o.metal,
+    roughness: o.rough === undefined ? 0.7 : o.rough,
+    side: o.double ? T.DoubleSide : T.FrontSide
+  });
+  m.envMapIntensity = 0.5 + 0.5 * m.metalness;
+  if (o.emissive) { m.emissive = srgb(o.emissive); m.emissiveIntensity = o.ei || 1; }
+  if (o.opacity !== undefined) { m.transparent = true; m.opacity = o.opacity; m.depthWrite = o.opacity > 0.6; }
+  m.name = name;
+  MAT[name] = m;
+  return m;
+}
+defMat('body', '#bcc4c9', { rough: 0.5 });
+defMat('bodyTrim', '#2c3339', { rough: 0.6 });
+defMat('frame', '#4b555f', { rough: 0.55, metal: 0.25 });
+defMat('frameLt', '#73818d', { rough: 0.5, metal: 0.3 });
+defMat('plow', '#ef7b1f', { rough: 0.45 });
+defMat('plowFrame', '#30373d', { rough: 0.55, metal: 0.3 });
+defMat('steel', '#cfd5da', { metal: 0.55, rough: 0.33 });
+defMat('steelDk', '#7c8790', { metal: 0.5, rough: 0.4 });
+defMat('black', '#2d3338', { metal: 0.3, rough: 0.5 });
+defMat('gear', '#4f86c6', { metal: 0.45, rough: 0.38 });
+defMat('pinion', '#86b6e6', { metal: 0.45, rough: 0.35 });
+defMat('sprocket', '#56616b', { metal: 0.5, rough: 0.4 });
+defMat('chainPlate', '#2f353a', { metal: 0.5, rough: 0.45 });
+defMat('chainRoll', '#b5bdc4', { metal: 0.6, rough: 0.3 });
+defMat('bronze', '#c2924a', { metal: 0.5, rough: 0.42 });
+defMat('key', '#e8b622', { metal: 0.4, rough: 0.4 });
+defMat('cast', '#95a2a9', { metal: 0.3, rough: 0.6 });
+defMat('castDk', '#78858d', { metal: 0.3, rough: 0.6 });
+defMat('spider', '#d23c31', { rough: 0.6 });
+defMat('motor', '#2c3a47', { metal: 0.3, rough: 0.5 });
+defMat('alu', '#bdc4ca', { metal: 0.5, rough: 0.4 });
+defMat('rubber', '#22262a', { rough: 0.95 });
+defMat('rim', '#cfd5d9', { metal: 0.3, rough: 0.45 });
+defMat('zinc', '#b3bcc3', { metal: 0.55, rough: 0.4 });
+defMat('weld', '#d6a85e', { metal: 0.45, rough: 0.5 });
+defMat('battery', '#2d5fa3', { rough: 0.55 });
+defMat('batteryTop', '#1c2733', { rough: 0.6 });
+defMat('ctrl', '#59636c', { metal: 0.6, rough: 0.45 });
+defMat('green', '#2c9c5e', { rough: 0.6 });
+defMat('red', '#c62e2e', { rough: 0.5 });
+defMat('yellow', '#f0c020', { rough: 0.55 });
+defMat('cable', '#1d2023', { rough: 0.85 });
+defMat('cableRed', '#b83227', { rough: 0.8 });
+defMat('hose', '#191b1d', { rough: 0.9 });
+defMat('chrome', '#eef1f3', { metal: 1, rough: 0.12 });
+defMat('cylBody', '#2b3137', { metal: 0.5, rough: 0.45 });
+defMat('tank', '#ece7d6', { rough: 0.4, opacity: 0.82 });
+defMat('oil', '#c98a1b', { rough: 0.3 });
+defMat('valve', '#2f5d8c', { metal: 0.4, rough: 0.5 });
+defMat('plastic', '#eef0ea', { rough: 0.6 });
+defMat('hopper', '#9da7ae', { metal: 0.6, rough: 0.45, double: true });
+defMat('amber', '#ffb020', { rough: 0.3, emissive: '#ff9a00', ei: 0.55 });
+defMat('lamp', '#ffffff', { rough: 0.3, emissive: '#ffffff', ei: 0.7 });
+defMat('glass', '#11161a', { metal: 0.9, rough: 0.12 });
+defMat('snow', '#e9f1f6', { rough: 1, opacity: 0.5, double: true });
+defMat('snowPile', '#f7fafc', { rough: 1, opacity: 0.66, double: true });
+
+/* ---------- geometri ---------- */
+var _m4 = new T.Matrix4(), _eu = new T.Euler();
+function tr(g, x, y, z, rx, ry, rz) {
+  if (rx || ry || rz) g.applyMatrix4(_m4.makeRotationFromEuler(_eu.set(rx || 0, ry || 0, rz || 0)));
+  if (x || y || z) g.translate(x || 0, y || 0, z || 0);
+  return g;
+}
+function gBox(w, h, d) { return new T.BoxGeometry(w, h, d); }
+/* cylinder langs akse; r = radius i den negative ende, r2 i den positive */
+function gCyl(r, len, axis, seg, r2) {
+  var g = new T.CylinderGeometry(r2 === undefined ? r : r2, r, len, seg || 28, 1, false);
+  if (axis === 'z') g.rotateX(HALF); else if (axis === 'x') g.rotateZ(-HALF);
+  return g;
+}
+/* trinaksel: [[z0, z1, r, r1?], ...] */
+function gSteps(secs, axis, seg) {
+  return merge(secs.map(function (s) {
+    var g = gCyl(s[2], s[1] - s[0], axis, seg || 28, s[3]);
+    var c = (s[0] + s[1]) / 2;
+    if (axis === 'z') g.translate(0, 0, c); else if (axis === 'x') g.translate(c, 0, 0); else g.translate(0, c, 0);
+    return g;
+  }));
+}
+/* drejelegeme; pts = [[r, aksial], ...] mod uret set i (r, aksial)-planet */
+function gLathe(pts, axis, seg, sharp) {
+  var p = [], i;
+  if (sharp) { for (i = 0; i < pts.length - 1; i++) { p.push(new T.Vector2(pts[i][0], pts[i][1])); p.push(new T.Vector2(pts[i + 1][0], pts[i + 1][1])); } }
+  else { for (i = 0; i < pts.length; i++) p.push(new T.Vector2(pts[i][0], pts[i][1])); }
+  var g = new T.LatheGeometry(p, seg || 32);
+  if (axis === 'z') g.rotateX(HALF); else if (axis === 'x') g.rotateZ(-HALF);
+  return g;
+}
+function gRing(ro, ri, len, axis, seg, c) {
+  var h = len / 2;
+  var g = gLathe([[ri, -h], [ro, -h], [ro, h], [ri, h], [ri, -h]], axis, seg, true);
+  if (c) { if (axis === 'z') g.translate(0, 0, c); else if (axis === 'x') g.translate(c, 0, 0); else g.translate(0, c, 0); }
+  return g;
+}
+function gExt(shape, depth, cs) {
+  return new T.ExtrudeGeometry(shape, { depth: depth, bevelEnabled: false, curveSegments: cs || 14 });
+}
+function shapeOf(pts) {
+  var s = new T.Shape();
+  s.moveTo(pts[0][0], pts[0][1]);
+  for (var i = 1; i < pts.length; i++) s.lineTo(pts[i][0], pts[i][1]);
+  s.closePath();
+  return s;
+}
+function hole(shape, x, y, r) { var h = new T.Path(); h.absarc(x, y, r, 0, TAU, true); shape.holes.push(h); return shape; }
+function roundRect(x0, y0, x1, y1, r) {
+  var s = new T.Shape();
+  s.moveTo(x0 + r, y0); s.lineTo(x1 - r, y0); s.absarc(x1 - r, y0 + r, r, -HALF, 0, false);
+  s.lineTo(x1, y1 - r); s.absarc(x1 - r, y1 - r, r, 0, HALF, false);
+  s.lineTo(x0 + r, y1); s.absarc(x0 + r, y1 - r, r, HALF, PI, false);
+  s.lineTo(x0, y0 + r); s.absarc(x0 + r, y0 + r, r, PI, PI * 1.5, false);
+  return s;
+}
+function roundRectPath(x0, y0, x1, y1, r) {
+  var s = new T.Path();
+  s.moveTo(x0 + r, y0); s.lineTo(x1 - r, y0); s.absarc(x1 - r, y0 + r, r, -HALF, 0, false);
+  s.lineTo(x1, y1 - r); s.absarc(x1 - r, y1 - r, r, 0, HALF, false);
+  s.lineTo(x0 + r, y1); s.absarc(x0 + r, y1 - r, r, HALF, PI, false);
+  s.lineTo(x0, y0 + r); s.absarc(x0 + r, y0 + r, r, PI, PI * 1.5, false);
+  return s;
+}
+/* bjælke mellem to punkter (tværsnit w × h, h lodret) */
+function gBeam(p1, p2, w, h) {
+  var d = v3(p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]);
+  var len = d.length();
+  var g = new T.BoxGeometry(len, h, w);
+  var q = new T.Quaternion().setFromUnitVectors(v3(1, 0, 0), d.clone().normalize());
+  g.applyMatrix4(_m4.makeRotationFromQuaternion(q));
+  g.translate((p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2, (p1[2] + p2[2]) / 2);
+  return g;
+}
+function gRod(p1, p2, r, seg) {
+  var d = v3(p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]);
+  var len = d.length();
+  var g = new T.CylinderGeometry(r, r, len, seg || 12);
+  var q = new T.Quaternion().setFromUnitVectors(v3(0, 1, 0), d.clone().normalize());
+  g.applyMatrix4(_m4.makeRotationFromQuaternion(q));
+  g.translate((p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2, (p1[2] + p2[2]) / 2);
+  return g;
+}
+function gTubePath(pts, r, seg, rad) {
+  var curve = new T.CatmullRomCurve3(pts.map(function (p) { return p.isVector3 ? p : v3(p[0], p[1], p[2]); }), false, 'catmullrom', 0.5);
+  return new T.TubeGeometry(curve, seg || 28, r, rad || 8, false);
+}
+/* sekskantet boltehoved/møtrik langs akse */
+function gHex(r, len, axis) { return gCyl(r, len, axis, 6); }
+/* pasfeder med runde ender, længde langs z, højde langs y */
+function gKey(b, h, l) {
+  return merge([
+    gBox(b, h, l - b),
+    tr(gCyl(b / 2, h, 'y', 12), 0, 0, (l - b) / 2),
+    tr(gCyl(b / 2, h, 'y', 12), 0, 0, -(l - b) / 2)
+  ]);
+}
+/* flet geometrier (kun position + normal) */
+function merge(geos) {
+  var parts = [], total = 0;
+  geos.forEach(function (g) {
+    if (!g) return;
+    var ng = g.index ? g.toNonIndexed() : g;
+    if (!ng.attributes.normal) ng.computeVertexNormals();
+    parts.push(ng);
+    total += ng.attributes.position.count;
+  });
+  var pos = new Float32Array(total * 3), nor = new Float32Array(total * 3), o = 0;
+  parts.forEach(function (ng) {
+    var n = ng.attributes.position.count * 3;
+    pos.set(ng.attributes.position.array.subarray(0, n), o);
+    nor.set(ng.attributes.normal.array.subarray(0, n), o);
+    o += n;
+  });
+  var out = new T.BufferGeometry();
+  out.setAttribute('position', new T.BufferAttribute(pos, 3));
+  out.setAttribute('normal', new T.BufferAttribute(nor, 3));
+  return out;
+}
+function flat(g) { var n = g.index ? g.toNonIndexed() : g; n.computeVertexNormals(); return n; }
+/* loft: sektioner = [[v3, v3, ...], ...] med samme antal punkter; lukket tværsnit */
+function gLoft(secs, capA, capB) {
+  var pos = [], n = secs[0].length, i, j;
+  function tri(a, b, c) { pos.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z); }
+  for (i = 0; i < secs.length - 1; i++) {
+    for (j = 0; j < n; j++) {
+      var a = secs[i][j], b = secs[i][(j + 1) % n], c = secs[i + 1][(j + 1) % n], d = secs[i + 1][j];
+      tri(a, b, c); tri(a, c, d);
+    }
+  }
+  if (capA !== false) for (j = 1; j < n - 1; j++) tri(secs[0][0], secs[0][j + 1], secs[0][j]);
+  var L = secs.length - 1;
+  if (capB !== false) for (j = 1; j < n - 1; j++) tri(secs[L][0], secs[L][j], secs[L][j + 1]);
+  var g = new T.BufferGeometry();
+  g.setAttribute('position', new T.BufferAttribute(new Float32Array(pos), 3));
+  g.computeVertexNormals();
+  return g;
+}
+
+/* åben flade mellem sektioner (bånd) med trekantede endeflader mod et fælles fodpunkt */
+function gRibbon(secs, feet) {
+  var pos = [], n = secs[0].length, i, j;
+  function tri(a, b, c) { pos.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z); }
+  for (i = 0; i < secs.length - 1; i++) for (j = 0; j < n - 1; j++) { tri(secs[i][j], secs[i][j + 1], secs[i + 1][j + 1]); tri(secs[i][j], secs[i + 1][j + 1], secs[i + 1][j]); }
+  if (feet) {
+    var L = secs.length - 1;
+    for (j = 0; j < n - 1; j++) { tri(feet[0], secs[0][j], secs[0][j + 1]); tri(feet[1], secs[L][j + 1], secs[L][j]); }
+  }
+  var g = new T.BufferGeometry();
+  g.setAttribute('position', new T.BufferAttribute(new Float32Array(pos), 3));
+  g.computeVertexNormals();
+  return g;
+}
+
+/* ---------- tandhjul og kædehjul ---------- */
+function gearOutline(z, m) {
+  var al = C.alpha, r = m * z / 2, rb = r * Math.cos(al), ra = r + m, rf = r - 1.25 * m;
+  function inv(a) { return Math.tan(a) - a; }
+  var half = PI / (2 * z), r0 = Math.max(rb, rf), fl = [], i, n = 5;
+  for (i = 0; i <= n; i++) {
+    var R = r0 + (ra - r0) * i / n;
+    var aR = Math.acos(Math.min(1, rb / R));
+    fl.push([R, half + inv(al) - inv(aR)]);
+  }
+  var pts = [], pr = fl[0][1], gap = PI / z - pr, fil = gap * 0.3;
+  for (var k = 0; k < z; k++) {
+    var c = TAU * k / z;
+    pts.push([rf * Math.cos(c - pr - fil), rf * Math.sin(c - pr - fil)]);
+    for (i = 0; i <= n; i++) pts.push([fl[i][0] * Math.cos(c - fl[i][1]), fl[i][0] * Math.sin(c - fl[i][1])]);
+    for (i = n; i >= 0; i--) pts.push([fl[i][0] * Math.cos(c + fl[i][1]), fl[i][0] * Math.sin(c + fl[i][1])]);
+    pts.push([rf * Math.cos(c + pr + fil), rf * Math.sin(c + pr + fil)]);
+  }
+  return pts;
+}
+function sprocketOutline(z, p, dr) {
+  var R = p / (2 * Math.sin(PI / z)), rs = dr / 2 * 1.03, Ra = R + 0.29 * p, pts = [], w = 0.085 * TAU / z;
+  for (var k = 0; k < z; k++) {
+    var c = TAU * k / z, cx = R * Math.cos(c), cy = R * Math.sin(c);
+    for (var t = 78; t >= -78; t -= 26) {
+      var a = c + PI + deg(t);
+      pts.push([cx + rs * Math.cos(a), cy + rs * Math.sin(a)]);
+    }
+    var tc = c + PI / z;
+    pts.push([Ra * Math.cos(tc - w), Ra * Math.sin(tc - w)]);
+    pts.push([Ra * Math.cos(tc + w), Ra * Math.sin(tc + w)]);
+  }
+  return pts;
+}
+
+/* ---------- dele ---------- */
+var REG = { groups: [], byId: {}, movers: [] };
+var EDGE = {
+  solid: new T.LineBasicMaterial({ color: 0x10181d, transparent: true, opacity: 0.62 }),
+  ghost: new T.LineBasicMaterial({ color: 0x5a6871, transparent: true, opacity: 0.22, depthWrite: false }),
+  snow: new T.LineBasicMaterial({ color: 0x8fa6b5, transparent: true, opacity: 0.8, depthWrite: false })
+};
+EDGE.solidCut = EDGE.solid.clone(); EDGE.ghostCut = EDGE.ghost.clone();
+function noRay() {}
+
+/* Part: samler geometri pr. materiale og bygger én gruppe */
+function Part(id, opt) { this.id = id; this.items = []; this.opt = opt || {}; }
+Part.prototype.add = function (geo, mat) { this.items.push([geo, typeof mat === 'string' ? MAT[mat] : mat]); return this; };
+Part.prototype.build = function () {
+  var g = new T.Group(), o = this.opt, self = this;
+  g.userData.part = this.id;
+  g.userData.shell = !!o.shell;
+  g.userData.ex = o.ex ? v3(o.ex[0], o.ex[1], o.ex[2]) : null;
+  g.userData.base = v3(0, 0, 0);
+  g.userData.side = o.side || 0;
+  var byMat = new Map();
+  this.items.forEach(function (it) { if (!byMat.has(it[1])) byMat.set(it[1], []); byMat.get(it[1]).push(it[0]); });
+  byMat.forEach(function (geos, m) {
+    var geo = merge(geos);
+    var mesh = new T.Mesh(geo, m);
+    mesh.userData.base = m;
+    mesh.castShadow = o.shadow !== false;
+    mesh.receiveShadow = true;
+    g.add(mesh);
+    if (o.edges !== false) {
+      var ln = new T.LineSegments(new T.EdgesGeometry(geo, o.edgeAngle || 32), EDGE.solid);
+      ln.raycast = noRay; ln.userData.edge = true;
+      mesh.add(ln);
+    }
+  });
+  register(g);
+  return g;
+};
+function register(g) {
+  REG.groups.push(g);
+  var id = g.userData.part;
+  (REG.byId[id] = REG.byId[id] || []).push(g);
+  if (g.userData.ex) REG.movers.push(g);
+  return g;
+}
+/* gruppe uden egen geometri, men med sprængforskydning */
+function mover(g, ex) { g.userData.ex = v3(ex[0], ex[1], ex[2]); g.userData.base = g.position.clone(); REG.movers.push(g); return g; }
+function place(g, x, y, z) { g.position.set(x, y, z); g.userData.base = g.position.clone(); return g; }
+
+/* ============================================================
+   3D-modellen
+   ============================================================ */
+var BALLOONS = [];
+function balloon(no, id, host, p, ref) { BALLOONS.push({ no: no, id: id, host: host, p: p, ref: ref || null }); }
+
+function bearingItems(d, D, B, x, y, zc) {
+  var ri = d / 2, ro = D / 2, t = (ro - ri) * 0.27, rp = (ri + ro) / 2, rb = (ro - ri) * 0.29;
+  var n = Math.max(7, Math.round(TAU * rp / (rb * 2.7))), items = [], balls = [];
+  items.push([tr(gRing(ro, ro - t, B, 'z', 32), x, y, zc), MAT.steel]);
+  items.push([tr(gRing(ri + t, ri, B, 'z', 32), x, y, zc), MAT.steel]);
+  for (var i = 0; i < n; i++) { var a = TAU * i / n; balls.push(tr(new T.SphereGeometry(rb, 10, 7), x + rp * Math.cos(a), y + rp * Math.sin(a), zc)); }
+  items.push([merge(balls), MAT.chrome]);
+  items.push([tr(gRing(rp + rb * 0.42, rp - rb * 0.42, B * 0.45, 'z', 32), x, y, zc), MAT.bronze]);
+  return items;
+}
+function addAll(part, items) { items.forEach(function (it) { part.add(it[0], it[1]); }); return part; }
+function sectorShape(r0, r1, a0, a1) {
+  var s = new T.Shape();
+  s.absarc(0, 0, r1, a0, a1, false);
+  s.absarc(0, 0, r0, a1, a0, true);
+  s.closePath();
+  return s;
+}
+
+/* ---------- rullekæde som instanser ---------- */
+function Chain(c1, c2, R1, R2, zPlane) {
+  var dx = c2[0] - c1[0], dy = c2[1] - c1[1], a = Math.sqrt(dx * dx + dy * dy);
+  var ex = dx / a, ey = dy / a, nx = -ey, ny = ex;
+  var b = Math.asin((R2 - R1) / a), cb = Math.cos(b), sb = Math.sin(b);
+  var pP = [-sb * ex + cb * nx, -sb * ey + cb * ny], pM = [-sb * ex - cb * nx, -sb * ey - cb * ny];
+  this.c1 = c1; this.c2 = c2; this.R1 = R1; this.R2 = R2; this.z = zPlane;
+  this.sA = a * cb; this.sB = R1 * (PI - 2 * b); this.sD = R2 * (PI + 2 * b);
+  this.len = 2 * this.sA + this.sB + this.sD;
+  this.N = Math.round(this.len / C.pitch); if (this.N % 2) this.N += 1;
+  this.p = this.len / this.N;
+  this.angP = Math.atan2(pP[1], pP[0]); this.angM = Math.atan2(pM[1], pM[0]);
+  this.nP = pP; this.nM = pM;
+  this.t2t = [c2[0] + R2 * pP[0], c2[1] + R2 * pP[1]]; this.t1t = [c1[0] + R1 * pP[0], c1[1] + R1 * pP[1]];
+  this.t1b = [c1[0] + R1 * pM[0], c1[1] + R1 * pM[1]]; this.t2b = [c2[0] + R2 * pM[0], c2[1] + R2 * pM[1]];
+}
+Chain.prototype.at = function (u, out) {
+  var L = this.len, t, ang;
+  u = ((u % L) + L) % L;
+  if (u < this.sA) {
+    t = u / this.sA; out[0] = this.t2t[0] + (this.t1t[0] - this.t2t[0]) * t; out[1] = this.t2t[1] + (this.t1t[1] - this.t2t[1]) * t;
+  } else if (u < this.sA + this.sB) {
+    ang = this.angP + (u - this.sA) / this.R1; out[0] = this.c1[0] + this.R1 * Math.cos(ang); out[1] = this.c1[1] + this.R1 * Math.sin(ang);
+  } else if (u < 2 * this.sA + this.sB) {
+    t = (u - this.sA - this.sB) / this.sA; out[0] = this.t1b[0] + (this.t2b[0] - this.t1b[0]) * t; out[1] = this.t1b[1] + (this.t2b[1] - this.t1b[1]) * t;
+  } else {
+    ang = this.angM + (u - 2 * this.sA - this.sB) / this.R2; out[0] = this.c2[0] + this.R2 * Math.cos(ang); out[1] = this.c2[1] + this.R2 * Math.sin(ang);
+  }
+};
+Chain.prototype.phase1 = function () { var i = Math.ceil(this.sA / this.p + 3); return this.angP + (i * this.p - this.sA) / this.R1; };
+Chain.prototype.phase2 = function () { var u0 = 2 * this.sA + this.sB, i = Math.ceil(u0 / this.p + 7); return this.angM + (i * this.p - u0) / this.R2; };
+Chain.prototype.build = function () {
+  var N = this.N, g = new T.Group(), hp = C.pitch / 2, hr = 0.0057, self = this;
+  g.userData.part = 'kaede'; g.userData.base = v3(0, 0, 0);
+  var s = new T.Shape();
+  s.absarc(hp, 0, hr, -HALF, HALF, false); s.absarc(-hp, 0, hr, HALF, PI * 1.5, false); s.closePath();
+  var plate = gExt(s, 0.0015, 5);
+  var inner = merge([tr(plate.clone(), 0, 0, 0.0039), tr(plate.clone(), 0, 0, -0.0054)]);
+  var outer = merge([tr(plate.clone(), 0, 0, 0.0055), tr(plate.clone(), 0, 0, -0.0070)]);
+  this.mRoll = new T.InstancedMesh(gCyl(C.rollerD / 2, 0.0077, 'z', 10), MAT.chainRoll, N);
+  this.mPin = new T.InstancedMesh(gCyl(0.0022, 0.0166, 'z', 6), MAT.steelDk, N);
+  this.mIn = new T.InstancedMesh(inner, MAT.chainPlate, N / 2);
+  this.mOut = new T.InstancedMesh(outer, MAT.chainPlate, N / 2);
+  [this.mRoll, this.mPin, this.mIn, this.mOut].forEach(function (m) { m.userData.base = m.material; m.frustumCulled = false; m.castShadow = false; g.add(m); });
+  this.group = g;
+  this.update(0);
+  return g;
+};
+Chain.prototype.update = function (delta) {
+  var N = this.N, p = this.p, z = this.z, a = [0, 0], b = [0, 0], M = _m4, i;
+  this.at(delta, a);
+  for (i = 0; i < N; i++) {
+    this.at((i + 1) * p + delta, b);
+    M.makeTranslation(a[0], a[1], z);
+    this.mRoll.setMatrixAt(i, M); this.mPin.setMatrixAt(i, M);
+    M.makeRotationZ(Math.atan2(b[1] - a[1], b[0] - a[0]));
+    M.setPosition((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, z);
+    if (i % 2 === 0) this.mIn.setMatrixAt(i / 2, M); else this.mOut.setMatrixAt((i - 1) / 2, M);
+    a[0] = b[0]; a[1] = b[1];
+  }
+  this.mRoll.instanceMatrix.needsUpdate = true; this.mPin.instanceMatrix.needsUpdate = true;
+  this.mIn.instanceMatrix.needsUpdate = true; this.mOut.instanceMatrix.needsUpdate = true;
+};
+
+/* ---------- hjul ---------- */
+function buildWheel(side) {
+  var grp = new T.Group();
+  var p = new Part('hjul', { edges: false, side: side });
+  var prof = [[0.106, -0.070], [0.126, -0.080], [0.160, -0.083], [0.186, -0.075], [0.1975, -0.058], [0.200, -0.030],
+    [0.200, 0.030], [0.1975, 0.058], [0.186, 0.075], [0.160, 0.083], [0.126, 0.080], [0.106, 0.070]];
+  var sm = new T.SplineCurve(prof.map(function (q) { return new T.Vector2(q[0], q[1]); })).getPoints(30).map(function (q) { return [q.x, q.y]; });
+  p.add(gLathe(sm, 'z', 44, false), 'rubber');
+  var lugs = [], i, s;
+  for (i = 0; i < 22; i++) {
+    for (s = -1; s <= 1; s += 2) {
+      var g = gBox(0.011, 0.020, 0.054);
+      tr(g, 0.2015, 0, s * 0.035, s * deg(24), 0, 0);
+      tr(g, 0, 0, 0, 0, 0, TAU * (i + (s > 0 ? 0.5 : 0)) / 22);
+      lugs.push(g);
+    }
+  }
+  p.add(merge(lugs), 'rubber');
+  grp.add(p.build());
+  p = new Part('hjul', { edgeAngle: 40, side: side });
+  p.add(gLathe([[0.094, -0.072], [0.112, -0.072], [0.112, -0.066], [0.103, -0.062], [0.103, 0.062], [0.112, 0.066], [0.112, 0.072], [0.094, 0.072], [0.094, -0.072]], 'z', 40, true), 'rim');
+  var ds = new T.Shape(); ds.absarc(0, 0, 0.095, 0, TAU, false);
+  hole(ds, 0, 0, 0.0226);
+  for (i = 0; i < 5; i++) {
+    hole(ds, 0.05 * Math.cos(TAU * i / 5), 0.05 * Math.sin(TAU * i / 5), 0.0058);
+    hole(ds, 0.074 * Math.cos(TAU * (i + 0.5) / 5), 0.074 * Math.sin(TAU * (i + 0.5) / 5), 0.0135);
+  }
+  p.add(tr(gExt(ds, 0.005, 20), 0, 0, -0.035), 'rim');
+  grp.add(p.build());
+  mover(grp, [0, 0, 1.08]);
+  return grp;
+}
+
+/* ---------- drivmodul: motor, kobling, gear, mellemaksel, kæder, hjulaksler ---------- */
+function buildDriveModule(side) {
+  var Z = C.zs, a = C.a, axY = C.axY, aG = C.aGear, i, k;
+  var mod = new T.Group(); mod.name = 'modul';
+  var M = { group: mod, side: side };
+  var o = function (ex, extra) { var r = { side: side }; if (ex) r.ex = ex; if (extra) for (var q in extra) r[q] = extra[q]; return r; };
+
+  /* kæder */
+  var chF = new Chain([0, axY], [a, axY], C.Rk1, C.Rk2, Z.chainF);
+  var chR = new Chain([0, axY], [-a, axY], C.Rk1, C.Rk2, Z.chainR);
+  var chainSet = new T.Group(); mod.add(chainSet); mover(chainSet, [0, 0, 0.60]);
+  [chF, chR].forEach(function (ch) { var g = ch.build(); g.userData.side = side; register(g); chainSet.add(g); });
+  M.chF = chF; M.chR = chR;
+  /* glideklodser på begge parter */
+  var pT = new Part('kaede', o(null));
+  [chF, chR].forEach(function (ch) {
+    [[ch.t1t, ch.t2t, ch.nP], [ch.t1b, ch.t2b, ch.nM]].forEach(function (sp) {
+      var mx = (sp[0][0] + sp[1][0]) / 2, my = (sp[0][1] + sp[1][1]) / 2, ang = Math.atan2(sp[1][1] - sp[0][1], sp[1][0] - sp[0][0]);
+      var off = 0.0057 + 0.0065, bx = mx + sp[2][0] * off, by = my + sp[2][1] * off;
+      pT.add(tr(gBox(0.075, 0.012, 0.015), bx, by, ch.z, 0, 0, ang), 'plastic');
+      var z0 = ch.z + 0.0075, z1 = Z.wallIn;
+      pT.add(tr(gBox(0.018, 0.006, z1 - z0), bx, by + sp[2][1] * 0.009, (z0 + z1) / 2, 0, 0, ang), 'frameLt');
+    });
+  });
+  chainSet.add(pT.build());
+
+  /* gearhus */
+  var hx0 = -0.152, hx1 = 0.086, hy0 = 0.112, hy1 = 0.288;
+  function plateShape() {
+    var s = roundRect(hx0, hy0, hx1, hy1, 0.012);
+    hole(s, 0, axY, 0.026); hole(s, -aG, axY, 0.0235);
+    return s;
+  }
+  var pHus = new Part('gearhus', o([0, 0, 0.115], { shell: true }));
+  pHus.add(tr(gExt(plateShape(), 0.008, 20), 0, 0, Z.plateB - 0.004), 'cast');
+  pHus.add(tr(gRing(0.034, 0.026, 0.016, 'z', 32), 0, axY, Z.plateB), 'cast');
+  pHus.add(tr(gRing(0.031, 0.0235, 0.016, 'z', 32), -aG, axY, Z.plateB), 'cast');
+  var sh = roundRect(hx0, hy0, hx1, hy1, 0.012);
+  sh.holes.push(roundRectPath(hx0 + 0.005, hy0 + 0.005, hx1 - 0.005, hy1 - 0.005, 0.008));
+  pHus.add(tr(gExt(sh, Z.plateA - Z.plateB - 0.008, 10), 0, 0, Z.plateB + 0.004), 'cast');
+  pHus.add(tr(gBox(0.304, 0.008, 0.094), -0.033, 0.110, 0.174), 'castDk');
+  pHus.add(tr(gHex(0.008, 0.007, 'y'), -0.03, 0.2915, 0.174), 'zinc');
+  pHus.add(tr(gHex(0.007, 0.006, 'x'), hx1 + 0.003, 0.128, 0.174), 'zinc');
+  var gHus = pHus.build(); mod.add(gHus);
+  var pLaag = new Part('gearhus', o([0, 0, 0.582], { shell: true }));
+  pLaag.add(tr(gExt(plateShape(), 0.008, 20), 0, 0, Z.plateA - 0.004), 'cast');
+  pLaag.add(tr(gRing(0.034, 0.026, 0.016, 'z', 32), 0, axY, Z.plateA), 'cast');
+  pLaag.add(tr(gRing(0.031, 0.0235, 0.016, 'z', 32), -aG, axY, Z.plateA), 'cast');
+  for (i = 0; i < 6; i++) {
+    var bx = [hx0 + 0.012, (hx0 + hx1) / 2, hx1 - 0.012][i % 3], by = i < 3 ? hy0 + 0.012 : hy1 - 0.012;
+    pLaag.add(tr(gHex(0.0045, 0.004, 'z'), bx, by, Z.plateA + 0.006), 'zinc');
+  }
+  mod.add(pLaag.build());
+
+  /* bolte: gearhus til ramme */
+  var pBolt = new Part('bolte', o([0, 0.10, 0.115]));
+  [[-0.170, 0.150], [-0.170, 0.198], [0.104, 0.150], [0.104, 0.198]].forEach(function (q) {
+    pBolt.add(tr(gCyl(0.0115, 0.002, 'y', 16), q[0], 0.115, q[1]), 'zinc');
+    pBolt.add(tr(gHex(0.0088, 0.007, 'y'), q[0], 0.1195, q[1]), 'zinc');
+    pBolt.add(tr(gCyl(0.005, 0.030, 'y', 10), q[0], 0.100, q[1]), 'zinc');
+  });
+  var gBolt = pBolt.build(); mod.add(gBolt);
+
+  /* lejer i gearhuset */
+  var pLB = new Part('lejer', o([0, 0, 0.225]));
+  addAll(pLB, bearingItems(0.025, 0.052, 0.015, 0, axY, Z.plateB));
+  addAll(pLB, bearingItems(0.020, 0.047, 0.014, -aG, axY, Z.plateB));
+  mod.add(pLB.build());
+  var pLA = new Part('lejer', o([0, 0, 0.557]));
+  addAll(pLA, bearingItems(0.025, 0.052, 0.015, 0, axY, Z.plateA));
+  addAll(pLA, bearingItems(0.020, 0.047, 0.014, -aG, axY, Z.plateA));
+  var gLA = pLA.build(); mod.add(gLA);
+
+  /* mellemaksel med glidenav, tandhjul og dobbelt kædehjul */
+  var rotMid = new T.Group(); rotMid.position.set(0, axY, 0); mod.add(rotMid); M.rotMid = rotMid;
+  var pAks = new Part('mellemaksel', o([0, 0, 0.26]));
+  pAks.add(gSteps([[0.116, 0.118, 0.0105, 0.0125], [0.118, 0.1385, 0.0125], [0.1385, 0.148, 0.017], [0.148, 0.206, 0.014],
+    [0.206, 0.2285, 0.0125], [0.2285, 0.277, 0.011], [0.277, 0.279, 0.011, 0.009]], 'z', 28), 'steel');
+  pAks.add(gRing(0.0135, 0.0108, 0.0012, 'z', 24, 0.2735), 'black');
+  var gAks = pAks.build(); rotMid.add(gAks);
+  var pKey = new Part('feder', o([0, 0.035, 0.26]));
+  pKey.add(tr(gKey(0.008, 0.007, 0.040), 0, 0.0135, 0.177), 'key');
+  pKey.add(tr(gKey(0.006, 0.006, 0.034), 0, 0.0105, 0.253), 'key');
+  var gKeyMid = pKey.build(); rotMid.add(gKeyMid);
+
+  var pNav = new Part('overbel', o([0, 0, 0.41]));
+  pNav.add(gLathe([[0.014, 0.150], [0.036, 0.150], [0.036, 0.156], [0.021, 0.156], [0.021, 0.204], [0.014, 0.204], [0.014, 0.150]], 'z', 36, true), 'steelDk');
+  var gNav = pNav.build(); rotMid.add(gNav);
+  var pF1 = new Part('overbel', o([0, 0, 0.4725])); pF1.add(gRing(0.034, 0.0215, 0.003, 'z', 36, 0.1575), 'bronze'); rotMid.add(pF1.build());
+  var pF2 = new Part('overbel', o([0, 0, 0.5075])); pF2.add(gRing(0.034, 0.0215, 0.003, 'z', 36, 0.1825), 'bronze'); rotMid.add(pF2.build());
+  var pTp = new Part('overbel', o([0, 0, 0.5185])); pTp.add(gRing(0.034, 0.0215, 0.005, 'z', 36, 0.1865), 'steelDk'); rotMid.add(pTp.build());
+  var pFj = new Part('overbel', o([0, 0, 0.5325]));
+  pFj.add(gLathe([[0.0218, 0.1893], [0.033, 0.1918], [0.033, 0.193], [0.0218, 0.1905], [0.0218, 0.1893]], 'z', 36, true), 'black');
+  pFj.add(gLathe([[0.0218, 0.1947], [0.033, 0.1922], [0.033, 0.1934], [0.0218, 0.1959], [0.0218, 0.1947]], 'z', 36, true), 'black');
+  rotMid.add(pFj.build());
+  var pMo = new Part('overbel', o([0, 0, 0.545]));
+  pMo.add(gRing(0.029, 0.021, 0.008, 'z', 36, 0.200), 'zinc');
+  for (i = 0; i < 4; i++) pMo.add(tr(gBox(0.006, 0.006, 0.0082), 0.029 * Math.cos(TAU * i / 4 + 0.4), 0.029 * Math.sin(TAU * i / 4 + 0.4), 0.200, 0, 0, TAU * i / 4 + 0.4), 'steelDk');
+  var gMo = pMo.build(); rotMid.add(gMo);
+
+  var psi2 = PI - PI / C.z2;
+  var pGear = new Part('tandhjul', o([0, 0, 0.49], { edgeAngle: 24 }));
+  var gs = shapeOf(gearOutline(C.z2, C.mod)); hole(gs, 0, 0, 0.060);
+  pGear.add(tr(gExt(gs, C.bGear, 24), 0, 0, Z.gear - C.bGear / 2, 0, 0, psi2), 'gear');
+  var ws = new T.Shape(); ws.absarc(0, 0, 0.0605, 0, TAU, false); hole(ws, 0, 0, 0.0355);
+  for (i = 0; i < 6; i++) hole(ws, 0.048 * Math.cos(TAU * i / 6), 0.048 * Math.sin(TAU * i / 6), 0.0088);
+  pGear.add(tr(gExt(ws, 0.008, 20), 0, 0, Z.gear - 0.004), 'gear');
+  pGear.add(gRing(0.036, 0.0215, C.bGear, 'z', 36, Z.gear), 'gear');
+  var gGear = pGear.build(); rotMid.add(gGear);
+
+  var pSp = new Part('kaede', o([0, 0, 0.60], { edgeAngle: 24 }));
+  pSp.add(gRing(0.021, 0.011, 0.033, 'z', 28, 0.253), 'sprocket');
+  [[chR, Z.chainR], [chF, Z.chainF]].forEach(function (q) {
+    var ss = shapeOf(sprocketOutline(C.zk1, C.pitch, C.rollerD)); hole(ss, 0, 0, 0.0205);
+    pSp.add(tr(gExt(ss, 0.0072, 12), 0, 0, q[1] - 0.0036, 0, 0, q[0].phase1()), 'sprocket');
+  });
+  var gSp = pSp.build(); rotMid.add(gSp);
+
+  /* indgangsaksel med drev, og kobling */
+  var rotPin = new T.Group(); rotPin.position.set(-aG, axY, 0); mod.add(rotPin); M.rotPin = rotPin;
+  var pPin = new Part('tandhjul', o([0, 0, 0.26], { edgeAngle: 24 }));
+  pPin.add(gSteps([[0.096, 0.098, 0.0075, 0.0095], [0.098, 0.123, 0.0095], [0.123, 0.1375, 0.010], [0.1375, 0.157, 0.013],
+    [0.183, 0.2105, 0.013], [0.2105, 0.2265, 0.010], [0.2265, 0.2285, 0.010, 0.008]], 'z', 24), 'steel');
+  pPin.add(tr(gExt(shapeOf(gearOutline(C.z1, C.mod)), 0.026, 4), 0, 0, Z.gear - 0.013), 'pinion');
+  var gPin = pPin.build(); rotPin.add(gPin);
+
+  function jaws(part, mat, z0, z1, a0, n, w, r0, r1) {
+    for (var j = 0; j < n; j++) {
+      var c = a0 + TAU * j / n;
+      part.add(tr(gExt(sectorShape(r0, r1, c - w / 2, c + w / 2), z1 - z0, 6), 0, 0, z0), mat);
+    }
+  }
+  var pKA = new Part('kobling', o([0, 0, 0.08]));
+  pKA.add(gRing(0.0275, 0.0095, 0.024, 'z', 32, 0.108), 'cast');
+  jaws(pKA, 'cast', 0.0835, 0.096, 0, 3, deg(42), 0.0135, 0.0275);
+  var gKA = pKA.build(); rotPin.add(gKA);
+  var pKS = new Part('kobling', o([0, 0, 0.055]));
+  pKS.add(gRing(0.0135, 0.008, 0.0105, 'z', 24, 0.089), 'spider');
+  jaws(pKS, 'spider', 0.08375, 0.09425, deg(30), 6, deg(16), 0.013, 0.0268);
+  rotPin.add(pKS.build());
+  var pKB = new Part('kobling', o([0, 0, 0.03]));
+  pKB.add(gRing(0.0275, 0.0095, 0.022, 'z', 32, 0.071), 'cast');
+  jaws(pKB, 'cast', 0.082, 0.0945, deg(60), 3, deg(42), 0.0135, 0.0275);
+  rotPin.add(pKB.build());
+  var pStub = new Part('motor', o(null)); pStub.add(tr(gCyl(0.0095, 0.034, 'z', 20), 0, 0, 0.069), 'steel'); rotPin.add(pStub.build());
+
+  /* motor med planetgear */
+  var pMot = new Part('motor', o(null));
+  pMot.add(tr(gCyl(0.055, Z.motor1 - Z.motor0, 'z', 40), -aG, axY, (Z.motor0 + Z.motor1) / 2), 'motor');
+  for (k = 0; k < 6; k++) pMot.add(tr(gRing(0.0585, 0.054, 0.004, 'z', 40), -aG, axY, Z.motor0 + 0.016 + k * 0.0135), 'motor');
+  pMot.add(tr(gCyl(0.046, 0.012, 'z', 32), -aG, axY, Z.motor0 - 0.006), 'alu');
+  pMot.add(tr(gBox(0.05, 0.028, 0.05), -aG, axY + 0.066, -0.054), 'alu');
+  pMot.add(tr(gCyl(0.008, 0.014, 'y', 12), -aG, axY + 0.087, -0.054), 'black');
+  pMot.add(tr(gCyl(0.041, 0.050, 'z', 36), -aG, axY, Z.gh0 + 0.025), 'alu');
+  pMot.add(tr(gBox(0.092, 0.092, 0.006), -aG, axY, 0.049), 'alu');
+  pMot.add(tr(gCyl(0.025, 0.006, 'z', 28), -aG, axY, 0.055), 'alu');
+  var gMot = pMot.build(); mod.add(gMot);
+  M.motorTerm = v3(-aG, axY + 0.094, -0.054);
+
+  /* motorkonsol, svejst til bunden */
+  var pSv = new Part('svejs', o(null));
+  var bs = shapeOf([[-0.150, 0.106], [-0.030, 0.106], [-0.030, 0.262], [-0.150, 0.262]]); hole(bs, -aG, axY, 0.0265);
+  pSv.add(tr(gExt(bs, 0.006, 20), 0, 0, Z.brk0), 'frameLt');
+  [-0.150, -0.035].forEach(function (gx) {
+    var tri = gExt(shapeOf([[0, 0], [0.042, 0], [0, 0.085]]), 0.005, 1);
+    tri.rotateY(-HALF);
+    pSv.add(tr(tri, gx + 0.005, 0.106, Z.brk1), 'frameLt');
+    pSv.add(gRod([gx + 0.0025, 0.1075, Z.brk1 + 0.002], [gx + 0.0025, 0.1075, Z.brk1 + 0.042], 0.0036, 8), 'weld');
+    pSv.add(gRod([gx + 0.0025, 0.108, Z.brk1 + 0.0015], [gx + 0.0025, 0.189, Z.brk1 + 0.0015], 0.0036, 8), 'weld');
+  });
+  pSv.add(gRod([-0.150, 0.1075, Z.brk1 + 0.0015], [-0.030, 0.1075, Z.brk1 + 0.0015], 0.0036, 8), 'weld');
+  pSv.add(gRod([-0.150, 0.1075, Z.brk0 - 0.0015], [-0.030, 0.1075, Z.brk0 - 0.0015], 0.0036, 8), 'weld');
+  [[-0.036, -0.036], [0.036, -0.036], [0.036, 0.036], [-0.036, 0.036]].forEach(function (q) {
+    pSv.add(tr(gHex(0.0055, 0.005, 'z'), -aG + q[0], axY + q[1], Z.brk1 + 0.0025), 'zinc');
+  });
+  var gSv = pSv.build(); mod.add(gSv);
+
+  /* hjulaksler */
+  M.axles = [];
+  function axle(xc, zk, ch) {
+    var rot = new T.Group(); rot.position.set(xc, axY, 0); mod.add(rot);
+    var pS = new Part('hjulaksel', o([0, 0, 0.93]));
+    pS.add(gSteps([[0.226, 0.228, 0.0105, 0.0125], [0.228, 0.2815, 0.0125], [0.2815, 0.2985, 0.015], [0.2985, 0.3765, 0.0175],
+      [0.3765, 0.3935, 0.015], [0.3935, 0.405, 0.014], [0.405, 0.415, 0.065], [0.415, 0.432, 0.0222]], 'z', 32), 'steel');
+    for (var j = 0; j < 5; j++) pS.add(tr(gCyl(0.005, 0.024, 'z', 10), 0.05 * Math.cos(TAU * j / 5), 0.05 * Math.sin(TAU * j / 5), 0.427), 'zinc');
+    pS.add(tr(gCyl(0.017, 0.003, 'z', 20), 0, 0, 0.2245), 'zinc');
+    pS.add(tr(gHex(0.008, 0.006, 'z'), 0, 0, 0.220), 'zinc');
+    var gS = pS.build(); rot.add(gS);
+    var pK = new Part('feder', o([0, 0.035, 0.93])); pK.add(tr(gKey(0.008, 0.007, 0.022), 0, 0.012, zk - 0.003), 'key'); var gK = pK.build(); rot.add(gK);
+    var pSpk = new Part('kaede', o([0, 0, 0.60], { edgeAngle: 24 }));
+    var ss = shapeOf(sprocketOutline(C.zk2, C.pitch, C.rollerD)); hole(ss, 0, 0, 0.0125);
+    for (j = 0; j < 5; j++) hole(ss, 0.037 * Math.cos(TAU * j / 5), 0.037 * Math.sin(TAU * j / 5), 0.0105);
+    pSpk.add(tr(gExt(ss, 0.0072, 12), 0, 0, zk - 0.0036, 0, 0, ch.phase2()), 'sprocket');
+    pSpk.add(gRing(0.022, 0.0125, 0.0176, 'z', 28, zk - 0.0052), 'sprocket');
+    rot.add(pSpk.build());
+    var pAf = new Part('hjulaksel', o([0, 0, 0.63]));
+    var s0 = zk + 0.0036, s1 = 0.282;
+    pAf.add(gRing(0.0165, 0.0125, s1 - s0, 'z', 24, (s0 + s1) / 2), 'zinc');
+    if (zk - 0.014 > 0.228) pAf.add(gRing(0.0165, 0.0125, zk - 0.014 - 0.226, 'z', 24, (zk - 0.014 + 0.226) / 2), 'zinc');
+    rot.add(pAf.build());
+    var wheel = buildWheel(side); wheel.position.set(0, 0, Z.wheel); wheel.userData.base = wheel.position.clone(); rot.add(wheel);
+    var pNut = new Part('hjul', o([0, 0, 1.16]));
+    for (j = 0; j < 5; j++) pNut.add(tr(gHex(0.0092, 0.008, 'z'), 0.05 * Math.cos(TAU * j / 5), 0.05 * Math.sin(TAU * j / 5), Z.wheel - 0.026), 'zinc');
+    pNut.add(tr(gCyl(0.0245, 0.006, 'z', 24), 0, 0, 0.435), 'black');
+    rot.add(pNut.build());
+    /* stillestående dele */
+    var pRor = new Part('hjulaksel', o([0, 0, 0.67], { shell: true }));
+    pRor.add(tr(gLathe([[0.031, 0.276], [0.038, 0.276], [0.038, 0.326], [0.060, 0.326], [0.060, 0.334], [0.038, 0.334], [0.038, 0.397],
+      [0.031, 0.397], [0.031, 0.276]], 'z', 36, true), xc, axY, 0), 'castDk');
+    for (j = 0; j < 6; j++) pRor.add(tr(gHex(0.0065, 0.006, 'z'), xc + 0.050 * Math.cos(TAU * j / 6 + 0.3), axY + 0.050 * Math.sin(TAU * j / 6 + 0.3), 0.337), 'zinc');
+    var gRor = pRor.build(); mod.add(gRor);
+    var pLi = new Part('hjulaksel', o([0, 0, 0.65])); addAll(pLi, bearingItems(0.030, 0.062, 0.016, xc, axY, Z.axInner)); mod.add(pLi.build());
+    var pLo = new Part('hjulaksel', o([0, 0, 0.71])); addAll(pLo, bearingItems(0.030, 0.062, 0.016, xc, axY, Z.axOuter));
+    var gLo = pLo.build(); mod.add(gLo);
+    var pSe = new Part('hjulaksel', o([0, 0, 0.73])); pSe.add(tr(gRing(0.031, 0.0145, 0.004, 'z', 28), xc, axY, 0.3955), 'rubber'); mod.add(pSe.build());
+    M.axles.push({ rot: rot, x: xc, shaft: gS, tube: gRor, wheel: wheel });
+    return { shaft: gS, tube: gRor, wheel: wheel, bearing: gLo, key: gK };
+  }
+  var axF = axle(a, Z.chainF, chF);
+  var axR = axle(-a, Z.chainR, chR);
+
+  if (side === 1) {
+    balloon('1', 'tandhjul', mod, v3(0.0, axY + 0.078, Z.gear), gGear);
+    balloon('2', 'mellemaksel', mod, v3(0, axY, 0.284), gAks);
+    balloon('3', 'lejer', mod, v3(-aG, axY, Z.plateA + 0.012), gLA);
+    balloon('4', 'feder', mod, v3(a, axY + 0.022, Z.chainF - 0.02), axF.key);
+    balloon('5', 'kaede', mod, v3(a * 0.5, axY + 0.052, Z.chainF + 0.008), chainSet);
+    balloon('6', 'hjulaksel', mod, v3(a, axY + 0.045, 0.356), axF.tube);
+    balloon('7', 'kobling', mod, v3(-aG, axY + 0.036, 0.090), gKA);
+    balloon('8', 'overbel', mod, v3(0.030, axY - 0.008, 0.205), gMo);
+    balloon('9', 'bolte', mod, v3(0.104, 0.126, 0.198), gBolt);
+    balloon('10', 'svejs', mod, v3(-0.150, 0.125, Z.brk1 + 0.032), gSv);
+    balloon('M', 'motor', mod, v3(-aG, axY + 0.064, -0.06), gMot);
+    balloon('G', 'gearhus', mod, v3(0.07, 0.288, 0.19), gHus);
+  }
+  M.update = function (s) {
+    /* s = kørt strækning [m]; højre modul kører frem ved negativ drejning set fra +z */
+    var phiAx = -side * s / C.rw;
+    var phiMid = phiAx * C.iK;
+    var delta = phiMid * C.Rk1;
+    rotMid.rotation.z = phiMid;
+    rotPin.rotation.z = -phiMid * C.iG;
+    M.axles[0].rot.rotation.z = phiAx;
+    M.axles[1].rot.rotation.z = phiAx;
+    chF.update(delta); chR.update(delta);
+  };
+  return M;
+}
+
+/* ---------- chassis ---------- */
+function buildChassis() {
+  var a = C.a, axY = C.axY, x0 = -0.56, x1 = 0.55, len = x1 - x0, xc = (x0 + x1) / 2, w = 0.652;
+  var p = new Part('chassis', { shell: true });
+  p.add(tr(gBox(len, 0.006, w), xc, 0.103, 0), 'frame');
+  [0.320, -0.326].forEach(function (z) {
+    var s = shapeOf([[x0, 0.106], [x1, 0.106], [x1, 0.306], [x0, 0.306]]);
+    hole(s, a, axY, 0.040); hole(s, -a, axY, 0.040);
+    p.add(tr(gExt(s, 0.006, 24), 0, 0, z), 'frame');
+  });
+  p.add(tr(gBox(0.006, 0.20, w - 0.012), x1 - 0.003, 0.206, 0), 'frame');
+  p.add(tr(gBox(0.006, 0.20, w - 0.012), x0 + 0.003, 0.206, 0), 'frame');
+  p.add(tr(gBox(len, 0.006, w), xc, 0.309, 0), 'frame');
+  /* tværvanger under gearhusene */
+  [-0.170, 0.104].forEach(function (x) { p.add(tr(gBox(0.04, 0.02, w - 0.03), x, 0.090, 0), 'frame'); });
+  [0.170, -0.104].forEach(function (x) { p.add(tr(gBox(0.04, 0.02, w - 0.03), x, 0.090, 0), 'frame'); });
+  var g = p.build();
+  return g;
+}
+
+/* ---------- udstyr over dækket ---------- */
+function buildDeck(root) {
+  var out = {}, i;
+  /* batteri */
+  var pB = new Part('batteri', { ex: [0, 0.30, 0] });
+  pB.add(tr(gBox(0.52, 0.185, 0.40), -0.01, 0.4045, 0), 'battery');
+  pB.add(tr(gBox(0.53, 0.016, 0.41), -0.01, 0.505, 0), 'batteryTop');
+  pB.add(tr(gBox(0.524, 0.02, 0.404), -0.01, 0.36, 0), 'batteryTop');
+  pB.add(tr(gCyl(0.012, 0.014, 'y', 16), -0.22, 0.520, 0.10), 'red');
+  pB.add(tr(gCyl(0.012, 0.014, 'y', 16), -0.22, 0.520, -0.10), 'black');
+  pB.add(tr(gBox(0.10, 0.012, 0.05), 0.12, 0.519, 0), 'ctrl');
+  [0.16, -0.16].forEach(function (z) { pB.add(gTubePath([[0.06, 0.513, z], [0.06, 0.535, z], [-0.08, 0.535, z], [-0.08, 0.513, z]], 0.005, 16, 6), 'batteryTop'); });
+  out.batteri = pB.build(); root.add(out.batteri);
+  balloon('B', 'batteri', root, v3(0.10, 0.515, 0.19), out.batteri);
+
+  /* motorstyringer */
+  var pC = new Part('styring', { ex: [0, 0.20, 0] });
+  [0.115, -0.115].forEach(function (z) {
+    pC.add(tr(gBox(0.17, 0.045, 0.125), -0.42, 0.3345, z), 'ctrl');
+    for (i = 0; i < 9; i++) pC.add(tr(gBox(0.15, 0.014, 0.004), -0.42, 0.364, z - 0.052 + i * 0.013), 'ctrl');
+    pC.add(tr(gBox(0.02, 0.022, 0.07), -0.327, 0.330, z), 'green');
+  });
+  out.styring = pC.build(); root.add(out.styring);
+  balloon('S', 'styring', root, v3(-0.42, 0.375, 0.115), out.styring);
+
+  /* hydraulikstation */
+  var px = 0.455, py = 0.366;
+  var pP = new Part('pumpe', { ex: [0, 0.24, 0] });
+  pP.add(tr(gCyl(0.045, 0.12, 'z', 32), px, py, -0.105), 'black');
+  pP.add(tr(gCyl(0.047, 0.012, 'z', 32), px, py, -0.170), 'alu');
+  pP.add(tr(gBox(0.08, 0.08, 0.076), px, py - 0.004, -0.006), 'alu');
+  pP.add(tr(gHex(0.011, 0.03, 'y'), px - 0.015, py + 0.05, -0.006), 'zinc');
+  pP.add(tr(gCyl(0.008, 0.012, 'x', 12), px - 0.046, py + 0.012, -0.02), 'zinc');
+  pP.add(tr(gCyl(0.008, 0.012, 'x', 12), px - 0.046, py + 0.012, 0.01), 'zinc');
+  pP.add(tr(gBox(0.11, 0.008, 0.36), px, 0.316, 0.01), 'frameLt');
+  out.pumpe = pP.build(); root.add(out.pumpe);
+  var pTk = new Part('pumpe', { ex: [0, 0.24, 0], edges: false });
+  pTk.add(tr(gCyl(0.036, 0.13, 'z', 24), px, py - 0.008, 0.108), 'oil');
+  out.oil = pTk.build(); root.add(out.oil);
+  var pTank = new Part('pumpe', { ex: [0, 0.24, 0] });
+  pTank.add(tr(gCyl(0.05, 0.165, 'z', 32), px, py, 0.1145), 'tank');
+  pTank.add(tr(gCyl(0.014, 0.014, 'y', 16), px, py + 0.054, 0.15), 'black');
+  out.tank = pTank.build(); root.add(out.tank);
+  balloon('H3', 'pumpe', root, v3(px, py + 0.055, 0.07), out.pumpe);
+
+  /* ventilblok */
+  var pV = new Part('ventil', { ex: [0, 0.34, 0] });
+  pV.add(tr(gBox(0.105, 0.032, 0.085), 0.335, 0.328, 0), 'alu');
+  [0.310, 0.360].forEach(function (x) {
+    pV.add(tr(gBox(0.044, 0.044, 0.07), x, 0.366, 0), 'valve');
+    [-1, 1].forEach(function (s) {
+      pV.add(tr(gCyl(0.018, 0.05, 'z', 20), x, 0.366, s * 0.06), 'black');
+      pV.add(tr(gHex(0.01, 0.01, 'z'), x, 0.366, s * 0.09), 'zinc');
+    });
+  });
+  [-0.03, 0.03].forEach(function (z) { pV.add(tr(gHex(0.009, 0.022, 'x'), 0.276, 0.328, z), 'zinc'); });
+  out.ventil = pV.build(); root.add(out.ventil);
+  balloon('H4', 'ventil', root, v3(0.335, 0.395, 0), out.ventil);
+
+  /* kabler */
+  var pK = new Part('kabler', { edges: false, shadow: false });
+  [1, -1].forEach(function (s) {
+    pK.add(gTubePath([[-0.22, 0.527, s * 0.10], [-0.22, 0.545, s * 0.10], [-0.30, 0.545, s * 0.11], [-0.335, 0.46, s * 0.115], [-0.33, 0.345, s * 0.115]], 0.006, 24, 6), s > 0 ? 'cableRed' : 'cable');
+  });
+  out.kabler = pK.build(); root.add(out.kabler);
+  return out;
+}
+
+function buildCover(root) {
+  var p = new Part('kappe', { shell: true, ex: [0, 0.62, 0], edgeAngle: 30 });
+  var prof = shapeOf([[-0.535, 0.326], [0.515, 0.326], [0.515, 0.395], [0.285, 0.553], [-0.455, 0.553], [-0.535, 0.49]]);
+  var g = new T.ExtrudeGeometry(prof, { depth: 0.60, bevelEnabled: true, bevelThickness: 0.014, bevelSize: 0.014, bevelSegments: 1, curveSegments: 4 });
+  g.translate(0, 0, -0.30);
+  p.add(g, 'body');
+  p.add(tr(gBox(1.085, 0.016, 0.634), -0.01, 0.321, 0), 'bodyTrim');
+  /* lameller i siderne */
+  [1, -1].forEach(function (s) {
+    for (var i = 0; i < 4; i++) p.add(tr(gBox(0.16, 0.008, 0.004), -0.36, 0.385 + i * 0.022, s * 0.3155), 'bodyTrim');
+  });
+  var gK = p.build(); root.add(gK);
+  var pL = new Part('kappe', { shell: true, ex: [0, 0.62, 0], edges: false });
+  pL.add(tr(gBox(0.008, 0.016, 0.30), 0.531, 0.372, 0), 'lamp');
+  var gL = pL.build(); root.add(gL);
+
+  var pS = new Part('sensor', { ex: [0, 0.74, 0] });
+  pS.add(tr(gCyl(0.032, 0.014, 'y', 24), -0.36, 0.574, 0), 'bodyTrim');
+  pS.add(tr(gCyl(0.036, 0.022, 'y', 24), 0.18, 0.578, 0), 'bodyTrim');
+  pS.add(tr(gCyl(0.043, 0.034, 'y', 28), 0.18, 0.606, 0), 'glass');
+  pS.add(tr(gCyl(0.040, 0.008, 'y', 28), 0.18, 0.627, 0), 'bodyTrim');
+  pS.add(tr(gCyl(0.03, 0.018, 'y', 20), -0.42, 0.576, 0.22), 'yellow');
+  pS.add(tr(gCyl(0.021, 0.018, 'y', 20), -0.42, 0.594, 0.22), 'red');
+  var gS = pS.build(); root.add(gS);
+  var pBe = new Part('sensor', { ex: [0, 0.74, 0], edges: false });
+  var dome = new T.SphereGeometry(0.027, 20, 10, 0, TAU, 0, HALF); dome.scale(1, 1.5, 1);
+  pBe.add(tr(dome, -0.36, 0.581, 0), 'amber');
+  root.add(pBe.build());
+  return { kappe: gK, sensor: gS };
+}
+
+function buildSpreader(root) {
+  var p = new Part('saltspreder', { ex: [-0.35, 0, 0] });
+  var xc = -0.775, i;
+  var hop = flat(new T.CylinderGeometry(0.30, 0.085, 0.30, 4, 1, true));
+  hop.rotateY(PI / 4); hop.scale(0.74, 1, 1.18);
+  p.add(tr(hop, xc, 0.50, 0), 'hopper');
+  p.add(tr(gBox(0.33, 0.012, 0.52), xc, 0.656, 0), 'bodyTrim');
+  p.add(tr(gBox(0.335, 0.02, 0.525), xc, 0.642, 0), 'steelDk');
+  p.add(tr(gBox(0.10, 0.05, 0.12), xc, 0.325, 0), 'steelDk');
+  p.add(tr(gCyl(0.03, 0.06, 'y', 20), xc, 0.29, 0), 'black');
+  p.add(tr(gCyl(0.008, 0.05, 'y', 10), xc, 0.25, 0), 'steel');
+  [0.15, -0.15].forEach(function (z) {
+    p.add(gBeam([-0.56, 0.20, z], [xc - 0.10, 0.20, z], 0.03, 0.03), 'frame');
+    p.add(gBeam([xc + 0.09, 0.215, z], [xc + 0.09, 0.50, z * 1.5], 0.025, 0.025), 'frame');
+    p.add(gBeam([xc - 0.09, 0.215, z], [xc - 0.09, 0.50, z * 1.5], 0.025, 0.025), 'frame');
+  });
+  p.add(tr(gBox(0.03, 0.03, 0.30), xc - 0.10, 0.20, 0), 'frame');
+  var g = p.build(); root.add(g);
+  var disc = new T.Group(); disc.position.set(xc, 0.222, 0); g.add(disc);
+  var pd = new Part('saltspreder', {});
+  pd.add(gCyl(0.15, 0.005, 'y', 36), 'steel');
+  for (i = 0; i < 4; i++) pd.add(tr(gBox(0.11, 0.018, 0.004), 0.085 * Math.cos(i * HALF), 0.011, -0.085 * Math.sin(i * HALF), 0, i * HALF, 0), 'steelDk');
+  var gd = pd.build(); disc.add(gd);
+  balloon('Ø', 'saltspreder', root, v3(xc, 0.67, 0.2), g);
+  return { group: g, disc: disc };
+}
+
+/* ---------- hydraulikcylinder ---------- */
+function makeCyl(id, o) {
+  var g = new T.Group(), up = o.pin === 'y';
+  var pB = new Part(id, { shell: true });
+  pB.add(gCyl(o.rb * 0.8, 0.024, o.pin, 16), 'cylBody');
+  pB.add(tr(gBox(o.c1, o.rb * 1.1, o.rb * 1.1), o.c1 / 2, 0, 0), 'cylBody');
+  pB.add(tr(gCyl(o.rb, o.Lb, 'x', 24), o.c1 + o.Lb / 2, 0, 0), 'cylBody');
+  pB.add(tr(gCyl(o.rb * 1.15, 0.014, 'x', 24), o.c1 + 0.007, 0, 0), 'cylBody');
+  pB.add(tr(gCyl(o.rb * 1.15, 0.018, 'x', 24), o.c1 + o.Lb - 0.009, 0, 0), 'cylBody');
+  var pa = v3(o.c1 + 0.011, 0, 0), pb = v3(o.c1 + o.Lb - 0.012, 0, 0), off = o.rb + 0.008;
+  if (up) { pa.y = off; pb.y = off; } else { pa.z = off; pb.z = off; }
+  [pa, pb].forEach(function (q) { pB.add(tr(gHex(0.0075, 0.016, up ? 'y' : 'z'), q.x, q.y, q.z), 'zinc'); });
+  var bar = pB.build(); g.add(bar);
+  var rodG = new T.Group(); g.add(rodG);
+  var pR = new Part(id, {});
+  pR.add(gCyl(o.rb * 0.72, 0.022, o.pin, 16), 'steelDk');
+  pR.add(tr(gBox(o.c2, o.rr * 2.3, o.rr * 2.3), -o.c2 / 2, 0, 0), 'steelDk');
+  pR.add(tr(gCyl(o.rr, o.rodLen, 'x', 16), -o.c2 - o.rodLen / 2 + 0.003, 0, 0), 'chrome');
+  pR.add(tr(gCyl(o.rb - 0.0035, 0.016, 'x', 20), -o.c2 - o.rodLen + 0.008, 0, 0), 'bronze');
+  rodG.add(pR.build());
+  if (up) { pa.y += 0.008; pb.y += 0.008; } else { pa.z += 0.008; pb.z += 0.008; }
+  return { group: g, rodG: rodG, bar: bar, portA: pa, portB: pb, setLen: function (L) { rodG.position.x = L; } };
+}
+
+/* ---------- plov, A-ramme og hydraulik ---------- */
+function buildPlow(root) {
+  var P = C.plow, hx = P.hinge.x, hy = P.hinge.y, pvx = P.pivot.x - hx, i;
+  var sys = new T.Group(); sys.name = 'plov'; root.add(sys);
+  var out = { sys: sys };
+  var yb = function (ya) { return ya - hy; };
+
+  /* plovbeslag på chassiset */
+  var pBe = new Part('aramme', { ex: [0.12, 0, 0] });
+  pBe.add(tr(gBox(0.012, 0.20, 0.56), 0.559, 0.24, 0), 'plowFrame');
+  [-1, 1].forEach(function (s) {
+    [-1, 1].forEach(function (e) { pBe.add(tr(gBox(0.058, 0.07, 0.008), 0.588, hy, s * P.hinge.z + e * 0.025), 'plowFrame'); });
+    pBe.add(tr(gCyl(0.008, 0.07, 'z', 12), hx, hy, s * P.hinge.z), 'zinc');
+  });
+  pBe.add(tr(gBox(0.04, 0.27, 0.05), 0.585, 0.445, 0), 'plowFrame');
+  pBe.add(gBeam([0.566, 0.335, 0], [0.60, 0.47, 0], 0.012, 0.05), 'plowFrame');
+  [-1, 1].forEach(function (e) { pBe.add(tr(gBox(0.045, 0.045, 0.006), P.liftT.x - 0.004, P.liftT.y, e * 0.017), 'plowFrame'); });
+  pBe.add(tr(gCyl(0.007, 0.05, 'z', 12), P.liftT.x, P.liftT.y, 0), 'zinc');
+  [[0.18, 0.31], [-0.18, 0.31], [0.25, 0.17], [-0.25, 0.17], [0.10, 0.17], [-0.10, 0.17]].forEach(function (q) {
+    pBe.add(tr(gHex(0.008, 0.006, 'x'), 0.568, q[1], q[0]), 'zinc');
+  });
+  out.bulk = [];
+  [[0.10, 0.305], [0.13, 0.305], [-0.10, 0.305], [-0.13, 0.305], [0.045, 0.325], [0.07, 0.325]].forEach(function (q) {
+    pBe.add(tr(gHex(0.008, 0.016, 'x'), 0.569, q[1], q[0]), 'zinc');
+    out.bulk.push(v3(0.578, q[1], q[0]));
+  });
+  out.beslag = pBe.build(); sys.add(out.beslag);
+
+  /* A-ramme, hængslet om tværaksen */
+  var aWrap = new T.Group(); sys.add(aWrap); mover(aWrap, [0.30, 0, 0]);
+  var aG = new T.Group(); aG.position.set(hx, hy, 0); aWrap.add(aG);
+  out.aG = aG; out.aWrap = aWrap;
+  var pA = new Part('aramme', {});
+  [-1, 1].forEach(function (s) {
+    pA.add(gBeam([0, 0, s * P.hinge.z], [pvx - 0.06, 0, s * 0.03], 0.045, 0.04), 'plowFrame');
+    pA.add(tr(gCyl(0.018, 0.040, 'z', 20), 0, 0, s * P.hinge.z), 'plowFrame');
+    pA.add(tr(gBox(0.03, 0.046, 0.03), pvx + P.cylA.x, 0.043, s * P.cylA.z), 'plowFrame');
+    pA.add(tr(gCyl(0.006, 0.06, 'y', 10), pvx + P.cylA.x, 0.05, s * P.cylA.z), 'zinc');
+  });
+  pA.add(tr(gBox(0.04, 0.04, 0.34), 0.09, 0, 0), 'plowFrame');
+  pA.add(gBeam([0.09, 0, 0], [pvx - 0.11, 0, 0], 0.04, 0.04), 'plowFrame');
+  pA.add(tr(gBox(0.06, 0.06, 0.11), pvx - 0.08, 0, 0), 'plowFrame');
+  [-1, 1].forEach(function (e) {
+    pA.add(tr(gCyl(0.07, 0.008, 'y', 28), pvx, e * 0.034, 0), 'plowFrame');
+    pA.add(tr(gBox(0.09, 0.008, 0.11), pvx - 0.06, e * 0.034, 0), 'plowFrame');
+    pA.add(tr(gBox(0.045, 0.05, 0.006), P.liftL.x - hx, 0.04, e * 0.016), 'plowFrame');
+  });
+  pA.add(tr(gCyl(0.006, 0.046, 'z', 10), P.liftL.x - hx, P.liftL.y - hy, 0), 'zinc');
+  out.aramme = pA.build(); aG.add(out.aramme);
+  balloon('P3', 'aramme', aG, v3(0.24, 0.03, -0.12), aWrap);
+
+  var pTap = new Part('drejeramme', { ex: [0, 0.22, 0] });
+  pTap.add(tr(gCyl(0.013, 0.10, 'y', 20), pvx, 0, 0), 'zinc');
+  pTap.add(tr(gCyl(0.021, 0.006, 'y', 20), pvx, 0.053, 0), 'zinc');
+  pTap.add(tr(gCyl(0.018, 0.004, 'y', 20), pvx, -0.052, 0), 'zinc');
+  out.tap = pTap.build(); aG.add(out.tap);
+
+  /* plov, drejelig om tappen */
+  var bG = new T.Group(); bG.position.set(pvx, 0, 0); aG.add(bG); out.bG = bG;
+  var pD = new Part('drejeramme', { ex: [0.18, 0, 0] });
+  pD.add(tr(gBox(0.06, 0.06, 0.92), 0.045, 0, 0), 'plowFrame');
+  pD.add(gCyl(0.028, 0.060, 'y', 24), 'plowFrame');
+  [-1, 1].forEach(function (s) {
+    pD.add(tr(gBox(0.032, 0.035, 0.03), P.cylB.x, 0.0475, s * P.cylB.z), 'plowFrame');
+    pD.add(tr(gCyl(0.006, 0.05, 'y', 10), P.cylB.x, 0.055, s * P.cylB.z), 'zinc');
+  });
+  out.drejeramme = pD.build(); bG.add(out.drejeramme);
+  balloon('P2', 'drejeramme', bG, v3(0.045, 0.04, -0.30), out.drejeramme);
+
+  var R = 0.40, cx = P.pf + R * Math.cos(deg(25)), cyA = 0.03 + R * Math.sin(deg(25)), th = 0.005;
+  function arc(rad, a0, a1, n) {
+    var pts = [];
+    for (var j = 0; j <= n; j++) { var q = deg(a0 + (a1 - a0) * j / n); pts.push([cx - rad * Math.cos(q), yb(cyA + rad * Math.sin(q))]); }
+    return pts;
+  }
+  out.arc = { R: R, cx: cx, cyA: cyA };
+  var pS = new Part('skaer', { ex: [0.40, 0, 0], edgeAngle: 40 });
+  var band = arc(R, -25, 45, 28).concat(arc(R + th, -25, 45, 28).reverse());
+  pS.add(tr(gExt(shapeOf(band), P.B, 1), 0, 0, -P.B / 2), 'plow');
+  [-0.69, -0.44, -0.19, 0.19, 0.44, 0.69].forEach(function (z) {
+    var rib = arc(R + th, -18, 38, 14).reverse().concat([[0.075, yb(0.10)], [0.075, yb(0.36)]]);
+    pS.add(tr(gExt(shapeOf(rib), 0.006, 1), 0, 0, z - 0.003), 'plow');
+  });
+  pS.add(tr(gBox(0.03, 0.03, 1.36), 0.083, yb(0.335), 0), 'plow');
+  [-1, 1].forEach(function (s) {
+    pS.add(tr(gCyl(0.005, 0.34, 'y', 8), 0.196, yb(0.65), s * 0.685), 'plow');
+    pS.add(tr(gCyl(0.006, 0.05, 'y', 8), 0.196, yb(0.845), s * 0.685), 'black');
+  });
+  out.skaer = pS.build(); bG.add(out.skaer);
+  balloon('P1', 'skaer', bG, v3(0.17, yb(0.44), -0.45), out.skaer);
+
+  /* slidskinne */
+  var ax = [-Math.sin(deg(25)), Math.cos(deg(25))], nr = [Math.cos(deg(25)), Math.sin(deg(25))];
+  var ec = [0.136 + ax[0] * 0.0525 + nr[0] * 0.004, 0.004 + ax[1] * 0.0525 + nr[1] * 0.004];
+  var pE = new Part('skaer', { ex: [0.40, -0.12, 0] });
+  pE.add(tr(gBox(0.014, 0.105, P.B), ec[0], yb(ec[1]), 0, 0, 0, deg(25)), 'rubber');
+  var cc = [ec[0] + ax[0] * 0.022 + nr[0] * 0.009, ec[1] + ax[1] * 0.022 + nr[1] * 0.009];
+  pE.add(tr(gBox(0.004, 0.036, P.B - 0.03), cc[0], yb(cc[1]), 0, 0, 0, deg(25)), 'steelDk');
+  for (i = 0; i < 10; i++) {
+    var hb = gHex(0.0065, 0.005, 'x'); tr(hb, 0, 0, 0, 0, 0, deg(25));
+    pE.add(tr(hb, cc[0] + nr[0] * 0.0045, yb(cc[1] + nr[1] * 0.0045), -0.63 + i * 0.14), 'zinc');
+  }
+  out.edge = pE.build(); bG.add(out.edge);
+
+  /* slidsko */
+  var pSk = new Part('skaer', { ex: [0.26, -0.10, 0] });
+  [-1, 1].forEach(function (s) {
+    pSk.add(tr(gCyl(0.045, 0.012, 'y', 20), 0.052, yb(0.006), s * 0.57), 'steelDk');
+    pSk.add(tr(gCyl(0.011, 0.12, 'y', 12), 0.052, yb(0.072), s * 0.57), 'zinc');
+    pSk.add(tr(gBox(0.075, 0.03, 0.045), 0.065, yb(0.135), s * 0.57), 'plowFrame');
+  });
+  out.sko = pSk.build(); bG.add(out.sko);
+
+  /* vinkelcylindre */
+  var cylO = { rb: 0.019, rr: 0.009, Lb: 0.282, c1: 0.028, c2: 0.028, rodLen: 0.275, pin: 'y' };
+  out.cyl = [1, -1].map(function (s) {
+    var c = makeCyl('vinkelcyl', cylO);
+    c.side = s; aG.add(c.group);
+    return c;
+  });
+  balloon('H1', 'vinkelcyl', aG, v3(pvx + P.cylA.x + 0.17, 0.085, 0.175), aWrap);
+
+  /* løftecylinder (trækker for at løfte) */
+  var liftO = { rb: 0.016, rr: 0.007, Lb: 0.14, c1: 0.026, c2: 0.026, rodLen: 0.25, pin: 'z' };
+  out.lift = makeCyl('loeftecyl', liftO);
+  sys.add(out.lift.group);
+  balloon('H2', 'loeftecyl', sys, v3(P.liftT.x + 0.06, P.liftT.y - 0.07, 0.03), null);
+
+  /* slanger */
+  out.hoseG = new T.Group(); out.hoseG.userData.part = 'slanger'; out.hoseG.userData.base = v3(0, 0, 0); sys.add(out.hoseG); register(out.hoseG);
+  out.hoses = [];
+  for (i = 0; i < 6; i++) {
+    var m = new T.Mesh(new T.BufferGeometry(), MAT.hose); m.userData.base = MAT.hose; m.castShadow = true;
+    out.hoseG.add(m); out.hoses.push(m);
+  }
+  var pHi = new Part('slanger', { edges: false });
+  out.bulk.forEach(function (b, j) {
+    var vz = (j < 4 ? [0.02, 0.035, -0.02, -0.035][j] : [0.0, 0.012][j - 4]);
+    var vx = j % 2 ? 0.360 : 0.310;
+    pHi.add(gTubePath([[0.553, b.y, b.z], [0.50, b.y + 0.02, b.z * 0.9], [0.42, 0.425, vz * 2 + b.z * 0.3], [vx, 0.41, vz], [vx, 0.392, vz]], 0.0055, 20, 6), 'hose');
+  });
+  out.hoseIn = pHi.build(); sys.add(out.hoseIn);
+  balloon('H5', 'slanger', sys, v3(0.66, 0.335, 0.14), null);
+
+  /* kinematik */
+  var _a = v3(), _b = v3();
+  out.exE = 0;
+  out.update = function (psi, phi) {
+    aG.rotation.z = phi;
+    bG.rotation.y = psi;
+    out.cyl.forEach(function (c) {
+      var gq = C.cylGeom(psi, c.side);
+      c.group.position.set(pvx + gq.ax, yb(P.cylA.y) + 0.12 * out.exE, gq.az);
+      c.group.rotation.y = Math.atan2(-gq.uz, gq.ux);
+      c.setLen(gq.len);
+    });
+    var lg = C.liftGeom(phi);
+    out.lift.group.position.set(P.liftT.x + 0.22 * out.exE, P.liftT.y + 0.10 * out.exE, 0);
+    out.lift.group.rotation.z = Math.atan2(lg.uy, lg.ux);
+    out.lift.setLen(lg.len);
+  };
+  out.updateHoses = function () {
+    sys.updateMatrixWorld(true);
+    var k = 0;
+    function run(c, port, bulk, sag) {
+      _a.copy(port); c.group.localToWorld(_a); sys.worldToLocal(_a);
+      _b.copy(bulk);
+      var up = v3(_a.x, _a.y + 0.045, _a.z);
+      var mid = v3((_a.x + _b.x) / 2 + 0.02, Math.max(_a.y, _b.y) + sag, (_a.z + _b.z) / 2);
+      var pre = v3(_b.x + 0.05, _b.y + 0.004, _b.z);
+      var geo = gTubePath([_a.clone(), up, mid, pre, _b.clone()], 0.0055, 26, 6);
+      out.hoses[k].geometry.dispose(); out.hoses[k].geometry = geo; k++;
+    }
+    run(out.cyl[0], out.cyl[0].portA, out.bulk[0], 0.05); run(out.cyl[0], out.cyl[0].portB, out.bulk[1], 0.07);
+    run(out.cyl[1], out.cyl[1].portA, out.bulk[2], 0.05); run(out.cyl[1], out.cyl[1].portB, out.bulk[3], 0.07);
+    run(out.lift, out.lift.portA, out.bulk[4], 0.01); run(out.lift, out.lift.portB, out.bulk[5], 0.015);
+  };
+  return out;
+}
+
+/* ---------- underlag og sne ---------- */
+function buildGround(world) {
+  var g = new T.Group(); world.add(g);
+  var half = 4, pos = [], pos2 = [], i;
+  for (i = -half * 4; i <= half * 4; i++) {
+    var t = i * 0.25, arr = (i % 4 === 0) ? pos2 : pos;
+    arr.push(-half, 0, t, half, 0, t, t, 0, -half, t, 0, half);
+  }
+  function lines(arr, op) {
+    var geo = new T.BufferGeometry(); geo.setAttribute('position', new T.BufferAttribute(new Float32Array(arr), 3));
+    var m = new T.LineBasicMaterial({ color: 0x9aa8b0, transparent: true, opacity: op, depthWrite: false });
+    var l = new T.LineSegments(geo, m); l.raycast = noRay; l.position.y = 0.0015; g.add(l); return l;
+  }
+  var l1 = lines(pos, 0.75), l2 = lines(pos2, 1);
+  var sh = new T.Mesh(new T.PlaneGeometry(half * 2, half * 2), new T.ShadowMaterial({ opacity: 0.22 }));
+  sh.rotation.x = -HALF; sh.receiveShadow = true; sh.raycast = noRay; g.add(sh);
+  return { group: g, minor: l1, major: l2, shadow: sh };
+}
+
+function buildSnow(world, plow) {
+  var P = C.plow, S = C.snow;
+  var slab = new T.Mesh(new T.BufferGeometry(), MAT.snow); slab.receiveShadow = false; slab.raycast = noRay; world.add(slab);
+  var row = new T.Mesh(new T.BufferGeometry(), MAT.snowPile); row.receiveShadow = false; row.castShadow = false; row.raycast = noRay; world.add(row);
+  var prism = new T.Mesh(new T.BufferGeometry(), MAT.snowPile); prism.castShadow = false; prism.raycast = noRay; plow.bG.add(prism);
+  var X0 = -1.7, X1 = 2.5, ZW = 1.55;
+  [slab, row, prism].forEach(function (m) {
+    var ln = new T.LineSegments(new T.BufferGeometry(), EDGE.snow); ln.raycast = noRay; m.add(ln); m.userData.ln = ln;
+  });
+  function setGeo(m, geo) {
+    m.geometry.dispose(); m.geometry = geo;
+    m.userData.ln.geometry.dispose(); m.userData.ln.geometry = new T.EdgesGeometry(geo, 25);
+  }
+  function update(res, show) {
+    var inp = res.inp, on = show && inp.h > 0;
+    slab.visible = on; row.visible = false; prism.visible = false;
+    if (!on) return;
+    var psi = res.psi, cp = Math.cos(psi), sp = Math.sin(psi), hb = P.B / 2;
+    function toV(xl, zl) { return [P.pivot.x + xl * cp + zl * sp, -xl * sp + zl * cp]; }
+    var pts;
+    if (inp.lift) pts = [[X0, -ZW], [X1, -ZW], [X1, ZW], [X0, ZW]];
+    else {
+      var eL = toV(P.pf + 0.012, -hb), eR = toV(P.pf + 0.012, hb);
+      pts = [[X0, -ZW], [X1, -ZW], [X1, ZW], [X0, ZW], [X0, eR[1]], [eR[0], eR[1]], [eL[0], eL[1]], [X0, eL[1]]];
+    }
+    var shp = shapeOf(pts.map(function (q) { return [q[0], -q[1]]; }));
+    var geo = gExt(shp, inp.h, 1); geo.rotateX(-HALF); geo.translate(0, 0.002, 0);
+    setGeo(slab, geo);
+    if (inp.lift) return;
+    /* snekile foran skæret (i plovens egne akser) */
+    var sn = res.snow, sg = res.sg, secs = [], K = 14, tanR = Math.tan(S.repose), hy = P.hinge.y, j;
+    var AR = plow.arc;
+    function faceX(y) { return AR.cx - Math.sqrt(Math.max(0, AR.R * AR.R - Math.pow(y - AR.cyA, 2))); }
+    for (j = 0; j <= K; j++) {
+      var s = P.B * j / K;
+      var lam = Math.min(isFinite(sn.k) ? sn.k * s : sn.lamMax, sn.lamMax);
+      var A = lam / sn.rhoC, hh = Math.max(inp.h, Math.min(Math.sqrt(2 * A * tanR), P.H - 0.04)), b = hh / tanR + 0.03;
+      var zl = sg * (s - hb), xb = faceX(0.035);
+      secs.push([v3(xb + b, inp.h * 0.5 - hy, zl), v3(faceX(hh) + 0.004, hh - hy, zl)]);
+    }
+    var f0 = v3(faceX(0.035), -hy, secs[0][0].z), f1 = v3(faceX(0.035), -hy, secs[K][0].z);
+    setGeo(prism, gRibbon(secs, [f0, f1])); prism.visible = sn.mPrism > 0.05;
+    /* snevold langs den side, sneen kastes til */
+    if (sn.slide > 1e-3) {
+      var Aw = inp.rho * inp.h * P.B * cp / sn.rhoC;
+      var hw = Math.sqrt(Aw * tanR), bw = 2 * hw / tanR;
+      var eT = toV(P.pf, sg * hb), z0 = eT[1], zs = sg;
+      var xs = [eT[0] + 0.12, eT[0] - 0.28, X0], sec2 = [];
+      xs.forEach(function (x, q) {
+        var f = q === 0 ? 0.2 : 1;
+        sec2.push([v3(x, inp.h, z0 - zs * 0.01), v3(x, inp.h + hw * f, z0 + zs * bw * f * 0.5), v3(x, inp.h, z0 + zs * Math.max(bw * f, 0.04))]);
+      });
+      setGeo(row, gRibbon(sec2, [v3(xs[0], inp.h, z0 + zs * bw * 0.1), v3(X0, inp.h, z0 + zs * bw * 0.5)])); row.visible = true;
+    }
+  }
+  return { slab: slab, row: row, prism: prism, update: update };
+}
+
+/* ============================================================
+   Stykliste: hvad hver del gør, hvad der skal regnes, og tal fra lasttilfældet
+   ============================================================ */
+function nf(x, d) { return (isFinite(x) ? x : 0).toLocaleString('da-DK', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
+function fN(x) { var a = Math.abs(x); return a >= 9950 ? nf(x / 1000, 1) + ' kN' : a >= 1000 ? nf(x / 1000, 2) + ' kN' : nf(x, 0) + ' N'; }
+function fNm(x) { return (Math.abs(x) >= 100 ? nf(x, 0) : nf(x, 1)) + ' Nm'; }
+function fBar(p) { var b = p / 1e5; return (b >= 100 ? nf(b, 0) : nf(b, 1)) + ' bar'; }
+function fRpm(n) { return nf(n, 0) + ' o/min'; }
+function fW(p) { return p >= 1000 ? nf(p / 1000, 2) + ' kW' : nf(p, 0) + ' W'; }
+function fMm(x) { return nf(x * 1000, 0) + ' mm'; }
+function fPct(x) { return nf(x * 100, 0) + ' %'; }
+
+var TYPE = { egen: 'Egen konstruktion', valg: 'Købedel, vælges ved beregning', koeb: 'Købedel' };
+var GROUPS = [['driv', 'Drivlinje'], ['hyd', 'Hydraulik'], ['plov', 'Plov'], ['ovr', 'Øvrigt']];
+var DRY = 'hjulspin på tør asfalt';
+
+var PARTS = {
+  tandhjul: {
+    no: '1', grp: 'driv', navn: 'Tandhjulstrin', kort: 'Drev z = 18, hjul z = 72, modul 2', antal: '2 sæt', type: 'egen', fag: ['Maskinelementer'],
+    rolle: 'Sænker omdrejningstallet fra gearmotoren til mellemakslen og gør momentet fire gange større. Det lille drev er skåret på indgangsakslen. Det store hjul sidder på mellemakslens glidenav.',
+    beregn: ['Udveksling <code>i = z₂/z₁</code> og akselafstand <code>a = m·(z₁ + z₂)/2</code>', 'Tandkraft <code>F_t = 2·M/d</code> og radialkraft <code>F_r = F_t·tan 20°</code>', 'Tandfodsspænding og fladetryk med driftsfaktor', 'Valg af modul, tandbredde og materiale'],
+    tal: function (r) {
+      return [['Moment på drevet', fNm(r.drv.T1)], ['Omdrejningstal, drev → hjul', nf(r.drv.n1) + ' → ' + fRpm(r.drv.n2)], ['Tandkraft F<sub>t</sub>', fN(r.drv.Ft)],
+        ['Radialkraft F<sub>r</sub>', fN(r.drv.Frad)], ['Resulterende tandkraft (pilen i modellen)', fN(r.drv.Fn)], ['Tandkraft F<sub>t</sub> ved ' + DRY, fN(r.drv.FtMax)]];
+    }
+  },
+  mellemaksel: {
+    no: '2', grp: 'driv', navn: 'Mellemaksel', kort: 'Trinaksel Ø22–Ø34 i to lejer', antal: '2', type: 'egen', fag: ['Maskinelementer', 'Styrkelære'],
+    rolle: 'Bærer det store tandhjul mellem lejerne og det dobbelte kædehjul uden for det yderste leje. Momentet kommer ind gennem tandhjulet og går ud gennem de to kæder.',
+    indsigt: 'De to kæder trækker hver sin vej, så akslen kun mærker forskellen mellem dem. Den største bøjning kommer fra tandkraften midt mellem lejerne.',
+    beregn: ['Lejereaktioner og bøjningsmoment i to planer', 'Bøjning og vridning: <code>σ = M_b/W</code>, <code>τ = M_v/W_v</code>, <code>σ_v = √(σ² + 3τ²)</code>', 'Udmattelse med kærvfaktor ved skuldre og notgange', 'Nedbøjning ved tandhjulet'],
+    tal: function (r) {
+      return [['Vridningsmoment', fNm(r.drv.T2)], ['Omdrejningstal', fRpm(r.drv.n2)], ['Bøjningsmoment ved tandhjulet', fNm(r.mid.Mg)],
+        ['Bøjningsmoment ved yderste leje', fNm(r.mid.Ma)], ['Vridningsmoment ved ' + DRY, fNm(r.drv.T2max)]];
+    }
+  },
+  lejer: {
+    no: '3', grp: 'driv', navn: 'Lejer i gearhuset', kort: 'Sporkuglelejer 6205 og 6204', antal: '8', type: 'valg', fag: ['Maskinelementer'],
+    rolle: 'Fire sporkuglelejer i hvert gearhus bærer mellemakslen og indgangsakslen i husets to plader. De optager tandkraften og kædekræfterne som radiallast.',
+    indsigt: 'Et 6205-leje har et dynamisk bæretal på omkring 14 kN. Lejestørrelsen bestemmes derfor af akseldiameteren og ikke af lasten.',
+    beregn: ['Lejereaktioner fra ligevægt på akslen', 'Levetid <code>L10h = 10⁶/(60·n) · (C/P)³</code>', 'Fast og løst leje, pasninger på aksel og i hus'],
+    tal: function (r) {
+      return [['Reaktion i yderste leje (A)', fN(r.mid.RA)], ['Reaktion i inderste leje (B)', fN(r.mid.RB)], ['Omdrejningstal', fRpm(r.drv.n2)],
+        ['Nødvendigt bæretal ved 5.000 timer', fN(r.mid.Cmin)]];
+    }
+  },
+  feder: {
+    no: '4', grp: 'driv', navn: 'Pasfeder mellem aksel og nav', kort: 'DIN 6885, form A', antal: '8', type: 'valg', fag: ['Maskinelementer'],
+    rolle: 'Pasfedre overfører momentet mellem aksel og nav ved glidenavet og kædehjulene. I sprængskitsen er de løftet op af notgangene, så de kan ses.',
+    beregn: ['Fladetryk i navet: <code>p = 2·M/(d·(h − t₁)·l_b)</code>', 'Bærende længde <code>l_b = l − b</code> for feder med runde ender', 'Alternativ: krympe- eller spændeforbindelse uden kærv fra notgangen'],
+    tal: function (r) {
+      return [['Moment på mellemakslen', fNm(r.drv.T2)], ['Omkredskraft på federen ved Ø28', fN(r.mid.keyF)], ['Samme ved ' + DRY, fN(2 * r.drv.T2max / 0.028)]];
+    }
+  },
+  kaede: {
+    no: '5', grp: 'driv', navn: 'Kædetræk', kort: 'Rullekæde 08B-1, z = 15/30, 80 led', antal: '4 kæder', type: 'valg', fag: ['Maskinelementer'],
+    rolle: 'To rullekæder fører momentet fra mellemakslens dobbelte kædehjul til for- og bagaksel. Det er dem, der gør maskinen firehjulstrukket med kun én motor pr. side.',
+    beregn: ['Delecirkel <code>d = p/sin(180°/z)</code> og udveksling <code>i = z₂/z₁</code>', 'Kædekraft <code>F = 2·M/d</code> og sikkerhed mod brudlasten', 'Kædelængde i et helt, lige antal led og den akselafstand, der passer til', 'Opstramning: glideklodser på begge parter, fordi maskinen kører begge veje'],
+    tal: function (r) {
+      var rows = [['Kædekraft til forakslen', fN(r.drv.Fkf)], ['Kædekraft til bagakslen', fN(r.drv.Fkr)], ['Kædehastighed', nf(r.drv.vChain, 2) + ' m/s'],
+        ['Største kædekraft, ' + DRY, fN(r.drv.FkMax)], ['Sikkerhed mod brud (ca. 17,8 kN)', nf(r.drv.chainS, 1)]];
+      return rows;
+    },
+    note: function (r) { return r.drv.chainS < 7 ? 'Sikkerheden ved hjulspin på tør asfalt ligger under de ca. 7, man normalt regner med statisk. Vælg en større kæde, eller lad glidenavet begrænse momentet.' : ''; }
+  },
+  hjulaksel: {
+    no: '6', grp: 'driv', navn: 'Hjulaksel og hjullejer', kort: 'Akseltap Ø30 i flangerør med to 6206', antal: '4', type: 'egen', fag: ['Maskinelementer', 'Styrkelære'],
+    rolle: 'Akseltappen bærer hjulet uden for chassiset og kædehjulet inden for. To lejer i et flangerør, der er boltet på sidepladen, optager hjullast, trækkraft og sidekraft.',
+    beregn: ['Bøjning fra hjullasten på udhænget plus vridning fra drivmomentet', 'Lejereaktioner: det yderste leje får mere end hjullasten', 'Sidekraften giver aksiallast og et ekstra bøjningsmoment <code>S·r</code>', 'Udmattelse ved lejesædets skulder, fordi bøjningen roterer med akslen'],
+    tal: function (r) {
+      return [['Hjullast, højre forhjul', fN(r.axle.N)], ['Trækkraft', fN(r.axle.Fx)], ['Sidekraft', fN(Math.abs(r.axle.S))], ['Drivmoment', fNm(r.axle.T)],
+        ['Reaktion i yderste leje', fN(r.axle.Ro)], ['Reaktion i inderste leje', fN(r.axle.Ri)], ['Bøjningsmoment ved yderste leje', fNm(r.axle.Mb)], ['Drivmoment ved ' + DRY, fNm(r.axle.TMax)]];
+    }
+  },
+  kobling: {
+    no: '7', grp: 'driv', navn: 'Elastisk kobling', kort: 'Klokobling med elastomerstjerne', antal: '2', type: 'valg', fag: ['Maskinelementer'],
+    rolle: 'Forbinder planetgearets udgangsaksel med indgangsakslen. Stjernen af elastomer optager små opretningsfejl og dæmper stød fra tandhjulstrinnet.',
+    beregn: ['Koblingsmoment <code>M_K = K_A·M</code> med driftsfaktor for stødvis last', 'Kontrol mod største moment ved start og ved hjulspin', 'Tilladelig vinkel-, radial- og aksialforsætning'],
+    tal: function (r) {
+      return [['Moment', fNm(r.drv.T1)], ['Omdrejningstal', fRpm(r.drv.n1)], ['Koblingsmoment ved K<sub>A</sub> = 1,5', fNm(1.5 * r.drv.T1)], ['Moment ved ' + DRY, fNm(r.drv.T1max)]];
+    }
+  },
+  overbel: {
+    no: '8', grp: 'driv', navn: 'Overbelastningskobling', kort: 'Glidenav med friktionsskiver og tallerkenfjedre', antal: '2', type: 'valg', fag: ['Maskinelementer', 'Dynamik'],
+    rolle: 'Det store tandhjul sidder ikke fast på akslen. Det er klemt mellem to friktionsskiver på et nav, og tallerkenfjedrene bestemmer, hvor hårdt. Bliver momentet for stort, glider hjulet på navet, før en tand eller en feder giver efter.',
+    beregn: ['Glidemoment <code>M_g = z·μ·F_f·r_m</code> med z = 2 friktionsflader', 'Indstilling over det største driftsmoment og under det, det svageste led tåler', 'Dynamik: ved et brat stop skal motorens rotor bremses gennem gearet. Reduceret inerti <code>J_red = J·i²</code>'],
+    tal: function (r) {
+      var V = r.C.veh, mr = V.Jm * r.C.iTot * r.C.iTot / (r.C.rw * r.C.rw);
+      return [['Moment på mellemakslen i drift', fNm(r.drv.T2)], ['Moment ved ' + DRY, fNm(r.drv.T2max)],
+        ['Rotorens inerti (antaget 5 kg·cm²) svarer ved hjulet til', nf(mr, 0) + ' kg pr. side']];
+    }
+  },
+  bolte: {
+    no: '9', grp: 'driv', navn: 'Boltesamling', kort: 'Gearhus til chassisbund, 4 × M10', antal: '8 bolte', type: 'valg', fag: ['Maskinelementer'],
+    rolle: 'Hvert gearhus er boltet til chassisbunden med fire bolte. Samlingen holder huset mod reaktionsmomentet fra gearet og mod kædetrækket, når den ene kæde bærer mere end den anden.',
+    beregn: ['Reaktionsmoment på huset: <code>M = M₁ + M₂</code>, fordi de to aksler drejer hver sin vej', 'Tværkraft pr. bolt og nødvendig forspænding: <code>F_V ≥ S·F_Q/μ</code>', 'Tilspændingsmoment og udnyttelse af bolten'],
+    tal: function (r) {
+      return [['Reaktionsmoment på huset i drift', fNm(r.mid.houseM)], ['Samme ved ' + DRY, fNm(r.drv.T1max + r.drv.T2max)], ['Tværkraft, hvis kun én kæde trækker', fN(r.drv.FkMax)]];
+    }
+  },
+  svejs: {
+    no: '10', grp: 'driv', navn: 'Svejsesamling', kort: 'Motorkonsol med knæplader', antal: '2', type: 'egen', fag: ['Maskinelementer', 'Styrkelære'],
+    rolle: 'Konsollen er en plade med to knæplader, svejst til chassisbunden. Den bærer gearmotoren og holder igen mod dens reaktionsmoment.',
+    beregn: ['Kantsøm: a-mål og sømlængde', 'Spændinger i sømmen fra reaktionsmoment og egenvægt', 'Udmattelse, fordi momentet skifter retning, hver gang maskinen bakker'],
+    tal: function (r) {
+      return [['Reaktionsmoment fra gearmotoren i drift', fNm(r.mid.brkM)], ['Samme ved ' + DRY, fNm(r.drv.T1max - r.drv.TmMax)], ['Gearmotorens vægt, ca. 9 kg', fN(9 * r.C.g)]];
+    }
+  },
+  motor: {
+    no: 'M', grp: 'driv', navn: 'Elmotor med planetgear', kort: 'Børsteløs 48 V-motor, planetgear i = 5', antal: '2', type: 'koeb', fag: ['Dynamik'],
+    rolle: 'Én gearmotor pr. side. Maskinen styrer ved at køre de to sider med forskellig hastighed, så der er hverken styretøj eller differentiale.',
+    beregn: ['Driftspunkt: moment og omdrejningstal ud fra trækkraft og hastighed', 'Effekt <code>P = M·ω</code> og opvarmning ved fire timers drift', 'Accelerationsmoment med reduceret inertimoment'],
+    tal: function (r) {
+      return [['Moment på motorakslen', nf(r.drv.Tm, 2) + ' Nm'], ['Omdrejningstal', fRpm(r.drv.nm)], ['Mekanisk effekt', fW(r.drv.Pm)], ['Elektrisk effekt', fW(r.drv.Pel)], ['Moment ved ' + DRY, fNm(r.drv.TmMax)]];
+    }
+  },
+  gearhus: {
+    no: 'G', grp: 'driv', navn: 'Gearhus', kort: 'To plader med lejesæder og kappe', antal: '2', type: 'egen', fag: ['Maskinelementer'],
+    rolle: 'To plader med lejesæder og en kappe imellem. Huset holder akselafstanden på 90 mm og fører lejekræfterne ned i chassisbunden.',
+    beregn: ['Akselafstandens tolerance bestemmer flankespillet', 'Smøring og tætning mod sne og salt'],
+    tal: function (r) { return [['Akselafstand', '90 mm'], ['Reaktionsmoment på huset', fNm(r.mid.houseM)]]; }
+  },
+  vinkelcyl: {
+    no: 'H1', grp: 'hyd', navn: 'Vinkelcylindre', kort: 'Dobbeltvirkende Ø32/18, slag 207 mm', antal: '2', type: 'valg', fag: ['Hydraulik', 'Dynamik'],
+    rolle: 'To cylindre mellem A-rammen og plovens drejeramme. Når den ene skubber, giver den anden efter, og ploven drejer om tappen.',
+    beregn: ['Moment om drejetappen fra snekraften, og cylinderkraft <code>F = M/r</code>', 'Tryk <code>p = F/A</code> og volumenstrøm <code>Q = A·v</code> for den ønskede svingtid', 'Chokventilens åbningstryk sætter den største kraft ved påkørsel', 'Knækning af stempelstangen i udkørt stilling'],
+    tal: function (r, lc) {
+      var h = r.hyd;
+      if (lc === 'kant') {
+        return [['Chokventil åbner ved', fBar(h.kant.p)], ['Cylinderkraft', fN(h.kant.F)], ['Største kraft på plovens hjørne', fN(h.kant.Fcorner)],
+          ['Maskinens bevægelsesenergi', nf(h.kant.Ek, 0) + ' J'], ['Energien optages på', fMm(h.kant.ds) + ' slag'], ['Samme kraft med trykluft ved 6 bar', 'Ø' + fMm(h.pneuDshock)]];
+      }
+      return [['Moment om drejetappen', fNm(h.ryd.M)], ['Momentarm', fMm(h.ryd.arm)], ['Cylinderkraft', fN(h.ryd.F)], ['Tryk', fBar(h.ryd.p)],
+        ['Samme kraft med trykluft ved 6 bar', 'Ø' + fMm(h.pneuD)]];
+    },
+    indsigt: 'Trykluft kan levere kraften under rydning. Men luft fjedrer, så ploven ikke står fast i vinklen, og kondensvand i ventiler og slanger fryser. Under en påkørsel skal cylinderen holde langt mere, og det kræver en meget stor luftcylinder.'
+  },
+  loeftecyl: {
+    no: 'H2', grp: 'hyd', navn: 'Løftecylinder', kort: 'Ø25/14, trækker for at løfte', antal: '1', type: 'valg', fag: ['Hydraulik'],
+    rolle: 'Løfter A-rammen om hængslerne, når maskinen bakker eller kører uden at rydde. Under rydning står ventilen i flydestilling, så ploven hviler på slidskinnen og følger underlaget.',
+    beregn: ['Momentligevægt om hængslet: <code>F = G_plov·a/b</code>', 'Tryk på ringarealet, fordi cylinderen trækker', 'Slaglængde for den ønskede løftehøjde'],
+    tal: function (r) {
+      return [['Plovens vægt', fN(r.plow.Wp)], ['Kraft for at holde ploven', fN(r.hyd.Flift)], ['Momentarm om hængslet', fMm(r.hyd.liftArm)], ['Tryk', fBar(r.hyd.pLift)],
+        ['Slag', fMm(r.C.plow.liftLen0 - r.C.plow.liftLen1)]];
+    }
+  },
+  pumpe: {
+    no: 'H3', grp: 'hyd', navn: 'Hydraulikstation', kort: '48 V-motor, tandhjulspumpe og tank', antal: '1', type: 'koeb', fag: ['Hydraulik'],
+    rolle: 'Kompakt pumpestation med elmotor, tandhjulspumpe, tank og trykbegrænsningsventil. Den kører kun, mens ploven flyttes.',
+    beregn: ['Pumpeflow <code>Q = V_g·n·η_vol</code>', 'Effekt <code>P = p·Q/η</code>', 'Olie med lav viskositet til frost, og tankens størrelse'],
+    tal: function (r) {
+      return [['Volumenstrøm for fuldt sving på 4 s', nf(r.hyd.Q * 60000, 1) + ' l/min'], ['Effekt ved 120 bar', fW(r.hyd.Ppump)], ['Effekt ved trykket under rydning', fW(r.hyd.Pdrift)]];
+    }
+  },
+  ventil: {
+    no: 'H4', grp: 'hyd', navn: 'Ventilblok', kort: 'To 4/3-retningsventiler og chokventiler', antal: '1', type: 'koeb', fag: ['Hydraulik'],
+    rolle: 'Én retningsventil til vinkling og én til løft. Lukket midterstilling holder ploven fast i den valgte vinkel. Krydsede chokventiler lader ploven give efter, hvis et hjørne rammer en kantsten.',
+    beregn: ['Kredsløbet: tank → pumpe → trykbegrænsning → retningsventil → cylinder → retur', 'Chokventilens tryk over arbejdstrykket og under det, cylinder og ramme tåler', 'Flydestilling på løfteventilen'],
+    tal: function (r) { return [['Arbejdstryk (trykbegrænsning)', fBar(r.C.plow.pRelief)], ['Chokventiler', fBar(r.C.plow.pShock)], ['Tryk under rydning', fBar(r.hyd.ryd.p)]]; }
+  },
+  slanger: {
+    no: 'H5', grp: 'hyd', navn: 'Slanger', kort: 'Seks slanger, 1/4"', antal: '6', type: 'koeb', fag: ['Hydraulik'],
+    rolle: 'Seks slanger fra ventilblokken til de tre cylindre. De skal kunne følge plovens løft og sving uden at komme i klemme.',
+    beregn: ['Strømningshastighed <code>v = Q/A</code>', 'Tryktab og mindste bøjeradius'],
+    tal: function (r) { return [['Strømningshastighed', nf(r.hyd.vHose, 1) + ' m/s']]; }
+  },
+  skaer: {
+    no: 'P1', grp: 'plov', navn: 'Plovskær', kort: '1,40 m krumt skjold, slidskinne og slidsko', antal: '1', type: 'egen', fag: ['Dynamik', 'Styrkelære'],
+    rolle: 'Krumt skjold, der ruller sneen frem og ud til siden. Slidskinnen forneden kan skiftes, og to slidsko bærer en del af vægten.',
+    indsigt: 'Sneen samler sig mod den side, den forlader ploven. Derfor angriber snekraften ikke midt på skæret, og den prøver at dreje ploven endnu mere på skrå.',
+    beregn: ['Snekraft ud fra snemassen foran skæret og friktionen mod underlaget', 'Skærets kapacitet: hvor meget sne kilen foran skæret kan bære og flytte til siden', 'Skærets egen friktion ud fra den del af plovvægten, det bærer', 'Pladetykkelse og ribber mod bøjning'],
+    tal: function (r) {
+      return [['Sne foran skæret', nf(r.snow.mPrism, 0) + ' kg'], ['Snekraft', fN(r.snow.R)], ['Retning fra køreretningen', nf(r.snow.beta * 180 / Math.PI, 0) + '°'],
+        ['Angrebspunkt fra skærets midte', fMm(Math.abs(r.snow.zlC))], ['Skærets friktion mod underlaget', fN(r.plow.Fe)], ['Rydningsbredde', nf(r.cap.wClear, 2) + ' m'],
+        ['Skærets udnyttelse', isFinite(r.snow.util) ? fPct(r.snow.util) : 'kaster ikke til siden'], ['Største snedybde ved denne vinkel', nf(r.snow.hMax * 100, 1) + ' cm']];
+    }
+  },
+  drejeramme: {
+    no: 'P2', grp: 'plov', navn: 'Drejeramme og drejetap', kort: 'Tap Ø26 i dobbelt snit', antal: '1', type: 'egen', fag: ['Maskinelementer', 'Styrkelære'],
+    rolle: 'Bjælken bag skæret drejer om en lodret tap i A-rammens spids. Skubbekraften går gennem tappen. Cylindrene holder vinklen.',
+    beregn: ['Tap i dobbelt snit: <code>τ = F/(2·A)</code>', 'Hulrandstryk <code>p = F/(d·t)</code>', 'Bøjning i bjælken mellem cylinderøjerne'],
+    tal: function (r) { return [['Kraft i drejetappen under rydning', fN(r.hyd.ryd.R)], ['Kraft i drejetappen, når chokventilen åbner', fN(r.hyd.kant.R)]]; }
+  },
+  aramme: {
+    no: 'P3', grp: 'plov', navn: 'A-ramme og plovbeslag', kort: 'Hængslet skubberamme og tårn til løft', antal: '1', type: 'egen', fag: ['Styrkelære'],
+    rolle: 'A-rammen skubber ploven og er hængslet til beslaget på chassiset, så ploven kan løftes og flyde. Beslaget bærer også tårnet til løftecylinderen.',
+    beregn: ['Hængselkræfter fra skubbekraft og sidekraft', 'Bøjning i benene, når et hjørne rammer', 'Svejsesømme ved næsen'],
+    tal: function (r) { return [['Skubbekraft under rydning', fN(r.veh.Fplow)], ['Sidekraft fra sneen', fN(Math.abs(r.snow.Fz))], ['Største kraft på plovens hjørne', fN(r.hyd.kant.Fcorner)]]; }
+  },
+  batteri: {
+    no: 'B', grp: 'ovr', navn: 'Batteri', kort: '48 V', antal: '1', type: 'koeb', fag: ['Matematik'],
+    rolle: 'Forsyner de to motorstyringer og hydraulikstationen. Vægten ligger lavt og midt i maskinen, hvor den giver tryk på alle fire hjul.',
+    beregn: ['Energi som effekt integreret over en kørecyklus', 'Reserve til kulde: kapaciteten falder i frost', 'Spidsstrøm ved start og hjulspin'],
+    tal: function (r) { return [['Elforbrug nu', fW(r.cap.PelTot)], ['Energi til fire timer', nf(r.cap.E4, 1) + ' kWh'], ['Svarer ved 48 V til', nf(r.cap.E4 * 1000 / 48, 0) + ' Ah']]; }
+  },
+  styring: {
+    no: 'S', grp: 'ovr', navn: 'Motorstyringer', kort: 'Én pr. motor', antal: '2', type: 'koeb', fag: [],
+    rolle: 'Én styring pr. motor. Strømgrænsen bestemmer motorens største moment og er den første sikring mod overbelastning. Glidenavet tager de stød, elektronikken ikke når at reagere på.',
+    beregn: [], tal: function (r) { return [['Elektrisk effekt pr. side', fW(r.drv.Pel)], ['Strøm ved 48 V', nf(r.drv.Pel / 48, 1) + ' A']]; }
+  },
+  kabler: {
+    no: 'K', grp: 'ovr', navn: 'Kabler', kort: 'Batteri, styringer, motorer og pumpe', antal: '', type: 'koeb', fag: [],
+    rolle: 'Forbindelser fra batteriet til styringerne og videre til de to motorer, og til hydraulikstationen.', beregn: [], tal: function () { return []; }
+  },
+  chassis: {
+    no: 'C', grp: 'ovr', navn: 'Chassis', kort: 'Svejst kasse af stålplade', antal: '1', type: 'egen', fag: ['Styrkelære'],
+    rolle: 'Svejst kasse af stålplade. Sidepladerne bærer hjullejernes flangerør, og bunden bærer gearhuse og motorkonsoller.',
+    beregn: ['Stivhed mellem de fire hjul', 'Lokal bøjning i sidepladen omkring lejeflangerne'], tal: function () { return []; }
+  },
+  hjul: {
+    no: 'D', grp: 'ovr', navn: 'Hjul', kort: 'Ø400 mm vinterdæk', antal: '4', type: 'koeb', fag: ['Dynamik'],
+    rolle: 'Fire ens hjul. Alle fire trækker, så hele maskinens vægt giver trækkraft.',
+    indsigt: 'På isslag er friktionen omkring 0,1, og på våd is kan den blive langt lavere. Så er det dækkets overflade, for eksempel pigge eller kæder, der afgør trækkraften.',
+    beregn: ['Friktionsgrænse <code>F ≤ μ·N</code> for hvert hjul', 'Trækkraft og sidekraft deler den samme friktion'],
+    tal: function (r) {
+      return [['Normalkraft, højre forhjul', fN(r.veh.NfR)], ['Normalkraft, højre baghjul', fN(r.veh.NrR)], ['Udnyttet friktion, foraksel', fPct(r.veh.utilF)], ['Udnyttet friktion, bagaksel', fPct(r.veh.utilR)]];
+    }
+  },
+  kappe: { no: 'A', grp: 'ovr', navn: 'Kappe', kort: 'Afdækning', antal: '1', type: 'egen', fag: [], rolle: 'Afdækning over batteri, styringer og hydraulik.', beregn: [], tal: function () { return []; } },
+  sensor: { no: 'R', grp: 'ovr', navn: 'Sensorer og sikkerhed', kort: 'Lidar, blink og nødstop', antal: '', type: 'koeb', fag: [], rolle: 'Lidar, advarselsblink og nødstop. De hører til robotdelen og er ikke med i drivlinjen.', beregn: [], tal: function () { return []; } },
+  saltspreder: {
+    no: 'Ø', grp: 'ovr', navn: 'Saltspreder', kort: 'Tragt og spredetallerken', antal: '1', type: 'koeb', fag: [],
+    rolle: 'Tragt og spredetallerken bag på maskinen. Saltet giver også vægt over bagakslen, som opvejer ploven foran.', beregn: [], tal: function () { return []; }
+  }
+};
+var PATH = ['batteri', 'styring', 'motor', 'kobling', 'tandhjul', 'overbel', 'mellemaksel', 'kaede', 'hjulaksel', 'hjul'];
+var PART_ORDER = ['tandhjul', 'mellemaksel', 'lejer', 'feder', 'kaede', 'hjulaksel', 'kobling', 'overbel', 'bolte', 'svejs', 'motor', 'gearhus',
+  'vinkelcyl', 'loeftecyl', 'pumpe', 'ventil', 'slanger', 'skaer', 'drejeramme', 'aramme', 'batteri', 'styring', 'kabler', 'chassis', 'hjul', 'kappe', 'sensor', 'saltspreder'];
+
+/* ============================================================
+   Program: scene, kamera, visning, kraftpile, betjening
+   ============================================================ */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var sheet = $('sheet'), canvas = $('gl'), labelBox = $('labels'), tipEl = $('tip');
+  var state = {
+    scene: 'maskine', forces: true, nums: true, dims: false, xray: false, cut: false, snow: true, run: false, lift: false, lc: 'ryd',
+    ang: 30, ex: 0, h: 0.05, rho: 250, mu: 0.25, slope: 0, v: 0.6, m: 300, sel: null, iso: false, tab: 'del'
+  };
+  function inputs() { return { ang: state.ang, lift: state.lift, h: state.h, rho: state.rho, mu: state.mu, slope: state.slope, v: state.v, m: state.m, lc: state.lc }; }
+  var res = SR.compute(inputs());
+  var liftPhi = 0, dist = 0, dirty = true, raf = 0, lastT = 0;
+  function invalidate() { dirty = true; if (!raf) raf = requestAnimationFrame(frame); }
+
+  /* ---------- renderer ---------- */
+  var renderer = null;
+  try {
+    renderer = new T.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+  } catch (e) { renderer = null; }
+  if (!renderer) {
+    var f = document.createElement('div'); f.className = 'fail';
+    f.textContent = '3D-visningen kan ikke starte i denne browser. Laster og stykliste virker stadig i panelet.';
+    sheet.appendChild(f);
+  }
+  var scene = new T.Scene(), world = new T.Group(), vehicle = new T.Group(), arrowRoot = new T.Group();
+  scene.add(world); world.add(vehicle); vehicle.add(arrowRoot);
+  var cam = new T.PerspectiveCamera(30, 1, 0.05, 80);
+
+  if (renderer) {
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.outputEncoding = T.sRGBEncoding;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = T.PCFSoftShadowMap;
+    renderer.setClearColor(0x000000, 0);
+    renderer.localClippingEnabled = true;
+  }
+  /* snitplan gennem alle akslers centerlinjer; plovsystemet skæres ikke */
+  var cutLocal = new T.Plane(new T.Vector3(0, -1, 0), C.axY), cutPlane = cutLocal.clone();
+  var NOCUT = { skaer: 1, drejeramme: 1, aramme: 1, vinkelcyl: 1, loeftecyl: 1 };
+  EDGE.solidCut.clippingPlanes = [cutPlane]; EDGE.ghostCut.clippingPlanes = [cutPlane];
+  scene.add(new T.HemisphereLight(0xffffff, 0x7c878f, 0.36));
+  var key = new T.DirectionalLight(0xffffff, 0.70);
+  key.position.set(3.2, 5.5, 3.6); key.castShadow = true;
+  key.shadow.mapSize.set(2048, 2048);
+  key.shadow.camera.left = -2.6; key.shadow.camera.right = 2.6; key.shadow.camera.top = 2.6; key.shadow.camera.bottom = -2.6;
+  key.shadow.camera.near = 1; key.shadow.camera.far = 14; key.shadow.bias = -0.0006; key.shadow.normalBias = 0.012;
+  scene.add(key);
+  var fill = new T.DirectionalLight(0xdfe9f2, 0.16); fill.position.set(-3.5, 2.5, -2.5); scene.add(fill);
+  /* enkel omgivelse, så metal får reflekser */
+  if (renderer) {
+    try {
+      var envS = new T.Scene();
+      var room = new T.Mesh(new T.BoxGeometry(10, 6, 10), new T.MeshBasicMaterial({ color: 0x5d666d, side: T.BackSide })); envS.add(room);
+      [[0, 2.9, 0, 6, 0.1, 6, 0xd9dfe4], [4.9, 0.5, 0, 0.1, 3, 5, 0xa9b3bb], [-4.9, 0.5, 0, 0.1, 3, 5, 0x7f8a93], [0, 0.5, 4.9, 5, 3, 0.1, 0xb9c2c9],
+        [0, -2.9, 0, 10, 0.1, 10, 0x3d454b]].forEach(function (b) {
+        var m = new T.Mesh(new T.BoxGeometry(b[3], b[4], b[5]), new T.MeshBasicMaterial({ color: b[6] })); m.position.set(b[0], b[1], b[2]); envS.add(m);
+      });
+      var pm = new T.PMREMGenerator(renderer);
+      scene.environment = pm.fromScene(envS, 0.035).texture;
+      pm.dispose();
+    } catch (e2) { /* uden omgivelse */ }
+  }
+
+  /* ---------- model ---------- */
+  var chassis = buildChassis(); vehicle.add(chassis);
+  balloon('C', 'chassis', vehicle, v3(-0.30, 0.20, 0.327), null);
+  var modR = buildDriveModule(1); vehicle.add(modR.group);
+  var modL = buildDriveModule(-1); modL.group.rotation.y = PI; vehicle.add(modL.group);
+  var deck = buildDeck(vehicle);
+  var cover = buildCover(vehicle);
+  var spreader = buildSpreader(vehicle);
+  var plow = buildPlow(vehicle);
+  /* kabler til motorer og pumpe */
+  (function () {
+    var p = new Part('kabler', { edges: false, shadow: false });
+    p.add(gTubePath([[-0.327, 0.322, -0.115], [-0.305, 0.300, -0.10], [-0.20, 0.293, -0.072], [-0.11, 0.303, -0.056], [-0.09, 0.296, -0.054]], 0.0065, 26, 6), 'cable');
+    p.add(gTubePath([[-0.327, 0.322, 0.115], [-0.305, 0.300, 0.10], [-0.15, 0.297, 0.088], [0.0, 0.297, 0.072], [0.07, 0.303, 0.057], [0.09, 0.296, 0.054]], 0.0065, 28, 6), 'cable');
+    p.add(gTubePath([[0.12, 0.525, 0.0], [0.19, 0.535, -0.03], [0.30, 0.50, -0.10], [0.40, 0.44, -0.13], [0.455, 0.412, -0.12]], 0.005, 24, 6), 'cable');
+    vehicle.add(p.build());
+  })();
+  var ground = buildGround(world);
+  var snow = buildSnow(world, plow);
+  balloon('D', 'hjul', modR.group, v3(-C.a, C.axY + 0.185, C.zs.wheel + 0.02), modR.axles[1].wheel);
+  balloon('A', 'kappe', vehicle, v3(-0.10, 0.572, 0.20), cover.kappe);
+  balloon('R', 'sensor', vehicle, v3(0.18, 0.645, 0), cover.sensor);
+
+  /* ---------- farver fra temaet ---------- */
+  var COL = {};
+  var arrowMat = {};
+  ['g', 'last', 'driv', 'reak'].forEach(function (k) {
+    arrowMat[k] = new T.MeshBasicMaterial({ color: 0x888888, depthTest: false, depthWrite: false, transparent: true, opacity: 0.96 });
+  });
+  var selCol = new T.Color(0x0a7fd1);
+  function readTheme() {
+    var cs = getComputedStyle(document.documentElement);
+    function c(n) { return cs.getPropertyValue(n).trim() || '#888888'; }
+    COL = { edge: c('--edge'), ghost: c('--edge-ghost'), grid: c('--grid'), grid2: c('--grid-2'), g: c('--f-g'), last: c('--f-last'), driv: c('--f-driv'), reak: c('--f-reak'), sel: c('--sel') };
+    EDGE.solid.color.copy(srgb(COL.edge)); EDGE.ghost.color.copy(srgb(COL.ghost)); EDGE.snow.color.copy(srgb(c('--snow-edge')));
+    EDGE.solidCut.color.copy(EDGE.solid.color); EDGE.ghostCut.color.copy(EDGE.ghost.color);
+    ground.minor.material.color.copy(srgb(COL.grid)); ground.major.material.color.copy(srgb(COL.grid2));
+    arrowMat.g.color.copy(srgb(COL.g)); arrowMat.last.color.copy(srgb(COL.last)); arrowMat.driv.color.copy(srgb(COL.driv)); arrowMat.reak.color.copy(srgb(COL.reak));
+    selCol.copy(srgb(COL.sel)); dimMat.color.copy(srgb(c('--ink')));
+    variants.forEach(function (m, k) { if (k.split('|')[1].indexOf('s') >= 0) { m.dispose(); variants.delete(k); } });
+    applyLook();
+  }
+
+  /* ---------- udseende: normal, røntgen, skjult, valgt ---------- */
+  var variants = new Map();
+  var DRIVSET = { tandhjul: 1, mellemaksel: 1, lejer: 1, feder: 1, kaede: 1, hjulaksel: 1, kobling: 1, overbel: 1, bolte: 1, svejs: 1, motor: 1 };
+  function variant(base, sel, ghost, cut) {
+    if (!sel && !ghost && !cut) return base;
+    var keyS = base.uuid + '|' + (sel ? 's' : '') + (ghost ? 'g' : '') + (cut ? 'c' : ''), m = variants.get(keyS);
+    if (!m) {
+      m = base.clone();
+      if (ghost) { m.transparent = true; m.opacity = sel ? 0.42 : 0.09; m.depthWrite = false; m.metalness = Math.min(m.metalness, 0.2); }
+      if (sel) { m.emissive = selCol.clone(); m.emissiveIntensity = 0.42; m.color = m.color.clone().lerp(selCol, 0.6); m.metalness = Math.min(m.metalness, 0.3); }
+      if (cut) { m.clippingPlanes = [cutPlane]; m.clipShadows = true; }
+      variants.set(keyS, m);
+    }
+    return m;
+  }
+  /* snitflade: bagsiderne tegnes i en flad farve, så det skårne materiale ser massivt ud */
+  function capOf(base, sel) {
+    var keyS = base.uuid + '|' + (sel ? 's' : '') + 'k', m = variants.get(keyS);
+    if (!m) {
+      m = new T.MeshBasicMaterial({ color: (sel ? selCol : base.color).clone().multiplyScalar(sel ? 0.8 : 0.62), side: T.BackSide, clippingPlanes: [cutPlane], polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 });
+      variants.set(keyS, m);
+    }
+    return m;
+  }
+  function lookOf(g) {
+    var id = g.userData.part, exOn = state.ex > 0.012;
+    if ((id === 'slanger' || id === 'kabler') && exOn) return 'hide';
+    if (state.iso && state.sel && id !== state.sel) {
+      if (state.scene === 'drivlinje' && !DRIVSET[id] && id !== 'chassis' && id !== 'hjul' && id !== 'gearhus') return 'hide';
+      return 'ghost';
+    }
+    if (state.scene === 'drivlinje') {
+      if (!DRIVSET[id]) return (id === 'chassis' || id === 'hjul' || id === 'gearhus') ? 'ghost' : 'hide';
+      if (g.userData.side === -1) return 'ghost';
+    }
+    if (g.userData.shell && (state.xray || exOn || state.scene === 'drivlinje')) return 'ghost';
+    return 'solid';
+  }
+  function applyLook() {
+    REG.groups.forEach(function (g) {
+      var look = lookOf(g), sel = state.sel === g.userData.part, ghost = look === 'ghost', cut = state.cut && !NOCUT[g.userData.part];
+      g.userData.look = look; g.userData.cut = cut;
+      g.visible = look !== 'hide';
+      if (!g.visible) return;
+      for (var i = 0; i < g.children.length; i++) {
+        var mesh = g.children[i], base = mesh.userData.base;
+        if (!mesh.isMesh || !base) continue;
+        mesh.material = variant(base, sel, ghost, cut);
+        mesh.castShadow = !ghost && base !== MAT.snow && !base.transparent;
+        var cap = mesh.userData.capMesh, wantCap = cut && !ghost && !base.transparent && !mesh.isInstancedMesh;
+        if (wantCap) {
+          if (!cap) { cap = new T.Mesh(mesh.geometry, capOf(base, sel)); cap.raycast = noRay; cap.castShadow = false; cap.receiveShadow = false; mesh.add(cap); mesh.userData.capMesh = cap; }
+          cap.material = capOf(base, sel); cap.visible = true;
+        } else if (cap) cap.visible = false;
+        for (var j = 0; j < mesh.children.length; j++) if (mesh.children[j].userData.edge) mesh.children[j].material = cut ? (ghost ? EDGE.ghostCut : EDGE.solidCut) : (ghost ? EDGE.ghost : EDGE.solid);
+      }
+    });
+    invalidate();
+  }
+  function applyExplode() {
+    var E = state.ex;
+    REG.movers.forEach(function (g) { g.position.copy(g.userData.base).addScaledVector(g.userData.ex, E); });
+    plow.exE = E;
+  }
+
+  /* ---------- kamera ---------- */
+  var orbit = { target: v3(0.30, 0.25, 0), th: 0.86, ph: 1.10, r: 4.9 };
+  var VIEWS = {
+    maskine: { t: [0.30, 0.25, 0], th: 0.86, ph: 1.10, r: 4.9 },
+    drivlinje: { t: [0.0, 0.18, 0.21], th: 0.50, ph: 0.98, r: 1.62 },
+    plov: { t: [0.88, 0.18, 0.02], th: -0.34, ph: 0.70, r: 4.0 }
+  };
+  var tween = null;
+  function aspectFit() { var a = cam.aspect; return a < 1.25 ? Math.pow(1.25 / a, 0.8) : 1; }
+  function narrowTh(name, th) { return (name === 'maskine' && cam.aspect < 1.05) ? 0.62 : th; }
+  function applyCam() {
+    var sp = Math.sin(orbit.ph);
+    cam.position.set(orbit.target.x + orbit.r * sp * Math.sin(orbit.th), orbit.target.y + orbit.r * Math.cos(orbit.ph), orbit.target.z + orbit.r * sp * Math.cos(orbit.th));
+    cam.lookAt(orbit.target);
+    cam.updateMatrixWorld();
+  }
+  var calm = false;
+  try { calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e0) { }
+  function flyTo(t, th, ph, r, ms) {
+    if (calm) ms = 0;
+    var dth = th - orbit.th; while (dth > PI) dth -= TAU; while (dth < -PI) dth += TAU;
+    tween = { t0: performance.now(), ms: ms === undefined ? 700 : ms, a: { t: orbit.target.clone(), th: orbit.th, ph: orbit.ph, r: orbit.r }, b: { t: t, th: orbit.th + dth, ph: ph, r: r } };
+    invalidate();
+  }
+  function goView(name, ms) {
+    var v = VIEWS[name], k = aspectFit() * (1 + state.ex * (name === 'plov' ? 0.35 : 0.78));
+    var nar = cam.aspect < 1.05 && name === 'maskine', th = narrowTh(name, v.th), tz = v.t[2], ph = v.ph;
+    if (name === 'plov' && state.ang < 0) { th = PI - th; tz = -tz; }
+    if (state.cut && name !== 'plov') { ph = name === 'maskine' ? 0.60 : 0.46; th = name === 'maskine' ? 0.62 : 0.34; }
+    flyTo(v3(v.t[0] + (nar ? 0.1 : 0), v.t[1] + state.ex * 0.12, tz), th, ph, v.r * k * (nar ? 0.93 : 1), ms);
+  }
+  function stepTween(now) {
+    if (!tween) return false;
+    var u = Math.min(1, (now - tween.t0) / Math.max(1, tween.ms)), e = u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+    orbit.target.lerpVectors(tween.a.t, tween.b.t, e);
+    orbit.th = tween.a.th + (tween.b.th - tween.a.th) * e; orbit.ph = tween.a.ph + (tween.b.ph - tween.a.ph) * e; orbit.r = tween.a.r + (tween.b.r - tween.a.r) * e;
+    if (u >= 1) tween = null;
+    return true;
+  }
+  function clamp(x, a, b) { return Math.max(a, Math.min(b, x)); }
+  function pan(dx, dy) {
+    var k = 2 * orbit.r * Math.tan(deg(cam.fov) / 2) / Math.max(1, canvas.clientHeight);
+    var right = v3().setFromMatrixColumn(cam.matrixWorld, 0), up = v3().setFromMatrixColumn(cam.matrixWorld, 1);
+    orbit.target.addScaledVector(right, -dx * k).addScaledVector(up, dy * k);
+    orbit.target.y = clamp(orbit.target.y, -0.5, 2); orbit.target.x = clamp(orbit.target.x, -3, 3); orbit.target.z = clamp(orbit.target.z, -3, 3);
+  }
+  var ptrs = new Map(), moved = 0, downT = 0, pinch = null;
+  canvas.addEventListener('pointerdown', function (e) {
+    try { canvas.setPointerCapture(e.pointerId); } catch (er) { }
+    ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY, btn: e.button, shift: e.shiftKey });
+    if (ptrs.size === 1) { moved = 0; downT = performance.now(); }
+    pinch = null; tween = null; tipEl.hidden = true;
+    canvas.classList.add('drag');
+  });
+  canvas.addEventListener('pointermove', function (e) {
+    var p = ptrs.get(e.pointerId);
+    if (!p) { if (e.pointerType === 'mouse') hover(e); return; }
+    var dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY;
+    if (ptrs.size === 1) {
+      moved += Math.abs(dx) + Math.abs(dy);
+      if (p.btn === 2 || p.btn === 1 || p.shift) pan(dx, dy);
+      else { orbit.th -= dx * 0.0062; orbit.ph = clamp(orbit.ph - dy * 0.0062, 0.06, 2.85); }
+    } else if (ptrs.size === 2) {
+      var a = Array.from(ptrs.values()), d = Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y), mx = (a[0].x + a[1].x) / 2, my = (a[0].y + a[1].y) / 2;
+      if (pinch) { orbit.r = clamp(orbit.r * pinch.d / Math.max(1, d), 0.3, 16); pan(mx - pinch.mx, my - pinch.my); }
+      pinch = { d: d, mx: mx, my: my }; moved += 20;
+    }
+    invalidate();
+  });
+  function endPtr(e) {
+    var had = ptrs.has(e.pointerId);
+    ptrs.delete(e.pointerId); pinch = null;
+    if (ptrs.size === 0) {
+      canvas.classList.remove('drag');
+      if (had && e.type === 'pointerup' && moved < 7 && performance.now() - downT < 600 && e.button === 0) select(pickAt(e.clientX, e.clientY), 'model');
+    }
+  }
+  canvas.addEventListener('pointerup', endPtr);
+  canvas.addEventListener('pointercancel', endPtr);
+  canvas.addEventListener('pointerleave', function () { tipEl.hidden = true; });
+  canvas.addEventListener('wheel', function (e) { e.preventDefault(); tween = null; orbit.r = clamp(orbit.r * Math.exp(e.deltaY * (e.deltaMode ? 0.04 : 0.0012)), 0.3, 16); invalidate(); }, { passive: false });
+  canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  canvas.addEventListener('keydown', function (e) {
+    var k = e.key, used = true;
+    if (k === 'ArrowLeft') orbit.th -= 0.08; else if (k === 'ArrowRight') orbit.th += 0.08;
+    else if (k === 'ArrowUp') orbit.ph = clamp(orbit.ph - 0.06, 0.06, 2.85); else if (k === 'ArrowDown') orbit.ph = clamp(orbit.ph + 0.06, 0.06, 2.85);
+    else if (k === '+' || k === '=') orbit.r = clamp(orbit.r * 0.9, 0.3, 16); else if (k === '-') orbit.r = clamp(orbit.r * 1.1, 0.3, 16);
+    else if (k === 'Escape') select(null, 'model'); else used = false;
+    if (used) { e.preventDefault(); tween = null; invalidate(); }
+  });
+
+  /* ---------- udpegning ---------- */
+  var ray = new T.Raycaster(), ndc = new T.Vector2();
+  function shown(o) { while (o) { if (!o.visible) return false; o = o.parent; } return true; }
+  function pickAt(cx, cy) {
+    if (!renderer) return null;
+    var r = canvas.getBoundingClientRect();
+    ndc.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
+    ray.setFromCamera(ndc, cam);
+    var hits = ray.intersectObject(vehicle, true), ghost = null;
+    for (var i = 0; i < hits.length; i++) {
+      var o = hits[i].object, g = o;
+      while (g && !(g.userData && g.userData.part)) g = g.parent;
+      if (!g || !shown(o)) continue;
+      if (g.userData.cut && cutPlane.distanceToPoint(hits[i].point) < 0) continue;
+      if (g.userData.look === 'ghost') { if (!ghost) ghost = g.userData.part; continue; }
+      return g.userData.part;
+    }
+    return ghost;
+  }
+  var hoverT = 0;
+  function hover(e) {
+    var now = performance.now(); if (now - hoverT < 70) return; hoverT = now;
+    var id = pickAt(e.clientX, e.clientY), r = sheet.getBoundingClientRect();
+    if (id && PARTS[id]) {
+      tipEl.textContent = PARTS[id].navn; tipEl.hidden = false;
+      var x = clamp(e.clientX - r.left + 14, 4, r.width - tipEl.offsetWidth - 4), y = clamp(e.clientY - r.top + 16, 4, r.height - 28);
+      tipEl.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+      canvas.style.cursor = 'pointer';
+    } else { tipEl.hidden = true; canvas.style.cursor = ''; }
+  }
+
+  /* ---------- kraftpile ---------- */
+  var YAX = v3(0, 1, 0), UNIT_CYL = new T.CylinderGeometry(1, 1, 1, 10), UNIT_CONE = new T.ConeGeometry(1, 1, 14);
+  var arrows = [], tags = [];
+  function mkTag(kind) {
+    var d = document.createElement('div'); d.className = 'tag'; d.dataset.k = kind; d.hidden = true;
+    var i = document.createElement('i'), s = document.createElement('span'); d.appendChild(i); d.appendChild(s);
+    labelBox.appendChild(d);
+    return { el: d, span: s, w: 0, h: 0, html: '' };
+  }
+  function setTag(t, html) { if (t.html !== html) { t.span.innerHTML = html; t.html = html; t.w = 0; } }
+  function Arrow(kind) {
+    this.kind = kind; this.g = new T.Group(); this.on = false;
+    this.shaft = new T.Mesh(UNIT_CYL, arrowMat[kind]); this.head = new T.Mesh(UNIT_CONE, arrowMat[kind]);
+    this.shaft.raycast = noRay; this.head.raycast = noRay; this.shaft.renderOrder = 50; this.head.renderOrder = 50;
+    this.g.add(this.shaft); this.g.add(this.head); this.g.visible = false; arrowRoot.add(this.g);
+    this.tag = mkTag(kind); this.anchor = v3(); this.org = v3();
+    arrows.push(this);
+  }
+  Arrow.prototype.hide = function () { this.on = false; this.g.visible = false; };
+  Arrow.prototype.set = function (p, f, html, o) {
+    o = o || {};
+    var F = Math.sqrt(f.x * f.x + f.y * f.y + f.z * f.z);
+    if (!(F > (o.min === undefined ? 4 : o.min))) { this.hide(); return; }
+    var sc = o.scale || 1, len = Math.min(0.80, 0.12 + 0.30 * Math.sqrt(F / (o.ref || 500))) * sc;
+    var hl = Math.min(0.105 * sc, len * 0.45), hr = 0.036 * sc, sr = 0.0125 * sc;
+    var d = v3(f.x / F, f.y / F, f.z / F), org = v3(p.x, p.y, p.z);
+    if (o.tip) org.addScaledVector(d, -len);
+    this.g.position.copy(org); this.g.quaternion.setFromUnitVectors(YAX, d);
+    this.sr = sr; this.hr = hr; this.hl = hl; this.len = len;
+    this.shaft.scale.set(sr, len - hl, sr); this.shaft.position.y = (len - hl) / 2;
+    this.head.scale.set(hr, hl, hr); this.head.position.y = len - hl / 2;
+    this.org.copy(org).addScaledVector(d, len / 2);
+    this.anchor.copy(org); if (!o.tip) this.anchor.addScaledVector(d, len);
+    this.away = 1; this.dir = d;
+    this.on = true; this.g.visible = true;
+    if (html) setTag(this.tag, html); this.label = !!html;
+  };
+  function Moment(kind) {
+    this.kind = kind; this.g = new T.Group(); this.on = false;
+    var a = 4.5;
+    this.arc = new T.Mesh(new T.TorusGeometry(1, 0.07, 6, 30, a), arrowMat[kind]);
+    this.head = new T.Mesh(UNIT_CONE, arrowMat[kind]);
+    this.head.scale.set(0.2, 0.42, 0.2); this.head.position.set(Math.cos(a) - Math.sin(a) * 0.16, Math.sin(a) + Math.cos(a) * 0.16, 0); this.head.rotation.z = a;
+    this.arc.raycast = noRay; this.head.raycast = noRay; this.arc.renderOrder = 50; this.head.renderOrder = 50;
+    this.g.add(this.arc); this.g.add(this.head); this.g.visible = false; arrowRoot.add(this.g);
+    this.tag = mkTag(kind); this.anchor = v3(); this.org = v3(); this.away = 1; this.dir = v3(0, 1, 0);
+    arrows.push(this);
+  }
+  Moment.prototype.hide = Arrow.prototype.hide;
+  Moment.prototype.set = function (p, dir, rad, html) {
+    this.g.position.set(p.x, p.y, p.z); this.g.scale.setScalar(rad); this.g.rotation.set(0, dir < 0 ? PI : 0, 0.6);
+    this.anchor.set(p.x, p.y + rad * 1.05, p.z); this.org.set(p.x, p.y, p.z);
+    this.on = true; this.g.visible = true; this.label = !!html; if (html) setTag(this.tag, html);
+  };
+  var A = {};
+  ['G', 'Gp', 'Ns', 'Nfr', 'Nfl', 'Nrr', 'Nrl', 'axN'].forEach(function (k) { A[k] = new Arrow('g'); });
+  ['sne', 'skaer', 'hj', 'tand', 'kf', 'kr', 'axK'].forEach(function (k) { A[k] = new Arrow('last'); });
+  ['Tfr', 'Tfl', 'Trr', 'Trl', 'cyl', 'loeft', 'axT'].forEach(function (k) { A[k] = new Arrow('driv'); });
+  ['Sfr', 'Sfl', 'Srr', 'Srl', 'tap', 'RA', 'RB', 'axRo', 'axRi'].forEach(function (k) { A[k] = new Arrow('reak'); });
+  ['Mm', 'M1', 'M2', 'Mf', 'Mr'].forEach(function (k) { A[k] = new Moment('driv'); });
+  function sub(a, b) { return a + '<sub>' + b + '</sub> '; }
+
+  function updateArrows() {
+    thinK = -1;
+    arrows.forEach(function (a) { a.hide(); });
+    var show = state.forces && state.ex < 0.012 && renderer;
+    $('legend').hidden = !show;
+    if (!show) return;
+    var r = res, V = r.veh, P = C.plow, Z = C.zs, L2 = C.L / 2, T2 = C.track / 2, sc = state.scene, kant = state.lc === 'kant', lifted = state.lift;
+    var sa = Math.sin(V.alpha), ca = Math.cos(V.alpha);
+    var cg = { x: C.veh.cgX, y: C.veh.cgY, z: 0 };
+    function wheelsN(labelBoth) {
+      A.Nfr.set({ x: L2, y: 0, z: T2 }, { x: 0, y: V.NfR, z: 0 }, sub('N', 'for') + fN(V.NfR), { ref: 900 });
+      A.Nrr.set({ x: -L2, y: 0, z: T2 }, { x: 0, y: V.NrR, z: 0 }, sub('N', 'bag') + fN(V.NrR), { ref: 900 });
+      if (labelBoth !== false) {
+        A.Nfl.set({ x: L2, y: 0, z: -T2 }, { x: 0, y: V.NfL, z: 0 }, null, { ref: 900 });
+        A.Nrl.set({ x: -L2, y: 0, z: -T2 }, { x: 0, y: V.NrL, z: 0 }, null, { ref: 900 });
+      }
+    }
+    function plowPts() {
+      var hinge = P.hinge, c = Math.cos(liftPhi), s = Math.sin(liftPhi);
+      return { cg: { x: hinge.x + (P.cg.x - hinge.x) * c - (P.cg.y - hinge.y) * s, y: hinge.y + (P.cg.x - hinge.x) * s + (P.cg.y - hinge.y) * c, z: 0 } };
+    }
+    function cylArrow(h) {
+      var g = h.cyl, b = { x: P.pivot.x + g.bx, y: P.cylB.y, z: g.bz };
+      A.cyl.set(b, { x: h.F * g.ux, y: 0, z: h.F * g.uz }, sub('F', 'cyl') + fN(h.F), { tip: true, ref: kant ? 4000 : 500 });
+      A.tap.set({ x: P.pivot.x, y: P.pivot.y + 0.06, z: 0 }, { x: h.Rx, y: 0, z: h.Rz }, sub('R', 'tap') + fN(h.R), { ref: kant ? 4000 : 500 });
+    }
+    function snowArrows() {
+      A.sne.set(r.snow.p, { x: r.snow.Fx, y: 0, z: r.snow.Fz }, sub('F', 'sne') + fN(r.snow.R), { tip: true });
+      A.skaer.set({ x: r.plow.contact.x + 0.02, y: 0.02, z: r.plow.contact.z }, { x: -r.plow.Fe, y: 0, z: 0 }, sub('F', 'skær') + fN(r.plow.Fe), { tip: true });
+    }
+    function cornerArrow() {
+      var k = r.hyd.kant;
+      A.hj.set({ x: k.tip.x, y: 0.10, z: k.tip.z }, { x: -k.Fcorner, y: 0, z: 0 }, sub('F', 'hjørne') + fN(k.Fcorner), { tip: true, ref: 4000 });
+    }
+    if (sc === 'maskine') {
+      A.G.set(cg, { x: -V.W * sa, y: -V.W * ca, z: 0 }, 'G ' + fN(V.W), { tip: true, ref: 900 });
+      wheelsN();
+      if (kant && !lifted) { cornerArrow(); cylArrow(r.hyd.kant); }
+      else {
+        var fF = V.Fdrv * V.shF / 2, fR = V.Fdrv * V.shR / 2;
+        A.Tfr.set({ x: L2, y: 0.012, z: T2 }, { x: fF, y: 0, z: 0 }, sub('F', 'træk') + fN(fF));
+        A.Trr.set({ x: -L2, y: 0.012, z: T2 }, { x: fR, y: 0, z: 0 }, sub('F', 'træk') + fN(fR));
+        A.Tfl.set({ x: L2, y: 0.012, z: -T2 }, { x: fF, y: 0, z: 0 }, null);
+        A.Trl.set({ x: -L2, y: 0.012, z: -T2 }, { x: fR, y: 0, z: 0 }, null);
+        if (!lifted) {
+          snowArrows();
+          A.Sfr.set({ x: L2, y: 0.012, z: T2 }, { x: 0, y: 0, z: V.Sf / 2 }, sub('S', 'for') + fN(Math.abs(V.Sf / 2)), { min: 6 });
+          A.Sfl.set({ x: L2, y: 0.012, z: -T2 }, { x: 0, y: 0, z: V.Sf / 2 }, null, { min: 6 });
+          A.Srr.set({ x: -L2, y: 0.012, z: T2 }, { x: 0, y: 0, z: V.Sr / 2 }, sub('S', 'bag') + fN(Math.abs(V.Sr / 2)), { min: 6 });
+          A.Srl.set({ x: -L2, y: 0.012, z: -T2 }, { x: 0, y: 0, z: V.Sr / 2 }, null, { min: 6 });
+        }
+      }
+    } else if (sc === 'plov') {
+      var pp = plowPts();
+      A.Gp.set(pp.cg, { x: 0, y: -r.plow.Wp, z: 0 }, sub('G', 'plov') + fN(r.plow.Wp), { tip: true });
+      if (lifted) {
+        var lg = r.hyd.lg;
+        A.loeft.set({ x: lg.x, y: lg.y, z: 0 }, { x: -lg.ux * r.hyd.Flift, y: -lg.uy * r.hyd.Flift, z: 0 }, sub('F', 'løft') + fN(r.hyd.Flift));
+      } else if (kant) {
+        cornerArrow(); cylArrow(r.hyd.kant);
+      } else {
+        snowArrows();
+        A.Ns.set({ x: r.plow.contact.x + 0.02, y: 0, z: r.plow.contact.z }, { x: 0, y: r.plow.Ns, z: 0 }, sub('N', 'skær') + fN(r.plow.Ns));
+        cylArrow(r.hyd.ryd);
+      }
+    } else {
+      var D = r.drv, o = { scale: 0.30 }, aG = C.aGear, y = C.axY, cgm = Math.cos(C.gamma), sgm = Math.sin(C.gamma), r2 = C.mod * C.z2 / 2;
+      A.Mm.set({ x: -aG, y: y, z: -0.054 }, 1, 0.072, sub('M', 'motor') + nf(D.Tm, 1) + ' Nm');
+      A.M1.set({ x: -aG, y: y, z: 0.090 }, 1, 0.043, sub('M', '1') + fNm(D.T1));
+      A.M2.set({ x: 0, y: y, z: 0.290 }, -1, 0.040, sub('M', '2') + fNm(D.T2));
+      A.Mf.set({ x: C.a, y: y, z: 0.352 }, -1, 0.058, sub('M', 'for') + fNm(D.Twf));
+      A.Mr.set({ x: -C.a, y: y, z: 0.352 }, -1, 0.058, sub('M', 'bag') + fNm(D.Twr));
+      if (state.sel === 'hjulaksel' || state.sel === 'hjul') {
+        /* forreste højre hjulaksel fritlagt */
+        var X = r.axle, xa = C.a;
+        A.axN.set({ x: xa, y: y, z: Z.wheel }, { x: 0, y: X.N, z: 0 }, sub('N', 'hjul') + fN(X.N), o);
+        A.axT.set({ x: xa, y: y, z: Z.wheel }, { x: X.Fx, y: 0, z: 0 }, sub('F', 'træk') + fN(X.Fx), o);
+        A.axK.set({ x: xa - C.Rk2 * sgm, y: y - C.Rk2 * cgm, z: Z.chainF }, { x: -X.Fk * cgm, y: X.Fk * sgm, z: 0 }, sub('F', 'kæde') + fN(X.Fk), o);
+        A.axRo.set({ x: xa, y: y, z: Z.axOuter }, { x: X.Rox, y: X.Roy, z: 0 }, sub('R', 'ydre') + fN(X.Ro), o);
+        A.axRi.set({ x: xa, y: y, z: Z.axInner }, { x: X.Rix, y: X.Riy, z: 0 }, sub('R', 'indre') + fN(X.Ri), o);
+      } else {
+        A.tand.set({ x: -r2, y: y, z: Z.gear }, { x: D.Frad, y: D.Ft, z: 0 }, sub('F', 'tand') + fN(D.Fn), o);
+        A.kf.set({ x: -C.Rk1 * sgm, y: y - C.Rk1 * cgm, z: Z.chainF }, { x: D.Fkf * cgm, y: -D.Fkf * sgm, z: 0 }, sub('F', 'kæde') + fN(D.Fkf), o);
+        A.kr.set({ x: C.Rk1 * sgm, y: y + C.Rk1 * cgm, z: Z.chainR }, { x: -D.Fkr * cgm, y: D.Fkr * sgm, z: 0 }, sub('F', 'kæde') + fN(D.Fkr), o);
+        A.RA.set({ x: 0, y: y, z: Z.plateA }, { x: r.mid.RAx, y: r.mid.RAy, z: 0 }, sub('R', 'A') + fN(r.mid.RA), o);
+        A.RB.set({ x: 0, y: y, z: Z.plateB }, { x: r.mid.RBx, y: r.mid.RBy, z: 0 }, sub('R', 'B') + fN(r.mid.RB), o);
+      }
+    }
+  }
+
+  /* ---------- hovedmål ---------- */
+  var dimMat = new T.LineBasicMaterial({ color: 0x333333, depthTest: false, depthWrite: false, transparent: true, opacity: 0.9 });
+  var dimLines = new T.LineSegments(new T.BufferGeometry(), dimMat);
+  dimLines.raycast = noRay; dimLines.renderOrder = 40; dimLines.frustumCulled = false; dimLines.visible = false; vehicle.add(dimLines);
+  var dimTags = [];
+  function updateDims() {
+    var on = state.dims && state.ex < 0.012 && !!renderer, segs = [], list = [], P = C.plow, a = C.a, T2 = C.track / 2;
+    dimLines.visible = on;
+    if (on) {
+      var dim = function (p, q, n, txt) {
+        var t = 0.035;
+        segs.push(p[0], p[1], p[2], q[0], q[1], q[2]);
+        [p, q].forEach(function (e) { segs.push(e[0] - n[0] * t, e[1] - n[1] * t, e[2] - n[2] * t, e[0] + n[0] * t, e[1] + n[1] * t, e[2] + n[2] * t); });
+        list.push({ m: v3((p[0] + q[0]) / 2, (p[1] + q[1]) / 2, (p[2] + q[2]) / 2), txt: txt });
+      };
+      var c = Math.cos(res.psi), s = Math.sin(res.psi), hb = P.B / 2;
+      var bl = function (xl, zl) { return [P.pivot.x + xl * c + zl * s, -xl * s + zl * c]; };
+      var e1 = bl(P.pf + 0.08, -hb), e2 = bl(P.pf + 0.08, hb), xf = Math.max(e1[0], e2[0]) + 0.30, zo = T2 + 0.30;
+      var mm = function (x) { return String(Math.round(x * 1000)); };
+      dim([-a, 0.005, zo], [a, 0.005, zo], [0, 0, 1], '<em>Akselafstand</em> ' + mm(C.L));
+      dim([-a - 0.34, 0.005, -T2], [-a - 0.34, 0.005, T2], [1, 0, 0], '<em>Sporvidde</em> ' + mm(C.track));
+      dim([-a, 0, T2 + 0.13], [-a, 2 * C.rw, T2 + 0.13], [1, 0, 0], '<em>Hjul</em> Ø' + mm(2 * C.rw));
+      if (!state.lift) {
+        dim([e1[0], 0.56, e1[1]], [e2[0], 0.56, e2[1]], [0, 1, 0], '<em>Plov</em> ' + mm(P.B));
+        dim([xf, 0.005, e1[1]], [xf, 0.005, e2[1]], [1, 0, 0], '<em>Rydningsbredde</em> ' + mm(Math.abs(e2[1] - e1[1])));
+      }
+      dim([-0.56, 0.60, -0.37], [0.55, 0.60, -0.37], [0, 1, 0], '<em>Chassis</em> 1110');
+      dim([-0.62, 0, 0.0], [-0.62, 0.567, 0.0], [0, 0, 1], '<em>Højde</em> 567');
+      var g = new T.BufferGeometry(); g.setAttribute('position', new T.BufferAttribute(new Float32Array(segs), 3));
+      dimLines.geometry.dispose(); dimLines.geometry = g;
+    }
+    for (var i = 0; i < Math.max(list.length, dimTags.length); i++) {
+      if (!dimTags[i]) { dimTags[i] = mkTag('g'); dimTags[i].el.classList.add('dim'); dimTags[i].m = v3(); }
+      var t = dimTags[i];
+      if (i < list.length) { setTag(t, list[i].txt + ' mm'); t.m.copy(list[i].m); t.on = true; } else { t.on = false; t.el.hidden = true; }
+    }
+  }
+
+  /* ---------- positionsnumre ---------- */
+  var INSIDE = { '1': 1, '2': 1, '3': 1, '4': 1, '5': 1, '6': 1, '7': 1, '8': 1, '9': 1, '10': 1, 'M': 1, 'G': 1 };
+  var UNDER = { 'B': 1, 'S': 1, 'H3': 1, 'H4': 1 };
+  var MINOR = { 'C': 1, 'A': 1, 'R': 1, 'P3': 1, 'H5': 1 };
+  var ABOVE = { 'A': 1, 'R': 1, 'Ø': 1, 'H5': 1 };
+  BALLOONS.forEach(function (b) {
+    var el = document.createElement('button'); el.type = 'button'; el.className = 'balloon' + (b.no.length > 1 ? ' h' : ''); el.textContent = b.no; el.hidden = true;
+    el.setAttribute('aria-label', 'Position ' + b.no + ': ' + PARTS[b.id].navn); el.setAttribute('aria-pressed', 'false'); el.id = 'bal-' + b.no;
+    el.addEventListener('click', function () { select(b.id, 'balloon'); });
+    labelBox.appendChild(el); b.el = el; b.w = v3();
+  });
+  function balloonOn(b) {
+    if (!state.nums) return false;
+    if (state.iso && state.sel) return b.id === state.sel && (state.scene !== 'drivlinje' || !!INSIDE[b.no]);
+    var exOn = state.ex > 0.012, grp = PARTS[b.id].grp;
+    if (state.scene === 'drivlinje') return !!INSIDE[b.no];
+    if (state.cut && (UNDER[b.no] || ABOVE[b.no])) return false;
+    if (state.scene === 'plov' && grp !== 'plov' && grp !== 'hyd') return false;
+    if (INSIDE[b.no]) return exOn || state.cut;
+    if (UNDER[b.no]) return state.xray || exOn;
+    if ((b.no === 'H5') && exOn) return false;
+    if (state.scene === 'maskine' && !state.xray && !exOn && MINOR[b.no]) return false;
+    return true;
+  }
+
+  /* ---------- tegning ---------- */
+  var tmp = v3(), tmp2 = v3(), W = 1, H = 1;
+  function project(local, host, out) {
+    tmp.copy(local); host.localToWorld(tmp); tmp.project(cam);
+    out.x = (tmp.x * 0.5 + 0.5) * W; out.y = (-tmp.y * 0.5 + 0.5) * H; out.z = tmp.z;
+    return out;
+  }
+  var pa = { x: 0, y: 0, z: 0 }, pb = { x: 0, y: 0, z: 0 };
+  var placed = [];
+  function clash(x, y, w, h) {
+    for (var q = 0; q < placed.length; q++) { var p = placed[q]; if (x < p.x + p.w + 2 && x + w + 2 > p.x && y < p.y + p.h + 2 && y + h + 2 > p.y) return p; }
+    return null;
+  }
+  function placeLabels() {
+    var i, a, t;
+    if (!renderer) return;
+    placed.length = 0;
+    for (i = 0; i < BALLOONS.length; i++) {
+      var b = BALLOONS[i], on = balloonOn(b);
+      if (on) {
+        tmp2.copy(b.p); if (b.ref && b.ref.userData.ex) tmp2.addScaledVector(b.ref.userData.ex, state.ex);
+        project(tmp2, b.host, pa);
+        on = pa.z < 1 && pa.z > -1 && pa.x > -20 && pa.x < W + 20 && pa.y > -20 && pa.y < H + 20;
+      }
+      if (b.el.hidden === on) b.el.hidden = !on;
+      if (on) {
+        var bx = pa.x - 12, by = pa.y - 12, hit = clash(bx, by, 24, 24), tries = 0;
+        while (hit && tries < 4) { if (bx + 12 >= hit.x + hit.w / 2) bx = hit.x + hit.w + 3; else bx = hit.x - 27; hit = clash(bx, by, 24, 24); tries++; }
+        b.el.style.transform = 'translate(' + (bx + 12).toFixed(1) + 'px,' + (by + 12).toFixed(1) + 'px)';
+        placed.push({ x: bx, y: by, w: 24, h: 24 });
+      }
+    }
+    for (i = 0; i < dimTags.length; i++) {
+      t = dimTags[i]; if (!t.on) continue;
+      project(t.m, vehicle, pa);
+      if (pa.z > 1 || pa.z < -1) { t.el.hidden = true; continue; }
+      if (t.el.hidden) t.el.hidden = false;
+      if (!t.w) { t.w = t.el.offsetWidth; t.h = t.el.offsetHeight; }
+      var dxm = clamp(pa.x - t.w / 2, 2, W - t.w - 2), dym = clamp(pa.y - t.h / 2, 2, H - t.h - 2);
+      t.el.style.transform = 'translate(' + dxm.toFixed(1) + 'px,' + dym.toFixed(1) + 'px)';
+      placed.push({ x: dxm, y: dym, w: t.w, h: t.h });
+    }
+    for (i = 0; i < arrows.length; i++) {
+      a = arrows[i]; t = a.tag;
+      if (!a.on || !a.label) { if (!t.el.hidden) t.el.hidden = true; continue; }
+      project(a.anchor, arrowRoot, pa); project(a.org, arrowRoot, pb);
+      if (pa.z > 1 || pa.z < -1) { t.el.hidden = true; continue; }
+      if (t.el.hidden) t.el.hidden = false;
+      if (!t.w) { t.w = t.el.offsetWidth; t.h = t.el.offsetHeight; }
+      var dx = (pa.x - pb.x) * a.away, dy = (pa.y - pb.y) * a.away, n = Math.hypot(dx, dy) || 1;
+      dx /= n; dy /= n;
+      var x0 = clamp(pa.x + dx * (t.w / 2 + 6) - t.w / 2, 2, W - t.w - 2), y0 = clamp(pa.y + dy * (t.h / 2 + 6) - t.h / 2, 2, H - t.h - 2);
+      var x = x0, y = y0, q;
+      for (q = 0; q < CAND.length; q++) {
+        var cx = clamp(x0 + CAND[q][0] * (t.w * 0.6 + 8), 2, W - t.w - 2), cy = clamp(y0 + CAND[q][1] * (t.h + 4), 2, H - t.h - 2);
+        if (!clash(cx, cy, t.w, t.h)) { x = cx; y = cy; break; }
+      }
+      t.el.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)';
+      placed.push({ x: x, y: y, w: t.w, h: t.h });
+    }
+  }
+  var CAND = [[0, 0], [0, -1], [0, 1], [1, 0], [-1, 0], [0, -2], [0, 2], [1, -1], [1, 1], [-1, -1], [-1, 1], [0, -3], [0, 3]];
+  function resize() {
+    var r = sheet.getBoundingClientRect();
+    W = Math.max(50, Math.round(r.width)); H = Math.max(50, Math.round(r.height));
+    cam.aspect = W / H; cam.updateProjectionMatrix();
+    if (renderer) renderer.setSize(W, H, false);
+    invalidate();
+  }
+  var frames = 0, frameMs = 0;
+  function frame(now) {
+    raf = 0; frames++;
+    var t0f = performance.now();
+    var dt = Math.min(0.05, (now - lastT) / 1000 || 0); lastT = now;
+    var again = false;
+    if (stepTween(now)) again = true;
+    var target = state.lift ? C.plow.liftMax : 0;
+    if (Math.abs(liftPhi - target) > 1e-4) {
+      liftPhi += clamp(target - liftPhi, -dt * 0.5, dt * 0.5); again = true; kinematics(); updateArrows();
+    }
+    if (state.run) {
+      dist += state.v * dt; again = true;
+      modR.update(dist); modL.update(dist);
+      spreader.disc.rotation.y = dist * 6;
+      ground.group.position.x = -(dist % 1);
+      MAT.amber.emissiveIntensity = (Math.floor(now / 380) % 2) ? 1.3 : 0.25;
+    }
+    if (dirty || again) {
+      applyCam();
+      thinArrows();
+      if (renderer) renderer.render(scene, cam);
+      placeLabels();
+      dirty = false;
+    }
+    frameMs = performance.now() - t0f;
+    if (again) raf = requestAnimationFrame(frame);
+  }
+  var thinK = -1;
+  function thinArrows() {
+    var ref = VIEWS[state.scene].r * aspectFit(), k = clamp(orbit.r / ref, 0.28, 1.15);
+    if (Math.abs(k - thinK) < 0.01) return;
+    thinK = k;
+    for (var i = 0; i < arrows.length; i++) {
+      var a = arrows[i]; if (!a.shaft || !a.sr) continue;
+      var hl = Math.min(a.hl * Math.max(k, 0.5), a.len * 0.45);
+      a.shaft.scale.set(a.sr * k, a.len - hl, a.sr * k); a.shaft.position.y = (a.len - hl) / 2;
+      a.head.scale.set(a.hr * k, hl, a.hr * k); a.head.position.y = a.len - hl / 2;
+    }
+  }
+  function kinematics() {
+    plow.update(res.psi, liftPhi);
+    if (state.ex <= 0.012) plow.updateHoses();
+  }
+
+  function snowOn() { return state.snow && state.ex < 0.012 && state.scene !== 'drivlinje'; }
+
+  /* ---------- genberegning ---------- */
+  function recompute() {
+    res = SR.compute(inputs());
+    world.rotation.z = Math.atan(state.slope);
+    world.updateMatrixWorld(true);
+    cutPlane.copy(cutLocal).applyMatrix4(vehicle.matrixWorld);
+    kinematics();
+    snow.update(res, snowOn());
+    updateArrows(); updateDims();
+    renderLast();
+    if (state.tab === 'del') renderPart();
+    invalidate();
+  }
+
+  /* ---------- panel: valgt del ---------- */
+  var paneDel = $('pane-del'), paneLast = $('pane-last'), paneListe = $('pane-liste');
+  function kv(rows) {
+    return '<dl class="kv">' + rows.map(function (q) { return '<div><dt>' + q[0] + '</dt><dd>' + q[1] + '</dd></div>'; }).join('') + '</dl>';
+  }
+  function subs(x) { return x.replace(/<code>([^<]*)<\/code>/g, function (m, c) { return '<code>' + c.replace(/_([A-Za-z0-9æøå]+)/g, '<sub>$1</sub>') + '</code>'; }); }
+  function renderPart() {
+    var id = state.sel, p = id && PARTS[id], h = '';
+    if (!p) {
+      h += '<div class="sec"><h2>Tryk på en del i modellen</h2><p class="lead">Så står der her, hvad delen gør, hvilke kræfter den får i det valgte lasttilfælde, og hvad I skal regne på.</p></div>';
+      h += '<div class="sec"><h3>Kraftens vej</h3><ol class="path">' + PATH.map(function (k) { return '<li><button type="button" data-id="' + k + '">' + PARTS[k].navn + '</button></li>'; }).join('') + '</ol><p class="small">Der sidder ét sæt i hver side, vendt 180° i forhold til hinanden. Tryk på et led for at følge kraften gennem maskinen.</p></div>';
+      h += '<div class="sec"><h3>De ti maskindele</h3><div class="tw"><table><tbody>';
+      PART_ORDER.slice(0, 10).forEach(function (k) {
+        h += '<tr class="row" data-id="' + k + '"><td class="c-no"><span class="no">' + PARTS[k].no + '</span></td><td><button type="button">' + PARTS[k].navn + '<span class="t2">' + PARTS[k].kort + '</span></button></td></tr>';
+      });
+      h += '</tbody></table></div></div>';
+      h += '<div class="sec"><h3>Sådan bruger du modellen</h3><ul class="calc"><li><b>Drivlinje</b> gør kassen gennemsigtig og viser momenter, tandkraft, kædekræfter og lejereaktioner.</li><li><b>Plov</b> viser snekraften, cylinderkraften og kraften i drejetappen. Flyt plovvinklen og se dem ændre sig.</li><li><b>Snit</b> skærer chassis og drivlinje over i akslernes højde, så du ser ned i gearhusene.</li><li><b>Sprængskitse</b> trækker delene fra hinanden langs akslerne.</li><li><b>Mål</b> viser hovedmålene.</li><li><b>Kantsten</b> viser, hvad der sker, når plovens hjørne rammer noget fast.</li></ul></div>';
+      paneDel.innerHTML = h; return;
+    }
+    var rows = p.tal(res, state.lc) || [];
+    h += '<div class="sec"><div class="pos"><span class="no">' + p.no + '</span><h2>' + p.navn + '</h2></div>';
+    h += '<div class="kind"><span class="' + (p.type === 'egen' ? 'egen' : '') + '">' + TYPE[p.type] + '</span>' + (p.antal ? '<span>' + (/^\d+$/.test(p.antal) ? p.antal + ' stk.' : p.antal) + '</span>' : '') + p.fag.map(function (x) { return '<span>' + x + '</span>'; }).join('') + '</div>';
+    h += '<p class="small">' + p.kort + '</p><p>' + p.rolle + '</p>' + (p.indsigt ? '<p class="note">' + p.indsigt + '</p>' : '') + '</div>';
+    if (rows.length) {
+      var head = id === 'vinkelcyl' && state.lc === 'kant' ? 'Når hjørnet rammer en kantsten' : state.lift ? 'Laster med løftet plov' : 'Laster under rydning';
+      h += '<div class="sec"><h3>' + head + '</h3>' + kv(rows) + '</div>';
+      var nt = p.note && p.note(res); if (nt) h += '<p class="note">' + nt + '</p>';
+    }
+    if (p.beregn.length) h += '<div class="sec"><h3>Det skal I regne</h3><ul class="calc">' + p.beregn.map(function (x) { return '<li>' + subs(x) + '</li>'; }).join('') + '</ul></div>';
+    var pi = PATH.indexOf(id);
+    if (pi >= 0) {
+      h += '<div class="sec"><h3>Kraftens vej, led ' + (pi + 1) + ' af ' + PATH.length + '</h3><div class="btnrow">';
+      h += pi > 0 ? '<button type="button" class="btn" data-go="' + PATH[pi - 1] + '">← ' + PARTS[PATH[pi - 1]].navn + '</button>' : '';
+      h += pi < PATH.length - 1 ? '<button type="button" class="btn" data-go="' + PATH[pi + 1] + '">' + PARTS[PATH[pi + 1]].navn + ' →</button>' : '';
+      h += '</div></div>';
+    }
+    h += '<div class="btnrow"><button type="button" class="btn" id="btn-zoom">Zoom til delen</button><button type="button" class="btn" id="btn-iso" aria-pressed="' + state.iso + '">' + (state.iso ? 'Vis alle dele' : 'Isolér delen') + '</button><button type="button" class="btn" id="btn-desel">Fjern valg</button></div>';
+    paneDel.innerHTML = h;
+  }
+  paneDel.addEventListener('click', function (e) {
+    var row = e.target.closest('tr.row');
+    if (row) { select(row.dataset.id, 'list'); return; }
+    var go = e.target.closest('[data-go], .path button');
+    if (go) { select(go.dataset.go || go.dataset.id, 'list'); return; }
+    if (e.target.id === 'btn-zoom') zoomTo(state.sel);
+    if (e.target.id === 'btn-iso') { state.iso = !state.iso; applyLook(); renderPart(); }
+    if (e.target.id === 'btn-desel') select(null, 'model');
+  });
+
+  /* ---------- panel: lasttilfælde ---------- */
+  function niceMax(x) { var p = Math.pow(10, Math.floor(Math.log10(x))), m = x / p; return (m <= 1 ? 1 : m <= 1.5 ? 1.5 : m <= 2 ? 2 : m <= 3 ? 3 : m <= 5 ? 5 : 10) * p; }
+  var lastOut = $('last-out');
+  function renderLast() {
+    var r = res, V = r.veh, D = r.drv, Hy = r.hyd, h = '';
+    var mx = niceMax(Math.max(V.Fmax4, V.Fdrv) * 1.08), pc = function (x) { return (100 * x / mx).toFixed(2) + '%'; };
+    var worst = Math.max(V.utilF, V.utilR), cls = 'ok', ic = '✓', msg;
+    if (V.util >= 1) { cls = 'bad'; ic = '×'; msg = 'Hjulene spinner. Der mangler ' + fN(V.Fdrv - V.Fmax4) + ' trækkraft.'; }
+    else if (worst >= 1) { cls = 'mid'; ic = '!'; msg = (V.utilF > V.utilR ? 'Forakslen' : 'Bagakslen') + ' skrider sidelæns: plovens sidekraft bruger resten af friktionen.'; }
+    else if (V.util > 0.85) { cls = 'mid'; ic = '!'; msg = 'Tæt på grænsen. Reserven er kun ' + fPct(1 - V.util) + '.'; }
+    else msg = 'Trækkraften rækker. Reserven er ' + fPct(1 - V.util) + '.';
+    if (cls !== 'bad' && !state.lift && state.h > 0 && !(r.snow.util <= 1)) msg += ' Men skæret kan ikke følge med, se Plov og hydraulik.';
+    h += '<div class="sec"><h3>Trækkraft</h3><div class="viz">';
+    h += '<div class="verdict ' + cls + '"><span class="ic" aria-hidden="true">' + ic + '</span><span>' + msg + '</span></div>';
+    h += '<div class="bar" id="bar"><div class="track">';
+    [['plov', 'Plov', V.Fplow], ['rul', 'Rulning', V.Frr], ['stig', 'Stigning', V.Fgrade]].forEach(function (s) {
+      if (s[2] > 0.5) h += '<button type="button" class="s ' + s[0] + '" style="width:' + pc(s[2]) + '" data-t="' + s[1] + '" data-v="' + fN(s[2]) + '" aria-label="' + s[1] + ' ' + fN(s[2]) + '"></button>';
+    });
+    h += '</div>';
+    h += '<div class="mark m4' + (V.Fmax4 / mx > 0.6 ? ' flip' : '') + '" style="left:' + pc(V.Fmax4) + '"><span>Grænse, 4 hjul</span></div>';
+    h += '<div class="mark m2' + (V.Fmax2 / mx > 0.36 ? ' flip' : '') + '" style="left:' + pc(V.Fmax2) + '"><span>Grænse, kun bagaksel</span></div>';
+    h += '</div><div class="axis"><span>0</span><span>' + fN(mx) + '</span></div>';
+    h += '<dl class="kv keyed"><div><dt class="plov"><i></i>Plov: sne og skærets friktion</dt><dd>' + fN(V.Fplow) + '</dd></div>';
+    h += '<div><dt class="rul"><i></i>Rullemodstand</dt><dd>' + fN(V.Frr) + '</dd></div>';
+    h += '<div><dt><i></i>Stigning</dt><dd>' + fN(V.Fgrade) + '</dd></div>';
+    h += '<div><dt>Nødvendig trækkraft i alt</dt><dd>' + fN(V.Fdrv) + '</dd></div>';
+    h += '<div><dt class="lim"><i></i>Friktionsgrænse med træk på alle fire hjul</dt><dd>' + fN(V.Fmax4) + '</dd></div>';
+    h += '<div><dt class="lim"><i></i>Friktionsgrænse med træk kun på bagakslen</dt><dd>' + fN(V.Fmax2) + '</dd></div>';
+    h += '<div><dt>Udnyttet friktion med sidekraft, for / bag</dt><dd>' + fPct(V.utilF) + ' / ' + fPct(V.utilR) + '</dd></div></dl>';
+    h += '<p class="small">' + (V.Fdrv > V.Fmax2 ? 'Med træk kun på bagakslen ville hjulene spinne her. ' : 'Med træk kun på bagakslen er reserven ' + fPct(1 - V.util2) + '. ') + 'Firehjulstræk bruger hele maskinens vægt til trækkraft.</p>';
+    h += '</div></div>';
+
+    h += '<div class="sec"><h3>Gennem drivlinjen, én side</h3><div class="tw"><table><thead><tr><th>Trin</th><th class="n">o/min</th><th class="n">Nm drift</th><th class="n">Nm maks.</th></tr></thead><tbody>';
+    [['motor', 'Motor', D.nm, D.Tm, D.TmMax], ['kobling', 'Efter planetgear, i = 5', D.n1, D.T1, D.T1max], ['mellemaksel', 'Mellemaksel, i = 4', D.n2, D.T2, D.T2max], ['hjulaksel', 'Hjulaksler, i = 2', D.nw, D.Tw, D.TsideMax]].forEach(function (q) {
+      h += '<tr class="row" data-id="' + q[0] + '"><td><button type="button">' + q[1] + '</button></td><td class="n">' + nf(q[2], 0) + '</td><td class="n">' + nf(q[3], 1) + '</td><td class="n">' + nf(q[4], q[4] >= 100 ? 0 : 1) + '</td></tr>';
+    });
+    h += '</tbody></table></div>';
+    h += kv([['Effekt ved hjulene', fW(D.Pw)], ['Effekt fra motoren', fW(D.Pm)], ['Elektrisk effekt', fW(D.Pel)]]);
+    h += '<p class="small">Maks. er momentet, når begge hjul i siden spinner på tør asfalt (μ = 0,8). Højere kan drivlinjen ikke belastes jævnt.</p></div>';
+
+    h += '<div class="sec"><h3>Plov og hydraulik</h3>';
+    if (!state.lift && state.h > 0) {
+      var su = r.snow.util, c2 = 'ok', i2 = '✓', m2;
+      if (!isFinite(su)) { c2 = 'bad'; i2 = '×'; m2 = 'Skæret står for lige til at kaste sneen til siden. Den skubbes foran ploven.'; }
+      else if (su > 1) { c2 = 'bad'; i2 = '×'; m2 = 'Skæret er fyldt. Ved ' + Math.abs(state.ang) + '° flytter det højst ' + nf(r.snow.hMax * 100, 1) + ' cm af denne sne til siden.'; }
+      else if (su > 0.85) { c2 = 'mid'; i2 = '!'; m2 = 'Skæret er næsten fyldt. Det er udnyttet ' + fPct(su) + '.'; }
+      else m2 = 'Skæret kan følge med. Det er udnyttet ' + fPct(su) + '.';
+      h += '<div class="verdict ' + c2 + '" id="v-skaer"><span class="ic" aria-hidden="true">' + i2 + '</span><span>' + m2 + '</span></div>';
+    }
+    if (state.lift) h += kv([['Ploven er løftet', 'ingen snekraft'], ['Kraft i løftecylinderen', fN(Hy.Flift)], ['Tryk', fBar(Hy.pLift)]]);
+    else h += kv([['Sne foran skæret', nf(r.snow.mPrism, 0) + ' kg'], ['Snekraft på skæret', fN(r.snow.R)], ['Skærets friktion mod underlaget', fN(r.plow.Fe)], ['Sidekraft på maskinen', fN(Math.abs(r.snow.Fz))],
+      ['Største snedybde, skæret kan flytte ved denne vinkel', nf(r.snow.hMax * 100, 1) + ' cm'],
+      ['Moment om drejetappen', fNm(Hy.ryd.M)], ['Cylinderkraft', fN(Hy.ryd.F)], ['Tryk i cylinderen', fBar(Hy.ryd.p)]]);
+    h += '<p class="small"><b>Hjørne mod kantsten:</b> chokventilen åbner ved ' + fBar(Hy.kant.p) + '. Det svarer til ' + fN(Hy.kant.F) + ' i cylinderen og højst ' + fN(Hy.kant.Fcorner) + ' på plovens hjørne. Skal cylinderen optage hele maskinens bevægelsesenergi på ' + nf(Hy.kant.Ek, 0) + ' J, sker det på ' + fMm(Hy.kant.ds) + ' slag.</p>';
+    h += kv([['Pumpe, fuldt sving på 4 s', nf(Hy.Q * 60000, 1) + ' l/min'], ['Pumpeeffekt ved 120 bar', fW(Hy.Ppump)]]) + '</div>';
+
+    h += '<div class="sec"><h3>Kapacitet, energi og dynamik</h3>';
+    h += kv([['Rydningsbredde', nf(r.cap.wClear, 2) + ' m'], ['Maskinens bredde over hjulene', nf(r.cap.wMachine, 2) + ' m'], ['2.000 m² ryddes på', nf(r.cap.tPass / 60, 0) + ' min'],
+      ['Sne, der når at falde imens ved 2,5 cm/t', nf(r.cap.dPass * 100, 1) + ' cm'], ['Elforbrug', fW(r.cap.PelTot)], ['Energi til fire timer', nf(r.cap.E4, 1) + ' kWh'],
+      ['Største acceleration', nf(r.dyn.aMax, 2) + ' m/s²'], ['Tid til fuld fart', isFinite(r.dyn.tAcc) ? nf(r.dyn.tAcc, 1) + ' s' : 'kan ikke accelerere'], ['Roterende dele tæller som', '+' + nf(r.dyn.mRot, 0) + ' kg']]);
+    if (isFinite(r.cap.dUtil) && !state.lift) h += '<p class="small">Kører maskinen uafbrudt i et snefald på 15 cm på 6 timer, møder skæret ' + nf(r.cap.dPass * 100, 1) + ' cm pr. overkørsel. Det er ' + fPct(r.cap.dUtil) + ' af, hvad skæret kan flytte ved denne vinkel.</p>';
+    if (r.cap.wClear < r.cap.wMachine) h += '<p class="note"><b>Ploven er for smal ved denne vinkel.</b> Hjulene kører i uryddet sne.</p>';
+    else if (r.cap.wClear < r.cap.wMachine + 0.10) h += '<p class="note"><b>Ploven dækker kun lige hjulenes spor ved denne vinkel.</b> Der er ' + fMm((r.cap.wClear - r.cap.wMachine) / 2) + ' at give af i hver side.</p>';
+    h += '</div>';
+
+    h += '<details id="det-ant"><summary>Antagelser bag tallene</summary><ul class="calc">';
+    ['Standardværdierne følger snerydningssimulatoren: 0,6 m/s, sat sne 250 kg/m³ og pakket sne med friktion 0,25.',
+      'Sneen glider langs skæret med friktion 0,15 og skubbes hen over underlaget med friktion 0,5. Snekilen vokser jævnt mod den side, sneen kastes til, indtil skæret er fyldt.',
+      'Skæret er fyldt, når kilen når skærets højde med 40° skrænt. Sneen i kilen er pakket til 1,5 gange sin massefylde, dog mindst 300 og højst 550 kg/m³.',
+      'Modellen regner én bane i et jævnt snelag. Volden fra tidligere baner, som ploven skal flytte igen, er ikke med. Det regner simulatoren med.',
+      'Skæret har friktion 0,4 mod underlaget. Ploven flyder og bærer omkring 90 % af sine 48 kg på slidskinnen.',
+      'Rullemodstanden er 0,035 gange hjultrykket, som på pakket sne i simulatoren.',
+      'Virkningsgrader: planetgear 0,94, tandhjulstrin 0,97, kæde 0,96, motor og styring 0,85.',
+      'Maskinens tyngdepunkt ligger 0,10 m bag midten og 0,31 m over jorden.',
+      'Begge sider trækker lige meget, og trækkraften fordeles mellem for- og baghjul efter hjultrykket. Dækkene tager plovens sidekraft.',
+      'Kapacitet: 24 % ekstra strækning til vendinger og overlap, som simulatoren finder for hjul med firehjulstræk. Snefaldet 2,5 cm/t svarer til 15 cm på 6 timer.',
+      'Hydraulik: arbejdstryk 120 bar, chokventiler 150 bar, cylindre Ø32/18.'].forEach(function (x) { h += '<li>' + x + '</li>'; });
+    h += '</ul><p class="note"><b>Tallene er overslag fra en forenklet model med modellens egne mål.</b> Brug jeres egne beregninger i rapporten, og brug modellen til at se, hvilken vej kræfterne går.</p></details>';
+    var det = lastOut.querySelector('details'), wasOpen = !!(det && det.open);
+    lastOut.innerHTML = h;
+    if (wasOpen) lastOut.querySelector('details').open = true;
+  }
+  var barTip = null;
+  lastOut.addEventListener('pointerover', function (e) { showBarTip(e.target); });
+  lastOut.addEventListener('focusin', function (e) { showBarTip(e.target); });
+  lastOut.addEventListener('pointerout', hideBarTip); lastOut.addEventListener('focusout', hideBarTip);
+  function showBarTip(t) {
+    if (!t.classList || !t.classList.contains('s')) return;
+    var bar = $('bar'); hideBarTip();
+    barTip = document.createElement('div'); barTip.className = 'bartip';
+    var b = document.createElement('b'); b.textContent = t.dataset.v; barTip.appendChild(b); barTip.appendChild(document.createTextNode(' ' + t.dataset.t));
+    barTip.style.left = (t.offsetLeft + t.offsetWidth / 2) + 'px'; barTip.style.top = t.parentNode.offsetTop + 'px';
+    bar.appendChild(barTip);
+  }
+  function hideBarTip() { if (barTip && barTip.parentNode) barTip.parentNode.removeChild(barTip); barTip = null; }
+  lastOut.addEventListener('click', function (e) { var row = e.target.closest('tr.row'); if (row) select(row.dataset.id, 'list'); });
+
+  /* ---------- panel: stykliste ---------- */
+  function renderListe() {
+    var h = '<div class="tw"><table><thead><tr><th>Pos.</th><th>Benævnelse</th><th class="n">Antal</th></tr></thead><tbody>';
+    GROUPS.forEach(function (gq) {
+      h += '<tr class="grp"><td colspan="3">' + gq[1] + '</td></tr>';
+      PART_ORDER.forEach(function (k) {
+        var p = PARTS[k]; if (p.grp !== gq[0]) return;
+        h += '<tr class="row' + (state.sel === k ? ' is-sel' : '') + '" data-id="' + k + '"><td class="c-no"><span class="no">' + p.no + '</span></td><td><button type="button"' + (state.sel === k ? ' aria-current="true"' : '') + '>' + p.navn + '<span class="t2">' + p.kort + ' · ' + TYPE[p.type] + '</span></button></td><td class="n">' + (p.antal || '') + '</td></tr>';
+      });
+    });
+    h += '</tbody></table></div><p class="small">Pos. 1–10 er de ti maskindele i drivlinjen. Numrene står også i modellen, når Numre er slået til.</p>';
+    paneListe.innerHTML = h;
+  }
+  paneListe.addEventListener('click', function (e) { var row = e.target.closest('tr.row'); if (row) select(row.dataset.id, 'list'); });
+
+  /* ---------- valg og zoom ---------- */
+  var autoXray = false;
+  function select(id, from) {
+    if (id && !PARTS[id]) id = null;
+    state.sel = id;
+    if (!id) state.iso = false;
+    var under = !!id && (!!UNDER[PARTS[id].no] || id === 'kabler');
+    if (autoXray && !under) { autoXray = false; setToggle('xray', false); }
+    if (id && from !== 'model' && state.ex < 0.012) {
+      var p = PARTS[id];
+      if (DRIVSET[id] || id === 'gearhus') { if (state.scene !== 'drivlinje') setScene('drivlinje'); }
+      else {
+        var want = (p.grp === 'plov' || p.grp === 'hyd') && !under ? 'plov' : 'maskine';
+        if (state.scene === 'drivlinje' || (from === 'list' && state.scene !== want)) setScene(want);
+        if (under && !state.xray && !state.cut) { setToggle('xray', true); autoXray = true; }
+      }
+    }
+    applyLook(); updateArrows();
+    BALLOONS.forEach(function (b) { b.el.setAttribute('aria-pressed', String(b.id === id)); });
+    renderPart(); renderListe();
+    if (id || from !== 'model') setTab('del');
+    paneDel.scrollTop = 0;
+    var chip = $('selchip');
+    if (id) {
+      chip.innerHTML = '<span class="no">' + PARTS[id].no + '</span><span class="nm">' + PARTS[id].navn + '</span><span aria-hidden="true">↓</span>';
+      chip.setAttribute('aria-label', 'Valgt: ' + PARTS[id].navn + '. Gå til beskrivelsen');
+    }
+    chip.hidden = !id;
+    if (id && from === 'list' && narrow()) toPanel();
+    invalidate();
+  }
+  function narrow() { try { return window.matchMedia('(max-width: 960px)').matches; } catch (e) { return false; } }
+  function toPanel() { $('panel').scrollIntoView({ block: 'start', behavior: calm ? 'auto' : 'smooth' }); }
+  $('selchip').addEventListener('click', toPanel);
+  var box = new T.Box3(), sph = new T.Sphere();
+  function zoomTo(id) {
+    var gs = REG.byId[id]; if (!gs) return;
+    box.makeEmpty(); vehicle.updateMatrixWorld(true);
+    var right = gs.filter(function (g) { return g.userData.side !== -1; });
+    (right.length ? right : gs).forEach(function (g) { if (shown(g)) box.expandByObject(g); });
+    if (box.isEmpty()) return;
+    box.getBoundingSphere(sph);
+    var r = Math.max(0.09, sph.radius), d = r / Math.sin(deg(cam.fov) / 2) * 1.25 * aspectFit();
+    flyTo(sph.center.clone(), orbit.th, clamp(orbit.ph, 0.5, 1.3), clamp(d, 0.5, 9));
+  }
+
+  /* ---------- betjening ---------- */
+  function setScene(name) {
+    state.scene = name;
+    ['maskine', 'drivlinje', 'plov'].forEach(function (k) { $('sc-' + k).setAttribute('aria-pressed', String(k === name)); });
+    applyLook(); snow.update(res, snowOn()); updateArrows(); goView(name);
+  }
+  function setTab(name) {
+    state.tab = name;
+    [['del', paneDel], ['last', paneLast], ['liste', paneListe]].forEach(function (q) { $('tab-' + q[0]).setAttribute('aria-selected', String(q[0] === name)); q[1].hidden = q[0] !== name; });
+    if (name === 'del') renderPart();
+  }
+  var TG = { forces: 'tg-forces', nums: 'tg-nums', dims: 'tg-dims', xray: 'tg-xray', cut: 'tg-cut', snow: 'tg-snow', run: 'tg-run', lift: 'tg-lift' };
+  function setToggle(k, v) {
+    state[k] = v; $(TG[k]).setAttribute('aria-pressed', String(v));
+    if (k === 'xray') applyLook();
+    else if (k === 'cut') { applyLook(); goView(state.scene, 600); }
+    else if (k === 'lift' || k === 'snow') recompute();
+    else if (k === 'run') { lastT = performance.now(); if (!v) MAT.amber.emissiveIntensity = 0.55; }
+    else if (k === 'dims') updateDims();
+    else updateArrows();
+    invalidate();
+  }
+  Object.keys(TG).forEach(function (k) { $(TG[k]).addEventListener('click', function () { if (k === 'xray') autoXray = false; setToggle(k, !state[k]); }); });
+  ['maskine', 'drivlinje', 'plov'].forEach(function (k) { $('sc-' + k).addEventListener('click', function () { setScene(k); }); });
+  ['del', 'last', 'liste'].forEach(function (k) { $('tab-' + k).addEventListener('click', function () { setTab(k); }); });
+  $('btn-home').addEventListener('click', function () { goView(state.scene); });
+  ['ryd', 'kant'].forEach(function (k) {
+    $('lc-' + k).addEventListener('click', function () {
+      state.lc = k; $('lc-ryd').setAttribute('aria-pressed', String(k === 'ryd')); $('lc-kant').setAttribute('aria-pressed', String(k === 'kant'));
+      if (k === 'kant' && state.scene === 'drivlinje') setScene('plov');
+      recompute();
+    });
+  });
+  /* navne og grænser følger snerydningssimulatoren: tør nysne 100, sat sne 250, våd sne 400; isslag 0,10, pakket sne 0,25, asfalt 0,55 */
+  function snowName(x) { return x < 175 ? 'tør nysne' : x < 325 ? 'sat sne' : 'våd, tung sne'; }
+  function muName(x) { return x < 0.05 ? 'våd is' : x < 0.175 ? 'isslag' : x < 0.4 ? 'pakket sne' : 'asfalt'; }
+  function syncOutputs() {
+    $('out-ang').textContent = state.ang === 0 ? 'lige frem' : Math.abs(state.ang) + '° ' + (state.ang > 0 ? 'højre' : 'venstre');
+    $('out-ex').textContent = state.ex < 0.012 ? 'samlet' : Math.round(state.ex * 100) + ' %';
+    $('out-h').textContent = nf(state.h * 100, 1) + ' cm';
+    $('out-rho').textContent = nf(state.rho, 0) + ' kg/m³'; $('sm-rho').textContent = snowName(state.rho);
+    $('out-mu').textContent = 'μ = ' + nf(state.mu, 2); $('sm-mu').textContent = muName(state.mu);
+    $('out-slope').textContent = nf(state.slope * 100, 1) + ' %';
+    $('sm-slope').textContent = state.slope > 0 ? nf(Math.atan(state.slope) * 180 / PI, 1) + '° op ad bakke' : 'plant';
+    $('out-v').textContent = nf(state.v, 2) + ' m/s'; $('sm-v').textContent = nf(state.v * 3.6, 1) + ' km/t';
+    $('out-m').textContent = nf(state.m, 0) + ' kg';
+  }
+  function bind(id, fn) { $(id).addEventListener('input', function () { fn(parseFloat(this.value)); syncOutputs(); recompute(); }); }
+  bind('in-ang', function (v) { state.ang = v; });
+  bind('in-h', function (v) { state.h = v / 100; });
+  bind('in-rho', function (v) { state.rho = v; });
+  bind('in-mu', function (v) { state.mu = v; });
+  bind('in-slope', function (v) { state.slope = v / 100; });
+  bind('in-v', function (v) { state.v = v; });
+  bind('in-m', function (v) { state.m = v; });
+  $('in-ex').addEventListener('input', function () {
+    var was = state.ex > 0.012; state.ex = parseFloat(this.value) / 100; var now = state.ex > 0.012;
+    applyExplode(); syncOutputs(); kinematics();
+    if (was !== now) { applyLook(); snow.update(res, snowOn()); updateArrows(); updateDims(); goView(state.scene, 500); }
+    invalidate();
+  });
+
+  /* ---------- start ---------- */
+  readTheme();
+  try {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readTheme);
+    new MutationObserver(readTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'class', 'style'] });
+  } catch (e3) { }
+  if (window.ResizeObserver) new ResizeObserver(resize).observe(sheet); else window.addEventListener('resize', resize);
+  ['in-ang', 'in-h', 'in-rho', 'in-mu', 'in-slope', 'in-v', 'in-m'].forEach(function (id) {
+    var el = $(id), v = parseFloat(el.value);
+    if (id === 'in-ang') state.ang = v; else if (id === 'in-h') state.h = v / 100; else if (id === 'in-rho') state.rho = v; else if (id === 'in-mu') state.mu = v;
+    else if (id === 'in-slope') state.slope = v / 100; else if (id === 'in-v') state.v = v; else state.m = v;
+  });
+  state.ex = parseFloat($('in-ex').value) / 100;
+  resize();
+  var v0 = VIEWS.maskine, k0 = aspectFit();
+  orbit.target.set(v0.t[0] + (cam.aspect < 1.05 ? 0.1 : 0), v0.t[1], v0.t[2]); orbit.th = narrowTh('maskine', v0.th); orbit.ph = v0.ph; orbit.r = v0.r * k0 * (cam.aspect < 1.05 ? 0.93 : 1);
+  if (W < 620) { state.nums = false; $('tg-nums').setAttribute('aria-pressed', 'false'); }
+  modR.update(0); modL.update(0);
+  applyExplode(); applyLook(); syncOutputs(); renderListe(); recompute(); renderPart();
+  window.__sr = {
+    state: state, select: select, setScene: setScene, setToggle: setToggle, orbit: orbit, res: function () { return res; }, invalidate: invalidate, zoomTo: zoomTo,
+    stat: function () { return { frames: frames, ms: Math.round(frameMs), raf: raf, tween: !!tween, lift: liftPhi }; },
+    drive: function (d) { dist = d; modR.update(dist); modL.update(dist); invalidate(); },
+    view: function (th, ph, r, x, y, z) { tween = null; orbit.th = th; orbit.ph = ph; orbit.r = r; if (x !== undefined) orbit.target.set(x, y, z); invalidate(); },
+    info: function () { return renderer ? { calls: renderer.info.render.calls, tris: renderer.info.render.triangles, geos: renderer.info.memory.geometries } : null; },
+    set: function (id, v) { var el = $(id); el.value = v; el.dispatchEvent(new Event('input', { bubbles: true })); }
+  };
+})();
+
+}
+(function () {
+  function fail() {
+    var f = document.createElement('div'); f.className = 'fail';
+    f.textContent = '3D-biblioteket kunne ikke hentes. Læg three.min.js i samme mappe som siden, eller åbn den med internetforbindelse.';
+    document.getElementById('sheet').appendChild(f);
+    document.getElementById('pane-del').textContent = 'Modellen kunne ikke indlæses.';
+  }
+  if (window.THREE) { startModel(); return; }
+  var s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+  s.onload = function () { if (window.THREE) startModel(); else fail(); };
+  s.onerror = fail;
+  document.head.appendChild(s);
+})();
+
+</script>
+</body>
+</html>
