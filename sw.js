@@ -1,5 +1,5 @@
 // Auto-increment version: updated on each deploy
-const CACHE_VERSION = '20261018-002'; // Format: YYYYMMDD-NNN
+const CACHE_VERSION = '20261022-001'; // Format: YYYYMMDD-NNN
 const CACHE_NAME = `studiehub-${CACHE_VERSION}`;
 const urlsToCache = [
   '/',
@@ -48,6 +48,13 @@ self.addEventListener('fetch', event => {
     return event.respondWith(
       fetch(event.request)
         .catch(() => caches.match(event.request))
+    );
+  }
+
+  // Network-first for undervisningsvideoerne (siden opdateres løbende; mp4 hentes med Range og caches ikke)
+  if (event.request.url.includes('/html/ele1/video/')) {
+    return event.respondWith(
+      fetch(event.request).catch(() => caches.match(event.request))
     );
   }
 
