@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Transformeren · 3D-lab</title>
+<meta name="description" content="En ideel transformer i 3D: vekselflux i jernkernen, omsætningsforholdet N2/N1, spændinger, strømme og den reflekterede impedans set fra primærsiden.">
+<link rel="stylesheet" href="../assets/lab.css">
+</head>
+<body>
+<script src="../assets/three.min.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+'use strict';
+var F = Lab.fmt, n = Lab.n, PI = Math.PI;
+var UI = Lab.build({
+  chip: 'ELE1 · dag 8 · Rizzoni kap. 6.4', title: 'Transformeren: flux i kernen og omsætningsforholdet',
+  src: 'Slides og bog dag 8: ideel transformer V<sub>2</sub>/V<sub>1</sub> = N<sub>2</sub>/N<sub>1</sub> = I<sub>1</sub>/I<sub>2</sub>, reflekteret impedans Z\' = (N<sub>1</sub>/N<sub>2</sub>)²Z',
+  side: ['Viklinger', 'Forsyning og belastning', 'Aflæsning'],
+  graphs: [{ id: 'gT', title: 'Spændinger og strømme', sub: 'primær og sekundær' }, { id: 'gR', title: 'Spænding og strøm mod omsætningsforhold', sub: 'N<sub>2</sub>/N<sub>1</sub>' }],
+  notes: '<li>Vekselstrøm i primærviklingen laver en <b>vekselflux i jernkernen</b>. Den samme flux går gennem sekundærviklingen og inducerer en spænding i hver vinding (Faradays lov).</li>' +
+    '<li>Derfor er spændingen pr. vinding den samme på begge sider: V<sub>2</sub>/V<sub>1</sub> = N<sub>2</sub>/N<sub>1</sub>. Flere vindinger på sekundærsiden giver højere spænding.</li>' +
+    '<li><b>Effekten bevares</b> (ideel transformer): løfter du spændingen, falder strømmen tilsvarende. Det er derfor, elnettet transporterer energi ved høj spænding.</li>' +
+    '<li>Transformeren virker kun med <b>vekselstrøm</b>. Konstant flux inducerer ingen spænding.</li>' +
+    '<li>Set fra primærsiden ser belastningen ud som (N<sub>1</sub>/N<sub>2</sub>)²·R. En transformer kan bruges til at tilpasse impedanser.</li>',
+  model: '<li>Ideel transformer: ingen tab, ingen lækflux, uendelig permeabilitet i kernen. Rent resistiv belastning på sekundærsiden.</li>' +
+    '<li>Antallet af viste vindinger er skaleret ned, men forholdet mellem dem er rigtigt. Fluxpartiklerne viser retning og størrelse af Φ(t).</li>'
+});
+var lab = Lab.scene(UI.stage, { view: { target: new THREE.Vector3(0, 0, 0), theta: 0.45, phi: 1.25, radius: 5 } });
+var S = { N1: 400, N2: 100, V1: 230, f: 50, R: 10, t: 0 };
+
+/* ---------- 3D ---------- */
+var coreMat = Lab.mat(0x5f7287, { metal: 0.4, rough: 0.5, opacity: 0.45 }); coreMat.depthWrite = false;
+[[0, 1.1, 2.6, 0.4], [0, -1.1, 2.6, 0.4], [-1.1, 0, 0.4, 1.8], [1.1, 0, 0.4, 1.8]].forEach(function (b) { var m = new THREE.Mesh(new THREE.BoxGeometry(b[2], b[3], 0.5), coreMat); m.position.set(b[0], b[1], 0); lab.scene.add(m); });
+var coil1 = null, coil2 = null, mat1 = Lab.mat(0xd9a441, { metal: 0.7, rough: 0.3 }), mat2 = Lab.mat(0xc08a3e, { metal: 0.7, rough: 0.3 });
+function coils() {
+  [coil1, coil2].forEach(function (cl) { if (cl) lab.scene.remove(cl); });
+  var t1 = Math.max(2, Math.round(S.N1 / Math.max(S.N1, S.N2) * 16)), t2 = Math.max(2, Math.round(S.N2 / Math.max(S.N1, S.N2) * 16));
+  coil1 = Lab.spring({ R: 0.38, wire: Math.min(0.04, 0.6 / t1 * 0.3), turns: t1, mat: mat1 }); coil1.set(1.4); coil1.position.set(-1.1, -0.7, 0); lab.scene.add(coil1);
+  coil2 = Lab.spring({ R: 0.38, wire: Math.min(0.04, 0.6 / t2 * 0.3), turns: t2, mat: mat2 }); coil2.set(1.4); coil2.position.set(1.1, -0.7, 0); lab.scene.add(coil2);
+}
+coils();
+var NF = 70, fp = new Float32Array(NF * 3), flux = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial({ color: 0x5ec8ff, size: 0.09, transparent: true, depthWrite: false }));
+flux.geometry.setAttribute('position', new THREE.BufferAttribute(fp, 3)); lab.scene.add(flux);
+var src = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 0.4, 24), Lab.mat(0x2f7fd1)); src.position.set(-2.4, 0, 0); lab.scene.add(src);
+var load = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.7, 0.3), Lab.mat(0xff7a59)); load.position.set(2.4, 0, 0); lab.scene.add(load);
+[[-2.4, 0.2, -1.1, 0.7], [-2.4, -0.2, -1.1, -0.7], [2.4, 0.35, 1.1, 0.7], [2.4, -0.35, 1.1, -0.7]].forEach(function (w) { var r = Lab.rod(0.02, Lab.mat(0xd9a441)); r.between(new THREE.Vector3(w[0], w[1], 0.4), new THREE.Vector3(w[2], w[3], 0.4)); lab.scene.add(r); });
+var tagV1 = Lab.tag(lab, '', '#ffd27a'), tagV2 = Lab.tag(lab, '', '#ffd27a'), tagN1 = Lab.tag(lab, '', '#d9a441'), tagN2 = Lab.tag(lab, '', '#c08a3e'), tagPhi = Lab.tag(lab, 'Φ(t)', '#5ec8ff');
+
+/* ---------- kontroller ---------- */
+var c = UI.side;
+var s1 = Lab.slider(c[0], { label: 'Primærvindinger N<sub>1</sub>', min: 10, max: 1000, step: 10, value: S.N1, unit: '', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.N1 = v; coils(); } });
+var s2 = Lab.slider(c[0], { label: 'Sekundærvindinger N<sub>2</sub>', min: 10, max: 1000, step: 10, value: S.N2, unit: '', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.N2 = v; coils(); } });
+Lab.presets(c[0], [['<b>Nedtransformering 230 → 57,5 V</b> (4:1)', function () { set(400, 100, 230); }], ['<b>Optransformering 10 kV → 60 kV</b> (1:6)', function () { set(100, 600, 10000); }], ['<b>Sikkerhedstransformer 230 → 12 V</b>', function () { set(920, 48, 230); }]]);
+function set(a, b, v) { S.N1 = a; S.N2 = b; S.V1 = v; s1.set(a, true); s2.set(b, true); sv.range(1, Math.max(400, v * 1.2), 1); sv.set(v, true); coils(); }
+var sv = Lab.slider(c[1], { label: 'Primærspænding V<sub>1</sub> (rms)', min: 1, max: 400, step: 1, value: S.V1, unit: 'V', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.V1 = v; } });
+Lab.slider(c[1], { label: 'Belastning R', min: 0.5, max: 1000, step: 0.5, value: S.R, unit: 'Ω', fmt: function (x) { return F(x, 1); }, onInput: function (v) { S.R = v; } });
+Lab.slider(c[1], { label: 'Frekvens f', min: 10, max: 400, step: 5, value: S.f, unit: 'Hz', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.f = v; } });
+var ro = Lab.readouts(c[2], [['a', 'Omsætningsforhold N<sub>2</sub>/N<sub>1</sub>'], ['V2', 'V<sub>2</sub> = (N<sub>2</sub>/N<sub>1</sub>)V<sub>1</sub>'], ['I2', 'I<sub>2</sub> = V<sub>2</sub>/R'], ['I1', 'I<sub>1</sub> = (N<sub>2</sub>/N<sub>1</sub>)I<sub>2</sub>'], '-', ['P', 'P<sub>1</sub> = P<sub>2</sub>'], ['Zr', 'R set fra primærsiden'], ['vt', 'Spænding pr. vinding']]);
+Lab.legendKeys(UI.legend, [['#5ec8ff', 'magnetisk flux Φ i kernen'], ['#d9a441', 'primærvikling N<sub>1</sub>'], ['#c08a3e', 'sekundærvikling N<sub>2</sub>'], ['#ff7a59', 'belastning R']]);
+
+function pathPt(u) { // rektangulær bane gennem kernen (midten af benene)
+  var L = [[-1.1, -0.9], [-1.1, 0.9], [1.1, 0.9], [1.1, -0.9]], per = [1.8, 2.2, 1.8, 2.2], tot = 8; var d = ((u % 1) + 1) % 1 * tot;
+  for (var i = 0; i < 4; i++) { if (d <= per[i]) { var a = L[i], b = L[(i + 1) % 4], t = d / per[i]; return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]; } d -= per[i]; } return L[0];
+}
+var gT = Lab.plot(UI.graphs.gT), gR = Lab.plot(UI.graphs.gR), off = 0;
+Lab.loop(function (dt, rdt) {
+  S.t += dt * 0.5; var a = S.N2 / S.N1, V2 = a * S.V1, I2 = V2 / S.R, I1 = a * I2, P = V2 * I2, ph = 2 * PI * S.t;
+  var phi = Math.sin(ph - PI / 2); // flux er 90° efter spændingen
+  off += dt * Math.cos(ph - PI / 2) * 0.6;
+  for (var i = 0; i < NF; i++) { var p = pathPt(i / NF + off); fp[i * 3] = p[0] + (i % 3 - 1) * 0.08; fp[i * 3 + 1] = p[1] + ((i * 7) % 3 - 1) * 0.08; fp[i * 3 + 2] = ((i * 5) % 3 - 1) * 0.12; }
+  flux.geometry.attributes.position.needsUpdate = true; flux.material.opacity = 0.2 + 0.8 * Math.abs(phi);
+  mat1.emissive.setRGB(0.5 * Math.abs(Math.sin(ph)) * Math.min(1, I1 / 20), 0.25 * Math.abs(Math.sin(ph)) * Math.min(1, I1 / 20), 0);
+  mat2.emissive.setRGB(0.5 * Math.abs(Math.sin(ph)) * Math.min(1, I2 / 20), 0.25 * Math.abs(Math.sin(ph)) * Math.min(1, I2 / 20), 0);
+  tagV1.set(new THREE.Vector3(-2.4, 0.5, 0), 'V₁ = ' + F(S.V1, 0) + ' V'); tagV2.set(new THREE.Vector3(2.4, 0.6, 0), 'V₂ = ' + F(V2, V2 < 10 ? 2 : 0) + ' V');
+  tagN1.set(new THREE.Vector3(-1.1, -1.55, 0.4), 'N₁ = ' + S.N1); tagN2.set(new THREE.Vector3(1.1, -1.55, 0.4), 'N₂ = ' + S.N2); tagPhi.set(new THREE.Vector3(0, 1.5, 0));
+  var fI = function (x) { return x < 1 ? F(x * 1000, 1) + ' mA' : F(x, 2) + ' A'; };
+  ro.set('a', F(a, 3) + (a < 1 ? ' (ned)' : a > 1 ? ' (op)' : ''), 'hi'); ro.set('V2', F(V2, 2) + ' V', 'ok'); ro.set('I2', fI(I2)); ro.set('I1', fI(I1)); ro.set('P', F(P, 1) + ' W');
+  ro.set('Zr', F(S.R / (a * a), 2) + ' Ω'); ro.set('vt', F(S.V1 / S.N1, 3) + ' V/vinding');
+  Lab.setStatus(UI.status, a < 1 ? 'Nedtransformering: lavere spænding, større strøm' : a > 1 ? 'Optransformering: højere spænding, mindre strøm' : '1:1 (skilletransformer)', '');
+  UI.note.textContent = 'Fluxen er 90° efter primærspændingen · vist i slowmotion';
+  var T = 1000 / S.f, m1 = Math.max(S.V1, V2) * Math.SQRT2 * 1.15;
+  gT.begin({ xmin: 0, xmax: 2 * T, ymin: -1.2, ymax: 1.2, xlabel: 't [ms]', ylabel: 'normaliseret', fx: function (x) { return F(x, 0); }, fy: function (y) { return F(y, 1); } });
+  var v1 = [], v2 = [], i1 = [], i2 = [], mx = Math.max(S.V1, V2), mi = Math.max(I1, I2);
+  for (i = 0; i <= 200; i++) { var t2 = 2 * T * i / 200, s2 = Math.sin(2 * PI * t2 / T); v1.push([t2, S.V1 / mx * s2]); v2.push([t2, V2 / mx * s2]); i1.push([t2, I1 / mi * s2 * 0.9]); i2.push([t2, I2 / mi * s2 * 0.9]); }
+  gT.line(v1, '#ffd27a', 2); gT.line(v2, '#ff7a59', 2); gT.line(i1, 'rgba(94,200,255,.8)', 1.6, [5, 4]); gT.line(i2, 'rgba(0,217,132,.8)', 1.6, [5, 4]);
+  gT.text(T * 0.03, 1.1, 'v₁', '#ffd27a'); gT.text(T * 0.15, 1.1, 'v₂', '#ff7a59'); gT.text(T * 0.3, 1.1, 'i₁ (stiplet)', '#5ec8ff'); gT.text(T * 0.65, 1.1, 'i₂ (stiplet)', '#00d984'); gT.end();
+  gR.begin({ xmin: 0, xmax: 4, ymin: 0, ymax: 4, xlabel: 'N₂/N₁', ylabel: 'faktor ift. primær', fx: function (x) { return F(x, 1); }, fy: function (y) { return F(y, 1); } });
+  var vr = [], ir = []; for (i = 1; i <= 80; i++) { var x = i / 20; vr.push([x, x]); ir.push([x, Math.min(4, 1 / x)]); }
+  gR.line(vr, '#ff7a59', 2.2); gR.line(ir, '#00d984', 2.2); if (a <= 4) { gR.dot(a, a, '#ff7a59', 5); gR.dot(a, Math.min(4, 1 / a), '#00d984', 5); }
+  gR.text(3.0, 3.4, 'V₂/V₁', '#ff7a59'); gR.text(0.3, 3.6, 'I₂/I₁', '#00d984'); gR.end();
+  UI.formulas.innerHTML =
+    Lab.F('V<sub>2</sub>/V<sub>1</sub> = N<sub>2</sub>/N<sub>1</sub> ⇒ V<sub>2</sub> = ' + n(S.N2, 0) + '/' + n(S.N1, 0) + ' · ' + n(S.V1, 0) + ' V = ' + n(V2, 2) + ' V', 'Faradays lov: samme flux gennem begge viklinger giver samme spænding pr. vinding.') +
+    Lab.F('I<sub>1</sub>/I<sub>2</sub> = N<sub>2</sub>/N<sub>1</sub> ⇒ I<sub>1</sub> = ' + n(a, 3) + ' · ' + n(I2, 3) + ' A = ' + n(I1, 3) + ' A;&nbsp; P = V<sub>1</sub>I<sub>1</sub> = V<sub>2</sub>I<sub>2</sub> = ' + n(P, 1) + ' W', 'Ideel transformer: effekten går uændret igennem.') +
+    Lab.F('R set fra primærsiden: R\' = (N<sub>1</sub>/N<sub>2</sub>)²·R = ' + n(1 / (a * a), 3) + ' · ' + n(S.R, 1) + ' Ω = ' + n(S.R / (a * a), 2) + ' Ω', 'Reflekteret impedans: V<sub>1</sub>/I<sub>1</sub> = (N<sub>1</sub>/N<sub>2</sub>)²·V<sub>2</sub>/I<sub>2</sub>.');
+  lab.render(rdt);
+});
+})();
+</script>
+</body>
+</html>

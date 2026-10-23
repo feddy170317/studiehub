@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Drejefelt og induktionsmotor · 3D-lab</title>
+<meta name="description" content="Tre pulserende felter forskudt 120° bliver til ét roterende magnetfelt. Rotoren følger med slip, og moment-hastighedskurven viser driftspunkt, kipmoment og stjerne-trekant-start.">
+<link rel="stylesheet" href="../assets/lab.css">
+</head>
+<body>
+<script src="../assets/three.min.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+'use strict';
+var F = Lab.fmt, n = Lab.n, PI = Math.PI;
+var UI = Lab.build({
+  chip: 'ELE1 · dag 8 og 10 · Rizzoni kap. 13.5–13.8', title: 'Drejefelt og asynkronmotor',
+  src: 'Slides og bog dag 8 og 10: trefaset drejefelt, synkron hastighed n<sub>s</sub> = 120f/p, slip s, motorstart (DOL og Y-D)',
+  side: ['Net og motor', 'Belastning', 'Aflæsning'],
+  graphs: [{ id: 'gI', title: 'Fasestrømme og drejefeltets vinkel', sub: 'i<sub>a</sub>, i<sub>b</sub>, i<sub>c</sub>' }, { id: 'gT', title: 'Moment-hastighedskurve', sub: 'driftspunkt = motor ∩ last' }],
+  notes: '<li>Hver vikling laver et felt, der kun <b>pulserer</b> frem og tilbage langs sin egen akse. Men fordi de tre strømme er forskudt 120° i tid, og viklingerne er forskudt 120° i rum, bliver summen et felt med <b>konstant størrelse, der roterer</b> (den hvide pil).</li>' +
+    '<li>Drejefeltet roterer med den synkrone hastighed n<sub>s</sub> = 120f/p. Med 50 Hz og 4 poler: 1500 o/min.</li>' +
+    '<li>Rotoren kan aldrig nå helt op på n<sub>s</sub>. Hvis den gjorde, ville der ikke blive induceret nogen strøm i den og dermed intet moment. Forskellen kaldes <b>slip</b>: s = (n<sub>s</sub> − n)/n<sub>s</sub>, typisk 2–6 %.</li>' +
+    '<li>Mere last giver mere slip og mere moment, op til <b>kipmomentet</b>. Bliver lasten større end det, går motoren i stå.</li>' +
+    '<li><b>Stjerne-trekant-start</b>: viklingerne får kun 1/√3 af spændingen under start. Startstrøm og startmoment falder til 1/3 (stiplet kurve). Det skåner nettet, men motoren kan ikke starte under fuld last.</li>',
+  model: '<li>Momentkurven er Kloss\' formel T = 2T<sub>k</sub>/(s/s<sub>k</sub> + s<sub>k</sub>/s) med kipmoment T<sub>k</sub> og kipslip s<sub>k</sub>. Det er en forenkling af den ækvivalente kredsløbsmodel.</li>' +
+    '<li>Drejefeltet er vist for en 2-polet maskine. Rotationen er vist i slowmotion, men forholdet mellem felt og rotor er rigtigt.</li>'
+});
+var lab = Lab.scene(UI.stage, { view: { target: new THREE.Vector3(0, 0, 0), theta: 0.2, phi: 1.0, radius: 4.6 } });
+var S = { f: 50, p: 4, Tk: 60, sk: 0.2, TL: 20, yd: false, t: 0, rot: 0 };
+
+/* ---------- 3D (motorakse langs y, felt i xz-planet) ---------- */
+var stator = new THREE.Mesh(new THREE.TorusGeometry(1.5, 0.2, 16, 72), Lab.mat(0x2b3c50, { metal: 0.4 })); stator.rotation.x = PI / 2; lab.scene.add(stator);
+var COLS = [0xff5e5e, 0xffd27a, 0x5ec8ff], NAMES = ['a', 'b', 'c'], fieldAr = [];
+for (var k = 0; k < 3; k++) {
+  var ang = k * 2 * PI / 3;
+  [0, PI].forEach(function (o) { var cc = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.5, 0.2), Lab.mat(COLS[k], { metal: 0.5 })); var a = ang + o; cc.position.set(1.28 * Math.cos(a), 0, -1.28 * Math.sin(a)); cc.rotation.y = a; lab.scene.add(cc); });
+  var ar = Lab.arrow(COLS[k], { radius: 0.025 }); lab.scene.add(ar); fieldAr.push(ar);
+  Lab.tag(lab, NAMES[k], '#' + COLS[k].toString(16)).set(new THREE.Vector3(1.75 * Math.cos(ang), 0.3, -1.75 * Math.sin(ang)));
+}
+var resAr = Lab.arrow(0xffffff, { radius: 0.04 }); lab.scene.add(resAr);
+var trail = Lab.line(0xffffff, true, 0.4); lab.scene.add(trail);
+var tp = []; for (var i = 0; i <= 64; i++) tp.push(new THREE.Vector3(1.0 * Math.cos(i / 64 * 2 * PI), 0.05, -1.0 * Math.sin(i / 64 * 2 * PI))); trail.set(tp);
+var rotor = new THREE.Group(); lab.scene.add(rotor);
+var rc = new THREE.Mesh(new THREE.CylinderGeometry(0.75, 0.75, 0.8, 40), Lab.mat(0x44586e, { metal: 0.4, opacity: 0.55 })); rotor.add(rc);
+for (i = 0; i < 16; i++) { var b = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.9, 0.06), Lab.mat(0xb87333, { metal: 0.7 })); var a2 = i / 16 * 2 * PI; b.position.set(0.7 * Math.cos(a2), 0, 0.7 * Math.sin(a2)); rotor.add(b); }
+var ringT = new THREE.Mesh(new THREE.TorusGeometry(0.7, 0.04, 8, 48), Lab.mat(0xb87333, { metal: 0.7 })); ringT.rotation.x = PI / 2; ringT.position.y = 0.45; rotor.add(ringT); var ringB = ringT.clone(); ringB.position.y = -0.45; rotor.add(ringB);
+var mark = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.06, 0.08), Lab.mat(0x00d984)); mark.position.set(0.3, 0.45, 0); rotor.add(mark);
+var shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 2.2, 16), Lab.mat(0xc9d6e3)); rotor.add(shaft);
+var tagR = Lab.tag(lab, '', '#ffffff'), tagN = Lab.tag(lab, '', '#00d984');
+
+/* ---------- kontroller ---------- */
+var c = UI.side;
+Lab.slider(c[0], { label: 'Netfrekvens f', min: 10, max: 100, step: 1, value: S.f, unit: 'Hz', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.f = v; }, sub: 'En frekvensomformer ændrer f og dermed farten.' });
+Lab.seg(c[0], { label: 'Poltal p', value: 4, options: [{ value: 2, label: '2' }, { value: 4, label: '4' }, { value: 6, label: '6' }, { value: 8, label: '8' }], onChange: function (v) { S.p = +v; } });
+Lab.slider(c[0], { label: 'Kipmoment T<sub>k</sub>', min: 10, max: 200, step: 1, value: S.Tk, unit: 'N·m', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.Tk = v; } });
+Lab.slider(c[0], { label: 'Kipslip s<sub>k</sub>', min: 0.05, max: 0.5, step: 0.01, value: S.sk, unit: '', fmt: function (x) { return F(x * 100, 0) + ' %'; }, onInput: function (v) { S.sk = v; } });
+Lab.slider(c[1], { label: 'Lastmoment T<sub>last</sub>', min: 0, max: 220, step: 1, value: S.TL, unit: 'N·m', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.TL = v; } });
+Lab.check(c[1], { label: 'Vis stjerne-trekant-start (1/3 moment)', value: false, onChange: function (v) { S.yd = v; } });
+var pauseBtn = Lab.button(Lab.btnRow(c[1]), '⏸ Pause', '', function () {});
+var ro = Lab.readouts(c[2], [['ns', 'Synkron hastighed n<sub>s</sub> = 120f/p'], ['s', 'Slip s'], ['n', 'Rotorhastighed n = n<sub>s</sub>(1 − s)'], ['fr', 'Rotorfrekvens f<sub>r</sub> = s·f'], '-', ['T', 'Moment'], ['P', 'Akseleffekt P = Tω'], ['Tst', 'Startmoment (DOL / Y-D)']]);
+Lab.legendKeys(UI.legend, [['#ff5e5e', 'felt fra vikling a'], ['#ffd27a', 'felt fra vikling b'], ['#5ec8ff', 'felt fra vikling c'], ['#ffffff', 'samlet drejefelt'], ['#00d984', 'rotorens markering']]);
+
+function Tm(s) { return s <= 0 ? 0 : 2 * S.Tk / (s / S.sk + S.sk / s); }
+function opSlip() { if (S.TL <= 0) return 0.0005; if (S.TL > S.Tk) return null; var r = S.Tk / S.TL; return S.sk * (r - Math.sqrt(r * r - 1)); }
+var gI = Lab.plot(UI.graphs.gI), gT = Lab.plot(UI.graphs.gT);
+Lab.loop(function (dt, rdt) {
+  var ns = 120 * S.f / S.p, s = opSlip(), stall = s === null, sd = stall ? 1 : s, nr = ns * (1 - sd);
+  S.t += dt * 0.12 * (S.f / 50); // én elektrisk periode ≈ 8 s ved 50 Hz
+  var th = 2 * PI * S.t, res = new THREE.Vector3();
+  for (var k = 0; k < 3; k++) {
+    var ang = k * 2 * PI / 3, ik = Math.cos(th - ang), dir = new THREE.Vector3(Math.cos(ang), 0, -Math.sin(ang));
+    fieldAr[k].set(new THREE.Vector3(0, 0.55 + k * 0.04, 0), dir.clone().multiplyScalar(0.9 * ik)); res.addScaledVector(dir, ik);
+  }
+  resAr.set(new THREE.Vector3(0, 0.7, 0), res.clone().multiplyScalar(0.9 / 1.5 * 1.1));
+  // rotoren: drejer i feltets retning med (1 − s) af feltets fart (2-polet visning)
+  S.rot += dt * 0.12 * (S.f / 50) * 2 * PI * (1 - sd);
+  rotor.rotation.y = S.rot;
+  tagR.set(new THREE.Vector3(0, 1.05, 0), '|B| = 1,5·B<sub>m</sub> (konstant)'); tagN.set(new THREE.Vector3(0, -0.9, 1.2), stall ? 'STÅR STILLE' : F(nr, 0) + ' o/min');
+  var T = stall ? Tm(1) : S.TL, w = nr * 2 * PI / 60;
+  ro.set('ns', F(ns, 0) + ' o/min', 'hi'); ro.set('s', stall ? '100 % (stå)' : F(sd * 100, 2) + ' %', stall ? 'bad' : ''); ro.set('n', F(nr, 0) + ' o/min', 'ok'); ro.set('fr', F(sd * S.f, 2) + ' Hz');
+  ro.set('T', F(T, 1) + ' N·m'); ro.set('P', F(T * w / 1000, 2) + ' kW'); ro.set('Tst', F(Tm(1), 1) + ' / ' + F(Tm(1) / 3, 1) + ' N·m');
+  Lab.setStatus(UI.status, stall ? 'Lasten er større end kipmomentet: motoren går i stå' : 'Kører med ' + F(sd * 100, 1) + ' % slip', stall ? 'bad' : '');
+  UI.note.textContent = 'Felt og rotor vist i slowmotion (2-polet billede)';
+  gI.begin({ xmin: 0, xmax: 2, ymin: -1.2, ymax: 1.2, xlabel: 'perioder', ylabel: 'i / I_m', fx: function (x) { return F(x, 1); }, fy: function (y) { return F(y, 1); } });
+  for (k = 0; k < 3; k++) { var pts = []; for (i = 0; i <= 120; i++) { var x = 2 * i / 120; pts.push([x, Math.cos(2 * PI * x - k * 2 * PI / 3)]); } gI.line(pts, '#' + COLS[k].toString(16), 2); }
+  var cur = (S.t % 2 + 2) % 2; gI.vline(cur, 'rgba(255,255,255,.7)'); gI.text(0.03, 1.08, 'i_a', '#ff5e5e'); gI.text(0.18, 1.08, 'i_b', '#ffd27a'); gI.text(0.33, 1.08, 'i_c', '#5ec8ff'); gI.end();
+  var Tmax = Math.max(S.Tk, S.TL) * 1.15;
+  gT.begin({ xmin: 0, xmax: Tmax, ymin: 0, ymax: ns * 1.05, xlabel: 'T [N·m]', ylabel: 'n [o/min]', fx: function (x) { return F(x, 0); }, fy: function (y) { return F(y, 0); } });
+  var cv = [], cy = []; for (i = 1; i <= 200; i++) { var ss = i / 200; cv.push([Tm(ss), ns * (1 - ss)]); cy.push([Tm(ss) / 3, ns * (1 - ss)]); }
+  gT.line(cv, '#5ec8ff', 2.4); if (S.yd) gT.line(cy, 'rgba(0,217,132,.85)', 2, [5, 4]);
+  gT.vline(S.TL, 'rgba(217,132,255,.85)', 'T_last'); gT.hline(ns, 'rgba(255,210,122,.6)', 'n_s'); gT.vline(S.Tk, 'rgba(255,94,94,.5)', 'kipmoment');
+  if (!stall) gT.dot(S.TL, nr, '#ffd27a', 6); gT.end();
+  UI.formulas.innerHTML =
+    Lab.F('n<sub>s</sub> = 120f/p = 120·' + n(S.f, 0) + '/' + n(S.p, 0) + ' = ' + n(ns, 0) + ' o/min', 'Drejefeltets hastighed bestemmes kun af netfrekvensen og poltallet.') +
+    Lab.F('B<sub>samlet</sub> = Σ B<sub>m</sub>cos(ωt − k·120°)·ê<sub>k</sub> = 1,5·B<sub>m</sub>∠ωt', 'Summen af tre pulserende felter forskudt 120° i både tid og rum er et felt med konstant størrelse, der roterer med ω.') +
+    (stall ? '' : Lab.F('s = (n<sub>s</sub> − n)/n<sub>s</sub> = ' + n(sd * 100, 2) + ' % ⇒ n = ' + n(nr, 0) + ' o/min,&nbsp; P = Tω = ' + n(S.TL, 0) + '·' + n(w, 1) + ' = ' + n(S.TL * w / 1000, 2) + ' kW', 'Driftspunktet ligger, hvor motorens moment er lig lastmomentet på den stabile gren (s < s<sub>k</sub>).'));
+  lab.render(rdt);
+}, { button: pauseBtn, flag: UI.paused });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AC-effekt og effektfaktor · 3D-lab</title>
+<meta name="description" content="Momentan og middel-effekt, aktiv og reaktiv effekt og effektfaktorkorrektion: se energien strømme til lasten og skvulpe frem og tilbage i kablet.">
+<link rel="stylesheet" href="../assets/lab.css">
+</head>
+<body>
+<script src="../assets/three.min.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+'use strict';
+var F = Lab.fmt, n = Lab.n, PI = Math.PI;
+var UI = Lab.build({
+  chip: 'ELE1 · dag 6–7 · Rizzoni kap. 6.1–6.3', title: 'AC-effekt: aktiv, reaktiv og effektfaktorkorrektion',
+  src: 'Slides dag 6–7: p(t) = v(t)·i(t), P = V<sub>rms</sub>I<sub>rms</sub>cos θ, Q, S, effekttrekanten og effektfaktorkorrektion',
+  side: ['Spænding og strøm', 'Effektfaktorkorrektion', 'Aflæsning'],
+  graphs: [{ id: 'gT', title: 'v(t), i(t) og p(t)', sub: 'to perioder' }, { id: 'gS', title: 'Effekttrekanten', sub: 'før (stiplet) og efter korrektion' }],
+  notes: '<li>Den momentane effekt p(t) svinger med <b>dobbelt frekvens</b>. Dens middelværdi er den aktive effekt P, som laver arbejde (varme, akselarbejde).</li>' +
+    '<li>Når strømmen er faseforskudt, er p(t) negativ en del af tiden: <b>energi løber tilbage til nettet</b>. Det er den reaktive effekt Q, som skvulper frem og tilbage og belaster kablet uden at lave arbejde.</li>' +
+    '<li>Effektfaktoren cos θ = P/S siger, hvor stor en del af "strømmen i kablet" der gør nytte. Dag 6-øvelsen har cos θ = 0,5: halvdelen af kablets strøm er spildt.</li>' +
+    '<li><b>Korrektion:</b> en kondensator ved motoren leverer motorens reaktive effekt lokalt. Energien skvulper nu mellem motor og kondensator, og kablet fra nettet skal kun bære P. Strømmen falder, og tabet i kablet falder med kvadratet.</li>',
+  model: '<li>Stationær sinus. Positiv vinkel θ = strømmen er efter spændingen (induktiv last, fx en motor). Kondensatoren er ideel og sidder parallelt med lasten.</li>' +
+    '<li>Partiklerne i kablet viser retningen og størrelsen af den momentane effekt. Kabeltabet er relativt: ∝ I<sub>rms</sub>².</li>'
+});
+var lab = Lab.scene(UI.stage, { view: { target: new THREE.Vector3(0, 0.3, 0), theta: 0.35, phi: 1.2, radius: 5.2 } });
+var S = { Vm: 325, Im: 2, th: 60, f: 50, QC: 0, t: 0 };
+
+/* ---------- 3D ---------- */
+var gen = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.8, 32), Lab.mat(0x2f7fd1, { metal: 0.4 })); gen.position.set(-2.2, 0.4, 0); lab.scene.add(gen);
+var motor = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.9, 32), Lab.mat(0x5f7287, { metal: 0.5 })); motor.rotation.z = PI / 2; motor.position.set(2.2, 0.4, 0); lab.scene.add(motor);
+var shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.5, 12), Lab.mat(0xc9d6e3)); shaft.rotation.z = PI / 2; shaft.position.set(2.85, 0.4, 0); lab.scene.add(shaft);
+var fan = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.6, 0.08), Lab.mat(0xffd27a)); fan.position.set(3.1, 0.4, 0); lab.scene.add(fan);
+var capBank = new THREE.Group(); lab.scene.add(capBank); capBank.position.set(2.2, 0.4, 1.2);
+for (var i = 0; i < 3; i++) { var cc = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.45, 20), Lab.mat(0x00d984, { metal: 0.3 })); cc.position.x = (i - 1) * 0.3; capBank.add(cc); }
+var cableMat = new THREE.MeshStandardMaterial({ color: 0x8a5a2b, emissive: 0x000000, metalness: 0.3, roughness: 0.6 });
+var cab1 = Lab.rod(0.035, cableMat), cab2 = Lab.rod(0.035, cableMat); cab1.between(new THREE.Vector3(-1.75, 0.6, 0), new THREE.Vector3(1.75, 0.6, 0)); cab2.between(new THREE.Vector3(-1.75, 0.2, 0), new THREE.Vector3(1.75, 0.2, 0)); lab.scene.add(cab1); lab.scene.add(cab2);
+var capCab = Lab.rod(0.025, Lab.mat(0x8a5a2b)); capCab.between(new THREE.Vector3(2.2, 0.6, 0), new THREE.Vector3(2.2, 0.6, 1.2)); lab.scene.add(capCab);
+var NP = 60, pp = new Float32Array(NP * 3), parts = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial({ color: 0xffd27a, size: 0.11, transparent: true, depthWrite: false }));
+parts.geometry.setAttribute('position', new THREE.BufferAttribute(pp, 3)); lab.scene.add(parts);
+var NQ = 14, qp = new Float32Array(NQ * 3), qparts = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial({ color: 0x00d984, size: 0.1, transparent: true, depthWrite: false }));
+qparts.geometry.setAttribute('position', new THREE.BufferAttribute(qp, 3)); lab.scene.add(qparts);
+Lab.grid(lab, 7, -0.02);
+var tagG = Lab.tag(lab, 'net / generator', '#5ec8ff'), tagM = Lab.tag(lab, 'last (motor)', '#e3e9ef'), tagC = Lab.tag(lab, 'kondensatorbatteri', '#00d984'), tagP = Lab.tag(lab, '', '#ffd27a');
+tagG.set(new THREE.Vector3(-2.2, 1.1, 0)); tagM.set(new THREE.Vector3(2.2, 1.1, 0)); tagC.set(new THREE.Vector3(2.2, 0.85, 1.2));
+
+/* ---------- kontroller ---------- */
+var c = UI.side;
+var sV = Lab.slider(c[0], { label: 'Spændingsamplitude V<sub>m</sub>', min: 10, max: 400, step: 1, value: S.Vm, unit: 'V', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.Vm = v; } });
+var sI = Lab.slider(c[0], { label: 'Strømamplitude I<sub>m</sub>', min: 0.1, max: 20, step: 0.1, value: S.Im, unit: 'A', fmt: function (x) { return F(x, 1); }, onInput: function (v) { S.Im = v; } });
+var sT = Lab.slider(c[0], { label: 'Faseforskydning θ (+ = i efter v)', min: -90, max: 90, step: 1, value: S.th, unit: '°', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.th = v; } });
+Lab.presets(c[0], [['<b>Dag 6, øvelse 1:</b> v = 325 cos 314t V, i = 2 cos(314t − π/3) A', function () { S.Vm = 325; S.Im = 2; S.th = 60; S.QC = 0; sV.set(325, true); sI.set(2, true); sT.set(60, true); sQ.set(0, true); }], ['<b>Ren modstand:</b> θ = 0°', function () { S.th = 0; sT.set(0, true); }], ['<b>Ren spole:</b> θ = 90° (kun reaktiv)', function () { S.th = 90; sT.set(90, true); }]]);
+var sQ = Lab.slider(c[1], { label: 'Kondensatorbatteri Q<sub>C</sub>', min: 0, max: 4000, step: 5, value: 0, unit: 'var', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.QC = v; } });
+var br = Lab.btnRow(c[1]); Lab.button(br, 'Korrigér til cos θ = 1', 'primary', function () { var q = calc().Q; S.QC = Math.max(0, q); sQ.range(0, Math.max(4000, Math.ceil(q * 1.5)), 5); sQ.set(S.QC, true); }); Lab.button(br, 'Fjern', '', function () { S.QC = 0; sQ.set(0, true); });
+var ro = Lab.readouts(c[2], [['P', 'Aktiv effekt P'], ['Q', 'Reaktiv effekt Q'], ['S', 'Tilsyneladende effekt S'], ['pf', 'Effektfaktor cos θ'], '-', ['I1', 'Kabelstrøm I<sub>rms</sub> før'], ['I2', 'Kabelstrøm I<sub>rms</sub> efter'], ['loss', 'Kabeltab efter / før'], ['C', 'Nødvendig C (ved 50 Hz)']]);
+Lab.legendKeys(UI.legend, [['#ffd27a', 'momentan effekt i kablet (retning = fortegn)'], ['#00d984', 'reaktiv energi, motor ↔ kondensator'], ['#8a5a2b', 'kabel (gløder med strømmen)']]);
+
+function calc() {
+  var Vr = S.Vm / Math.SQRT2, Ir = S.Im / Math.SQRT2, th = S.th * PI / 180, P = Vr * Ir * Math.cos(th), Q = Vr * Ir * Math.sin(th), Sx = Vr * Ir;
+  var Q2 = Q - S.QC, S2 = Math.hypot(P, Q2), I2 = S2 / Vr, th2 = Math.atan2(Q2, P);
+  return { Vr: Vr, Ir: Ir, th: th, P: P, Q: Q, S: Sx, Q2: Q2, S2: S2, I2: I2, th2: th2, C: S.QC / (2 * PI * S.f * Vr * Vr) };
+}
+var gT = Lab.plot(UI.graphs.gT), gS = Lab.plot(UI.graphs.gS), fl = 0;
+Lab.loop(function (dt, rdt) {
+  var K = calc(); S.t += dt * 0.6; var w = 2 * PI, ph = S.t * w;
+  // efter korrektion: kablet ser fase θ2 og amplitude √2·I2
+  var vNow = S.Vm * Math.cos(ph), iCab = Math.SQRT2 * K.I2 * Math.cos(ph - K.th2), pCab = vNow * iCab;
+  var pmax = S.Vm * Math.SQRT2 * Math.max(K.Ir, K.I2) * 1.0;
+  fl += dt * 1.6 * pCab / Math.max(pmax, 1e-9);
+  for (i = 0; i < NP; i++) { var u = ((i / NP + fl) % 1 + 1) % 1, top = i % 2 === 0; pp[i * 3] = -1.75 + 3.5 * u; pp[i * 3 + 1] = top ? 0.6 : 0.2; pp[i * 3 + 2] = 0; }
+  parts.geometry.attributes.position.needsUpdate = true; parts.material.opacity = 0.25 + 0.75 * Math.abs(pCab) / Math.max(pmax, 1e-9);
+  var qa = S.QC > 0 ? Math.sin(2 * ph) : 0;
+  for (i = 0; i < NQ; i++) { var u2 = (i / NQ + 0.3 * qa) % 1; qp[i * 3] = 2.2; qp[i * 3 + 1] = 0.6; qp[i * 3 + 2] = Lab.clamp(u2, 0, 1) * 1.2; }
+  qparts.geometry.attributes.position.needsUpdate = true; qparts.visible = S.QC > 0; capBank.visible = capCab.visible = S.QC > 0; tagC.visible = S.QC > 0;
+  var glow = Math.min(1, (iCab * iCab) / Math.max(2 * Math.max(K.Ir, K.I2) * Math.max(K.Ir, K.I2), 1e-9));
+  cableMat.emissive.setRGB(0.9 * glow, 0.35 * glow, 0.05 * glow);
+  fan.rotation.x += dt * 8 * Math.max(0, K.P) / Math.max(K.S, 1);
+  tagP.set(new THREE.Vector3(0, 0.95, 0), 'p(t) = ' + F(pCab, 0) + ' W ' + (pCab >= 0 ? '→ last' : '← tilbage til nettet'));
+  ro.set('P', F(K.P, 1) + ' W', 'ok'); ro.set('Q', F(K.Q, 1) + ' var'); ro.set('S', F(K.S, 1) + ' VA'); ro.set('pf', F(Math.cos(K.th), 3) + ' → ' + F(Math.cos(K.th2), 3), 'hi');
+  ro.set('I1', F(K.Ir, 3) + ' A'); ro.set('I2', F(K.I2, 3) + ' A', K.I2 < K.Ir ? 'ok' : ''); ro.set('loss', F(K.I2 * K.I2 / Math.max(K.Ir * K.Ir, 1e-12) * 100, 0) + ' %'); ro.set('C', S.QC > 0 ? F(K.C * 1e6, 1) + ' µF' : '–');
+  Lab.setStatus(UI.status, pCab >= 0 ? 'Energi strømmer til lasten' : 'Energi løber tilbage til nettet (reaktiv)', pCab < 0 ? 'warn' : '');
+  UI.note.textContent = 'Vist i slowmotion · cos θ = ' + F(Math.cos(K.th2), 2) + ' set fra nettet';
+  var T = 1 / S.f * 1000, vm = S.Vm * 1.15, Pm = Math.max(S.Vm * S.Im, 1);
+  gT.begin({ xmin: 0, xmax: 2 * T, ymin: -1.2, ymax: 1.2, xlabel: 't [ms]', ylabel: 'normaliseret', fx: function (x) { return F(x, 0); }, fy: function (y) { return F(y, 1); } });
+  var vv = [], ii = [], pv = []; for (i = 0; i <= 200; i++) { var t2 = 2 * T * i / 200, a2 = 2 * PI * t2 / T, v = Math.cos(a2), ic = Math.cos(a2 - K.th); vv.push([t2, v]); ii.push([t2, ic]); pv.push([t2, v * ic]); }
+  gT.fill([[0, 0]].concat(pv, [[2 * T, 0]]), 'rgba(255,165,0,.15)'); gT.line(pv, '#ffa500', 2); gT.line(vv, '#ffd27a', 1.6); gT.line(ii, '#00d984', 1.6);
+  gT.hline(0.5 * Math.cos(K.th), 'rgba(255,94,94,.9)', 'P (middel)'); gT.text(T * 0.05, 1.08, 'v', '#ffd27a'); gT.text(T * 0.15, 1.08, 'i', '#00d984'); gT.text(T * 0.25, 1.08, 'p = v·i', '#ffa500');
+  var ph2 = (S.t % 1) * T; gT.vline(ph2, 'rgba(255,255,255,.5)'); gT.end();
+  var lim = Math.max(K.S, K.P, Math.abs(K.Q), 1) * 1.2;
+  gS.begin({ xmin: 0, xmax: lim, ymin: -lim * 0.3, ymax: lim, xlabel: 'P [W]', ylabel: 'Q [var]', fx: function (x) { return F(x, 0); }, fy: function (y) { return F(y, 0); } });
+  gS.line([[0, 0], [K.P, 0], [K.P, K.Q], [0, 0]], 'rgba(227,233,239,.5)', 1.6, [5, 4]);
+  gS.line([[0, 0], [K.P, 0]], '#ff5e5e', 3); gS.line([[K.P, 0], [K.P, K.Q2]], '#5ec8ff', 3); gS.line([[0, 0], [K.P, K.Q2]], '#ffd27a', 3);
+  if (S.QC > 0) { gS.line([[K.P, K.Q], [K.P, K.Q2]], '#00d984', 4); gS.text(K.P + lim * 0.02, (K.Q + K.Q2) / 2, 'Q_C', '#00d984'); }
+  gS.text(K.P / 2, -lim * 0.06, 'P', '#ff5e5e', 'center'); gS.text(K.P + lim * 0.02, K.Q2 / 2, 'Q', '#5ec8ff'); gS.text(K.P * 0.45, K.Q2 * 0.55 + lim * 0.05, 'S', '#ffd27a'); gS.end();
+  UI.formulas.innerHTML =
+    Lab.F('P = ½V<sub>m</sub>I<sub>m</sub>cos θ = V<sub>rms</sub>I<sub>rms</sub>cos θ = ' + n(K.Vr, 1) + '·' + n(K.Ir, 3) + '·cos ' + n(S.th, 0) + '° = ' + n(K.P, 1) + ' W', 'Middeleffekt (slides dag 6). Dag 6-øvelsen: ½·325·2·cos 60° = 162,5 W.') +
+    Lab.F('Q = V<sub>rms</sub>I<sub>rms</sub>sin θ = ' + n(K.Q, 1) + ' var,&nbsp; S = V<sub>rms</sub>I<sub>rms</sub> = ' + n(K.S, 1) + ' VA,&nbsp; cos θ = P/S = ' + n(Math.cos(K.th), 3), 'Kompleks effekt S = P + jQ og effekttrekanten (slides dag 7).') +
+    Lab.F('Q<sub>C</sub> = ' + n(S.QC, 0) + ' var ⇒ C = Q<sub>C</sub>/(ωV<sub>rms</sub>²) = ' + n(K.C * 1e6, 2) + ' µF;&nbsp; ny kabelstrøm I = √(P² + (Q − Q<sub>C</sub>)²)/V<sub>rms</sub> = ' + n(K.I2, 3) + ' A', 'Effektfaktorkorrektion: kondensatoren leverer reaktiv effekt lokalt, og P er uændret.');
+  lab.render(rdt);
+});
+})();
+</script>
+</body>
+</html>

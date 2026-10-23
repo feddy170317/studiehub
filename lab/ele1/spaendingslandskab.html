@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spændingslandskab · 3D-lab</title>
+<meta name="description" content="Et kredsløb i 3D, hvor højden er potentialet: modstande er skrænter, kilder er elevatorer og strømmen er partikler. Kirchhoffs love bliver til geometri.">
+<link rel="stylesheet" href="../assets/lab.css">
+</head>
+<body>
+<script src="../assets/three.min.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+'use strict';
+var F = Lab.fmt, n = Lab.n, PI = Math.PI;
+var UI = Lab.build({
+  chip: 'ELE1 · dag 2 · Rizzoni kap. 1–2', title: 'Spændingslandskab: Ohm, KCL og KVL i 3D',
+  src: 'Slides dag 2: Ohms lov og effekt, knuder og masker, Kirchhoffs strøm- og spændingslov',
+  side: ['Kilder', 'Modstande', 'Aflæsning'],
+  graphs: [{ id: 'gK', title: 'KVL rundt i hver maske', sub: 'stigninger og fald summer til 0' }, { id: 'gP', title: 'Effektbalance', sub: 'afgivet = optaget' }],
+  notes: '<li><b>Højden er potentialet.</b> Hver ledning ligger vandret (samme potential hele vejen), modstande er skrænter (spændingsfald i strømmens retning), og spændingskilder er elevatorer.</li>' +
+    '<li><b>KVL:</b> gå en tur rundt i en maske, og du ender i samme højde, som du startede. Summen af stigninger og fald er 0.</li>' +
+    '<li><b>KCL:</b> se partiklerne i knuden. Lige så mange kommer ind, som går ud. Strøm ophobes ikke.</li>' +
+    '<li>Gør V<sub>2</sub> større end knudespændingen, og strømmen i R<sub>3</sub> vender: kilde 2 går fra at levere effekt til at optage den (som et batteri, der lades).</li>',
+  model: '<li>Ideelle spændingskilder og modstande, DC. Knudepunktsmetoden med én ukendt knudespænding V<sub>N</sub> (jord nederst).</li>' +
+    '<li>Partiklernes fart er proportional med strømmen (de viser konventionel strømretning, fra + mod −). Højden er skaleret: 1 enhed = største spænding.</li>'
+});
+var lab = Lab.scene(UI.stage, { view: { target: new THREE.Vector3(0, 0.6, 0), theta: 0.6, phi: 1.1, radius: 5.4 } });
+var S = { V1: 12, V2: 6, R1: 4, R2: 6, R3: 2, off: 0 };
+
+/* ---------- topologi (i planet, x og z), højde = potentiale ---------- */
+// punkter: A (V1 −, jord) nederst venstre, B (V1 +) øverst venstre, N (knude) øverst midt, C (V2 +) øverst højre, D (V2 −, jord) nederst højre, G (under N, jord)
+var P = { A: [-2, 1], B: [-2, -1], N: [0, -1], C: [2, -1], D: [2, 1], G: [0, 1] };
+function solve() {
+  var g1 = 1 / S.R1, g2 = 1 / S.R2, g3 = 1 / S.R3, VN = (S.V1 * g1 + S.V2 * g3) / (g1 + g2 + g3);
+  return { VN: VN, I1: (S.V1 - VN) / S.R1, I2: VN / S.R2, I3: (S.V2 - VN) / S.R3 };
+}
+var board = new THREE.Mesh(new THREE.BoxGeometry(5.2, 0.05, 3), Lab.mat(0x163a2a, { rough: 0.9 })); board.position.y = -0.03; lab.scene.add(board);
+var segs = [], resist = [], partGroups = [];
+var wireMat = Lab.mat(0xd9a441, { metal: 0.7, rough: 0.3 });
+function tube(a, b, r, m) { var t = Lab.rod(r, m); lab.scene.add(t); t.between(a, b); return t; }
+var objs = [];
+var tagN = Lab.tag(lab, '', '#ffd27a'), tags = { R1: Lab.tag(lab, '', '#ff7a59'), R2: Lab.tag(lab, '', '#ff7a59'), R3: Lab.tag(lab, '', '#ff7a59'), V1: Lab.tag(lab, '', '#5ec8ff'), V2: Lab.tag(lab, '', '#5ec8ff') };
+var parts = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial({ color: 0xfff2a8, size: 0.09, transparent: true, opacity: 0.95, depthWrite: false }));
+lab.scene.add(parts);
+var pathsCache = null;
+function build() {
+  objs.forEach(function (o) { lab.scene.remove(o); if (o.geometry) o.geometry.dispose(); }); objs = [];
+  var s = solve(), Vm = Math.max(S.V1, S.V2, Math.abs(s.VN), 1), hs = 1.6 / Vm;
+  function at(p, V) { return new THREE.Vector3(p[0], V * hs, p[1]); }
+  var VN = s.VN;
+  // grene som polylinjer (konventionel strøm i positiv retning langs listen)
+  var br1 = [at(P.A, 0), at(P.B, 0), at(P.B, S.V1), at([-1.4, -1], S.V1), at([-0.6, -1], VN), at(P.N, VN)]; // V1-gren: jord → kilde → R1 → N
+  var br3 = [at(P.D, 0), at(P.C, 0), at(P.C, S.V2), at([1.4, -1], S.V2), at([0.6, -1], VN), at(P.N, VN)];   // V2-gren
+  var br2 = [at(P.N, VN), at([0, -0.4], VN), at([0, 0.4], 0), at(P.G, 0)];                                        // R2 til jord
+  var gnd = [at(P.A, 0), at(P.G, 0), at(P.D, 0)];
+  function poly(pts, kinds) {
+    for (var i = 0; i < pts.length - 1; i++) {
+      var k = kinds[i], m = k === 'R' ? Lab.mat(0xff7a59, { metal: 0.2 }) : k === 'V' ? Lab.mat(0x5ec8ff, { metal: 0.3, emissive: 0x0b3350 }) : wireMat;
+      objs.push(tube(pts[i], pts[i + 1], k === 'R' ? 0.07 : k === 'V' ? 0.09 : 0.03, m));
+    }
+  }
+  poly(br1, ['w', 'V', 'w', 'R', 'w']); poly(br3, ['w', 'V', 'w', 'R', 'w']); poly(br2, ['w', 'R', 'w']); poly(gnd, ['w', 'w']);
+  // lodrette "pæle" ned til printpladen, så højden kan aflæses
+  [[P.B, S.V1], [P.N, VN], [P.C, S.V2]].forEach(function (q) { var l = Lab.line(0x8fa3b8, true, 0.5); l.set([at(q[0], 0), at(q[0], q[1])]); lab.scene.add(l); objs.push(l); });
+  var nd = new THREE.Mesh(new THREE.SphereGeometry(0.09, 18, 12), new THREE.MeshStandardMaterial({ color: 0xffd27a, emissive: 0xffd27a, emissiveIntensity: 0.5 })); nd.position.copy(at(P.N, VN)); lab.scene.add(nd); objs.push(nd);
+  tagN.set(at(P.N, VN).add(new THREE.Vector3(0, 0.25, 0)), 'V<sub>N</sub> = ' + F(VN, 2) + ' V');
+  tags.R1.set(at([-1, -1.25], (S.V1 + VN) / 2), 'R₁: ' + F(s.I1 * S.R1, 2) + ' V'); tags.R3.set(at([1, -1.25], (S.V2 + VN) / 2), 'R₃: ' + F(s.I3 * S.R3, 2) + ' V');
+  tags.R2.set(at([0.3, 0], VN / 2), 'R₂: ' + F(VN, 2) + ' V'); tags.V1.set(at([-2.35, -1], S.V1 / 2), 'V₁ = ' + F(S.V1, 1) + ' V'); tags.V2.set(at([2.35, -1], S.V2 / 2), 'V₂ = ' + F(S.V2, 1) + ' V');
+  pathsCache = { br: [{ pts: br1, I: s.I1 }, { pts: br3, I: s.I3 }, { pts: br2, I: s.I2 }], s: s };
+}
+function along(pts, f) { // f ∈ [0,1) langs polylinjen
+  var L = 0, seg = []; for (var i = 0; i < pts.length - 1; i++) { var d = pts[i].distanceTo(pts[i + 1]); seg.push(d); L += d; }
+  var t = ((f % 1) + 1) % 1 * L; for (i = 0; i < seg.length; i++) { if (t <= seg[i]) return pts[i].clone().lerp(pts[i + 1], t / seg[i]); t -= seg[i]; } return pts[pts.length - 1].clone();
+}
+
+/* ---------- kontroller ---------- */
+var c = UI.side;
+function sl(card, key, label, min, max, step, unit, d) { return Lab.slider(card, { label: label, min: min, max: max, step: step, value: S[key], unit: unit, fmt: function (x) { return F(x, d); }, onInput: function (v) { S[key] = v; build(); } }); }
+var s1 = sl(c[0], 'V1', 'Kilde V<sub>1</sub>', 0, 24, 0.5, 'V', 1), s2 = sl(c[0], 'V2', 'Kilde V<sub>2</sub>', 0, 24, 0.5, 'V', 1);
+var r1 = sl(c[1], 'R1', 'R<sub>1</sub>', 0.5, 20, 0.5, 'Ω', 1), r2 = sl(c[1], 'R2', 'R<sub>2</sub>', 0.5, 20, 0.5, 'Ω', 1), r3 = sl(c[1], 'R3', 'R<sub>3</sub>', 0.5, 20, 0.5, 'Ω', 1);
+Lab.presets(c[1], [['<b>Lad batteri 2:</b> V<sub>1</sub> = 14 V, V<sub>2</sub> = 12 V', function () { S.V1 = 14; S.V2 = 12; S.R1 = 0.5; S.R2 = 10; S.R3 = 1; s1.set(14, true); s2.set(12, true); r1.set(0.5, true); r2.set(10, true); r3.set(1, true); build(); }], ['<b>Kun én kilde:</b> V<sub>2</sub> = 0 (spændingsdeler)', function () { S.V2 = 0; s2.set(0, true); build(); }]]);
+var ro = Lab.readouts(c[2], [['VN', 'Knudespænding V<sub>N</sub>'], ['I1', 'I<sub>1</sub> (gennem R<sub>1</sub>, mod knuden)'], ['I3', 'I<sub>3</sub> (gennem R<sub>3</sub>, mod knuden)'], ['I2', 'I<sub>2</sub> (gennem R<sub>2</sub>, fra knuden)'], ['kcl', 'KCL: I<sub>1</sub> + I<sub>3</sub> − I<sub>2</sub>'], '-', ['Ps', 'Afgivet af kilderne'], ['Pr', 'Optaget i modstandene']]);
+Lab.legendKeys(UI.legend, [['#5ec8ff', 'spændingskilde (elevator)'], ['#ff7a59', 'modstand (skrænt)'], ['#d9a441', 'ledning (vandret)'], ['#fff2a8', 'strøm (konventionel retning)']]);
+build();
+
+var gK = Lab.plot(UI.graphs.gK), gP = Lab.plot(UI.graphs.gP), NPART = 90, pos = new Float32Array(NPART * 3);
+parts.geometry.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+Lab.loop(function (dt, rdt) {
+  var s = pathsCache.s; S.off += dt;
+  var per = NPART / 3;
+  pathsCache.br.forEach(function (b, k) {
+    for (var i = 0; i < per; i++) { var q = along(b.pts, i / per + S.off * b.I * 0.08); var j = (k * per + i) * 3; pos[j] = q.x; pos[j + 1] = q.y + 0.05; pos[j + 2] = q.z; }
+  });
+  parts.geometry.attributes.position.needsUpdate = true;
+  var P1 = S.V1 * s.I1, P2 = S.V2 * s.I3, PR = s.I1 * s.I1 * S.R1 + s.I2 * s.I2 * S.R2 + s.I3 * s.I3 * S.R3;
+  ro.set('VN', F(s.VN, 3) + ' V', 'hi'); ro.set('I1', F(s.I1, 3) + ' A'); ro.set('I3', F(s.I3, 3) + ' A', s.I3 < 0 ? 'bad' : ''); ro.set('I2', F(s.I2, 3) + ' A'); ro.set('kcl', F(s.I1 + s.I3 - s.I2, 6) + ' A', 'ok');
+  ro.set('Ps', F(P1, 2) + ' + ' + F(P2, 2) + ' = ' + F(P1 + P2, 2) + ' W'); ro.set('Pr', F(PR, 2) + ' W', 'ok');
+  Lab.setStatus(UI.status, s.I3 < -1e-9 ? 'Kilde 2 optager effekt (strømmen løber ind i dens +)' : s.I1 < -1e-9 ? 'Kilde 1 optager effekt' : 'Begge kilder leverer effekt', s.I3 < 0 || s.I1 < 0 ? 'warn' : '');
+  UI.note.textContent = 'Højde = potentiale · jord = printpladen';
+  var u1 = [['+V₁', S.V1], ['−U_R1', -s.I1 * S.R1], ['−U_R2', -s.VN]], u2 = [['+V₂', S.V2], ['−U_R3', -s.I3 * S.R3], ['−U_R2', -s.VN]];
+  var lim = Math.max(S.V1, S.V2, 1) * 1.2;
+  gK.begin({ xmin: 0, xmax: 8, ymin: -lim, ymax: lim, xlabel: '', ylabel: 'V', fx: function () { return ''; }, fy: function (y) { return F(y, 0); } });
+  [u1, u2].forEach(function (u, m) { var x0 = m * 4.2; u.forEach(function (q, k) { gK.fill([[x0 + k + 0.1, 0], [x0 + k + 0.1, q[1]], [x0 + k + 0.9, q[1]], [x0 + k + 0.9, 0]], q[1] >= 0 ? '#5ec8ff' : '#ff7a59'); gK.text(x0 + k + 0.5, q[1] >= 0 ? q[1] + lim * 0.06 : q[1] - lim * 0.06, q[0], '#cdd7e1', 'center'); }); var sum = u.reduce(function (a, q) { return a + q[1]; }, 0); gK.text(x0 + 1.5, lim * 0.88, 'maske ' + (m + 1) + ': Σ = ' + F(sum, 3) + ' V', '#00d984', 'center'); });
+  gK.hline(0, 'rgba(227,233,239,.5)'); gK.end();
+  var pm = Math.max(P1 + P2, PR, Math.abs(P1), Math.abs(P2), 1) * 1.2;
+  gP.begin({ xmin: 0, xmax: 2, ymin: Math.min(0, P1, P2) * 1.2, ymax: pm, xlabel: '', ylabel: 'W', fx: function () { return ''; }, fy: function (y) { return F(y, 0); } });
+  var y0 = 0; [[P1, '#5ec8ff', 'V₁'], [P2, '#7fd8ff', 'V₂']].forEach(function (q) { gP.fill([[0.2, y0], [0.2, y0 + q[0]], [0.8, y0 + q[0]], [0.8, y0]], q[1]); gP.text(0.5, y0 + q[0] / 2, q[2] + ' ' + F(q[0], 1), '#0a1a2b', 'center'); y0 += q[0]; });
+  y0 = 0; [[s.I1 * s.I1 * S.R1, 'R₁'], [s.I2 * s.I2 * S.R2, 'R₂'], [s.I3 * s.I3 * S.R3, 'R₃']].forEach(function (q, k) { var col = ['#ff7a59', '#ff9a7a', '#ffb89f'][k]; gP.fill([[1.2, y0], [1.2, y0 + q[0]], [1.8, y0 + q[0]], [1.8, y0]], col); gP.text(1.5, y0 + q[0] / 2, q[1] + ' ' + F(q[0], 1), '#0a1a2b', 'center'); y0 += q[0]; });
+  gP.text(0.5, pm * 0.95, 'kilder', '#5ec8ff', 'center'); gP.text(1.5, pm * 0.95, 'modstande', '#ff7a59', 'center'); gP.end();
+  UI.formulas.innerHTML =
+    Lab.F('KCL i N: (V<sub>1</sub> − V<sub>N</sub>)/R<sub>1</sub> + (V<sub>2</sub> − V<sub>N</sub>)/R<sub>3</sub> = V<sub>N</sub>/R<sub>2</sub> ⇒ V<sub>N</sub> = (V<sub>1</sub>/R<sub>1</sub> + V<sub>2</sub>/R<sub>3</sub>)/(1/R<sub>1</sub> + 1/R<sub>2</sub> + 1/R<sub>3</sub>) = ' + n(s.VN, 3) + ' V',
+      'Knudepunktsmetoden: summen af strømme ind i knuden er nul (slides dag 2, KCL).') +
+    Lab.F('Ohm: I<sub>1</sub> = (V<sub>1</sub> − V<sub>N</sub>)/R<sub>1</sub> = ' + n(s.I1, 3) + ' A, I<sub>2</sub> = V<sub>N</sub>/R<sub>2</sub> = ' + n(s.I2, 3) + ' A, I<sub>3</sub> = (V<sub>2</sub> − V<sub>N</sub>)/R<sub>3</sub> = ' + n(s.I3, 3) + ' A') +
+    Lab.F('KVL maske 1: V<sub>1</sub> − R<sub>1</sub>I<sub>1</sub> − R<sub>2</sub>I<sub>2</sub> = ' + n(S.V1, 1) + ' − ' + n(s.I1 * S.R1, 3) + ' − ' + n(s.VN, 3) + ' = ' + n(S.V1 - s.I1 * S.R1 - s.VN, 6) + ' V', 'Kontrol med Kirchhoffs spændingslov. Effekt: P = VI = I²R; kilderne afgiver præcis det, modstandene optager.');
+  lab.render(rdt);
+});
+})();
+</script>
+</body>
+</html>

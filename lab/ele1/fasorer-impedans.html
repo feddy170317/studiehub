@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fasorer og impedans · 3D-lab</title>
+<meta name="description" content="En fasor er en roterende vektor i den komplekse plan, og sinussen er dens skygge. Se spænding og strøm for R, L, C og sammensatte belastninger og impedansen Z.">
+<link rel="stylesheet" href="../assets/lab.css">
+</head>
+<body>
+<script src="../assets/three.min.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+'use strict';
+var F = Lab.fmt, n = Lab.n, PI = Math.PI;
+var UI = Lab.build({
+  chip: 'ELE1 · dag 4–5 · Rizzoni kap. 3.4–3.5, app. A', title: 'Fasorer og impedans: sinussen er en roterende vektors skygge',
+  src: 'Slides dag 3–5: komplekse tal, fasorer V = V<sub>m</sub>∠θ, impedans Z<sub>R</sub> = R, Z<sub>L</sub> = jωL, Z<sub>C</sub> = 1/(jωC)',
+  side: ['Belastning', 'Kilde', 'Aflæsning'],
+  graphs: [{ id: 'gZ', title: 'Den komplekse plan', sub: 'fasorerne V og I og impedansen Z' }, { id: 'gT', title: 'Tidsdomænet', sub: 'v(t) og i(t) = projektionen' }],
+  notes: '<li>En fasor V = V<sub>m</sub>∠θ er en vektor i den komplekse plan, der roterer med ω. <b>Spændingen v(t) er dens skygge på den reelle akse.</b> I 3D-visningen tegner spidsen en spiral, når tiden løber.</li>' +
+    '<li>Ohms lov virker med komplekse tal: I = V/Z. Impedansens vinkel er netop faseforskydningen mellem v og i.</li>' +
+    '<li>Ren modstand: v og i i fase. Spole: i 90° efter v. Kondensator: i 90° foran v. Huskeregel: <b>ELI the ICE man</b>.</li>' +
+    '<li>Skru frekvensen op: spolens impedans vokser (ωL), kondensatorens falder (1/ωC). Ved resonans i RLC-serie ophæver de hinanden, og Z = R.</li>' +
+    '<li>Den praktiske kondensator fra dag 5 (C ∥ R<sub>læk</sub>) er næsten ren kondensator ved høj frekvens men næsten ren modstand ved lav frekvens.</li>',
+  model: '<li>Lineært kredsløb i stationær sinustilstand. Amplituder er spidsværdier; effektivværdier fås ved at dividere med √2.</li>' +
+    '<li>Tidsaksen i 3D er strakt, så en periode passer til billedet.</li>'
+});
+var lab = Lab.scene(UI.stage, { view: { target: new THREE.Vector3(1.4, 0, 0), theta: 0.95, phi: 1.2, radius: 5.2 } });
+var LOADS = { R: 'R alene', L: 'L alene', C: 'C alene', RL: 'R + L i serie', RC: 'R + C i serie', RLC: 'R + L + C i serie', RpC: 'C ∥ R (praktisk kondensator)' };
+var S = { load: 'RL', R: 10, L: 50, C: 100, f: 50, Vm: 10, t: 0 };
+function Z() { // impedans som [re, im]
+  var w = 2 * PI * S.f, R = S.R, XL = w * S.L * 1e-3, XC = 1 / (w * S.C * 1e-6);
+  switch (S.load) {
+    case 'R': return [R, 0]; case 'L': return [0, XL]; case 'C': return [0, -XC];
+    case 'RL': return [R, XL]; case 'RC': return [R, -XC]; case 'RLC': return [R, XL - XC];
+    default: { var a = R, b = -XC, den = a * a + b * b; return [a * b * b / den, a * a * b / den]; } // R ∥ (−jXC) = R·(−jX)/(R − jX)
+  }
+}
+
+/* ---------- 3D: kompleks plan (x = Re, y = Im), tid langs z ---------- */
+var plane = new THREE.Mesh(new THREE.CircleGeometry(1.6, 64), new THREE.MeshBasicMaterial({ color: 0x1a3a5c, transparent: true, opacity: 0.35, side: THREE.DoubleSide })); lab.scene.add(plane);
+var ring = Lab.line(0x5ec8ff, false, 0.35), ringPts = []; for (var i = 0; i <= 64; i++) ringPts.push(new THREE.Vector3(Math.cos(i / 64 * 2 * PI), Math.sin(i / 64 * 2 * PI), 0)); ring.set(ringPts); lab.scene.add(ring);
+var axRe = Lab.arrow(0x8fa3b8, { radius: 0.006 }); axRe.set(new THREE.Vector3(-1.8, 0, 0), new THREE.Vector3(3.6, 0, 0)); lab.scene.add(axRe);
+var axIm = Lab.arrow(0x8fa3b8, { radius: 0.006 }); axIm.set(new THREE.Vector3(0, -1.8, 0), new THREE.Vector3(0, 3.6, 0)); lab.scene.add(axIm);
+var axT = Lab.arrow(0x8fa3b8, { radius: 0.006 }); axT.set(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 4.2)); lab.scene.add(axT);
+Lab.tag(lab, 'Re', '#8fa3b8').set(new THREE.Vector3(1.95, 0, 0)); Lab.tag(lab, 'Im (j)', '#8fa3b8').set(new THREE.Vector3(0, 1.95, 0)); Lab.tag(lab, 't →', '#8fa3b8').set(new THREE.Vector3(0, 0, 4.4));
+var fV = Lab.arrow(0xffd27a, { radius: 0.025 }), fI = Lab.arrow(0x00d984, { radius: 0.025 }); lab.scene.add(fV); lab.scene.add(fI);
+var spV = Lab.line(0xffd27a, false, 0.9), spI = Lab.line(0x00d984, false, 0.9), shV = Lab.line(0xffd27a, false, 0.55), shI = Lab.line(0x00d984, false, 0.55); [spV, spI, shV, shI].forEach(function (l) { lab.scene.add(l); });
+var wall = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 3.6), new THREE.MeshBasicMaterial({ color: 0x0f2a40, transparent: true, opacity: 0.45, side: THREE.DoubleSide })); wall.rotation.y = PI / 2; wall.position.set(-1.85, 0, 2.1); lab.scene.add(wall);
+var projV = Lab.line(0xffd27a, true, 0.6), projI = Lab.line(0x00d984, true, 0.6); lab.scene.add(projV); lab.scene.add(projI);
+var tV = Lab.tag(lab, 'V', '#ffd27a'), tI = Lab.tag(lab, 'I', '#00d984');
+
+/* ---------- kontroller ---------- */
+var c = UI.side;
+var sLoad = Lab.select(c[0], { label: 'Belastning', options: Object.keys(LOADS).map(function (k) { return { value: k, label: LOADS[k] }; }), value: S.load, onChange: function (v) { S.load = v; } });
+var sR = Lab.slider(c[0], { label: 'R', min: 0.5, max: 2000, step: 0.5, value: S.R, unit: 'Ω', fmt: function (x) { return F(x, x < 10 ? 1 : 0); }, onInput: function (v) { S.R = v; } });
+var sL = Lab.slider(c[0], { label: 'L', min: 1, max: 1000, step: 1, value: S.L, unit: 'mH', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.L = v; } });
+var sC = Lab.slider(c[0], { label: 'C', min: 0.001, max: 1000, step: 0.001, value: S.C, unit: 'µF', fmt: function (x) { return F(x, x < 1 ? 3 : 0); }, onInput: function (v) { S.C = v; } });
+var sf = Lab.slider(c[1], { label: 'Frekvens f', min: 1, max: 2000, step: 1, value: S.f, unit: 'Hz', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.f = v; } });
+var sV = Lab.slider(c[1], { label: 'Spændingsamplitude V<sub>m</sub>', min: 1, max: 325, step: 1, value: S.Vm, unit: 'V', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.Vm = v; } });
+Lab.button(Lab.btnRow(c[1]), 'Find resonans (RLC)', 'primary', function () { S.load = 'RLC'; sLoad.set('RLC', true); S.f = Math.max(1, Math.round(1 / (2 * PI * Math.sqrt(S.L * 1e-3 * S.C * 1e-6)))); sf.set(S.f, true); });
+Lab.presets(c[1], [['<b>Dag 5, praktisk kondensator:</b> C = 0,001 µF ∥ R = 1 MΩ ved ω = 377 rad/s', function () { S.load = 'RpC'; S.C = 0.001; S.R = 1e6; S.f = 377 / (2 * PI); sLoad.set('RpC', true); sC.set(0.001, true); sR.range(0.5, 2e6, 1); sR.set(1e6, true); sf.set(S.f, true); }]]);
+var ro = Lab.readouts(c[2], [['Z', 'Z (rektangulær)'], ['Zp', 'Z = |Z|∠θ<sub>Z</sub>'], ['I', 'I = V/Z'], ['ph', 'Faseforskydning (v − i)'], ['typ', 'Karakter'], '-', ['XL', 'X<sub>L</sub> = ωL'], ['XC', 'X<sub>C</sub> = 1/(ωC)']]);
+Lab.legendKeys(UI.legend, [['#ffd27a', 'spændingsfasor V og v(t)'], ['#00d984', 'strømfasor I og i(t) (skaleret)'], ['#8fa3b8', 'kompleks plan og tidsakse']]);
+
+var gZ = Lab.plot(UI.graphs.gZ), gT = Lab.plot(UI.graphs.gT);
+Lab.loop(function (dt, rdt) {
+  S.t += dt * 0.25; var z = Z(), Zm = Math.hypot(z[0], z[1]), thZ = Math.atan2(z[1], z[0]), Im = S.Vm / Zm, w = 2 * PI;
+  var ph = (S.t % 1) * 2 * PI, vA = ph, iA = ph - thZ, sv = 1.3, si = 1.3; // vist med normaliseret længde
+  fV.set(new THREE.Vector3(0, 0, 0), new THREE.Vector3(sv * Math.cos(vA), sv * Math.sin(vA), 0)); fI.set(new THREE.Vector3(0, 0, 0.01), new THREE.Vector3(si * 0.8 * Math.cos(iA), si * 0.8 * Math.sin(iA), 0));
+  tV.set(new THREE.Vector3(sv * 1.12 * Math.cos(vA), sv * 1.12 * Math.sin(vA), 0)); tI.set(new THREE.Vector3(si * 0.92 * Math.cos(iA), si * 0.92 * Math.sin(iA), 0));
+  var pv = [], pi2 = [], hv = [], hi = [], Lz = 4.0;
+  for (i = 0; i <= 160; i++) { var tt = i / 160, a = vA - tt * 2 * PI, z0 = tt * Lz; pv.push(new THREE.Vector3(sv * Math.cos(a), sv * Math.sin(a), z0)); pi2.push(new THREE.Vector3(si * 0.8 * Math.cos(a - thZ), si * 0.8 * Math.sin(a - thZ), z0)); hv.push(new THREE.Vector3(-1.84, sv * Math.cos(a), z0)); hi.push(new THREE.Vector3(-1.83, si * 0.8 * Math.cos(a - thZ), z0)); }
+  spV.set(pv); spI.set(pi2); shV.set(hv); shI.set(hi);
+  projV.set([new THREE.Vector3(sv * Math.cos(vA), sv * Math.sin(vA), 0), new THREE.Vector3(-1.84, sv * Math.cos(vA), 0)]); projI.set([new THREE.Vector3(si * 0.8 * Math.cos(iA), si * 0.8 * Math.sin(iA), 0), new THREE.Vector3(-1.83, si * 0.8 * Math.cos(iA), 0)]);
+  var deg = thZ * 180 / PI, typ = Math.abs(deg) < 0.5 ? 'resistiv (i fase)' : deg > 0 ? 'induktiv (i efter v)' : 'kapacitiv (i før v)';
+  var wr = 2 * PI * S.f;
+  ro.set('Z', F(z[0], 2) + (z[1] >= 0 ? ' + j' : ' − j') + F(Math.abs(z[1]), 2) + ' Ω'); ro.set('Zp', F(Zm, 2) + ' Ω ∠ ' + F(deg, 1) + '°', 'hi'); ro.set('I', (Im < 1e-3 ? F(Im * 1e6, 2) + ' µA' : F(Im, 4) + ' A') + ' ∠ ' + F(-deg, 1) + '°', 'ok');
+  ro.set('ph', F(deg, 1) + '°'); ro.set('typ', typ, 'hi'); ro.set('XL', /L/.test(S.load) ? F(wr * S.L * 1e-3, 2) + ' Ω' : '–'); ro.set('XC', /C/.test(S.load) ? F(1 / (wr * S.C * 1e-6), 2) + ' Ω' : '–');
+  Lab.setStatus(UI.status, typ.charAt(0).toUpperCase() + typ.slice(1), Math.abs(deg) < 0.5 ? '' : 'warn');
+  UI.note.textContent = 'f = ' + F(S.f, 1) + ' Hz · ω = ' + F(wr, 1) + ' rad/s · vist i slowmotion';
+  var lim = Math.max(Zm, 1) * 1.25;
+  gZ.begin({ xmin: -lim, xmax: lim, ymin: -lim, ymax: lim, xlabel: 'Re [Ω]', ylabel: 'Im [Ω]', fx: function (x) { return F(x, 0); }, fy: function (y) { return F(y, 0); } });
+  gZ.line([[0, 0], [z[0], 0]], '#ff7a59', 3); gZ.line([[z[0], 0], [z[0], z[1]]], '#5ec8ff', 3); gZ.line([[0, 0], [z[0], z[1]]], '#e3e9ef', 2.4); gZ.dot(z[0], z[1], '#e3e9ef', 5);
+  gZ.text(z[0] / 2, -lim * 0.07, 'R-del', '#ff7a59', 'center'); gZ.text(z[0] + lim * 0.03, z[1] / 2, 'X-del', '#5ec8ff'); gZ.text(z[0] * 0.5 - lim * 0.05, z[1] * 0.5 + lim * 0.08, 'Z', '#e3e9ef');
+  var sc = lim * 0.6; gZ.line([[0, 0], [sc, 0]], 'rgba(255,210,122,.6)', 1.6, [5, 4]); gZ.line([[0, 0], [sc * 0.8 * Math.cos(-thZ), sc * 0.8 * Math.sin(-thZ)]], 'rgba(0,217,132,.7)', 1.6, [5, 4]);
+  gZ.text(sc, lim * 0.05, 'V (ref.)', '#ffd27a'); gZ.text(sc * 0.8 * Math.cos(-thZ), sc * 0.8 * Math.sin(-thZ) - lim * 0.06, 'I', '#00d984'); gZ.end();
+  var T = 1 / S.f;
+  gT.begin({ xmin: 0, xmax: 2 * T * 1000, ymin: -S.Vm * 1.25, ymax: S.Vm * 1.25, xlabel: 't [ms]', ylabel: 'v [V]', fx: function (x) { return F(x, 1); }, fy: function (y) { return F(y, 0); } });
+  var vv = [], ii = []; for (i = 0; i <= 200; i++) { var t2 = 2 * T * i / 200; vv.push([t2 * 1000, S.Vm * Math.cos(2 * PI * S.f * t2)]); ii.push([t2 * 1000, S.Vm * 0.8 * Math.cos(2 * PI * S.f * t2 - thZ)]); }
+  gT.line(vv, '#ffd27a', 2.2); gT.line(ii, '#00d984', 2.2); gT.text(T * 50, S.Vm * 1.1, 'v(t) = V_m cos ωt', '#ffd27a'); gT.text(T * 1000, S.Vm * 1.1, 'i(t) = (V_m/|Z|) cos(ωt − θ_Z) (skaleret)', '#00d984'); gT.end();
+  UI.formulas.innerHTML =
+    Lab.F('Z = ' + n(z[0], 2) + (z[1] >= 0 ? ' + j' : ' − j') + n(Math.abs(z[1]), 2) + ' Ω = ' + n(Zm, 2) + '∠' + n(deg, 1) + '° Ω', 'Z<sub>R</sub> = R, Z<sub>L</sub> = jωL og Z<sub>C</sub> = 1/(jωC) = −j/(ωC). Serie: læg sammen. Parallel: 1/Z = Σ1/Z<sub>k</sub> (slides dag 5).') +
+    Lab.F('I = V/Z = ' + n(S.Vm, 0) + '∠0° / ' + n(Zm, 2) + '∠' + n(deg, 1) + '° = ' + (Im < 1e-3 ? n(Im * 1e6, 2) + '∠' + n(-deg, 1) + '° µA' : n(Im, 4) + '∠' + n(-deg, 1) + '° A'), 'Ohms lov med fasorer: divider længderne og træk vinklerne fra (polær form, appendiks A).') +
+    Lab.F('i(t) = ' + n(Im, 4) + ' cos(' + n(wr, 1) + 't ' + (deg >= 0 ? '− ' : '+ ') + n(Math.abs(deg), 1) + '°) A', 'Tilbage til tidsdomænet: fasorens længde er amplituden, og dens vinkel er fasen.');
+  lab.render(rdt);
+});
+})();
+</script>
+</body>
+</html>

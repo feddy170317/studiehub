@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Elnettet · 3D-lab</title>
+<meta name="description" content="Fra kraftværk til by: optransformering, højspændingsledning og nedtransformering. Se hvorfor ledningstabet I²R tvinger elnettet op på 400 kV.">
+<link rel="stylesheet" href="../assets/lab.css">
+</head>
+<body>
+<script src="../assets/three.min.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+'use strict';
+var F = Lab.fmt, n = Lab.n, PI = Math.PI;
+var UI = Lab.build({
+  chip: 'ELE1 · dag 11 · Rizzoni kap. 6.6–6.7', title: 'Elnettet: hvorfor transmission foregår ved høj spænding',
+  src: 'Slides og bog dag 11: produktion, transmission og distribution af AC-effekt, transformere, tab P<sub>tab</sub> = 3I²R',
+  side: ['Overførsel', 'Ledning', 'Aflæsning'],
+  graphs: [{ id: 'gL', title: 'Tab mod transmissionsspænding', sub: 'samme effekt, samme ledning' }, { id: 'gE', title: 'Energiregnskab', sub: 'produceret = tab + leveret' }],
+  notes: '<li>Effekten er P = √3·V·I. Den samme effekt kan overføres med <b>høj spænding og lille strøm</b> eller lav spænding og stor strøm.</li>' +
+    '<li>Tabet i ledningen er P<sub>tab</sub> = 3I²R. Halveres strømmen, falder tabet til en fjerdedel. <b>Tabet falder med kvadratet af spændingen</b>: 10 gange højere spænding giver 100 gange mindre tab.</li>' +
+    '<li>Derfor transformerer man op til 400 kV ved kraftværket og ned igen i flere trin (150/132 kV, 60/50 kV, 10 kV, 0,4 kV) tæt på forbrugerne. Det kan kun lade sig gøre med vekselstrøm og transformere.</li>' +
+    '<li>Prøv at sende 50 MW 100 km ved 10 kV: ledningen ville brænde mere effekt af, end den leverer.</li>',
+  model: '<li>Trefaset, symmetrisk, cos φ = 1, ideelle transformere. Ledningen er en ren modstand R = r·l pr. fase (ingen induktans eller kapacitans).</li>' +
+    '<li>Modstand pr. km er et typisk tal for en luftledning (<span class="est">ESTIMAT</span>). Tabet er beregnet med den leverede effekt som udgangspunkt, så strømmen er I = P/(√3·V).</li>'
+});
+var lab = Lab.scene(UI.stage, { view: { target: new THREE.Vector3(0, 0.6, 0), theta: 0.3, phi: 1.15, radius: 11 } });
+var S = { P: 50, V: 132, L: 100, r: 0.08, off: 0 };
+
+/* ---------- 3D-landskab ---------- */
+var ground = new THREE.Mesh(new THREE.PlaneGeometry(14, 6), Lab.mat(0x1d3b2a, { rough: 1 })); ground.rotation.x = -PI / 2; lab.scene.add(ground);
+var plant = new THREE.Group(); plant.position.set(-5.6, 0, 0); lab.scene.add(plant);
+var hall = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.7, 0.9), Lab.mat(0x8fa3b8)); hall.position.y = 0.35; plant.add(hall);
+var chim = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.18, 1.6, 20), Lab.mat(0xc9d6e3)); chim.position.set(0.3, 0.8, -0.2); plant.add(chim);
+var tr1 = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), Lab.mat(0x2f7fd1)); tr1.position.set(-4.4, 0.25, 0); lab.scene.add(tr1);
+var tr2 = tr1.clone(); tr2.position.set(4.4, 0.25, 0); lab.scene.add(tr2);
+var town = new THREE.Group(); town.position.set(5.6, 0, 0); lab.scene.add(town);
+for (var i = 0; i < 7; i++) { var h = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.25, 0.28), Lab.mat(0xe3e9ef)); h.position.set((i % 3) * 0.4 - 0.4, 0.125, Math.floor(i / 3) * 0.45 - 0.45); town.add(h); var rf = new THREE.Mesh(new THREE.ConeGeometry(0.24, 0.18, 4), Lab.mat(0xff7a59)); rf.position.set(h.position.x, 0.34, h.position.z); rf.rotation.y = PI / 4; town.add(rf); }
+var winM = []; town.children.forEach(function (ch) { if (ch.geometry.type === 'BoxGeometry') winM.push(ch.material); });
+var pylonX = [-3.3, -1.65, 0, 1.65, 3.3], pyl = [];
+pylonX.forEach(function (x) { var g = new THREE.Group(); g.position.x = x; var m = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.12, 2.2, 4), Lab.mat(0x8fa3b8, { metal: 0.6 })); m.position.y = 1.1; g.add(m); var arm = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.05, 1.1), Lab.mat(0x8fa3b8, { metal: 0.6 })); arm.position.y = 2.0; g.add(arm); lab.scene.add(g); pyl.push(g); });
+var wireMat = new THREE.MeshStandardMaterial({ color: 0x9aa7b5, emissive: 0x000000, metalness: 0.6, roughness: 0.4 }), wires = [];
+function catenary(z) { var pts = []; for (var k = 0; k < pylonX.length - 1; k++) { for (var j = 0; j <= 12; j++) { var t = j / 12, x = pylonX[k] + (pylonX[k + 1] - pylonX[k]) * t; pts.push(new THREE.Vector3(x, 1.98 - 0.25 * 4 * t * (1 - t), z)); } } return pts; }
+[-0.5, 0, 0.5].forEach(function (z) { var m = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(catenary(z)), 120, 0.015, 6, false), wireMat); lab.scene.add(m); wires.push(m); });
+var low1 = Lab.rod(0.02, Lab.mat(0xd9a441)), low2 = Lab.rod(0.02, Lab.mat(0xd9a441)); low1.between(new THREE.Vector3(-5.05, 0.4, 0), new THREE.Vector3(-4.65, 0.4, 0)); low2.between(new THREE.Vector3(4.65, 0.4, 0), new THREE.Vector3(5.1, 0.25, 0)); lab.scene.add(low1); lab.scene.add(low2);
+var up1 = Lab.rod(0.015, Lab.mat(0x9aa7b5)), up2 = Lab.rod(0.015, Lab.mat(0x9aa7b5)); up1.between(new THREE.Vector3(-4.4, 0.5, 0), new THREE.Vector3(-3.3, 1.98, 0)); up2.between(new THREE.Vector3(3.3, 1.98, 0), new THREE.Vector3(4.4, 0.5, 0)); lab.scene.add(up1); lab.scene.add(up2);
+var NP = 40, pp = new Float32Array(NP * 3), parts = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial({ color: 0xffd27a, size: 0.12, transparent: true, depthWrite: false })); parts.geometry.setAttribute('position', new THREE.BufferAttribute(pp, 3)); lab.scene.add(parts);
+var heat = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial({ color: 0xff5e3a, size: 0.1, transparent: true, depthWrite: false })), hp = new Float32Array(60 * 3); heat.geometry.setAttribute('position', new THREE.BufferAttribute(hp, 3)); lab.scene.add(heat);
+var hseed = []; for (i = 0; i < 60; i++) hseed.push([Math.random(), Math.random(), (i % 3 - 1) * 0.5]);
+var tagG = Lab.tag(lab, 'kraftværk', '#e3e9ef'), tagT1 = Lab.tag(lab, '', '#5ec8ff'), tagT2 = Lab.tag(lab, '', '#5ec8ff'), tagLn = Lab.tag(lab, '', '#ffd27a'), tagTown = Lab.tag(lab, '', '#00d984');
+tagG.set(new THREE.Vector3(-5.6, 1.9, 0));
+
+/* ---------- kontroller ---------- */
+var c = UI.side;
+var sP = Lab.slider(c[0], { label: 'Leveret effekt P', min: 1, max: 1000, step: 1, value: S.P, unit: 'MW', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.P = v; } });
+var sV = Lab.slider(c[0], { label: 'Transmissionsspænding (linje)', min: 0.4, max: 400, step: 0.1, value: S.V, unit: 'kV', fmt: function (x) { return F(x, x < 10 ? 1 : 0); }, onInput: function (v) { S.V = v; } });
+Lab.presets(c[0], [['<b>400 kV</b> (transmissionsnettet)', function () { setV(400); }], ['<b>132 kV</b> (regionalt)', function () { setV(132); }], ['<b>10 kV</b> (lokal distribution)', function () { setV(10); }], ['<b>0,4 kV</b> (husstandsniveau hele vejen)', function () { setV(0.4); }]]);
+function setV(v) { S.V = v; sV.set(v, true); }
+Lab.slider(c[1], { label: 'Ledningens længde', min: 1, max: 400, step: 1, value: S.L, unit: 'km', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.L = v; } });
+Lab.slider(c[1], { label: 'Modstand pr. km pr. fase', min: 0.02, max: 0.5, step: 0.01, value: S.r, unit: 'Ω/km', fmt: function (x) { return F(x, 2); }, onInput: function (v) { S.r = v; } });
+var ro = Lab.readouts(c[2], [['I', 'Strøm i ledningen I = P/(√3·V)'], ['R', 'Modstand pr. fase R'], ['Pl', 'Tab P<sub>tab</sub> = 3I²R'], ['pct', 'Tab i procent af leveret'], ['Pg', 'Produceret'], ['dV', 'Spændingsfald I·R (pr. fase)']]);
+Lab.legendKeys(UI.legend, [['#ffd27a', 'energi på vej til byen'], ['#ff5e3a', 'tab (varme i ledningen)'], ['#2f7fd1', 'transformerstation']]);
+
+var gL = Lab.plot(UI.graphs.gL), gE = Lab.plot(UI.graphs.gE);
+Lab.loop(function (dt, rdt) {
+  var P = S.P * 1e6, V = S.V * 1e3, I = P / (Math.sqrt(3) * V), R = S.r * S.L, Pl = 3 * I * I * R, pct = Pl / P * 100, Pg = P + Pl;
+  var fl = Math.min(1, pct / 20);
+  wireMat.emissive.setRGB(0.9 * fl, 0.25 * fl, 0.05 * fl); wireMat.color.setRGB(0.6 + 0.4 * fl, 0.65 - 0.3 * fl, 0.7 - 0.5 * fl);
+  S.off += dt * 0.25;
+  for (i = 0; i < NP; i++) { var u = ((i / NP + S.off) % 1), z = (i % 3 - 1) * 0.5, x = -3.3 + 6.6 * u, t = ((x - -3.3) / 1.65) % 1; pp[i * 3] = x; pp[i * 3 + 1] = 1.98 - 0.25 * 4 * t * (1 - t); pp[i * 3 + 2] = z; }
+  parts.geometry.attributes.position.needsUpdate = true; parts.material.opacity = Math.max(0.15, 1 - Math.min(1, pct / 100));
+  for (i = 0; i < 60; i++) { var s0 = hseed[i], age = (s0[1] + S.off * 1.5) % 1, xh = -3.3 + 6.6 * s0[0], th = ((xh + 3.3) / 1.65) % 1; hp[i * 3] = xh; hp[i * 3 + 1] = 1.98 - 0.25 * 4 * th * (1 - th) + age * 0.6; hp[i * 3 + 2] = s0[2]; }
+  heat.geometry.attributes.position.needsUpdate = true; heat.material.opacity = Math.min(1, pct / 10); heat.visible = pct > 0.3;
+  var lit = Math.max(0.15, Math.min(1, P / Pg)); winM.forEach(function (m) { m.emissive.setRGB(0.55 * lit, 0.45 * lit, 0.15 * lit); });
+  tagT1.set(new THREE.Vector3(-4.4, 0.85, 0), 'op til ' + F(S.V, S.V < 10 ? 1 : 0) + ' kV'); tagT2.set(new THREE.Vector3(4.4, 0.85, 0), 'ned til 0,4 kV');
+  tagLn.set(new THREE.Vector3(0, 2.45, 0), 'I = ' + (I < 1000 ? F(I, 0) + ' A' : F(I / 1000, 2) + ' kA') + ' · tab ' + F(pct, pct < 1 ? 2 : 0) + ' %'); tagTown.set(new THREE.Vector3(5.6, 0.75, 0), F(S.P, 0) + ' MW leveret');
+  ro.set('I', I < 1000 ? F(I, 1) + ' A' : F(I / 1000, 2) + ' kA', 'hi'); ro.set('R', F(R, 2) + ' Ω'); ro.set('Pl', Pl < 1e6 ? F(Pl / 1e3, 1) + ' kW' : F(Pl / 1e6, 2) + ' MW', pct > 10 ? 'bad' : '');
+  ro.set('pct', F(pct, pct < 1 ? 3 : 1) + ' %', pct > 10 ? 'bad' : pct > 3 ? 'hi' : 'ok'); ro.set('Pg', F(Pg / 1e6, 2) + ' MW'); ro.set('dV', F(I * R / 1000, 2) + ' kV (' + F(I * R / (V / Math.sqrt(3)) * 100, 1) + ' %)');
+  Lab.setStatus(UI.status, pct > 100 ? 'Umuligt: ledningen ville brænde mere af, end den leverer' : pct > 10 ? 'Alt for stort tab: hæv spændingen' : pct > 3 ? 'Mærkbart tab' : 'Lille tab: fornuftigt spændingsniveau', pct > 10 ? 'bad' : pct > 3 ? 'warn' : '');
+  UI.note.textContent = F(S.P, 0) + ' MW over ' + F(S.L, 0) + ' km';
+  gL.begin({ xmin: Math.log10(0.4), xmax: Math.log10(400), ymin: -3, ymax: 3, xlabel: 'V [kV] (log)', ylabel: 'tab [%] (log)', fx: function (x) { return F(Math.pow(10, x), Math.pow(10, x) < 10 ? 1 : 0); }, fy: function (y) { return F(Math.pow(10, y), y < 0 ? 3 : 0); } });
+  var cv = []; for (i = 0; i <= 100; i++) { var lv = Math.log10(0.4) + (Math.log10(400) - Math.log10(0.4)) * i / 100, Vv = Math.pow(10, lv) * 1e3, Iv = P / (Math.sqrt(3) * Vv); cv.push([lv, Math.log10(Math.max(3 * Iv * Iv * R / P * 100, 1e-3))]); }
+  gL.line(cv, '#ff5e3a', 2.4); [0.4, 10, 60, 132, 400].forEach(function (v) { gL.vline(Math.log10(v), 'rgba(143,163,184,.35)', F(v, v < 1 ? 1 : 0) + ' kV'); });
+  gL.dot(Math.log10(S.V), Math.log10(Math.max(pct, 1e-3)), '#ffd27a', 6); gL.text(Math.log10(0.5), 2.6, 'hældning −2: tab ∝ 1/V²', '#ff5e3a'); gL.end();
+  var mx = Pg / 1e6 * 1.1;
+  gE.begin({ xmin: 0, xmax: 3, ymin: 0, ymax: Math.max(mx, 1), xlabel: '', ylabel: 'MW', fx: function () { return ''; }, fy: function (y) { return F(y, 0); } });
+  [[Pg / 1e6, '#2f7fd1', 'produceret'], [Pl / 1e6, '#ff5e3a', 'tab'], [P / 1e6, '#00d984', 'leveret']].forEach(function (q, k) { gE.fill([[k + 0.15, 0], [k + 0.15, q[0]], [k + 0.85, q[0]], [k + 0.85, 0]], q[1]); gE.text(k + 0.5, q[0] + mx * 0.04, q[2] + ' ' + F(q[0], q[0] < 10 ? 2 : 0), q[1], 'center'); });
+  gE.end();
+  UI.formulas.innerHTML =
+    Lab.F('I = P/(√3·V<sub>L</sub>) = ' + n(S.P, 0) + ' MW / (√3·' + n(S.V, 1) + ' kV) = ' + n(I, 1) + ' A', 'Trefaset effekt med cos φ = 1 (slides dag 9–11).') +
+    Lab.F('P<sub>tab</sub> = 3I²R = 3·' + n(I, 1) + '²·' + n(R, 2) + ' Ω = ' + n(Pl / 1e6, 3) + ' MW (' + n(pct, 2) + ' %)', 'Tabet ∝ I² ∝ 1/V². Ved 10 gange højere spænding falder tabet 100 gange.');
+  lab.render(rdt);
+});
+})();
+</script>
+</body>
+</html>

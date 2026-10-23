@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DC-motoren · 3D-lab</title>
+<meta name="description" content="Jævnstrømsmotoren indefra: magnetfelt, ankervikling, kommutator, kræfterne F = BIL, modelektromotorisk kraft, startstrøm og moment-hastighedskurven.">
+<link rel="stylesheet" href="../assets/lab.css">
+</head>
+<body>
+<script src="../assets/three.min.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+'use strict';
+var F = Lab.fmt, n = Lab.n, PI = Math.PI;
+var UI = Lab.build({
+  chip: 'ELE1 · dag 7 · Rizzoni kap. 13.2–13.4', title: 'DC-motoren: kraft på lederen og modelektromotorisk kraft',
+  src: 'Slides dag 7: elektromagnetisk induktion, Flemings regler, ankermoment T = kφI<sub>a</sub> og E<sub>a</sub> = kφω',
+  side: ['Forsyning og last', 'Motor', 'Aflæsning'],
+  graphs: [{ id: 'gN', title: 'Moment-hastighedskarakteristik', sub: 'ω = V/(kφ) − R<sub>a</sub>T/(kφ)²' }, { id: 'gT', title: 'Opstart fra stilstand', sub: 'ω(t) og I<sub>a</sub>(t)' }],
+  notes: '<li><b>Kraften på en strømførende leder i et magnetfelt</b> er F = BIL (Flemings venstrehåndsregel). De to sider af viklingen får modsat rettede kræfter, og det giver et moment.</li>' +
+    '<li><b>Kommutatoren</b> vender strømmen i viklingen hver halve omgang. Ellers ville momentet skifte fortegn, og motoren ville bare vippe frem og tilbage.</li>' +
+    '<li>Når ankeret drejer, skærer lederne feltlinjerne, og der induceres en <b>modelektromotorisk kraft</b> E<sub>a</sub> = kφω, som modvirker forsyningen. Derfor falder strømmen, når motoren kommer op i fart.</li>' +
+    '<li>Ved start er ω = 0, så E<sub>a</sub> = 0, og strømmen er kun begrænset af R<sub>a</sub>: <b>startstrømmen er stor</b>. Se spidsen i den højre graf.</li>' +
+    '<li>Mere last giver lidt lavere fart og mere strøm. Linjen er næsten vandret, fordi R<sub>a</sub> er lille: en DC-motor med fast felt holder farten godt.</li>',
+  model: '<li>Permanentmagnet- eller fremmedmagnetiseret DC-motor med konstant φ: V = E<sub>a</sub> + R<sub>a</sub>I<sub>a</sub>, E<sub>a</sub> = kφω, T = kφI<sub>a</sub>, Jdω/dt = T − T<sub>last</sub>. Ankerinduktans og friktion er udeladt.</li>' +
+    '<li>3D-modellen har én vinding og to kommutatorlameller. En rigtig motor har mange, så momentet er næsten jævnt.</li>'
+});
+var lab = Lab.scene(UI.stage, { view: { target: new THREE.Vector3(0, 0, 0), theta: 0.75, phi: 1.15, radius: 4.4 } });
+var S = { V: 24, TL: 0.2, Ra: 1.0, kphi: 0.1, J: 0.0005, w: 0, ang: 0, t: 0, hist: [], run: true };
+
+/* ---------- 3D (motorakse langs z) ---------- */
+function arcMag(col, a0) { var sh = new THREE.Shape(); var r1 = 1.05, r2 = 1.35, a1 = a0 - 0.75, a2 = a0 + 0.75; sh.absarc(0, 0, r2, a1, a2, false); sh.absarc(0, 0, r1, a2, a1, true); var g = new THREE.ExtrudeGeometry(sh, { depth: 1.4, bevelEnabled: false, curveSegments: 24 }); g.translate(0, 0, -0.7); return new THREE.Mesh(g, Lab.mat(col, { metal: 0.3 })); }
+lab.scene.add(arcMag(0xff5e5e, 0)); lab.scene.add(arcMag(0x5ec8ff, PI));
+Lab.tag(lab, 'N', '#ff5e5e').set(new THREE.Vector3(1.5, 0, 0)); Lab.tag(lab, 'S', '#5ec8ff').set(new THREE.Vector3(-1.5, 0, 0));
+var yoke = new THREE.Mesh(new THREE.TorusGeometry(1.42, 0.07, 10, 64), Lab.mat(0x2b3c50)); lab.scene.add(yoke);
+var bArrows = []; for (var i = 0; i < 5; i++) { var b = Lab.arrow(0xffd27a, { radius: 0.008 }); b.set(new THREE.Vector3(1.0, -0.6 + 0.3 * i, -0.75), new THREE.Vector3(-2.0, 0, 0)); b.children.forEach(function (ch) { ch.material.transparent = true; ch.material.opacity = 0.45; }); lab.scene.add(b); bArrows.push(b); }
+var rotor = new THREE.Group(); lab.scene.add(rotor);
+var core = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.55, 1.3, 40), Lab.mat(0x44586e, { metal: 0.4 })); core.rotation.x = PI / 2; rotor.add(core);
+var coilMat = Lab.mat(0xd9a441, { metal: 0.7, rough: 0.3 });
+var W = 0.8, Lc = 0.75; // vindingens halve bredde og halve længde
+var sideA = Lab.rod(0.05, coilMat), sideB = Lab.rod(0.05, coilMat), endF = Lab.rod(0.05, coilMat), endB = Lab.rod(0.05, coilMat);
+sideA.between(new THREE.Vector3(0, W, -Lc), new THREE.Vector3(0, W, Lc)); sideB.between(new THREE.Vector3(0, -W, -Lc), new THREE.Vector3(0, -W, Lc));
+endF.between(new THREE.Vector3(0, W, Lc), new THREE.Vector3(0, -W, Lc)); endB.between(new THREE.Vector3(0, W, -Lc), new THREE.Vector3(0, -W, -Lc));
+[sideA, sideB, endF, endB].forEach(function (s) { rotor.add(s); });
+var shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 2.6, 16), Lab.mat(0xc9d6e3, { metal: 0.6 })); shaft.rotation.x = PI / 2; shaft.position.z = 0.4; rotor.add(shaft);
+var comm1 = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.3, 24, 1, false, 0.1, PI - 0.2), Lab.mat(0xb87333, { metal: 0.8 })); comm1.rotation.x = PI / 2; comm1.position.z = 1.15; rotor.add(comm1);
+var comm2 = comm1.clone(); comm2.rotation.y = PI; rotor.add(comm2);
+var br1 = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.12, 0.2), Lab.mat(0x1a1f26)), br2 = br1.clone(); br1.position.set(0.32, 0, 1.15); br2.position.set(-0.32, 0, 1.15); lab.scene.add(br1); lab.scene.add(br2);
+var fA = Lab.arrow(0x00d984, { radius: 0.03 }), fB = Lab.arrow(0x00d984, { radius: 0.03 }); lab.scene.add(fA); lab.scene.add(fB);
+var tagF = Lab.tag(lab, '', '#00d984'), tagW = Lab.tag(lab, '', '#e3e9ef');
+var iMarkA = new THREE.Mesh(new THREE.SphereGeometry(0.07, 12, 10), new THREE.MeshBasicMaterial({ color: 0xff7a59 })), iMarkB = iMarkA.clone(); lab.scene.add(iMarkA); lab.scene.add(iMarkB);
+
+/* ---------- kontroller ---------- */
+var c = UI.side;
+var sV = Lab.slider(c[0], { label: 'Forsyningsspænding V', min: 0, max: 48, step: 0.5, value: S.V, unit: 'V', fmt: function (x) { return F(x, 1); }, onInput: function (v) { S.V = v; } });
+var sTL = Lab.slider(c[0], { label: 'Lastmoment T<sub>last</sub>', min: 0, max: 3, step: 0.01, value: S.TL, unit: 'N·m', fmt: function (x) { return F(x, 2); }, onInput: function (v) { S.TL = v; } });
+var bb = Lab.btnRow(c[0]); Lab.button(bb, '▶ Start fra stilstand', 'primary', function () { S.w = 0; S.t = 0; S.hist = []; }); var pauseBtn = Lab.button(bb, '⏸ Pause', '', function () {});
+Lab.slider(c[1], { label: 'Ankermodstand R<sub>a</sub>', min: 0.1, max: 5, step: 0.05, value: S.Ra, unit: 'Ω', fmt: function (x) { return F(x, 2); }, onInput: function (v) { S.Ra = v; } });
+Lab.slider(c[1], { label: 'Motorkonstant kφ', min: 0.02, max: 0.5, step: 0.005, value: S.kphi, unit: 'V·s/rad', fmt: function (x) { return F(x, 3); }, onInput: function (v) { S.kphi = v; } });
+Lab.slider(c[1], { label: 'Inertimoment J', min: 0.0001, max: 0.01, step: 0.0001, value: S.J, unit: 'kg·m²', fmt: function (x) { return F(x * 1000, 1) + '·10⁻³'; }, onInput: function (v) { S.J = v; } });
+var ro = Lab.readouts(c[2], [['n', 'Omdrejningstal'], ['Ia', 'Ankerstrøm I<sub>a</sub> = (V − E<sub>a</sub>)/R<sub>a</sub>'], ['Ea', 'Modelektromotorisk kraft E<sub>a</sub>'], ['T', 'Moment T = kφI<sub>a</sub>'], '-', ['Pin', 'P<sub>ind</sub> = V·I<sub>a</sub>'], ['Pm', 'P<sub>mek</sub> = T·ω'], ['eta', 'Virkningsgrad'], ['Ist', 'Startstrøm V/R<sub>a</sub>']]);
+Lab.legendKeys(UI.legend, [['#ffd27a', 'magnetfelt B (N → S)'], ['#00d984', 'kraft F = BIL på lederne'], ['#ff7a59', 'strøm ind i lederen'], ['#b87333', 'kommutator og børster']]);
+
+var gN = Lab.plot(UI.graphs.gN), gT = Lab.plot(UI.graphs.gT);
+Lab.loop(function (dt, rdt) {
+  var steps = 20, h = dt / steps, Ia = 0;
+  for (var k = 0; k < steps && dt > 0; k++) { var Ea = S.kphi * S.w; Ia = (S.V - Ea) / S.Ra; var T = S.kphi * Ia, Tl = S.w > 1e-6 || T > S.TL ? S.TL : Math.max(0, T); S.w = Math.max(0, S.w + h * (T - Tl) / S.J); S.t += h; }
+  var Ea2 = S.kphi * S.w; Ia = (S.V - Ea2) / S.Ra; var T2 = S.kphi * Ia;
+  if (dt > 0) { S.hist.push([S.t, S.w, Ia]); if (S.hist.length > 800) S.hist.shift(); }
+  S.ang += dt * Math.min(S.w, 60) * 0.15; rotor.rotation.z = S.ang;
+  // kræfter på de to lange sider (i verden): siden længst ude i +x skubbes op eller ned afhængigt af strømretning (kommutator)
+  var a = S.ang, pA = new THREE.Vector3(-W * Math.sin(a), W * Math.cos(a), 0), pB = pA.clone().negate();
+  var sgn = Math.cos(a) >= 0 ? 1 : -1; // kommutatoren vender strømmen, så momentet altid er samme vej
+  var fl = 0.25 + 0.6 * Math.min(1, Math.abs(Ia) / Math.max(S.V / S.Ra, 1e-6));
+  var dirA = new THREE.Vector3(-Math.cos(a), -Math.sin(a), 0).multiplyScalar(sgn), // tangentielt
+      fAv = new THREE.Vector3(0, 1, 0).multiplyScalar(0);
+  // kraften er vinkelret på B (B langs −x), dvs. lodret: F = ±BIL·ŷ, fortegn så momentet driver rotationen
+  var upA = pA.x * 1 > 0 ? 1 : -1;
+  fA.set(pA.clone().setZ(0.8), new THREE.Vector3(0, fl * (pA.x >= 0 ? 1 : -1), 0)); fB.set(pB.clone().setZ(0.8), new THREE.Vector3(0, fl * (pB.x >= 0 ? 1 : -1), 0));
+  fA.visible = fB.visible = Ia > 0.01 && Math.abs(Math.sin(a)) > 0.15;
+  iMarkA.position.copy(pA).setZ(0.85); iMarkB.position.copy(pB).setZ(0.85); iMarkA.material.color.setHex(pA.x >= 0 ? 0xff7a59 : 0x5ec8ff); iMarkB.material.color.setHex(pB.x >= 0 ? 0xff7a59 : 0x5ec8ff);
+  tagF.set(pA.clone().setZ(0.8).add(new THREE.Vector3(0.15, fl * (pA.x >= 0 ? 1 : -1) + 0.1, 0)), 'F = BIL'); tagF.visible = fA.visible;
+  tagW.set(new THREE.Vector3(0, -1.75, 1.2), F(S.w * 60 / (2 * PI), 0) + ' o/min');
+  var w0 = S.V / S.kphi, Tst = S.kphi * S.V / S.Ra, wss = Math.max(0, (S.V - S.Ra * S.TL / S.kphi) / S.kphi);
+  ro.set('n', F(S.w * 60 / (2 * PI), 0) + ' o/min', 'hi'); ro.set('Ia', F(Ia, 2) + ' A', 'ok'); ro.set('Ea', F(Ea2, 2) + ' V'); ro.set('T', F(T2, 3) + ' N·m');
+  ro.set('Pin', F(S.V * Ia, 1) + ' W'); ro.set('Pm', F(T2 * S.w, 1) + ' W'); ro.set('eta', S.V * Ia > 0.01 ? F(T2 * S.w / (S.V * Ia) * 100, 1) + ' %' : '–'); ro.set('Ist', F(S.V / S.Ra, 1) + ' A', 'bad');
+  var stalled = S.TL >= Tst;
+  Lab.setStatus(UI.status, stalled ? 'Blokeret: lastmomentet er større end startmomentet' : Math.abs(S.w - wss) / Math.max(wss, 1) < 0.01 ? 'Stationær drift' : 'Accelererer: strømmen falder, når E_a vokser', stalled ? 'bad' : '');
+  UI.note.textContent = 'Rotationen vises langsomt · E_a/V = ' + F(Ea2 / Math.max(S.V, 1e-6) * 100, 0) + ' %';
+  gN.begin({ xmin: 0, xmax: Math.max(Tst, S.TL) * 1.1, ymin: 0, ymax: w0 * 60 / (2 * PI) * 1.1, xlabel: 'T [N·m]', ylabel: 'n [o/min]', fx: function (x) { return F(x, 2); }, fy: function (y) { return F(y, 0); } });
+  gN.line([[0, w0 * 60 / (2 * PI)], [Tst, 0]], '#5ec8ff', 2.2); gN.vline(S.TL, 'rgba(217,132,255,.8)', 'T_last'); gN.dot(T2, S.w * 60 / (2 * PI), '#ffd27a', 6);
+  gN.text(Tst * 0.02, w0 * 60 / (2 * PI) * 1.04, 'tomgang n₀ = ' + F(w0 * 60 / (2 * PI), 0), '#5ec8ff'); gN.text(Tst * 0.98, w0 * 6, 'startmoment ' + F(Tst, 2), '#5ec8ff', 'right'); gN.end();
+  var tm = Math.max(S.t, 0.5), t0 = Math.max(0, S.t - 4), Im = S.V / S.Ra * 1.1, Wm = w0 * 1.1;
+  gT.begin({ xmin: t0, xmax: Math.max(t0 + 1, S.t), ymin: 0, ymax: 1.1, xlabel: 't [s]', ylabel: 'andel af maks', fx: function (x) { return F(x, 1); }, fy: function (y) { return F(y * 100, 0) + '%'; } });
+  gT.line(S.hist.filter(function (p) { return p[0] >= t0; }).map(function (p) { return [p[0], p[1] / Wm]; }), '#5ec8ff', 2.2);
+  gT.line(S.hist.filter(function (p) { return p[0] >= t0; }).map(function (p) { return [p[0], p[2] / Im]; }), '#ff7a59', 2.2);
+  gT.text(t0 + 0.05, 1.03, 'ω (af tomgang)', '#5ec8ff'); gT.text(t0 + (Math.max(t0 + 1, S.t) - t0) * 0.45, 1.03, 'I_a (af startstrøm)', '#ff7a59'); gT.end();
+  UI.formulas.innerHTML =
+    Lab.F('V = E<sub>a</sub> + R<sub>a</sub>I<sub>a</sub> ⇒ I<sub>a</sub> = (V − kφω)/R<sub>a</sub> = (' + n(S.V, 1) + ' − ' + n(Ea2, 2) + ')/' + n(S.Ra, 2) + ' = ' + n(Ia, 2) + ' A', 'Ankerkredsens spændingsligning (slides dag 7). E<sub>a</sub> = kφω er den inducerede spænding.') +
+    Lab.F('T = kφI<sub>a</sub> = ' + n(S.kphi, 3) + '·' + n(Ia, 2) + ' = ' + n(T2, 3) + ' N·m', 'Ankermomentet: summen af F = BIL på alle ledere gange armen r.') +
+    Lab.F('Stationær fart: ω = V/(kφ) − R<sub>a</sub>T<sub>last</sub>/(kφ)² = ' + n(wss, 1) + ' rad/s = ' + n(wss * 60 / (2 * PI), 0) + ' o/min', 'Skæringen mellem motorens karakteristik og lastmomentet.');
+  lab.render(rdt);
+}, { button: pauseBtn, flag: UI.paused });
+})();
+</script>
+</body>
+</html>

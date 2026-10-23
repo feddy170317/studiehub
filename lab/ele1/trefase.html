@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trefase · 3D-lab</title>
+<meta name="description" content="Tre faser forskudt 120°: fasorstjernen, linje- og fasespænding, stjerne- og trekantforbindelse, effekt og strømmen i nullederen ved symmetrisk og usymmetrisk last.">
+<link rel="stylesheet" href="../assets/lab.css">
+</head>
+<body>
+<script src="../assets/three.min.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+'use strict';
+var F = Lab.fmt, n = Lab.n, PI = Math.PI;
+var UI = Lab.build({
+  chip: 'ELE1 · dag 9–10 · Rizzoni kap. 6.5', title: 'Trefase: fasorstjernen, Y og Δ og nullederen',
+  src: 'Slides og bog dag 9–10: V<sub>L</sub> = √3·V<sub>f</sub>, P = √3·V<sub>L</sub>I<sub>L</sub>cos θ, stjerne- og trekantforbindelse',
+  side: ['Net', 'Belastning', 'Aflæsning'],
+  graphs: [{ id: 'gF', title: 'Fasordiagram', sub: 'fasespændinger, linjespænding og strømme' }, { id: 'gT', title: 'Strømme over tid', sub: 'i<sub>a</sub> + i<sub>b</sub> + i<sub>c</sub> = i<sub>N</sub>' }],
+  notes: '<li>Tre spændinger med samme amplitude og 120° imellem. Læg dem sammen som vektorer: <b>summen er nul</b>. Det er hele idéen med trefase.</li>' +
+    '<li>Ved <b>symmetrisk last</b> er strømmene også symmetriske, og deres sum er nul: der løber ingen strøm i nullederen. Den kan i princippet undværes (som i en motor).</li>' +
+    '<li>Gør én fase anderledes (usymmetri), og nullederen skal pludselig bære en strøm. Se partiklerne i den blå leder.</li>' +
+    '<li>Linjespændingen er forskellen mellem to fasespændinger: |V<sub>a</sub> − V<sub>b</sub>| = √3·V<sub>f</sub>. I Danmark er det 400 V mellem faserne og 230 V til nul.</li>' +
+    '<li>Den samlede trefase-effekt er <b>konstant i tid</b> (ved symmetri), i modsætning til enfase-effekten, der pulserer. Det giver motorer et jævnt moment.</li>',
+  model: '<li>Ideelt, symmetrisk net. Belastningen er en impedans pr. fase (samme vinkel θ). Usymmetri: fase c får en anden størrelse impedans.</li>' +
+    '<li>Δ-forbindelse er vist for symmetrisk last: fasestrømmen i hver gren og linjestrømmen I<sub>L</sub> = √3·I<sub>f</sub>.</li>'
+});
+var lab = Lab.scene(UI.stage, { view: { target: new THREE.Vector3(0.6, 0.2, 0), theta: 0.3, phi: 1.1, radius: 5.2 } });
+var S = { Vf: 230, f: 50, Z: 23, th: 30, unb: 1, conn: 'Y', t: 0 };
+var COLS = [0x8a5a2b, 0x1a1f26, 0x8fa3b8], CSS = ['#c08a3e', '#e3e9ef', '#8fa3b8'], NM = ['L1', 'L2', 'L3'];
+
+/* ---------- 3D ---------- */
+var star = new THREE.Group(); star.position.set(-1.6, 0.3, 0); lab.scene.add(star);
+var disc = new THREE.Mesh(new THREE.CircleGeometry(1.0, 64), new THREE.MeshBasicMaterial({ color: 0x1a3a5c, transparent: true, opacity: 0.35, side: THREE.DoubleSide })); star.add(disc);
+var ph = [0xff7a59, 0xffd27a, 0x5ec8ff], phAr = [], phTag = [];
+for (var k = 0; k < 3; k++) { var a = Lab.arrow(ph[k], { radius: 0.03 }); star.add(a); phAr.push(a); phTag.push(Lab.tag(lab, NM[k], '#' + ph[k].toString(16))); }
+var lineAB = Lab.arrow(0xd984ff, { radius: 0.018 }); star.add(lineAB); var tagLL = Lab.tag(lab, '', '#d984ff');
+// belastninger
+var loads = new THREE.Group(); loads.position.set(1.6, 0, 0); lab.scene.add(loads);
+var lp = [[0, 0.9], [-0.8, -0.5], [0.8, -0.5]], boxes = [], wires = [];
+for (k = 0; k < 3; k++) { var bx = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.5, 0.35), Lab.mat(ph[k], { metal: 0.2 })); bx.position.set(lp[k][0], lp[k][1], 0); loads.add(bx); boxes.push(bx); }
+var starPt = new THREE.Mesh(new THREE.SphereGeometry(0.08, 16, 12), Lab.mat(0xffffff)); loads.add(starPt);
+var nWire = Lab.rod(0.03, Lab.mat(0x2f7fd1)); loads.add(nWire); nWire.between(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -1.4));
+var dEdges = []; for (k = 0; k < 3; k++) { var e = Lab.rod(0.025, Lab.mat(0xd9a441)); loads.add(e); dEdges.push(e); }
+var yLegs = []; for (k = 0; k < 3; k++) { var y = Lab.rod(0.025, Lab.mat(0xd9a441)); loads.add(y); yLegs.push(y); }
+var NP = 18, partSets = [];
+for (k = 0; k < 4; k++) { var arr = new Float32Array(NP * 3), pts = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial({ color: k < 3 ? ph[k] : 0x5ec8ff, size: 0.09, transparent: true, depthWrite: false })); pts.geometry.setAttribute('position', new THREE.BufferAttribute(arr, 3)); loads.add(pts); partSets.push({ p: pts, a: arr, off: 0 }); }
+var tagIn = Lab.tag(lab, '', '#5ec8ff');
+
+/* ---------- kontroller ---------- */
+var c = UI.side;
+Lab.slider(c[0], { label: 'Fasespænding V<sub>f</sub> (rms)', min: 50, max: 400, step: 1, value: S.Vf, unit: 'V', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.Vf = v; } });
+Lab.seg(c[0], { label: 'Forbindelse', value: 'Y', options: [{ value: 'Y', label: 'Stjerne (Y)' }, { value: 'D', label: 'Trekant (Δ)' }], onChange: function (v) { S.conn = v; if (v === 'D') { S.unb = 1; su.set(1, true); } } });
+Lab.slider(c[1], { label: 'Impedans pr. fase |Z|', min: 2, max: 200, step: 1, value: S.Z, unit: 'Ω', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.Z = v; } });
+Lab.slider(c[1], { label: 'Impedansvinkel θ', min: -60, max: 85, step: 1, value: S.th, unit: '°', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.th = v; } });
+var su = Lab.slider(c[1], { label: 'Usymmetri: |Z| i L3 ganges med', min: 0.2, max: 5, step: 0.05, value: 1, unit: '×', fmt: function (x) { return F(x, 2); }, onInput: function (v) { S.unb = v; }, sub: 'Kun i stjerne med nulleder.' });
+Lab.presets(c[1], [['<b>Dansk net:</b> 230/400 V, symmetrisk motorlast', function () { S.Vf = 230; S.unb = 1; su.set(1, true); }], ['<b>Én fase næsten afbrudt:</b> Z<sub>L3</sub> × 5', function () { S.unb = 5; S.conn = 'Y'; su.set(5, true); }]]);
+var pauseBtn = Lab.button(Lab.btnRow(c[1]), '⏸ Pause', '', function () {});
+var ro = Lab.readouts(c[2], [['VL', 'Linjespænding V<sub>L</sub> = √3·V<sub>f</sub>'], ['If', 'Fasestrøm I<sub>f</sub>'], ['IL', 'Linjestrøm I<sub>L</sub>'], ['IN', 'Strøm i nullederen I<sub>N</sub>'], '-', ['P', 'P = √3·V<sub>L</sub>I<sub>L</sub>cos θ'], ['Q', 'Q'], ['S', 'S']]);
+Lab.legendKeys(UI.legend, [['#ff7a59', 'L1'], ['#ffd27a', 'L2'], ['#5ec8ff', 'L3 og nulleder N'], ['#d984ff', 'linjespænding V<sub>L1</sub> − V<sub>L2</sub>']]);
+
+function cx(re, im) { return { re: re, im: im }; }
+function calc() {
+  var Vs = [0, 1, 2].map(function (k) { var a2 = -k * 2 * PI / 3; return cx(S.Vf * Math.cos(a2), S.Vf * Math.sin(a2)); });
+  var th = S.th * PI / 180, Zk = [S.Z, S.Z, S.Z * (S.conn === 'Y' ? S.unb : 1)];
+  var Is = Vs.map(function (V, k) { var m = Math.hypot(V.re, V.im) / Zk[k], a2 = Math.atan2(V.im, V.re) - th; return cx(m * Math.cos(a2), m * Math.sin(a2)); });
+  if (S.conn === 'D') { var VL = Math.sqrt(3) * S.Vf, If = VL / S.Z, IL = Math.sqrt(3) * If; return { Vs: Vs, Is: Is, IN: cx(0, 0), VL: VL, If: If, IL: IL, P: 3 * VL * If * Math.cos(th), Q: 3 * VL * If * Math.sin(th), th: th }; }
+  var IN = cx(Is[0].re + Is[1].re + Is[2].re, Is[0].im + Is[1].im + Is[2].im), P = 0, Q = 0;
+  Is.forEach(function (I, k) { var m = Math.hypot(I.re, I.im); P += S.Vf * m * Math.cos(th); Q += S.Vf * m * Math.sin(th); });
+  return { Vs: Vs, Is: Is, IN: IN, VL: Math.sqrt(3) * S.Vf, If: S.Vf / S.Z, IL: S.Vf / S.Z, P: P, Q: Q, th: th };
+}
+function inst(Cx, w) { return Math.SQRT2 * (Cx.re * Math.cos(w) - Cx.im * Math.sin(w)); }
+var gF = Lab.plot(UI.graphs.gF), gT = Lab.plot(UI.graphs.gT);
+Lab.loop(function (dt, rdt) {
+  var K = calc(); S.t += dt * 0.15; var w = 2 * PI * S.t;
+  // roterende fasorstjerne (i planet x–y)
+  for (k = 0; k < 3; k++) { var V = K.Vs[k], a2 = Math.atan2(V.im, V.re) + w; phAr[k].set(new THREE.Vector3(0, 0, 0.01), new THREE.Vector3(0.9 * Math.cos(a2), 0.9 * Math.sin(a2), 0)); phTag[k].set(star.position.clone().add(new THREE.Vector3(1.02 * Math.cos(a2), 1.02 * Math.sin(a2), 0))); }
+  var a0 = w, a1 = w - 2 * PI / 3, pA = new THREE.Vector3(0.9 * Math.cos(a0), 0.9 * Math.sin(a0), 0.02), pB = new THREE.Vector3(0.9 * Math.cos(a1), 0.9 * Math.sin(a1), 0.02);
+  lineAB.set(pB, pA.clone().sub(pB)); tagLL.set(star.position.clone().add(pA.clone().add(pB).multiplyScalar(0.5)).add(new THREE.Vector3(0.1, 0.1, 0)), 'V<sub>L</sub> = ' + F(K.VL, 0) + ' V');
+  // ledninger og partikler
+  var isY = S.conn === 'Y'; starPt.visible = nWire.visible = isY; dEdges.forEach(function (e) { e.visible = !isY; }); yLegs.forEach(function (y2) { y2.visible = isY; });
+  var srcPts = [new THREE.Vector3(-1.4, 1.2, 0), new THREE.Vector3(-1.4, 0.3, 0), new THREE.Vector3(-1.4, -0.6, 0)];
+  for (k = 0; k < 3; k++) {
+    var bp = new THREE.Vector3(lp[k][0], lp[k][1], 0);
+    if (isY) yLegs[k].between(bp, new THREE.Vector3(0, 0, 0)); else dEdges[k].between(bp, new THREE.Vector3(lp[(k + 1) % 3][0], lp[(k + 1) % 3][1], 0));
+    var iNow = inst(K.Is[k], w), ps = partSets[k], Imax = Math.max(Math.hypot(K.Is[k].re, K.Is[k].im) * Math.SQRT2, 1e-9);
+    ps.off += dt * 1.5 * iNow / Math.max(K.IL * Math.SQRT2, 1e-9);
+    for (var j = 0; j < NP; j++) { var u = ((j / NP + ps.off) % 1 + 1) % 1, p = srcPts[k].clone().lerp(bp, u); ps.a[j * 3] = p.x; ps.a[j * 3 + 1] = p.y; ps.a[j * 3 + 2] = p.z + 0.12; }
+    ps.p.geometry.attributes.position.needsUpdate = true; ps.p.material.opacity = 0.2 + 0.8 * Math.abs(iNow) / (Imax);
+    boxes[k].scale.set(1, isY && k === 2 ? 1 / Math.sqrt(S.unb) : 1, 1);
+  }
+  var inNow = inst(K.IN, w), psN = partSets[3], INm = Math.hypot(K.IN.re, K.IN.im);
+  psN.off += dt * 1.5 * inNow / Math.max(K.IL * Math.SQRT2, 1e-9);
+  for (j = 0; j < NP; j++) { var u2 = ((j / NP + psN.off) % 1 + 1) % 1; psN.a[j * 3] = 0; psN.a[j * 3 + 1] = 0; psN.a[j * 3 + 2] = -1.4 * u2; }
+  psN.p.geometry.attributes.position.needsUpdate = true; psN.p.visible = isY && INm > 1e-3;
+  tagIn.set(loads.position.clone().add(new THREE.Vector3(0.2, -0.2, -1.4)), isY ? 'I<sub>N</sub> = ' + F(INm, 2) + ' A' : 'ingen nulleder');
+  ro.set('VL', F(K.VL, 0) + ' V', 'hi'); ro.set('If', F(K.If, 2) + ' A'); ro.set('IL', F(K.IL, 2) + ' A'); ro.set('IN', isY ? F(INm, 3) + ' A' : '–', INm > 0.01 ? 'bad' : 'ok');
+  ro.set('P', F(K.P / 1000, 2) + ' kW', 'ok'); ro.set('Q', F(K.Q / 1000, 2) + ' kvar'); ro.set('S', F(Math.hypot(K.P, K.Q) / 1000, 2) + ' kVA');
+  Lab.setStatus(UI.status, !isY ? 'Trekant: linjespændingen ligger over hver gren' : INm < 0.01 ? 'Symmetrisk: ingen strøm i nullederen' : 'Usymmetrisk: nullederen bærer ' + F(INm, 1) + ' A', INm > 0.01 ? 'warn' : '');
+  UI.note.textContent = 'Fasorerne roterer med ω (vist langsomt)';
+  var lim = S.Vf * 1.25, isc = S.Vf / Math.max(K.IL, 1e-9) * 0.6;
+  gF.begin({ xmin: -lim, xmax: lim, ymin: -lim, ymax: lim, xlabel: 'Re', ylabel: 'Im', fx: function () { return ''; }, fy: function () { return ''; } });
+  K.Vs.forEach(function (V, k2) { gF.line([[0, 0], [V.re, V.im]], '#' + ph[k2].toString(16), 2.6); gF.text(V.re * 1.08, V.im * 1.08, 'V' + (k2 + 1), '#' + ph[k2].toString(16)); });
+  gF.line([[K.Vs[1].re, K.Vs[1].im], [K.Vs[0].re, K.Vs[0].im]], '#d984ff', 2.2); gF.text((K.Vs[0].re + K.Vs[1].re) / 2 + 10, (K.Vs[0].im + K.Vs[1].im) / 2, 'V_L = √3·V_f', '#d984ff');
+  K.Is.forEach(function (I, k2) { gF.line([[0, 0], [I.re * isc, I.im * isc]], '#' + ph[k2].toString(16), 1.4, [4, 3]); });
+  if (S.conn === 'Y' && INm > 0.01) { gF.line([[0, 0], [K.IN.re * isc, K.IN.im * isc]], '#5ec8ff', 2.4); gF.text(K.IN.re * isc, K.IN.im * isc - lim * 0.06, 'I_N', '#5ec8ff'); }
+  gF.end();
+  var Im2 = Math.max(K.IL, K.If) * Math.SQRT2 * 1.3 + 1e-9;
+  gT.begin({ xmin: 0, xmax: 2, ymin: -Im2, ymax: Im2, xlabel: 'perioder', ylabel: 'i [A]', fx: function (x) { return F(x, 1); }, fy: function (y) { return F(y, 0); } });
+  for (var q = 0; q < 3; q++) { var pts2 = []; for (j = 0; j <= 120; j++) { var x = 2 * j / 120; pts2.push([x, inst(K.Is[q], 2 * PI * x)]); } gT.line(pts2, '#' + ph[q].toString(16), 1.8); }
+  var nn = []; for (j = 0; j <= 120; j++) { x = 2 * j / 120; nn.push([x, inst(K.IN, 2 * PI * x)]); } gT.line(nn, '#5ec8ff', 2.6); gT.vline((S.t % 2 + 2) % 2, 'rgba(255,255,255,.6)');
+  gT.text(0.03, Im2 * 0.9, 'i_N (tyk blå)', '#5ec8ff'); gT.end();
+  UI.formulas.innerHTML =
+    Lab.F('V<sub>L</sub> = |V<sub>1</sub> − V<sub>2</sub>| = √3·V<sub>f</sub> = √3·' + n(S.Vf, 0) + ' = ' + n(K.VL, 0) + ' V', 'Linjespændingen er 30° foran fasespændingen (fasordiagrammet).') +
+    (S.conn === 'Y' ? Lab.F('Y: I<sub>L</sub> = I<sub>f</sub> = V<sub>f</sub>/|Z| = ' + n(K.If, 2) + ' A;&nbsp; I<sub>N</sub> = I<sub>1</sub> + I<sub>2</sub> + I<sub>3</sub> = ' + n(INm, 3) + ' A', 'Kirchhoffs strømlov i stjernepunktet. Ved symmetri er fasorsummen nul.')
+      : Lab.F('Δ: I<sub>f</sub> = V<sub>L</sub>/|Z| = ' + n(K.If, 2) + ' A,&nbsp; I<sub>L</sub> = √3·I<sub>f</sub> = ' + n(K.IL, 2) + ' A', 'I trekant ligger linjespændingen over hver gren. Samme impedans i Δ trækker 3 gange så meget effekt som i Y.')) +
+    Lab.F('P = √3·V<sub>L</sub>I<sub>L</sub>cos θ = √3·' + n(K.VL, 0) + '·' + n(K.IL, 2) + '·cos ' + n(S.th, 0) + '° = ' + n(K.P / 1000, 2) + ' kW', 'Trefaset effekt (symmetrisk). Ved usymmetri lægges de tre faser sammen hver for sig.');
+  lab.render(rdt);
+}, { button: pauseBtn, flag: UI.paused });
+})();
+</script>
+</body>
+</html>
