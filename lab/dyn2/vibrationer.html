@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vibrationer · 3D-lab</title>
+<meta name="description" content="Frie svingninger: masse-fjeder-dæmper, matematisk og fysisk pendul samt en stang med fjeder og dæmper. Egenfrekvens, dæmpningsforhold og kritisk dæmpning.">
+<link rel="stylesheet" href="../assets/lab.css">
+</head>
+<body>
+<script src="../assets/three.min.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+'use strict';
+var F = Lab.fmt, n = Lab.n, PI = Math.PI, g = 9.81;
+var UI = Lab.build({
+  chip: 'DYN2 · HI 22.1, 22.2, 22.4 · eksamenssæt A25 nr. 7', title: 'Frie svingninger med og uden dæmpning',
+  src: 'Slides Vibrationer I–III: ẍ + ω<sub>n</sub>²x = 0, energimetoden og mẍ + cẋ + kx = 0 (under-, kritisk og overdæmpet)',
+  side: ['System', 'Parametre', 'Start og afspilning', 'Aflæsning'],
+  graphs: [{ id: 'gX', title: 'Udsving over tid', sub: 'simulation og indhyldningskurve e<sup>−γt</sup>' }, { id: 'gP', title: 'Faseportræt', sub: 'hastighed mod udsving' }],
+  notes: '<li>ω<sub>n</sub> afhænger kun af systemet (k/m, g/l eller mgd/I<sub>O</sub>), <b>ikke af hvor hårdt du skubber</b>. Skift startudsvinget, og perioden er den samme (for små udsving).</li>' +
+    '<li>Mange forskellige systemer har samme bevægelsesligning ẍ + ω<sub>n</sub>²x = 0 og derfor samme opførsel (slides Vibrationer I).</li>' +
+    '<li>Matematisk pendul: lineariseringen sin θ ≈ θ gælder kun for små vinkler. Giv det 90° og se den rigtige periode blive længere end 2π√(l/g).</li>' +
+    '<li><b>Dæmpning:</b> under c<sub>c</sub> = 2mω<sub>n</sub> svinger systemet med aftagende amplitude. Ved præcis c<sub>c</sub> kommer det hurtigst muligt til ro uden at svinge. Over c<sub>c</sub> kryber det langsomt tilbage.</li>' +
+    '<li>Stangen med fjeder og dæmper: dæmperens effekt vokser med <b>a²</b> (armen i anden). Flyt dæmperen udad for at gå fra underdæmpet til kritisk dæmpet. Det er del (c) i eksamensopgaven.</li>',
+  model: '<li>Lineær viskøs dæmper F = cẋ. Pendulerne er uden dæmpning, og det matematiske pendul simuleres med den eksakte sin θ.</li>' +
+    '<li>Stangen er slank og homogen, leddet i A (I<sub>A</sub> = mL²/3), vandret i ligevægt. Fjeder og dæmper sidder lodret i afstand b og a fra A. Små udsving: I<sub>A</sub>θ̈ + ca²θ̇ + kb²θ = 0 (tyngden går ud mod fjederens forspænding).</li>'
+});
+var lab = Lab.scene(UI.stage, { view: { target: new THREE.Vector3(0, 0.6, 0), theta: 0.3, phi: 1.35, radius: 4.4 } });
+var S = { mode: 'msd', m: 2, k: 50, c: 1.5, l: 1.2, Lr: 1.2, mr: 30, kr: 2000, br: 0.6, cr: 150, ar: 0.9, x0: 0.25, v0: 0, th0: 20, t: 0, x: [0, 0], hist: [], speed: 1 };
+
+/* ---------- 3D ---------- */
+var G = { msd: new THREE.Group(), pen: new THREE.Group(), phy: new THREE.Group(), rod: new THREE.Group() }; Object.keys(G).forEach(function (k) { lab.scene.add(G[k]); });
+var dark = Lab.mat(0x2b3c50, { metal: 0.3, rough: 0.7 });
+// masse-fjeder-dæmper
+var ceil = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.1, 0.6), dark); ceil.position.y = 2.1; G.msd.add(ceil);
+var spr = Lab.spring({ R: 0.12, wire: 0.012, turns: 12 }); G.msd.add(spr);
+var mass = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.35, 0.4), Lab.mat(0xff7a59)); G.msd.add(mass);
+var dCyl = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.6, 20), Lab.mat(0x8a9db3, { opacity: 0.7 })); G.msd.add(dCyl);
+var dRod = Lab.rod(0.02, Lab.mat(0xe3e9ef, { metal: 0.6 })); G.msd.add(dRod);
+var eqLine = Lab.line(0xffd27a, true, 0.7); G.msd.add(eqLine);
+// matematisk pendul
+var pPiv = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.3, 16), Lab.mat(0xffd27a)); pPiv.rotation.x = PI / 2; pPiv.position.y = 2; G.pen.add(pPiv);
+var pStr = Lab.line(0xe3e9ef, false, 0.9); G.pen.add(pStr);
+var bob = new THREE.Mesh(new THREE.SphereGeometry(0.12, 24, 16), Lab.mat(0xff7a59)); G.pen.add(bob);
+var pArc = Lab.line(0x8fa3b8, true, 0.5); G.pen.add(pArc);
+// fysisk pendul (stang)
+var fPiv = pPiv.clone(); G.phy.add(fPiv); var fRod = Lab.rod(0.05, Lab.mat(0xc08a3e, { metal: 0.2 })); G.phy.add(fRod);
+// stang med fjeder og dæmper
+var rPiv = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.3, 16), Lab.mat(0xffd27a)); rPiv.rotation.x = PI / 2; G.rod.add(rPiv);
+var rBar = Lab.rod(0.045, Lab.mat(0xc08a3e, { metal: 0.2 })); G.rod.add(rBar);
+var rSpr = Lab.spring({ R: 0.07, wire: 0.009, turns: 10 }); G.rod.add(rSpr);
+var rDc = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.45, 20), Lab.mat(0x8a9db3, { opacity: 0.7 })); G.rod.add(rDc); var rDr = Lab.rod(0.018, Lab.mat(0xe3e9ef)); G.rod.add(rDr);
+var rFloor = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.08, 0.5), dark); rFloor.position.set(0.9, -0.95, 0); G.rod.add(rFloor);
+var tagA = Lab.tag(lab, '', '#e3e9ef'), tagB = Lab.tag(lab, '', '#8fa3b8'), tagC = Lab.tag(lab, '', '#8fa3b8');
+
+/* ---------- kontroller ---------- */
+var c = UI.side;
+Lab.seg(c[0], { value: 'msd', options: [{ value: 'msd', label: 'Masse-fjeder' }, { value: 'pen', label: 'Mat. pendul' }, { value: 'phy', label: 'Stang-pendul' }, { value: 'rod', label: 'Stang + dæmper' }], onChange: function (v) { S.mode = v; ui(); reset(); } });
+var bx = {}; ['msd', 'pen', 'phy', 'rod'].forEach(function (k) { bx[k] = document.createElement('div'); c[1].appendChild(bx[k]); });
+var sls = {};
+function sl(box, key, label, min, max, step, unit, d) { sls[key] = Lab.slider(box, { label: label, min: min, max: max, step: step, value: S[key], unit: unit, fmt: function (x) { return F(x, d); }, onInput: function (v) { S[key] = v; reset(); } }); }
+sl(bx.msd, 'm', 'Masse m', 0.2, 10, 0.1, 'kg', 1); sl(bx.msd, 'k', 'Fjederkonstant k', 5, 300, 1, 'N/m', 0); sl(bx.msd, 'c', 'Dæmpning c', 0, 60, 0.1, 'N·s/m', 1);
+var crit = Lab.btnRow(bx.msd); Lab.button(crit, 'c = c<sub>c</sub> (kritisk)', 'primary', function () { S.c = 2 * Math.sqrt(S.k * S.m); sls.c.set(S.c, true); reset(); }); Lab.button(crit, 'c = 0', '', function () { S.c = 0; sls.c.set(0, true); reset(); });
+sl(bx.pen, 'l', 'Snorlængde l', 0.3, 2, 0.05, 'm', 2);
+sl(bx.phy, 'l', 'Stangens længde l', 0.3, 2, 0.05, 'm', 2);
+sl(bx.rod, 'mr', 'Stangens masse m', 5, 80, 1, 'kg', 0); sl(bx.rod, 'Lr', 'Stangens længde L', 0.6, 1.8, 0.05, 'm', 2); sl(bx.rod, 'kr', 'Fjederkonstant k', 200, 8000, 50, 'N/m', 0); sl(bx.rod, 'br', 'Fjederens afstand b fra A', 0.1, 1.8, 0.05, 'm', 2);
+sl(bx.rod, 'cr', 'Dæmpning c', 0, 800, 5, 'N·s/m', 0); sl(bx.rod, 'ar', 'Dæmperens afstand a fra A', 0.1, 1.8, 0.05, 'm', 2);
+Lab.button(Lab.btnRow(bx.rod), 'Flyt dæmperen til kritisk dæmpning', 'primary', function () { var p = rodP(); S.ar = Math.min(S.Lr, Math.sqrt(2 * Math.sqrt(S.kr * S.br * S.br * p.I) / Math.max(S.cr, 1e-6))); sls.ar.set(S.ar, true); reset(); });
+var sx0 = Lab.slider(c[2], { label: 'Startudsving', min: 0.02, max: 1, step: 0.01, value: 0.25, unit: '', fmt: function (x) { return S.mode === 'msd' ? F(x, 2) + ' m' : F(x * 180, 0) + '°'; }, onInput: function (v) { S.x0 = v; reset(); } });
+Lab.slider(c[2], { label: 'Afspilningstempo', min: 0.1, max: 2, step: 0.05, value: 1, unit: '×', fmt: function (x) { return F(x, 2); }, onInput: function (v) { S.speed = v; } });
+var br = Lab.btnRow(c[2]); var pauseBtn = Lab.button(br, '⏸ Pause', '', function () {}); Lab.button(br, '↺ Slip igen', 'primary', reset);
+var ro = Lab.readouts(c[3], [['wn', 'Egenfrekvens ω<sub>n</sub>'], ['f', 'f = ω<sub>n</sub>/2π'], ['tau', 'Periode τ = 2π/ω<sub>n</sub>'], '-', ['z', 'Dæmpningsforhold ζ = c/c<sub>c</sub>'], ['wd', 'ω<sub>d</sub> = ω<sub>n</sub>√(1−ζ²)'], ['typ', 'Type']]);
+Lab.legendKeys(UI.legend, [['#ff7a59', 'svingende masse'], ['#ffd27a', 'ligevægt / led'], ['#8a9db3', 'viskøs dæmper']]);
+
+function rodP() { var I = S.mr * S.Lr * S.Lr / 3; return { I: I, keq: S.kr * S.br * S.br, ceq: S.cr * S.ar * S.ar }; }
+function params() { // ẍ + 2ζω_n ẋ + ω_n²x = 0 (pendul: eksakt sin)
+  if (S.mode === 'msd') { var wn = Math.sqrt(S.k / S.m), cc = 2 * S.m * wn; return { wn: wn, z: S.c / cc, cc: cc, unit: 'm' }; }
+  if (S.mode === 'pen') return { wn: Math.sqrt(g / S.l), z: 0, unit: 'rad' };
+  if (S.mode === 'phy') return { wn: Math.sqrt(3 * g / (2 * S.l)), z: 0, unit: 'rad' };
+  var p = rodP(), wn2 = Math.sqrt(p.keq / p.I), cc2 = 2 * Math.sqrt(p.keq * p.I); return { wn: wn2, z: p.ceq / cc2, cc: cc2, unit: 'rad', I: p.I };
+}
+function acc(x, v) {
+  var P = params();
+  if (S.mode === 'pen') return -g / S.l * Math.sin(x);
+  if (S.mode === 'phy') return -1.5 * g / S.l * Math.sin(x);
+  return -2 * P.z * P.wn * v - P.wn * P.wn * x;
+}
+function ui() { Object.keys(G).forEach(function (k) { G[k].visible = k === S.mode; bx[k].style.display = k === S.mode ? '' : 'none'; }); sx0.show();
+  var V = { msd: [0, 1.25, 4.2], pen: [0, 1.0, 4.6], phy: [0, 1.0, 4.6], rod: [0.9, -0.1, 3.9] }[S.mode]; lab.setView({ target: new THREE.Vector3(V[0], V[1], 0), radius: V[2], theta: 0.3, phi: 1.35 }, true); }
+function reset() { S.t = 0; S.hist = []; var x0 = S.mode === 'msd' ? S.x0 : S.x0 * PI; if (S.mode === 'rod') x0 = Math.min(x0, 0.35); S.x = [x0, 0]; }
+ui(); reset();
+var gX = Lab.plot(UI.graphs.gX), gP = Lab.plot(UI.graphs.gP);
+Lab.loop(function (dt, rdt) {
+  var P = params(), h = dt * S.speed / 10;
+  for (var i = 0; i < 10 && dt > 0; i++) {
+    var x = S.x, k1 = [x[1], acc(x[0], x[1])], k2 = [x[1] + h / 2 * k1[1], acc(x[0] + h / 2 * k1[0], x[1] + h / 2 * k1[1])], k3 = [x[1] + h / 2 * k2[1], acc(x[0] + h / 2 * k2[0], x[1] + h / 2 * k2[1])], k4 = [x[1] + h * k3[1], acc(x[0] + h * k3[0], x[1] + h * k3[1])];
+    S.x = [x[0] + h / 6 * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]), x[1] + h / 6 * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1])]; S.t += h;
+  }
+  if (dt > 0) { S.hist.push([S.t, S.x[0], S.x[1]]); if (S.hist.length > 1500) S.hist.shift(); }
+  var X = S.x[0];
+  if (S.mode === 'msd') {
+    var yeq = 0.9, ym = yeq - X * 1.4; mass.position.set(0, ym, 0); spr.between(new THREE.Vector3(-0.1, 2.05, 0), new THREE.Vector3(-0.1, ym + 0.17, 0));
+    dCyl.position.set(0.17, 1.6, 0); dRod.between(new THREE.Vector3(0.17, 1.4, 0), new THREE.Vector3(0.17, ym + 0.17, 0)); dCyl.visible = dRod.visible = S.c > 0;
+    eqLine.set([new THREE.Vector3(-0.6, yeq, 0.25), new THREE.Vector3(0.6, yeq, 0.25)]); tagA.set(new THREE.Vector3(0.45, ym, 0.2), 'x = ' + F(X, 3) + ' m'); tagB.set(new THREE.Vector3(-0.85, yeq, 0.25), 'ligevægt'); tagC.set(new THREE.Vector3(0.35, 1.7, 0), S.c > 0 ? 'c' : '');
+  } else if (S.mode === 'pen') {
+    var L = S.l * 1.2, piv = new THREE.Vector3(0, 2, 0), b = new THREE.Vector3(L * Math.sin(X), 2 - L * Math.cos(X), 0); bob.position.copy(b); pStr.set([piv, b]);
+    var ap = []; for (i = 0; i <= 40; i++) { var q = -S.x0 * PI + 2 * S.x0 * PI * i / 40; ap.push(new THREE.Vector3(L * Math.sin(q), 2 - L * Math.cos(q), -0.05)); } pArc.set(ap);
+    tagA.set(b.clone().add(new THREE.Vector3(0.2, 0, 0)), 'θ = ' + F(X * 180 / PI, 1) + '°'); tagB.set(new THREE.Vector3(0, 2.25, 0), 'l = ' + F(S.l, 2) + ' m'); tagC.set(new THREE.Vector3(0, 0, 0), '');
+  } else if (S.mode === 'phy') {
+    var L2 = S.l * 1.2, tip = new THREE.Vector3(L2 * Math.sin(X), 2 - L2 * Math.cos(X), 0); fPiv.position.set(0, 2, 0); fRod.between(new THREE.Vector3(0, 2, 0), tip);
+    tagA.set(tip.clone().add(new THREE.Vector3(0.2, 0, 0)), 'θ = ' + F(X * 180 / PI, 1) + '°'); tagB.set(new THREE.Vector3(0.2, 2.2, 0), 'O'); tagC.set(new THREE.Vector3(0, 0, 0), '');
+  } else {
+    var sc = 1.5 / Math.max(S.Lr, 1), A0 = new THREE.Vector3(0, 0.3, 0), dirv = new THREE.Vector3(Math.cos(X), Math.sin(X), 0);
+    var Lw = S.Lr * sc, endP = A0.clone().addScaledVector(dirv, Lw); rPiv.position.copy(A0); rBar.between(A0, endP);
+    var pb = A0.clone().addScaledVector(dirv, S.br * sc), pa = A0.clone().addScaledVector(dirv, Math.min(S.ar, S.Lr) * sc);
+    rSpr.between(new THREE.Vector3(pb.x, -0.9, 0.1), pb.clone().setZ(0.1)); rDc.position.set(pa.x, -0.6, -0.1); rDr.between(new THREE.Vector3(pa.x, -0.4, -0.1), pa.clone().setZ(-0.1)); rDc.visible = rDr.visible = S.cr > 0;
+    tagA.set(endP.clone().add(new THREE.Vector3(0.1, 0.15, 0)), 'θ = ' + F(X * 180 / PI, 1) + '°'); tagB.set(new THREE.Vector3(pb.x, -1.1, 0.1), 'k, b = ' + F(S.br, 2)); tagC.set(new THREE.Vector3(pa.x, -1.1, -0.1), 'c, a = ' + F(S.ar, 2));
+  }
+  var typ = !P.z ? 'udæmpet' : P.z < 0.999 ? 'underdæmpet' : P.z <= 1.001 ? 'kritisk dæmpet' : 'overdæmpet';
+  var tauExact = null;
+  if (S.mode === 'pen') { var k0 = Math.sin(S.x0 * PI / 2), Kk = PI / 2 * (1 + k0 * k0 / 4 + 9 * Math.pow(k0, 4) / 64 + 25 * Math.pow(k0, 6) / 256); tauExact = 4 * Math.sqrt(S.l / g) * Kk; }
+  ro.set('wn', F(P.wn, 3) + ' rad/s', 'hi'); ro.set('f', F(P.wn / (2 * PI), 3) + ' Hz'); ro.set('tau', F(2 * PI / P.wn, 3) + ' s' + (tauExact ? ' (eksakt ≈ ' + F(tauExact, 3) + ' s)' : ''));
+  ro.set('z', P.cc ? F(P.z, 3) : '–', P.z > 1.001 ? 'bad' : P.z > 0.999 ? 'ok' : ''); ro.set('wd', P.z < 1 ? F(P.wn * Math.sqrt(1 - P.z * P.z), 3) + ' rad/s' : '–'); ro.set('typ', typ, 'hi');
+  Lab.setStatus(UI.status, typ.charAt(0).toUpperCase() + typ.slice(1), P.z > 1.001 ? 'warn' : '');
+  UI.note.textContent = 't = ' + F(S.t, 2) + ' s · tempo ×' + F(S.speed, 2);
+  var tw = Math.max(5 * 2 * PI / P.wn, 3), t0 = Math.max(0, S.t - tw), amp = Math.max(Math.abs(S.hist.length ? S.hist[0][1] : S.x[0]), 0.01) * 1.25, X0 = Math.abs(S.mode === 'msd' ? S.x0 : (S.mode === 'rod' ? Math.min(S.x0 * PI, 0.35) : S.x0 * PI));
+  amp = X0 * 1.25;
+  gX.begin({ xmin: t0, xmax: t0 + tw, ymin: -amp, ymax: amp, xlabel: 't [s]', ylabel: P.unit === 'm' ? 'x [m]' : 'θ [rad]', fx: function (x) { return F(x, 1); }, fy: function (y) { return F(y, 2); } });
+  if (P.z > 0 && P.z < 1) { var gm = P.z * P.wn, env = [], env2 = []; for (i = 0; i <= 80; i++) { var tt = t0 + tw * i / 80, e = X0 / Math.sqrt(1 - P.z * P.z) * Math.exp(-gm * tt); env.push([tt, e]); env2.push([tt, -e]); } gX.line(env, 'rgba(255,94,94,.6)', 1.4, [5, 4]); gX.line(env2, 'rgba(255,94,94,.6)', 1.4, [5, 4]); }
+  if (S.mode === 'pen') { var lin = []; for (i = 0; i <= 200; i++) { var t2 = t0 + tw * i / 200; lin.push([t2, X0 * Math.cos(P.wn * t2)]); } gX.line(lin, 'rgba(94,200,255,.55)', 1.4, [5, 4]); gX.text(t0 + tw * 0.02, -amp * 0.88, 'stiplet: lineariseret sin θ ≈ θ', '#5ec8ff'); }
+  gX.line(S.hist.filter(function (p) { return p[0] >= t0; }).map(function (p) { return [p[0], p[1]]; }), '#ff7a59', 2.2); gX.hline(0, 'rgba(255,210,122,.5)'); gX.end();
+  var vm = Math.max(X0 * P.wn * 1.25, 0.01);
+  gP.begin({ xmin: -amp, xmax: amp, ymin: -vm, ymax: vm, xlabel: P.unit === 'm' ? 'x' : 'θ', ylabel: P.unit === 'm' ? 'ẋ [m/s]' : 'θ̇ [rad/s]', fx: function (x) { return F(x, 2); }, fy: function (y) { return F(y, 1); } });
+  gP.line(S.hist.map(function (p) { return [p[1], p[2]]; }), '#ffd27a', 1.8); gP.dot(S.x[0], S.x[1], '#ff7a59', 5); gP.end();
+  var f;
+  if (S.mode === 'msd') f = Lab.F('mẍ + cẋ + kx = 0, &nbsp;ω<sub>n</sub> = √(k/m) = √(' + n(S.k, 0) + '/' + n(S.m, 1) + ') = ' + n(P.wn, 3) + ' rad/s', 'Newton II på massen (22-1). Tyngden går ud mod fjederens forspænding, når x måles fra ligevægt (slides Vibrationer I, s. 5).') + Lab.F('c<sub>c</sub> = 2mω<sub>n</sub> = ' + n(P.cc, 2) + ' N·s/m, &nbsp;ζ = c/c<sub>c</sub> = ' + n(P.z, 3) + ', &nbsp;γ = c/(2m) = ' + n(S.c / (2 * S.m), 3) + ' s⁻¹', 'Karakteristisk ligning mλ² + cλ + k = 0. Under kritisk: x = De<sup>−γt</sup>sin(ω<sub>d</sub>t + φ) (slides Vibrationer III).');
+  else if (S.mode === 'pen') f = Lab.F('ml²θ̈ + mgl sin θ = 0 ≈ ml²θ̈ + mglθ = 0 ⇒ ω<sub>n</sub> = √(g/l) = ' + n(P.wn, 3) + ' rad/s', 'Udledt med energimetoden: dE/dt = 0 (slides Vibrationer II). Lineariseringen gælder kun for små θ.') + Lab.F('τ = 2π√(l/g) = ' + n(2 * PI / P.wn, 3) + ' s (lineær) mod ' + n(tauExact, 3) + ' s (eksakt ved ' + n(S.x0 * 180, 0) + '°)');
+  else if (S.mode === 'phy') f = Lab.F('I<sub>O</sub>θ̈ + mgd sin θ = 0 ⇒ ω<sub>n</sub> = √(mgd/I<sub>O</sub>), slank stang: I<sub>O</sub> = ml²/3, d = l/2 ⇒ ω<sub>n</sub> = √(3g/(2l)) = ' + n(P.wn, 3) + ' rad/s', 'Fysisk pendul (slides Vibrationer I, s. 4). En stang svinger hurtigere end et matematisk pendul med samme længde, fordi massen er tættere på O.');
+  else { var Pp = rodP(); f = Lab.F('I<sub>A</sub>θ̈ + ca²θ̇ + kb²θ = 0, I<sub>A</sub> = mL²/3 = ' + n(Pp.I, 2) + ' kg·m² ⇒ ω<sub>n</sub> = √(kb²/I<sub>A</sub>) = ' + n(P.wn, 3) + ' rad/s', 'Momentligning om A for små udsving: fjederen giver moment kb²θ og dæmperen ca²θ̇.') + Lab.F('ζ = ca²/(2√(kb²·I<sub>A</sub>)) = ' + n(P.z, 3) + ';&nbsp; kritisk når a = √(2√(kb²I<sub>A</sub>)/c) = ' + n(Math.sqrt(2 * Math.sqrt(Pp.keq * Pp.I) / Math.max(S.cr, 1e-6)), 3) + ' m', 'Del (c) i eksamensopgaven: hvor skal dæmperen sidde for kritisk dæmpning? Dæmpet periode τ<sub>d</sub> = 2π/ω<sub>d</sub>' + (P.z < 1 ? ' = ' + F(2 * PI / (P.wn * Math.sqrt(1 - P.z * P.z)), 3) + ' s' : '') + '.'); }
+  UI.formulas.innerHTML = f;
+  lab.render(rdt);
+}, { button: pauseBtn, flag: UI.paused });
+})();
+</script>
+</body>
+</html>

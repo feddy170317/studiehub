@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arbejde og energi · 3D-lab</title>
+<meta name="description" content="Energibevarelse for stive legemer: stang med fjeder, rulning ned ad skråplan og skive med lod. Se T, V_g, V_e og andet arbejde ændre sig, mens summen holder.">
+<link rel="stylesheet" href="../assets/lab.css">
+</head>
+<body>
+<script src="../assets/three.min.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+'use strict';
+var F = Lab.fmt, n = Lab.n, PI = Math.PI, g = 9.81;
+var UI = Lab.build({
+  chip: 'DYN2 · HI 18.1–18.5 · Energi I–II', title: 'Arbejde og energi for stive legemer',
+  src: 'Slides Energi I–II: T = ½mv<sub>G</sub>² + ½I<sub>G</sub>ω², V<sub>g</sub> = mgy, V<sub>e</sub> = ½ks², T<sub>1</sub> + V<sub>1</sub> + ΣU<sub>andre</sub> = T<sub>2</sub> + V<sub>2</sub>',
+  side: ['System', 'Parametre', 'Aflæsning'],
+  graphs: [{ id: 'gB', title: 'Energiregnskab lige nu', sub: 'søjlerne summer til startenergien' }, { id: 'gT', title: 'Energi over tid', sub: '' }],
+  notes: '<li><b>Energien flytter rundt, men summen er konstant</b>, når der ikke er friktion eller tilført arbejde. Se søjlerne bytte plads, mens den hvide linje (total) ligger stille.</li>' +
+    '<li>For et stift legeme består T af <b>translation og rotation</b>: T = ½mv<sub>G</sub>² + ½I<sub>G</sub>ω². En ring ned ad et skråplan bruger halvdelen af energien på at rotere og kommer langsommere ned end en kugle.</li>' +
+    '<li>Med fast akse i O kan du skrive T = ½I<sub>O</sub>ω² direkte (18-5). Stangen svinger om O, så det er nemmest her.</li>' +
+    '<li>Friktion i lejet er "andet arbejde" U<sub>andre</sub> &lt; 0. Det tager energi ud af systemet (den røde søjle), og summen af T + V falder.</li>' +
+    '<li>Normalkraft, statisk friktion ved ren rulning og reaktioner i faste lejer udfører <b>intet arbejde</b> (slides Energi I, s. 4).</li>',
+  model: '<li>Bevægelsesligningerne er integreret numerisk (RK4) ud fra energiudtrykkene. Ingen luftmodstand. Ren rulning uden glidning på skråplanet.</li>' +
+    '<li>Stangen er slank og homogen: I<sub>O</sub> = ml²/3. Fjederen går fra stangens spids til et fast punkt og er afslappet ved længden s<sub>0</sub>.</li>'
+});
+var lab = Lab.scene(UI.stage, { view: { target: new THREE.Vector3(0, 0.2, 0), theta: 0.0, phi: 1.42, radius: 5.4 } });
+var S = { mode: 'rod', m: 4, l: 1.2, k: 40, th0: 90, s0: 0.6, cf: 0, body: 'disk', beta: 25, Lr: 3, R: 0.25, M: 6, mb: 2, Mf: 0, hb: 2, t: 0, x: [0, 0], E0: 0, Uo: 0, hist: [] };
+var BODY = { ring: ['Tynd ring', 1], disk: ['Massiv skive', 0.5], sphere: ['Massiv kugle', 0.4], slide: ['Glidende klods (friktionsfri)', 0] };
+
+/* ---------- 3D ---------- */
+var grpRod = new THREE.Group(), grpInc = new THREE.Group(), grpPul = new THREE.Group(); [grpRod, grpInc, grpPul].forEach(function (gp) { lab.scene.add(gp); });
+var pin = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.4, 16), Lab.mat(0xffd27a)); pin.rotation.x = PI / 2; grpRod.add(pin);
+var rod = Lab.rod(0.04, Lab.mat(0xc08a3e, { metal: 0.2 })); grpRod.add(rod);
+var anchor = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.15, 0.3), Lab.mat(0x2b3c50)); grpRod.add(anchor);
+var spr = Lab.spring({ R: 0.05, wire: 0.008, turns: 14 }); grpRod.add(spr);
+var support = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.9, 0.3), Lab.mat(0x2b3c50)); support.position.set(0, 0.5, -0.2); grpRod.add(support);
+var wedge = new THREE.Mesh(undefined, Lab.mat(0x22384f, { rough: 0.9 })); grpInc.add(wedge);
+var roller = new THREE.Group(); grpInc.add(roller); var rollMesh = null;
+var ghost = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.2), Lab.mat(0xffffff, { opacity: 0.3 })); grpInc.add(ghost);
+var disk = new THREE.Group(); grpPul.add(disk);
+(function () { var d = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 0.12, 48), Lab.mat(0x8a9db3)); d.rotation.x = PI / 2; disk.add(d); var s2 = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.08, 0.14), Lab.mat(0x2b3c50)); disk.add(s2); })();
+var frame = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.5, 0.3), Lab.mat(0x2b3c50)); frame.position.set(0, 2.25, -0.2); grpPul.add(frame); disk.position.set(0, 2, 0);
+var block = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.3, 0.3), Lab.mat(0xff7a59)); grpPul.add(block);
+var string = Lab.line(0xe3e9ef, false, 0.9); grpPul.add(string);
+var floor = Lab.grid(lab, 6, -1.5);
+var tagA = Lab.tag(lab, '', '#e3e9ef'), tagB = Lab.tag(lab, '', '#5ec8ff');
+
+/* ---------- kontroller ---------- */
+var c = UI.side;
+Lab.seg(c[0], { value: 'rod', options: [{ value: 'rod', label: 'Stang + fjeder' }, { value: 'inc', label: 'Rulning' }, { value: 'pul', label: 'Skive + lod' }], onChange: function (v) { S.mode = v; ui(); reset(); } });
+var br = Lab.btnRow(c[0]); var pauseBtn = Lab.button(br, '⏸ Pause', '', function () {}); Lab.button(br, '↺ Slip igen', 'primary', reset);
+var bx = { rod: document.createElement('div'), inc: document.createElement('div'), pul: document.createElement('div') }; Object.keys(bx).forEach(function (k) { c[1].appendChild(bx[k]); });
+function sl(box, key, label, min, max, step, unit, d) { return Lab.slider(box, { label: label, min: min, max: max, step: step, value: S[key], unit: unit, fmt: function (x) { return F(x, d); }, onInput: function (v) { S[key] = v; reset(); } }); }
+sl(bx.rod, 'm', 'Stangens masse m', 0.5, 10, 0.5, 'kg', 1); sl(bx.rod, 'l', 'Længde l', 0.5, 2, 0.05, 'm', 2); sl(bx.rod, 'th0', 'Startvinkel fra lodret', 5, 175, 1, '°', 0); sl(bx.rod, 'k', 'Fjederkonstant k (0 = ingen fjeder)', 0, 200, 1, 'N/m', 0); sl(bx.rod, 's0', 'Fjederens afslappede længde s<sub>0</sub>', 0.2, 1.5, 0.05, 'm', 2); sl(bx.rod, 'cf', 'Lejefriktion (moment)', 0, 3, 0.05, 'N·m', 2);
+var sb = Lab.select(bx.inc, { label: 'Legeme', options: Object.keys(BODY).map(function (k) { return { value: k, label: BODY[k][0] }; }), value: S.body, onChange: function (v) { S.body = v; reset(); } });
+sl(bx.inc, 'beta', 'Hældning β', 5, 60, 1, '°', 0); sl(bx.inc, 'Lr', 'Skråplanets længde', 1, 4, 0.1, 'm', 1); sl(bx.inc, 'm', 'Masse m', 0.5, 10, 0.5, 'kg', 1);
+sl(bx.pul, 'M', 'Skivens masse M (I = ½MR²)', 0, 20, 0.5, 'kg', 1); sl(bx.pul, 'R', 'Skivens radius R', 0.1, 0.5, 0.01, 'm', 2); sl(bx.pul, 'mb', 'Loddets masse m', 0.2, 10, 0.1, 'kg', 1); sl(bx.pul, 'hb', 'Faldhøjde h', 0.5, 3, 0.1, 'm', 1); sl(bx.pul, 'Mf', 'Friktionsmoment i lejet', 0, 5, 0.1, 'N·m', 1);
+var ro = Lab.readouts(c[2], [['T', 'T (kinetisk)'], ['Vg', 'V<sub>g</sub>'], ['Ve', 'V<sub>e</sub>'], ['U', 'ΣU<sub>andre</sub> (friktion)'], ['E', 'T + V − ΣU<sub>andre</sub>'], '-', ['w', 'ω nu'], ['v', 'v nu']]);
+Lab.legendKeys(UI.legend, [['#00d984', 'kinetisk, translation'], ['#5ec8ff', 'kinetisk, rotation'], ['#ffa500', 'potentiel, tyngde'], ['#d984ff', 'potentiel, fjeder'], ['#ff5e5e', 'tabt til friktion']]);
+function ui() { Object.keys(bx).forEach(function (k) { bx[k].style.display = S.mode === k ? '' : 'none'; }); grpRod.visible = S.mode === 'rod'; grpInc.visible = S.mode === 'inc'; grpPul.visible = S.mode === 'pul';
+  var V = { rod: [0, -0.1, 4.6], inc: [0, -0.7, 5.2], pul: [0.3, 0.5, 6.2] }[S.mode]; lab.setView({ target: new THREE.Vector3(V[0], V[1], 0), radius: V[2], theta: 0, phi: 1.42 }, true); }
+
+/* ---------- fysik ---------- */
+var anc = new THREE.Vector3(1.1, -0.2, 0);
+function rodE(th, w) { // θ fra lodret nedad
+  var I = S.m * S.l * S.l / 3, tip = new THREE.Vector3(S.l * Math.sin(th), -S.l * Math.cos(th), 0), s = tip.distanceTo(anc) - S.s0;
+  return { Tt: 0, Tr: 0.5 * I * w * w, Vg: -S.m * g * S.l / 2 * Math.cos(th), Ve: 0.5 * S.k * s * s, tip: tip, I: I };
+}
+function incK() { var Ir = BODY[S.body][1]; return { Ir: Ir, a: g * Math.sin(S.beta * PI / 180) / (1 + Ir) }; }
+function accel(x) {
+  if (S.mode === 'rod') { var h = 1e-5, V = function (th) { var e = rodE(th, 0); return e.Vg + e.Ve; }, I = S.m * S.l * S.l / 3; var dV = (V(x[0] + h) - V(x[0] - h)) / (2 * h); var fr = -S.cf * Math.tanh(x[1] * 20); return (-dV + fr) / I; }
+  if (S.mode === 'inc') return incK().a;
+  var I2 = 0.5 * S.M * S.R * S.R; return (S.mb * g - S.Mf / S.R * Math.tanh(x[1] * 20)) / (S.mb + I2 / (S.R * S.R));
+}
+function energy(x) {
+  if (S.mode === 'rod') { var e = rodE(x[0], x[1]); return { Tt: 0, Tr: e.Tr, Vg: e.Vg, Ve: e.Ve }; }
+  if (S.mode === 'inc') { var k = incK(), v = x[1], y = -x[0] * Math.sin(S.beta * PI / 180); return { Tt: 0.5 * S.m * v * v, Tr: 0.5 * k.Ir * S.m * v * v, Vg: S.m * g * y, Ve: 0 }; }
+  var I2 = 0.5 * S.M * S.R * S.R, vb = x[1]; return { Tt: 0.5 * S.mb * vb * vb, Tr: 0.5 * I2 * (vb / S.R) * (vb / S.R), Vg: -S.mb * g * x[0], Ve: 0 };
+}
+function reset() {
+  S.t = 0; S.Uo = 0; S.hist = []; S.done = false;
+  S.x = S.mode === 'rod' ? [S.th0 * PI / 180, 0] : [0, 0];
+  var e = energy(S.x); S.E0 = e.Tt + e.Tr + e.Vg + e.Ve;
+  if (S.mode === 'inc') {
+    var b = S.beta * PI / 180, L = S.Lr, H = L * Math.sin(b), Wd = L * Math.cos(b), sh = new THREE.Shape(); sh.moveTo(0, 0); sh.lineTo(Wd, 0); sh.lineTo(0, H); sh.closePath();
+    if (wedge.geometry) wedge.geometry.dispose(); wedge.geometry = new THREE.ExtrudeGeometry(sh, { depth: 0.6, bevelEnabled: false }); wedge.position.set(-Wd / 2, -1.5, -0.3);
+    if (rollMesh) roller.remove(rollMesh);
+    var r = 0.2;
+    if (S.body === 'ring') { rollMesh = new THREE.Mesh(new THREE.TorusGeometry(r, 0.035, 12, 48), Lab.mat(0x5ec8ff)); }
+    else if (S.body === 'disk') { rollMesh = new THREE.Mesh(new THREE.CylinderGeometry(r, r, 0.12, 40), Lab.mat(0x5ec8ff)); rollMesh.rotation.x = PI / 2; }
+    else if (S.body === 'sphere') { rollMesh = new THREE.Mesh(new THREE.SphereGeometry(r, 32, 20), Lab.mat(0x5ec8ff)); }
+    else { rollMesh = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), Lab.mat(0x5ec8ff)); }
+    var mk = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.38, 0.13), Lab.mat(0xffd27a)); if (S.body !== 'slide') rollMesh.add(mk);
+    roller.add(rollMesh); S.g0 = 0;
+  }
+}
+ui(); reset();
+
+var gB = Lab.plot(UI.graphs.gB), gT = Lab.plot(UI.graphs.gT);
+function rk4(x, h) { var f = function (s) { return [s[1], accel(s)]; }; var k1 = f(x), k2 = f([x[0] + h / 2 * k1[0], x[1] + h / 2 * k1[1]]), k3 = f([x[0] + h / 2 * k2[0], x[1] + h / 2 * k2[1]]), k4 = f([x[0] + h * k3[0], x[1] + h * k3[1]]); return [x[0] + h / 6 * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]), x[1] + h / 6 * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1])]; }
+Lab.loop(function (dt, rdt) {
+  var steps = 8, h = dt / steps, stop = !!S.done;
+  for (var i = 0; i < steps && dt > 0 && !S.done; i++) {
+    var xo = S.x.slice(); S.x = rk4(S.x, h); S.t += h;
+    if (S.mode === 'rod' && S.cf > 0) S.Uo -= S.cf * Math.abs(S.x[0] - xo[0]);
+    if (S.mode === 'pul' && S.Mf > 0) S.Uo -= S.Mf * Math.abs(S.x[0] - xo[0]) / S.R;
+    var lim = S.mode === 'inc' ? S.Lr - 0.25 : S.mode === 'pul' ? S.hb : Infinity;
+    if (S.x[0] >= lim) { S.x[0] = lim; S.x[1] = Math.sqrt(2 * accel(S.x) * lim); if (S.mode === 'pul' && S.Mf > 0) S.Uo = -S.Mf * lim / S.R; S.done = true; stop = true; } // konstant a: v = √(2as) ved anslaget
+  }
+  var e = energy(S.x), T = e.Tt + e.Tr, V = e.Vg + e.Ve, w = 0, v = 0;
+  if (dt > 0 && !stop) { S.hist.push([S.t, T, V, T + V - S.Uo]); if (S.hist.length > 900) S.hist.shift(); }
+  if (S.mode === 'rod') {
+    var tip = rodE(S.x[0], 0).tip; rod.between(new THREE.Vector3(0, 0, 0), tip); anchor.position.copy(anc);
+    spr.visible = S.k > 0; anchor.visible = S.k > 0; if (S.k > 0) spr.between(anc.clone(), tip.clone());
+    w = S.x[1]; v = Math.abs(w) * S.l / 2;
+    tagA.set(tip.clone().add(new THREE.Vector3(0.15, 0.1, 0)), 'θ = ' + F(S.x[0] * 180 / PI, 0) + '°'); tagB.set(new THREE.Vector3(-0.35, 0.25, 0), 'O');
+  } else if (S.mode === 'inc') {
+    var b = S.beta * PI / 180, L = S.Lr, Wd = L * Math.cos(b), H = L * Math.sin(b), r = S.body === 'slide' ? 0.15 : 0.2;
+    var top = new THREE.Vector3(-Wd / 2, -1.5 + H, 0), dir = new THREE.Vector3(Math.cos(b), -Math.sin(b), 0), nrm = new THREE.Vector3(Math.sin(b), Math.cos(b), 0);
+    roller.position.copy(top).addScaledVector(dir, S.x[0] + 0.25).addScaledVector(nrm, r); roller.rotation.z = S.body === 'slide' ? -b : -S.x[0] / r;
+    var xg = 0.5 * g * Math.sin(b) * S.t * S.t; ghost.position.copy(top).addScaledVector(dir, Math.min(xg, L - 0.25) + 0.25).addScaledVector(nrm, 0.1).setZ(-0.45); ghost.rotation.z = -b; ghost.visible = S.body !== 'slide';
+    v = S.x[1]; w = S.body === 'slide' ? 0 : v / r * 0 + v / 0.2;
+    tagA.set(roller.position.clone().add(new THREE.Vector3(0, 0.4, 0)), 'v = ' + F(v, 2) + ' m/s'); tagB.set(ghost.position.clone().add(new THREE.Vector3(0, 0.35, -0.2)), ghost.visible ? 'glidende klods' : '');
+  } else {
+    disk.scale.set(S.R / 0.4 * 0.8, S.R / 0.4 * 0.8, 1); var Rw = 0.8 * S.R / 0.4; disk.rotation.z = -S.x[0] / Rw;
+    var by = 2 - 0.4 - S.x[0] * (3 / Math.max(S.hb, 0.5)) * 0.9; block.position.set(Rw, by, 0); string.set([new THREE.Vector3(Rw, 2, 0), new THREE.Vector3(Rw, by + 0.15, 0)]);
+    v = S.x[1]; w = v / S.R; tagA.set(block.position.clone().add(new THREE.Vector3(0.4, 0, 0)), 'v = ' + F(v, 2) + ' m/s'); tagB.set(new THREE.Vector3(-0.6, 2.3, 0), 'ω = ' + F(w, 2) + ' rad/s');
+  }
+  ro.set('T', F(T, 2) + ' J', 'ok'); ro.set('Vg', F(e.Vg, 2) + ' J'); ro.set('Ve', F(e.Ve, 2) + ' J'); ro.set('U', F(S.Uo, 2) + ' J', S.Uo < 0 ? 'bad' : ''); ro.set('E', F(T + V - S.Uo, 2) + ' J (start ' + F(S.E0, 2) + ')', 'hi');
+  ro.set('w', F(w, 2) + ' rad/s'); ro.set('v', F(v, 2) + ' m/s');
+  Lab.setStatus(UI.status, stop ? 'Nået bunden' : S.Uo < -0.01 ? 'Friktion tager energi ud af systemet' : 'Mekanisk energi bevaret', S.Uo < -0.01 ? 'warn' : '');
+  UI.note.textContent = 't = ' + F(S.t, 2) + ' s';
+  // søjler (forskudt så laveste V er nul i plottet)
+  var base0 = Math.min(0, e.Vg, S.mode === 'rod' ? -S.m * g * S.l / 2 : S.mode === 'inc' ? -S.m * g * S.Lr * Math.sin(S.beta * PI / 180) : -S.mb * g * S.hb);
+  var bars = [['T_trans', e.Tt, '#00d984'], ['T_rot', e.Tr, '#5ec8ff'], ['V_g', e.Vg - base0, '#ffa500'], ['V_e', e.Ve, '#d984ff'], ['tab', -S.Uo, '#ff5e5e']];
+  var tot = S.E0 - base0, ym = Math.max(tot, 1) * 1.15;
+  gB.begin({ xmin: 0, xmax: 5, ymin: 0, ymax: ym, xlabel: '', ylabel: 'J', fx: function () { return ''; }, fy: function (y) { return F(y, 0); } });
+  bars.forEach(function (q, k) { gB.fill([[k + 0.15, 0], [k + 0.15, Math.max(q[1], 0)], [k + 0.85, Math.max(q[1], 0)], [k + 0.85, 0]], q[2]); gB.text(k + 0.5, Math.max(q[1], 0) + ym * 0.04, q[0], q[2], 'center'); });
+  gB.hline(tot, 'rgba(255,255,255,.7)', 'start: T₁ + V₁');
+  gB.end();
+  var tm = Math.max(S.t, 2), ylo = Math.min(base0, -1), yhi = Math.max(S.E0, ...S.hist.map(function (p) { return Math.max(p[1], p[2]); }), 1) * 1.1;
+  gT.begin({ xmin: Math.max(0, S.t - 12), xmax: Math.max(12, S.t), ymin: ylo * 1.1, ymax: yhi, xlabel: 't [s]', ylabel: 'J', fx: function (x) { return F(x, 0); }, fy: function (y) { return F(y, 0); } });
+  gT.line(S.hist.map(function (p) { return [p[0], p[1]]; }), '#00d984', 2); gT.line(S.hist.map(function (p) { return [p[0], p[2]]; }), '#ffa500', 2); gT.line(S.hist.map(function (p) { return [p[0], p[1] + p[2]]; }), '#ffffff', 2);
+  gT.text(Math.max(0, S.t - 12) + 0.2, yhi * 0.92, 'T', '#00d984'); gT.text(Math.max(0, S.t - 12) + 1, yhi * 0.92, 'V', '#ffa500'); gT.text(Math.max(0, S.t - 12) + 2, yhi * 0.92, 'T + V', '#ffffff'); gT.end();
+  var f = '';
+  if (S.mode === 'rod') { var I = S.m * S.l * S.l / 3; f = Lab.F('T = ½I<sub>O</sub>ω² = ½·(ml²/3)·ω² = ½·' + n(I, 3) + '·' + n(w, 2) + '² = ' + n(T, 2) + ' J', 'Fast akse i O (18-5). Hele stangens kinetiske energi på én gang.') + Lab.F('V<sub>g</sub> = mg·y<sub>G</sub> = −mg(l/2)cos θ = ' + n(e.Vg, 2) + ' J,&nbsp; V<sub>e</sub> = ½ks² = ' + n(e.Ve, 2) + ' J', 'y måles opad fra O, og s = fjederens forlængelse fra den afslappede længde (18-15, 18-16).') + Lab.F('T<sub>1</sub> + V<sub>1</sub> + U<sub>friktion</sub> = T<sub>2</sub> + V<sub>2</sub>: ' + n(S.E0, 2) + ' + (' + n(S.Uo, 2) + ') = ' + n(T + V, 2) + ' J'); }
+  else if (S.mode === 'inc') { var k2 = incK(), dh = S.x[0] * Math.sin(S.beta * PI / 180); f = Lab.F('mgΔh = ½mv² + ½I<sub>G</sub>(v/r)² = ½mv²(1 + I<sub>G</sub>/(mr²)) ⇒ v = √(2gΔh/(1 + ' + n(k2.Ir, 2) + ')) = ' + n(Math.sqrt(2 * g * dh / (1 + k2.Ir)), 3) + ' m/s', 'Ren rulning: friktionen i kontaktpunktet udfører intet arbejde. ' + BODY[S.body][0] + ': I<sub>G</sub>/(mr²) = ' + F(k2.Ir, 2) + '.') + Lab.F('Andel af T i rotation: I<sub>G</sub>/(mr² + I<sub>G</sub>) = ' + n(k2.Ir / (1 + k2.Ir) * 100, 0) + ' %', 'Derfor er en ring (50 %) langsommere end en kugle (29 %), uanset masse og radius.'); }
+  else { var I3 = 0.5 * S.M * S.R * S.R; f = Lab.F('m g h + U<sub>leje</sub> = ½mv² + ½I ω², v = ωR ⇒ v = √(2(mg − M<sub>f</sub>/R)h/(m + I/R²))', 'Snoren er ustrækkelig og masseløs: den flytter energi mellem loddet og skiven uden selv at bidrage (slides Energi II).') + Lab.F('Nu: v = ' + n(v, 3) + ' m/s; energi i skiven: ½Iω² = ' + n(e.Tr, 2) + ' J, i loddet: ½mv² = ' + n(e.Tt, 2) + ' J'); }
+  UI.formulas.innerHTML = f;
+  lab.render(rdt);
+}, { button: pauseBtn, flag: UI.paused });
+})();
+</script>
+</body>
+</html>

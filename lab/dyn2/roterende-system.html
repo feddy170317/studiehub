@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roterende referencesystem · 3D-lab</title>
+<meta name="description" content="En klods glider i en roterende slids: se hastighed og alle fem accelerationsled, inklusive Coriolis, og skift mellem at se det fra jorden og fra den roterende arm.">
+<link rel="stylesheet" href="../assets/lab.css">
+</head>
+<body>
+<script src="../assets/three.min.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+'use strict';
+var F = Lab.fmt, n = Lab.n, PI = Math.PI;
+var UI = Lab.build({
+  chip: 'DYN2 · HI 16.8 · Kinematik VI', title: 'Bevæget koordinatsystem: klods i roterende slids',
+  src: 'Slides Kinematik VI: v<sub>B</sub> = v<sub>A</sub> + Ω × r<sub>B/A</sub> + (v<sub>B/A</sub>)<sub>xy</sub> og a<sub>B</sub> med Coriolis-leddet 2Ω × (v<sub>B/A</sub>)<sub>xy</sub>',
+  side: ['Armens rotation', 'Klodsens bevægelse i slidsen', 'Aflæsning'],
+  graphs: [{ id: 'gP', title: 'Klodsens bane set ovenfra', sub: 'fast system (X, Y) og roterende (x, y)' }, { id: 'gA', title: 'Accelerationsleddene', sub: 'størrelser nu' }],
+  notes: '<li>I det roterende system bevæger klodsen sig bare <b>lige ud ad slidsen</b>. Set fra jorden bevæger den sig i en spiral. Skift observatør, og se samme bevægelse to gange.</li>' +
+    '<li><b>Coriolis-accelerationen</b> 2Ω × v<sub>rel</sub> står vinkelret på slidsen. Den skyldes to ting på én gang: v<sub>rel</sub> skifter retning, fordi slidsen drejer, og klodsen kommer ud, hvor armen bevæger sig hurtigere. Det er slidsens væg, der skubber klodsen med denne kraft.</li>' +
+    '<li>Stop klodsen (v<sub>rel</sub> = 0): Coriolis forsvinder, og der er kun centripetal plus Ω̇ × r tilbage, altså almindelig rotation om fast akse.</li>' +
+    '<li>Vend klodsens retning ind mod centrum: Coriolis skifter fortegn.</li>',
+  model: '<li>Armen drejer om en fast lodret akse gennem A (a<sub>A</sub> = 0). Ω kan være konstant eller have vinkelacceleration Ω̇. Klodsen bevæger sig langs slidsen (x-aksen i det roterende system).</li>' +
+    '<li>Pilene er skaleret, og hvert led har sin farve. De præcise tal står i aflæsningen og i formlerne.</li>'
+});
+var lab = Lab.scene(UI.stage, { view: { target: new THREE.Vector3(0, 0, 0), theta: 0.3, phi: 0.75, radius: 4.4 } });
+var S = { W: 2, Wd: 0, x0: 0.3, mode: 'const', vr: 0.4, amp: 0.4, fr: 0.5, t: 0, th: 0, obs: 'fixed', sa: 0.15, sv: 0.5, histF: [], histR: [] };
+function B(x, y, z) { return new THREE.Vector3(x, z || 0, -y); }
+
+/* ---------- 3D ---------- */
+var arm = new THREE.Group(); lab.scene.add(arm);
+var plate = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.6, 0.05, 64), Lab.mat(0x22384f, { rough: 0.9, opacity: 0.5 })); plate.position.y = -0.06; lab.scene.add(plate);
+var railA = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.08, 0.05), Lab.mat(0x8a9db3)), railB = railA.clone(); railA.position.set(0.85, 0.02, 0.09); railB.position.set(0.85, 0.02, -0.09); arm.add(railA); arm.add(railB);
+var armBase = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.03, 0.26), Lab.mat(0x44586e)); armBase.position.set(0.85, -0.02, 0); arm.add(armBase);
+var hub = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.3, 24), Lab.mat(0xffd27a)); lab.scene.add(hub);
+var block = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.1, 0.12), Lab.mat(0xff7a59, { metal: 0.2 })); lab.scene.add(block);
+var axX = Lab.arrow(0xd984ff, { radius: 0.006 }), axY = Lab.arrow(0xd984ff, { radius: 0.006 }); arm.add(axX); arm.add(axY);
+axX.set(new THREE.Vector3(0, 0.12, 0), new THREE.Vector3(0.5, 0, 0)); axY.set(new THREE.Vector3(0, 0.12, 0), new THREE.Vector3(0, 0, -0.5));
+var tX = Lab.tag(lab, 'x', '#d984ff'), tY = Lab.tag(lab, 'y', '#d984ff');
+var wArr = Lab.arrow(0x5ec8ff, { radius: 0.02 }); lab.scene.add(wArr); var wArc = Lab.arc(0x5ec8ff, { thick: 0.012 }); lab.scene.add(wArc); var tW = Lab.tag(lab, '', '#5ec8ff');
+var COLS = { v: 0x00d984, at: 0xffa500, an: 0xd984ff, co: 0xff5e5e, ar: 0xffd27a, a: 0xffffff };
+var ar = {}; Object.keys(COLS).forEach(function (k) { ar[k] = Lab.arrow(COLS[k], { radius: k === 'a' ? 0.016 : 0.012 }); lab.scene.add(ar[k]); });
+var tg = {}; ['v', 'co', 'an'].forEach(function (k) { tg[k] = Lab.tag(lab, '', '#' + COLS[k].toString(16).padStart(6, '0')); });
+var trailF = Lab.line(0xffd27a, false, 0.6); lab.scene.add(trailF); var tptsF = [];
+
+/* ---------- kontroller ---------- */
+var c = UI.side;
+Lab.slider(c[0], { label: 'Vinkelhastighed Ω', min: -4, max: 4, step: 0.1, value: S.W, unit: 'rad/s', fmt: function (x) { return F(x, 1); }, onInput: function (v) { S.W = v; } });
+Lab.slider(c[0], { label: 'Vinkelacceleration Ω̇', min: -2, max: 2, step: 0.1, value: S.Wd, unit: 'rad/s²', fmt: function (x) { return F(x, 1); }, onInput: function (v) { S.Wd = v; } });
+Lab.seg(c[0], { label: 'Se det fra', value: 'fixed', options: [{ value: 'fixed', label: 'Jorden (fast)' }, { value: 'rot', label: 'Armen (roterende)' }], onChange: function (v) { S.obs = v; tptsF = []; } });
+Lab.seg(c[1], { label: 'Bevægelse', value: 'const', options: [{ value: 'const', label: 'Konstant ẋ udad' }, { value: 'osc', label: 'Frem og tilbage' }, { value: 'stop', label: 'Står stille' }], onChange: function (v) { S.mode = v; S.t = 0; tptsF = []; S.histF = []; S.histR = []; } });
+Lab.slider(c[1], { label: 'Fart i slidsen ẋ', min: -1, max: 1, step: 0.05, value: S.vr, unit: 'm/s', fmt: function (x) { return F(x, 2); }, onInput: function (v) { S.vr = v; } });
+Lab.slider(c[1], { label: 'Pileskala (acceleration)', min: 0.03, max: 0.5, step: 0.01, value: S.sa, unit: '', fmt: function (x) { return F(x, 2); }, onInput: function (v) { S.sa = v; } });
+var br = Lab.btnRow(c[1]); var pauseBtn = Lab.button(br, '⏸ Pause', '', function () {}); Lab.button(br, '↺ Start forfra', 'primary', function () { S.t = 0; S.th = 0; tptsF = []; S.histF = []; S.histR = []; });
+var ro = Lab.readouts(c[2], [['x', 'Position x i slidsen'], ['xd', 'ẋ (relativ hastighed)'], ['v', '|v<sub>B</sub>|'], '-', ['at', '|Ω̇ × r|'], ['an', '|Ω × (Ω × r)| = Ω²x'], ['co', '|2Ω × v<sub>rel</sub>| = 2Ωẋ'], ['arel', '|ẍ| (relativ acc.)'], ['a', '|a<sub>B</sub>|']]);
+Lab.legendKeys(UI.legend, [['#00d984', 'hastighed v<sub>B</sub>'], ['#ffa500', 'Ω̇ × r'], ['#d984ff', 'centripetal Ω × (Ω × r)'], ['#ff5e5e', 'Coriolis 2Ω × v<sub>rel</sub>'], ['#ffd27a', 'relativ acc. ẍ'], ['#ffffff', 'samlet a<sub>B</sub>']]);
+
+function motion(t) {
+  if (S.mode === 'stop') return { x: 0.9, xd: 0, xdd: 0 };
+  if (S.mode === 'osc') { var w = 2 * PI * S.fr; return { x: 0.9 + 0.5 * Math.sin(w * t), xd: 0.5 * w * Math.cos(w * t), xdd: -0.5 * w * w * Math.sin(w * t) }; }
+  var L = 1.4, x = S.x0 + S.vr * t; if (S.vr >= 0) x = S.x0 + ((S.vr * t) % (L - S.x0)); else x = L + ((S.vr * t) % (L - S.x0));
+  return { x: x, xd: S.vr, xdd: 0 };
+}
+var gP = Lab.plot(UI.graphs.gP), gA = Lab.plot(UI.graphs.gA);
+Lab.loop(function (dt, rdt) {
+  S.t += dt; S.W += S.Wd * dt; if (Math.abs(S.W) > 6) S.W = Math.sign(S.W) * 6;
+  S.th += S.W * dt;
+  var m = motion(S.t), th = S.th, c1 = Math.cos(th), s1 = Math.sin(th);
+  if (S.prevX !== undefined && Math.abs(m.x - S.prevX) > 0.2) { tptsF = []; S.histF = []; S.histR = []; } // klodsen sprang tilbage til start
+  S.prevX = m.x;
+  var i = [c1, s1], j = [-s1, c1], W = S.W, Wd = S.Wd;
+  var r = [m.x * i[0], m.x * i[1]], vrel = [m.xd * i[0], m.xd * i[1]], arel = [m.xdd * i[0], m.xdd * i[1]];
+  var vtr = [-W * r[1], W * r[0]], v = [vtr[0] + vrel[0], vtr[1] + vrel[1]];
+  var at = [-Wd * r[1], Wd * r[0]], an = [-W * W * r[0], -W * W * r[1]], co = [-2 * W * vrel[1], 2 * W * vrel[0]];
+  var a = [at[0] + an[0] + co[0] + arel[0], at[1] + an[1] + co[1] + arel[1]];
+  // observatør: i roterende system drejes alt tilbage med −θ
+  var rot = S.obs === 'rot' ? -th : 0;
+  function R(p) { var c2 = Math.cos(rot), s2 = Math.sin(rot); return [p[0] * c2 - p[1] * s2, p[0] * s2 + p[1] * c2]; }
+  arm.rotation.y = th + rot; hub.rotation.y = th + rot;
+  var rr = R(r), P = B(rr[0], rr[1], 0.09); block.position.copy(P); block.rotation.y = th + rot;
+  var vv = R(S.obs === 'rot' ? vrel : v);
+  ar.v.set(P.clone().setY(0.2), B(vv[0] * S.sv, vv[1] * S.sv, 0));
+  [['at', at], ['an', an], ['co', co], ['ar', arel], ['a', a]].forEach(function (k) { var q = R(k[1]); ar[k[0]].set(P.clone().setY(k[0] === 'a' ? 0.16 : 0.12), B(q[0] * S.sa, q[1] * S.sa, 0)); });
+  ar.v.visible = Math.hypot(vv[0], vv[1]) > 1e-4; ar.at.visible = Math.abs(Wd) > 1e-3; ar.ar.visible = Math.abs(m.xdd) > 1e-3; ar.co.visible = Math.abs(m.xd * W) > 1e-3;
+  var cq = R(co), nq = R(an), vq = vv;
+  tg.v.set(P.clone().add(B(vq[0] * S.sv * 1.15, vq[1] * S.sv * 1.15, 0.25)), 'v'); tg.co.set(P.clone().add(B(cq[0] * S.sa * 1.15, cq[1] * S.sa * 1.15, 0.2)), 'Coriolis'); tg.co.visible = ar.co.visible;
+  tg.an.set(P.clone().add(B(nq[0] * S.sa * 1.1, nq[1] * S.sa * 1.1, 0.2)), 'centripetal');
+  var xa = R(i), ya = R(j); tX.set(B(xa[0] * 0.6, xa[1] * 0.6, 0.12)); tY.set(B(ya[0] * 0.6, ya[1] * 0.6, 0.12));
+  wArr.set(new THREE.Vector3(0, 0.15, 0), new THREE.Vector3(0, 0.12 * W, 0)); wArc.set(new THREE.Vector3(0, 0.15 + 0.06 * W, 0), new THREE.Vector3(0, 1, 0), 0.2, S.obs === 'rot' ? 0 : Math.sign(W), 4);
+  tW.set(new THREE.Vector3(0.15, 0.2 + 0.12 * W, 0), S.obs === 'rot' ? 'du drejer med armen' : 'Ω = ' + F(W, 2) + ' rad/s');
+  if (dt > 0) { tptsF.push(P.clone().setY(0.03)); if (tptsF.length > 500) tptsF.shift(); if (tptsF.length > 1) trailF.set(tptsF); S.histF.push([r[0], r[1]]); S.histR.push([m.x, 0]); if (S.histF.length > 800) { S.histF.shift(); S.histR.shift(); } }
+  var mag = function (p) { return Math.hypot(p[0], p[1]); };
+  ro.set('x', F(m.x, 2) + ' m'); ro.set('xd', F(m.xd, 2) + ' m/s'); ro.set('v', F(mag(v), 2) + ' m/s', 'ok'); ro.set('at', F(mag(at), 2) + ' m/s²'); ro.set('an', F(mag(an), 2) + ' m/s²'); ro.set('co', F(mag(co), 2) + ' m/s²', 'bad'); ro.set('arel', F(Math.abs(m.xdd), 2) + ' m/s²'); ro.set('a', F(mag(a), 2) + ' m/s²', 'hi');
+  Lab.setStatus(UI.status, S.obs === 'rot' ? 'Set fra armen: klodsen kører lige ud ad slidsen' : 'Set fra jorden: klodsen følger en spiral', S.obs === 'rot' ? 'warn' : '');
+  UI.note.textContent = 't = ' + F(S.t, 2) + ' s · θ = ' + F((th * 180 / PI) % 360, 0) + '°';
+  gP.begin({ xmin: -1.6, xmax: 1.6, ymin: -1.6, ymax: 1.6, xlabel: 'X [m]', ylabel: 'Y [m]', fx: function (x) { return F(x, 1); }, fy: function (y) { return F(y, 1); } });
+  gP.line(S.histF, '#ffd27a', 2); gP.line([[0, 0], [1.5 * c1, 1.5 * s1]], 'rgba(217,132,255,.6)', 2); gP.dot(r[0], r[1], '#ff7a59', 5); gP.text(-1.5, 1.4, 'fast system: spiral', '#ffd27a'); gP.text(-1.5, 1.2, 'slidsen (x-aksen)', '#d984ff');
+  gP.end();
+  var bars = [['Ω̇×r', mag(at), '#ffa500'], ['Ω×(Ω×r)', mag(an), '#d984ff'], ['2Ω×v_rel', mag(co), '#ff5e5e'], ['ẍ', Math.abs(m.xdd), '#ffd27a'], ['|a|', mag(a), '#ffffff']];
+  var bm = Math.max.apply(null, bars.map(function (b) { return b[1]; }).concat([0.5])) * 1.2;
+  gA.begin({ xmin: 0, xmax: 5, ymin: 0, ymax: bm, xlabel: '', ylabel: 'm/s²', fx: function () { return ''; }, fy: function (y) { return F(y, 1); } });
+  bars.forEach(function (b, k) { gA.fill([[k + 0.15, 0], [k + 0.15, b[1]], [k + 0.85, b[1]], [k + 0.85, 0]], b[2]); gA.text(k + 0.5, -bm * 0.0 + b[1] + bm * 0.05, b[0], b[2], 'center'); });
+  gA.end();
+  UI.formulas.innerHTML =
+    Lab.F('v<sub>B</sub> = v<sub>A</sub> + Ω × r<sub>B/A</sub> + ẋ<sub>B</sub> î = 0 + ' + n(W, 2) + '·' + n(m.x, 2) + ' ĵ + ' + n(m.xd, 2) + ' î ⇒ |v<sub>B</sub>| = ' + n(mag(v), 2) + ' m/s',
+      'Bevæget koordinatsystem (16-26): rotation af systemet plus bevægelsen i systemet. î peger langs slidsen og ĵ på tværs.') +
+    Lab.F('a<sub>B</sub> = a<sub>A</sub> + Ω̇ × r + Ω × (Ω × r) + 2Ω × ẋ î + ẍ î = 0 + ' + n(Wd * m.x, 2) + ' ĵ − ' + n(W * W * m.x, 2) + ' î + ' + n(2 * W * m.xd, 2) + ' ĵ + ' + n(m.xdd, 2) + ' î',
+      'Alle fem led (16-29). Coriolis-leddet 2Ωẋ = ' + F(2 * W * m.xd, 2) + ' m/s² står på tværs af slidsen. Det er slidsens væg, der skal levere den kraft (m·2Ωẋ) på klodsen.');
+  lab.render(rdt);
+}, { button: pauseBtn, flag: UI.paused });
+})();
+</script>
+</body>
+</html>

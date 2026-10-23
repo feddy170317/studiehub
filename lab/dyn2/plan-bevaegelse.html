@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plan bevægelse og IC · 3D-lab</title>
+<meta name="description" content="Rullende hjul, glidende stige og krumtap med plejlstang: relativ hastighed v_B = v_A + ω × r_B/A og det øjeblikkelige hastighedscentrum IC, konstrueret live.">
+<link rel="stylesheet" href="../assets/lab.css">
+</head>
+<body>
+<script src="../assets/three.min.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+'use strict';
+var F = Lab.fmt, n = Lab.n, PI = Math.PI;
+var UI = Lab.build({
+  chip: 'DYN2 · HI 16.4–16.7', title: 'Generel plan bevægelse og øjeblikkeligt hastighedscentrum',
+  src: 'Slides Kinematik II–V: v<sub>B</sub> = v<sub>A</sub> + ω × r<sub>B/A</sub>, IC og a<sub>B</sub> = a<sub>A</sub> + α × r<sub>B/A</sub> − ω²r<sub>B/A</sub>',
+  side: ['Mekanisme', 'Bevægelse', 'Aflæsning'],
+  graphs: [{ id: 'gI', title: 'Fart mod afstand til IC', sub: 'alle punkter: |v| = ω·|r<sub>P/IC</sub>|' }, { id: 'gH', title: 'Over tid', sub: '' }],
+  notes: '<li>I hvert øjeblik bevæger hele det stive legeme sig, <b>som om det drejede om IC</b>. Alle hastigheder står vinkelret på linjen til IC, og farten vokser lineært med afstanden (venstre graf: én ret linje med hældning ω).</li>' +
+    '<li>IC findes geometrisk: tegn linjer gennem to punkter <b>vinkelret på deres hastigheder</b>. Hvor de skærer, ligger IC (slides Kinematik IV).</li>' +
+    '<li>IC er kun <b>øjeblikkeligt</b>. Se det vandre, mens stigen glider: det ligger altid i skæringen af normalerne til væg og gulv.</li>' +
+    '<li>Ruller hjulet uden at glide, ligger IC i kontaktpunktet: bunden står stille, og toppen kører med 2v<sub>G</sub>. Giv det glidning, og IC flytter sig op eller ned.</li>' +
+    '<li>IC har hastighed nul, men <b>ikke</b> acceleration nul. Accelerationer skal regnes med a<sub>B</sub> = a<sub>A</sub> + α × r − ω²r (slides Kinematik V).</li>',
+  model: '<li>Stive legemer i planen. Stigen: B (på gulvet) trækkes med konstant fart v, A glider på væggen. Krumtappen drejer med konstant ω.</li>' +
+    '<li>Hastighedspile er skaleret (se skyderen). Tallene står i aflæsningen.</li>'
+});
+var lab = Lab.scene(UI.stage, { view: { target: new THREE.Vector3(0.9, 0.8, 0), theta: 0.0, phi: 1.45, radius: 5.2 } });
+var S = { mode: 'ladder', t: 0, l: 2, v: 0.5, th0: 70, wr: 0.5, vG: 1.0, w: -2.0, cr: 0.5, cl: 1.6, cw: 2, sp: 0.5, sv: 0.5, hist: [] };
+
+/* ---------- 3D ---------- */
+var W = new THREE.Group(); lab.scene.add(W);
+var floor = new THREE.Mesh(new THREE.BoxGeometry(8, 0.08, 1.2), Lab.mat(0x22384f, { rough: 0.9 })); floor.position.set(1.5, -0.04, 0); lab.scene.add(floor);
+var wall = new THREE.Mesh(new THREE.BoxGeometry(0.08, 3.2, 1.2), Lab.mat(0x22384f, { rough: 0.9 })); wall.position.set(-0.04, 1.6, 0); lab.scene.add(wall);
+var body = new THREE.Group(); lab.scene.add(body);
+var ladder = Lab.rod(0.045, Lab.mat(0xc08a3e, { metal: 0.2 })); lab.scene.add(ladder);
+var wheel = new THREE.Group(); lab.scene.add(wheel);
+(function () { var m = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 0.18, 64), Lab.mat(0x5f7287)); m.rotation.x = PI / 2; wheel.add(m);
+  for (var k = 0; k < 6; k++) { var s = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.06, 0.2), Lab.mat(0x2b3c50)); s.rotation.z = k * PI / 6; wheel.add(s); }
+  var tire = new THREE.Mesh(new THREE.TorusGeometry(1, 0.06, 12, 64), Lab.mat(0x1a1f26, { rough: 0.9 })); wheel.add(tire); })();
+var crank = Lab.rod(0.05, Lab.mat(0x8a9db3)), rod = Lab.rod(0.045, Lab.mat(0xc08a3e, { metal: 0.2 })); lab.scene.add(crank); lab.scene.add(rod);
+var piston = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.25, 0.3), Lab.mat(0x44586e)); lab.scene.add(piston);
+var guideTop = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.04, 0.4), Lab.mat(0x2b3c50)), guideBot = guideTop.clone(); lab.scene.add(guideTop); lab.scene.add(guideBot);
+var pivot = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.3, 20), Lab.mat(0xffd27a)); pivot.rotation.x = PI / 2; lab.scene.add(pivot);
+var ICdot = new THREE.Mesh(new THREE.SphereGeometry(0.07, 20, 14), new THREE.MeshStandardMaterial({ color: 0xff5e5e, emissive: 0xff5e5e, emissiveIntensity: 0.7 })); lab.scene.add(ICdot);
+var tagIC = Lab.tag(lab, 'IC', '#ff5e5e');
+var perpA = Lab.line(0xff5e5e, true, 0.7), perpB = Lab.line(0xff5e5e, true, 0.7), rayP = Lab.line(0xffd27a, true, 0.6); lab.scene.add(perpA); lab.scene.add(perpB); lab.scene.add(rayP);
+var NP = 9, vArr = [], dots = [];
+for (var i = 0; i < NP; i++) { var a = Lab.arrow(0x00d984, { radius: 0.014 }); vArr.push(a); lab.scene.add(a); var d = new THREE.Mesh(new THREE.SphereGeometry(0.04, 12, 10), Lab.mat(0xe3e9ef)); dots.push(d); lab.scene.add(d); }
+var tagA = Lab.tag(lab, 'A', '#e3e9ef'), tagB = Lab.tag(lab, 'B', '#e3e9ef'), tagP = Lab.tag(lab, '', '#00d984'), tagW = Lab.tag(lab, '', '#5ec8ff');
+var wArc = Lab.arc(0x5ec8ff, { thick: 0.014 }); lab.scene.add(wArc);
+var trail = Lab.line(0xffd27a, false, 0.5), trailPts = []; lab.scene.add(trail);
+
+/* ---------- kontroller ---------- */
+var c = UI.side;
+var modeSeg = Lab.seg(c[0], { value: 'ladder', options: [{ value: 'ladder', label: 'Glidende stige' }, { value: 'wheel', label: 'Rullende hjul' }, { value: 'crank', label: 'Krumtap' }], onChange: function (v) { S.mode = v; reset(); } });
+var boxL = document.createElement('div'), boxW = document.createElement('div'), boxC = document.createElement('div'); [boxL, boxW, boxC].forEach(function (b) { c[1].appendChild(b); });
+Lab.slider(boxL, { label: 'Stigens længde l', min: 1, max: 3, step: 0.05, value: S.l, unit: 'm', fmt: function (x) { return F(x, 2); }, onInput: function (v) { S.l = v; reset(); } });
+Lab.slider(boxL, { label: 'Fart af B langs gulvet v', min: 0.1, max: 1.5, step: 0.05, value: S.v, unit: 'm/s', fmt: function (x) { return F(x, 2); }, onInput: function (v) { S.v = v; } });
+Lab.slider(boxL, { label: 'Startvinkel θ<sub>0</sub> (mod gulvet)', min: 20, max: 85, step: 1, value: S.th0, unit: '°', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.th0 = v; reset(); } });
+Lab.slider(boxW, { label: 'Hjulradius r', min: 0.2, max: 1, step: 0.05, value: S.wr, unit: 'm', fmt: function (x) { return F(x, 2); }, onInput: function (v) { S.wr = v; } });
+var svG = Lab.slider(boxW, { label: 'Centrets fart v<sub>G</sub>', min: -2, max: 2, step: 0.05, value: S.vG, unit: 'm/s', fmt: function (x) { return F(x, 2); }, onInput: function (v) { S.vG = v; } });
+var sw = Lab.slider(boxW, { label: 'Vinkelhastighed ω<sub>z</sub> (− = med uret)', min: -6, max: 6, step: 0.1, value: S.w, unit: 'rad/s', fmt: function (x) { return F(x, 1); }, onInput: function (v) { S.w = v; } });
+Lab.button(Lab.btnRow(boxW), 'Ruller uden glidning (v<sub>G</sub> = −ω<sub>z</sub>r)', 'primary', function () { S.w = -S.vG / S.wr; sw.set(S.w, true); });
+Lab.slider(boxC, { label: 'Krumtappens radius r', min: 0.2, max: 0.8, step: 0.05, value: S.cr, unit: 'm', fmt: function (x) { return F(x, 2); }, onInput: function (v) { S.cr = v; } });
+Lab.slider(boxC, { label: 'Plejlstangens længde L', min: 0.9, max: 2.5, step: 0.05, value: S.cl, unit: 'm', fmt: function (x) { return F(x, 2); }, onInput: function (v) { S.cl = v; } });
+Lab.slider(boxC, { label: 'Krumtappens ω', min: 0.2, max: 6, step: 0.1, value: S.cw, unit: 'rad/s', fmt: function (x) { return F(x, 1); }, onInput: function (v) { S.cw = v; } });
+Lab.slider(c[1], { label: 'Punkt P langs legemet', min: 0, max: 1, step: 0.01, value: S.sp, unit: '', fmt: function (x) { return F(x * 100, 0) + ' %'; }, onInput: function (v) { S.sp = v; } });
+Lab.slider(c[1], { label: 'Pileskala', min: 0.1, max: 1.5, step: 0.05, value: S.sv, unit: 'm pr. m/s', fmt: function (x) { return F(x, 2); }, onInput: function (v) { S.sv = v; } });
+var br = Lab.btnRow(c[1]); var pauseBtn = Lab.button(br, '⏸ Pause', '', function () {}); Lab.button(br, '↺ Start forfra', 'primary', reset);
+var ro = Lab.readouts(c[2], [['w', 'ω<sub>z</sub>'], ['al', 'α<sub>z</sub>'], ['vA', 'v<sub>A</sub>'], ['vB', 'v<sub>B</sub>'], ['vP', '|v<sub>P</sub>| = |ω|·|r<sub>P/IC</sub>|'], '-', ['ic', 'IC (x, y)']]);
+Lab.legendKeys(UI.legend, [['#00d984', 'hastigheder'], ['#ff5e5e', 'IC og normalerne til hastighederne'], ['#5ec8ff', 'vinkelhastighed ω'], ['#ffd27a', 'bane for P']]);
+
+function reset() { S.t = 0; S.hist = []; trailPts = []; boxL.style.display = S.mode === 'ladder' ? '' : 'none'; boxW.style.display = S.mode === 'wheel' ? '' : 'none'; boxC.style.display = S.mode === 'crank' ? '' : 'none';
+  ladder.visible = S.mode === 'ladder'; wall.visible = S.mode === 'ladder'; wheel.visible = S.mode === 'wheel'; [crank, rod, piston, guideTop, guideBot, pivot].forEach(function (o) { o.visible = S.mode === 'crank'; });
+  floor.visible = S.mode !== 'crank';
+  if (S.mode === 'wheel') sw.set(S.w, true);
+  var tgt = S.mode === 'crank' ? [0.8, 0.6] : S.mode === 'wheel' ? [0, 0.6] : [0.9, 0.9];
+  lab.setView({ target: new THREE.Vector3(tgt[0], tgt[1], 0), radius: S.mode === 'ladder' ? 5.2 : 4.6, theta: 0, phi: 1.45 }, true);
+}
+function V(x, y) { return new THREE.Vector3(x, y, 0); }
+// stive punkter: punkt P = A + s·(B − A); v_P = ω × r_P/IC
+function state() {
+  var o = {};
+  if (S.mode === 'ladder') {
+    var x0 = S.l * Math.cos(S.th0 * PI / 180), x = Math.min(S.l * 0.995, x0 + S.v * S.t), th = Math.acos(x / S.l);
+    var A = V(0, S.l * Math.sin(th)), B = V(x, 0), w = S.v / (S.l * Math.sin(th)), al = w * w / Math.tan(th); // B→A drejer mod uret, når θ falder
+    o = { A: A, B: B, w: w, al: al, IC: V(x, A.y), vA: V(0, -S.v / Math.tan(th)), vB: V(S.v, 0), th: th, done: x >= S.l * 0.99 };
+  } else if (S.mode === 'wheel') {
+    var xc = ((S.vG * S.t) % 4.4 + 4.4) % 4.4 - 2.2, G = V(xc, S.wr), w2 = S.w, ang = S.w * S.t;
+    var ic = null;
+    // v_P = v_G + ω k × r_P/G; IC: punkt med v = 0 ⇒ r_IC/G = (−v_G/ω)·ĵ ... for v_G i x: ω k × (0, y) = (−ω y, 0) ⇒ v_G − ω y = 0 ⇒ y = v_G/ω
+    if (Math.abs(w2) > 1e-6) ic = V(xc, S.wr + S.vG / w2);
+    o = { G: G, w: w2, al: 0, IC: ic, ang: ang, A: V(xc, 2 * S.wr), B: V(xc, 0) };
+  } else {
+    var phi = S.cw * S.t, r = S.cr, L = S.cl, Ax = r * Math.cos(phi), Ay = r * Math.sin(phi);
+    var Bx = Ax + Math.sqrt(L * L - Ay * Ay), A2 = V(Ax, Ay), B2 = V(Bx, 0);
+    var vA = V(-S.cw * Ay, S.cw * Ax), wr = -vA.y / Math.max(Math.abs(Bx - Ax), 1e-9) * Math.sign(Bx - Ax), wrod = (-vA.y) / (Bx - Ax);
+    // stang AB: v_B = v_A + ω k × (B − A); v_By = 0 ⇒ v_Ay + ω (Bx − Ax) = 0
+    var vBx = vA.x - wrod * (0 - Ay);
+    var ic2 = null; // IC for stangen: skæring af linjen O-A (forlænget) og lodret linje gennem B
+    if (Math.abs(Ax) > 1e-6) { var k = Bx / Ax; ic2 = V(Bx, Ay * k); }
+    o = { A: A2, B: B2, w: wrod, al: 0, IC: ic2, vA: vA, vB: V(vBx, 0), phi: phi };
+  }
+  return o;
+}
+function vel(o, P) { // ω k × (P − IC)
+  if (!o.IC) return V(0, 0); var r = P.clone().sub(o.IC); return V(-o.w * r.y, o.w * r.x);
+}
+var gI = Lab.plot(UI.graphs.gI), gH = Lab.plot(UI.graphs.gH);
+reset();
+Lab.loop(function (dt, rdt) {
+  S.t += dt; var o = state();
+  if (S.mode === 'ladder' && o.done) { S.t = 0; trailPts = []; S.hist = []; }
+  var pts = [];
+  if (S.mode === 'ladder') { ladder.between(o.A, o.B); for (var i = 0; i < NP; i++) pts.push(o.A.clone().lerp(o.B, i / (NP - 1))); }
+  else if (S.mode === 'wheel') {
+    wheel.position.copy(o.G); wheel.scale.set(S.wr, S.wr, 1); wheel.rotation.z = o.ang;
+    for (i = 0; i < NP - 1; i++) { var a = i / (NP - 1) * 2 * PI - PI / 2; pts.push(o.G.clone().add(V(S.wr * Math.cos(a), S.wr * Math.sin(a)))); } pts.push(o.G.clone());
+  } else {
+    crank.between(V(0, 0), o.A); rod.between(o.A, o.B); piston.position.copy(o.B); pivot.position.set(0, 0, 0);
+    guideTop.position.set(S.cl, 0.15, 0); guideBot.position.set(S.cl, -0.15, 0); guideTop.scale.x = guideBot.scale.x = (2 * S.cr + 0.6) / 2.6;
+    for (i = 0; i < NP; i++) pts.push(o.A.clone().lerp(o.B, i / (NP - 1)));
+  }
+  for (i = 0; i < NP; i++) { var vp = vel(o, pts[i]); dots[i].position.copy(pts[i]); vArr[i].set(pts[i].clone().setZ(0.12), vp.multiplyScalar(S.sv)); }
+  var Pp = S.mode === 'wheel' ? o.G.clone().add(V(S.wr * Math.cos(-PI / 2 + o.ang + S.sp * 2 * PI), S.wr * Math.sin(-PI / 2 + o.ang + S.sp * 2 * PI))) : o.A.clone().lerp(o.B, S.sp);
+  var vP = vel(o, Pp);
+  if (dt > 0) { trailPts.push(Pp.clone().setZ(0.05)); if (trailPts.length > 400) trailPts.shift(); if (trailPts.length > 1) trail.set(trailPts); }
+  tagP.set(Pp.clone().add(V(0.12, 0.15)), 'P: ' + F(vP.length(), 2) + ' m/s');
+  if (o.IC) {
+    ICdot.visible = true; ICdot.position.copy(o.IC); tagIC.visible = true; tagIC.set(o.IC.clone().add(V(0.15, 0.12)));
+    perpA.visible = perpB.visible = rayP.visible = true;
+    perpA.set([o.A.clone().setZ(0.06), o.IC.clone().setZ(0.06)]); perpB.set([o.B.clone().setZ(0.06), o.IC.clone().setZ(0.06)]); rayP.set([Pp.clone().setZ(0.08), o.IC.clone().setZ(0.08)]);
+  } else { ICdot.visible = tagIC.visible = perpA.visible = perpB.visible = rayP.visible = false; }
+  tagA.set(o.A.clone().add(V(-0.18, 0.1))); tagB.set(o.B.clone().add(V(0.15, -0.15)));
+  var ctr = S.mode === 'wheel' ? o.G : o.A.clone().lerp(o.B, 0.5);
+  wArc.set(ctr.clone().setZ(0.2), new THREE.Vector3(0, 0, 1), 0.22, Math.abs(o.w) > 0.01 ? Math.sign(o.w) : 0, 3.6);
+  tagW.set(ctr.clone().add(V(0.3, 0.3)), 'ω = ' + F(o.w, 2) + ' rad/s');
+  var vAm = vel(o, o.A).length(), vBm = vel(o, o.B).length(), ric = o.IC ? Pp.distanceTo(o.IC) : NaN;
+  ro.set('w', F(o.w, 3) + ' rad/s', 'hi'); ro.set('al', S.mode === 'ladder' ? F(o.al, 3) + ' rad/s²' : S.mode === 'wheel' ? '0 (konstant)' : '–');
+  ro.set('vA', F(vAm, 2) + ' m/s'); ro.set('vB', F(vBm, 2) + ' m/s'); ro.set('vP', F(vP.length(), 2) + ' = ' + F(Math.abs(o.w), 2) + '·' + F(ric, 2), 'ok');
+  ro.set('ic', o.IC ? '(' + F(o.IC.x, 2) + ', ' + F(o.IC.y, 2) + ') m' : 'uendeligt langt væk (ren translation)');
+  var noslip = S.mode === 'wheel' && Math.abs(S.vG + S.w * S.wr) < 0.02;
+  Lab.setStatus(UI.status, S.mode === 'wheel' ? (noslip ? 'Ruller uden glidning: IC i kontaktpunktet' : 'Glider: IC ligger ' + (o.IC && o.IC.y > 0 ? 'over' : 'under') + ' gulvet') : S.mode === 'ladder' ? 'IC = skæringen af normalerne til væg og gulv' : 'IC for plejlstangen: krumtappens forlængelse ∩ normalen ved stemplet', S.mode === 'wheel' && !noslip ? 'warn' : '');
+  UI.note.textContent = 't = ' + F(S.t, 2) + ' s';
+  if (dt > 0) { S.hist.push([S.t, o.w, S.mode === 'crank' ? vel(o, o.B).x : vP.length(), S.mode === 'crank' ? ((o.phi * 180 / PI) % 360) : 0]); if (S.hist.length > 900) S.hist.shift(); }
+  // graf 1
+  var rmax = 0, vmax = 0, pv = [];
+  for (i = 0; i < NP; i++) { var r = o.IC ? pts[i].distanceTo(o.IC) : 0, v = vel(o, pts[i]).length(); pv.push([r, v]); rmax = Math.max(rmax, r); vmax = Math.max(vmax, v); }
+  gI.begin({ xmin: 0, xmax: Math.max(rmax * 1.15, 0.5), ymin: 0, ymax: Math.max(vmax * 1.15, 0.2), xlabel: '|r_P/IC| [m]', ylabel: '|v_P| [m/s]', fx: function (x) { return F(x, 1); }, fy: function (y) { return F(y, 1); } });
+  gI.line([[0, 0], [rmax * 1.15, Math.abs(o.w) * rmax * 1.15]], 'rgba(94,200,255,.6)', 1.6, [5, 4]); pv.forEach(function (p) { gI.dot(p[0], p[1], '#00d984', 4); });
+  if (o.IC) gI.dot(ric, vP.length(), '#ffd27a', 6); gI.text(rmax * 0.05, vmax * 1.05, 'hældning = |ω| = ' + F(Math.abs(o.w), 2), '#5ec8ff'); gI.end();
+  // graf 2
+  if (S.mode === 'crank') {
+    gH.begin({ xmin: 0, xmax: 360, ymin: -S.cw * S.cr * 1.4, ymax: S.cw * S.cr * 1.4, xlabel: 'krumtapvinkel [°]', ylabel: 'v_stempel [m/s]', fx: function (x) { return F(x, 0); }, fy: function (y) { return F(y, 1); } });
+    gH.line(S.hist.filter(function (p) { return p[0] > S.t - 2 * PI / S.cw; }).map(function (p) { return [p[3], p[2]]; }).sort(function (a, b) { return a[0] - b[0]; }), '#00d984', 2.2); gH.end();
+  } else {
+    var tm = Math.max(S.t, 2); var key = S.mode === 'ladder' ? 1 : 2;
+    var ym = 0.5; S.hist.forEach(function (p) { ym = Math.max(ym, Math.abs(p[key])); });
+    gH.begin({ xmin: 0, xmax: tm, ymin: S.mode === 'ladder' ? -ym * 1.1 : 0, ymax: S.mode === 'ladder' ? 0.1 : ym * 1.1, xlabel: 't [s]', ylabel: S.mode === 'ladder' ? 'ω [rad/s]' : '|v_P| [m/s]', fx: function (x) { return F(x, 1); }, fy: function (y) { return F(y, 1); } });
+    gH.line(S.hist.map(function (p) { return [p[0], p[key]]; }), S.mode === 'ladder' ? '#5ec8ff' : '#ffd27a', 2.2); gH.end();
+  }
+  var f = '';
+  if (S.mode === 'ladder') f = Lab.F('Binding: x<sub>B</sub> = l cos θ ⇒ ω = v/(l sin θ) = ' + n(S.v, 2) + '/(' + n(S.l, 2) + '·sin ' + n(o.th * 180 / PI, 1) + '°) = ' + n(Math.abs(o.w), 3) + ' rad/s', 'Tidsafledning af bindingsligningen (slides Kinematik II). ω vokser mod uendelig, når stigen flader ud.') +
+    Lab.F('v<sub>A</sub> = v<sub>B</sub> + ω × r<sub>A/B</sub> ⇒ v<sub>A</sub> = −v/tan θ = ' + n(-S.v / Math.tan(o.th), 3) + ' m/s (nedad)', 'Relativ hastighed på samme stive legeme (16-16).') +
+    Lab.F('α = ω²/tan θ = ' + n(o.al, 3) + ' rad/s² (konstant v)', 'Anden tidsafledning af bindingen (slides Kinematik II, s. 25 med a = 0).');
+  else if (S.mode === 'wheel') f = Lab.F('v<sub>C</sub> = v<sub>G</sub> + ω<sub>z</sub>k × (−r j) = (v<sub>G</sub> + ω<sub>z</sub>r) i = (' + n(S.vG, 2) + ' + ' + n(o.w, 2) + '·' + n(S.wr, 2) + ') i = ' + n(S.vG + o.w * S.wr, 2) + ' i m/s', 'Kontaktpunktets hastighed (slides Kinematik III). Ingen glidning ⇔ v<sub>C</sub> = 0 ⇔ v<sub>G</sub> = −ω<sub>z</sub>r.') +
+    Lab.F('IC ligger r<sub>IC/G</sub> = (v<sub>G</sub>/ω<sub>z</sub>) j fra centrum: y<sub>IC</sub> = ' + n(o.IC ? o.IC.y : NaN, 3) + ' m over gulvet', 'Fra v = ω × r<sub>/IC</sub> (slides Kinematik IV).');
+  else f = Lab.F('v<sub>A</sub> = ω<sub>k</sub> × r<sub>A/O</sub>, |v<sub>A</sub>| = ω<sub>k</sub>r = ' + n(S.cw * S.cr, 2) + ' m/s;&nbsp; v<sub>B</sub> = v<sub>A</sub> + ω<sub>AB</sub> × r<sub>B/A</sub> med v<sub>By</sub> = 0 ⇒ ω<sub>AB</sub> = ' + n(o.w, 3) + ' rad/s, v<sub>B</sub> = ' + n(vel(o, o.B).x, 3) + ' m/s', 'Én frihedsgrad: krumtappens vinkel bestemmer alt (slides Kinematik II og III).');
+  UI.formulas.innerHTML = f;
+  lab.render(rdt);
+}, { button: pauseBtn, flag: UI.paused });
+})();
+</script>
+</body>
+</html>

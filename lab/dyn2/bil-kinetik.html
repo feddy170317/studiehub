@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bil der accelererer · 3D-lab</title>
+<meta name="description" content="Kinetik for stive legemer: en bil accelererer eller bremser. Kræfter på hjulene, drivmoment, lastoverførsel mellem for- og bagaksel, hjulspind og wheelie.">
+<link rel="stylesheet" href="../assets/lab.css">
+</head>
+<body>
+<script src="../assets/three.min.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+'use strict';
+var F = Lab.fmt, n = Lab.n, PI = Math.PI, g = 9.81;
+var UI = Lab.build({
+  chip: 'DYN2 · HI 17.2–17.5 · eksamenssæt A25 nr. 4', title: 'Kinetik: bil der accelererer (forhjulstræk)',
+  src: 'Slides Kinetik II–III: ΣF = ma<sub>G</sub>, ΣM<sub>G</sub> = I<sub>G</sub>α, "sum i FLD = sum i KD"',
+  side: ['Bil', 'Hjul', 'Kørsel', 'Aflæsning'],
+  graphs: [{ id: 'gN', title: 'Lastoverførsel', sub: 'kraft fra bil på hvert hjul mod acceleration' }, { id: 'gM', title: 'Nødvendig friktion på de trukne hjul', sub: 'μ<sub>krævet</sub> = f/N' }],
+  notes: '<li>Når bilen accelererer, virker <b>ma<sub>G</sub> i tyngdepunktet</b> i det kinetiske diagram, i højden h over vejen. Momentet fra det skubber lasten bagud: forhjulene aflastes, og baghjulene belastes.</li>' +
+    '<li>Med forhjulstræk mister de trukne hjul altså greb, netop når du speeder op. Derfor kan en baghjulstrukket bil accelerere hårdere, før hjulene spinner (se højre graf).</li>' +
+    '<li>Ved hård bremsning (negativ a) vender det: næsen dykker, og forhjulene tager mest.</li>' +
+    '<li>Hjulene er stive legemer med egen masse og I = m<sub>w</sub>k<sub>G</sub>². Et frit rullende hjul skal have et lille friktionsmoment for at accelerere sin rotation, f = Iα/r. Derfor er H<sub>r</sub> ikke nul.</li>' +
+    '<li>Sæt hjulmassen til 0, og du får slide-eksemplets simple formel N<sub>A</sub> = (l<sub>B</sub>mg − h·ma)/(2(l<sub>A</sub>+l<sub>B</sub>)).</li>',
+  model: '<li>Karrosseriet (masse m<sub>c</sub>) er i ren translation, og hjulene ruller uden glidning (α = a/r). Der ses bort fra luft- og rullemodstand og fra roterende dele inde i bilen, som i opgaven.</li>' +
+    '<li>V og H er kræfterne <b>fra bilen på hvert hjul</b> (som i opgaven). Normalkraften fra vejen er N = V + m<sub>w</sub>g. Firehjulstræk: samme friktionskraft på alle fire hjul.</li>' +
+    '<li>Karosseriets hældning og bilens fart er kun illustration.</li>'
+});
+var lab = Lab.scene(UI.stage, { view: { target: new THREE.Vector3(0, 0.6, 0), theta: 0.55, phi: 1.3, radius: 6.2 } });
+var S = { a: 2, mc: 1750, h: 0.75, l1: 1.75, l2: 1.25, r: 0.30, kG: 0.20, mw: 20, drive: 'F', mu: 0.9, v: 8, off: 0, ang: 0, pitch: 0 };
+
+/* ---------- 3D ---------- */
+var road = new THREE.Mesh(new THREE.BoxGeometry(14, 0.04, 3), Lab.mat(0x2a2f37, { rough: 0.95 })); road.position.y = -0.02; lab.scene.add(road);
+var stripes = []; for (var i = 0; i < 10; i++) { var s0 = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.01, 0.1), Lab.mat(0xe3e9ef)); s0.position.set(-7 + i * 1.5, 0.005, 0); lab.scene.add(s0); stripes.push(s0); }
+var car = new THREE.Group(); lab.scene.add(car);
+var bodyMat = Lab.mat(0x2f7fd1, { metal: 0.5, rough: 0.35 });
+var lower = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), bodyMat), cabin = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), Lab.mat(0x9fd2ff, { opacity: 0.55, metal: 0.2 }));
+car.add(lower); car.add(cabin);
+var Gdot = new THREE.Mesh(new THREE.SphereGeometry(0.07, 18, 12), new THREE.MeshStandardMaterial({ color: 0xffd27a, emissive: 0xffd27a, emissiveIntensity: 0.7 })); lab.scene.add(Gdot);
+var wheels = []; for (i = 0; i < 4; i++) { var wg = new THREE.Group(); var t = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 0.22, 36), Lab.mat(0x1a1f26, { rough: 0.9 })); t.rotation.x = PI / 2; wg.add(t); var rim = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 0.24, 6), Lab.mat(0xc9d6e3, { metal: 0.6 })); rim.rotation.x = PI / 2; wg.add(rim); lab.scene.add(wg); wheels.push(wg); }
+var arN = [Lab.arrow(0x00d984, { radius: 0.025 }), Lab.arrow(0x00d984, { radius: 0.025 })], arF = [Lab.arrow(0xffa500, { radius: 0.022 }), Lab.arrow(0xffa500, { radius: 0.022 })];
+var arMa = Lab.arrow(0xff5e5e, { radius: 0.025 }), arW = Lab.arrow(0xd984ff, { radius: 0.02 });
+[arN[0], arN[1], arF[0], arF[1], arMa, arW].forEach(function (a) { lab.scene.add(a); });
+var arcM = [Lab.arc(0x5ec8ff, { thick: 0.016 }), Lab.arc(0x5ec8ff, { thick: 0.016 })]; arcM.forEach(function (a) { lab.scene.add(a); });
+var tN = [Lab.tag(lab, '', '#00d984'), Lab.tag(lab, '', '#00d984')], tF = [Lab.tag(lab, '', '#ffa500'), Lab.tag(lab, '', '#ffa500')], tMa = Lab.tag(lab, '', '#ff5e5e'), tM = Lab.tag(lab, '', '#5ec8ff');
+
+/* ---------- kontroller ---------- */
+var c = UI.side, sl = {};
+function slid(card, key, label, min, max, step, unit, d) { sl[key] = Lab.slider(card, { label: label, min: min, max: max, step: step, value: S[key], unit: unit, fmt: function (x) { return F(x, d); }, onInput: function (v) { S[key] = v; } }); }
+slid(c[0], 'mc', 'Masse uden hjul m<sub>c</sub>', 300, 3000, 10, 'kg', 0); slid(c[0], 'l1', 'Bagaksel → G, l<sub>1</sub> (BG)', 0.5, 2.5, 0.05, 'm', 2); slid(c[0], 'l2', 'G → foraksel, l<sub>2</sub> (FG)', 0.5, 2.5, 0.05, 'm', 2); slid(c[0], 'h', 'Tyngdepunktets højde h', 0.3, 1.5, 0.05, 'm', 2);
+slid(c[1], 'r', 'Hjulradius r', 0.2, 0.5, 0.01, 'm', 2); slid(c[1], 'kG', 'Gyrationsradius k<sub>G</sub>', 0, 0.4, 0.01, 'm', 2); slid(c[1], 'mw', 'Masse pr. hjul m<sub>w</sub>', 0, 60, 1, 'kg', 0);
+var dSeg = Lab.seg(c[2], { label: 'Træk', value: 'F', options: [{ value: 'F', label: 'Forhjul' }, { value: 'R', label: 'Baghjul' }, { value: 'A', label: 'Firehjul' }], onChange: function (v) { S.drive = v; } });
+slid(c[2], 'a', 'Acceleration a (− = bremsning)', -9, 9, 0.1, 'm/s²', 1); slid(c[2], 'mu', 'Friktion dæk–vej μ', 0.1, 1.2, 0.05, '', 2);
+Lab.presets(c[2], [
+  ['<b>Eksamenssæt A25 nr. 4:</b> forhjulstræk, a = 2 m/s², m<sub>c</sub> = 1750 kg, l<sub>1</sub> = 1,75, l<sub>2</sub> = 1,25, h = 0,75 m, r = 30 cm, k<sub>G</sub> = 20 cm, m<sub>w</sub> = 20 kg', function () { set({ a: 2, mc: 1750, h: 0.75, l1: 1.75, l2: 1.25, r: 0.3, kG: 0.2, mw: 20 }, 'F'); }],
+  ['<b>Slide-eksemplet:</b> masseløse hjul', function () { set({ mw: 0, kG: 0 }); }],
+  ['<b>Wheelie:</b> baghjulstræk, højt tyngdepunkt, kort akselafstand', function () { set({ a: 8.5, h: 1.4, l1: 0.9, l2: 1.0, mu: 1.2 }, 'R'); }]
+]);
+function set(o, d) { for (var k in o) { S[k] = o[k]; if (sl[k]) sl[k].set(o[k], true); } if (d) { S.drive = d; dSeg.set(d, true); } }
+var ro = Lab.readouts(c[3], [['Hr', 'H<sub>r</sub> (bil → baghjul)'], ['Vr', 'V<sub>r</sub>'], ['Hf', 'H<sub>f</sub> (bil → forhjul)'], ['Vf', 'V<sub>f</sub>'], ['M', 'Drivmoment pr. trukket hjul M'], '-', ['mu', 'μ krævet på trukne hjul'], ['st', 'Status']]);
+Lab.legendKeys(UI.legend, [['#00d984', 'normalkraft fra vejen N'], ['#ffa500', 'friktion fra vejen'], ['#5ec8ff', 'drivmoment M'], ['#ff5e5e', 'm<sub>c</sub>a i G (kinetisk diagram)'], ['#d984ff', 'tyngdekraft m<sub>c</sub>g']]);
+
+function solve(a, drive) {
+  var I = S.mw * S.kG * S.kG, al = a / S.r, free = I * a / (S.r * S.r);
+  var o = { I: I }, mc = S.mc, mw = S.mw;
+  if (drive === 'F') { o.Hr = mw * a + free; o.fr = -free; o.Mr = 0; o.Hf = -mc * a / 2 - o.Hr; o.ff = mw * a - o.Hf; o.Mf = o.ff * S.r + I * al; }
+  else if (drive === 'R') { o.Hf = mw * a + free; o.ff = -free; o.Mf = 0; o.Hr = -mc * a / 2 - o.Hf; o.fr = mw * a - o.Hr; o.Mr = o.fr * S.r + I * al; }
+  else { var f = mw * a + mc * a / 4; o.ff = o.fr = f; o.Hf = o.Hr = mw * a - f; o.Mf = o.Mr = f * S.r + I * al; }
+  var rh = S.r - S.h;
+  o.Vf = (S.l1 * mc * g - 2 * rh * (o.Hr + o.Hf) - 2 * (o.Mf + o.Mr)) / (2 * (S.l1 + S.l2)); o.Vr = mc * g / 2 - o.Vf;
+  o.Nf = o.Vf + mw * g; o.Nr = o.Vr + mw * g;
+  var muF = Math.abs(o.ff) / Math.max(o.Nf, 1e-6), muR = Math.abs(o.fr) / Math.max(o.Nr, 1e-6);
+  o.muReq = drive === 'F' ? muF : drive === 'R' ? muR : Math.max(muF, muR);
+  if (o.Nf <= 0 || o.Nr <= 0) o.muReq = Infinity;
+  return o;
+}
+var gN = Lab.plot(UI.graphs.gN), gM = Lab.plot(UI.graphs.gM);
+Lab.loop(function (dt, rdt) {
+  var o = solve(S.a, S.drive), L = S.l1 + S.l2, r = S.r;
+  var lift = o.Vf < 0 ? 'front' : o.Vr < 0 ? 'rear' : '';
+  var spin = isFinite(o.muReq) && o.muReq > S.mu;
+  S.v = Math.max(2, Math.min(25, S.v + S.a * dt * 0.3)); if (S.v >= 25 || S.v <= 2) S.v = 8;
+  S.off = (S.off + S.v * dt * 0.4) % 1.5; stripes.forEach(function (s1, k) { s1.position.x = -7 + k * 1.5 - S.off; });
+  S.ang -= S.v * dt * 0.4 / r;
+  var targetP = lift === 'front' ? 0.18 : lift === 'rear' ? -0.18 : Lab.clamp(0.0012 * ((o.Vr - o.Vf) - (S.l1 * 0 + (S.l2 - S.l1) * S.mc * g / (2 * L))) / Math.max(S.mc, 1) * 9, -0.08, 0.08);
+  S.pitch += (targetP - S.pitch) * Math.min(1, rdt * 4);
+  var xr = -S.l1, xf = S.l2;
+  car.position.set(0, 0, 0); car.rotation.z = S.pitch; // drej om bagakslen ved wheelie
+  var bodyLen = L + 1.2, bh = Math.max(0.35, S.h * 0.9);
+  lower.scale.set(bodyLen, bh * 0.75, 1.7); lower.position.set((xf + xr) / 2, r + bh * 0.42, 0);
+  cabin.scale.set(bodyLen * 0.5, bh * 0.55, 1.5); cabin.position.set((xf + xr) / 2 - 0.15, r + bh * 0.8 + bh * 0.28, 0);
+  if (lift === 'front') { var cp = Math.cos(S.pitch), sp = Math.sin(S.pitch); car.position.set(xr - (xr * cp - r * sp), r - (xr * sp + r * cp), 0); } // vip om bagakslen
+  var G = new THREE.Vector3(0, S.h, 0).applyEuler(car.rotation).add(car.position); Gdot.position.copy(G).setZ(0.9);
+  var pos = [[xr, -0.9], [xr, 0.9], [xf, -0.9], [xf, 0.9]];
+  wheels.forEach(function (w, k) { var p = new THREE.Vector3(pos[k][0], r, 0).applyEuler(car.rotation).add(car.position); w.position.set(p.x, p.y, pos[k][1]); w.scale.set(r, r, 1); w.rotation.z = S.ang * (spin && ((S.drive !== 'R' && k >= 2) || (S.drive !== 'F' && k < 2)) ? 2.2 : 1); });
+  // kræfter fra vejen (pr. hjul, foran-siden)
+  var sc = 1 / 4000, z = 1.15;
+  [[xr, o.Nr, o.fr], [xf, o.Nf, o.ff]].forEach(function (q, k) {
+    var base = new THREE.Vector3(q[0], 0, z).applyEuler(car.rotation).add(car.position).setZ(z);
+    var lenN = Math.min(Math.max(q[1], 0) * sc, 1.6), lenF = Math.sign(q[2]) * Math.min(Math.abs(q[2]) * sc * 2, 1.4);
+    arN[k].set(base.clone().setY(0.01), new THREE.Vector3(0, lenN, 0)); arN[k].visible = q[1] > 1;
+    arF[k].set(base.clone().setY(0.03), new THREE.Vector3(lenF, 0, 0)); arF[k].visible = Math.abs(q[2]) > 2 && q[1] > 0;
+    tN[k].set(base.clone().add(new THREE.Vector3(0.15, lenN + 0.12, 0)), q[1] > 0 ? 'N = ' + F(q[1], 0) + ' N' : 'løftet');
+    tF[k].set(base.clone().add(new THREE.Vector3(lenF + Math.sign(q[2] || 1) * 0.2, -0.15, 0)), 'f = ' + F(q[2], 0)); tF[k].visible = arF[k].visible;
+  });
+  arMa.set(G.clone().setZ(0.9), new THREE.Vector3(Lab.clamp(S.mc * S.a / 6000, -1.6, 1.6), 0, 0)); arMa.visible = Math.abs(S.a) > 0.05;
+  tMa.set(G.clone().setZ(0.9).add(new THREE.Vector3(Lab.clamp(S.mc * S.a / 6000, -1.6, 1.6) + Math.sign(S.a) * 0.3, 0.15, 0)), 'm<sub>c</sub>a = ' + F(S.mc * S.a, 0) + ' N'); tMa.visible = arMa.visible;
+  arW.set(G.clone().setZ(0.9), new THREE.Vector3(0, -Math.min(S.mc * g / 25000, S.h * 0.8), 0));
+  var drivenK = S.drive === 'R' ? [0] : S.drive === 'F' ? [1] : [0, 1];
+  arcM.forEach(function (a, k) { var on = drivenK.indexOf(k) >= 0, xw = k ? xf : xr; var p = new THREE.Vector3(xw, r, 0).applyEuler(car.rotation).add(car.position); a.set(p.setZ(1.0), new THREE.Vector3(0, 0, 1), r * 1.25, on && Math.abs(S.a) > 0.01 ? (S.a > 0 ? -1 : 1) : 0, 3); });
+  tM.set(new THREE.Vector3((S.drive === 'R' ? xr : xf), r * 2.6 + 0.2, 1.0), 'M = ' + F(S.drive === 'R' ? o.Mr : o.Mf, 0) + ' N·m');
+  ro.set('Hr', F(o.Hr, 2) + ' N'); ro.set('Vr', F(o.Vr, 0) + ' N', 'hi'); ro.set('Hf', F(o.Hf, 0) + ' N'); ro.set('Vf', F(o.Vf, 0) + ' N', 'hi'); ro.set('M', F(S.drive === 'R' ? o.Mr : o.Mf, 1) + ' N·m', 'ok');
+  ro.set('mu', isFinite(o.muReq) ? F(o.muReq, 3) : '∞', spin ? 'bad' : 'ok'); ro.set('st', lift ? (lift === 'front' ? 'WHEELIE' : 'bagende løfter') : spin ? 'HJULSPIND' : 'OK', lift || spin ? 'bad' : 'ok');
+  Lab.setStatus(UI.status, lift === 'front' ? 'Wheelie: forhjulene letter (V_f < 0)' : lift === 'rear' ? 'Bagenden letter under bremsning' : spin ? 'Hjulspind: μ_krævet > μ' : S.a >= 0 ? 'Accelererer' : 'Bremser', lift || spin ? 'bad' : '');
+  UI.note.textContent = (S.drive === 'F' ? 'Forhjulstræk' : S.drive === 'R' ? 'Baghjulstræk' : 'Firehjulstræk') + ' · kræfter pr. hjul';
+  // grafer
+  var as = [], vf = [], vr = [], mr = [];
+  for (var k = 0; k <= 80; k++) { var aa = -9 + 18 * k / 80, q = solve(aa, S.drive); as.push(aa); vf.push([aa, q.Vf]); vr.push([aa, q.Vr]); mr.push([aa, isFinite(q.muReq) ? Math.min(q.muReq, 2) : 2]); }
+  var Vm = S.mc * g / 2 * 1.3;
+  gN.begin({ xmin: -9, xmax: 9, ymin: -Vm * 0.15, ymax: Vm, xlabel: 'a [m/s²]', ylabel: 'V [N]', fx: function (x) { return F(x, 0); }, fy: function (y) { return F(y / 1000, 1) + 'k'; } });
+  gN.line(vf, '#5ec8ff', 2.2); gN.line(vr, '#ff7a59', 2.2); gN.hline(0, 'rgba(255,94,94,.8)', 'letter'); gN.dot(S.a, o.Vf, '#5ec8ff', 5); gN.dot(S.a, o.Vr, '#ff7a59', 5);
+  gN.text(-8.5, Vm * 0.9, 'forhjul V_f', '#5ec8ff'); gN.text(-8.5, Vm * 0.78, 'baghjul V_r', '#ff7a59'); gN.end();
+  gM.begin({ xmin: -9, xmax: 9, ymin: 0, ymax: 1.6, xlabel: 'a [m/s²]', ylabel: 'μ krævet', fx: function (x) { return F(x, 0); }, fy: function (y) { return F(y, 1); } });
+  gM.fill([[-9, S.mu], [9, S.mu], [9, 1.6], [-9, 1.6]], 'rgba(255,94,94,.08)'); gM.line(mr, '#ffd27a', 2.2); gM.hline(S.mu, 'rgba(255,94,94,.8)', 'μ = ' + F(S.mu, 2)); gM.dot(S.a, Math.min(isFinite(o.muReq) ? o.muReq : 1.6, 1.6), spin ? '#ff5e5e' : '#00d984', 5); gM.end();
+  var rh = S.r - S.h;
+  UI.formulas.innerHTML =
+    Lab.F('Frit hjul: f·r = Iα ⇒ f = m<sub>w</sub>k<sub>G</sub>²·a/r² = ' + n(o.I * S.a / (r * r), 2) + ' N,&nbsp; ΣF<sub>x</sub> = m<sub>w</sub>a ⇒ H = m<sub>w</sub>a + f = ' + n(S.drive === 'R' ? o.Hf : o.Hr, 2) + ' N',
+      'Det ikke-trukne hjul (17-16 om hjulets centrum, rulning α = a/r). Eksamenstallene: f = 17,78 N og H<sub>r</sub> = 57,78 N.') +
+    Lab.F('Karrosseri: −2H<sub>f</sub> − 2H<sub>r</sub> = m<sub>c</sub>a ⇒ H = ' + n(S.drive === 'R' ? o.Hr : o.Hf, 0) + ' N;&nbsp; trukket hjul: M = f·r + Iα = ' + n(S.drive === 'R' ? o.Mr : o.Mf, 1) + ' N·m',
+      'Eksamenstallene: |H<sub>f</sub>| = 1,81 kN og M = 559,7 N·m (som i Aflevering 4).') +
+    Lab.F('ΣM<sub>G</sub> = 0 (ren translation): V<sub>f</sub> = [l<sub>1</sub>m<sub>c</sub>g − 2(r−h)(H<sub>r</sub>+H<sub>f</sub>) − 2ΣM]/(2(l<sub>1</sub>+l<sub>2</sub>)) = ' + n(o.Vf, 0) + ' N,&nbsp; V<sub>r</sub> = m<sub>c</sub>g/2 − V<sub>f</sub> = ' + n(o.Vr, 0) + ' N',
+      'Momentligning om karrosseriets tyngdepunkt, hvor h − r = ' + F(-rh, 2) + ' m over akslerne. Reaktionen fra drivmomentet M virker også på karrosseriet. Eksamenstallene: V<sub>f</sub> = 4,56 kN og V<sub>r</sub> = 4,02 kN.');
+  lab.render(rdt);
+});
+})();
+</script>
+</body>
+</html>
