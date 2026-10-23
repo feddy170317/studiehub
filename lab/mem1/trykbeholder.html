@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tykvægget trykbeholder · 3D-lab</title>
+<meta name="description" content="Opskåret hydraulikcylinder: se omkredsspændingen fordele sig gennem væggen efter Lamés ligninger, og hvorfor en tykkere væg hjælper mindre og mindre.">
+<link rel="stylesheet" href="../assets/lab.css">
+</head>
+<body>
+<script src="../assets/three.min.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+'use strict';
+var F = Lab.fmt, n = Lab.n, PI = Math.PI;
+var UI = Lab.build({
+  chip: 'MEM1 · kap. 10 · eksamensspm. 8', title: 'Tykvægget trykbeholder: Lamé gennem væggen',
+  src: 'Hamrock kap. 10: Lamés ligninger for tykvæggede cylindre',
+  side: ['Geometri', 'Tryk og materiale', 'Aflæsning'],
+  graphs: [{ id: 'gR', title: 'Spændinger gennem væggen', sub: 'σ<sub>θ</sub>(r) og σ<sub>r</sub>(r)' }, { id: 'gW', title: 'Hjælper en tykkere væg?', sub: 'σ<sub>θ</sub>(r<sub>i</sub>)/p<sub>i</sub> mod r<sub>o</sub>/r<sub>i</sub>' }],
+  notes: '<li><b>Inderste lag bærer mest.</b> σ<sub>θ</sub> falder med 1/r² gennem væggen, så den maksimale omkredsspænding ligger altid på indersiden.</li>' +
+    '<li>σ<sub>r</sub> går fra −p<sub>i</sub> på indersiden til 0 på ydersiden (ingen ydre tryk). Det er tryk, fordi væsken skubber væggen sammen radialt.</li>' +
+    '<li><b>En tykkere væg hjælper mindre og mindre:</b> selv med uendelig væg er σ<sub>θ</sub>(r<sub>i</sub>) mindst lig p<sub>i</sub>. Se den højre graf.</li>' +
+    '<li>Tyndvægsformlen σ = pr/t passer godt, når t er lille i forhold til r, men undervurderer spændingen på indersiden af en tyk væg.</li>' +
+    '<li>Sæt et ydre tryk på (fx krympepasning eller en ubåd), og se hvordan det trækker σ<sub>θ</sub> ned på indersiden.</li>',
+  model: '<li>Lang cylinder, lineært elastisk, aksesymmetrisk. Lamés ligninger: σ<sub>θ,r</sub> = (p<sub>i</sub>r<sub>i</sub>² − p<sub>o</sub>r<sub>o</sub>²)/(r<sub>o</sub>² − r<sub>i</sub>²) ± r<sub>i</sub>²r<sub>o</sub>²(p<sub>i</sub> − p<sub>o</sub>)/((r<sub>o</sub>² − r<sub>i</sub>²)r²).</li>' +
+    '<li>Lukkede ender giver en aksialspænding σ<sub>z</sub> = (p<sub>i</sub>r<sub>i</sub>² − p<sub>o</sub>r<sub>o</sub>²)/(r<sub>o</sub>² − r<sub>i</sub>²), som indgår i von Mises-tjekket.</li>'
+});
+var lab = Lab.scene(UI.stage, { view: { target: new THREE.Vector3(0, 0, 0), theta: 0.9, phi: 1.05, radius: 4.3 } });
+var S = { ri: 40, ro: 60, pi: 50, po: 0, Sy: 350, closed: true };
+
+function lame(r) {
+  var a = S.ri * S.ri, b = S.ro * S.ro, A = (S.pi * a - S.po * b) / (b - a), B = a * b * (S.pi - S.po) / (b - a);
+  return { th: A + B / (r * r), r: A - B / (r * r), z: S.closed ? A : 0 };
+}
+
+/* ---------- 3D: opskåret cylinder ---------- */
+var grp = new THREE.Group(); lab.scene.add(grp);
+var parts = [], fluid = null, arrowsIn = [], arrowsOut = [];
+var H = 1.6, CUT = PI / 2, TH = 2 * PI - CUT, k;
+for (k = 0; k < 8; k++) { var a1 = Lab.arrow(0x5ec8ff, { radius: 0.01 }); arrowsIn.push(a1); lab.scene.add(a1); var a2 = Lab.arrow(0xd984ff, { radius: 0.01 }); arrowsOut.push(a2); lab.scene.add(a2); }
+var tagIn = Lab.tag(lab, '', '#ffd27a'), tagOut = Lab.tag(lab, '', '#ffd27a'), tagP = Lab.tag(lab, '', '#5ec8ff');
+var hc = new THREE.Color();
+function build() {
+  parts.forEach(function (p) { grp.remove(p); p.geometry.dispose(); }); parts = [];
+  var sc = 1 / 60, ri = S.ri * sc, ro = S.ro * sc, smax = Math.max(Math.abs(lame(S.ri).th), Math.abs(lame(S.ro).th), 1);
+  function col(r) { return Lab.cmapHeat(0.08 + 0.92 * Math.abs(lame(r).th) / smax, new THREE.Color()); }
+  var outer = new THREE.Mesh(new THREE.CylinderGeometry(ro, ro, H, 64, 1, true, CUT / 2, TH), Lab.mat(col(S.ro), { metal: 0.3, rough: 0.5 }));
+  var inner = new THREE.Mesh(new THREE.CylinderGeometry(ri, ri, H, 64, 1, true, CUT / 2, TH), Lab.mat(col(S.ri), { metal: 0.3, rough: 0.5, double: true }));
+  parts.push(outer, inner);
+  // snitflader og endeflader med farve efter radius
+  function sector(th0, isCap, y) {
+    var pos = [], colr = [], idx = [], NR = 24, NA = isCap ? 64 : 1, NY = isCap ? 1 : 1;
+    for (var i = 0; i <= NR; i++) {
+      var rmm = S.ri + (S.ro - S.ri) * i / NR, r = rmm * sc, c = col(rmm);
+      for (var j = 0; j <= (isCap ? NA : 1); j++) {
+        var x, yy, z;
+        if (isCap) { var th = CUT / 2 + TH * j / NA; x = r * Math.sin(th); z = r * Math.cos(th); yy = y; }
+        else { x = r * Math.sin(th0); z = r * Math.cos(th0); yy = -H / 2 + H * j; }
+        pos.push(x, yy, z); colr.push(c.r, c.g, c.b);
+      }
+    }
+    var W = (isCap ? NA : 1) + 1;
+    for (i = 0; i < NR; i++) for (var j2 = 0; j2 < W - 1; j2++) { var p0 = i * W + j2, p1 = p0 + 1, p2 = p0 + W, p3 = p2 + 1; idx.push(p0, p2, p1, p1, p2, p3); }
+    var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(colr, 3)); g.setIndex(idx); g.computeVertexNormals();
+    return new THREE.Mesh(g, new THREE.MeshStandardMaterial({ vertexColors: true, side: THREE.DoubleSide, metalness: 0.2, roughness: 0.6 }));
+  }
+  parts.push(sector(CUT / 2, false), sector(CUT / 2 + TH, false), sector(0, true, H / 2), sector(0, true, -H / 2));
+  parts.forEach(function (p) { grp.add(p); });
+  if (fluid) { grp.remove(fluid); fluid.geometry.dispose(); }
+  fluid = new THREE.Mesh(new THREE.CylinderGeometry(ri * 0.995, ri * 0.995, H * 0.98, 48), new THREE.MeshStandardMaterial({ color: 0x2f7fd1, transparent: true, opacity: 0.22 + 0.4 * Math.min(1, S.pi / 150), depthWrite: false }));
+  grp.add(fluid);
+  // trykpile
+  var L = 0.12 + 0.3 * Math.min(1, S.pi / 150), Lo = 0.12 + 0.3 * Math.min(1, S.po / 150);
+  for (k = 0; k < 8; k++) {
+    var th = CUT / 2 + TH * (k + 0.5) / 8, d = new THREE.Vector3(Math.sin(th), 0, Math.cos(th)), y = (k % 2 ? 0.35 : -0.35);
+    arrowsIn[k].set(d.clone().multiplyScalar(ri - L - 0.01).setY(y), d.clone().multiplyScalar(L)); arrowsIn[k].visible = S.pi > 0;
+    arrowsOut[k].set(d.clone().multiplyScalar(ro + Lo + 0.02).setY(-y), d.clone().multiplyScalar(-Lo)); arrowsOut[k].visible = S.po > 0;
+  }
+  tagIn.set(new THREE.Vector3(ri * Math.sin(CUT / 2) * 0.6, H / 2 + 0.12, ri * Math.cos(CUT / 2)), 'σ<sub>θ</sub>(r<sub>i</sub>) = ' + F(lame(S.ri).th, 1) + ' MPa');
+  tagOut.set(new THREE.Vector3(ro * Math.sin(CUT / 2) * 1.05, -H / 2 - 0.12, ro * Math.cos(CUT / 2)), 'σ<sub>θ</sub>(r<sub>o</sub>) = ' + F(lame(S.ro).th, 1) + ' MPa');
+  tagP.set(new THREE.Vector3(0, 0, 0), 'p<sub>i</sub> = ' + F(S.pi, 0) + ' MPa');
+}
+
+/* ---------- kontroller ---------- */
+var c = UI.side;
+var sri = Lab.slider(c[0], { label: 'Inderradius r<sub>i</sub>', min: 5, max: 95, step: 1, value: S.ri, unit: 'mm', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.ri = Math.min(v, S.ro - 1); upd(); } });
+var sro = Lab.slider(c[0], { label: 'Yderradius r<sub>o</sub>', min: 6, max: 150, step: 1, value: S.ro, unit: 'mm', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.ro = Math.max(v, S.ri + 1); upd(); } });
+Lab.check(c[0], { label: 'Lukkede ender (aksialspænding σ<sub>z</sub>)', value: true, onChange: function (v) { S.closed = v; upd(); } });
+var spi = Lab.slider(c[1], { label: 'Indvendigt tryk p<sub>i</sub>', min: 0, max: 300, step: 1, value: S.pi, unit: 'MPa', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.pi = v; upd(); } });
+var spo = Lab.slider(c[1], { label: 'Udvendigt tryk p<sub>o</sub>', min: 0, max: 200, step: 1, value: S.po, unit: 'MPa', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.po = v; upd(); } });
+var ssy = Lab.slider(c[1], { label: 'Flydespænding S<sub>y</sub>', min: 150, max: 1200, step: 10, value: S.Sy, unit: 'MPa', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.Sy = v; upd(); } });
+Lab.presets(c[1], [
+  ['<b>Eksamensspm. 8:</b> hydraulikcylinder r<sub>i</sub> = 40, r<sub>o</sub> = 60 mm, p<sub>i</sub> = 50 MPa', function () { set(40, 60, 50, 0); }],
+  ['<b>Tyndvægget rør:</b> r<sub>i</sub> = 50, r<sub>o</sub> = 53 mm', function () { set(50, 53, 10, 0); }],
+  ['<b>Krympepasning:</b> kun ydre tryk 60 MPa', function () { set(40, 60, 0, 60); }]
+]);
+function set(a, b, p, q) { S.ri = a; S.ro = b; S.pi = p; S.po = q; sri.set(a, true); sro.set(b, true); spi.set(p, true); spo.set(q, true); upd(); }
+var ro = Lab.readouts(c[2], [['ti', 'σ<sub>θ</sub>(r<sub>i</sub>) (maks)'], ['ri', 'σ<sub>r</sub>(r<sub>i</sub>)'], ['to', 'σ<sub>θ</sub>(r<sub>o</sub>)'], ['z', 'σ<sub>z</sub> (lukkede ender)'], '-', ['thin', 'Tyndvægsformel p r<sub>i</sub>/t'], ['vm', 'von Mises på indersiden'], ['n', 'Sikkerhed mod flydning']]);
+Lab.legendKeys(UI.legend, [[Lab.heatCSS, 'farve = |σ<sub>θ</sub>| (omkredsspænding)'], ['#5ec8ff', 'indvendigt tryk'], ['#d984ff', 'udvendigt tryk']]);
+
+var gR = Lab.plot(UI.graphs.gR), gW = Lab.plot(UI.graphs.gW);
+function upd() {
+  build();
+  var i = lame(S.ri), o = lame(S.ro), t = S.ro - S.ri, thin = S.pi * S.ri / t;
+  var vm = Math.sqrt(0.5 * ((i.th - i.r) * (i.th - i.r) + (i.r - i.z) * (i.r - i.z) + (i.z - i.th) * (i.z - i.th)));
+  ro.set('ti', F(i.th, 1) + ' MPa', 'hi'); ro.set('ri', F(i.r, 1) + ' MPa'); ro.set('to', F(o.th, 1) + ' MPa'); ro.set('z', S.closed ? F(i.z, 1) + ' MPa' : '–');
+  ro.set('thin', F(thin, 1) + ' MPa'); ro.set('vm', F(vm, 1) + ' MPa'); ro.set('n', vm > 0 ? F(S.Sy / vm, 2) : '∞', S.Sy / vm < 1 ? 'bad' : 'ok');
+  Lab.setStatus(UI.status, vm > S.Sy ? 'Flydning på indersiden' : 'Elastisk', vm > S.Sy ? 'bad' : '');
+  UI.note.textContent = 'Vægtykkelse t = ' + F(t, 0) + ' mm · r_o/r_i = ' + F(S.ro / S.ri, 2);
+  // graf 1
+  var lim = Math.max(Math.abs(i.th), Math.abs(i.r), Math.abs(o.th), S.pi, S.po, 10) * 1.2;
+  gR.begin({ xmin: S.ri, xmax: S.ro, ymin: -lim, ymax: lim, xlabel: 'r [mm]', ylabel: 'σ [MPa]', fx: function (x) { return F(x, 0); }, fy: function (y) { return F(y, 0); } });
+  var th = [], rr = []; for (var q = 0; q <= 60; q++) { var r = S.ri + (S.ro - S.ri) * q / 60, l = lame(r); th.push([r, l.th]); rr.push([r, l.r]); }
+  gR.fill([[S.ri, 0]].concat(th, [[S.ro, 0]]), 'rgba(255,165,0,.15)'); gR.line(th, '#ffa500', 2.4); gR.line(rr, '#5ec8ff', 2.2);
+  if (S.closed) gR.hline(i.z, 'rgba(217,132,255,.8)', 'σ_z');
+  gR.hline(thin, 'rgba(227,233,239,.6)', 'tyndvæg p·r_i/t', [3, 4]);
+  gR.dot(S.ri, i.th, '#ffa500', 5); gR.text(S.ri, i.th, '  σ_θ', '#ffa500'); gR.text(S.ri + (S.ro - S.ri) * 0.05, i.r * 0.8, 'σ_r', '#5ec8ff');
+  gR.end();
+  // graf 2
+  gW.begin({ xmin: 1, xmax: 4, ymin: 0, ymax: 6, xlabel: 'r_o / r_i', ylabel: 'σ_θ(r_i) / p_i', fx: function (x) { return F(x, 1); }, fy: function (y) { return F(y, 0); } });
+  var lamC = [], thinC = []; for (q = 1; q <= 120; q++) { var kk = 1 + q / 40; lamC.push([kk, (kk * kk + 1) / (kk * kk - 1)]); thinC.push([kk, 1 / (kk - 1)]); }
+  gW.line(lamC, '#ffa500', 2.4); gW.line(thinC, 'rgba(227,233,239,.6)', 1.6, [5, 4]); gW.hline(1, 'rgba(94,200,255,.8)', 'grænse: σ_θ = p_i');
+  var kc = S.ro / S.ri; if (kc <= 4) gW.dot(kc, (kc * kc + 1) / (kc * kc - 1), '#ffffff', 5);
+  gW.text(2.6, 2.2, 'Lamé', '#ffa500'); gW.text(1.3, 4.8, 'tyndvæg', 'rgba(227,233,239,.8)');
+  gW.end();
+  UI.formulas.innerHTML =
+    Lab.F('σ<sub>θ</sub>(r) = (p<sub>i</sub>r<sub>i</sub>²)/(r<sub>o</sub>²−r<sub>i</sub>²) · (1 + r<sub>o</sub>²/r²) ⇒ σ<sub>θ</sub>(r<sub>i</sub>) = p<sub>i</sub>(r<sub>o</sub>²+r<sub>i</sub>²)/(r<sub>o</sub>²−r<sub>i</sub>²) = ' + n(S.pi, 0) + '·(' + n(S.ro * S.ro, 0) + '+' + n(S.ri * S.ri, 0) + ')/(' + n(S.ro * S.ro, 0) + '−' + n(S.ri * S.ri, 0) + ') = ' + n(i.th, 1) + ' MPa',
+      'Lamé med p<sub>o</sub> = 0 (Hamrock kap. 10). Med eksamenstallene: 50·5200/2000 = 130 MPa. Formlen med p<sub>o</sub> står under Model og antagelser.') +
+    Lab.F('σ<sub>r</sub>(r) = (p<sub>i</sub>r<sub>i</sub>²)/(r<sub>o</sub>²−r<sub>i</sub>²) · (1 − r<sub>o</sub>²/r²) ⇒ σ<sub>r</sub>(r<sub>i</sub>) = −p<sub>i</sub> = ' + n(i.r, 1) + ' MPa', 'Randbetingelsen: radialspændingen er lig minus trykket på hver flade.') +
+    Lab.F('σ<sub>θ</sub>(r<sub>o</sub>) = 2p<sub>i</sub>r<sub>i</sub>²/(r<sub>o</sub>²−r<sub>i</sub>²) = ' + n(o.th, 1) + ' MPa', 'Maksimum ligger på indersiden og minimum på ydersiden. Forskellen er netop p<sub>i</sub>, når p<sub>o</sub> = 0.');
+}
+upd();
+Lab.loop(function (dt, rdt) { lab.render(rdt); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mohrs cirkel · 3D-lab</title>
+<meta name="description" content="Drej et spændingselement i 3D og se spændingerne på det skrå snit følge Mohrs cirkel. Hovedspændinger og maksimal forskydning med ét klik.">
+<link rel="stylesheet" href="../assets/lab.css">
+</head>
+<body>
+<script src="../assets/three.min.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+'use strict';
+var F = Lab.fmt, n = Lab.n, PI = Math.PI, D = PI / 180;
+var UI = Lab.build({
+  chip: 'MEM1 · kap. 2 · eksamensspm. 1', title: 'Mohrs cirkel: drej spændingselementet',
+  src: 'Hamrock kap. 2: plan spændingstransformation og Mohrs cirkel',
+  side: ['Spændingstilstand', 'Snitvinkel φ', 'Aflæsning'],
+  graphs: [{ id: 'gM', title: 'Mohrs cirkel', sub: 'τ afsat positivt nedad' }, { id: 'gP', title: 'σ<sub>φ</sub> og τ<sub>φ</sub> som funktion af φ', sub: '0–180°' }],
+  notes: '<li>Hele cirklen er alle de snit, du kan lægge gennem det samme punkt. Når elementet drejer φ, drejer punktet <b>2φ</b> på cirklen.</li>' +
+    '<li><b>Hovedspændingerne</b> σ<sub>1</sub> og σ<sub>2</sub> ligger, hvor cirklen skærer σ-aksen. Dér er τ = 0, altså ingen forskydning på snittet.</li>' +
+    '<li><b>Maksimal forskydning</b> τ<sub>maks</sub> = R ligger 45° fra hovedretningerne. Normalspændingen er dér lig middelspændingen σ<sub>m</sub>.</li>' +
+    '<li>σ<sub>φ</sub> + σ<sub>φ+90°</sub> er konstant (= σ<sub>x</sub> + σ<sub>y</sub>). Det er derfor, centrum ikke flytter sig, når du drejer.</li>',
+  model: '<li>Plan spænding (σ<sub>z</sub> = τ<sub>xz</sub> = τ<sub>yz</sub> = 0). Elementet er drejet φ mod uret om <i>z</i>-aksen.</li>' +
+    '<li>Fortegn: τ<sub>xy</sub> > 0 virker i +<i>y</i>-retning på fladen med normal +<i>x</i>. På cirklen er τ afsat positivt nedad, så punktet drejer samme vej som elementet.</li>' +
+    '<li>Pilenes længde er proportional med spændingen. Røde pile er træk, blå er tryk, og grønne er forskydning.</li>'
+});
+var lab = Lab.scene(UI.stage, { view: { target: new THREE.Vector3(0, 0, 0), theta: 0.0, phi: 1.2, radius: 4.4 } });
+var S = { sx: 90, sy: 10, txy: 30, phi: 0, auto: false, ghost: true, goal: null };
+
+/* ---------- 3D: plade + element ---------- */
+var plate = new THREE.Mesh(new THREE.BoxGeometry(3.2, 3.2, 0.06), Lab.mat(0x22384f, { metal: 0.2, rough: 0.9, opacity: 0.55 }));
+plate.position.z = -0.4; lab.scene.add(plate);
+var elem = new THREE.Group(); lab.scene.add(elem);
+var cube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 0.35), Lab.mat(0x8a9db3, { metal: 0.5, rough: 0.4 })); elem.add(cube);
+var edges = new THREE.LineSegments(new THREE.EdgesGeometry(cube.geometry), new THREE.LineBasicMaterial({ color: 0xe3e9ef })); elem.add(edges);
+var ghost = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1, 1, 0.35)), new THREE.LineDashedMaterial({ color: 0x8fa3b8, dashSize: 0.05, gapSize: 0.04 }));
+ghost.computeLineDistances(); lab.scene.add(ghost);
+// fast koordinatsystem og drejet akse x'
+var axX = Lab.arrow(0x8fa3b8, { radius: 0.006 }); axX.set(new THREE.Vector3(-1.7, -1.7, 0), new THREE.Vector3(0.6, 0, 0)); lab.scene.add(axX);
+var axY = Lab.arrow(0x8fa3b8, { radius: 0.006 }); axY.set(new THREE.Vector3(-1.7, -1.7, 0), new THREE.Vector3(0, 0.6, 0)); lab.scene.add(axY);
+Lab.tag(lab, 'x', '#8fa3b8').set(new THREE.Vector3(-1.0, -1.7, 0)); Lab.tag(lab, 'y', '#8fa3b8').set(new THREE.Vector3(-1.7, -1.0, 0));
+var tagXp = Lab.tag(lab, "x′", '#ffd27a'), lineXp = Lab.line(0xffd27a, true); lab.scene.add(lineXp);
+// pile: 4 normal + 4 forskydning
+var nA = [], tA = [], k;
+for (k = 0; k < 4; k++) { nA.push(Lab.arrow(0xff5e5e, { radius: 0.022 })); tA.push(Lab.arrow(0x00d984, { radius: 0.018 })); lab.scene.add(nA[k]); lab.scene.add(tA[k]); }
+var tagN = Lab.tag(lab, '', '#ff5e5e'), tagT = Lab.tag(lab, '', '#00d984'), tagN2 = Lab.tag(lab, '', '#ff5e5e');
+
+/* ---------- kontroller ---------- */
+var sx = Lab.slider(UI.side[0], { label: 'σ<sub>x</sub>', min: -200, max: 200, step: 1, value: S.sx, unit: 'MPa', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.sx = v; } });
+var sy = Lab.slider(UI.side[0], { label: 'σ<sub>y</sub>', min: -200, max: 200, step: 1, value: S.sy, unit: 'MPa', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.sy = v; } });
+var st = Lab.slider(UI.side[0], { label: 'τ<sub>xy</sub>', min: -150, max: 150, step: 1, value: S.txy, unit: 'MPa', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.txy = v; } });
+Lab.presets(UI.side[0], [
+  ['<b>Eksamensspm. 1:</b> σ<sub>x</sub> = 90, σ<sub>y</sub> = 10, τ<sub>xy</sub> = 30 MPa', function () { set(90, 10, 30); }],
+  ['<b>Ren forskydning:</b> τ<sub>xy</sub> = 60 MPa (fx en aksel i vridning)', function () { set(0, 0, 60); }],
+  ['<b>Enakset træk:</b> σ<sub>x</sub> = 100 MPa', function () { set(100, 0, 0); }]
+]);
+function set(a, b, c) { S.sx = a; S.sy = b; S.txy = c; sx.set(a, true); sy.set(b, true); st.set(c, true); S.goal = 0; }
+var sphi = Lab.slider(UI.side[1], { label: 'Snitvinkel φ', min: -90, max: 90, step: 0.5, value: 0, unit: '°', fmt: function (x) { return F(x, 1); }, onInput: function (v) { S.phi = v * D; S.goal = null; } });
+var row = Lab.btnRow(UI.side[1]);
+Lab.button(row, '→ hovedretning', 'primary', function () { S.goal = princ().thp; });
+Lab.button(row, '→ τ<sub>maks</sub>', '', function () { S.goal = princ().thp + 45 * D; });
+Lab.button(row, '→ 0°', '', function () { S.goal = 0; });
+Lab.check(UI.side[1], { label: 'Drej langsomt rundt af sig selv', value: false, onChange: function (v) { S.auto = v; S.goal = null; } });
+Lab.check(UI.side[1], { label: 'Vis det oprindelige element (stiplet)', value: true, onChange: function (v) { S.ghost = v; } });
+var ro = Lab.readouts(UI.side[2], [['m', 'Middelspænding σ<sub>m</sub> (centrum)'], ['R', 'Radius <i>R</i>'], ['s1', 'σ<sub>1</sub> = σ<sub>m</sub> + <i>R</i>'], ['s2', 'σ<sub>2</sub> = σ<sub>m</sub> − <i>R</i>'], ['tm', 'τ<sub>maks</sub> = <i>R</i>'], ['tp', 'Hovedretning θ<sub>p</sub>'], '-', ['sp', 'σ<sub>φ</sub> på snittet'], ['tph', 'τ<sub>φ</sub> på snittet']]);
+Lab.legendKeys(UI.legend, [['#ff5e5e', 'normalspænding, træk'], ['#5ec8ff', 'normalspænding, tryk'], ['#00d984', 'forskydning'], ['#ffd27a', "drejet akse x′"]]);
+
+function princ() {
+  var m = (S.sx + S.sy) / 2, R = Math.hypot((S.sx - S.sy) / 2, S.txy);
+  var thp = 0.5 * Math.atan2(2 * S.txy, S.sx - S.sy);
+  return { m: m, R: R, s1: m + R, s2: m - R, thp: thp };
+}
+function trans(p) {
+  var c = Math.cos(2 * p), s = Math.sin(2 * p), a = (S.sx + S.sy) / 2, b = (S.sx - S.sy) / 2;
+  return { s: a + b * c + S.txy * s, t: -b * s + S.txy * c };
+}
+
+/* ---------- grafer ---------- */
+var gM = Lab.plot(UI.graphs.gM), gP = Lab.plot(UI.graphs.gP);
+function graphs() {
+  var p = princ(), cur = trans(S.phi), span = Math.max(p.R * 1.25, Math.abs(p.m) + p.R * 1.15, 20);
+  var cx = p.m;
+  gM.begin({ xmin: cx - span * 1.25, xmax: cx + span * 1.25, ymin: span * 0.95, ymax: -span * 0.95, xlabel: 'σ [MPa]', ylabel: 'τ [MPa] (nedad +)', fx: function (x) { return F(x, 0); }, fy: function (y) { return F(y, 0); } });
+  var circ = []; for (var i = 0; i <= 120; i++) { var a = i / 120 * 2 * PI; circ.push([p.m + p.R * Math.cos(a), p.R * Math.sin(a)]); }
+  gM.fill(circ, 'rgba(94,200,255,.07)'); gM.line(circ, '#5ec8ff', 2);
+  gM.line([[S.sx, S.txy], [S.sy, -S.txy]], 'rgba(143,163,184,.7)', 1.2, [4, 4]);
+  gM.dot(S.sx, S.txy, '#8fa3b8', 4); gM.text(S.sx, S.txy, '  X (φ = 0)', '#8fa3b8');
+  gM.dot(S.sy, -S.txy, '#8fa3b8', 4); gM.text(S.sy, -S.txy, '  Y', '#8fa3b8');
+  gM.dot(p.s1, 0, '#ff5e5e', 4); gM.text(p.s1, 0, ' σ₁', '#ff5e5e'); gM.dot(p.s2, 0, '#5ec8ff', 4); gM.text(p.s2, 0, ' σ₂', '#5ec8ff');
+  gM.dot(p.m, p.R, '#00d984', 3.5); gM.text(p.m, p.R, ' τ_maks', '#00d984');
+  gM.line([[p.m, 0], [cur.s, cur.t]], '#ffd27a', 2);
+  gM.dot(cur.s, cur.t, '#ffd27a', 6); gM.text(cur.s, cur.t, '  φ = ' + F(S.phi / D, 1) + '°', '#ffd27a');
+  gM.dot(p.m, 0, '#e3e9ef', 3);
+  gM.end();
+  var lim = Math.max(Math.abs(p.s1), Math.abs(p.s2), p.R, 10) * 1.15;
+  gP.begin({ xmin: 0, xmax: 180, ymin: -lim, ymax: lim, xlabel: 'φ [°]', ylabel: 'MPa', fx: function (x) { return F(x, 0); }, fy: function (y) { return F(y, 0); } });
+  var a1 = [], a2 = []; for (i = 0; i <= 180; i += 2) { var tr = trans(i * D); a1.push([i, tr.s]); a2.push([i, tr.t]); }
+  gP.line(a1, '#ff5e5e', 2); gP.line(a2, '#00d984', 2);
+  var ph = ((S.phi / D) % 180 + 180) % 180; gP.vline(ph, 'rgba(255,210,122,.8)');
+  gP.dot(ph, cur.s, '#ff5e5e'); gP.dot(ph, cur.t, '#00d984');
+  gP.text(4, lim * 0.85, 'σ_φ', '#ff5e5e'); gP.text(30, lim * 0.85, 'τ_φ', '#00d984');
+  gP.end();
+}
+
+/* ---------- løkke ---------- */
+var pauseBtn = Lab.button(Lab.btnRow(UI.side[1]), '⏸ Pause', '', function () {});
+var v = new THREE.Vector3(), nrm = new THREE.Vector3(), tan = new THREE.Vector3();
+Lab.loop(function (dt, rdt) {
+  if (S.auto) { S.phi += dt * 0.35; if (S.phi > PI / 2) S.phi -= PI; sphi.set(S.phi / D, true); }
+  if (S.goal !== null) { var dd = S.goal - S.phi; if (Math.abs(dd) < 0.002) { S.phi = S.goal; S.goal = null; } else S.phi += dd * Math.min(1, rdt * 4); sphi.set(S.phi / D, true); }
+  var p = princ(), cur = trans(S.phi), cur2 = trans(S.phi + PI / 2), smax = Math.max(Math.abs(p.s1), Math.abs(p.s2), p.R, 1);
+  elem.rotation.z = S.phi; ghost.visible = S.ghost;
+  var c = Math.cos(S.phi), s = Math.sin(S.phi);
+  var faces = [[c, s, cur.s, cur.t], [-c, -s, cur.s, cur.t], [-s, c, cur2.s, cur.t], [s, -c, cur2.s, cur.t]];
+  for (var i = 0; i < 4; i++) {
+    var f = faces[i]; nrm.set(f[0], f[1], 0); tan.set(-f[1], f[0], 0);
+    var L = 0.85 * Math.abs(f[2]) / smax, face = nrm.clone().multiplyScalar(0.5);
+    nA[i].visible = L > 0.01;
+    nA[i].children.forEach(function (ch) { ch.material.color.setHex(f[2] >= 0 ? 0xff5e5e : 0x5ec8ff); ch.material.emissive.setHex(f[2] >= 0 ? 0xff5e5e : 0x5ec8ff); });
+    if (f[2] >= 0) nA[i].set(face.clone().addScaledVector(nrm, 0.04), nrm.clone().multiplyScalar(L));
+    else nA[i].set(face.clone().addScaledVector(nrm, 0.04 + L), nrm.clone().multiplyScalar(-L));
+    // traktion t = σ′·n: x′-flader har forskydning τ·rot(+90°)n, y′-flader τ·rot(−90°)n
+    var Lt = 0.85 * Math.abs(f[3]) / smax, dir = tan.clone().multiplyScalar(Math.sign(f[3]) * (i >= 2 ? -1 : 1));
+    tA[i].visible = Lt > 0.01;
+    tA[i].set(face.clone().addScaledVector(nrm, 0.09).addScaledVector(dir, -Lt / 2), dir.multiplyScalar(Lt));
+  }
+  tagN.set(new THREE.Vector3(c * (0.62 + 0.85 * Math.abs(cur.s) / smax), s * (0.62 + 0.85 * Math.abs(cur.s) / smax), 0), 'σ<sub>φ</sub> = ' + F(cur.s, 1));
+  tagT.set(new THREE.Vector3(c * 0.75 - s * 0.55, s * 0.75 + c * 0.55, 0.15), 'τ<sub>φ</sub> = ' + F(cur.t, 1));
+  tagN2.set(new THREE.Vector3(-s * (0.62 + 0.85 * Math.abs(cur2.s) / smax), c * (0.62 + 0.85 * Math.abs(cur2.s) / smax), 0), 'σ<sub>φ+90°</sub> = ' + F(cur2.s, 1));
+  lineXp.set([new THREE.Vector3(-1.6 * c, -1.6 * s, 0.2), new THREE.Vector3(1.6 * c, 1.6 * s, 0.2)]); tagXp.set(new THREE.Vector3(1.75 * c, 1.75 * s, 0.2));
+
+  ro.set('m', F(p.m, 1) + ' MPa'); ro.set('R', F(p.R, 1) + ' MPa'); ro.set('s1', F(p.s1, 1) + ' MPa', 'hi'); ro.set('s2', F(p.s2, 1) + ' MPa', 'hi');
+  ro.set('tm', F(p.R, 1) + ' MPa', 'ok'); ro.set('tp', F(p.thp / D, 1) + '°'); ro.set('sp', F(cur.s, 1) + ' MPa'); ro.set('tph', F(cur.t, 1) + ' MPa');
+  var atP = Math.abs(cur.t) < 0.01 * Math.max(p.R, 1), atT = Math.abs(Math.abs(cur.t) - p.R) < 0.01 * Math.max(p.R, 1);
+  Lab.setStatus(UI.status, atP ? 'Hovedretning: ingen forskydning på snittet' : atT ? 'Maksimal forskydning: 45° fra hovedretningen' : 'Snit under φ = ' + F(S.phi / D, 1) + '°', atP || atT ? '' : 'warn');
+  UI.note.textContent = 'Punktet på cirklen står i 2φ = ' + F(2 * S.phi / D, 1) + '°';
+
+  var cc = Math.cos(2 * S.phi), ss = Math.sin(2 * S.phi);
+  UI.formulas.innerHTML =
+    Lab.F('σ<sub>φ</sub> = (σ<sub>x</sub>+σ<sub>y</sub>)/2 + (σ<sub>x</sub>−σ<sub>y</sub>)/2 · cos 2φ + τ<sub>xy</sub> sin 2φ = ' + n(p.m, 1) + ' + ' + n((S.sx - S.sy) / 2, 1) + '·' + n(cc, 3) + ' + ' + n(S.txy, 0) + '·' + n(ss, 3) + ' = ' + n(cur.s, 1) + ' MPa') +
+    Lab.F('τ<sub>φ</sub> = −(σ<sub>x</sub>−σ<sub>y</sub>)/2 · sin 2φ + τ<sub>xy</sub> cos 2φ = ' + n(cur.t, 1) + ' MPa',
+      'Transformationsligningerne for plan spænding fås af ligevægt på en kile skåret under vinklen φ (Hamrock kap. 2). Indsæt 2φ, og (σ<sub>φ</sub>, τ<sub>φ</sub>) ligger på en cirkel.') +
+    Lab.F('σ<sub>m</sub> = (σ<sub>x</sub>+σ<sub>y</sub>)/2 = ' + n(p.m, 1) + ' MPa,&nbsp;&nbsp; <i>R</i> = √[((σ<sub>x</sub>−σ<sub>y</sub>)/2)² + τ<sub>xy</sub>²] = ' + n(p.R, 1) + ' MPa',
+      'Cirklens centrum (listen kalder det middelspændingen) og radius.') +
+    Lab.F('σ<sub>1,2</sub> = σ<sub>m</sub> ± <i>R</i> = ' + n(p.s1, 1) + ' / ' + n(p.s2, 1) + ' MPa,&nbsp;&nbsp; τ<sub>maks</sub> = <i>R</i> = ' + n(p.R, 1) + ' MPa,&nbsp;&nbsp; tan 2θ<sub>p</sub> = 2τ<sub>xy</sub>/(σ<sub>x</sub>−σ<sub>y</sub>) ⇒ θ<sub>p</sub> = ' + n(p.thp / D, 1) + '°',
+      'Med eksamenstallene: σ<sub>m</sub> = 50, R = 50, σ<sub>1</sub> = 100, σ<sub>2</sub> = 0 og τ<sub>maks</sub> = 50 MPa (θ<sub>p</sub> = 18,4°).');
+  graphs();
+  lab.render(rdt);
+}, { button: pauseBtn, flag: UI.paused });
+})();
+</script>
+</body>
+</html>

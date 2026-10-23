@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fladremstræk · 3D-lab</title>
+<meta name="description" content="Et fladremstræk med remmen farvet efter trækket: stram og slap part, eksponentiel remfriktion over omslutningsvinklen, glidning og centrifugalkraftens tab ved høj hastighed.">
+<link rel="stylesheet" href="../assets/lab.css">
+</head>
+<body>
+<script src="../assets/three.min.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+'use strict';
+var F = Lab.fmt, n = Lab.n, PI = Math.PI;
+var UI = Lab.build({
+  chip: 'MEM1 · kap. 19 · eksamensspm. 15', title: 'Fladremstransmission og remfriktion',
+  src: 'Hamrock kap. 19: (F<sub>1</sub> − F<sub>c</sub>)/(F<sub>2</sub> − F<sub>c</sub>) = e<sup>μφ</sup>',
+  side: ['Remtræk', 'Rem og drift', 'Aflæsning'],
+  graphs: [{ id: 'gF', title: 'Trækket langs remmen', sub: 'én omgang rundt' }, { id: 'gV', title: 'Største moment mod remhastighed', sub: 'centrifugalkraften stjæler greb' }],
+  notes: '<li><b>Friktion om en bue forstærker eksponentielt</b>, ligesom et reb om en pullert: hver lille vinkel dφ kan ændre trækket med μF·dφ, så F<sub>1</sub>/F<sub>2</sub> = e<sup>μφ</sup>.</li>' +
+    '<li>Den <b>stramme part</b> trækker den drivende skive rundt, og den <b>slappe part</b> løber tilbage. Momentet er forskellen: T = (F<sub>1</sub> − F<sub>2</sub>)·r.</li>' +
+    '<li>Den mindste skive har den mindste omslutningsvinkel, så det er dér, remmen glider først. Gør skiverne forskellige og afstanden kort for at se det.</li>' +
+    '<li>Ved høj hastighed trækker centrifugalkraften F<sub>c</sub> = m′v² remmen væk fra skiven. Det mindsker greb og kapacitet, selvom trækket i remmen er det samme.</li>' +
+    '<li>Skru lastmomentet over kapaciteten: remmen <b>glider</b>. Mærkerne på remmen bevæger sig langsommere end den drivende skives overflade.</li>',
+  model: '<li>Flad rem, Euler-Eytelweins ligning med centrifugalled. Omslutningsvinkel på den lille skive: φ = π − 2·arcsin((R − r)/C).</li>' +
+    '<li><span class="est">FORENKLING:</span> Trækket langs skiven er vist efter krybeteorien: det ændrer sig kun over den aktive del af buen, nær det sted hvor remmen forlader skiven, og over hele buen ved glidegrænsen.</li>'
+});
+var lab = Lab.scene(UI.stage, { view: { target: new THREE.Vector3(0.6, 0, 0), theta: 0.0, phi: 1.35, radius: 4.6 } });
+var S = { r: 0.2, R: 0.2, C: 1.0, mu: 0.35, F1: 3000, Tl: 300, mp: 0.5, v: 5, off: 0, slip: 0 };
+
+/* ---------- 3D ---------- */
+function B(x, y) { return new THREE.Vector3(x, y, 0); }
+var p1 = new THREE.Group(), p2 = new THREE.Group(); lab.scene.add(p1); lab.scene.add(p2);
+function pulley(g, R, col) {
+  while (g.children.length) { var c0 = g.children.pop(); c0.geometry.dispose(); }
+  var m = new THREE.Mesh(new THREE.CylinderGeometry(R, R, 0.28, 64), Lab.mat(col, { metal: 0.4, rough: 0.4 })); m.rotation.x = PI / 2; g.add(m);
+  for (var k = 0; k < 4; k++) { var s = new THREE.Mesh(new THREE.BoxGeometry(R * 1.6, 0.03, 0.3), Lab.mat(0x2b3c50)); s.rotation.z = k * PI / 4; g.add(s); }
+  var hub = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.6, 16), Lab.mat(0x8fa3b8)); hub.rotation.x = PI / 2; g.add(hub);
+}
+var segs = [], NSEG = 160, path = null;
+for (var i = 0; i < NSEG; i++) { var sm = new THREE.Mesh(new THREE.BoxGeometry(1, 0.025, 0.24), new THREE.MeshStandardMaterial({ roughness: 0.8 })); lab.scene.add(sm); segs.push(sm); }
+var tag1 = Lab.tag(lab, '', '#ff5e3a'), tag2 = Lab.tag(lab, '', '#5ec8ff'), tagT = Lab.tag(lab, '', '#00d984'), tagL = Lab.tag(lab, '', '#d984ff');
+var arcT = Lab.arc(0x00d984, { thick: 0.014 }), arcL = Lab.arc(0xd984ff, { thick: 0.014 }); lab.scene.add(arcT); lab.scene.add(arcL);
+
+function geom() {
+  var r = S.r, R = S.R, d = S.C, c1 = 0, c2 = d, sg = (r - R) / d, gam = Math.asin(Lab.clamp(sg, -0.99, 0.99));
+  // hjul 1 (drivende, venstre), hjul 2 (drevet, højre); remmen om venstre side af 1 og højre side af 2
+  var pts = [], seg = [], i, N = 60;
+  var a0 = PI / 2 - gam, a1 = 3 * PI / 2 + gam;
+  for (i = 0; i <= N; i++) { var a = a0 + (a1 - a0) * i / N; pts.push([c1 + r * Math.cos(a), r * Math.sin(a), 'arc1', (a - a0)]); }
+  var b0 = -(PI / 2 - gam), b1 = PI / 2 - gam;
+  for (i = 0; i <= N; i++) { var b = b0 + (b1 - b0) * i / N; pts.push([c2 + R * Math.cos(b), R * Math.sin(b), 'arc2', (b - b0)]); }
+  var cum = [0]; for (i = 1; i <= pts.length; i++) { var p = pts[i % pts.length], q = pts[i - 1]; cum.push(cum[i - 1] + Math.hypot(p[0] - q[0], p[1] - q[1])); }
+  return { pts: pts, cum: cum, len: cum[cum.length - 1], phi1: a1 - a0, phi2: b1 - b0, n1: N };
+}
+function at(P, s) {
+  var L = P.len; s = ((s % L) + L) % L; var lo = 0, hi = P.cum.length - 1;
+  while (hi - lo > 1) { var mid = (lo + hi) >> 1; if (P.cum[mid] <= s) lo = mid; else hi = mid; }
+  var a = P.pts[lo], b = P.pts[(lo + 1) % P.pts.length], t = (s - P.cum[lo]) / Math.max(P.cum[lo + 1] - P.cum[lo], 1e-9);
+  return { x: a[0] + (b[0] - a[0]) * t, y: a[1] + (b[1] - a[1]) * t, dx: b[0] - a[0], dy: b[1] - a[1], i: lo };
+}
+
+/* ---------- kontroller ---------- */
+var c = UI.side;
+var sr = Lab.slider(c[0], { label: 'Drivende skive, radius r', min: 0.08, max: 0.5, step: 0.01, value: S.r, unit: 'm', fmt: function (x) { return F(x, 2); }, onInput: function (v) { S.r = v; build(); } });
+var sR = Lab.slider(c[0], { label: 'Drevet skive, radius R', min: 0.08, max: 0.5, step: 0.01, value: S.R, unit: 'm', fmt: function (x) { return F(x, 2); }, onInput: function (v) { S.R = v; build(); } });
+var sC = Lab.slider(c[0], { label: 'Akseafstand C', min: 0.6, max: 2.5, step: 0.05, value: S.C, unit: 'm', fmt: function (x) { return F(x, 2); }, onInput: function (v) { S.C = v; build(); } });
+var smu = Lab.slider(c[0], { label: 'Friktionskoefficient μ', min: 0.1, max: 0.8, step: 0.01, value: S.mu, unit: '', fmt: function (x) { return F(x, 2); }, onInput: function (v) { S.mu = v; } });
+Lab.presets(c[0], [['<b>Eksamensspm. 15:</b> φ = π, μ = 0,35, F<sub>1</sub> = 3000 N, r = 0,2 m, lav hastighed', function () { S.r = 0.2; S.R = 0.2; S.C = 1; S.mu = 0.35; S.F1 = 3000; S.v = 1; S.Tl = 300; sr.set(0.2, true); sR.set(0.2, true); sC.set(1, true); smu.set(0.35, true); sF1.set(3000, true); sv.set(1, true); sTl.set(300, true); build(); }]]);
+var sF1 = Lab.slider(c[1], { label: 'Tilladeligt træk F<sub>1</sub>', min: 500, max: 6000, step: 50, value: S.F1, unit: 'N', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.F1 = v; } });
+var sTl = Lab.slider(c[1], { label: 'Lastmoment på den drevne skive', min: 0, max: 1200, step: 5, value: S.Tl, unit: 'N·m', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.Tl = v; } });
+var sv = Lab.slider(c[1], { label: 'Remhastighed v', min: 0.5, max: 50, step: 0.5, value: S.v, unit: 'm/s', fmt: function (x) { return F(x, 1); }, onInput: function (v) { S.v = v; } });
+var smp = Lab.slider(c[1], { label: 'Remmens masse pr. meter m′', min: 0.05, max: 2, step: 0.05, value: S.mp, unit: 'kg/m', fmt: function (x) { return F(x, 2); }, onInput: function (v) { S.mp = v; } });
+var ro = Lab.readouts(c[2], [['phi', 'Omslutningsvinkel φ (lille skive)'], ['e', 'e<sup>μφ</sup>'], ['Fc', 'Centrifugalkraft F<sub>c</sub> = m′v²'], ['F2', 'F<sub>2,min</sub>'], ['Tm', 'Største moment på drivende skive'], '-', ['Tn', 'Krævet moment (fra last)'], ['st', 'Tilstand']]);
+Lab.legendKeys(UI.legend, [[Lab.heatCSS, 'farve = træk i remmen'], ['#00d984', 'drivende moment'], ['#d984ff', 'lastmoment']]);
+var P = null;
+function build() {
+  pulley(p1, S.r, 0x8a9db3); pulley(p2, S.R, 0x9fb9a6); p2.position.x = S.C; P = geom();
+  lab.setView({ target: new THREE.Vector3(S.C / 2, 0, 0), radius: 1.0 + S.C * 1.25 + Math.max(S.r, S.R) * 2.2, theta: 0, phi: 1.35 }, true);
+}
+build();
+
+function calc() {
+  var phi = Math.min(P.phi1, P.phi2), e = Math.exp(S.mu * phi), Fc = S.mp * S.v * S.v;
+  var F2min = Fc + (S.F1 - Fc) / e, Tmax = Math.max(0, (S.F1 - F2min) * S.r);
+  var Treq = S.Tl * S.r / S.R; // moment på drivende skive (ingen tab)
+  var slip = Treq > Tmax, Teff = Math.min(Treq, Tmax), F2 = S.F1 - Teff / S.r;
+  return { phi: phi, e: e, Fc: Fc, F2min: F2min, Tmax: Tmax, Treq: Treq, slip: slip, F2: F2 };
+}
+var gF = Lab.plot(UI.graphs.gF), gV = Lab.plot(UI.graphs.gV), ang1 = 0, ang2 = 0, col = new THREE.Color();
+function tension(K, s) { // træk som funktion af position langs remmen
+  var q = at(P, s), pt = P.pts[q.i], F1 = S.F1, F2 = K.F2, beta = Math.log(Math.max((F1 - K.Fc) / Math.max(F2 - K.Fc, 1e-6), 1)) / S.mu;
+  if (pt[2] === 'arc1') { var phi = P.phi1, th = pt[3], b = Math.min(beta, phi); return th < phi - b ? F1 : K.Fc + (F1 - K.Fc) * Math.exp(-S.mu * (th - (phi - b))); }
+  if (pt[2] === 'arc2') { var phi2 = P.phi2, th2 = pt[3], b2 = Math.min(beta, phi2); return th2 < phi2 - b2 ? F2 : K.Fc + (F2 - K.Fc) * Math.exp(S.mu * (th2 - (phi2 - b2))); }
+  return F1;
+}
+Lab.loop(function (dt, rdt) {
+  var K = calc(), w1 = S.v / S.r * 0.12;
+  ang1 += dt * w1; p1.rotation.z = ang1;
+  var vb = K.slip ? S.v * Math.max(0.15, K.Tmax / Math.max(K.Treq, 1e-9)) : S.v;
+  S.off += dt * vb / S.r * 0.12 * S.r; // remmens forskydning (vist)
+  ang2 += dt * vb / S.R * 0.12; p2.rotation.z = ang2;
+  for (var i = 0; i < NSEG; i++) {
+    var s = i / NSEG * P.len, seg = segs[i];
+    var sa = ((s - S.off) % P.len + P.len) % P.len, qq = at(P, s), Fv = tension(K, s); // mønstret glider med remmen
+    seg.position.set(qq.x, qq.y, 0); seg.rotation.z = Math.atan2(qq.dy, qq.dx); seg.scale.x = P.len / NSEG * 1.02;
+    var mark = Math.floor((sa / P.len) * 24) % 2 === 0 && ((sa / P.len) * 24 % 1) < 0.15;
+    Lab.cmapHeat(0.05 + 0.95 * Math.min(1, Fv / 6000), col); if (mark) col.lerp(new THREE.Color(0xffffff), 0.6);
+    seg.material.color.copy(col);
+  }
+  // remmen bevæger sig: forskyd mærkerne (positionerne er faste, farvemønstret glider)
+  tag1.set(B(S.C * 0.5, Math.max(S.r, S.R) + 0.18), 'F<sub>1</sub> = ' + F(S.F1, 0) + ' N (stram)');
+  tag2.set(B(S.C * 0.5, -Math.max(S.r, S.R) - 0.18), 'F<sub>2</sub> = ' + F(K.F2, 0) + ' N (slap)');
+  arcT.set(B(0, 0).setZ(0.25), new THREE.Vector3(0, 0, 1), S.r * 0.6, 1, 2.5); tagT.set(B(-S.r - 0.2, S.r + 0.2), 'T = ' + F(Math.min(K.Treq, K.Tmax), 0) + ' N·m');
+  arcL.set(B(S.C, 0).setZ(0.25), new THREE.Vector3(0, 0, 1), S.R * 0.6, S.Tl > 0 ? -1 : 0, 2.5); tagL.set(B(S.C + S.R + 0.25, S.R + 0.2), 'T<sub>last</sub> = ' + F(S.Tl, 0) + ' N·m');
+  ro.set('phi', F(K.phi * 180 / PI, 1) + '°'); ro.set('e', F(K.e, 3)); ro.set('Fc', F(K.Fc, 0) + ' N'); ro.set('F2', F(K.F2min, 0) + ' N', 'hi');
+  ro.set('Tm', F(K.Tmax, 1) + ' N·m', 'hi'); ro.set('Tn', F(K.Treq, 1) + ' N·m'); ro.set('st', K.slip ? 'GLIDER' : 'griber', K.slip ? 'bad' : 'ok');
+  Lab.setStatus(UI.status, K.slip ? 'Remmen glider: krævet moment > kapacitet' : 'Remmen griber', K.slip ? 'bad' : '');
+  UI.note.textContent = 'Hvide mærker følger remmen · v = ' + F(S.v, 1) + ' m/s' + (K.slip ? ' · den drevne skive halter efter' : '');
+  // graf 1: træk langs remmen
+  gF.begin({ xmin: 0, xmax: P.len, ymin: 0, ymax: S.F1 * 1.15, xlabel: 'position langs remmen [m]', ylabel: 'træk [N]', fx: function (x) { return F(x, 1); }, fy: function (y) { return F(y, 0); } });
+  var tl = []; for (i = 0; i <= 200; i++) { var s2 = i / 200 * P.len; tl.push([s2, tension(K, s2)]); }
+  gF.fill([[0, 0]].concat(tl, [[P.len, 0]]), 'rgba(255,165,0,.12)'); gF.line(tl, '#ffa500', 2.2);
+  gF.hline(S.F1, 'rgba(255,94,58,.8)', 'F₁'); gF.hline(K.F2, 'rgba(94,200,255,.8)', 'F₂'); if (K.Fc > 1) gF.hline(K.Fc, 'rgba(217,132,255,.7)', 'F_c');
+  gF.text(P.cum[P.n1] * 0.15, S.F1 * 1.07, 'om drivende skive', '#8fa3b8'); gF.end();
+  // graf 2: kapacitet mod hastighed
+  var vm = 50, Tcap = function (v) { var Fc = S.mp * v * v; return Math.max(0, (S.F1 - Fc) * (1 - 1 / K.e) * S.r); };
+  gV.begin({ xmin: 0, xmax: vm, ymin: 0, ymax: Math.max(Tcap(0) * 1.15, K.Treq * 1.1, 1), xlabel: 'v [m/s]', ylabel: 'T_maks [N·m]', fx: function (x) { return F(x, 0); }, fy: function (y) { return F(y, 0); } });
+  var tc = []; for (i = 0; i <= 100; i++) { var vv = vm * i / 100; tc.push([vv, Tcap(vv)]); }
+  gV.line(tc, '#5ec8ff', 2.2); gV.hline(K.Treq, 'rgba(217,132,255,.8)', 'krævet'); gV.dot(S.v, Tcap(S.v), K.slip ? '#ff5e5e' : '#00d984', 6); gV.end();
+  UI.formulas.innerHTML =
+    Lab.F('(F<sub>1</sub> − F<sub>c</sub>)/(F<sub>2</sub> − F<sub>c</sub>) = e<sup>μφ</sup> = e<sup>' + n(S.mu, 2) + '·' + n(K.phi, 3) + '</sup> = ' + n(K.e, 3) + ' ⇒ F<sub>2</sub> = F<sub>c</sub> + (F<sub>1</sub> − F<sub>c</sub>)/e<sup>μφ</sup> = ' + n(K.F2min, 0) + ' N',
+      'Remfriktion (Hamrock kap. 19). F<sub>c</sub> = m′v² = ' + F(K.Fc, 0) + ' N. Eksamenstallene med F<sub>c</sub> ≈ 0: e<sup>0,35π</sup> ≈ 3,0 og F<sub>2</sub> = 1000 N.') +
+    Lab.F('T = (F<sub>1</sub> − F<sub>2</sub>)·r = (' + n(S.F1, 0) + ' − ' + n(K.F2min, 0) + ')·' + n(S.r, 2) + ' = ' + n(K.Tmax, 1) + ' N·m', 'Største moment, før remmen glider. Eksamensfacit: T = 400 N·m (akselbelastning F<sub>1</sub> + F<sub>2</sub> = 4000 N).') +
+    Lab.F('φ = π − 2·arcsin((R − r)/C) = ' + n(K.phi * 180 / PI, 1) + '° på den mindste skive', 'Den mindste omslutningsvinkel styrer glidningen.');
+  lab.render(rdt);
+});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Helisk trykfjeder · 3D-lab</title>
+<meta name="description" content="Tryk en skruefjeder sammen: fjederkonstant, udbøjning, Wahl-faktor og forskydningsspændingen i tråden, til fjederen når blokhøjden.">
+<link rel="stylesheet" href="../assets/lab.css">
+</head>
+<body>
+<script src="../assets/three.min.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+'use strict';
+var F = Lab.fmt, n = Lab.n, PI = Math.PI;
+var UI = Lab.build({
+  chip: 'MEM1 · kap. 17 · eksamensspm. 13', title: 'Helisk trykfjeder: spænding og udbøjning',
+  src: 'Hamrock kap. 17: τ = K<sub>w</sub>·8FD/(πd³), Wahl-faktoren og k = Gd⁴/(8D³N<sub>a</sub>)',
+  side: ['Fjeder', 'Last', 'Aflæsning'],
+  graphs: [{ id: 'gK', title: 'Kraft mod udbøjning', sub: 'hældning = k' }, { id: 'gW', title: 'Wahl-faktoren mod fjederindeks C', sub: 'K<sub>w</sub> og K<sub>s</sub>' }, { id: 'gX', title: 'τ over trådens tværsnit', sub: 'inderside → yderside' }],
+  notes: '<li>Tråden i en trykfjeder bliver <b>vredet</b>, ikke bøjet. Skær fjederen over: kraften F virker i en afstand D/2 fra trådens akse, så tråden bærer vridningsmomentet T = FD/2.</li>' +
+    '<li>Wahl-faktoren K<sub>w</sub> samler to tillæg: direkte forskydning fra F og trådens krumning, som koncentrerer spændingen på <b>indersiden</b> af vindingen (se den højre graf).</li>' +
+    '<li>Lille fjederindeks C = D/d (tæt viklet, tyk tråd) giver stor K<sub>w</sub>. Det er derfor, man sjældent laver fjedre med C under ca. 4.</li>' +
+    '<li>k afhænger af d<sup>4</sup> og 1/D<sup>3</sup>. Lidt tykkere tråd gør fjederen meget stivere.</li>' +
+    '<li>Tryk fjederen helt sammen, og den når <b>blokhøjden</b> L<sub>s</sub>, hvor vindingerne ligger an mod hinanden. Derefter er den ikke længere en fjeder.</li>',
+  model: '<li>Lineært elastisk, kun aktive vindinger N<sub>a</sub> bidrager til fjederkonstanten. Lukkede, slebne ender: to ekstra inaktive vindinger, blokhøjde L<sub>s</sub> ≈ (N<sub>a</sub> + 2)·d.</li>' +
+    '<li>K<sub>w</sub> = (4C − 1)/(4C − 4) + 0,615/C og K<sub>s</sub> = 1 + 0,5/C (kun direkte forskydning). Eksamensopgaven bruger den afrundede værdi K<sub>w</sub> = 1,18.</li>' +
+    '<li>Fordelingen over tråden er en forenklet illustration: lineær vridning plus jævn direkte forskydning plus en krumningsforhøjelse på indersiden.</li>'
+});
+var lab = Lab.scene(UI.stage, { view: { target: new THREE.Vector3(0, 1.0, 0), theta: 0.5, phi: 1.3, radius: 4 } });
+var S = { d: 4, D: 32, Na: 10, G: 80, Lf: 80, F: 200, tall: 600, fixK: true };
+
+/* ---------- 3D ---------- */
+var sc = 1 / 40;
+var springMat = Lab.mat(0xc9d6e3, { metal: 0.4, rough: 0.3 });
+var spring = Lab.spring({ R: 0.4, wire: 0.05, turns: 12, mat: springMat }); lab.scene.add(spring);
+var bot = new THREE.Mesh(new THREE.CylinderGeometry(0.75, 0.75, 0.1, 48), Lab.mat(0x2b3c50, { metal: 0.3, rough: 0.7 })); bot.position.y = -0.05; lab.scene.add(bot);
+var top = new THREE.Mesh(new THREE.CylinderGeometry(0.75, 0.75, 0.1, 48), Lab.mat(0x44586e, { metal: 0.3, rough: 0.6 })); lab.scene.add(top);
+var guide = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 4, 16), Lab.mat(0x8fa3b8, { opacity: 0.25 })); guide.position.y = 2; lab.scene.add(guide);
+var fArrow = Lab.arrow(0xffa500, { radius: 0.02 }); lab.scene.add(fArrow);
+var tagF = Lab.tag(lab, '', '#ffa500'), tagL = Lab.tag(lab, '', '#ffd27a');
+var freeLine = Lab.line(0x8fa3b8, true, 0.7), solidLine = Lab.line(0xff5e5e, true, 0.7); lab.scene.add(freeLine); lab.scene.add(solidLine);
+var tagFree = Lab.tag(lab, 'fri længde', '#8fa3b8'), tagSolid = Lab.tag(lab, 'blokhøjde', '#ff5e5e');
+Lab.grid(lab, 3, -0.1);
+
+/* ---------- kontroller ---------- */
+var c = UI.side;
+var sd = Lab.slider(c[0], { label: 'Tråddiameter d', min: 1, max: 10, step: 0.1, value: S.d, unit: 'mm', fmt: function (x) { return F(x, 1); }, onInput: function (v) { S.d = v; } });
+var sD = Lab.slider(c[0], { label: 'Middeldiameter D', min: 8, max: 80, step: 1, value: S.D, unit: 'mm', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.D = v; } });
+var sNa = Lab.slider(c[0], { label: 'Aktive vindinger N<sub>a</sub>', min: 2, max: 25, step: 1, value: S.Na, unit: '', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.Na = v; } });
+var sLf = Lab.slider(c[0], { label: 'Fri længde L<sub>f</sub>', min: 20, max: 200, step: 1, value: S.Lf, unit: 'mm', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.Lf = v; } });
+var sG = Lab.slider(c[0], { label: 'Forskydningsmodul G', min: 20, max: 85, step: 1, value: S.G, unit: 'GPa', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.G = v; } });
+var sF = Lab.slider(c[1], { label: 'Kraft F', min: 0, max: 600, step: 1, value: S.F, unit: 'N', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.F = v; } });
+var sTa = Lab.slider(c[1], { label: 'Tilladelig forskydning', min: 200, max: 1000, step: 10, value: S.tall, unit: 'MPa', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.tall = v; } });
+var kChk = Lab.check(c[1], { label: 'Brug K<sub>w</sub> = 1,18 som i opgaven (ellers formlen)', value: true, onChange: function (v) { S.fixK = v; } });
+Lab.presets(c[1], [
+  ['<b>Eksamensspm. 13:</b> d = 4, D = 32 mm (C = 8), N<sub>a</sub> = 10, G = 80 GPa, F = 200 N', function () { set(4, 32, 10, 80, 80, 200, true); }],
+  ['<b>Tæt viklet:</b> D = 16 mm (C = 4)', function () { set(4, 16, 10, 80, 80, 200, false); }]
+]);
+function set(d, D, Na, G, Lf, Fv, fk) { S.d = d; S.D = D; S.Na = Na; S.G = G; S.Lf = Lf; S.F = Fv; S.fixK = fk; sd.set(d, true); sD.set(D, true); sNa.set(Na, true); sG.set(G, true); sLf.set(Lf, true); sF.set(Fv, true); kChk.set(fk); }
+var ro = Lab.readouts(c[2], [['C', 'Fjederindeks C = D/d'], ['Kw', 'Wahl-faktor K<sub>w</sub>'], ['tau', 'τ = K<sub>w</sub>·8FD/(πd³)'], ['k', 'Fjederkonstant k'], ['del', 'Udbøjning δ = F/k'], '-', ['Ls', 'Blokhøjde L<sub>s</sub> ≈ (N<sub>a</sub>+2)d'], ['Fs', 'Kraft ved blokhøjde'], ['n', 'τ<sub>till</sub>/τ']]);
+Lab.legendKeys(UI.legend, [['#ffa500', 'kraft F'], [Lab.heatCSS, 'farve = τ/τ<sub>till</sub>'], ['#ff5e5e', 'blokhøjde']]);
+
+function calc() {
+  var C = S.D / S.d, KwF = (4 * C - 1) / (4 * C - 4) + 0.615 / C, Kw = S.fixK ? 1.18 : KwF, Ks = 1 + 0.5 / C;
+  var k = S.G * 1000 * Math.pow(S.d, 4) / (8 * Math.pow(S.D, 3) * S.Na); // N/mm
+  var Ls = (S.Na + 2) * S.d, dmax = Math.max(S.Lf - Ls, 0), Fs = k * dmax;
+  var Fe = Math.min(S.F, Fs), del = Fe / k, t1 = 8 * S.F * S.D / (PI * Math.pow(S.d, 3));
+  return { C: C, Kw: Kw, KwF: KwF, Ks: Ks, k: k, Ls: Ls, Fs: Fs, del: del, solid: S.F >= Fs, tau: Kw * t1, t1: t1 };
+}
+var gK = Lab.plot(UI.graphs.gK), gW = Lab.plot(UI.graphs.gW), gX = Lab.plot(UI.graphs.gX), lastSig = '';
+Lab.loop(function (dt, rdt) {
+  var K = calc(), L = Math.max(S.Lf - K.del, K.Ls), R = S.D / 2 * sc, wire = S.d / 2 * sc;
+  var sig = [L, R, wire, S.Na].map(function (x) { return x.toFixed(3); }).join('|');
+  if (sig !== lastSig) {
+    lastSig = sig; lab.scene.remove(spring); spring = Lab.spring({ R: R, wire: wire, turns: S.Na + 2, mat: springMat }); spring.set(L * sc); lab.scene.add(spring);
+  }
+  Lab.cmapHeat(0.1 + 0.9 * Math.min(1, K.tau / S.tall), springMat.color);
+  top.position.y = L * sc + 0.05; top.scale.set(Math.max(R * 1.6, 0.2) / 0.75, 1, Math.max(R * 1.6, 0.2) / 0.75); bot.scale.copy(top.scale);
+  var al = 0.2 + 0.5 * Math.min(1, S.F / 600);
+  fArrow.set(new THREE.Vector3(0, top.position.y + 0.06 + al, 0), new THREE.Vector3(0, -al, 0)); fArrow.visible = S.F > 0;
+  tagF.set(new THREE.Vector3(0.12, top.position.y + 0.15 + al, 0), 'F = ' + F(S.F, 0) + ' N');
+  tagL.set(new THREE.Vector3(R + 0.3, L * sc / 2, 0), 'δ = ' + F(K.del, 1) + ' mm');
+  var w = R + 0.5;
+  freeLine.set([new THREE.Vector3(-w, S.Lf * sc, 0), new THREE.Vector3(w, S.Lf * sc, 0)]); tagFree.set(new THREE.Vector3(-w - 0.2, S.Lf * sc, 0));
+  solidLine.set([new THREE.Vector3(-w, K.Ls * sc, 0), new THREE.Vector3(w, K.Ls * sc, 0)]); tagSolid.set(new THREE.Vector3(-w - 0.2, K.Ls * sc, 0));
+  ro.set('C', F(K.C, 2)); ro.set('Kw', F(K.Kw, 3) + (S.fixK ? ' (fast)' : '')); ro.set('tau', F(K.tau, 1) + ' MPa', K.tau > S.tall ? 'bad' : 'hi');
+  ro.set('k', F(K.k, 2) + ' N/mm', 'hi'); ro.set('del', F(K.del, 1) + ' mm' + (K.solid ? ' (blok)' : '')); ro.set('Ls', F(K.Ls, 1) + ' mm'); ro.set('Fs', F(K.Fs, 0) + ' N'); ro.set('n', F(S.tall / K.tau, 2), K.tau > S.tall ? 'bad' : 'ok');
+  Lab.setStatus(UI.status, K.solid ? 'Blokhøjde nået: vindingerne ligger an' : K.tau > S.tall ? 'Overbelastet: τ > τ_till' : 'Fjederen arbejder elastisk', K.solid || K.tau > S.tall ? 'bad' : '');
+  UI.note.textContent = 'L = ' + F(L, 1) + ' mm af L_f = ' + F(S.Lf, 0) + ' mm · ' + (S.Na + 2) + ' vindinger i alt';
+  var dmax = Math.max(S.Lf - K.Ls, 1), Fm = Math.max(K.Fs * 1.2, S.F * 1.1, 10);
+  gK.begin({ xmin: 0, xmax: dmax * 1.15, ymin: 0, ymax: Fm, xlabel: 'δ [mm]', ylabel: 'F [N]', fx: function (x) { return F(x, 0); }, fy: function (y) { return F(y, 0); } });
+  gK.line([[0, 0], [dmax, K.Fs], [dmax, Fm]], '#5ec8ff', 2.2); gK.vline(dmax, 'rgba(255,94,94,.8)', 'blokhøjde'); gK.dot(K.del, Math.min(S.F, K.Fs), '#ffa500', 6);
+  gK.text(dmax * 0.1, Fm * 0.9, 'k = ' + F(K.k, 2) + ' N/mm', '#5ec8ff'); gK.end();
+  gW.begin({ xmin: 2, xmax: 16, ymin: 1, ymax: 2, xlabel: 'C = D/d', ylabel: 'K', fx: function (x) { return F(x, 0); }, fy: function (y) { return F(y, 1); } });
+  var kw = [], ks = []; for (var i = 0; i <= 80; i++) { var C = 2.5 + 13.5 * i / 80; kw.push([C, (4 * C - 1) / (4 * C - 4) + 0.615 / C]); ks.push([C, 1 + 0.5 / C]); }
+  gW.line(kw, '#ff5e5e', 2.2); gW.line(ks, '#5ec8ff', 2); gW.dot(K.C, K.KwF, '#ffa500', 6); gW.text(10, 1.2, 'K_w (Wahl)', '#ff5e5e'); gW.text(10, 1.03, 'K_s (kun direkte forskydning)', '#5ec8ff'); gW.end();
+  var tv = K.t1, td = 4 * S.F / (PI * S.d * S.d), lim = K.tau * 1.25;
+  gX.begin({ xmin: -1, xmax: 1, ymin: -lim * 0.6, ymax: lim, xlabel: 'inderside ← tråd → yderside', ylabel: 'τ [MPa]', fx: function (x) { return x === -1 ? 'ind' : x === 1 ? 'ud' : ''; }, fy: function (y) { return F(y, 0); } });
+  var tor = [], tot = []; for (i = 0; i <= 40; i++) { var x = -1 + 2 * i / 40; tor.push([x, -x * tv]); tot.push([x, -x * tv + td + (K.Kw - 1 - 0.5 / K.C) * tv * Math.max(0, -x) * 1.0]); }
+  gX.line(tor, 'rgba(94,200,255,.7)', 1.6, [5, 4]); gX.hline(td, 'rgba(0,217,132,.7)', 'direkte F/A'); gX.line(tot, '#ff5e5e', 2.4); gX.dot(-1, K.tau, '#ffa500', 5); gX.text(-0.95, K.tau, '  τ_maks', '#ffa500');
+  gX.end();
+  UI.formulas.innerHTML =
+    Lab.F('τ = K<sub>w</sub>·8FD/(πd³) = ' + n(K.Kw, 3) + ' · 8·' + n(S.F, 0) + '·' + n(S.D, 0) + '/(π·' + n(S.d, 1) + '³) = ' + n(K.tau, 1) + ' MPa',
+      'Snittet gennem tråden bærer vridningsmomentet FD/2. 8FD/(πd³) er ren vridning, og K<sub>w</sub> tilføjer direkte forskydning og krumning (Hamrock kap. 17). Eksamensfacit: 300,5 MPa.') +
+    Lab.F('K<sub>w</sub> = (4C−1)/(4C−4) + 0,615/C = ' + n(K.KwF, 3) + ' for C = ' + n(K.C, 2)) +
+    Lab.F('k = Gd⁴/(8D³N<sub>a</sub>) = ' + n(S.G * 1000, 0) + '·' + n(S.d, 1) + '⁴/(8·' + n(S.D, 0) + '³·' + n(S.Na, 0) + ') = ' + n(K.k, 2) + ' N/mm,&nbsp;&nbsp; δ = F/k = ' + n(K.del, 1) + ' mm',
+      'Fjederkonstanten kan udledes med Castiglianos sætning via vridningsenergien (se spm. 4). Eksamensfacit: k = 7,81 N/mm, δ = 25,6 mm.');
+  lab.render(rdt);
+});
+})();
+</script>
+</body>
+</html>

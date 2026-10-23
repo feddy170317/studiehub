@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Udmattelse og Goodman · 3D-lab</title>
+<meta name="description" content="En prøvestang i en pulsator: vælg middel- og amplitudespænding, tæl cyklerne og se revnen vokse til brud, hvis driftspunktet ligger over Goodman-linjen.">
+<link rel="stylesheet" href="../assets/lab.css">
+</head>
+<body>
+<script src="../assets/three.min.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+'use strict';
+var F = Lab.fmt, n = Lab.n, PI = Math.PI;
+var UI = Lab.build({
+  chip: 'MEM1 · kap. 7 · eksamensspm. 6', title: 'Udmattelse: Goodman-diagrammet i pulsatoren',
+  src: 'Hamrock kap. 7: modificeret udmattelsesgrænse (Marin-faktorer) og modificeret Goodman',
+  side: ['Belastning', 'Materiale', 'Pulsator', 'Aflæsning'],
+  graphs: [{ id: 'gG', title: 'Modificeret Goodman-diagram', sub: 'σ<sub>a</sub> mod σ<sub>m</sub>' }, { id: 'gT', title: 'Spænding over tid', sub: 'én cyklus = σ<sub>min</sub> → σ<sub>maks</sub> → σ<sub>min</sub>' }, { id: 'gS', title: 'S-N-kurve (Wöhler)', sub: 'log-log' }],
+  notes: '<li>Udmattelse sker langt under S<sub>y</sub>. Spændingen i eksamensopgaven når aldrig over 250 MPa, men gentaget millioner af gange er det amplituden, der afgør levetiden.</li>' +
+    '<li><b>Middelspændingen æder af den tilladte amplitude.</b> Hold σ<sub>a</sub> fast og skru σ<sub>m</sub> op: punktet vandrer mod Goodman-linjen.</li>' +
+    '<li>Sikkerhedsfaktoren er, hvor langt du kan skalere belastningslinjen (fra origo gennem punktet), før den rammer Goodman-linjen.</li>' +
+    '<li>Ligger punktet over linjen, har stangen <b>endelig levetid</b>. Sæt tempoet op og se revnen vokse og stangen knække ved det beregnede antal cyklusser.</li>' +
+    '<li>Marin-faktorerne sænker S<sub>e</sub>: en grov overflade, en tyk stang eller aksial last flytter hele Goodman-linjen ned.</li>',
+  model: '<li>Modificeret Goodman: σ<sub>a</sub>/S<sub>e</sub> + σ<sub>m</sub>/S<sub>ut</sub> = 1/<i>n</i><sub>f</sub> (for σ<sub>m</sub> ≥ 0). Gerber-parablen er vist til sammenligning.</li>' +
+    '<li><span class="est">ESTIMAT:</span> Levetiden er beregnet med en Basquin-linje gennem 0,9·S<sub>ut</sub> ved 10³ og S<sub>e</sub> ved 10⁶ cyklusser og en ækvivalent fuldt vekslende spænding σ<sub>ar</sub> = σ<sub>a</sub>/(1 − σ<sub>m</sub>/S<sub>ut</sub>). Det er den sædvanlige lærebogsmodel, ikke målte data.</li>' +
+    '<li><span class="est">ESTIMAT:</span> Marin-faktorerne i beregneren er typiske lærebogsværdier (overflade: e = a·S<sub>ut</sub><sup>b</sup>; størrelse: 1,24·d<sup>−0,107</sup>; aksial last 0,85). Tjek mod tabellerne i Hamrock kap. 7, før du bruger dem i en opgave.</li>' +
+    '<li>Revnens vækst er kun illustration: den vises først de sidste ca. 20 % af levetiden.</li>'
+});
+var lab = Lab.scene(UI.stage, { view: { target: new THREE.Vector3(0, 0.05, 0), theta: 0.5, phi: 1.32, radius: 2.3 } });
+var S = { smin: 50, smax: 250, Sut: 600, Se: 200, marin: false, surf: 'machined', d: 10, load: 'axial', rate: 3, count: 0, broken: false, tvis: 0 };
+var SURF = { ground: ['slebet', 1.58, -0.085], machined: ['drejet / koldtrukket', 4.51, -0.265], hot: ['varmvalset', 57.7, -0.718], forged: ['smedet', 272, -0.995] };
+
+/* ---------- 3D: pulsator med prøvestang ---------- */
+var steel = Lab.mat(0x8a9db3, { metal: 0.6, rough: 0.35 }), dark = Lab.mat(0x2b3c50, { metal: 0.3, rough: 0.7 });
+var base = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.12, 0.6), dark); base.position.y = -0.82; lab.scene.add(base);
+var top = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.12, 0.6), dark); top.position.y = 0.95; lab.scene.add(top);
+[-0.48, 0.48].forEach(function (x) { var c = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 1.8, 16), Lab.mat(0xc9d6e3, { metal: 0.8, rough: 0.2 })); c.position.set(x, 0.07, 0); lab.scene.add(c); });
+var cross = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.08, 0.3), dark); lab.scene.add(cross);
+var gripT = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.16, 0.16), Lab.mat(0x44586e)), gripB = gripT.clone(); lab.scene.add(gripT); lab.scene.add(gripB);
+// prøvestang: to halvdele (drejet profil), samles i midten
+function half() {
+  var pts = [], i;
+  for (i = 0; i <= 30; i++) { var y = i / 30 * 0.5, q = Math.min(1, Math.max(0, (y - 0.28) / 0.12)), r = 0.045 + 0.035 * (1 - Math.cos(q * PI / 2)); pts.push(new THREE.Vector2(r, y)); }
+  pts.unshift(new THREE.Vector2(0, 0)); pts.push(new THREE.Vector2(0, 0.5));
+  return new THREE.LatheGeometry(pts, 48);
+}
+var specMat = Lab.mat(0x9fb2c6, { metal: 0.55, rough: 0.35 });
+var lower = new THREE.Mesh(half(), specMat), upper = new THREE.Mesh(half(), specMat);
+lower.rotation.x = PI; // spejlet: midten (y=0) ved halsen
+var spec = new THREE.Group(); spec.add(lower); spec.add(upper); lab.scene.add(spec);
+var crack = null, crackArc = -1, crackMat = new THREE.MeshBasicMaterial({ color: 0x0b0f14 });
+var tagS = Lab.tag(lab, '', '#ffd27a'), tagF = Lab.tag(lab, '', '#e3e9ef');
+var fArrowT = Lab.arrow(0xffa500, { radius: 0.012 }), fArrowB = Lab.arrow(0xffa500, { radius: 0.012 }); lab.scene.add(fArrowT); lab.scene.add(fArrowB);
+
+/* ---------- kontroller ---------- */
+var c0 = UI.side[0], c1 = UI.side[1], c2 = UI.side[2];
+var sMin = Lab.slider(c0, { label: 'σ<sub>min</sub>', min: -300, max: 600, step: 5, value: S.smin, unit: 'MPa', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.smin = Math.min(v, S.smax); restart(); } });
+var sMax = Lab.slider(c0, { label: 'σ<sub>maks</sub>', min: -300, max: 700, step: 5, value: S.smax, unit: 'MPa', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.smax = Math.max(v, S.smin); restart(); } });
+Lab.presets(c0, [
+  ['<b>Eksamensspm. 6:</b> σ<sub>min</sub> = 50, σ<sub>maks</sub> = 250 MPa, S<sub>e</sub> = 200, S<sub>ut</sub> = 600 MPa', function () { set(50, 250, 600, 200); }],
+  ['<b>Fuldt vekslende:</b> σ<sub>m</sub> = 0, σ<sub>a</sub> = 220 MPa (endelig levetid)', function () { set(-220, 220, 600, 200); }],
+  ['<b>Pulserende fra 0:</b> 0 → 330 MPa', function () { set(0, 330, 600, 200); }]
+]);
+function set(a, b, ut, se) { S.smin = a; S.smax = b; S.Sut = ut; S.Se = se; sMin.set(a, true); sMax.set(b, true); sUt.set(ut, true); sSe.set(se, true); if (S.marin) mChk.set(false), S.marin = false, marinBox.style.display = 'none'; restart(); }
+var sUt = Lab.slider(c1, { label: 'Brudstyrke S<sub>ut</sub>', min: 300, max: 1400, step: 10, value: S.Sut, unit: 'MPa', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.Sut = v; restart(); } });
+var sSe = Lab.slider(c1, { label: 'Udmattelsesgrænse S<sub>e</sub>', min: 50, max: 700, step: 5, value: S.Se, unit: 'MPa', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.Se = v; restart(); } });
+var mChk = Lab.check(c1, { label: 'Beregn S<sub>e</sub> med Marin-faktorer', value: false, onChange: function (v) { S.marin = v; marinBox.style.display = v ? '' : 'none'; sSe.el.disabled = v; restart(); } });
+var marinBox = document.createElement('div'); marinBox.style.display = 'none'; c1.appendChild(marinBox);
+Lab.select(marinBox, { label: 'Overflade (k<sub>a</sub>)', options: Object.keys(SURF).map(function (k) { return { value: k, label: SURF[k][0] }; }), value: S.surf, onChange: function (v) { S.surf = v; restart(); } });
+Lab.slider(marinBox, { label: 'Diameter <i>d</i> (k<sub>b</sub>)', min: 3, max: 50, step: 1, value: S.d, unit: 'mm', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.d = v; restart(); } });
+Lab.seg(marinBox, { label: 'Lasttype (k<sub>c</sub>)', value: 'axial', options: [{ value: 'axial', label: 'Aksial' }, { value: 'bend', label: 'Bøjning' }], onChange: function (v) { S.load = v; restart(); } });
+var sRate = Lab.slider(c2, { label: 'Tempo', min: 0, max: 6, step: 0.05, value: S.rate, unit: '', fmt: function (x) { return F(Math.pow(10, x), 0) + ' cyklusser/s'; }, onInput: function (v) { S.rate = v; } });
+var br = Lab.btnRow(c2); var pauseBtn = Lab.button(br, '⏸ Pause', '', function () {}); Lab.button(br, '↺ Ny prøvestang', 'primary', function () { restart(); });
+var ro = Lab.readouts(UI.side[3], [['m', 'σ<sub>m</sub> = (σ<sub>maks</sub>+σ<sub>min</sub>)/2'], ['a', 'σ<sub>a</sub> = (σ<sub>maks</sub>−σ<sub>min</sub>)/2'], ['se', 'S<sub>e</sub> anvendt'], ['nf', '<i>n</i><sub>f</sub> (Goodman)'], '-', ['ar', 'σ<sub>ar</sub> (ækv. vekslende)'], ['N', 'Forventet levetid <i>N</i>'], ['cnt', 'Cyklusser kørt']]);
+Lab.legendKeys(UI.legend, [['#ffa500', 'aksialkraft på prøvestangen'], [Lab.heatCSS, 'farve = σ(t)/S<sub>ut</sub>']]);
+
+function SeUsed() {
+  if (!S.marin) return S.Se;
+  var s = SURF[S.surf], ka = Math.min(1, s[1] * Math.pow(S.Sut, s[2])), kb = S.load === 'axial' ? 1 : (S.d <= 51 ? 1.24 * Math.pow(Math.max(S.d, 2.79), -0.107) : 0.859 - 0.000837 * S.d);
+  var kc = S.load === 'axial' ? 0.85 : 1, Sep = S.Sut <= 1400 ? 0.5 * S.Sut : 700;
+  return { Se: ka * kb * kc * Sep, ka: ka, kb: kb, kc: kc, Sep: Sep };
+}
+function life() {
+  var m = (S.smax + S.smin) / 2, a = (S.smax - S.smin) / 2, mr = SeUsed(), Se = S.marin ? mr.Se : mr;
+  var nf = m >= 0 ? 1 / (a / Se + m / S.Sut) : Se / a;
+  var ar = m >= 0 ? a / Math.max(1 - m / S.Sut, 1e-6) : a;
+  var bB = -Math.log10(0.9 * S.Sut / Se) / 3, aB = Math.pow(0.9 * S.Sut, 2) / Se;
+  var N = S.smax >= S.Sut ? 0 : (ar <= Se ? Infinity : Math.pow(ar / aB, 1 / bB));
+  return { m: m, a: a, Se: Se, mr: mr, nf: nf, ar: ar, N: N, aB: aB, bB: bB };
+}
+function restart() {
+  S.count = 0; S.broken = false; S.tvis = 0;
+  upper.position.set(0, 0, 0); upper.rotation.set(0, 0, 0); lower.position.set(0, 0, 0); lower.rotation.set(PI, 0, 0);
+  setCrack(0);
+}
+function setCrack(f) { // f ∈ [0,1] andel af omkredsen
+  var arc = Math.round(f * 40) / 40 * 2 * PI;
+  if (Math.abs(arc - crackArc) < 1e-6) return; crackArc = arc;
+  if (crack) { spec.remove(crack); crack.geometry.dispose(); crack = null; }
+  if (arc > 0.01) { crack = new THREE.Mesh(new THREE.TorusGeometry(0.0455, 0.004 + 0.006 * f, 8, 48, arc), crackMat); crack.rotation.x = PI / 2; spec.add(crack); }
+}
+
+var gG = Lab.plot(UI.graphs.gG), gT = Lab.plot(UI.graphs.gT), gS = Lab.plot(UI.graphs.gS);
+function fmtN(N) { if (!isFinite(N)) return '∞ (under S<sub>e</sub>)'; if (N < 1) return 'statisk brud (σ<sub>maks</sub> ≥ S<sub>ut</sub>)'; var e = Math.floor(Math.log10(N)); return F(N / Math.pow(10, e), 2) + '·10<sup>' + e + '</sup>'; }
+
+Lab.loop(function (dt, rdt) {
+  var L = life(), Sut = S.Sut;
+  if (!S.broken) {
+    S.tvis += dt * 1.2;
+    S.count += dt * Math.pow(10, S.rate);
+    if (isFinite(L.N) && S.count >= L.N) { S.count = L.N; S.broken = true; }
+  }
+  var sig = S.broken ? 0 : L.m + L.a * Math.sin(2 * PI * S.tvis);
+  // tøjning vist stærkt forstørret
+  var str = 1 + 0.18 * sig / Sut;
+  spec.scale.set(1, str, 1);
+  var gy = 0.5 * str + 0.08; gripT.position.y = gy; gripB.position.y = -gy; cross.position.y = gy + 0.12;
+  Lab.cmapHeat(0.18 + Math.abs(sig) / Sut * 1.1, specMat.color);
+  var D = isFinite(L.N) && L.N > 0 ? Math.min(1, S.count / L.N) : 0;
+  setCrack(D > 0.8 ? (D - 0.8) / 0.2 : 0);
+  if (S.broken) { // de to halvdele skilles
+    upper.position.y = Math.min(upper.position.y + rdt * 0.4, 0.06); upper.rotation.z = Math.min(upper.rotation.z + rdt * 0.2, 0.06);
+    lower.position.y = Math.max(lower.position.y - rdt * 0.4, -0.06); lower.rotation.z = Math.max(lower.rotation.z - rdt * 0.15, -0.04);
+  }
+  var fl = 0.25 * Math.abs(sig) / Sut + 0.04, sg = sig >= 0 ? 1 : -1;
+  fArrowT.set(new THREE.Vector3(0.22, gy - (sg < 0 ? fl : 0), 0), new THREE.Vector3(0, sg * fl, 0));
+  fArrowB.set(new THREE.Vector3(0.22, -gy + (sg < 0 ? fl : 0), 0), new THREE.Vector3(0, -sg * fl, 0));
+  fArrowT.visible = fArrowB.visible = !S.broken && Math.abs(sig) > 1; // efter set(), som ellers viser pilen igen
+  tagS.set(new THREE.Vector3(-0.3, 0.05, 0), 'σ(t) = ' + F(sig, 0) + ' MPa');
+  tagF.set(new THREE.Vector3(0, -0.95, 0.3), 'N = ' + F(Math.floor(S.count), 0).replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
+
+  ro.set('m', F(L.m, 1) + ' MPa'); ro.set('a', F(L.a, 1) + ' MPa'); ro.set('se', F(L.Se, 1) + ' MPa');
+  ro.set('nf', F(L.nf, 2), L.nf < 1 ? 'bad' : L.nf < 1.3 ? 'hi' : 'ok'); ro.set('ar', F(L.ar, 1) + ' MPa'); ro.set('N', fmtN(L.N), isFinite(L.N) ? 'bad' : 'ok');
+  ro.set('cnt', F(Math.floor(S.count), 0).replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
+  Lab.setStatus(UI.status, S.broken ? 'UDMATTELSESBRUD efter ' + fmtN(L.N).replace('<sup>', '^').replace(/<[^>]+>/g, '') + ' cyklusser' : isFinite(L.N) ? 'Endelig levetid: ' + F(D * 100, 1) + ' % brugt' : 'Uendelig levetid: punktet er under Goodman-linjen', S.broken ? 'bad' : isFinite(L.N) ? 'warn' : '');
+  UI.note.textContent = 'Tøjning vist stærkt forstørret · tempo ' + F(Math.pow(10, S.rate), 0) + ' cyklusser/s';
+
+  // Goodman
+  var xm = Sut * 1.08, ym = Math.max(L.Se * 1.35, L.a * 1.25, 10);
+  gG.begin({ xmin: Math.min(0, L.m * 1.1), xmax: xm, ymin: 0, ymax: ym, xlabel: 'σ_m [MPa]', ylabel: 'σ_a [MPa]', fx: function (x) { return F(x, 0); }, fy: function (y) { return F(y, 0); } });
+  gG.fill([[0, 0], [0, L.Se], [Sut, 0]], 'rgba(0,217,132,.10)');
+  gG.line([[0, L.Se], [Sut, 0]], '#00d984', 2.2);
+  var gb = []; for (var i = 0; i <= 40; i++) { var x = Sut * i / 40; gb.push([x, L.Se * (1 - x * x / (Sut * Sut))]); } gG.line(gb, 'rgba(217,132,255,.7)', 1.4, [5, 4]);
+  if (L.m < 0) gG.line([[Math.min(0, L.m * 1.1), L.Se], [0, L.Se]], '#00d984', 2.2);
+  if (L.a > 0) { var k = L.nf; gG.line([[0, 0], [L.m * Math.max(k, 1) * 1.05, L.a * Math.max(k, 1) * 1.05]], 'rgba(227,233,239,.45)', 1.2, [5, 4]); gG.dot(L.m * k, L.a * k, '#00d984', 4); }
+  gG.dot(L.m, L.a, L.nf < 1 ? '#ff5e5e' : '#ffd27a', 6);
+  gG.text(Sut * 0.42, L.Se * 0.55, 'Goodman', '#00d984'); gG.text(Sut * 0.6, L.Se * 0.75, 'Gerber', 'rgba(217,132,255,.9)');
+  gG.text(4, L.Se, ' S_e = ' + F(L.Se, 0), '#00d984'); gG.text(Sut, ym * 0.06, 'S_ut ', '#00d984', 'right');
+  gG.end();
+  // σ(t)
+  var lo = Math.min(S.smin, 0) - 30, hi = Math.max(S.smax, Sut * 0.5) + 30;
+  gT.begin({ xmin: 0, xmax: 3, ymin: lo, ymax: hi, xlabel: 'cyklusser', ylabel: 'σ [MPa]', fx: function (x) { return F(x, 0); }, fy: function (y) { return F(y, 0); } });
+  var wv = []; for (i = 0; i <= 150; i++) { var tt = i / 50; wv.push([tt, L.m + L.a * Math.sin(2 * PI * tt)]); }
+  gT.line(wv, '#ffd27a', 2.2); gT.hline(L.m, 'rgba(94,200,255,.9)', 'σ_m = ' + F(L.m, 0)); gT.hline(S.smax, 'rgba(255,94,94,.7)', 'σ_maks'); gT.hline(S.smin, 'rgba(255,94,94,.7)', 'σ_min');
+  gT.line([[0.25, L.m], [0.25, S.smax]], '#00d984', 2); gT.text(0.28, (L.m + S.smax) / 2, 'σ_a', '#00d984');
+  var ph = S.tvis % 3; gT.dot(ph, sig, '#ffffff', 5);
+  gT.end();
+  // S-N
+  gS.begin({ xmin: 3, xmax: 7.5, ymin: Math.log10(Math.max(20, L.Se * 0.5)), ymax: Math.log10(Sut * 1.05), xlabel: 'log₁₀ N', ylabel: 'σ [MPa] (log)', fx: function (x) { return '10^' + F(x, 0); }, fy: function (y) { return F(Math.pow(10, y), 0); } });
+  gS.line([[3, Math.log10(0.9 * Sut)], [6, Math.log10(L.Se)], [7.5, Math.log10(L.Se)]], '#5ec8ff', 2.2);
+  gS.hline(Math.log10(Sut), 'rgba(217,132,255,.7)', 'S_ut');
+  if (isFinite(L.N) && L.N >= 1) { var ln = Math.log10(Math.max(L.N, 1000)); gS.dot(ln, Math.log10(L.ar), '#ff5e5e', 6); gS.text(ln, Math.log10(L.ar), '  N = ' + fmtN(L.N).replace('<sup>', '^').replace(/<[^>]+>/g, ''), '#ff5e5e'); }
+  else if (!isFinite(L.N)) { gS.dot(7.2, Math.log10(Math.max(L.ar, Math.pow(10, Math.log10(L.Se * 0.5) + 0.02))), '#00d984', 6); gS.text(7.15, Math.log10(Math.max(L.ar, L.Se * 0.52)), 'uendelig levetid ', '#00d984', 'right'); }
+  gS.end();
+
+  var mr = L.mr, marinTxt = S.marin ? Lab.F('S<sub>e</sub> = k<sub>a</sub>k<sub>b</sub>k<sub>c</sub>k<sub>d</sub>k<sub>e</sub>S′<sub>e</sub> = ' + n(mr.ka, 3) + '·' + n(mr.kb, 3) + '·' + n(mr.kc, 2) + '·1·1·' + n(mr.Sep, 0) + ' = ' + n(mr.Se, 1) + ' MPa',
+    'S′<sub>e</sub> = 0,5·S<sub>ut</sub> for stål med S<sub>ut</sub> ≤ 1400 MPa. k<sub>d</sub> (temperatur) og k<sub>e</sub> (pålidelighed) er sat til 1. Faktorerne er typiske værdier (se Model og antagelser).') : '';
+  UI.formulas.innerHTML =
+    Lab.F('σ<sub>m</sub> = (σ<sub>maks</sub>+σ<sub>min</sub>)/2 = (' + n(S.smax, 0) + ' + ' + n(S.smin, 0) + ')/2 = ' + n(L.m, 1) + ' MPa,&nbsp;&nbsp; σ<sub>a</sub> = (σ<sub>maks</sub>−σ<sub>min</sub>)/2 = ' + n(L.a, 1) + ' MPa') +
+    marinTxt +
+    Lab.F('1/<i>n</i><sub>f</sub> = σ<sub>a</sub>/S<sub>e</sub> + σ<sub>m</sub>/S<sub>ut</sub> = ' + n(L.a, 1) + '/' + n(L.Se, 0) + ' + ' + n(L.m, 1) + '/' + n(Sut, 0) + ' = ' + n(1 / L.nf, 3) + ' ⇒ <i>n</i><sub>f</sub> = ' + n(L.nf, 2),
+      'Modificeret Goodman (Hamrock kap. 7). Eksamenstallene giver σ<sub>m</sub> = 150 MPa, σ<sub>a</sub> = 100 MPa og <i>n</i><sub>f</sub> = 1,33.') +
+    Lab.F('σ<sub>ar</sub> = σ<sub>a</sub>/(1 − σ<sub>m</sub>/S<sub>ut</sub>) = ' + n(L.ar, 1) + ' MPa,&nbsp;&nbsp; <i>N</i> = (σ<sub>ar</sub>/<i>a</i>)<sup>1/<i>b</i></sup> med <i>a</i> = (0,9S<sub>ut</sub>)²/S<sub>e</sub> = ' + n(L.aB, 0) + ' MPa, <i>b</i> = ' + n(L.bB, 4),
+      'Levetidsestimat (Basquin). Under S<sub>e</sub> er levetiden uendelig for stål.');
+  lab.render(rdt);
+}, { button: pauseBtn, flag: UI.paused });
+restart();
+})();
+</script>
+</body>
+</html>

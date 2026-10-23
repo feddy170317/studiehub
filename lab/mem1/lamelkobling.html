@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lamelkobling · 3D-lab</title>
+<meta name="description" content="En flerskivet friktionskobling: klem lamellerne sammen, kobl ind og se, om den overfører lastmomentet eller glider og bliver varm. Konstant tryk mod konstant slid.">
+<link rel="stylesheet" href="../assets/lab.css">
+</head>
+<body>
+<script src="../assets/three.min.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+'use strict';
+var F = Lab.fmt, n = Lab.n, PI = Math.PI;
+var UI = Lab.build({
+  chip: 'MEM1 · kap. 18 · eksamensspm. 14', title: 'Lamelkobling: konstant tryk eller konstant slid',
+  src: 'Hamrock kap. 18: skivekoblinger, momentkapacitet ved ensformigt tryk og ensformigt slid',
+  side: ['Kobling', 'Drift', 'Aflæsning'],
+  graphs: [{ id: 'gP', title: 'Trykfordeling på friktionsfladen', sub: 'samme klemkraft F' }, { id: 'gW', title: 'Omdrejningstal under indkobling', sub: 'drivende og drevet aksel' }],
+  notes: '<li><b>Ny kobling: konstant tryk.</b> Trykket er jævnt over fladen. Men slid ∝ tryk·glidehastighed, og yderst glider fladen hurtigst, så den slides mest.</li>' +
+    '<li><b>Tilslidt kobling: konstant slid.</b> Når yderkanten er slidt lidt ned, bærer den mindre tryk. Ligevægten er p·r = konstant, og trykket er størst inderst (se grafen).</li>' +
+    '<li>Konstant slid giver en lidt <b>lavere</b> momentkapacitet, fordi trykket flytter ind mod en kortere arm. Derfor er det den konservative antagelse, som eksamensopgaven bruger.</li>' +
+    '<li>Momentet går lineært med antallet af friktionsflader N. Det er hele idéen med en lamelkobling: stort moment i lille diameter.</li>' +
+    '<li>Sæt lastmomentet over kapaciteten. Koblingen <b>glider</b> og omsætter slipeffekten T·Δω til varme i lamellerne.</li>',
+  model: '<li>Konstant slid: T = NμF(r<sub>o</sub> + r<sub>i</sub>)/2. Konstant tryk: T = (2/3)NμF(r<sub>o</sub>³ − r<sub>i</sub>³)/(r<sub>o</sub>² − r<sub>i</sub>²).</li>' +
+    '<li>Indkoblingen er en simpel model: den drevne side har et inertimoment, friktionsmomentet er lig kapaciteten, mens der er slip, og lastmomentet er konstant. Varme og afkøling er kun illustration.</li>'
+});
+var lab = Lab.scene(UI.stage, { view: { target: new THREE.Vector3(0.1, 0, 0), theta: 0.75, phi: 1.2, radius: 4.4 } });
+var S = { N: 4, ri: 50, ro: 100, mu: 0.3, F: 2000, theory: 'wear', Tload: 120, win: 150, wout: 0, engaged: false, J: 0.6, heat: 0, hist: [], t: 0 };
+
+/* ---------- 3D (akse langs x) ---------- */
+function ring(r0, r1, w) { var p = [new THREE.Vector2(r0, -w), new THREE.Vector2(r1, -w), new THREE.Vector2(r1, w), new THREE.Vector2(r0, w), new THREE.Vector2(r0, -w)]; var g = new THREE.LatheGeometry(p, 72); g.rotateZ(-PI / 2); return g; }
+var inG = new THREE.Group(), outG = new THREE.Group(); lab.scene.add(inG); lab.scene.add(outG);
+var sIn = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 2.2, 32), Lab.mat(0x8a9db3)); sIn.rotation.z = PI / 2; sIn.position.x = -1.3; inG.add(sIn);
+var sOut = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 2.2, 32), Lab.mat(0x9fb9a6)); sOut.rotation.z = PI / 2; sOut.position.x = 1.3; outG.add(sOut);
+var drum = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.55, 0.35, 48), Lab.mat(0x5f7287)); drum.rotation.z = PI / 2; drum.position.x = 2.2; outG.add(drum);
+var drumMark = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.08, 0.08), Lab.mat(0xffd27a)); drumMark.position.set(2.2, 0.5, 0); outG.add(drumMark);
+var inMark = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.06, 0.06), Lab.mat(0xffd27a)); inMark.position.set(-2.0, 0.14, 0); inG.add(inMark);
+var discs = [], plates = [], fricMats = [];
+var pressPlate = new THREE.Mesh(ring(0.15, 0.95, 0.05), Lab.mat(0x44586e)); lab.scene.add(pressPlate);
+var fArrows = [Lab.arrow(0xffa500, { radius: 0.016 }), Lab.arrow(0xffa500, { radius: 0.016 })]; fArrows.forEach(function (a) { lab.scene.add(a); });
+var tagF = Lab.tag(lab, '', '#ffa500'), tagTl = Lab.tag(lab, '', '#d984ff'), tagSlip = Lab.tag(lab, '', '#ff5e5e');
+var brakeArc = Lab.arc(0xd984ff, { thick: 0.014 }); lab.scene.add(brakeArc);
+function buildStack() {
+  discs.concat(plates).forEach(function (d) { (d.parent || lab.scene).remove(d); d.geometry.dispose(); }); discs = []; plates = []; fricMats = [];
+  var nf = Math.max(1, Math.round(S.N / 2)), sc = 0.9 / Math.max(S.ro, 1), ri = S.ri * sc, ro = S.ro * sc, th = 0.045, x = -((2 * nf + 1) * th * 2) / 2;
+  for (var i = 0; i < 2 * nf + 1; i++) {
+    var steel = i % 2 === 0, m = steel ? Lab.mat(0xb8c7d6, { metal: 0.5, rough: 0.3 }) : Lab.mat(0x8a5a2b, { metal: 0.1, rough: 0.9 });
+    var d = new THREE.Mesh(ring(steel ? ri * 0.85 : ri, steel ? ro : ro * 1.05, th), m); d.position.x = x + th; x += th * 2.05;
+    if (steel) { outG.add(d); plates.push(d); } else { inG.add(d); discs.push(d); fricMats.push(m); }
+  }
+  pressPlate.position.x = x + 0.06; S.stackEnd = x; S.roW = ro;
+}
+
+/* ---------- kontroller ---------- */
+var c = UI.side;
+var sN = Lab.slider(c[0], { label: 'Friktionsflader N', min: 2, max: 12, step: 2, value: S.N, unit: '', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.N = v; buildStack(); } });
+var sri = Lab.slider(c[0], { label: 'Inderradius r<sub>i</sub>', min: 5, max: 140, step: 1, value: S.ri, unit: 'mm', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.ri = Math.min(v, S.ro - 5); buildStack(); } });
+var sro = Lab.slider(c[0], { label: 'Yderradius r<sub>o</sub>', min: 20, max: 150, step: 1, value: S.ro, unit: 'mm', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.ro = Math.max(v, S.ri + 5); buildStack(); } });
+var smu = Lab.slider(c[0], { label: 'Friktionskoefficient μ', min: 0.05, max: 0.6, step: 0.01, value: S.mu, unit: '', fmt: function (x) { return F(x, 2); }, onInput: function (v) { S.mu = v; } });
+var sF = Lab.slider(c[0], { label: 'Aksial klemkraft F', min: 0, max: 8000, step: 50, value: S.F, unit: 'N', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.F = v; } });
+Lab.seg(c[0], { label: 'Antagelse', value: 'wear', options: [{ value: 'wear', label: 'Konstant slid' }, { value: 'pres', label: 'Konstant tryk' }], onChange: function (v) { S.theory = v; } });
+Lab.presets(c[0], [['<b>Eksamensspm. 14:</b> N = 4, r<sub>i</sub> = 50, r<sub>o</sub> = 100 mm, μ = 0,30, F = 2000 N', function () { S.N = 4; S.ri = 50; S.ro = 100; S.mu = 0.3; S.F = 2000; sN.set(4, true); sri.set(50, true); sro.set(100, true); smu.set(0.3, true); sF.set(2000, true); buildStack(); }]]);
+var sTl = Lab.slider(c[1], { label: 'Lastmoment på den drevne side', min: 0, max: 600, step: 5, value: S.Tload, unit: 'N·m', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.Tload = v; } });
+var sW = Lab.slider(c[1], { label: 'Drivende omdrejningstal', min: 20, max: 300, step: 5, value: S.win, unit: 'rad/s', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.win = v; } });
+var br = Lab.btnRow(c[1]);
+Lab.button(br, 'Kobl ind', 'primary', function () { S.engaged = true; }); Lab.button(br, 'Kobl ud', '', function () { S.engaged = false; }); Lab.button(br, '↺ Start forfra', '', function () { S.engaged = false; S.wout = 0; S.heat = 0; S.hist = []; S.t = 0; });
+var ro = Lab.readouts(c[2], [['Tw', 'T (konstant slid)'], ['Tp', 'T (konstant tryk)'], ['T', 'Anvendt kapacitet'], ['st', 'Tilstand'], '-', ['w', 'Drevet omdrejningstal'], ['P', 'Slipeffekt T·Δω']]);
+Lab.legendKeys(UI.legend, [['#8a5a2b', 'friktionslameller (drivende)'], ['#b8c7d6', 'stålplader (drevne)'], ['#ffa500', 'klemkraft F'], ['#d984ff', 'lastmoment (bremse)']]);
+buildStack();
+
+function cap() {
+  var ri = S.ri / 1000, ro_ = S.ro / 1000;
+  var Tw = S.N * S.mu * S.F * (ro_ + ri) / 2, Tp = 2 / 3 * S.N * S.mu * S.F * (Math.pow(ro_, 3) - Math.pow(ri, 3)) / (ro_ * ro_ - ri * ri);
+  return { Tw: Tw, Tp: Tp, T: S.theory === 'wear' ? Tw : Tp };
+}
+var gP = Lab.plot(UI.graphs.gP), gW = Lab.plot(UI.graphs.gW), ang = { i: 0, o: 0 };
+Lab.loop(function (dt, rdt) {
+  var K = cap(), Tc = S.engaged ? K.T : 0, dw = S.win - S.wout, slip = Math.abs(dw) > 0.5 || Tc < S.Tload;
+  if (S.engaged && !(Math.abs(dw) < 0.5 && Tc >= S.Tload)) S.wout += dt * (Tc * Math.sign(dw || 1) - S.Tload) / S.J;
+  else if (S.engaged) S.wout = S.win;
+  else S.wout += dt * (-S.Tload) / S.J;
+  S.wout = Math.max(0, S.wout);
+  var Pslip = S.engaged ? Tc * Math.abs(S.win - S.wout) : 0;
+  S.heat = Math.max(0, S.heat + dt * (Pslip / 4000 - S.heat * 0.15));
+  S.t += dt; if (dt > 0) { S.hist.push([S.t, S.win, S.wout]); if (S.hist.length > 900) S.hist.shift(); }
+  ang.i += dt * S.win * 0.05; ang.o += dt * S.wout * 0.05; inG.rotation.x = ang.i; outG.rotation.x = ang.o;
+  fricMats.forEach(function (m) { m.color.setHex(0x8a5a2b).lerp(new THREE.Color(0xff6a2a), Math.min(1, S.heat)); m.emissive.setHex(0x000000).lerp(new THREE.Color(0xff3a00), Math.min(0.8, S.heat * 0.8)); });
+  var gap = S.engaged ? 0 : 0.08; pressPlate.position.x = S.stackEnd + 0.06 + gap;
+  var al = 0.2 + 0.4 * Math.min(1, S.F / 6000);
+  [0.55, -0.55].forEach(function (y, i) { fArrows[i].set(new THREE.Vector3(pressPlate.position.x + 0.05 + al, y, 0), new THREE.Vector3(-al, 0, 0)); fArrows[i].visible = S.engaged && S.F > 0; });
+  tagF.set(new THREE.Vector3(pressPlate.position.x + al * 0.6, 0.85, 0), S.engaged ? 'F = ' + F(S.F, 0) + ' N' : 'udkoblet');
+  brakeArc.set(new THREE.Vector3(2.45, 0, 0), new THREE.Vector3(1, 0, 0), 0.7, S.Tload > 0 ? -1 : 0, 2.2);
+  tagTl.set(new THREE.Vector3(2.4, -0.85, 0.3), 'T<sub>last</sub> = ' + F(S.Tload, 0) + ' N·m');
+  var locked = S.engaged && !slip;
+  tagSlip.set(new THREE.Vector3(0, 1.1, 0), !S.engaged ? '' : locked ? 'låst: Δω = 0' : 'GLIDER: Δω = ' + F(S.win - S.wout, 0) + ' rad/s'); tagSlip.visible = S.engaged;
+  ro.set('Tw', F(K.Tw, 1) + ' N·m', S.theory === 'wear' ? 'hi' : ''); ro.set('Tp', F(K.Tp, 1) + ' N·m', S.theory === 'pres' ? 'hi' : ''); ro.set('T', F(K.T, 1) + ' N·m');
+  ro.set('st', !S.engaged ? 'udkoblet' : locked ? 'låst' : K.T < S.Tload ? 'glider (T < T_last)' : 'kobler ind', !S.engaged ? '' : locked ? 'ok' : 'bad');
+  ro.set('w', F(S.wout, 0) + ' rad/s'); ro.set('P', F(Pslip / 1000, 2) + ' kW');
+  Lab.setStatus(UI.status, !S.engaged ? 'Udkoblet: tryk "Kobl ind"' : locked ? 'Låst: overfører lastmomentet' : K.T < S.Tload ? 'Glider: kapaciteten er mindre end lastmomentet' : 'Kobler ind: glider, indtil hastighederne er ens', !S.engaged ? 'warn' : locked ? '' : 'bad');
+  UI.note.textContent = 'Lamelpakke: ' + Math.round(S.N / 2) + ' friktionslameller, ' + (Math.round(S.N / 2) + 1) + ' stålplader = ' + S.N + ' friktionsflader';
+  // tryk
+  var ri = S.ri, rO = S.ro, A = PI * (rO * rO - ri * ri) * Math.max(1, S.N / S.N), pU = S.F / A, cW = S.F / (2 * PI * (rO - ri)), pmax = cW / ri * 1.2;
+  gP.begin({ xmin: 0, xmax: rO * 1.1, ymin: 0, ymax: pmax, xlabel: 'r [mm]', ylabel: 'p [MPa]', fx: function (x) { return F(x, 0); }, fy: function (y) { return F(y, 2); } });
+  gP.line([[ri, 0], [ri, pU], [rO, pU], [rO, 0]], S.theory === 'pres' ? '#5ec8ff' : 'rgba(94,200,255,.4)', 2.2);
+  var pw = []; for (var i = 0; i <= 40; i++) { var r = ri + (rO - ri) * i / 40; pw.push([r, cW / r]); } gP.line(pw, S.theory === 'wear' ? '#ff5e5e' : 'rgba(255,94,94,.4)', 2.2);
+  gP.text(ri + 2, pU * 1.06, 'konstant tryk', '#5ec8ff'); gP.text(ri + 2, cW / ri * 1.05, 'konstant slid: p·r = konst.', '#ff5e5e');
+  gP.vline((rO + ri) / 2, 'rgba(255,210,122,.6)', 'middelradius'); gP.end();
+  var wm = Math.max(S.win * 1.15, 10), tmin = Math.max(0, S.t - 12);
+  gW.begin({ xmin: tmin, xmax: tmin + 12, ymin: 0, ymax: wm, xlabel: 't [s]', ylabel: 'ω [rad/s]', fx: function (x) { return F(x, 0); }, fy: function (y) { return F(y, 0); } });
+  gW.line(S.hist.map(function (p) { return [p[0], p[1]]; }), '#5ec8ff', 2.2); gW.line(S.hist.map(function (p) { return [p[0], p[2]]; }), '#9fb9a6', 2.2);
+  gW.text(tmin + 0.3, S.win * 1.07, 'drivende', '#5ec8ff'); gW.text(tmin + 0.3, Math.max(S.wout, 5) * 0.9, 'drevet', '#9fb9a6'); gW.end();
+  UI.formulas.innerHTML =
+    Lab.F('Konstant slid: T = NμF(r<sub>o</sub>+r<sub>i</sub>)/2 = ' + n(S.N, 0) + '·' + n(S.mu, 2) + '·' + n(S.F, 0) + '·(' + n(S.ro, 0) + '+' + n(S.ri, 0) + ')/2 mm = ' + n(K.Tw, 1) + ' N·m',
+      'Tilslidt kobling: p·r = konstant, så trykket er størst inderst. Effektiv arm = middelradius (Hamrock kap. 18). Eksamensfacit: 180 N·m.') +
+    Lab.F('Konstant tryk: T = (2/3)NμF(r<sub>o</sub>³−r<sub>i</sub>³)/(r<sub>o</sub>²−r<sub>i</sub>²) = ' + n(K.Tp, 1) + ' N·m', 'Ny kobling: jævnt tryk, lidt større effektiv arm. Med eksamenstallene 186,7 N·m, altså ca. 4 % mere.') +
+    Lab.F('Slipeffekt: P = T·Δω = ' + n(K.T, 1) + ' N·m · ' + n(Math.abs(S.win - S.wout), 0) + ' rad/s = ' + n(Pslip / 1000, 2) + ' kW', 'Effekten, der bliver til varme i lamellerne, mens koblingen glider.');
+  lab.render(rdt);
+});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rullelejers levetid · 3D-lab</title>
+<meta name="description" content="Et sporkugleleje i drift: se lastzonen, og hvordan levetiden L10 = (C/P)^p reagerer på last, lejetype og krævet pålidelighed.">
+<link rel="stylesheet" href="../assets/lab.css">
+</head>
+<body>
+<script src="../assets/three.min.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+'use strict';
+var F = Lab.fmt, n = Lab.n, PI = Math.PI;
+var UI = Lab.build({
+  chip: 'MEM1 · kap. 13 · eksamensspm. 10', title: 'Rullelejer: levetid og bæreevne',
+  src: 'Hamrock kap. 13: L<sub>10</sub> = (C/P)<sup>p</sup>, dynamisk bæreevne og pålidelighed',
+  side: ['Leje og last', 'Drift', 'Aflæsning'],
+  graphs: [{ id: 'gL', title: 'Levetid mod last', sub: 'log-log: hældningen er −p' }, { id: 'gR', title: 'Hvor mange lejer overlever?', sub: 'Weibull-fordeling, L<sub>10</sub> = 10 % svigtet' }],
+  notes: '<li>Rullelejer svigter ved <b>overfladeudmattelse</b>: kontaktspændingen gentages, hver gang en kugle ruller hen over et punkt, til materialet skaller af.</li>' +
+    '<li>Levetiden er <b>statistisk</b>. L<sub>10</sub> er det antal omdrejninger, som 90 % af ens lejer klarer. Kravet om højere pålidelighed sænker den brugbare levetid kraftigt (se højre graf).</li>' +
+    '<li><b>Halv last giver otte gange levetid</b> for et kugleleje (p = 3) og ca. ti gange for et rulleleje (p = 10/3). Prøv at halvere P.</li>' +
+    '<li>Kun kuglerne i den nederste halvdel bærer lasten (lastzonen). Den mest belastede kugle bærer ca. 5P/Z (Stribeck).</li>',
+  model: '<li>L<sub>10</sub> = (C/P)<sup>p</sup> i millioner omdrejninger, p = 3 for kuglelejer og 10/3 for rullelejer. L<sub>10h</sub> = L<sub>10</sub>·10⁶/(60·n).</li>' +
+    '<li>Pålidelighedsfaktor a<sub>1</sub> efter ISO 281 (90 %: 1; 95 %: 0,64; 96 %: 0,55; 97 %: 0,47; 98 %: 0,37; 99 %: 0,25). Overlevelseskurven er en Weibull-fordeling med formparameter 1,5.</li>' +
+    '<li>Lastfordelingen i lejet er Stribecks model: Q(ψ) ∝ cos<sup>1,5</sup>ψ i lastzonen. Rotationen er vist langsomt.</li>'
+});
+var lab = Lab.scene(UI.stage, { view: { target: new THREE.Vector3(0, 0, 0), theta: 0.45, phi: 1.3, radius: 3.2 } });
+var S = { P: 5, C: 50, rpm: 1500, type: 'ball', R: 90, Lreq: 10000, ang: 0 };
+var A1 = { 90: 1, 95: 0.64, 96: 0.55, 97: 0.47, 98: 0.37, 99: 0.25 };
+
+/* ---------- 3D: leje (akse langs z) ---------- */
+var brg = new THREE.Group(); lab.scene.add(brg);
+function ring(r0, r1, w) { var p = [new THREE.Vector2(r0, -w), new THREE.Vector2(r1, -w), new THREE.Vector2(r1, w), new THREE.Vector2(r0, w), new THREE.Vector2(r0, -w)]; var g = new THREE.LatheGeometry(p, 72); g.rotateX(PI / 2); return g; }
+var steel = Lab.mat(0xb8c7d6, { metal: 0.4, rough: 0.35 });
+var outer = new THREE.Mesh(ring(0.64, 0.82, 0.16), steel); brg.add(outer);
+var innerG = new THREE.Group(); brg.add(innerG);
+var inner = new THREE.Mesh(ring(0.3, 0.44, 0.16), steel); innerG.add(inner);
+var shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 1.4, 48), Lab.mat(0x5f7287, { metal: 0.6, rough: 0.4 })); shaft.rotation.x = PI / 2; shaft.position.z = -0.45; innerG.add(shaft);
+var key = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.06, 1.42), Lab.mat(0xffd27a)); key.position.set(0, 0.3, -0.45); innerG.add(key);
+var cageG = new THREE.Group(); brg.add(cageG);
+var cage = new THREE.Mesh(new THREE.TorusGeometry(0.54, 0.012, 8, 72), Lab.mat(0xc08a3e, { metal: 0.6 })); cage.position.z = 0.13; cageG.add(cage);
+var cage2 = cage.clone(); cage2.position.z = -0.13; cageG.add(cage2);
+var Z = 9, elems = [], elemMats = [];
+function buildElems() {
+  elems.forEach(function (e) { cageG.remove(e); e.geometry.dispose(); }); elems = []; elemMats = [];
+  for (var i = 0; i < Z; i++) {
+    var m = Lab.mat(0xdfe8f1, { metal: 0.3, rough: 0.3 }), a = i / Z * 2 * PI, g;
+    if (S.type === 'ball') g = new THREE.SphereGeometry(0.095, 24, 18); else { g = new THREE.CylinderGeometry(0.085, 0.085, 0.24, 24); g.rotateX(PI / 2); }
+    var e = new THREE.Mesh(g, m); e.position.set(0.54 * Math.cos(a), 0.54 * Math.sin(a), 0); e.userData.a = a; cageG.add(e); elems.push(e); elemMats.push(m);
+  }
+}
+buildElems();
+var housing = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.5, 0.5), Lab.mat(0x2b3c50, { metal: 0.3, rough: 0.8 })); housing.position.y = -1.08; lab.scene.add(housing);
+var stand = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.3, 0.45), Lab.mat(0x2b3c50, { metal: 0.3, rough: 0.8 })); stand.position.y = -0.8; lab.scene.add(stand);
+var loadArrow = Lab.arrow(0xffa500, { radius: 0.02 }); lab.scene.add(loadArrow);
+var tagP = Lab.tag(lab, '', '#ffa500'), tagQ = Lab.tag(lab, '', '#ff5e5e');
+var qArrows = []; for (var i = 0; i < Z; i++) { var qa = Lab.arrow(0xff5e5e, { radius: 0.01 }); qArrows.push(qa); lab.scene.add(qa); }
+
+/* ---------- kontroller ---------- */
+var c = UI.side;
+Lab.seg(c[0], { label: 'Lejetype', value: 'ball', options: [{ value: 'ball', label: 'Kugleleje (p = 3)' }, { value: 'roller', label: 'Rulleleje (p = 10/3)' }], onChange: function (v) { S.type = v; buildElems(); } });
+var sP = Lab.slider(c[0], { label: 'Ækvivalent radiallast <i>P</i>', min: 0.5, max: 40, step: 0.1, value: S.P, unit: 'kN', fmt: function (x) { return F(x, 1); }, onInput: function (v) { S.P = v; } });
+var sC = Lab.slider(c[0], { label: 'Dynamisk bæreevne <i>C</i>', min: 5, max: 200, step: 1, value: S.C, unit: 'kN', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.C = v; } });
+Lab.presets(c[0], [
+  ['<b>Eksamensspm. 10:</b> sporkugleleje, P = 5 kN, C = 50 kN, 1500 o/min', function () { S.P = 5; S.C = 50; S.rpm = 1500; sP.set(5, true); sC.set(50, true); sN.set(1500, true); }],
+  ['<b>Halv last:</b> P = 2,5 kN → 8 × levetid', function () { S.P = 2.5; sP.set(2.5, true); }]
+]);
+var sN = Lab.slider(c[1], { label: 'Omdrejningstal <i>n</i>', min: 100, max: 6000, step: 50, value: S.rpm, unit: 'o/min', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.rpm = v; } });
+var sRel = Lab.select(c[1], { label: 'Krævet pålidelighed', options: [90, 95, 96, 97, 98, 99].map(function (r) { return { value: r, label: r + ' % (a₁ = ' + F(A1[r], 2) + ')' }; }), value: 90, onChange: function (v) { S.R = +v; } });
+var sReq = Lab.slider(c[1], { label: 'Krævet levetid', min: 1000, max: 100000, step: 500, value: 10000, unit: 'timer', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.Lreq = v; } });
+var pauseBtn = Lab.button(Lab.btnRow(c[1]), '⏸ Pause', '', function () {});
+var ro = Lab.readouts(c[2], [['p', 'Levetidseksponent <i>p</i>'], ['L', 'L<sub>10</sub> = (C/P)<sup>p</sup>'], ['Lh', 'L<sub>10h</sub> ved n'], ['La', 'Levetid ved ' + 'valgt pålidelighed'], '-', ['Creq', '<i>C</i> krævet for den ønskede levetid'], ['Q', 'Største kuglelast ≈ 5P/Z']]);
+Lab.legendKeys(UI.legend, [['#ffa500', 'ydre last P'], [Lab.heatCSS, 'farve = last på det rullende legeme'], ['#ff5e5e', 'kontaktkraft i lastzonen']]);
+
+function calc() {
+  var p = S.type === 'ball' ? 3 : 10 / 3, L10 = Math.pow(S.C / S.P, p), L10h = L10 * 1e6 / (60 * S.rpm), a1 = A1[S.R];
+  var Creq = S.P * Math.pow(S.Lreq * 60 * S.rpm / 1e6 / a1, 1 / p);
+  return { p: p, L10: L10, L10h: L10h, a1: a1, La: a1 * L10h, Creq: Creq, Q: 5 * S.P / Z };
+}
+var gL = Lab.plot(UI.graphs.gL), gR = Lab.plot(UI.graphs.gR), col = new THREE.Color();
+Lab.loop(function (dt, rdt) {
+  var K = calc(), w = dt * Math.min(S.rpm, 3000) / 3000 * 3.0;
+  S.ang += w; innerG.rotation.z = S.ang; cageG.rotation.z = S.ang * 0.4;
+  var Qmax = K.Q;
+  for (var i = 0; i < Z; i++) {
+    var a = elems[i].userData.a + cageG.rotation.z, psi = Math.atan2(Math.sin(a + PI / 2), Math.cos(a + PI / 2)); // vinkel fra nedadrettet last
+    var c1 = Math.cos(psi), q = c1 > 0 ? Math.pow(c1, 1.5) : 0;
+    Lab.cmapHeat(0.1 + 0.9 * q, elemMats[i].color);
+    var pos = new THREE.Vector3(0.64 * Math.cos(a), 0.64 * Math.sin(a), 0.2), dir = new THREE.Vector3(Math.cos(a), Math.sin(a), 0);
+    qArrows[i].set(pos, dir.multiplyScalar(0.28 * q)); qArrows[i].visible = q > 0.05;
+  }
+  var al = 0.25 + 0.35 * Math.min(1, S.P / 20);
+  loadArrow.set(new THREE.Vector3(0, 0.3 + al + 0.05, 0.75), new THREE.Vector3(0, -al, 0));
+  tagP.set(new THREE.Vector3(0.12, 0.3 + al + 0.12, 0.75), 'P = ' + F(S.P, 1) + ' kN');
+  tagQ.set(new THREE.Vector3(0, -0.98, 0.3), 'Q<sub>maks</sub> ≈ ' + F(Qmax, 2) + ' kN');
+  var ok = K.La >= S.Lreq;
+  ro.set('p', S.type === 'ball' ? '3' : '10/3'); ro.set('L', F(K.L10, K.L10 < 10 ? 2 : 0) + ' mio. omdr.', 'hi'); ro.set('Lh', F(K.L10h, 0) + ' timer', 'hi');
+  ro.set('La', F(K.La, 0) + ' timer (' + S.R + ' %)', ok ? 'ok' : 'bad'); ro.set('Creq', F(K.Creq, 1) + ' kN', K.Creq > S.C ? 'bad' : 'ok'); ro.set('Q', F(Qmax, 2) + ' kN');
+  Lab.setStatus(UI.status, ok ? 'Levetidskravet er opfyldt' : 'For kort levetid: vælg et leje med større C', ok ? '' : 'bad');
+  UI.note.textContent = 'Lastzonen er den nederste halvdel · rotation vist langsomt';
+  // graf 1
+  gL.begin({ xmin: -0.3, xmax: 1.7, ymin: -1, ymax: 5, xlabel: 'P [kN] (log)', ylabel: 'L₁₀ [mio. omdr.] (log)', fx: function (x) { return F(Math.pow(10, x), Math.pow(10, x) < 1 ? 1 : 0); }, fy: function (y) { return '10^' + F(y, 0); } });
+  var cb = [], cr = []; for (i = 0; i <= 60; i++) { var lp = -0.3 + 2 * i / 60, Pp = Math.pow(10, lp); cb.push([lp, 3 * Math.log10(S.C / Pp)]); cr.push([lp, 10 / 3 * Math.log10(S.C / Pp)]); }
+  gL.line(cb, S.type === 'ball' ? '#5ec8ff' : 'rgba(94,200,255,.35)', 2.2); gL.line(cr, S.type === 'roller' ? '#00d984' : 'rgba(0,217,132,.35)', 2.2);
+  gL.dot(Math.log10(S.P), Math.log10(K.L10), '#ffd27a', 6); gL.vline(Math.log10(S.C), 'rgba(255,210,122,.6)', 'P = C → 1 mio.');
+  gL.text(-0.25, 4.6, 'kugle p = 3', '#5ec8ff'); gL.text(-0.25, 4.2, 'rulle p = 10/3', '#00d984');
+  gL.end();
+  // graf 2: Weibull-overlevelse R(L) = exp(-(L/η)^b) med R(L10) = 0,9
+  var b = 1.5, eta = K.L10h / Math.pow(-Math.log(0.9), 1 / b), xm = K.L10h * 6;
+  gR.begin({ xmin: 0, xmax: xm, ymin: 0, ymax: 100, xlabel: 'driftstimer', ylabel: 'overlever [%]', fx: function (x) { return F(x / 1000, 0) + 'k'; }, fy: function (y) { return F(y, 0); } });
+  var wb = []; for (i = 0; i <= 100; i++) { var L = xm * i / 100; wb.push([L, 100 * Math.exp(-Math.pow(L / eta, b))]); }
+  gR.fill([[0, 0]].concat(wb, [[xm, 0]]), 'rgba(94,200,255,.1)'); gR.line(wb, '#5ec8ff', 2.2);
+  gR.hline(90, 'rgba(255,210,122,.6)', '90 %'); gR.vline(K.L10h, 'rgba(255,210,122,.9)', 'L₁₀h'); gR.dot(K.L10h, 90, '#ffd27a', 5);
+  gR.hline(S.R, 'rgba(255,94,94,.6)', S.R + ' %'); gR.dot(K.La, S.R, '#ff5e5e', 5); gR.vline(S.Lreq, 'rgba(0,217,132,.7)', 'krav');
+  gR.end();
+  UI.formulas.innerHTML =
+    Lab.F('L<sub>10</sub> = (C/P)<sup>p</sup> = (' + n(S.C, 0) + '/' + n(S.P, 1) + ')<sup>' + (S.type === 'ball' ? '3' : '10/3') + '</sup> = ' + n(K.L10, 1) + ' mio. omdr.',
+      'Levetidsligningen (Hamrock kap. 13). C er den last, lejet kan bære i 10⁶ omdrejninger med 90 % pålidelighed. p = 3 for punktkontakt (kugler), 10/3 for linjekontakt (ruller).') +
+    Lab.F('L<sub>10h</sub> = L<sub>10</sub>·10⁶/(60·n) = ' + n(K.L10, 1) + '·10⁶/(60·' + n(S.rpm, 0) + ') = ' + n(K.L10h, 0) + ' timer', 'Eksamenstallene: 1000 mio. omdrejninger og 11 111 timer ved 1500 o/min.') +
+    Lab.F('L<sub>' + (100 - S.R) + '</sub> = a<sub>1</sub>·L<sub>10h</sub> = ' + n(K.a1, 2) + '·' + n(K.L10h, 0) + ' = ' + n(K.La, 0) + ' timer;&nbsp;&nbsp; C<sub>krævet</sub> = P·(L<sub>krav</sub>·60n/(10⁶a<sub>1</sub>))<sup>1/p</sup> = ' + n(K.Creq, 1) + ' kN',
+      'Pålidelighedskorrektion og omvendt dimensionering: hvilken bæreevne skal lejet have for at nå kravet?');
+  lab.render(rdt);
+}, { button: pauseBtn, flag: UI.paused });
+})();
+</script>
+</body>
+</html>

@@ -7,16 +7,16 @@
 <meta name="description" content="Interaktive 3D-scenarier til kursusmaterialet på maskiningeniøruddannelsen: skru på parametrene og se fysikken ske.">
 <link rel="stylesheet" href="assets/lab.css">
 <style>
-  .hub { max-width: 1100px; margin: 0 auto; padding: 18px 16px 40px; }
-  .hub p.lead { color: #cdd7e1; margin: .2rem 0 1.4rem; max-width: 70ch; }
-  .hub h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 1.6rem 0 .6rem; }
-  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; }
+  .hub { max-width: 1150px; margin: 0 auto; padding: 18px 16px 40px; }
+  .hub p.lead { color: #cdd7e1; margin: .2rem 0 1.4rem; max-width: 72ch; }
+  .hub h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 1.8rem 0 .6rem; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
   .lc { display: block; text-decoration: none; color: var(--text); background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; transition: border-color .15s, transform .15s; }
   .lc:hover { border-color: var(--cyan); transform: translateY(-2px); }
   .lc .tag { font-size: .72rem; color: var(--cyan); letter-spacing: .04em; }
-  .lc h3 { font-size: 1.05rem; margin: .25rem 0 .35rem; }
-  .lc p { font-size: .86rem; color: #b8c6d4; }
-  .lc.soon { opacity: .55; pointer-events: none; }
+  .lc h3 { font-size: 1.02rem; margin: .25rem 0 .35rem; }
+  .lc p { font-size: .85rem; color: #b8c6d4; }
+  .lc.soon { opacity: .5; pointer-events: none; }
   .lc.soon .tag { color: var(--muted); }
 </style>
 </head>
@@ -24,30 +24,41 @@
 <header class="lab-top">
   <a class="back" href="../index.html">← Studiehub</a>
   <h1>3D-laboratorium</h1>
+  <span class="src" id="count"></span>
 </header>
 <main class="hub">
-  <p class="lead">Hvert scenarie er et lille fysiklaboratorium bygget på pensum. Skru på parametrene, og se det ske i 3D. Formlerne opdateres med dine tal, og der står kilde ved dem (bog og slides). Mellemrum sætter på pause.</p>
-
-  <h2>3. semester · MEM1 Maskinelementer</h2>
-  <div class="cards">
-    <a class="lc" href="mem1/bjaelke-brud.html">
-      <div class="tag">Kap. 2–5 · eksamensspm. 2, 3, 4</div>
-      <h3>Bjælke belastet til brud</h3>
-      <p>Skru op for lasten: bøjningsspænding, første flydning, plastisk zone, blivende deformation og brud. Kurven for spænding og tøjning tegnes live.</p>
-    </a>
-    <div class="lc soon"><div class="tag">Kommer · eksamensspm. 1</div><h3>Mohrs cirkel i 3D</h3><p>Drej snittet gennem et spændingselement og se punktet løbe rundt på cirklen.</p></div>
-    <div class="lc soon"><div class="tag">Kommer · eksamensspm. 7</div><h3>Søjleknækning</h3><p>Euler mod Johnson: tryk søjlen sammen, til den knækker ud.</p></div>
-  </div>
-
-  <h2>3. semester · DYN2 Dynamik</h2>
-  <div class="cards">
-    <a class="lc" href="dyn2/rotation-fast-akse.html">
-      <div class="tag">HI 16.3 · slides Kinematik I</div>
-      <h3>Rotation om fast akse</h3>
-      <p>ω og α som vektorer langs aksen, v = ω × r og a = α × r − ω²r i et punkt. Desuden tandhjul og remdrev. Slide-eksemplet er indbygget.</p>
-    </a>
-    <div class="lc soon"><div class="tag">Kommer · HI 16.5–16.7</div><h3>Generel plan bevægelse</h3><p>Relativ hastighed og øjeblikkeligt hastighedscentrum på en stangmekanisme.</p></div>
-  </div>
+  <p class="lead">Hvert scenarie er et lille fysiklaboratorium bygget på pensum. Skru på parametrene, og se det ske i 3D. Formlerne opdateres med dine tal, og der står kilde ved dem (bog og slides). Mellemrum sætter på pause. Eksamensopgavernes tal ligger som knapper, så du kan tjekke dit facit.</p>
+  <div id="groups"></div>
 </main>
+<script>
+var GROUPS = [
+ { t: '3. semester · MEM1 Maskinelementer', labs: [
+  ['mem1/mohrs-cirkel.html', 'Kap. 2 · eksamensspm. 1', 'Mohrs cirkel', 'Drej et spændingselement i 3D og se punktet løbe rundt på cirklen. Hovedspændinger og τ<sub>maks</sub> med ét klik.'],
+  ['mem1/bjaelke-brud.html', 'Kap. 2–5 · eksamensspm. 2, 3, 4', 'Bjælke belastet til brud', 'Bøjningsspænding, første flydning, plastisk zone, blivende deformation og brud. Kurven for spænding og tøjning tegnes live.'],
+  ['mem1/flydekriterier.html', 'Kap. 6 · eksamensspm. 5', 'Flydekriterier i 3D', 'von Mises-cylinderen og Tresca-prismet i hovedspændingsrummet. Skru lasten op, til punktet rammer fladen.'],
+  ['mem1/udmattelse-goodman.html', 'Kap. 7 · eksamensspm. 6', 'Udmattelse og Goodman', 'En prøvestang i pulsatoren: Goodman-diagram, S-N-kurve, revnevækst og udmattelsesbrud.'],
+  ['mem1/soejleknaekning.html', 'Kap. 9 · eksamensspm. 7', 'Søjleknækning', 'Euler eller Johnson? Fire understøtninger, og en lille skævhed, der vokser mod knæklasten.'],
+  ['mem1/trykbeholder.html', 'Kap. 10 · eksamensspm. 8', 'Tykvægget trykbeholder', 'Opskåret cylinder farvet efter omkredsspændingen. Lamé gennem væggen, og hvorfor tykkere væg hjælper mindre og mindre.'],
+  ['mem1/aksel.html', 'Kap. 11 · eksamensspm. 9', 'Aksel: bøjning og torsion', 'Roterende aksel, hvor materialepunktet skifter mellem træk og tryk. T<sub>e</sub>, M<sub>e</sub> og den nødvendige diameter.'],
+  ['mem1/rulleleje.html', 'Kap. 13 · eksamensspm. 10', 'Rullelejers levetid', 'Kugleleje i drift med lastzonen tændt. L<sub>10</sub>, driftstimer og pålidelighed.'],
+  ['mem1/tandhjul-lewis.html', 'Kap. 14 · eksamensspm. 11', 'Tandhjul og Lewis', 'Tandhjulspar i indgreb og en forstørret tand som udkraget bjælke. Modul, tandtal og formfaktor Y.'],
+  ['mem1/kraftskrue.html', 'Kap. 16 · eksamensspm. 12', 'Kraftskrue og selvlåsning', 'Skruedonkraft: løft, sænk eller slip håndtaget. Selvlåsende eller ej, og det udrullede gevind.'],
+  ['mem1/trykfjeder.html', 'Kap. 17 · eksamensspm. 13', 'Helisk trykfjeder', 'Tryk fjederen sammen til blokhøjden. Wahl-faktoren og forskydningsspændingen over tråden.'],
+  ['mem1/lamelkobling.html', 'Kap. 18 · eksamensspm. 14', 'Lamelkobling', 'Kobl ind og se, om lamellerne griber eller glider og bliver varme. Konstant tryk mod konstant slid.'],
+  ['mem1/remtraek.html', 'Kap. 19 · eksamensspm. 15', 'Fladremstræk', 'Remmen farvet efter trækket: stram og slap part, eksponentiel remfriktion og glidning.']
+ ]},
+ { t: '3. semester · DYN2 Dynamik', labs: [
+  ['dyn2/rotation-fast-akse.html', 'HI 16.3 · Kinematik I', 'Rotation om fast akse', 'ω og α som vektorer langs aksen, v = ω × r og a = α × r − ω²r. Desuden tandhjul og remdrev.']
+ ]}
+];
+var h = '', total = 0;
+GROUPS.forEach(function (g) {
+  h += '<h2>' + g.t + '</h2><div class="cards">';
+  g.labs.forEach(function (l) { total++; h += '<a class="lc" href="' + l[0] + '"><div class="tag">' + l[1] + '</div><h3>' + l[2] + '</h3><p>' + l[3] + '</p></a>'; });
+  h += '</div>';
+});
+document.getElementById('groups').innerHTML = h;
+document.getElementById('count').textContent = total + ' scenarier';
+</script>
 </body>
 </html>

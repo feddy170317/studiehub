@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tandhjul og Lewis · 3D-lab</title>
+<meta name="description" content="Et cylindrisk tandhjulspar i indgreb og en forstørret tand som udkraget bjælke: modul, tandtal, Lewis-formfaktor og tandens bøjespænding.">
+<link rel="stylesheet" href="../assets/lab.css">
+</head>
+<body>
+<script src="../assets/three.min.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+'use strict';
+var F = Lab.fmt, n = Lab.n, PI = Math.PI;
+var UI = Lab.build({
+  chip: 'MEM1 · kap. 14 · eksamensspm. 11', title: 'Tandhjul: Lewis-ligningen for tandens bøjning',
+  src: 'Hamrock kap. 14: modul, delingsdiameter, trykvinkel og Lewis-ligningen σ<sub>b</sub> = F<sub>t</sub>/(bmY)',
+  side: ['Geometri', 'Belastning', 'Aflæsning'],
+  graphs: [{ id: 'gY', title: 'Lewis-formfaktor Y mod tandtal', sub: '20° trykvinkel, fuld tandhøjde' }, { id: 'gB', title: 'Tanden som udkraget bjælke', sub: 'Lewis\' parabel og det kritiske snit' }],
+  notes: '<li>Hver tand er en lille <b>udkraget bjælke</b>, indspændt i hjulkransen. F<sub>t</sub> bøjer den, og spændingen er størst ved tandfoden: træk på den belastede side og tryk på den anden.</li>' +
+    '<li><b>Modulet</b> m = d/N bestemmer tandens størrelse. To hjul kan kun gå i indgreb, hvis de har samme modul. Dobbelt modul giver en tand, der er dobbelt så tyk og høj.</li>' +
+    '<li><b>Y</b> samler tandens form i ét tal. Få tænder giver en underskåret, smal tandfod og lav Y. Mange tænder nærmer sig tandstangen (Y ≈ 0,485).</li>' +
+    '<li>σ<sub>b</sub> er omvendt proportional med b, m og Y. Bredden hjælper lineært, men modulet er mest effektivt, fordi tanden både bliver tykkere og større.</li>',
+  model: '<li>Den simple Lewis-ligning: hele lasten virker på tandspidsen på én tand, uden dynamik- eller spændingskoncentrationsfaktorer. Den er god til at forstå tanden, men konservativ og forenklet.</li>' +
+    '<li>Y er standardtabellen for 20° fuld tandhøjde (samme værdi som eksamensopgavens Y = 0,32 ved 20 tænder). Du kan også bruge en fast Y.</li>' +
+    '<li>Tandformen er forenklet (trapez i stedet for evolvent). Den forstørrede tand og dens udbøjning er kun illustration.</li>'
+});
+var lab = Lab.scene(UI.stage, { view: { target: new THREE.Vector3(0.45, 0, 0), theta: 0.15, phi: 1.0, radius: 4.4 } });
+var YT = [[12, .245], [13, .261], [14, .277], [15, .290], [16, .296], [17, .303], [18, .309], [19, .314], [20, .322], [21, .328], [22, .331], [24, .337], [26, .346], [28, .353], [30, .359], [34, .371], [38, .384], [43, .397], [50, .409], [60, .422], [75, .435], [100, .447], [150, .460], [300, .472], [400, .480]];
+function Ytab(N) { if (N <= 12) return YT[0][1]; for (var i = 1; i < YT.length; i++) if (N <= YT[i][0]) { var a = YT[i - 1], b = YT[i]; return a[1] + (b[1] - a[1]) * (N - a[0]) / (b[0] - a[0]); } return 0.485; }
+var S = { m: 4, b: 40, N1: 20, N2: 40, Ft: 1600, rpm: 30, useTab: false, Yman: 0.32, Sall: 150, ang: 0 };
+
+/* ---------- 3D ---------- */
+var g1 = new THREE.Mesh(undefined, Lab.mat(0x8a9db3, { metal: 0.45, rough: 0.4 })), g2 = new THREE.Mesh(undefined, Lab.mat(0x9fb9a6, { metal: 0.45, rough: 0.4 }));
+var pair = new THREE.Group(); pair.add(g1); pair.add(g2); lab.scene.add(pair); pair.rotation.x = PI / 2; pair.position.x = -0.45;
+var pitch = Lab.line(0xffd27a, true, 0.8), pitch2 = Lab.line(0xffd27a, true, 0.8); pair.add(pitch); pair.add(pitch2);
+var ftArrow = Lab.arrow(0xffa500, { radius: 0.014 }); lab.scene.add(ftArrow);
+var tagFt = Lab.tag(lab, '', '#ffa500'), tagD = Lab.tag(lab, '', '#ffd27a'), tagD2 = Lab.tag(lab, '', '#ffd27a');
+// forstørret tand
+var toothGeo = null, tooth = new THREE.Mesh(undefined, new THREE.MeshStandardMaterial({ vertexColors: true, metalness: 0.2, roughness: 0.5 })); lab.scene.add(tooth);
+var rim = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.18, 0.5), Lab.mat(0x44586e)); lab.scene.add(rim);
+var tArrow = Lab.arrow(0xffa500, { radius: 0.016 }); lab.scene.add(tArrow);
+var tagT = Lab.tag(lab, 'én tand, forstørret', '#8fa3b8'), tagTs = Lab.tag(lab, '', '#ff5e5e');
+var TX = 1.95, TY = -0.35, TW = 0.42, TH = 0.9, TD = 0.5; // tandens placering og mål (verden)
+
+function scale() { return 1.4 / Math.max(S.m * (S.N1 + S.N2) / 2, 1); } // mm → verden, så parret passer
+function buildGears() {
+  var sc = scale(), m = S.m * sc, R1 = S.m * S.N1 / 2 * sc, R2 = S.m * S.N2 / 2 * sc, w = Math.max(S.b * sc, 0.05);
+  var a = Lab.gearGeo(R1, m, w, R1 * 0.25), b = Lab.gearGeo(R2, m, w, R2 * 0.18);
+  if (g1.geometry) g1.geometry.dispose(); if (g2.geometry) g2.geometry.dispose();
+  g1.geometry = a.geo; g2.geometry = b.geo; g1.userData.N = a.N; g2.userData.N = b.N;
+  g1.position.set(-R2 * 0.0, 0, 0); g2.position.set(R1 + R2, 0, 0); g1.position.x = -(R1 + R2) / 2 + 0; g2.position.x = (R1 + R2) / 2;
+  g1.position.x = -(R1 + R2) / 2; g2.position.x = (R1 + R2) / 2;
+  function circ(R, cx) { var p = []; for (var i = 0; i <= 96; i++) { var t = i / 96 * 2 * PI; p.push(new THREE.Vector3(cx + R * Math.cos(t), w / 2 + 0.003, R * Math.sin(t))); } return p; }
+  pitch.set(circ(R1, g1.position.x)); pitch2.set(circ(R2, g2.position.x));
+  S.R1w = R1; S.R2w = R2; S.ww = w;
+}
+var colr = new THREE.Color();
+function buildTooth(bend) {
+  // trapez: bund TW, top 0.45·TW, højde TH; kolonne-segmenteret så vi kan farve og bøje
+  var NY = 24, NX = 10, pos = [], col = [], idx = [], i, j, k;
+  var sh = [];
+  for (k = 0; k < 2; k++) for (j = 0; j <= NY; j++) for (i = 0; i <= NX; i++) {
+    var h = j / NY, half = TW / 2 * (1 - 0.55 * h) + (h < 0.12 ? TW * 0.18 * Math.pow(1 - h / 0.12, 2) : 0), x = -half + 2 * half * i / NX;
+    var defl = bend * Math.pow(h, 2) * (3 - h) / 2; // udkraget bjælke, last i spidsen
+    pos.push(x + defl * TW, TY + 0.09 + h * TH, (k ? 1 : -1) * TD / 2);
+    // bøjespænding ∝ M(h)·y/I(h) = (1−h)·x/half³ (normaliseret); træk på den side, lasten skubber fra
+    var s = (1 - h) * (x / half) / Math.pow(half / (TW / 2), 2) / 1.0;
+    Lab.cmapDiv(-s * Math.min(1, 0.25 + 1.5 * Math.abs(S.sigma) / S.Sall), colr);
+    col.push(colr.r, colr.g, colr.b);
+  }
+  var W = NX + 1, Lp = (NY + 1) * W;
+  function q(a, b, c, d) { idx.push(a, b, c, a, c, d); }
+  for (j = 0; j < NY; j++) for (i = 0; i < NX; i++) { var a0 = j * W + i; q(a0, a0 + 1, a0 + W + 1, a0 + W); q(Lp + a0, Lp + a0 + W, Lp + a0 + W + 1, Lp + a0 + 1); }
+  for (j = 0; j < NY; j++) { var l = j * W, r = j * W + NX; q(l, l + W, Lp + l + W, Lp + l); q(r, Lp + r, Lp + r + W, r + W); }
+  var t0 = NY * W; for (i = 0; i < NX; i++) q(t0 + i, Lp + t0 + i, Lp + t0 + i + 1, t0 + i + 1);
+  var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); g.setIndex(idx); g.computeVertexNormals();
+  if (tooth.geometry) tooth.geometry.dispose(); tooth.geometry = g;
+}
+tooth.position.x = TX; rim.position.set(TX, TY, 0);
+
+/* ---------- kontroller ---------- */
+var c = UI.side;
+var sm = Lab.slider(c[0], { label: 'Modul <i>m</i>', min: 1, max: 10, step: 0.5, value: S.m, unit: 'mm', fmt: function (x) { return F(x, 1); }, onInput: function (v) { S.m = v; buildGears(); } });
+var sb = Lab.slider(c[0], { label: 'Tandbredde <i>b</i>', min: 5, max: 120, step: 1, value: S.b, unit: 'mm', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.b = v; buildGears(); } });
+var sN1 = Lab.slider(c[0], { label: 'Tandtal, drev N<sub>1</sub>', min: 12, max: 60, step: 1, value: S.N1, unit: '', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.N1 = v; buildGears(); } });
+var sN2 = Lab.slider(c[0], { label: 'Tandtal, hjul N<sub>2</sub>', min: 12, max: 120, step: 1, value: S.N2, unit: '', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.N2 = v; buildGears(); } });
+var sFt = Lab.slider(c[1], { label: 'Tangentialkraft F<sub>t</sub>', min: 0, max: 10000, step: 50, value: S.Ft, unit: 'N', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.Ft = v; } });
+var yChk = Lab.check(c[1], { label: 'Slå Y op i tabellen (ellers fast Y)', value: false, onChange: function (v) { S.useTab = v; sY.el.disabled = v; } });
+var sY = Lab.slider(c[1], { label: 'Fast Lewis-formfaktor Y', min: 0.2, max: 0.5, step: 0.005, value: S.Yman, unit: '', fmt: function (x) { return F(x, 3); }, onInput: function (v) { S.Yman = v; } });
+var sSa = Lab.slider(c[1], { label: 'Tilladelig bøjespænding', min: 20, max: 500, step: 5, value: S.Sall, unit: 'MPa', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.Sall = v; } });
+Lab.presets(c[1], [['<b>Eksamensspm. 11:</b> m = 4 mm, b = 40 mm, 20 tænder, F<sub>t</sub> = 1600 N, Y = 0,32', function () { S.m = 4; S.b = 40; S.N1 = 20; S.Ft = 1600; S.Yman = 0.32; S.useTab = false; sm.set(4, true); sb.set(40, true); sN1.set(20, true); sFt.set(1600, true); sY.set(0.32, true); yChk.set(false); sY.el.disabled = false; buildGears(); }]]);
+var pauseBtn = Lab.button(Lab.btnRow(c[1]), '⏸ Pause', '', function () {});
+var ro = Lab.readouts(c[2], [['d1', 'Delingsdiameter d<sub>1</sub> = mN<sub>1</sub>'], ['d2', 'd<sub>2</sub> = mN<sub>2</sub>'], ['i', 'Udveksling N<sub>2</sub>/N<sub>1</sub>'], ['T', 'Moment på drevet T = F<sub>t</sub>d<sub>1</sub>/2'], '-', ['Y', 'Lewis-formfaktor Y'], ['s', 'σ<sub>b</sub> = F<sub>t</sub>/(bmY)'], ['n', 'Sikkerhed']]);
+Lab.legendKeys(UI.legend, [['#ffa500', 'tangentialkraft F<sub>t</sub>'], ['#ffd27a', 'delecirkler (rører hinanden)'], [Lab.divCSS, 'bøjespænding i tanden: tryk – træk']]);
+buildGears();
+
+var gY = Lab.plot(UI.graphs.gY), gB = Lab.plot(UI.graphs.gB), lastBend = -1;
+Lab.loop(function (dt, rdt) {
+  var Y = S.useTab ? Ytab(S.N1) : S.Yman, sig = S.Ft / (S.b * S.m * Y); S.sigma = sig;
+  S.ang += dt * S.rpm / 60 * 2 * PI * 0.3;
+  g1.rotation.y = S.ang; g2.rotation.y = -S.ang * S.N1 / S.N2 + PI + PI / (g2.userData.N || S.N2);
+  var R1 = S.R1w, cp = new THREE.Vector3(pair.position.x + g1.position.x + R1, 0, 0);
+  // kraften fra drevet på hjulets tand i kontaktpunktet (tangentielt)
+  var al = 0.15 + 0.35 * Math.min(1, S.Ft / 8000);
+  ftArrow.set(cp.clone().add(new THREE.Vector3(0, -al - 0.02, S.ww / 2 + 0.05)), new THREE.Vector3(0, al, 0)); ftArrow.visible = S.Ft > 0;
+  tagFt.set(cp.clone().add(new THREE.Vector3(0.05, 0.12, S.ww / 2 + 0.05)), 'F<sub>t</sub> = ' + F(S.Ft, 0) + ' N');
+  tagD.set(new THREE.Vector3(pair.position.x + g1.position.x, 0.12, -S.R1w * 0.6), 'd₁ = ' + F(S.m * S.N1, 0) + ' mm');
+  tagD2.set(new THREE.Vector3(pair.position.x + g2.position.x, 0.12, -S.R2w * 0.6), 'd₂ = ' + F(S.m * S.N2, 0) + ' mm');
+  var bend = 0.35 * Math.min(1.4, sig / S.Sall);
+  if (Math.abs(bend - lastBend) > 1e-4) { lastBend = bend; buildTooth(bend); }
+  tArrow.set(new THREE.Vector3(TX - TW / 2 - 0.05 - al + bend * TW, TY + 0.09 + TH * 0.97, 0), new THREE.Vector3(al, 0, 0)); tArrow.visible = S.Ft > 0;
+  tagT.set(new THREE.Vector3(TX, TY - 0.2, 0.3)); tagTs.set(new THREE.Vector3(TX + TW * 0.8, TY + 0.15, 0.3), 'σ<sub>b</sub> = ' + F(sig, 1) + ' MPa');
+  var nn = S.Sall / sig;
+  ro.set('d1', F(S.m * S.N1, 0) + ' mm'); ro.set('d2', F(S.m * S.N2, 0) + ' mm'); ro.set('i', F(S.N2 / S.N1, 2)); ro.set('T', F(S.Ft * S.m * S.N1 / 2000, 1) + ' N·m');
+  ro.set('Y', F(Y, 3) + (S.useTab ? ' (tabel)' : ' (fast)')); ro.set('s', F(sig, 2) + ' MPa', 'hi'); ro.set('n', S.Ft > 0 ? F(nn, 2) : '∞', nn < 1 ? 'bad' : 'ok');
+  Lab.setStatus(UI.status, nn < 1 ? 'Tanden er overbelastet' : 'Tanden holder', nn < 1 ? 'bad' : '');
+  UI.note.textContent = 'Tandhjulene: ' + S.N1 + ' og ' + S.N2 + ' tænder, samme modul ' + F(S.m, 1) + ' mm';
+  gY.begin({ xmin: 10, xmax: 160, ymin: 0.2, ymax: 0.5, xlabel: 'tandtal N', ylabel: 'Y', fx: function (x) { return F(x, 0); }, fy: function (y) { return F(y, 2); } });
+  var yy = []; for (var N = 12; N <= 160; N++) yy.push([N, Ytab(N)]); gY.line(yy, '#5ec8ff', 2.2); YT.forEach(function (p) { if (p[0] <= 160) gY.dot(p[0], p[1], 'rgba(94,200,255,.6)', 2.5); });
+  gY.hline(0.485, 'rgba(255,210,122,.6)', 'tandstang 0,485'); gY.dot(S.N1, Y, '#ffa500', 6);
+  gY.end();
+  // Lewis-konstruktion (skematisk)
+  gB.begin({ xmin: -1.4, xmax: 1.4, ymin: -0.15, ymax: 2.3, xlabel: '', ylabel: '', fx: function () { return ''; }, fy: function () { return ''; } });
+  var tl = [[-0.75, 0], [-0.62, 0.2], [-0.35, 2], [0.35, 2], [0.62, 0.2], [0.75, 0]]; gB.fill(tl.concat([[0.75, 0]]), 'rgba(138,157,179,.25)'); gB.line(tl, '#8a9db3', 2);
+  var par = []; for (var i = 0; i <= 40; i++) { var yv = 2 - 1.75 * i / 40, xv = 0.5 * Math.sqrt((2 - yv) / 1.75); par.push([xv, yv]); } gB.line(par, '#00d984', 1.8, [5, 3]); gB.line(par.map(function (p) { return [-p[0], p[1]]; }), '#00d984', 1.8, [5, 3]);
+  gB.line([[-0.5, 0.25], [0.5, 0.25]], '#ff5e5e', 2.4); gB.text(0.55, 0.25, ' kritisk snit, tykkelse t', '#ff5e5e');
+  gB.line([[-1.15, 2], [-0.38, 2]], '#ffa500', 3); gB.text(-1.2, 2.12, 'F_t (spidsen)', '#ffa500');
+  gB.line([[1.0, 2], [1.0, 0.25]], 'rgba(255,210,122,.8)', 1.4); gB.text(1.03, 1.1, 'l', '#ffd27a');
+  gB.text(-1.35, 0.95, 'Lewis-parablen = bjælke med', '#00d984'); gB.text(-1.35, 0.8, 'konstant styrke', '#00d984');
+  gB.end();
+  UI.formulas.innerHTML =
+    Lab.F('d = mN = ' + n(S.m, 1) + '·' + n(S.N1, 0) + ' = ' + n(S.m * S.N1, 0) + ' mm,&nbsp;&nbsp; delingen p = πm = ' + n(PI * S.m, 2) + ' mm,&nbsp;&nbsp; trykvinkel φ = 20°',
+      'Grundlæggende tandhjulsgeometri (Hamrock kap. 14). Hjul i indgreb har samme modul og samme trykvinkel. Delecirklerne ruller på hinanden uden at glide.') +
+    Lab.F('σ<sub>b</sub> = F<sub>t</sub>/(bmY) = ' + n(S.Ft, 0) + ' N / (' + n(S.b, 0) + ' mm · ' + n(S.m, 1) + ' mm · ' + n(Y, 3) + ') = ' + n(sig, 2) + ' MPa',
+      'Lewis-ligningen. Tanden ses som en udkraget bjælke med bøjningsmoment F<sub>t</sub>·l og modstandsmoment bt²/6 i det kritiske snit. Y samler l og t for den givne tandform. Eksamensfacit: 1600/(40·4·0,32) = 31,25 MPa.');
+  lab.render(rdt);
+}, { button: pauseBtn, flag: UI.paused });
+})();
+</script>
+</body>
+</html>

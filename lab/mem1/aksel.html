@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aksel: bøjning og vridning · 3D-lab</title>
+<meta name="description" content="En roterende transmissionsaksel med bøjningsmoment og torsionsmoment: se spændingen i et materialepunkt skifte fortegn hver omgang, og find den nødvendige diameter via T_e.">
+<link rel="stylesheet" href="../assets/lab.css">
+</head>
+<body>
+<script src="../assets/three.min.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+'use strict';
+var F = Lab.fmt, n = Lab.n, PI = Math.PI;
+var UI = Lab.build({
+  chip: 'MEM1 · kap. 11 · eksamensspm. 9', title: 'Akseldimensionering: bøjning og torsion samtidig',
+  src: 'Hamrock kap. 11: ækvivalent torsionsmoment T<sub>e</sub> og bøjningsmoment M<sub>e</sub>',
+  side: ['Belastning', 'Aksel', 'Aflæsning'],
+  graphs: [{ id: 'gS', title: 'Spænding i det markerede materialepunkt', sub: 'over én omdrejning' }, { id: 'gM', title: 'Mohrs cirkel i det farligste punkt', sub: 'σ fra bøjning, τ fra torsion' }, { id: 'gT', title: 'T<sub>e</sub> er hypotenusen', sub: 'M og T som kateter' }],
+  notes: '<li>Bøjningen giver træk i den ene side og tryk i den anden. <b>Når akslen roterer, skifter hvert materialepunkt mellem træk og tryk én gang pr. omgang</b>: fuldt vekslende bøjning. Det er derfor, aksler typisk svigter ved udmattelse.</li>' +
+    '<li>Torsionen giver den samme forskydning hele vejen rundt. Den roterer med uden at ændre sig.</li>' +
+    '<li>I det farligste punkt (yderst, hvor bøjningen er størst) virker σ og τ samtidig. Mohrs cirkel giver τ<sub>maks</sub> = √((σ/2)² + τ²). Indsæt σ = 32M/(πd³) og τ = 16T/(πd³), så falder det sammen til 16·<b>T<sub>e</sub></b>/(πd³) med T<sub>e</sub> = √(M² + T²).</li>' +
+    '<li>Diameteren indgår i tredje potens: 10 % tykkere aksel giver 25 % lavere spænding.</li>',
+  model: '<li>Massiv cirkulær aksel, konstant M og T (statisk dimensionering efter maksimal forskydningsspænding, Tresca). M<sub>e</sub> svarer til den største hovedspænding.</li>' +
+    '<li>Bøjning og vridning er vist stærkt forstørret. Akslens bøjning følger momentet, og de skrå striber viser vridningen.</li>'
+});
+var lab = Lab.scene(UI.stage, { view: { target: new THREE.Vector3(0, 0, 0), theta: 0.55, phi: 1.2, radius: 3.6 } });
+var S = { M: 400, T: 300, d: 40, tall: 50, rpm: 60, ang: 0 };
+
+/* ---------- 3D ---------- */
+var Lx = 2.4, NX = 80, NA = 48;
+var geo = new THREE.CylinderGeometry(1, 1, 1, NA, NX, false); geo.rotateZ(-PI / 2); // akse langs x
+var basePos = geo.attributes.position.array.slice();
+geo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(basePos.length), 3));
+var shaft = new THREE.Mesh(geo, Lab.mat(0xffffff, { vc: true, metal: 0.35, rough: 0.45 })); lab.scene.add(shaft);
+var dark = Lab.mat(0x2b3c50, { metal: 0.3, rough: 0.7 });
+var brgs = [-1, 1].map(function (s) { var b = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.5, 0.42), dark); b.position.set(s * Lx * 0.5, -0.12, 0); lab.scene.add(b); return b; });
+var marker = new THREE.Mesh(new THREE.SphereGeometry(0.045, 16, 12), new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.6 })); lab.scene.add(marker);
+var tagMk = Lab.tag(lab, '', '#ffffff');
+var arcT1 = Lab.arc(0x00d984, { thick: 0.012 }), arcT2 = Lab.arc(0x00d984, { thick: 0.012 }), arcM1 = Lab.arc(0xffa500, { thick: 0.012 }), arcM2 = Lab.arc(0xffa500, { thick: 0.012 });
+[arcT1, arcT2, arcM1, arcM2].forEach(function (a) { lab.scene.add(a); });
+var tagT = Lab.tag(lab, '', '#00d984'), tagM = Lab.tag(lab, '', '#ffa500');
+var floor = Lab.grid(lab, 4, -0.62);
+
+/* ---------- kontroller ---------- */
+var c = UI.side;
+var sM = Lab.slider(c[0], { label: 'Bøjningsmoment <i>M</i>', min: 0, max: 1500, step: 10, value: S.M, unit: 'N·m', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.M = v; } });
+var sT = Lab.slider(c[0], { label: 'Torsionsmoment <i>T</i>', min: 0, max: 1500, step: 10, value: S.T, unit: 'N·m', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.T = v; } });
+var sR = Lab.slider(c[0], { label: 'Omdrejningstal (vist)', min: 0, max: 120, step: 1, value: S.rpm, unit: 'o/min', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.rpm = v; } });
+Lab.presets(c[0], [
+  ['<b>Eksamensspm. 9:</b> T = 300 N·m, M = 400 N·m, τ<sub>till</sub> = 50 MPa', function () { S.M = 400; S.T = 300; S.tall = 50; sM.set(400, true); sT.set(300, true); sTa.set(50, true); setReq(); }],
+  ['<b>Kun torsion:</b> M = 0', function () { S.M = 0; sM.set(0, true); }],
+  ['<b>Kun bøjning:</b> T = 0', function () { S.T = 0; sT.set(0, true); }]
+]);
+var sd = Lab.slider(c[1], { label: 'Diameter <i>d</i>', min: 15, max: 100, step: 0.1, value: S.d, unit: 'mm', fmt: function (x) { return F(x, 1); }, onInput: function (v) { S.d = v; } });
+var sTa = Lab.slider(c[1], { label: 'Tilladelig forskydning τ<sub>till</sub>', min: 10, max: 200, step: 1, value: S.tall, unit: 'MPa', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.tall = v; } });
+Lab.button(Lab.btnRow(c[1]), 'Sæt d = mindste krævede diameter', 'primary', setReq);
+function setReq() { var r = calc(); S.d = Math.round(r.dreq * 10) / 10 + 0.0; sd.set(S.d, true); }
+var pauseBtn = Lab.button(Lab.btnRow(c[1]), '⏸ Pause', '', function () {});
+var ro = Lab.readouts(c[2], [['s', 'σ<sub>b</sub> = 32M/(πd³)'], ['t', 'τ = 16T/(πd³)'], ['tm', 'τ<sub>maks</sub> = 16T<sub>e</sub>/(πd³)'], ['s1', 'σ<sub>1</sub> = 32M<sub>e</sub>/(πd³)'], '-', ['Te', 'T<sub>e</sub> = √(M² + T²)'], ['Me', 'M<sub>e</sub> = ½(M + T<sub>e</sub>)'], ['dr', '<i>d</i><sub>krævet</sub>'], ['n', 'τ<sub>till</sub>/τ<sub>maks</sub>']]);
+Lab.legendKeys(UI.legend, [[Lab.divCSS, 'bøjningsspænding: tryk – 0 – træk'], ['#ffa500', 'bøjningsmoment M'], ['#00d984', 'torsionsmoment T'], ['#ffffff', 'fulgt materialepunkt']]);
+
+function calc() {
+  var d = S.d / 1000, Te = Math.hypot(S.M, S.T), Me = 0.5 * (S.M + Te), k = PI * d * d * d;
+  var s = 32 * S.M / k / 1e6, t = 16 * S.T / k / 1e6, tm = 16 * Te / k / 1e6, s1 = 32 * Me / k / 1e6;
+  var dreq = Math.cbrt(16 * Te / (PI * S.tall * 1e6)) * 1000;
+  return { Te: Te, Me: Me, s: s, t: t, tm: tm, s1: s1, dreq: dreq };
+}
+var gS = Lab.plot(UI.graphs.gS), gM = Lab.plot(UI.graphs.gM), gT = Lab.plot(UI.graphs.gT), col = new THREE.Color();
+Lab.loop(function (dt, rdt) {
+  var K = calc(); S.ang += dt * S.rpm / 60 * 2 * PI;
+  var R = 0.06 + 0.12 * (S.d / 100), bend = 0.25 * Math.min(1.5, K.s / 200), twist = 2.2 * Math.min(1.5, K.t / 200);
+  var pos = geo.attributes.position.array, cc = geo.attributes.color.array;
+  for (var v = 0; v < pos.length; v += 3) {
+    var x0 = basePos[v], y0 = basePos[v + 1], z0 = basePos[v + 2], r0 = Math.hypot(y0, z0), th0 = Math.atan2(z0, y0);
+    var x = x0 * Lx, u = x0; // u ∈ [-0.5, 0.5]
+    var th = th0 + S.ang + twist * (u + 0.5); // rotation + vridning (forstørret)
+    var yb = -bend * (0.25 - u * u) * 4 * 0.15;    // nedbøjning (forstørret)
+    pos[v] = x; pos[v + 1] = yb + R * r0 * Math.cos(th); pos[v + 2] = R * r0 * Math.sin(th);
+    // bøjning om z: træk øverst (y > 0), tryk nederst
+    var sig = K.s * Math.cos(th) * r0, t = r0 < 0.999 ? 0 : 1;
+    Lab.cmapDiv(sig / Math.max(K.s, 1) * (K.s > 0 ? 1 : 0), col);
+    if (S.T > 0) { var stripe = Math.sin(6 * (th0 - 0)) > 0.92 ? 0.25 : 0; col.lerp(new THREE.Color(0x00d984), stripe * t); }
+    cc[v] = col.r; cc[v + 1] = col.g; cc[v + 2] = col.b;
+  }
+  geo.attributes.position.needsUpdate = true; geo.attributes.color.needsUpdate = true; geo.computeVertexNormals();
+  brgs.forEach(function (b) { b.scale.y = 1; b.position.y = -R - 0.13; b.scale.set(1, 0.6 + R, 1); });
+  // markør på overfladen midt på akslen
+  var thm = S.ang + twist * 0.5, ym = -bend * 0.15;
+  marker.position.set(0, ym + R * 1.02 * Math.cos(thm), R * 1.02 * Math.sin(thm));
+  var sNow = K.s * Math.cos(thm);
+  tagMk.set(marker.position.clone().add(new THREE.Vector3(0, 0.16, 0)), 'σ = ' + F(sNow, 1) + ' · τ = ' + F(K.t, 1) + ' MPa');
+  var ax = new THREE.Vector3(1, 0, 0), axn = new THREE.Vector3(-1, 0, 0);
+  arcT1.set(new THREE.Vector3(Lx * 0.5 + 0.18, 0, 0), ax, R + 0.1, S.T > 0 ? 1 : 0, 4.2); arcT2.set(new THREE.Vector3(-Lx * 0.5 - 0.18, 0, 0), ax, R + 0.1, S.T > 0 ? -1 : 0, 4.2);
+  arcM1.set(new THREE.Vector3(Lx * 0.5 + 0.42, 0, 0), new THREE.Vector3(0, 0, 1), 0.18, S.M > 0 ? -1 : 0, 3.0); arcM2.set(new THREE.Vector3(-Lx * 0.5 - 0.42, 0, 0), new THREE.Vector3(0, 0, 1), 0.18, S.M > 0 ? 1 : 0, 3.0);
+  tagT.set(new THREE.Vector3(Lx * 0.5 + 0.2, R + 0.32, 0), 'T = ' + F(S.T, 0) + ' N·m'); tagT.visible = S.T > 0;
+  tagM.set(new THREE.Vector3(-Lx * 0.5 - 0.45, 0.42, 0), 'M = ' + F(S.M, 0) + ' N·m'); tagM.visible = S.M > 0;
+
+  ro.set('s', F(K.s, 1) + ' MPa'); ro.set('t', F(K.t, 1) + ' MPa'); ro.set('tm', F(K.tm, 1) + ' MPa', K.tm > S.tall ? 'bad' : 'ok'); ro.set('s1', F(K.s1, 1) + ' MPa');
+  ro.set('Te', F(K.Te, 0) + ' N·m', 'hi'); ro.set('Me', F(K.Me, 0) + ' N·m'); ro.set('dr', F(K.dreq, 1) + ' mm', 'hi'); ro.set('n', K.tm > 0 ? F(S.tall / K.tm, 2) : '∞', K.tm > S.tall ? 'bad' : 'ok');
+  Lab.setStatus(UI.status, K.tm > S.tall ? 'For tynd: τ_maks > τ_till' : 'OK: τ_maks ≤ τ_till', K.tm > S.tall ? 'bad' : '');
+  UI.note.textContent = 'Bøjning og vridning vist stærkt forstørret · markøren følger ét materialepunkt';
+
+  var lim = Math.max(K.s, K.t, K.tm, 5) * 1.25, a = ((S.ang + twist * 0.5) % (2 * PI) + 2 * PI) % (2 * PI);
+  gS.begin({ xmin: 0, xmax: 360, ymin: -lim, ymax: lim, xlabel: 'drejningsvinkel [°]', ylabel: 'MPa', fx: function (x) { return F(x, 0); }, fy: function (y) { return F(y, 0); } });
+  var sv = []; for (var i = 0; i <= 90; i++) sv.push([i * 4, K.s * Math.cos(i * 4 * PI / 180)]);
+  gS.line(sv, '#ff5e5e', 2.2); gS.hline(K.t, 'rgba(0,217,132,.9)', 'τ = ' + F(K.t, 1)); gS.hline(S.tall, 'rgba(255,210,122,.6)', 'τ_till');
+  gS.dot(a * 180 / PI, K.s * Math.cos(a), '#ffffff', 5); gS.text(8, lim * 0.85, 'σ_bøjning', '#ff5e5e');
+  gS.end();
+  var cm = K.s / 2, rr = K.tm, sp = Math.max(K.s1, rr * 1.2, 5) * 1.2;
+  gM.begin({ xmin: Math.min(-sp * 0.4, cm - rr * 1.2), xmax: sp, ymin: -rr * 1.3 - 1, ymax: rr * 1.3 + 1, xlabel: 'σ [MPa]', ylabel: 'τ [MPa]', fx: function (x) { return F(x, 0); }, fy: function (y) { return F(y, 0); } });
+  var ci = []; for (i = 0; i <= 90; i++) { var q = i / 90 * 2 * PI; ci.push([cm + rr * Math.cos(q), rr * Math.sin(q)]); }
+  gM.fill(ci, 'rgba(94,200,255,.08)'); gM.line(ci, '#5ec8ff', 2); gM.dot(K.s, K.t, '#ffa500', 4); gM.dot(0, -K.t, '#ffa500', 4); gM.line([[K.s, K.t], [0, -K.t]], 'rgba(255,165,0,.6)', 1.2, [4, 4]);
+  gM.dot(cm + rr, 0, '#ff5e5e', 4); gM.text(cm + rr, 0, ' σ₁', '#ff5e5e'); gM.dot(cm, rr, '#00d984', 4); gM.text(cm, rr, ' τ_maks', '#00d984');
+  gM.end();
+  var mx = Math.max(S.M, S.T, 50) * 1.15;
+  gT.begin({ xmin: 0, xmax: mx, ymin: 0, ymax: mx, xlabel: 'M [N·m]', ylabel: 'T [N·m]', fx: function (x) { return F(x, 0); }, fy: function (y) { return F(y, 0); } });
+  gT.fill([[0, 0], [S.M, 0], [S.M, S.T]], 'rgba(255,210,122,.12)');
+  gT.line([[0, 0], [S.M, 0]], '#ffa500', 3); gT.line([[S.M, 0], [S.M, S.T]], '#00d984', 3); gT.line([[0, 0], [S.M, S.T]], '#ffd27a', 3);
+  gT.text(S.M * 0.4, S.T * 0.5 + mx * 0.05, 'T_e = ' + F(K.Te, 0), '#ffd27a', 'right'); gT.text(S.M * 0.5, mx * 0.03, 'M', '#ffa500'); gT.text(S.M, S.T * 0.5, ' T', '#00d984');
+  gT.end();
+  UI.formulas.innerHTML =
+    Lab.F('T<sub>e</sub> = √(M² + T²) = √(' + n(S.M, 0) + '² + ' + n(S.T, 0) + '²) = ' + n(K.Te, 0) + ' N·m,&nbsp;&nbsp; M<sub>e</sub> = ½(M + T<sub>e</sub>) = ' + n(K.Me, 0) + ' N·m',
+      'Det ækvivalente torsionsmoment giver samme τ<sub>maks</sub> som M og T tilsammen, og M<sub>e</sub> giver samme største hovedspænding (Hamrock kap. 11).') +
+    Lab.F('τ<sub>maks</sub> = 16T<sub>e</sub>/(πd³) ≤ τ<sub>till</sub> ⇒ d ≥ ∛(16T<sub>e</sub>/(πτ<sub>till</sub>)) = ∛(16 · ' + n(K.Te * 1000, 0) + ' N·mm / (π · ' + n(S.tall, 0) + ' MPa)) = ' + n(K.dreq, 1) + ' mm',
+      'Maksimal forskydningsspænding (Tresca). Eksamenstallene: T<sub>e</sub> = 500 N·m, M<sub>e</sub> = 450 N·m, d = 37,1 mm → vælg 38 mm.') +
+    Lab.F('Med d = ' + n(S.d, 1) + ' mm: σ<sub>b</sub> = ' + n(K.s, 1) + ' MPa, τ = ' + n(K.t, 1) + ' MPa, τ<sub>maks</sub> = √((σ<sub>b</sub>/2)² + τ²) = ' + n(K.tm, 1) + ' MPa', 'Kontrol med Mohrs cirkel i det farligste punkt (yderst i bøjningsplanet).');
+  lab.render(rdt);
+}, { button: pauseBtn, flag: UI.paused });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Søjleknækning · 3D-lab</title>
+<meta name="description" content="Tryk en søjle sammen og se den knække ud. Euler eller Johnson, fire understøtninger, og hvordan en lille skævhed vokser mod knæklasten.">
+<link rel="stylesheet" href="../assets/lab.css">
+</head>
+<body>
+<script src="../assets/three.min.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+'use strict';
+var F = Lab.fmt, n = Lab.n, PI = Math.PI;
+var UI = Lab.build({
+  chip: 'MEM1 · kap. 9 · eksamensspm. 7', title: 'Søjleknækning: Euler eller Johnson?',
+  src: 'Hamrock kap. 9: Eulers knæklast, effektiv længde, slankhedsforhold og Johnsons parabel',
+  side: ['Last', 'Søjle og understøtning', 'Materiale', 'Aflæsning'],
+  graphs: [{ id: 'gK', title: 'Kritisk spænding mod slankhed', sub: 'Euler-hyperbel og Johnson-parabel' }, { id: 'gD', title: 'Udbøjning mod last', sub: 'δ = e<sub>0</sub> / (1 − P/P<sub>cr</sub>)' }],
+  notes: '<li>Knækning er et <b>stabilitetssvigt</b>, ikke et styrkesvigt. En lang søjle knækker ved en spænding langt under S<sub>y</sub>. I eksamensopgaven er σ<sub>cr</sub> kun 49 MPa mod S<sub>y</sub> = 400 MPa.</li>' +
+    '<li><b>Understøtningen</b> ændrer den effektive længde L<sub>e</sub>. Indspænd begge ender (L<sub>e</sub> = 0,5L), og knæklasten bliver fire gange så stor.</li>' +
+    '<li>Ingen søjle er helt lige. Den lille skævhed e<sub>0</sub> forstærkes, når P nærmer sig P<sub>cr</sub>. Det er derfor, en rigtig søjle bøjer synligt ud, før den knækker.</li>' +
+    '<li>Gør søjlen kort og tyk, så punktet krydser (L<sub>e</sub>/k)<sub>cr</sub>. Nu gælder Johnson, og flydning blandes ind i svigtet.</li>' +
+    '<li>Knæklasten afhænger af <b>E</b> og <b>I</b> men ikke af styrken. En stærkere stållegering hjælper ikke en lang søjle.</li>',
+  model: '<li>Massiv rund søjle, aksial last i tyngdepunktet. Euler gælder for L<sub>e</sub>/k > (L<sub>e</sub>/k)<sub>cr</sub> = √(2π²E/S<sub>y</sub>), og Johnsons parabel gælder under (overgang ved σ<sub>cr</sub> = S<sub>y</sub>/2).</li>' +
+    '<li>Effektive længder (teoretiske): leddet–leddet 1,0L, indspændt–fri 2,0L, indspændt–leddet 0,7L, indspændt–indspændt 0,5L.</li>' +
+    '<li><span class="est">ESTIMAT:</span> Udbøjningsformen efter knækning og den viste skævhed er illustrationer (vist forstørret). Formlen δ = e<sub>0</sub>/(1 − P/P<sub>cr</sub>) er den klassiske forstærkning for en sinusformet startkrumning.</li>'
+});
+var lab = Lab.scene(UI.stage, { view: { target: new THREE.Vector3(0, 0.5, 0), theta: 0.5, phi: 1.35, radius: 2.4 } });
+var ENDS = { pp: ['Leddet–leddet', 1.0], ff: ['Indspændt–fri (flagstang)', 2.0], fp: ['Indspændt–leddet', 0.7], cc: ['Indspændt–indspændt', 0.5] };
+var S = { P: 10, d: 20, L: 1, end: 'pp', E: 200, Sy: 400, e0: 1, amp: 0, broke: false };
+
+/* ---------- 3D ---------- */
+var stMat = Lab.mat(0x9fb2c6, { metal: 0.55, rough: 0.35 }), dark = Lab.mat(0x2b3c50, { metal: 0.3, rough: 0.7 });
+var col = null, lastKey = '';
+var baseBlk = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), dark), topBlk = baseBlk.clone(); lab.scene.add(baseBlk); lab.scene.add(topBlk);
+var pinB = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 1, 16), Lab.mat(0xffd27a, { metal: 0.6 })), pinT = pinB.clone(); lab.scene.add(pinB); lab.scene.add(pinT);
+var ram = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 1, 24), Lab.mat(0x44586e)); lab.scene.add(ram);
+var arrow = Lab.arrow(0xffa500, { radius: 0.014 }); lab.scene.add(arrow);
+var tagP = Lab.tag(lab, '', '#ffa500'), tagD = Lab.tag(lab, '', '#ffd27a');
+var floor = Lab.grid(lab, 3, 0);
+var guide = Lab.line(0x8fa3b8, true, 0.6); lab.scene.add(guide);
+
+/* ---------- kontroller ---------- */
+var c = UI.side;
+var sP = Lab.slider(c[0], { label: 'Trykkraft <i>P</i>', min: 0, max: 30, step: 0.01, value: S.P, unit: 'kN', fmt: function (x) { return F(x, x < 10 ? 2 : 1); }, onInput: function (v) { S.P = v; } });
+var br = Lab.btnRow(c[0]); Lab.button(br, 'Slip lasten', '', function () { sP.set(0); S.broke = false; S.amp = 0; }); Lab.button(br, '→ 99 % af P<sub>cr</sub>', 'primary', function () { S.broke = false; sP.set(+(calc().Pcr / 1000 * 0.99).toFixed(2)); });
+var sEnd = Lab.select(c[1], { label: 'Understøtning', options: Object.keys(ENDS).map(function (k) { return { value: k, label: ENDS[k][0] + ' (L<sub>e</sub> = ' + ENDS[k][1] + 'L)' }; }), value: 'pp', onChange: function (v) { S.end = v; reset(); } });
+sEnd.el.querySelectorAll('option').forEach(function (o) { o.textContent = o.textContent.replace(/<\/?sub>/g, ''); });
+var sL = Lab.slider(c[1], { label: 'Længde <i>L</i>', min: 0.1, max: 3, step: 0.01, value: S.L, unit: 'm', fmt: function (x) { return F(x, 2); }, onInput: function (v) { S.L = v; reset(); } });
+var sd = Lab.slider(c[1], { label: 'Diameter <i>d</i>', min: 5, max: 80, step: 1, value: S.d, unit: 'mm', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.d = v; reset(); } });
+var se0 = Lab.slider(c[1], { label: 'Startskævhed e<sub>0</sub>', min: 0, max: 5, step: 0.1, value: S.e0, unit: 'mm', fmt: function (x) { return F(x, 1); }, onInput: function (v) { S.e0 = v; } });
+var sE = Lab.slider(c[2], { label: 'Elasticitetsmodul <i>E</i>', min: 40, max: 220, step: 1, value: S.E, unit: 'GPa', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.E = v; reset(); } });
+var sSy = Lab.slider(c[2], { label: 'Flydespænding S<sub>y</sub>', min: 100, max: 1200, step: 10, value: S.Sy, unit: 'MPa', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.Sy = v; reset(); } });
+Lab.presets(c[2], [
+  ['<b>Eksamensspm. 7:</b> leddet i begge ender, d = 20 mm, L<sub>e</sub> = 1 m, E = 200 GPa, S<sub>y</sub> = 400 MPa', function () { preset('pp', 1, 20, 200, 400, 10); }],
+  ['<b>Kort og tyk:</b> Johnson-område', function () { preset('pp', 0.4, 30, 200, 400, 100); }],
+  ['<b>Aluminiumsrør i stedet for stål:</b> E = 70 GPa', function () { preset('pp', 1, 20, 70, 270, 4); }]
+]);
+function preset(e, L, d, E, Sy, P) { S.end = e; S.L = L; S.d = d; S.E = E; S.Sy = Sy; sEnd.set(e, true); sL.set(L, true); sd.set(d, true); sE.set(E, true); sSy.set(Sy, true); reset(); sP.set(P); }
+var ro = Lab.readouts(c[3], [['k', 'Inertiradius <i>k</i> = d/4'], ['sl', 'Slankhed L<sub>e</sub>/k'], ['slc', '(L<sub>e</sub>/k)<sub>cr</sub>'], ['reg', 'Område'], '-', ['Pcr', '<i>P</i><sub>cr</sub>'], ['scr', 'σ<sub>cr</sub> = P<sub>cr</sub>/A'], ['Py', '<i>P</i><sub>y</sub> = S<sub>y</sub>·A (flydning)'], ['s', 'σ = P/A nu'], ['nn', 'Sikkerhed P<sub>cr</sub>/P']]);
+Lab.legendKeys(UI.legend, [['#ffa500', 'trykkraft P'], [Lab.heatCSS, 'farve = σ/S<sub>y</sub>'], ['#ffd27a', 'led (drejeligt)'], ['#2b3c50', 'indspænding']]);
+
+function calc() {
+  var d = S.d / 1000, A = PI * d * d / 4, I = PI * Math.pow(d, 4) / 64, k = d / 4, Le = ENDS[S.end][1] * S.L, E = S.E * 1e9, Sy = S.Sy * 1e6;
+  var sl = Le / k, slc = Math.sqrt(2 * PI * PI * E / Sy), euler = sl >= slc;
+  var Pcr = euler ? PI * PI * E * I / (Le * Le) : A * (Sy - Math.pow(Sy * sl / (2 * PI), 2) / E);
+  return { A: A, I: I, k: k, Le: Le, sl: sl, slc: slc, euler: euler, Pcr: Pcr, Py: Sy * A, E: E, Sy: Sy };
+}
+function reset() {
+  S.broke = false; S.amp = 0; var K = calc();
+  sP.range(0, +(Math.min(K.Pcr, K.Py) * 1.25 / 1000).toPrecision(3), 'any');
+  var L = S.L, sc = Math.max(L, 0.5);
+  lab.setView({ target: new THREE.Vector3(0, L * 0.62, 0), radius: 2.7 * sc + 0.5, theta: 0.5, phi: 1.38 }, true);
+}
+function shape(x) { // udbøjningsform, x ∈ [0,1] (0 = bund)
+  switch (S.end) {
+    case 'pp': return Math.sin(PI * x);
+    case 'ff': return 1 - Math.cos(PI * x / 2);
+    case 'cc': return (1 - Math.cos(2 * PI * x)) / 2;
+    default: { var v = Math.sin(4.4934 * (1 - x)) - 4.4934 * (1 - x) * Math.cos(4.4934) - Math.sin(4.4934) * 0 ; return v / 4.6; }
+  }
+}
+var fpMax = 0; (function () { for (var i = 0; i <= 200; i++) { var x = i / 200, v = Math.sin(4.4934 * (1 - x)) - 4.4934 * (1 - x) * Math.cos(4.4934); fpMax = Math.max(fpMax, Math.abs(v)); } })();
+function shapeN(x) { if (S.end !== 'fp') return shape(x); var v = Math.sin(4.4934 * (1 - x)) - 4.4934 * (1 - x) * Math.cos(4.4934); return v / fpMax; }
+
+var gK = Lab.plot(UI.graphs.gK), gD = Lab.plot(UI.graphs.gD);
+Lab.loop(function (dt, rdt) {
+  var K = calc(), P = S.P * 1000, L = S.L, d = S.d / 1000, r = P / K.Pcr;
+  if (r >= 1) S.broke = true;
+  var target;
+  if (S.broke && r > 0.02) target = 0.22 * L; // knækket: store udbøjninger
+  else { S.broke = r >= 1; target = Math.min(0.2 * L, 25 * (S.e0 / 1000) / Math.max(1 - r, 0.01)); }
+  if (r < 0.02) S.broke = false;
+  S.amp += (target - S.amp) * Math.min(1, rdt * (S.broke ? 2.5 : 8));
+  // søjlen som rør langs kurven
+  var pts = [], N = 40;
+  for (var i = 0; i <= N; i++) { var x = i / N; pts.push(new THREE.Vector3(S.amp * shapeN(x), x * L * (1 - 0.15 * Math.min(1, S.amp / (0.22 * L)) * 0.2), 0)); }
+  var key = S.amp.toFixed(5) + '|' + L + '|' + d;
+  if (key !== lastKey) {
+    lastKey = key; if (col) { lab.scene.remove(col); col.geometry.dispose(); }
+    col = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 64, Math.max(d / 2, 0.004) * (L < 0.5 ? 1 : 1), 20, false), stMat); lab.scene.add(col);
+  }
+  var sig = P / K.A; Lab.cmapHeat(0.12 + 0.88 * Math.min(1, sig / K.Sy), stMat.color);
+  var topY = pts[N].y, w = Math.max(0.08, d * 4);
+  var fixedB = S.end !== 'pp', fixedT = S.end === 'cc';
+  baseBlk.scale.set(w * 2.2, fixedB ? 0.06 : 0.03, w * 2.2); baseBlk.position.set(0, fixedB ? -0.03 : -0.05, 0);
+  pinB.visible = !fixedB; pinB.scale.set(d * 0.6, w * 1.2, d * 0.6); pinB.rotation.x = PI / 2; pinB.position.set(0, -0.012, 0);
+  var topFree = S.end === 'ff';
+  topBlk.visible = !topFree; topBlk.scale.set(w * 2.2, fixedT ? 0.06 : 0.03, w * 2.2); topBlk.position.set(S.end === 'ff' ? S.amp : 0, topY + (fixedT ? 0.03 : 0.05), 0);
+  pinT.visible = S.end === 'pp' || S.end === 'fp'; pinT.scale.set(d * 0.6, w * 1.2, d * 0.6); pinT.rotation.x = PI / 2; pinT.position.set(0, topY + 0.012, 0);
+  ram.scale.set(w * 0.8, 0.08, w * 0.8); ram.position.set(topFree ? pts[N].x : 0, topY + (topFree ? 0.04 : 0.12), 0);
+  var al = 0.12 + 0.3 * Math.min(1.2, r);
+  arrow.set(new THREE.Vector3(ram.position.x, ram.position.y + 0.04 + al, 0), new THREE.Vector3(0, -al, 0)); arrow.visible = P > 0;
+  tagP.set(new THREE.Vector3(ram.position.x + 0.08, ram.position.y + 0.1 + al, 0), 'P = ' + F(S.P, 2) + ' kN'); tagP.visible = P > 0;
+  var mid = shapeN(0.5) !== 0 ? 0.5 : 0.7;
+  var xm = S.end === 'ff' ? 1 : S.end === 'fp' ? 0.4 : 0.5;
+  tagD.set(new THREE.Vector3(S.amp * shapeN(xm) + 0.1, xm * L, 0), 'δ = ' + F(S.broke ? NaN : (S.e0 / Math.max(1 - r, 0.01)), 1) + ' mm');
+  tagD.visible = !S.broke && S.e0 > 0;
+  guide.set([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, L, 0)]);
+
+  ro.set('k', F(K.k * 1000, 2) + ' mm'); ro.set('sl', F(K.sl, 1)); ro.set('slc', F(K.slc, 1)); ro.set('reg', K.euler ? 'Euler (lang)' : 'Johnson (kort)', K.euler ? 'hi' : 'ok');
+  ro.set('Pcr', F(K.Pcr / 1000, 2) + ' kN', 'hi'); ro.set('scr', F(K.Pcr / K.A / 1e6, 1) + ' MPa'); ro.set('Py', F(K.Py / 1000, 1) + ' kN'); ro.set('s', F(sig / 1e6, 1) + ' MPa');
+  ro.set('nn', P > 0 ? F(K.Pcr / P, 2) : '∞', P > 0 && K.Pcr / P < 1 ? 'bad' : 'ok');
+  Lab.setStatus(UI.status, S.broke ? 'KNÆKKET: P har nået P_cr' : r > 0.8 ? 'Tæt på knæklasten: udbøjningen vokser hurtigt' : 'Stabil', S.broke ? 'bad' : r > 0.8 ? 'warn' : '');
+  UI.note.textContent = 'P/P_cr = ' + F(r, 2) + ' · udbøjning vist forstørret';
+
+  // graf 1: σ_cr mod L_e/k
+  var Smax = K.Sy / 1e6 * 1.15, xmax = Math.max(250, K.sl * 1.2, K.slc * 1.5);
+  gK.begin({ xmin: 0, xmax: xmax, ymin: 0, ymax: Smax, xlabel: 'L_e/k', ylabel: 'σ_cr [MPa]', fx: function (x) { return F(x, 0); }, fy: function (y) { return F(y, 0); } });
+  var eu = [], jo = []; for (i = 1; i <= 200; i++) { var s = i / 200 * xmax, se = PI * PI * K.E / (s * s) / 1e6; if (se < Smax * 1.4) eu.push([s, se]); if (s <= K.slc) jo.push([s, (K.Sy - Math.pow(K.Sy * s / (2 * PI), 2) / K.E) / 1e6]); }
+  gK.line(eu.filter(function (q) { return q[0] >= K.slc * 0.6; }), 'rgba(94,200,255,.4)', 1.2, [5, 4]);
+  gK.line(eu.filter(function (q) { return q[0] >= K.slc; }), '#5ec8ff', 2.2); gK.line([[0, K.Sy / 1e6]].concat(jo), '#00d984', 2.2);
+  gK.vline(K.slc, 'rgba(255,210,122,.8)', '(L_e/k)_cr = ' + F(K.slc, 1)); gK.hline(K.Sy / 2e6, 'rgba(255,210,122,.5)', 'S_y/2');
+  gK.dot(K.sl, K.Pcr / K.A / 1e6, '#ffa500', 5); gK.dot(K.sl, sig / 1e6, S.broke ? '#ff5e5e' : '#ffffff', 4);
+  gK.text(xmax * 0.6, Smax * 0.3, 'Euler', '#5ec8ff'); gK.text(K.slc * 0.25, K.Sy / 1e6 * 0.88, 'Johnson', '#00d984');
+  gK.end();
+  // graf 2: forstærkning
+  gD.begin({ xmin: 0, xmax: 1.1, ymin: 0, ymax: Math.max(10, S.e0 * 12), xlabel: 'P / P_cr', ylabel: 'δ [mm]', fx: function (x) { return F(x, 1); }, fy: function (y) { return F(y, 0); } });
+  var am = []; for (i = 0; i <= 98; i++) { var q = i / 100; am.push([q, S.e0 / (1 - q)]); }
+  gD.line(am, '#ffd27a', 2.2); gD.vline(1, 'rgba(255,94,94,.8)', 'P_cr');
+  if (!S.broke) gD.dot(Math.min(r, 0.99), S.e0 / Math.max(1 - r, 0.01), '#ffffff', 5);
+  gD.end();
+
+  UI.formulas.innerHTML =
+    Lab.F('<i>P</i><sub>cr</sub> = π²<i>EI</i>/L<sub>e</sub>² = π² · ' + n(S.E * 1000, 0) + ' MPa · ' + n(K.I * 1e12, 0) + ' mm⁴ / (' + n(K.Le * 1000, 0) + ' mm)² = ' + n(PI * PI * K.E * K.I / (K.Le * K.Le) / 1000, 2) + ' kN',
+      'Eulers knæklast (Hamrock kap. 9). <i>I</i> = πd⁴/64 = ' + F(K.I * 1e12, 0) + ' mm⁴ (= 2500π for d = 20 mm). L<sub>e</sub> = ' + ENDS[S.end][1] + '·L for ' + ENDS[S.end][0].toLowerCase() + '.') +
+    Lab.F('σ<sub>cr</sub> = <i>P</i><sub>cr</sub>/A = ' + n(K.Pcr / 1000, 2) + ' kN / ' + n(K.A * 1e6, 1) + ' mm² = ' + n(K.Pcr / K.A / 1e6, 1) + ' MPa', 'Den tilsvarende kritiske spænding, som den officielle liste også spørger efter.') +
+    Lab.F('L<sub>e</sub>/k = ' + n(K.Le * 1000, 0) + '/' + n(K.k * 1000, 2) + ' = ' + n(K.sl, 1) + ',&nbsp;&nbsp; (L<sub>e</sub>/k)<sub>cr</sub> = √(2π²E/S<sub>y</sub>) = ' + n(K.slc, 1) + ' ⇒ ' + (K.euler ? 'Euler-søjle' : 'Johnson-søjle'),
+      'Overgangen ligger, hvor Euler-hyperblen rammer σ = S<sub>y</sub>/2. Med eksamenstallene: 200 > 99,3, altså Euler, og knækning sker længe før flydning (15,5 kN mod 125,7 kN).') +
+    (K.euler ? '' : Lab.F('<i>P</i><sub>cr</sub> = A[S<sub>y</sub> − (S<sub>y</sub>·L<sub>e</sub>/(2πk))²/E] = ' + n(K.Pcr / 1000, 2) + ' kN', 'Johnsons parabel for korte og mellemlange søjler.'));
+  lab.render(rdt);
+});
+reset();
+})();
+</script>
+</body>
+</html>

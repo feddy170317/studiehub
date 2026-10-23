@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flydekriterier i 3D · 3D-lab</title>
+<meta name="description" content="von Mises-cylinderen og Tresca-prismet i hovedspændingsrummet. Skru lasten op og se, hvornår spændingspunktet rammer flydefladen.">
+<link rel="stylesheet" href="../assets/lab.css">
+</head>
+<body>
+<script src="../assets/three.min.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+'use strict';
+var F = Lab.fmt, n = Lab.n, PI = Math.PI;
+var UI = Lab.build({
+  chip: 'MEM1 · kap. 6 · eksamensspm. 5', title: 'Flydekriterier: von Mises og Tresca i 3D',
+  src: 'Hamrock kap. 6: formændringsenergi (von Mises) og maksimal forskydningsspænding (Tresca)',
+  side: ['Hovedspændinger', 'Last og materiale', 'Aflæsning'],
+  graphs: [{ id: 'gP', title: 'Plan spænding (σ<sub>3</sub> = 0)', sub: 'ellipse = von Mises, sekskant = Tresca' }, { id: 'gC', title: 'Mohrs tre cirkler', sub: 'τ<sub>maks</sub> = største radius' }],
+  notes: '<li>Begge flydeflader er <b>uendeligt lange langs den hydrostatiske akse</b> σ<sub>1</sub> = σ<sub>2</sub> = σ<sub>3</sub>. Lige meget tryk fra alle sider får ikke et duktilt metal til at flyde. Prøv preset "hydrostatisk".</li>' +
+    '<li>Tresca-prismet ligger <b>inden i</b> von Mises-cylinderen og rører den kun i de seks hjørner (enakset træk og tryk). Tresca er altså altid på den sikre side.</li>' +
+    '<li>Størst forskel er der ved <b>ren forskydning</b> (σ<sub>1</sub> = −σ<sub>2</sub>). Der giver von Mises 15 % højere sikkerhed (1/0,577 mod 1/0,5).</li>' +
+    '<li>Sikkerhedsfaktoren er, hvor mange gange du kan gange lasten op, før punktet rammer fladen. Træk i lastfaktoren og se punktet krydse fladerne præcis ved λ = <i>n</i>.</li>',
+  model: '<li>Duktilt, isotropt materiale med samme flydespænding i træk og tryk. Proportional belastning: alle hovedspændinger skaleres med samme faktor λ.</li>' +
+    '<li>Akserne er normaliseret med S<sub>y</sub>, så cylinderens radius er √(2/3) i enheder af S<sub>y</sub>.</li>'
+});
+var lab = Lab.scene(UI.stage, { view: { target: new THREE.Vector3(0, 0, 0), theta: 0.75, phi: 1.05, radius: 5.2 } });
+var S = { s1: 120, s2: -40, s3: 0, Sy: 280, lam: 1 };
+
+/* ---------- 3D: hovedspændingsrummet (σ1 → x, σ2 → z mod beskueren... σ3 → y op) ---------- */
+function P(a, b, c) { return new THREE.Vector3(a, c, b); } // (σ1, σ2, σ3)/S_y → verden
+var axCol = [0xff8a8a, 0x8adcff, 0xb6e35a], axName = ['σ₁', 'σ₂', 'σ₃'];
+for (var i = 0; i < 3; i++) {
+  var e = [0, 0, 0]; e[i] = 1.9; var m = [0, 0, 0]; m[i] = -1.9;
+  var ar = Lab.arrow(axCol[i], { radius: 0.007 }); ar.set(P(m[0], m[1], m[2]), P(e[0] * 2, e[1] * 2, e[2] * 2)); lab.scene.add(ar);
+  var tp = [0, 0, 0]; tp[i] = 2.05; Lab.tag(lab, axName[i], '#' + axCol[i].toString(16)).set(P(tp[0], tp[1], tp[2]));
+}
+var hyd = Lab.line(0xffd27a, true, 0.9); hyd.set([P(-1.6, -1.6, -1.6), P(1.6, 1.6, 1.6)]); lab.scene.add(hyd);
+Lab.tag(lab, 'hydrostatisk akse', '#ffd27a').set(P(1.75, 1.75, 1.75));
+var axis = new THREE.Vector3(1, 1, 1).normalize(), R = Math.sqrt(2 / 3), H = 3.2;
+var cyl = new THREE.Mesh(new THREE.CylinderGeometry(R, R, H, 72, 1, true), new THREE.MeshStandardMaterial({ color: 0x5ec8ff, transparent: true, opacity: 0.16, side: THREE.DoubleSide, depthWrite: false }));
+cyl.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), P(1, 1, 1).normalize()); lab.scene.add(cyl);
+var cylEdge = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.CylinderGeometry(R, R, H, 36, 6, true), 1), new THREE.LineBasicMaterial({ color: 0x5ec8ff, transparent: true, opacity: 0.25 }));
+cylEdge.quaternion.copy(cyl.quaternion); lab.scene.add(cylEdge);
+// Tresca-prisme: hjørner i de projicerede akseretninger
+var u = new THREE.Vector3(2, -1, -1).normalize(), w = new THREE.Vector3(0, 1, -1).normalize(), hex = [];
+for (i = 0; i < 6; i++) { var a = i * PI / 3; hex.push(u.clone().multiplyScalar(R * Math.cos(a)).addScaledVector(w, R * Math.sin(a))); }
+var pos = [], ax3 = new THREE.Vector3(1, 1, 1).normalize();
+function toW(v) { return P(v.x, v.y, v.z); }
+for (i = 0; i < 6; i++) {
+  var A0 = hex[i].clone().addScaledVector(ax3, -H / 2), A1 = hex[i].clone().addScaledVector(ax3, H / 2), B0 = hex[(i + 1) % 6].clone().addScaledVector(ax3, -H / 2), B1 = hex[(i + 1) % 6].clone().addScaledVector(ax3, H / 2);
+  [A0, B0, B1, A0, B1, A1].forEach(function (q) { var t = toW(q); pos.push(t.x, t.y, t.z); });
+}
+var prismGeo = new THREE.BufferGeometry(); prismGeo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); prismGeo.computeVertexNormals();
+var prism = new THREE.Mesh(prismGeo, new THREE.MeshStandardMaterial({ color: 0xffa500, transparent: true, opacity: 0.18, side: THREE.DoubleSide, depthWrite: false }));
+lab.scene.add(prism);
+var prismEdges = new THREE.LineSegments(new THREE.EdgesGeometry(prismGeo, 20), new THREE.LineBasicMaterial({ color: 0xffa500, transparent: true, opacity: 0.6 })); lab.scene.add(prismEdges);
+// planet σ3 = 0 med skæringskurverne
+var plane = new THREE.Mesh(new THREE.PlaneGeometry(3.6, 3.6), new THREE.MeshBasicMaterial({ color: 0xb6e35a, transparent: true, opacity: 0.05, side: THREE.DoubleSide, depthWrite: false }));
+plane.rotation.x = -PI / 2; lab.scene.add(plane);
+var ell = [], hx = [];
+for (i = 0; i <= 180; i++) {
+  var t = i / 180 * 2 * PI, c = Math.cos(t), s = Math.sin(t);
+  var rv = 1 / Math.sqrt(c * c - c * s + s * s), rt = 1 / Math.max(Math.abs(c - s), Math.abs(c), Math.abs(s));
+  ell.push(P(rv * c, rv * s, 0)); hx.push(P(rt * c, rt * s, 0));
+}
+var ellL = Lab.line(0x5ec8ff, false, 1); ellL.set(ell); lab.scene.add(ellL);
+var hexL = Lab.line(0xffa500, false, 1); hexL.set(hx); lab.scene.add(hexL);
+// spændingspunkt + lastlinje
+var dot = new THREE.Mesh(new THREE.SphereGeometry(0.055, 24, 16), new THREE.MeshStandardMaterial({ color: 0x00d984, emissive: 0x00d984, emissiveIntensity: 0.6 }));
+lab.scene.add(dot);
+var path = Lab.line(0xe3e9ef, false, 0.7); lab.scene.add(path);
+var pathFull = Lab.line(0x8fa3b8, true, 0.6); lab.scene.add(pathFull);
+var drop = Lab.line(0xe3e9ef, true, 0.5); lab.scene.add(drop);
+var tagDot = Lab.tag(lab, '', '#00d984');
+
+/* ---------- kontroller ---------- */
+var c0 = UI.side[0], c1 = UI.side[1];
+var sl1 = Lab.slider(c0, { label: 'σ<sub>1</sub>', min: -400, max: 400, step: 5, value: S.s1, unit: 'MPa', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.s1 = v; } });
+var sl2 = Lab.slider(c0, { label: 'σ<sub>2</sub>', min: -400, max: 400, step: 5, value: S.s2, unit: 'MPa', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.s2 = v; } });
+var sl3 = Lab.slider(c0, { label: 'σ<sub>3</sub>', min: -400, max: 400, step: 5, value: S.s3, unit: 'MPa', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.s3 = v; } });
+Lab.presets(c0, [
+  ['<b>Eksamensspm. 5:</b> drivtap, σ<sub>1</sub> = 120, σ<sub>2</sub> = −40 MPa, S<sub>y</sub> = 280 MPa', function () { set(120, -40, 0, 280, 1); }],
+  ['<b>Ren forskydning:</b> σ<sub>1</sub> = −σ<sub>2</sub> (størst forskel)', function () { set(140, -140, 0, 280, 1); }],
+  ['<b>Hydrostatisk:</b> σ<sub>1</sub> = σ<sub>2</sub> = σ<sub>3</sub> = −300 MPa', function () { set(-300, -300, -300, 280, 1); }],
+  ['<b>Enakset træk:</b> kriterierne er enige', function () { set(200, 0, 0, 280, 1); }]
+]);
+var sSy = Lab.slider(c1, { label: 'Flydespænding S<sub>y</sub>', min: 100, max: 800, step: 10, value: S.Sy, unit: 'MPa', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.Sy = v; } });
+var sLam = Lab.slider(c1, { label: 'Lastfaktor λ', min: 0, max: 3, step: 0.01, value: 1, unit: '×', fmt: function (x) { return F(x, 2); }, onInput: function (v) { S.lam = v; }, sub: 'Ganger alle tre hovedspændinger op. Punktet rammer fladen, når λ = n.' });
+function set(a, b, c, sy, l) { S.s1 = a; S.s2 = b; S.s3 = c; S.Sy = sy; S.lam = l; sl1.set(a, true); sl2.set(b, true); sl3.set(c, true); sSy.set(sy, true); sLam.set(l, true); }
+var ro = Lab.readouts(UI.side[2], [['se', 'von Mises σ<sub>e</sub>'], ['nv', '<i>n</i><sub>s</sub> (von Mises)'], ['tm', 'τ<sub>maks</sub> = (σ<sub>maks</sub> − σ<sub>min</sub>)/2'], ['nt', '<i>n</i><sub>s</sub> (Tresca)'], '-', ['diff', 'von Mises / Tresca']]);
+Lab.legendKeys(UI.legend, [['#5ec8ff', 'von Mises-cylinder (formændringsenergi)'], ['#ffa500', 'Tresca-prisme (maks. forskydning)'], ['#b6e35a', 'planet σ<sub>3</sub> = 0 (plan spænding)'], ['#00d984', 'spændingspunkt × λ']]);
+
+function crit(a, b, c) {
+  var se = Math.sqrt(0.5 * ((a - b) * (a - b) + (b - c) * (b - c) + (c - a) * (c - a)));
+  var mx = Math.max(a, b, c), mn = Math.min(a, b, c);
+  return { se: se, tm: (mx - mn) / 2, nv: se > 1e-9 ? S.Sy / se : Infinity, nt: mx - mn > 1e-9 ? S.Sy / (mx - mn) : Infinity };
+}
+
+var gP = Lab.plot(UI.graphs.gP), gC = Lab.plot(UI.graphs.gC);
+Lab.loop(function (dt, rdt) {
+  var k = crit(S.s1, S.s2, S.s3), l = S.lam, a = S.s1 * l, b = S.s2 * l, c = S.s3 * l, kk = crit(a, b, c), Sy = S.Sy;
+  var p = P(a / Sy, b / Sy, c / Sy); dot.position.copy(p);
+  var yv = kk.se > Sy * 1.0001, yt = kk.tm * 2 > Sy * 1.0001;
+  var col = yv ? 0xff5e5e : yt ? 0xffa500 : 0x00d984; dot.material.color.setHex(col); dot.material.emissive.setHex(col);
+  path.set([P(0, 0, 0), p]);
+  var far = Math.max(1.2, 3 / Math.max(Math.abs(S.s1), Math.abs(S.s2), Math.abs(S.s3), 1) * Sy);
+  pathFull.set([P(0, 0, 0), P(S.s1 / Sy * Math.min(far, 3), S.s2 / Sy * Math.min(far, 3), S.s3 / Sy * Math.min(far, 3))]);
+  drop.set([p, P(a / Sy, b / Sy, 0)]);
+  tagDot.set(p.clone().add(new THREE.Vector3(0.12, 0.12, 0)), '(' + F(a, 0) + ', ' + F(b, 0) + ', ' + F(c, 0) + ')');
+  ro.set('se', F(k.se, 1) + ' MPa'); ro.set('nv', F(k.nv, 2), k.nv < 1 ? 'bad' : 'ok'); ro.set('tm', F(k.tm, 1) + ' MPa'); ro.set('nt', F(k.nt, 2), k.nt < 1 ? 'bad' : 'hi');
+  ro.set('diff', isFinite(k.nv / k.nt) ? F(k.nv / k.nt, 3) + ' × højere n' : '–');
+  Lab.setStatus(UI.status, yv ? 'Flyder efter begge kriterier' : yt ? 'Tresca: flyder · von Mises: holder' : 'Elastisk: punktet er inden for begge flader', yv ? 'bad' : yt ? 'warn' : '');
+  UI.note.textContent = 'λ = ' + F(l, 2) + ' · flydning ved λ = ' + F(k.nt, 2) + ' (Tresca) og ' + F(k.nv, 2) + ' (von Mises)';
+
+  var lim = Math.max(Sy * 1.25, Math.abs(a) * 1.15, Math.abs(b) * 1.15);
+  gP.begin({ xmin: -lim, xmax: lim, ymin: -lim, ymax: lim, xlabel: 'σ₁ [MPa]', ylabel: 'σ₂ [MPa]', fx: function (x) { return F(x, 0); }, fy: function (y) { return F(y, 0); } });
+  gP.fill(ell.map(function (q) { return [q.x * Sy, q.z * Sy]; }), 'rgba(94,200,255,.08)');
+  gP.line(ell.map(function (q) { return [q.x * Sy, q.z * Sy]; }), '#5ec8ff', 2);
+  gP.line(hx.map(function (q) { return [q.x * Sy, q.z * Sy]; }), '#ffa500', 2);
+  gP.line([[-lim, -lim], [lim, lim]], 'rgba(255,210,122,.35)', 1, [4, 4]);
+  gP.line([[0, 0], [S.s1 * Math.max(k.nv, k.nt, l) * 1.1, S.s2 * Math.max(k.nv, k.nt, l) * 1.1]], 'rgba(227,233,239,.5)', 1.2, [5, 4]);
+  if (isFinite(k.nt)) gP.dot(S.s1 * k.nt, S.s2 * k.nt, '#ffa500', 4);
+  if (isFinite(k.nv)) gP.dot(S.s1 * k.nv, S.s2 * k.nv, '#5ec8ff', 4);
+  gP.dot(a, b, '#' + col.toString(16).padStart(6, '0'), 6);
+  if (Math.abs(S.s3) > 0.5) gP.text(-lim * 0.95, lim * 0.88, 'NB: σ₃ ≠ 0, planet viser kun σ₁ og σ₂', '#ffd27a');
+  gP.end();
+  var srt = [a, b, c].sort(function (x, y) { return y - x; }), mx = srt[0], mn = srt[2], md = srt[1];
+  var span = Math.max(Math.abs(mx), Math.abs(mn), Sy * 0.6) * 1.15;
+  gC.begin({ xmin: -span, xmax: span, ymin: -span * 0.55, ymax: span * 0.55, xlabel: 'σ [MPa]', ylabel: 'τ [MPa]', fx: function (x) { return F(x, 0); }, fy: function (y) { return F(y, 0); } });
+  [[mx, mn, '#ff5e5e'], [mx, md, '#8fa3b8'], [md, mn, '#8fa3b8']].forEach(function (cc) {
+    var cm = (cc[0] + cc[1]) / 2, r = Math.abs(cc[0] - cc[1]) / 2, pts = [];
+    for (var j = 0; j <= 90; j++) { var t = j / 90 * 2 * PI; pts.push([cm + r * Math.cos(t), r * Math.sin(t)]); }
+    gC.line(pts, cc[2], cc[2] === '#ff5e5e' ? 2.2 : 1.4);
+  });
+  gC.hline(Sy / 2, 'rgba(255,165,0,.85)', 'Tresca-grænse S_y/2 = ' + F(Sy / 2, 0));
+  gC.hline(Sy / Math.sqrt(3), 'rgba(94,200,255,.85)', 'von Mises ved ren forskydning S_y/√3 = ' + F(Sy / Math.sqrt(3), 0));
+  gC.end();
+
+  UI.formulas.innerHTML =
+    Lab.F('σ<sub>e</sub> = √(½[(σ<sub>1</sub>−σ<sub>2</sub>)² + (σ<sub>2</sub>−σ<sub>3</sub>)² + (σ<sub>3</sub>−σ<sub>1</sub>)²]) = ' + n(k.se, 1) + ' MPa,&nbsp;&nbsp; <i>n</i><sub>s</sub> = S<sub>y</sub>/σ<sub>e</sub> = ' + n(Sy, 0) + '/' + n(k.se, 1) + ' = ' + n(k.nv, 2),
+      'Formændringsenergikriteriet (von Mises): materialet flyder, når formændringsenergien når værdien fra trækprøven ved S<sub>y</sub>. Ved plan spænding: σ<sub>e</sub> = √(σ<sub>1</sub>² − σ<sub>1</sub>σ<sub>2</sub> + σ<sub>2</sub>²).') +
+    Lab.F('τ<sub>maks</sub> = (σ<sub>maks</sub> − σ<sub>min</sub>)/2 = ' + n(k.tm, 1) + ' MPa,&nbsp;&nbsp; <i>n</i><sub>s</sub> = (S<sub>y</sub>/2)/τ<sub>maks</sub> = ' + n(Sy / 2, 0) + '/' + n(k.tm, 1) + ' = ' + n(k.nt, 2),
+      'Maksimal forskydningsspænding (Tresca). Husk σ<sub>3</sub> = 0 ved plan spænding: Med σ<sub>1</sub> = 120 og σ<sub>2</sub> = −40 er τ<sub>maks</sub> = 80 MPa (ikke 60). Eksamensfacit: Tresca 1,75 og von Mises 1,94.');
+  lab.render(rdt);
+});
+})();
+</script>
+</body>
+</html>

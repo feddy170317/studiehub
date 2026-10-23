@@ -321,6 +321,118 @@
     return { pause: function () { setPaused(true); }, play: function () { setPaused(false); }, paused: function () { return paused; } };
   };
 
+  /* ---------- sidelayout ----------
+   * Lab.build({ chip, title, src, side: ['Last', ...], graphs: [{id, title, sub}], formulas: true,
+   *             notes: '<li>..</li>', model: '<li>..</li>', legend: true })
+   * → { stage, status, note, legend, paused, side: [cardEl...], formulas, graphs: {id: canvas} } */
+  Lab.build = function (c) {
+    var b = document.body, h = '';
+    h += '<header class="lab-top"><a class="back" href="../index.html">← 3D-lab</a><span class="chip">' + c.chip + '</span><h1>' + c.title + '</h1>' + (c.src ? '<span class="src">' + c.src + '</span>' : '') + '</header>';
+    h += '<main class="lab-main"><section class="lab-stage" id="stage"><div class="lab-hud"><div class="lab-status" id="status"></div><div class="lab-note" id="note"></div></div>' +
+      '<div class="lab-paused" id="pausedFlag">PAUSE · mellemrum fortsætter</div><div class="lab-legend" id="legend"' + (c.legend === false ? ' style="display:none"' : '') + '></div>' +
+      '<div class="lab-hint">Træk = drej · hjul/knib = zoom · dobbeltklik = nulstil visning · mellemrum = pause</div></section><aside class="lab-side">';
+    (c.side || []).forEach(function (t, i) { h += '<div class="card" id="side' + i + '"><h2>' + t + '</h2></div>'; });
+    h += '</aside></main>';
+    if (c.graphs && c.graphs.length) {
+      h += '<section class="lab-graphs" style="grid-template-columns:repeat(' + c.graphs.length + ',minmax(0,1fr))">';
+      c.graphs.forEach(function (g) { h += '<div class="graph"><h3><span class="gt">' + g.title + '</span>' + (g.sub ? ' <span>' + g.sub + '</span>' : '') + '</h3><canvas id="' + g.id + '"></canvas>' + (g.extra || '') + '</div>'; });
+      h += '</section>';
+    }
+    h += '<section class="lab-text"><div class="card"><h2>Formler med dine tal</h2><div id="formulas"></div></div><div class="card"><h2>Hvad skal du lægge mærke til?</h2><ul>' + (c.notes || '') + '</ul>' +
+      (c.model ? '<h2 style="margin-top:.8rem">Model og antagelser</h2><ul>' + c.model + '</ul>' : '') + '</div></section>';
+    b.insertAdjacentHTML('afterbegin', h);
+    if (/(^|[#&])embed\b/.test(location.hash)) b.classList.add('embed');
+    var g = {}; (c.graphs || []).forEach(function (x) { g[x.id] = document.getElementById(x.id); });
+    return {
+      stage: document.getElementById('stage'), status: document.getElementById('status'), note: document.getElementById('note'),
+      legend: document.getElementById('legend'), paused: document.getElementById('pausedFlag'), formulas: document.getElementById('formulas'),
+      side: (c.side || []).map(function (_, i) { return document.getElementById('side' + i); }), graphs: g
+    };
+  };
+  Lab.setStatus = function (el, txt, kind) { if (el._t !== txt) { el.textContent = txt; el._t = txt; } el.className = 'lab-status' + (kind ? ' ' + kind : ''); };
+  Lab.legendKeys = function (el, keys) { // [[farve, html], ...]
+    el.innerHTML = keys.map(function (k) { return '<div class="key"><span class="sw" style="background:' + k[0] + '"></span><span>' + k[1] + '</span></div>'; }).join('');
+  };
+  Lab.n = function (x, d) { return '<span class="num">' + Lab.fmt(x, d) + '</span>'; };
+  Lab.F = function (expr, where) { return '<div class="f">' + expr + '</div>' + (where ? '<div class="where">' + where + '</div>' : ''); };
+  Lab.presets = function (parent, list) { // [[html, fn], ...]
+    var d = document.createElement('div'); d.className = 'btns'; parent.appendChild(d);
+    list.forEach(function (p) { Lab.button(d, p[0], 'preset', p[1]); }); return d;
+  };
+  Lab.btnRow = function (parent) { var d = document.createElement('div'); d.className = 'btns'; parent.appendChild(d); return d; };
+
+  /* ---------- farver ---------- */
+  var C_BLUE = new THREE.Color(0x5ec8ff), C_GREY = new THREE.Color(0x7d8fa3), C_RED = new THREE.Color(0xff5e5e);
+  var HEAT = [0x16365c, 0x2f7fd1, 0x3fd0c9, 0xb6e35a, 0xffc93c, 0xff5e3a].map(function (x) { return new THREE.Color(x); });
+  Lab.cmapDiv = function (t, out) { // t ∈ [-1, 1]: tryk blå → grå → træk rød
+    out = out || new THREE.Color(); t = Lab.clamp(t, -1, 1);
+    return out.copy(C_GREY).lerp(t < 0 ? C_BLUE : C_RED, Math.abs(t));
+  };
+  Lab.cmapHeat = function (t, out) { // t ∈ [0, 1]: lav → høj
+    out = out || new THREE.Color(); t = Lab.clamp(t, 0, 1) * (HEAT.length - 1);
+    var i = Math.min(HEAT.length - 2, Math.floor(t)); return out.copy(HEAT[i]).lerp(HEAT[i + 1], t - i);
+  };
+  Lab.heatCSS = 'linear-gradient(90deg,#16365c,#2f7fd1,#3fd0c9,#b6e35a,#ffc93c,#ff5e3a)';
+  Lab.divCSS = 'linear-gradient(90deg,#5ec8ff,#7d8fa3,#ff5e5e)';
+  Lab.mat = function (color, o) {
+    o = o || {};
+    return new THREE.MeshStandardMaterial({ color: color, metalness: o.metal !== undefined ? o.metal : 0.35, roughness: o.rough !== undefined ? o.rough : 0.5,
+      transparent: !!o.opacity, opacity: o.opacity || 1, side: o.double ? THREE.DoubleSide : THREE.FrontSide, emissive: o.emissive || 0x000000, vertexColors: !!o.vc });
+  };
+
+  /* ---------- geometri ---------- */
+  // cylinder (stang) mellem to punkter: rod = Lab.rod(radius, mat); rod.between(a, b)
+  Lab.rod = function (radius, mat, seg) {
+    var m = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, 1, seg || 16), mat), up = new THREE.Vector3(0, 1, 0), d = new THREE.Vector3();
+    m.between = function (a, b) {
+      d.subVectors(b, a); var L = d.length();
+      m.visible = L > 1e-9; if (!m.visible) return m;
+      m.scale.set(1, L, 1); m.position.copy(a).addScaledVector(d, 0.5); m.quaternion.setFromUnitVectors(up, d.normalize()); return m;
+    };
+    return m;
+  };
+  // skruefjeder langs +y fra 0 til length: spring = Lab.spring({R, wire, turns, mat}); spring.set(length) eller spring.between(a, b)
+  Lab.spring = function (o) {
+    var R = o.R || 0.05, wire = o.wire || 0.006, turns = o.turns || 10, mat = o.mat || Lab.mat(0xc9d6e3, { metal: 0.7, rough: 0.3 });
+    var g = new THREE.Group(), mesh = null, lastL = -1, up = new THREE.Vector3(0, 1, 0), d = new THREE.Vector3();
+    g.set = function (L) {
+      if (Math.abs(L - lastL) < 1e-5) return g; lastL = L;
+      if (mesh) { g.remove(mesh); mesh.geometry.dispose(); }
+      var pts = [], N = Math.max(60, turns * 24);
+      for (var i = 0; i <= N; i++) {
+        var t = i / N, a = t * turns * 2 * Math.PI, end = (i < 6 || i > N - 6);
+        pts.push(new THREE.Vector3((end ? 0.98 : 1) * R * Math.cos(a), t * L, R * Math.sin(a)));
+      }
+      mesh = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), N * 2, wire, 8, false), mat);
+      g.add(mesh); return g;
+    };
+    g.between = function (a, b) { d.subVectors(b, a); g.set(d.length()); g.position.copy(a); g.quaternion.setFromUnitVectors(up, d.normalize()); return g; };
+    g.material = mat;
+    return g;
+  };
+  // tandhjul (ekstruderet, akse langs y): R = delecirkelradius, m = modul. Returnerer {geo, N}
+  Lab.gearGeo = function (R, m, depth, hole) {
+    var N = Math.max(6, Math.round(2 * R / m)), p = 2 * Math.PI / N, rt = R + m, rr = R - 1.25 * m, sh = new THREE.Shape();
+    for (var i = 0; i < N; i++) {
+      var a = i * p, pts = [[rr, a - 0.5 * p], [rr, a - 0.27 * p], [rt, a - 0.11 * p], [rt, a + 0.11 * p], [rr, a + 0.27 * p]];
+      pts.forEach(function (q, j) { var x = q[0] * Math.cos(q[1]), y = q[0] * Math.sin(q[1]); if (i === 0 && j === 0) sh.moveTo(x, y); else sh.lineTo(x, y); });
+    }
+    sh.closePath();
+    if (hole) { var hp = new THREE.Path(); hp.absarc(0, 0, hole, 0, 2 * Math.PI, true); sh.holes.push(hp); }
+    var geo = new THREE.ExtrudeGeometry(sh, { depth: depth, bevelEnabled: false, curveSegments: 6 });
+    geo.rotateX(-Math.PI / 2); geo.translate(0, -depth / 2, 0);
+    return { geo: geo, N: N };
+  };
+  // linje(r) til hjælpelinjer: Lab.line(color, dashed) → obj.set([v3, v3, ...])
+  Lab.line = function (color, dashed, opacity) {
+    var geo = new THREE.BufferGeometry(), mat = dashed ? new THREE.LineDashedMaterial({ color: color, dashSize: 0.04, gapSize: 0.03, transparent: true, opacity: opacity || 0.8 })
+      : new THREE.LineBasicMaterial({ color: color, transparent: true, opacity: opacity || 0.8 });
+    var l = new THREE.Line(geo, mat);
+    l.set = function (pts) { geo.setFromPoints(pts); if (dashed) l.computeLineDistances(); geo.computeBoundingSphere(); return l; };
+    return l;
+  };
+  Lab.grid = function (lab, size, y) { var g = new THREE.GridHelper(size, Math.round(size * 5), 0x2a4560, 0x1a3248); g.position.y = y || 0; lab.scene.add(g); return g; };
+
   function showError(err) {
     var d = document.createElement('div');
     d.style.cssText = 'position:fixed;left:16px;right:16px;bottom:16px;background:#3a1418;color:#ffb3b3;border:1px solid #ff5e5e;padding:.7rem 1rem;border-radius:8px;font:13px Consolas,monospace;z-index:99';
