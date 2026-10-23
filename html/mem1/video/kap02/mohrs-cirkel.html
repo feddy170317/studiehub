@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mohrs cirkel · video</title>
+<meta name="description" content="Transformationsligningerne, cirklens centrum og radius, hovedspændinger og den største forskydning, med eksemplet fra slide 44.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 2: videoer</a><h1>Mohrs cirkel</h1><span class="meta">MEM1 · kapitel 2 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Mohrs cirkel"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Transformationsligningerne, cirklens centrum og radius, hovedspændinger og den største forskydning, med eksemplet fra slide 44.</p><div class="chips"><a href="../../../../lab/mem1/mohrs-cirkel.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel02_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l02">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Mohrs cirkel (MEM1 kap. 2, slides 36–44 og eksemplet på slide 44)
+BP.scene({ header: 'MEM1 · kap. 2' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, PI } = B;
+
+  B.titel(0, 'Mohrs cirkel', 'MEM1 · kapitel 2 · begreb (slide 36–44)', 'titel');
+  text(0, 'alle snit → én cirkel', 640, 520, 40, 'red', wt('titel', 'samler') - 0.2, we('titel', 'tegning'), { align: 'center' });
+
+  // ---------------- 1 elementet og det skrå snit ----------------
+  B.goto('element', 1);
+  {
+    const cx = 360, cy = 400, h = 110, te = L('element').start;
+    line(1, [[cx - h, cy - h], [cx + h, cy - h], [cx + h, cy + h], [cx - h, cy + h], [cx - h, cy - h + 2]], 'black', 3.4, te, te + 1.2);
+    const tx = wt('element', 'lodrette') - 0.1;
+    arrow(1, [[cx + h + 8, cy], [cx + h + 110, cy]], 'red', 4, tx, tx + 0.5);
+    arrow(1, [[cx - h - 8, cy], [cx - h - 110, cy]], 'red', 4, tx + 0.2, tx + 0.7);
+    text(1, 'σ_x', cx + h + 120, cy + 14, 44, 'red', wt('element', 'normalspændingen'), wt('element', 'x'));
+    const ty = wt('element', 'vandrette') - 0.1;
+    arrow(1, [[cx, cy - h - 8], [cx, cy - h - 100]], 'red', 4, ty, ty + 0.5);
+    arrow(1, [[cx, cy + h + 8], [cx, cy + h + 100]], 'red', 4, ty + 0.2, ty + 0.7);
+    text(1, 'σ_y', cx + 14, cy - h - 80, 44, 'red', wt('element', 'y'), wt('element', 'y') + 0.4);
+    const tt = wt('element', 'forskydningsspændingen') - 0.2;
+    arrow(1, [[cx + h + 18, cy + 60], [cx + h + 18, cy - 60]], 'green', 3.6, tt, tt + 0.4, 16);
+    arrow(1, [[cx - h - 18, cy - 60], [cx - h - 18, cy + 60]], 'green', 3.6, tt + 0.2, tt + 0.6, 16);
+    arrow(1, [[cx - 60, cy - h - 18], [cx + 60, cy - h - 18]], 'green', 3.6, tt + 0.4, tt + 0.8, 16);
+    arrow(1, [[cx + 60, cy + h + 18], [cx - 60, cy + h + 18]], 'green', 3.6, tt + 0.6, tt + 1.0, 16);
+    text(1, 'τ_{xy}', cx + h + 30, cy - 70, 40, 'green', wt('element', 'tau'), we('element', 'y', 1) + 0.3);
+    // skråt snit
+    const ts = L('snit').start, a = -PI / 5;
+    line(1, [[cx - 150 * Math.cos(a) + 0, cy - 150 * Math.sin(a)], [cx + 150 * Math.cos(a), cy + 150 * Math.sin(a)]], 'blue', 3, wt('snit', 'skråt') - 0.2, wt('snit', 'skråt') + 0.5);
+    text(1, 'φ', cx + 160, cy - 50, 40, 'blue', wt('snit', 'phi'), wt('snit', 'phi') + 0.3);
+    const nx = -Math.sin(a), ny = Math.cos(a); // normal til snittet (opad til venstre i skærmkoordinater)
+    arrow(1, [[cx - nx * 10, cy - ny * 10], [cx - nx * 120, cy - ny * 120]], 'red', 4.2, wt('snit', 'normalspænding') - 0.1, wt('snit', 'normalspænding') + 0.4);
+    text(1, 'σ_φ', cx - nx * 140 - 10, cy - ny * 140, 42, 'red', wt('snit', 'sigma'), wt('snit', 'phi', 1) + 0.2);
+    arrow(1, [[cx - 20 * Math.cos(a), cy - 20 * Math.sin(a)], [cx - 120 * Math.cos(a), cy - 120 * Math.sin(a)]], 'green', 3.8, wt('snit', 'forskydningsspænding') - 0.1, wt('snit', 'forskydningsspænding') + 0.4, 16);
+    text(1, 'τ_φ', cx - 150 * Math.cos(a) - 20, cy - 120 * Math.sin(a) + 50, 40, 'green', wt('snit', 'tau'), wt('snit', 'phi', 2) + 0.2);
+    text(1, 'samme belastning,', 720, 300, 42, 'black', wt('snit', 'Belastningen') - 0.1, we('snit', 'samme'));
+    text(1, 'kun snittet drejer', 720, 360, 42, 'blue', wt('snit', 'kun') - 0.1, we('snit', 'drejer'));
+  }
+
+  // ---------------- 2 transformationsligningerne ----------------
+  B.goto('ligninger', 2);
+  {
+    const tl = L('ligninger').start;
+    text(2, 'Ligevægt af kilen giver:', 150, 150, 42, 'black', tl, wt('ligninger', 'transformationsligningerne'));
+    text(2, 'σ_φ = (σ_x + σ_y)/2 + (σ_x − σ_y)/2 · cos 2φ + τ_{xy} sin 2φ', 150, 250, 36, 'red', wt('ligninger', 'Sigma') - 0.1, we('ligninger', 'phi', 2));
+    text(2, 'middelværdi', 210, 300, 28, 'blue', wt('ligninger', 'middelværdien') - 0.1, we('ligninger', 'middelværdien') + 0.2);
+    text(2, 'τ_φ = −(σ_x − σ_y)/2 · sin 2φ + τ_{xy} cos 2φ', 150, 380, 36, 'green', wt('ligninger', 'Tau') - 0.1, we('ligninger', 'rundt'));
+    text(2, 'et punkt (σ_φ, τ_φ) for hver vinkel φ', 150, 480, 42, 'blue', wt('cirkel', 'Afsætter') - 0.1, we('cirkel', 'vinkel'));
+    text(2, '→ alle ligger på en cirkel', 200, 560, 44, 'black', wt('cirkel', 'ligger') - 0.1, we('cirkel', 'cirkel', 0));
+  }
+
+  // ---------------- 3 Mohrs cirkel i eksemplets skala ----------------
+  B.goto('centrum', 3, [], 1.0);
+  {
+    const s = 2.4, ox = 170, oy = 400, X = (sg) => ox + sg * s, Y = (tau) => oy - tau * s;
+    const sx = 90, sy = 190, txy = 80, sc = (sx + sy) / 2, R = Math.hypot((sx - sy) / 2, txy), C = [X(sc), oy];
+    const tc = L('cirkel').start;
+    arrow(3, [[140, oy], [780, oy]], 'black', 2.8, tc - 0.6, tc, 16); text(3, 'σ', 770, oy - 16, 40, 'black', tc, tc + 0.2);
+    arrow(3, [[ox, 680], [ox, 120]], 'black', 2.8, tc - 0.3, tc + 0.3, 16); text(3, 'τ', ox - 34, 140, 40, 'black', tc + 0.3, tc + 0.5);
+    line(3, ell(C[0], C[1], R * s, R * s, -PI / 2, 1.5 * PI), 'blue', 3.6, wt('cirkel', 'ligger') - 0.2, we('cirkel', 'cirkel', 0) + 0.6);
+    const tce = wt('centrum', 'Centrum');
+    dot(3, C[0], C[1], 7, 'black', tce); text(3, 'σ_c', C[0] - 22, C[1] + 46, 40, 'black', wt('centrum', 'middelspændingen') - 0.2, wt('centrum', 'c') + 0.2);
+    text(3, 'σ_c = (σ_x + σ_y)/2', 800, 190, 34, 'black', wt('centrum', 'sigma', 1) - 0.1, we('centrum', 'to'));
+    const xp = [X(sx), Y(txy)], yp = [X(sy), Y(-txy)];
+    line(3, [C, xp], 'red', 3.2, wt('centrum', 'Radius') - 0.1, wt('centrum', 'Radius') + 0.5);
+    text(3, 'R', (C[0] + xp[0]) / 2 + 10, (C[1] + xp[1]) / 2 + 10, 40, 'red', wt('centrum', 'R'), wt('centrum', 'R') + 0.3);
+    text(3, 'R = √[((σ_x − σ_y)/2)² + τ_{xy}²]', 800, 250, 32, 'red', wt('centrum', 'kvadratroden') - 0.1, we('centrum', 'anden', 1));
+    // X og Y
+    const tp = L('punkter').start;
+    dot(3, xp[0], xp[1], 8, 'blue', wt('punkter', 'X')); text(3, 'X(σ_x, τ_{xy})', xp[0] - 230, xp[1] - 10, 34, 'blue', wt('punkter', 'X'), wt('punkter', 'X') + 0.6);
+    dot(3, yp[0], yp[1], 8, 'blue', wt('punkter', 'Y')); text(3, 'Y(σ_y, −τ_{xy})', yp[0] + 16, yp[1] + 40, 34, 'blue', wt('punkter', 'Y'), wt('punkter', 'Y') + 0.6);
+    line(3, [xp, yp], 'blue', 2.8, wt('punkter', 'Linjen') - 0.1, we('punkter', 'diameter'));
+    text(3, 'diameter', (xp[0] + yp[0]) / 2 - 150, (xp[1] + yp[1]) / 2 + 100, 32, 'blue', wt('punkter', 'diameter') - 0.1, we('punkter', 'diameter') + 0.3);
+    // 2φ
+    const a0 = Math.atan2(xp[1] - C[1], xp[0] - C[0]), a1 = a0 - 0.9;
+    line(3, ell(C[0], C[1], 70, 70, a0, a1), 'green', 3, wt('tophi', 'drejer', 1) - 0.1, we('tophi', 'phi', 1));
+    const p2 = [C[0] + R * s * Math.cos(a1), C[1] + R * s * Math.sin(a1)];
+    line(3, [C, p2], 'green', 2.6, wt('tophi', 'to') - 0.2, we('tophi', 'phi', 1));
+    dot(3, p2[0], p2[1], 7, 'green', we('tophi', 'phi', 1));
+    text(3, '2φ', C[0] + 80 * Math.cos((a0 + a1) / 2) - 10, C[1] + 80 * Math.sin((a0 + a1) / 2) + 6, 38, 'green', wt('tophi', 'to'), we('tophi', 'phi', 1) + 0.2);
+    text(3, 'element drejer φ', 800, 320, 32, 'green', wt('tophi', 'elementet') - 0.1, we('tophi', 'phi', 0));
+    text(3, '⇒ punkt drejer 2φ', 800, 360, 32, 'green', wt('tophi', 'punktet') - 0.1, we('tophi', 'cirklen'));
+    // hovedspændinger og τ_{max}
+    const th = wt('hoved', 'hovedspændingerne');
+    dot(3, X(sc + R), oy, 8, 'red', th); dot(3, X(sc - R), oy, 8, 'red', th + 0.3);
+    text(3, 'σ_1', X(sc + R) + 10, oy + 44, 42, 'red', wt('hoved', 'et'), wt('hoved', 'et') + 0.3);
+    text(3, 'σ_2', X(sc - R) - 50, oy + 44, 42, 'red', wt('hoved', 'to'), wt('hoved', 'to') + 0.3);
+    text(3, 'τ = 0', X(sc + R) - 70, oy - 18, 28, 'red', wt('hoved', 'nul') - 0.1, wt('hoved', 'nul') + 0.4);
+    const h1 = text(3, 'σ_{1,2} = σ_c ± R', 820, 470, 40, 'red', wt('hoved', 'centrum') - 0.1, we('hoved', 'radius'));
+    const tm = wt('tmax', 'Øverst');
+    dot(3, C[0], C[1] - R * s, 8, 'green', tm); dot(3, C[0], C[1] + R * s, 8, 'green', tm + 0.3);
+    text(3, 'τ_{max}', C[0] + 16, C[1] - R * s - 12, 38, 'green', wt('tmax', 'Tau'), wt('tmax', 'max') + 0.3);
+    const h2 = text(3, 'τ_{max} = R', 820, 540, 40, 'green', wt('tmax', 'lig') - 0.1, we('tmax', 'radius'));
+    text(3, '45° fra hovedretningerne', 800, 610, 30, 'green', wt('tmax', 'femogfyrre') - 0.1, we('tmax', 'hovedretningerne'));
+    box(3, 795, 425, 400, 135, 'black', we('tmax', 'radius') + 0.1, we('tmax', 'radius') + 0.8);
+  }
+
+  // ---------------- 4 eksemplet fra slide 44 ----------------
+  B.goto('eks', 4);
+  {
+    const te = L('eks').start;
+    bubble(4, 'Eksempel', 150, 140, 60, 'blue', te, te + 0.9);
+    text(4, 'σ_x = 90 MPa,  σ_y = 190 MPa,  τ_{xy} = 80 MPa', 150, 230, 40, 'black', wt('eks', 'Sigma') - 0.1, we('eks', 'megapascal'));
+    text(4, 'σ_c = (90 + 190)/2 = 140 MPa', 150, 320, 42, 'blue', wt('eks2', 'Centrum') - 0.1, we('eks2', 'fyrre'));
+    text(4, 'R = √(50² + 80²) = 94,3 MPa', 150, 400, 42, 'red', wt('eks2', 'Radius') - 0.1, we('eks2', 'tre'));
+    text(4, 'σ_1 = 140 + 94,3 = 234,3 MPa', 150, 490, 42, 'red', wt('eks3', 'sigma') - 0.1, we('eks3', 'tre'));
+    text(4, 'σ_2 = 140 − 94,3 = 45,7 MPa', 150, 560, 42, 'red', wt('eks3', 'sigma', 1) - 0.1, we('eks3', 'syv'));
+    text(4, 'τ_{max} = R = 94,3 MPa', 150, 630, 42, 'green', wt('eks3', 'tau') - 0.1, we('eks3', 'megapascal'));
+    // lille skitse af cirklen
+    const cx = 1000, cy = 420, r = 140;
+    line(4, [[820, cy], [1220, cy]], 'black', 2.4, wt('eks2', 'Centrum'), wt('eks2', 'Centrum') + 0.4);
+    line(4, ell(cx, cy, r, r, -PI / 2, 1.5 * PI), 'blue', 3, wt('eks2', 'Centrum') + 0.2, wt('eks2', 'Radius') + 0.6);
+    dot(4, cx, cy, 6, 'black', wt('eks2', 'Centrum') + 0.3); text(4, '140', cx - 24, cy + 40, 32, 'black', wt('eks2', 'fyrre'), wt('eks2', 'fyrre') + 0.3);
+    text(4, '45,7', cx - r - 70, cy + 40, 30, 'red', wt('eks3', 'syv'), wt('eks3', 'syv') + 0.3);
+    text(4, '234,3', cx + r - 10, cy + 40, 30, 'red', wt('eks3', 'fireogtredive'), wt('eks3', 'fireogtredive') + 0.3);
+    text(4, '94,3', cx + 10, cy - r - 12, 30, 'green', wt('eks3', 'tau'), wt('eks3', 'tau') + 0.3);
+  }
+
+  B.goto('tjek_q', 5);
+  B.tjek(5, ['Hvad er τ på det snit,', 'hvor σ er størst?'], ['τ = 0', 'største σ er en hovedspænding', 'og der er τ altid nul'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 6);
+  B.slut(6, 'Abou-Hayt (2026), MEM1 Chapter 2, slide 36–44 · Hamrock, Schmid & Jacobson, kap. 2', '3D-labbet: drej elementet selv', 'slut');
+  text(6, 'σ_c = (σ_x + σ_y)/2   ·   R = √[((σ_x − σ_y)/2)² + τ_{xy}²]', 200, 300, 36, 'blue', L('slut').start + 0.6, L('slut').start + 2.4);
+  text(6, 'σ_{1,2} = σ_c ± R   ·   τ_{max} = R', 200, 380, 40, 'red', wt('slut', 'hovedspændingerne') - 0.1, we('slut', 'radius'));
+});
+
+</script>
+<script>BP.live({"duration":177.206,"audio":"mohrs-cirkel.mp3","order":["titel","element","snit","ligninger","cirkel","centrum","punkter","tophi","hoved","tmax","eks","eks2","eks3","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":10.384,"words":[["Mohrs",0.601,1.026],["cirkel",1.026,1.529],["Den",2.433,2.549],["samme",2.549,2.871],["spændingstilstand",2.871,3.722],["ser",3.722,3.941],["forskellig",3.941,4.353],["ud",4.353,4.688],["alt",4.83,5.062],["efter",5.062,5.332],["hvilket",5.332,5.655],["snit",5.655,5.899],["du",5.899,6.015],["lægger",6.015,6.505],["Mohrs",7.394,7.678],["cirkel",7.678,8.142],["samler",8.142,8.631],["alle",8.631,8.928],["snittene",8.928,9.469],["i",9.469,9.662],["én",9.662,9.83],["tegning",9.83,10.384]],"text":"Mohrs cirkel. Den samme spændingstilstand ser forskellig ud, alt efter hvilket snit du lægger. Mohrs cirkel samler alle snittene i én tegning."},"element":{"start":11.626,"end":23.082,"words":[["Vi",11.766,11.856],["starter",11.856,12.23],["med",12.23,12.423],["et",12.423,12.501],["lille",12.501,12.784],["element",12.784,13.313],["i",13.313,13.429],["plan",13.429,13.725],["spænding",13.725,14.279],["På",15.183,15.26],["de",15.26,15.337],["lodrette",15.337,15.763],["flader",15.763,16.265],["virker",16.265,16.574],["normalspændingen",16.574,17.322],["sigma",17.322,17.683],["x",17.683,18.172],["på",18.314,18.443],["de",18.443,18.533],["vandrette",18.533,18.933],["sigma",18.933,19.268],["y",19.268,19.59],["og",19.732,19.886],["langs",19.886,20.221],["fladerne",20.221,20.698],["virker",20.698,21.046],["forskydningsspændingen",21.046,22.064],["tau",22.064,22.412],["x",22.412,22.747],["y",22.747,23.082]],"text":"Vi starter med et lille element i plan spænding. På de lodrette flader virker normalspændingen sigma x, på de vandrette sigma y, og langs fladerne virker forskydningsspændingen tau x y."},"snit":{"start":24.312,"end":37.804,"words":[["Skærer",24.426,24.826],["vi",24.826,25.019],["elementet",25.019,25.548],["skråt",25.548,25.973],["under",25.973,26.166],["vinklen",26.166,26.553],["phi",26.553,26.965],["får",27.094,27.236],["snittet",27.236,27.597],["sin",27.597,27.828],["egen",27.829,28.086],["normalspænding",28.086,28.937],["sigma",29.066,29.491],["phi",29.491,29.916],["og",30.071,30.187],["sin",30.187,30.393],["egen",30.393,30.689],["forskydningsspænding",30.689,31.694],["tau",31.836,32.107],["phi",32.107,32.519],["Belastningen",33.41,34.157],["er",34.157,34.325],["den",34.325,34.492],["samme",34.492,35.008],["Det",35.871,36.064],["er",36.064,36.154],["kun",36.154,36.425],["snittet",36.425,36.966],["der",37.108,37.237],["drejer",37.237,37.804]],"text":"Skærer vi elementet skråt under vinklen phi, får snittet sin egen normalspænding, sigma phi, og sin egen forskydningsspænding, tau phi. Belastningen er den samme. Det er kun snittet, der drejer."},"ligninger":{"start":39.038,"end":52.337,"words":[["Ligevægt",39.152,39.681],["af",39.681,39.823],["den",39.823,40.029],["lille",40.029,40.261],["kile",40.261,40.725],["giver",40.725,41.034],["transformationsligningerne",41.034,42.439],["Sigma",43.329,43.742],["phi",43.742,43.999],["er",43.999,44.141],["middelværdien",44.141,44.747],["plus",44.747,45.03],["et",45.03,45.185],["led",45.185,45.481],["med",45.481,45.726],["cosinus",45.726,46.28],["to",46.28,46.512],["phi",46.512,46.886],["og",46.886,47.053],["et",47.053,47.144],["led",47.144,47.427],["med",47.427,47.633],["sinus",47.633,48.072],["to",48.072,48.303],["phi",48.303,48.677],["Tau",49.579,49.798],["phi",49.798,50.03],["har",50.03,50.172],["de",50.172,50.262],["samme",50.262,50.597],["to",50.597,50.868],["led",50.868,51.177],["bare",51.319,51.538],["byttet",51.538,51.925],["rundt",51.925,52.337]],"text":"Ligevægt af den lille kile giver transformationsligningerne. Sigma phi er middelværdien plus et led med cosinus to phi og et led med sinus to phi. Tau phi har de samme to led, bare byttet rundt."},"cirkel":{"start":53.572,"end":61.781,"words":[["Og",53.712,53.815],["her",53.815,54.099],["er",54.099,54.228],["pointen",54.228,54.911],["Afsætter",55.801,56.201],["vi",56.201,56.317],["sigma",56.317,56.755],["phi",56.755,57.038],["og",57.038,57.103],["tau",57.103,57.399],["phi",57.399,57.747],["som",57.747,58.018],["et",58.018,58.108],["punkt",58.108,58.353],["for",58.353,58.495],["hver",58.495,58.727],["eneste",58.727,59.165],["vinkel",59.165,59.68],["ligger",59.822,60.196],["alle",60.196,60.479],["punkterne",60.479,60.956],["på",60.956,61.124],["en",61.124,61.201],["cirkel",61.201,61.781]],"text":"Og her er pointen. Afsætter vi sigma phi og tau phi som et punkt for hver eneste vinkel, ligger alle punkterne på en cirkel."},"centrum":{"start":62.994,"end":74.461,"words":[["Centrum",63.121,63.598],["ligger",63.598,63.843],["på",63.843,63.985],["sigma-aksen",63.985,64.693],["i",64.694,64.784],["middelspændingen",64.784,65.621],["sigma",65.737,66.163],["c",66.163,66.588],["som",66.73,66.987],["er",66.987,67.013],["sigma",67.013,67.451],["x",67.451,67.709],["plus",67.709,67.928],["sigma",67.928,68.276],["y",68.276,68.624],["divideret",68.624,69.165],["med",69.165,69.346],["to.",69.346,69.603],["Radius",69.603,69.977],["R",69.977,70.299],["er",70.299,70.415],["kvadratroden",70.415,71.124],["af",71.124,71.266],["den",71.266,71.407],["halve",71.407,71.704],["forskel",71.704,72.232],["i",72.232,72.4],["anden",72.4,72.709],["plus",72.709,72.941],["tau",72.941,73.276],["x",73.276,73.611],["y",73.611,73.83],["i",73.83,74.023],["anden",74.023,74.461]],"text":"Centrum ligger på sigma-aksen i middelspændingen, sigma c, som er sigma x plus sigma y divideret med to. Radius R er kvadratroden af den halve forskel i anden plus tau x y i anden."},"punkter":{"start":75.68,"end":85.487,"words":[["Punktet",75.807,76.207],["X",76.207,76.645],["svarer",76.645,77.032],["til",77.032,77.173],["snittet",77.173,77.611],["med",77.611,77.83],["normalen",77.831,78.539],["i",78.539,78.72],["x-retningen",78.72,79.532],["Punktet",80.409,80.822],["Y",80.822,81.118],["ligger",81.118,81.479],["lige",81.479,81.788],["overfor",81.788,82.433],["Linjen",83.322,83.773],["mellem",83.773,84.082],["dem",84.082,84.43],["er",84.43,84.61],["en",84.61,84.739],["diameter",84.739,85.487]],"text":"Punktet X svarer til snittet med normalen i x-retningen. Punktet Y ligger lige overfor. Linjen mellem dem er en diameter."},"tophi":{"start":86.71,"end":92.52,"words":[["Læg",86.837,87.018],["mærke",87.018,87.34],["til",87.34,87.52],["én",87.52,87.714],["ting",87.714,88.062],["når",88.19,88.474],["elementet",88.474,88.989],["drejer",88.989,89.324],["vinklen",89.324,89.737],["phi",89.737,90.149],["drejer",90.291,90.613],["punktet",90.613,90.974],["to",90.974,91.245],["phi",91.245,91.464],["rundt",91.464,91.696],["på",91.696,91.812],["cirklen",91.812,92.52]],"text":"Læg mærke til én ting: når elementet drejer vinklen phi, drejer punktet to phi rundt på cirklen."},"hoved":{"start":93.732,"end":104.286,"words":[["Hvor",93.872,94.065],["cirklen",94.066,94.555],["skærer",94.555,94.852],["sigma-aksen",94.852,95.741],["er",95.883,95.986],["forskydningen",95.986,96.643],["nul",96.643,97.042],["Det",97.92,98.088],["er",98.088,98.204],["hovedspændingerne",98.204,99.183],["sigma",99.299,99.776],["et",99.776,100.085],["og",100.085,100.214],["sigma",100.214,100.601],["to.",100.601,101.026],["De",101.928,102.082],["er",102.083,102.186],["centrum",102.186,102.791],["plus",102.791,103.101],["og",103.101,103.191],["minus",103.191,103.603],["radius",103.603,104.286]],"text":"Hvor cirklen skærer sigma-aksen, er forskydningen nul. Det er hovedspændingerne, sigma et og sigma to. De er centrum plus og minus radius."},"tmax":{"start":105.506,"end":113.934,"words":[["Øverst",105.646,106.059],["og",106.059,106.226],["nederst",106.226,106.677],["er",106.677,106.819],["forskydningen",106.819,107.45],["størst",107.45,108.004],["Tau",108.895,109.127],["max",109.127,109.54],["er",109.54,109.707],["lig",109.707,109.965],["radius",109.965,110.596],["og",110.738,110.893],["det",110.893,111.021],["snit",111.021,111.421],["ligger",111.421,111.743],["femogfyrre",111.743,112.31],["grader",112.31,112.838],["fra",112.838,113.019],["hovedretningerne",113.019,113.934]],"text":"Øverst og nederst er forskydningen størst. Tau max er lig radius, og det snit ligger femogfyrre grader fra hovedretningerne."},"eks":{"start":115.168,"end":124.098,"words":[["Lad",115.282,115.501],["os",115.502,115.618],["tage",115.618,115.914],["eksemplet",115.914,116.623],["fra",116.623,116.777],["slides",116.777,117.396],["Sigma",118.274,118.763],["x",118.763,119.06],["er",119.06,119.15],["halvfems",119.15,119.82],["sigma",119.949,120.4],["y",120.4,120.671],["er",120.671,120.722],["hundrede",120.722,120.967],["og",120.967,120.993],["halvfems",120.993,121.624],["og",121.766,121.921],["tau",121.921,122.217],["x",122.217,122.513],["y",122.513,122.745],["er",122.745,122.861],["firs",122.861,123.196],["megapascal",123.196,124.098]],"text":"Lad os tage eksemplet fra slides. Sigma x er halvfems, sigma y er hundrede og halvfems, og tau x y er firs megapascal."},"eks2":{"start":125.334,"end":133.62,"words":[["Centrum",125.448,126.144],["er",126.144,126.26],["hundrede",126.26,126.582],["og",126.582,126.621],["fyrre",126.621,127.175],["Radius",128.066,128.556],["er",128.556,128.672],["kvadratroden",128.672,129.329],["af",129.329,129.419],["halvtreds",129.419,129.947],["i",129.947,130.179],["anden",130.179,130.476],["plus",130.476,130.733],["firs",130.733,131.043],["i",131.043,131.249],["anden",131.249,131.674],["altså",131.816,132.177],["fireoghalvfems",132.177,132.924],["komma",132.924,133.208],["tre",133.208,133.62]],"text":"Centrum er hundrede og fyrre. Radius er kvadratroden af halvtreds i anden plus firs i anden, altså fireoghalvfems komma tre."},"eks3":{"start":134.852,"end":143.085,"words":[["Så",134.979,135.224],["er",135.224,135.25],["sigma",135.25,135.714],["et",135.714,135.894],["to",135.894,136.1],["hundrede",136.1,136.294],["og",136.294,136.307],["fireogtredive",136.307,136.951],["komma",136.951,137.222],["tre",137.222,137.66],["sigma",137.789,138.214],["to",138.214,138.536],["er",138.536,138.588],["femogfyrre",138.588,139.142],["komma",139.142,139.412],["syv",139.412,139.812],["og",139.979,140.147],["tau",140.147,140.379],["max",140.379,140.74],["er",140.74,140.907],["fireoghalvfems",140.907,141.629],["komma",141.629,141.887],["tre",141.887,142.183],["megapascal",142.183,143.085]],"text":"Så er sigma et to hundrede og fireogtredive komma tre, sigma to er femogfyrre komma syv, og tau max er fireoghalvfems komma tre megapascal."},"tjek_q":{"start":144.298,"end":149.942,"words":[["Tjek",144.399,144.721],["dig",144.721,144.901],["selv",144.901,145.327],["Hvad",146.231,146.45],["er",146.45,146.527],["forskydningsspændingen",146.527,147.494],["på",147.494,147.623],["det",147.623,147.739],["snit",147.739,148.19],["hvor",148.332,148.512],["normalspændingen",148.512,149.298],["er",149.298,149.401],["størst",149.401,149.942]],"text":"Tjek dig selv. Hvad er forskydningsspændingen på det snit, hvor normalspændingen er størst?"},"tjek_a":{"start":153.826,"end":160.746,"words":[["Den",153.927,154.288],["er",154.288,154.494],["nul",154.494,155.035],["Den",155.952,156.068],["største",156.068,156.493],["normalspænding",156.494,157.267],["er",157.267,157.434],["en",157.434,157.524],["hovedspænding",157.524,158.285],["og",158.427,158.607],["på",158.607,158.749],["hovedsnittene",158.749,159.457],["er",159.457,159.599],["der",159.599,159.741],["ingen",159.741,160.037],["forskydning",160.037,160.746]],"text":"Den er nul. Den største normalspænding er en hovedspænding, og på hovedsnittene er der ingen forskydning."},"slut":{"start":161.976,"end":174.785,"words":[["Kort",162.103,162.335],["sagt",162.335,162.838],["centrum",162.941,163.495],["i",163.495,163.598],["middelspændingen",163.598,164.474],["radius",164.603,165.157],["fra",165.157,165.273],["Pythagoras",165.273,166.227],["hovedspændingerne",166.356,167.245],["på",167.245,167.425],["aksen",167.425,167.992],["og",168.237,168.366],["tau",168.366,168.598],["max",168.598,168.985],["er",168.985,169.114],["lig",169.114,169.346],["radius",169.346,169.964],["Drej",170.855,171.074],["selv",171.074,171.345],["elementet",171.345,171.924],["i",171.924,172.092],["3D-labbet",172.092,173.02],["og",173.162,173.368],["se",173.368,173.613],["punktet",173.613,174.051],["løbe",174.051,174.373],["rundt",174.373,174.785]],"text":"Kort sagt: centrum i middelspændingen, radius fra Pythagoras, hovedspændingerne på aksen, og tau max er lig radius. Drej selv elementet i 3D-labbet, og se punktet løbe rundt."}}}, { audio: 'mohrs-cirkel.mp3', id: 'mohrs-cirkel' });</script>
+</body>
+</html>
