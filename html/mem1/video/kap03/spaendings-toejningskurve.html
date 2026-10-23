@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spændings-tøjningskurven · video</title>
+<meta name="description" content="Trækprøvningen, det elastiske område, S_y, deformationshærdning, S_u, indsnøring og blivende tøjning.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 3: videoer</a><h1>Spændings-tøjningskurven</h1><span class="meta">MEM1 · kapitel 3 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Spændings-tøjningskurven"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Trækprøvningen, det elastiske område, S_y, deformationshærdning, S_u, indsnøring og blivende tøjning.</p><div class="chips"><a href="duktil-skoer.html">Se først: Duktile og sprøde materialer</a><a href="../../../../lab/mem1/bjaelke-brud.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel03_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l03">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Spændings-tøjningskurven (MEM1 kap. 3, slides 10–11 og 16)
+BP.scene({ header: 'MEM1 · kap. 3' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, axes, plot, dashed, PI } = B;
+
+  B.titel(0, 'Spændings-tøjningskurven', 'MEM1 · kapitel 3 · begreb (slide 10–11, 16)', 'titel');
+  text(0, 'materialets visitkort', 640, 520, 42, 'red', wt('titel', 'visitkort') - 0.4, we('titel', 'visitkort'), { align: 'center' });
+
+  // ---------------- 1 trækprøvningen ----------------
+  B.goto('proeve', 1);
+  {
+    const t0 = L('proeve').start;
+    line(1, [[300, 300], [420, 300], [460, 330], [820, 330], [860, 300], [980, 300], [980, 420], [860, 420], [820, 390], [460, 390], [420, 420], [300, 420], [300, 302]], 'black', 3.2, t0 + 0.3, t0 + 1.4);
+    arrow(1, [[984, 360], [1120, 360]], 'red', 4.4, wt('proeve', 'trækker') - 0.1, wt('proeve', 'trækker') + 0.4);
+    arrow(1, [[296, 360], [160, 360]], 'red', 4.4, wt('proeve', 'trækker'), wt('proeve', 'trækker') + 0.5);
+    text(1, 'F', 1130, 372, 40, 'red', wt('proeve', 'kraft') - 0.1, wt('proeve', 'kraft') + 0.3);
+    arrow(1, [[460, 470], [820, 470]], 'blue', 2.4, wt('proeve', 'forlængelse') - 0.3, wt('proeve', 'forlængelse') + 0.2, 12);
+    text(1, 'l + δ', 640, 510, 34, 'blue', wt('proeve', 'forlængelse'), we('proeve', 'forlængelse'), { align: 'center' });
+    text(1, 'σ = F / A_0      ε = δ / l_0', 640, 600, 44, 'black', wt('proeve', 'omregnes') - 0.1, we('proeve', 'tøjning'), { align: 'center' });
+  }
+
+  // ---------------- 2 kurven ----------------
+  B.goto('elastisk', 2);
+  {
+    const ox = 160, oy = 620, t0 = L('elastisk').start;
+    axes(2, ox, oy, 1180, 110, 'ε', 'σ', t0 - 0.4);
+    plot(2, [[ox, oy], [250, 360]], 'blue', t0 + 0.4, wt('elastisk', 'linje'));
+    dot(2, 250, 360, 7, 'black', wt('elastisk', 'proportionalitetsgrænsen'));
+    text(2, 'proportionalitetsgrænse', 270, 380, 26, 'black', wt('elastisk', 'proportionalitetsgrænsen') - 0.1, we('elastisk', 'proportionalitetsgrænsen'));
+    text(2, 'elastisk', 175, 470, 28, 'blue', wt('elastisk', 'elastiske') - 0.1, we('elastisk', 'område'), { rot: -1.2 });
+    const tf = L('flyd').start;
+    plot(2, [[250, 360], [268, 320], [300, 318]], 'blue', tf, tf + 0.5);
+    dashed(2, [ox, 320], [268, 320], 'black', wt('flyd', 'S') - 0.1, wt('flyd', 'S') + 0.4);
+    text(2, 'S_y', ox - 14, 330, 34, 'red', wt('flyd', 'S'), we('flyd', 'y'), { align: 'right' });
+    const H = [[300, 318]]; for (let j = 1; j <= 24; j++) { const u = j / 24; H.push([300 + 400 * u, 318 - 118 * Math.sin(u * PI / 2)]); }
+    plot(2, H, 'blue', L('haerdning').start + 0.2, we('haerdning', 'deformeres'));
+    text(2, 'deformationshærdning', 380, 240, 28, 'blue', wt('haerdning', 'deformationshærdning') - 0.2, we('haerdning', 'deformationshærdning') + 0.3);
+    const tu = L('su').start;
+    dot(2, 700, 200, 8, 'red', tu + 0.2);
+    dashed(2, [ox, 200], [700, 200], 'black', wt('su', 'S') - 0.2, wt('su', 'S') + 0.4);
+    text(2, 'S_u', ox - 14, 210, 34, 'red', wt('su', 'S'), we('su', 'u'), { align: 'right' });
+    const N = [[700, 200]]; for (let j = 1; j <= 16; j++) { const u = j / 16; N.push([700 + 260 * u, 200 + 90 * u * u]); }
+    plot(2, N, 'blue', wt('indsnoering', 'indsnøringen') - 0.1, wt('indsnoering', 'bruddet'));
+    text(2, 'indsnøring', 820, 200, 28, 'blue', wt('indsnoering', 'indsnøringen') - 0.1, we('indsnoering', 'indsnøringen'));
+    line(2, [[950, 278], [970, 302]], 'red', 3.4, wt('indsnoering', 'bruddet') - 0.1, wt('indsnoering', 'bruddet')); line(2, [[970, 278], [950, 302]], 'red', 3.4, wt('indsnoering', 'bruddet'), wt('indsnoering', 'bruddet') + 0.1);
+    text(2, 'brud', 980, 320, 30, 'red', wt('indsnoering', 'bruddet'), we('indsnoering', 'bruddet'));
+    // aflastning
+    const tb = L('blivende').start, xa = 520, ya = 318 - 118 * Math.sin(0.55 * PI / 2), xb = xa - (oy - ya) * (90 / 260);
+    dot(2, xa, ya, 6, 'green', tb + 0.2);
+    plot(2, [[xa, ya], [xb, oy]], 'green', wt('blivende', 'parallelt') - 0.3, we('blivende', 'linje'));
+    line(2, [[ox, oy + 22], [xb, oy + 22]], 'green', 3.4, wt('blivende', 'blivende') - 0.1, we('blivende', 'tøjning'));
+    text(2, 'blivende tøjning', ox + 10, oy + 60, 30, 'green', wt('blivende', 'blivende') - 0.1, we('blivende', 'tilbage', 1));
+    const tr = L('brug').start;
+    box(2, 760, 420, 400, 110, 'red', tr, tr + 0.6);
+    text(2, 'S_y og S_u', 790, 470, 38, 'red', tr + 0.2, we('brug', 'styrketal'));
+    text(2, '→ alle brudkriterier', 790, 515, 30, 'black', wt('brug', 'senere') - 0.1, we('brug', 'brudkriterierne'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Hvad er forskellen', 'på S_y og S_u?'], ['S_y: plastisk deformation begynder', 'S_u: kurvens største spænding'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 3, slide 10–11 og 16 · Hamrock, Schmid & Jacobson, kap. 3', 'E-modul og Poissons forhold', 'slut');
+  text(4, 'elastisk → S_y → hærdning → S_u → indsnøring → brud', 200, 290, 34, 'blue', L('slut').start + 0.4, we('slut', 'brud'));
+  text(4, 'over S_y: blivende deformation', 200, 370, 40, 'red', wt('slut', 'Over') - 0.1, we('slut', 'deformation'));
+});
+
+</script>
+<script>BP.live({"duration":103.494,"audio":"spaendings-toejningskurve.mp3","order":["titel","proeve","elastisk","flyd","haerdning","su","indsnoering","blivende","brug","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":6.157,"words":[["Spændings-tøjningskurven",0.601,2.044],["Den",2.948,3.077],["kommer",3.077,3.374],["fra",3.374,3.554],["en",3.554,3.644],["trækprøvning",3.644,4.392],["og",4.392,4.598],["er",4.598,4.662],["materialets",4.662,5.32],["visitkort",5.32,6.157]],"text":"Spændings-tøjningskurven. Den kommer fra en trækprøvning og er materialets visitkort."},"proeve":{"start":7.378,"end":14.517,"words":[["I",7.518,7.583],["en",7.583,7.686],["trækprøvning",7.686,8.407],["trækker",8.407,8.82],["vi",8.82,8.974],["i",8.974,9.077],["en",9.078,9.168],["prøvestang",9.168,9.876],["og",9.876,9.992],["måler",9.992,10.289],["kraft",10.289,10.675],["og",10.675,10.817],["forlængelse",10.817,11.565],["Det",12.455,12.558],["omregnes",12.558,13.113],["til",13.113,13.228],["spænding",13.229,13.783],["og",13.783,13.924],["tøjning",13.924,14.517]],"text":"I en trækprøvning trækker vi i en prøvestang og måler kraft og forlængelse. Det omregnes til spænding og tøjning."},"elastisk":{"start":15.744,"end":25.873,"words":[["Først",15.858,16.271],["kommer",16.271,16.554],["det",16.554,16.735],["elastiske",16.735,17.379],["område",17.379,18.036],["Kurven",18.966,19.365],["er",19.365,19.533],["en",19.533,19.636],["ret",19.636,19.855],["linje",19.855,20.151],["op",20.151,20.37],["til",20.37,20.615],["proportionalitetsgrænsen",20.615,22.084],["og",22.278,22.419],["aflaster",22.419,22.973],["vi",22.973,23.102],["her",23.102,23.463],["går",23.605,23.811],["stangen",23.811,24.133],["tilbage",24.133,24.584],["til",24.584,24.739],["sin",24.739,24.932],["oprindelige",24.932,25.37],["længde",25.37,25.873]],"text":"Først kommer det elastiske område. Kurven er en ret linje op til proportionalitetsgrænsen, og aflaster vi her, går stangen tilbage til sin oprindelige længde."},"flyd":{"start":27.086,"end":31.402,"words":[["Ved",27.226,27.368],["flydespændingen",27.368,28.27],["S",28.412,28.747],["y",28.747,29.043],["begynder",29.211,29.61],["betydelig",29.61,30.087],["plastisk",30.087,30.59],["deformation",30.59,31.402]],"text":"Ved flydespændingen, S y, begynder betydelig plastisk deformation."},"haerdning":{"start":32.62,"end":40.287,"words":[["Derefter",32.721,33.262],["stiger",33.262,33.584],["kurven",33.584,33.997],["igen",33.997,34.564],["Det",35.455,35.635],["er",35.635,35.867],["deformationshærdning",35.867,37.169],["materialet",37.311,37.929],["bliver",37.929,38.11],["stærkere",38.11,38.806],["jo",38.947,39.102],["mere",39.102,39.373],["det",39.373,39.489],["deformeres",39.489,40.287]],"text":"Derefter stiger kurven igen. Det er deformationshærdning: materialet bliver stærkere, jo mere det deformeres."},"su":{"start":41.514,"end":48.292,"words":[["Toppen",41.641,42.028],["af",42.028,42.157],["kurven",42.157,42.608],["er",42.608,42.737],["brudstyrken",42.737,43.561],["S",43.703,43.961],["u.",43.961,44.734],["Det",45.638,45.754],["er",45.754,45.883],["den",45.883,46.05],["største",46.05,46.462],["ingeniørspænding",46.462,47.468],["i",47.468,47.609],["prøvningen",47.609,48.292]],"text":"Toppen af kurven er brudstyrken, S u. Det er den største ingeniørspænding i prøvningen."},"indsnoering":{"start":49.52,"end":56.801,"words":[["Efter",49.66,49.931],["toppen",49.931,50.42],["begynder",50.42,50.923],["indsnøringen",50.923,51.761],["Stangen",52.639,53.064],["bliver",53.064,53.244],["tyndere",53.244,53.669],["ét",53.669,53.798],["sted",53.798,54.236],["kurven",54.378,54.713],["falder",54.713,55.229],["og",55.371,55.551],["til",55.551,55.693],["sidst",55.693,56.053],["kommer",56.054,56.324],["bruddet",56.324,56.801]],"text":"Efter toppen begynder indsnøringen. Stangen bliver tyndere ét sted, kurven falder, og til sidst kommer bruddet."},"blivende":{"start":58.03,"end":65.672,"words":[["Aflaster",58.157,58.647],["vi",58.647,58.815],["over",58.815,59.008],["flydegrænsen",59.008,59.884],["går",60.026,60.232],["vi",60.232,60.335],["tilbage",60.335,60.76],["parallelt",60.76,61.353],["med",61.353,61.546],["den",61.547,61.714],["elastiske",61.714,62.32],["linje",62.32,62.848],["Der",63.726,63.906],["er",63.906,64.074],["en",64.074,64.216],["blivende",64.216,64.602],["tøjning",64.602,65.015],["tilbage",65.015,65.672]],"text":"Aflaster vi over flydegrænsen, går vi tilbage parallelt med den elastiske linje. Der er en blivende tøjning tilbage."},"brug":{"start":66.9,"end":73.408,"words":[["S",67.04,67.285],["y",67.285,67.478],["og",67.478,67.556],["S",67.556,67.826],["u",67.826,68.123],["er",68.123,68.239],["de",68.239,68.368],["to",68.368,68.651],["vigtigste",68.651,69.102],["styrketal",69.102,69.927],["Dem",70.843,70.972],["bruger",70.972,71.256],["vi",71.256,71.372],["senere",71.372,71.99],["i",71.99,72.209],["alle",72.209,72.454],["brudkriterierne",72.454,73.408]],"text":"S y og S u er de to vigtigste styrketal. Dem bruger vi senere i alle brudkriterierne."},"tjek_q":{"start":74.642,"end":79.127,"words":[["Tjek",74.743,75.052],["dig",75.052,75.232],["selv",75.232,75.658],["Hvad",76.549,76.704],["er",76.704,76.73],["forskellen",76.73,77.258],["på",77.258,77.632],["S",77.632,77.98],["y",77.98,78.212],["og",78.212,78.418],["S",78.418,78.779],["u",78.779,79.127]],"text":"Tjek dig selv. Hvad er forskellen på S y og S u?"},"tjek_a":{"start":82.994,"end":89.966,"words":[["S",83.134,83.379],["y",83.379,83.611],["er",83.611,83.753],["der",83.753,84.088],["hvor",84.23,84.436],["den",84.436,84.616],["plastiske",84.616,85.157],["deformation",85.157,85.853],["begynder",85.853,86.498],["S",87.401,87.633],["u",87.633,87.891],["er",87.891,88.02],["den",88.02,88.213],["største",88.213,88.6],["spænding",88.6,89.141],["kurven",89.27,89.631],["når",89.631,89.966]],"text":"S y er der, hvor den plastiske deformation begynder. S u er den største spænding, kurven når."},"slut":{"start":91.192,"end":101.063,"words":[["Kort",91.319,91.538],["sagt",91.538,92.028],["elastisk",92.157,92.737],["linje",92.737,93.201],["flydning",93.304,93.806],["ved",93.806,94.013],["S",94.013,94.309],["y",94.309,94.644],["hærdning",94.773,95.237],["op",95.237,95.456],["til",95.456,95.701],["S",95.701,95.997],["u",95.997,96.306],["indsnøring",96.435,97.092],["og",97.093,97.247],["brud",97.247,97.685],["Over",98.602,98.86],["S",98.86,99.13],["y",99.13,99.401],["får",99.401,99.581],["vi",99.581,99.736],["en",99.736,99.852],["blivende",99.852,100.225],["deformation",100.226,101.063]],"text":"Kort sagt: elastisk linje, flydning ved S y, hærdning op til S u, indsnøring og brud. Over S y får vi en blivende deformation."}}}, { audio: 'spaendings-toejningskurve.mp3', id: 'spaendings-toejningskurve' });</script>
+</body>
+</html>

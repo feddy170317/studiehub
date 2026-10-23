@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>E-modul og Poissons forhold · video</title>
+<meta name="description" content="Hookes lov, E som hældning, Poissons forhold og potensmodellen σ = Kεⁿ.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 3: videoer</a><h1>E-modul og Poissons forhold</h1><span class="meta">MEM1 · kapitel 3 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: E-modul og Poissons forhold"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Hookes lov, E som hældning, Poissons forhold og potensmodellen σ = Kεⁿ.</p><div class="chips"><a href="spaendings-toejningskurve.html">Se først: Spændings-tøjningskurven</a><a href="../../Kapitel03_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l03">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// E-modul og Poissons forhold (MEM1 kap. 3, slides 14–15 og 22)
+BP.scene({ header: 'MEM1 · kap. 3' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, axes, plot, dashed, frac, PI } = B;
+
+  B.titel(0, 'E-modul og Poisson', 'MEM1 · kapitel 3 · begreb (slide 14–15, 22)', 'titel');
+  text(0, 'hvor stift · hvor meget tyndere', 640, 520, 40, 'red', wt('titel', 'stift') - 0.3, we('titel', 'det', 1), { align: 'center' });
+
+  // ---------------- 1 Hookes lov ----------------
+  B.goto('e', 1);
+  {
+    const ox = 160, oy = 620, t0 = L('e').start;
+    axes(1, ox, oy, 640, 150, 'ε', 'σ', t0);
+    plot(1, [[ox, oy], [560, 220]], 'blue', wt('e', 'lineær') - 0.2, we('e', 'epsilon'));
+    text(1, 'σ = E · ε', 720, 230, 60, 'red', wt('e', 'sigma') - 0.1, we('e', 'epsilon'));
+    text(1, 'Hookes lov', 720, 300, 38, 'black', wt('e', 'Hookes') - 0.1, we('e', 'lov'));
+    const th = L('haeldning').start;
+    line(1, [[360, 420], [460, 420], [460, 320]], 'red', 2.8, th + 0.2, th + 0.8);
+    text(1, 'E', 476, 386, 42, 'red', wt('haeldning', 'hældningen') - 0.1, we('haeldning', 'hældningen') + 0.3);
+    text(1, 'E = hældningen', 720, 380, 38, 'red', wt('haeldning', 'hældningen') - 0.1, we('haeldning', 'spændings-tøjningskurven'));
+    const ts = L('stiv').start;
+    plot(1, [[ox, oy], [380, 160]], 'green', wt('stiv', 'Stål') - 0.2, we('stiv', 'gigapascal'));
+    text(1, 'stål ≈ 200 GPa', 720, 480, 36, 'green', wt('stiv', 'Stål') - 0.1, we('stiv', 'gigapascal'));
+    plot(1, [[ox, oy], [620, 460]], 'black', wt('stiv', 'aluminium') - 0.2, we('stiv', 'halvfjerds'));
+    text(1, 'aluminium ≈ 70 GPa', 720, 540, 36, 'black', wt('stiv', 'aluminium') - 0.1, we('stiv', 'halvfjerds'));
+    text(1, 'stort E ⇒ lille ε', 720, 610, 36, 'red', wt('stiv', 'Stort') - 0.1, we('stiv', 'spænding'));
+  }
+
+  // ---------------- 2 Poissons forhold ----------------
+  B.goto('poisson', 2);
+  {
+    const t0 = L('poisson').start;
+    line(2, [[260, 180], [660, 180], [660, 280], [260, 280], [260, 182]], 'black', 2.6, t0, t0 + 0.6, { alpha: 0.45 });
+    line(2, [[260, 190], [760, 190], [760, 270], [260, 270], [260, 192]], 'blue', 3.4, wt('poisson', 'længere') - 0.3, wt('poisson', 'tyndere'));
+    arrow(2, [[764, 230], [880, 230]], 'red', 4, wt('poisson', 'trækker') - 0.1, wt('poisson', 'trækker') + 0.4);
+    arrow(2, [[256, 230], [150, 230]], 'red', 4, wt('poisson', 'trækker'), wt('poisson', 'trækker') + 0.5);
+    text(2, 'ε_a > 0', 700, 330, 34, 'red', wt('poisson', 'længere') - 0.1, we('poisson', 'længere'));
+    text(2, 'ε_t < 0', 300, 330, 34, 'blue', wt('poisson', 'tyndere') - 0.1, we('poisson', 'tyndere'));
+    text(2, 'ν =', 300, 470, 56, 'red', wt('poisson', 'ny') - 0.1, wt('poisson', 'ny') + 0.3);
+    frac(2, '−ε_t', 'ε_a', 470, 452, 52, 'red', wt('poisson', 'minus') - 0.1, we('poisson', 'længdetøjningen'));
+    const tf = L('fortegn').start;
+    text(2, 'minus ⇒ ν > 0', 640, 470, 40, 'black', wt('fortegn', 'minus') - 0.2, we('fortegn', 'positiv', 1));
+    text(2, 'metaller:  ν ≈ 0,3', 640, 560, 44, 'blue', L('vaerdi').start, we('vaerdi', 'tre'));
+  }
+
+  // ---------------- 3 potensmodel ----------------
+  B.goto('potens', 3);
+  {
+    const ox = 160, oy = 620, t0 = L('potens').start;
+    axes(3, ox, oy, 640, 150, 'ε', 'σ', t0);
+    const P = []; for (let j = 0; j <= 40; j++) { const u = j / 40; P.push([ox + 440 * u, oy - 400 * Math.pow(u, 0.25)]); }
+    plot(3, P, 'blue', wt('potens', 'potensmodel') - 0.2, we('potens', 'n'));
+    text(3, 'σ = K · εⁿ', 720, 260, 56, 'red', wt('potens', 'sigma') - 0.1, we('potens', 'n'));
+    text(3, 'K = styrkekoefficient', 720, 360, 34, 'black', wt('potens', 'K', 1) - 0.1, we('potens', 'styrkekoefficienten'));
+    text(3, 'n = deformationshærdningseksponent', 700, 420, 27, 'black', wt('potens', 'n', 1) - 0.1, we('potens', 'deformationshærdningseksponenten'));
+  }
+
+  B.goto('tjek_q', 4);
+  B.tjek(4, ['Stål og aluminium, samme σ.', 'Hvilken forlænges mest?'], ['Aluminium: E ≈ 1/3 af ståls', '⇒ ca. 3 gange så stor ε'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 5);
+  B.slut(5, 'Abou-Hayt (2026), MEM1 Chapter 3, slide 14–15 og 22 · Hamrock, Schmid & Jacobson, kap. 3', 'resiliens og sejhed', 'slut');
+  text(5, 'σ = E · ε   (E = stivhed)', 200, 280, 44, 'blue', L('slut').start + 0.4, we('slut', 'stivheden'));
+  text(5, 'ν = −ε_t / ε_a ≈ 0,3 for metaller', 200, 370, 44, 'red', wt('slut', 'ny') - 0.1, we('slut', 'metaller'));
+});
+
+</script>
+<script>BP.live({"duration":105.592,"audio":"e-modul-poisson.mp3","order":["titel","e","haeldning","stiv","poisson","fortegn","vaerdi","potens","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":8.271,"words":[["Elasticitetsmodul",0.64,1.929],["og",1.929,2.071],["Poissons",2.071,2.651],["forhold",2.651,3.192],["Hvor",4.121,4.289],["stift",4.289,4.572],["er",4.572,4.662],["materialet",4.662,5.436],["og",5.577,5.706],["hvor",5.706,5.848],["meget",5.848,6.131],["bliver",6.131,6.325],["det",6.325,6.402],["tyndere",6.402,6.995],["når",7.137,7.317],["vi",7.317,7.433],["trækker",7.433,7.82],["i",7.82,8.0],["det",8.0,8.271]],"text":"Elasticitetsmodul og Poissons forhold. Hvor stift er materialet, og hvor meget bliver det tyndere, når vi trækker i det?"},"e":{"start":9.49,"end":20.572,"words":[["Elasticitetsmodulet",9.63,10.919],["E",10.919,11.151],["måler",11.151,11.525],["modstanden",11.525,12.156],["mod",12.156,12.388],["elastisk",12.388,12.942],["deformation",12.942,13.741],["For",14.632,14.761],["lineær",14.761,15.147],["enakset",15.147,15.701],["opførsel",15.701,16.462],["er",16.462,16.59],["sigma",16.591,17.016],["lig",17.016,17.299],["E",17.299,17.48],["gange",17.48,17.84],["epsilon",17.841,18.562],["Det",19.425,19.657],["er",19.657,19.799],["Hookes",19.799,20.146],["lov",20.146,20.572]],"text":"Elasticitetsmodulet E måler modstanden mod elastisk deformation. For lineær enakset opførsel er sigma lig E gange epsilon. Det er Hookes lov."},"haeldning":{"start":21.816,"end":25.294,"words":[["E",21.956,22.137],["er",22.137,22.253],["hældningen",22.253,22.845],["af",22.845,23.013],["den",23.013,23.168],["rette",23.168,23.451],["del",23.451,23.773],["af",23.773,23.902],["spændings-tøjningskurven",23.902,25.294]],"text":"E er hældningen af den rette del af spændings-tøjningskurven."},"stiv":{"start":26.51,"end":34.951,"words":[["Stort",26.637,27.037],["E",27.037,27.256],["betyder",27.256,27.668],["mindre",27.668,28.016],["tøjning",28.016,28.532],["for",28.532,28.686],["samme",28.686,29.047],["spænding",29.047,29.563],["Stål",30.44,30.853],["har",30.853,31.02],["E",31.02,31.226],["omkring",31.226,31.6],["to",31.6,31.858],["hundrede",31.858,32.09],["gigapascal",32.09,32.992],["aluminium",33.134,33.868],["omkring",33.868,34.294],["halvfjerds",34.294,34.951]],"text":"Stort E betyder mindre tøjning for samme spænding. Stål har E omkring to hundrede gigapascal, aluminium omkring halvfjerds."},"poisson":{"start":36.172,"end":45.154,"words":[["Når",36.286,36.428],["vi",36.428,36.531],["trækker",36.531,36.905],["i",36.905,37.008],["en",37.008,37.098],["stang",37.098,37.549],["bliver",37.691,37.884],["den",37.884,38.052],["længere",38.052,38.619],["men",38.761,39.109],["også",39.109,39.469],["tyndere",39.469,40.075],["Poissons",40.966,41.43],["forhold",41.43,41.829],["ny",41.829,42.126],["er",42.126,42.293],["minus",42.293,42.667],["tværtøjningen",42.667,43.363],["divideret",43.363,44.02],["med",44.02,44.2],["længdetøjningen",44.2,45.154]],"text":"Når vi trækker i en stang, bliver den længere, men også tyndere. Poissons forhold ny er minus tværtøjningen divideret med længdetøjningen."},"fortegn":{"start":46.386,"end":53.925,"words":[["I",46.513,46.604],["træk",46.604,47.08],["er",47.08,47.261],["længdetøjningen",47.261,48.021],["positiv",48.021,48.717],["og",48.717,48.82],["tværtøjningen",48.82,49.593],["negativ",49.593,50.276],["Derfor",51.154,51.463],["står",51.463,51.708],["der",51.708,51.824],["et",51.824,51.901],["minus",51.901,52.468],["så",52.61,52.803],["ny",52.804,52.984],["bliver",52.984,53.164],["positiv",53.164,53.925]],"text":"I træk er længdetøjningen positiv og tværtøjningen negativ. Derfor står der et minus, så ny bliver positiv."},"vaerdi":{"start":55.16,"end":58.213,"words":[["For",55.287,55.416],["metaller",55.416,55.919],["er",55.919,56.048],["ny",56.048,56.241],["typisk",56.241,56.756],["omkring",56.756,57.259],["nul",57.259,57.517],["komma",57.517,57.787],["tre",57.787,58.213]],"text":"For metaller er ny typisk omkring nul komma tre."},"potens":{"start":59.446,"end":69.96,"words":[["Uden",59.573,59.767],["for",59.767,59.908],["det",59.908,60.024],["elastiske",60.024,60.604],["område",60.604,61.029],["bruger",61.029,61.339],["bogen",61.339,61.687],["en",61.687,61.841],["potensmodel",61.841,62.718],["sigma",62.847,63.323],["er",63.323,63.452],["K",63.452,63.697],["gange",63.697,63.993],["epsilon",63.993,64.56],["opløftet",64.56,65.089],["til",65.089,65.243],["n.",65.243,65.682],["K",65.682,66.004],["er",66.004,66.081],["styrkekoefficienten",66.081,67.357],["og",67.55,67.718],["n",67.718,67.924],["er",67.924,68.014],["deformationshærdningseksponenten",68.014,69.96]],"text":"Uden for det elastiske område bruger bogen en potensmodel: sigma er K gange epsilon opløftet til n. K er styrkekoefficienten, og n er deformationshærdningseksponenten."},"tjek_q":{"start":71.196,"end":81.698,"words":[["Tjek",71.297,71.619],["dig",71.619,71.799],["selv",71.799,72.225],["To",73.116,73.348],["stænger",73.348,73.683],["har",73.683,73.838],["samme",73.838,74.199],["mål",74.199,74.598],["og",74.598,74.753],["samme",74.753,75.114],["spænding",75.114,75.629],["Den",76.505,76.634],["ene",76.634,76.943],["er",76.943,77.111],["af",77.111,77.137],["stål",77.137,77.665],["den",77.807,78.0],["anden",78.0,78.374],["af",78.374,78.58],["aluminium",78.58,79.379],["Hvilken",80.242,80.706],["forlænges",80.706,81.208],["mest",81.208,81.698]],"text":"Tjek dig selv. To stænger har samme mål og samme spænding. Den ene er af stål, den anden af aluminium. Hvilken forlænges mest?"},"tjek_a":{"start":85.572,"end":93.368,"words":[["Aluminiumsstangen",85.686,86.872],["Den",87.788,87.904],["har",87.904,88.02],["det",88.02,88.124],["mindste",88.124,88.549],["E",88.549,88.91],["cirka",89.0,89.477],["en",89.477,89.606],["tredjedel",89.606,90.134],["af",90.134,90.172],["ståls",90.173,90.727],["så",90.868,91.1],["den",91.1,91.268],["får",91.268,91.435],["omtrent",91.435,91.848],["tre",91.848,92.118],["gange",92.118,92.415],["så",92.415,92.557],["stor",92.557,92.84],["tøjning",92.84,93.368]],"text":"Aluminiumsstangen. Den har det mindste E, cirka en tredjedel af ståls, så den får omtrent tre gange så stor tøjning."},"slut":{"start":94.61,"end":103.178,"words":[["Kort",94.737,94.943],["sagt",94.944,95.407],["sigma",95.536,96.039],["er",96.039,96.219],["E",96.219,96.413],["gange",96.413,96.722],["epsilon",96.722,97.418],["E",97.56,97.766],["er",97.766,97.83],["stivheden",97.83,98.474],["og",98.616,98.745],["ny",98.745,98.977],["er",98.977,99.067],["minus",99.067,99.389],["tværtøjning",99.389,100.021],["over",100.021,100.266],["længdetøjning",100.266,101.065],["typisk",101.193,101.67],["nul",101.67,101.876],["komma",101.876,102.16],["tre",102.16,102.443],["for",102.443,102.572],["metaller",102.572,103.178]],"text":"Kort sagt: sigma er E gange epsilon, E er stivheden, og ny er minus tværtøjning over længdetøjning, typisk nul komma tre for metaller."}}}, { audio: 'e-modul-poisson.mp3', id: 'e-modul-poisson' });</script>
+</body>
+</html>

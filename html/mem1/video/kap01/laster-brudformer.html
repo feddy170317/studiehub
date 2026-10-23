@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laster og brudformer · video</title>
+<meta name="description" content="Lasttyper, lastens vej gennem elementet, de otte brudformer og et kriterium for hver.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 1: videoer</a><h1>Laster og brudformer</h1><span class="meta">MEM1 · kapitel 1 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Laster og brudformer"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Lasttyper, lastens vej gennem elementet, de otte brudformer og et kriterium for hver.</p><div class="chips"><a href="../../Kapitel01_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l01">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Laster og brudformer (MEM1 kap. 1, slides 9–10)
+BP.scene({ header: 'MEM1 · kap. 1' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, strike, PI } = B;
+
+  B.titel(0, 'Laster og brudformer', 'MEM1 · kapitel 1 · begreb (slide 9–10)', 'titel');
+  text(0, 'find lasterne · undgå svigt', 640, 520, 40, 'red', wt('titel', 'lasterne') - 0.4, we('titel', 'svigter'), { align: 'center' });
+
+  // ---------------- 1 lasttyper og lastens vej ----------------
+  B.goto('laster', 1);
+  {
+    const t0 = L('laster').start;
+    bubble(1, 'Lasttyper', 150, 140, 54, 'blue', t0, t0 + 0.7);
+    const items = [['aksialt træk / tryk', 'aksialt'], ['forskydning', 'forskydning'], ['bøjning', 'bøjning'], ['vridning', 'vridning'], ['kombinerede laster', 'kombinerede'], ['gentagne / svingende', 'gentagne']];
+    items.forEach(([s, w], i) => { const t = wt('laster', w) - 0.2; dot(1, 160, 228 + 62 * i - 12, 6, 'red', t); text(1, s, 182, 228 + 62 * i, 36, 'black', t, we('laster', w) + 0.5); });
+    const tv = L('vej').start;
+    const vej = [['Ydre laster', 'Ydre'], ['indre kræfter og momenter', 'indre'], ['spænding og deformation', 'spænding']];
+    vej.forEach(([s, w], i) => {
+      const t = wt('vej', w) - 0.2, y = 250 + 150 * i;
+      box(1, 700, y - 50, 470, 80, i === 2 ? 'red' : 'blue', t, t + 0.6);
+      text(1, s, 935, y + 2, 32, i === 2 ? 'red' : 'blue', t + 0.2, t + 0.8, { align: 'center' });
+      if (i) arrow(1, [[935, y - 116], [935, y - 56]], 'black', 3, t - 0.3, t, 14);
+    });
+    text(1, 'går igen i hele kurset', 935, 660, 30, 'black', wt('vej', 'igen') - 0.1, we('vej', 'kurset'), { align: 'center' });
+  }
+
+  // ---------------- 2 brudformer og kriterier ----------------
+  B.goto('svigt', 2);
+  {
+    const t0 = L('svigt').start;
+    bubble(2, 'Brudformer', 150, 140, 54, 'red', t0, t0 + 0.8);
+    const former = [['for stor spænding', 'stor'], ['flydning', 'flydning'], ['sprødt brud', 'sprødt'], ['udmattelse', 'udmattelse'],
+      ['for stor udbøjning', 'udbøjning'], ['knækning', 'knækning'], ['slid', 'slid'], ['korrosion', 'korrosion']];
+    former.forEach(([s, w], i) => {
+      const x = 140 + 270 * (i % 4), y = 230 + 80 * Math.floor(i / 4), t = wt('former', w) - 0.2;
+      box(2, x, y - 40, 240, 60, 'black', t, t + 0.4, { off: 8 });
+      text(2, s, x + 120, y, s.length > 12 ? 24 : 28, 'black', t + 0.1, t + 0.6, { align: 'center' });
+    });
+    const tk = L('kriterium').start;
+    text(2, 'eget kriterium pr. brudform:', 140, 450, 34, 'blue', tk, wt('kriterium', 'Flydning'));
+    text(2, 'flydning  →  S_y', 180, 510, 36, 'black', wt('kriterium', 'Flydning') - 0.1, we('kriterium', 'flydespændingen'));
+    text(2, 'udmattelse  →  udmattelsesstyrke', 180, 565, 36, 'black', wt('kriterium', 'udmattelse') - 0.1, we('kriterium', 'udmattelsesstyrken'));
+    text(2, 'knækning  →  kritisk last P_{cr}', 180, 620, 36, 'black', wt('kriterium', 'knækning') - 0.1, we('kriterium', 'last'));
+    const ta = L('alle').start;
+    text(2, 'forhindr ALLE relevante', 880, 520, 32, 'red', ta, we('alle', 'brudformer'));
+    text(2, 'ikke kun én', 880, 575, 32, 'red', wt('alle', 'ikke') - 0.1, we('alle', 'én'));
+  }
+
+  // ---------------- 3 kæden ----------------
+  B.goto('kaede2', 3);
+  {
+    const t0 = L('kaede2').start;
+    const ord = [['Last', 'last'], ['Brudform', 'brudform'], ['Designkriterium', 'designkriterium']];
+    ord.forEach(([s, w], i) => {
+      const x = 110 + 390 * i, t = wt('kaede2', w) - 0.2;
+      box(3, x, 300, 320, 110, i === 2 ? 'red' : 'blue', t, t + 0.5);
+      text(3, s, x + 160, 368, 38, i === 2 ? 'red' : 'blue', t + 0.2, t + 0.7, { align: 'center' });
+      if (i) arrow(3, [[x - 64, 355], [x - 10, 355]], 'black', 3, t - 0.2, t, 14);
+    });
+  }
+
+  B.goto('tjek_q', 4);
+  B.tjek(4, ['En slank trykstang holder til σ.', 'Kan den stadig svigte?'], ['Ja: knækning', 'før σ når S_y'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 5);
+  B.slut(5, 'Abou-Hayt (2026), MEM1 Chapter 1, slide 9–10 · Hamrock, Schmid & Jacobson, kap. 1', 'sikkerhedsfaktor', 'slut');
+  text(5, 'lasttype → brudformer → kriterium for hver', 200, 300, 40, 'blue', L('slut').start + 0.4, we('slut', 'dem'));
+});
+
+</script>
+<script>BP.live({"duration":97.936,"audio":"laster-brudformer.mp3","order":["titel","laster","vej","svigt","former","kriterium","alle","kaede2","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":8.142,"words":[["Laster",0.602,1.207],["og",1.207,1.362],["brudformer",1.362,2.161],["Et",3.064,3.167],["design",3.168,3.631],["starter",3.631,4.044],["med",4.044,4.211],["at",4.211,4.237],["finde",4.237,4.508],["lasterne",4.508,5.088],["og",5.088,5.191],["slutter",5.191,5.526],["med",5.526,5.706],["at",5.706,5.732],["sikre",5.732,6.312],["at",6.466,6.634],["elementet",6.634,7.265],["ikke",7.265,7.549],["svigter",7.549,8.142]],"text":"Laster og brudformer. Et design starter med at finde lasterne og slutter med at sikre, at elementet ikke svigter."},"laster":{"start":9.37,"end":18.943,"words":[["De",9.484,9.6],["almindelige",9.6,10.013],["lasttyper",10.013,10.734],["er",10.734,10.876],["aksialt",10.876,11.276],["træk",11.276,11.675],["eller",11.675,11.92],["tryk",11.92,12.371],["direkte",12.5,13.067],["og",13.067,13.183],["tværgående",13.183,13.685],["forskydning",13.685,14.368],["bøjning",14.497,15.051],["vridning",15.193,15.812],["kombinerede",15.953,16.495],["laster",16.495,16.972],["og",16.972,17.062],["gentagne",17.062,17.796],["eller",17.796,18.002],["svingende",18.002,18.402],["laster",18.402,18.943]],"text":"De almindelige lasttyper er aksialt træk eller tryk, direkte og tværgående forskydning, bøjning, vridning, kombinerede laster og gentagne eller svingende laster."},"vej":{"start":20.16,"end":31.152,"words":[["Lasten",20.274,20.738],["følger",20.738,21.086],["altid",21.086,21.55],["den",21.55,21.743],["samme",21.743,22.091],["vej",22.091,22.478],["Ydre",23.382,23.626],["laster",23.626,24.116],["giver",24.116,24.425],["indre",24.425,24.799],["kræfter",24.799,25.237],["og",25.237,25.276],["momenter",25.276,25.92],["og",26.062,26.191],["de",26.191,26.307],["giver",26.307,26.616],["spænding",26.616,27.157],["og",27.157,27.286],["deformation",27.286,28.059],["Den",28.949,29.078],["kæde",29.078,29.361],["går",29.361,29.606],["igen",29.606,30.044],["i",30.044,30.186],["hele",30.186,30.495],["kurset",30.495,31.152]],"text":"Lasten følger altid den samme vej. Ydre laster giver indre kræfter og momenter, og de giver spænding og deformation. Den kæde går igen i hele kurset."},"svigt":{"start":32.39,"end":35.159,"words":[["Et",32.53,32.646],["element",32.646,33.097],["kan",33.097,33.226],["svigte",33.226,33.638],["på",33.638,33.806],["flere",33.806,34.167],["forskellige",34.167,34.656],["måder",34.657,35.159]],"text":"Et element kan svigte på flere forskellige måder."},"former":{"start":36.388,"end":43.435,"words":[["For",36.502,36.644],["stor",36.644,36.953],["spænding",36.953,37.469],["flydning",37.598,38.242],["sprødt",38.384,38.732],["brud",38.732,39.118],["udmattelse",39.247,40.046],["for",40.188,40.343],["stor",40.343,40.652],["udbøjning",40.652,41.322],["knækning",41.464,42.057],["slid",42.198,42.649],["og",42.649,42.765],["korrosion",42.765,43.435]],"text":"For stor spænding, flydning, sprødt brud, udmattelse, for stor udbøjning, knækning, slid og korrosion."},"kriterium":{"start":44.682,"end":54.424,"words":[["Hver",44.822,45.067],["brudform",45.067,45.647],["har",45.647,45.853],["sit",45.853,46.059],["eget",46.059,46.356],["kriterium",46.356,47.142],["Flydning",48.032,48.496],["tjekker",48.496,48.857],["vi",48.857,48.973],["mod",48.973,49.167],["flydespændingen",49.167,50.056],["udmattelse",50.146,50.739],["mod",50.739,50.996],["udmattelsesstyrken",50.996,52.079],["og",52.272,52.504],["knækning",52.504,53.02],["mod",53.02,53.29],["den",53.29,53.484],["kritiske",53.484,53.96],["last",53.96,54.424]],"text":"Hver brudform har sit eget kriterium. Flydning tjekker vi mod flydespændingen, udmattelse mod udmattelsesstyrken, og knækning mod den kritiske last."},"alle":{"start":55.64,"end":62.856,"words":[["Et",55.78,55.896],["godt",55.896,56.102],["design",56.102,56.553],["forhindrer",56.553,57.172],["alle",57.172,57.481],["de",57.481,57.636],["relevante",57.636,58.126],["brudformer",58.126,58.873],["under",58.873,59.131],["de",59.131,59.234],["givne",59.234,59.556],["driftsforhold",59.556,60.316],["Det",61.18,61.348],["er",61.348,61.49],["ikke",61.49,61.812],["nok",61.812,62.057],["at",62.057,62.121],["tjekke",62.121,62.495],["én",62.495,62.856]],"text":"Et godt design forhindrer alle de relevante brudformer under de givne driftsforhold. Det er ikke nok at tjekke én."},"kaede2":{"start":64.102,"end":68.095,"words":[["Derfor",64.216,64.539],["gælder",64.539,64.796],["kæden",64.796,65.312],["last",65.441,66.059],["brudform",66.188,66.858],["designkriterium",67.0,68.095]],"text":"Derfor gælder kæden: last, brudform, designkriterium."},"tjek_q":{"start":69.324,"end":76.282,"words":[["Tjek",69.425,69.747],["dig",69.747,69.927],["selv",69.927,70.353],["En",71.244,71.36],["lang",71.36,71.785],["slank",71.901,72.314],["trykstang",72.314,72.945],["holder",72.945,73.332],["til",73.332,73.473],["spændingen",73.473,74.105],["Kan",74.968,75.135],["den",75.135,75.341],["stadig",75.341,75.728],["svigte",75.728,76.282]],"text":"Tjek dig selv. En lang, slank trykstang holder til spændingen. Kan den stadig svigte?"},"tjek_a":{"start":80.172,"end":88.162,"words":[["Ja",80.272,80.659],["Den",81.641,81.731],["kan",81.731,81.834],["knække",81.834,82.169],["ud",82.169,82.337],["til",82.337,82.453],["siden",82.453,82.968],["før",83.084,83.381],["spændingen",83.381,84.051],["når",84.051,84.218],["flydegrænsen",84.218,85.159],["Knækning",86.061,86.628],["er",86.628,86.809],["en",86.809,86.912],["selvstændig",86.912,87.504],["brudform",87.504,88.162]],"text":"Ja. Den kan knække ud til siden, før spændingen når flydegrænsen. Knækning er en selvstændig brudform."},"slut":{"start":89.402,"end":95.509,"words":[["Kort",89.529,89.748],["sagt",89.748,90.251],["find",90.367,90.65],["lasttypen",90.65,91.424],["find",91.527,91.759],["de",91.759,91.836],["mulige",91.836,92.184],["brudformer",92.184,92.918],["og",93.06,93.189],["vælg",93.189,93.408],["det",93.408,93.498],["rigtige",93.498,93.924],["kriterium",93.924,94.542],["for",94.542,94.723],["hver",94.723,94.993],["af",94.993,95.122],["dem",95.122,95.509]],"text":"Kort sagt: find lasttypen, find de mulige brudformer, og vælg det rigtige kriterium for hver af dem."}}}, { audio: 'laster-brudformer.mp3', id: 'laster-brudformer' });</script>
+</body>
+</html>

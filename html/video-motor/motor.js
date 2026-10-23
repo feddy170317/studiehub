@@ -451,7 +451,7 @@ function slut(k, kilde, naeste, id) {
   bubble(k, 'Kort sagt', 200, 140, 64, 'blue', t - 0.1, t + 0.9);
   kilde.split(' · ').forEach((kl, i) => text(k, (i ? '' : 'Kilde: ') + kl, i ? 290 : 200, 640 + i * 40, 30, 'black', t + 0.4 + i * 0.6, t + 1.2 + i * 0.6));
   if (naeste) {
-    const tn = /næste/i.test(L.text) ? BP.wt(id, 'næste') - 0.15 : L.start + (L.end - L.start) * 0.6;
+    const tn = /(^|\s)næste([\s.,:]|$)/i.test(L.text) ? BP.wt(id, 'næste') - 0.15 : L.start + (L.end - L.start) * 0.6;
     const n = text(k, 'Næste: ' + naeste, 200, 570, 38, 'red', tn, tn + 1.1);
     under(n, 'red', tn + 1.05, tn + 1.25);
   }

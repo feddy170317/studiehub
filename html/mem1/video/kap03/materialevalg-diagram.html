@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Materialevalg og materialediagrammer · video</title>
+<meta name="description" content="Afvejning af egenskaber, specifik styrke og stivhed, materialediagrammer og eksemplet fra slide 30.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 3: videoer</a><h1>Materialevalg og materialediagrammer</h1><span class="meta">MEM1 · kapitel 3 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Materialevalg og materialediagrammer"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Afvejning af egenskaber, specifik styrke og stivhed, materialediagrammer og eksemplet fra slide 30.</p><div class="chips"><a href="../../Kapitel03_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l03">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Materialevalg og materialediagrammer (MEM1 kap. 3, slides 25–30 og 37). Eksempel slide 30: 600/2700 = 0,222 · 1000/7800 = 0,128
+BP.scene({ header: 'MEM1 · kap. 3' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, axes, ell, hatch, frac, PI, TAU } = B;
+
+  B.titel(0, 'Materialevalg', 'MEM1 · kapitel 3 · begreb (slide 25–30, 37)', 'titel');
+  text(0, 'ikke den største enkelte egenskab', 640, 520, 40, 'red', wt('titel', 'sjældent') - 0.2, we('titel', 'egenskab'), { align: 'center' });
+
+  B.goto('afvejning', 1);
+  {
+    const t0 = L('afvejning').start, cx = 400, cy = 380, R = 190;
+    const eg = [['styrke', 'Styrke'], ['stivhed', 'stivhed'], ['lav densitet', 'densitet'], ['sejhed', 'sejhed'], ['pris', 'pris'], ['fremstilling', 'fremstilling']];
+    eg.forEach(([s, w], i) => {
+      const an = -PI / 2 + i * TAU / 6, x = cx + R * Math.cos(an), y = cy + R * Math.sin(an), t = wt('afvejning', w) - 0.2;
+      line(1, [[cx, cy], [x * 0.85 + cx * 0.15, y * 0.85 + cy * 0.15]], 'black', 2, t, t + 0.3, { alpha: 0.6 });
+      text(1, s, x, y + 10, 32, 'blue', t, t + 0.5, { align: 'center' });
+    });
+    text(1, 'afvej!', cx, cy + 14, 40, 'red', wt('afvejning', 'afvejes') - 0.2, we('afvejning', 'hinanden'), { align: 'center' });
+    const ts = L('specifik').start;
+    text(1, 'Letvægt:', 760, 250, 38, 'black', ts, wt('specifik', 'Specifik'));
+    text(1, 'specifik styrke = S / ρ', 760, 330, 40, 'red', wt('specifik', 'Specifik') - 0.1, we('specifik', 'rho'));
+    text(1, 'specifik stivhed = E / ρ', 760, 410, 40, 'red', wt('specifik', 'specifik', 1) - 0.1, we('specifik', 'rho', 1));
+  }
+
+  B.goto('diagram', 2);
+  {
+    const ox = 170, oy = 620, t0 = L('diagram').start;
+    axes(2, ox, oy, 900, 130, 'ρ', 'S', t0);
+    const sky = [['skum', 'skum', 260, 560, 70, 40], ['polymerer', 'polymerer', 380, 430, 90, 60], ['metaller', 'metaller', 660, 270, 120, 70], ['keramik', 'keramik', 600, 170, 100, 45]];
+    sky.forEach(([s, w, x, y, rx, ry]) => {
+      const t = wt('retning', w) - 0.2;
+      line(2, ell(x, y, rx, ry, 0, TAU), 'blue', 2.8, t, t + 0.5);
+      text(2, s, x, y + 10, 28, 'blue', t + 0.2, t + 0.6, { align: 'center' });
+    });
+    const tg = wt('retning', 'gode') - 0.2;
+    arrow(2, [[560, 520], [300, 230]], 'red', 4.4, tg, tg + 0.6);
+    text(2, 'bedre S/ρ', 250, 210, 34, 'red', tg + 0.4, we('retning', 'densitet'));
+    const tb = L('brug').start;
+    text(2, 'finder kandidater,', 900, 300, 30, 'black', tb, we('brug', 'kandidater'));
+    text(2, 'ikke det endelige valg', 900, 345, 30, 'black', wt('brug', 'ikke') - 0.1, we('brug', 'beslutning'));
+    text(2, 'intet program:', 900, 440, 30, 'green', wt('brug', 'EduPack') - 0.4, we('brug', 'programmer'));
+    text(2, 'læs akserne,', 900, 485, 30, 'green', wt('brug', 'læse') - 0.1, we('brug', 'akserne'));
+    text(2, 'forklar afvejningen', 900, 530, 30, 'green', wt('brug', 'forklare') - 0.1, we('brug', 'afvejningen'));
+  }
+
+  B.goto('eks', 3);
+  {
+    const t0 = L('eks').start;
+    bubble(3, 'Eksempel (slide 30)', 150, 140, 52, 'blue', t0, t0 + 0.8);
+    text(3, 'A:  S = 600 MPa,   ρ = 2700 kg/m³', 170, 230, 38, 'black', wt('eks', 'A') - 0.1, we('eks', 'hundrede', 1));
+    text(3, 'B:  S = 1000 MPa,   ρ = 7800 kg/m³', 170, 290, 38, 'black', wt('eks', 'B') - 0.1, we('eks', 'hundrede', 2));
+    text(3, 'S/ρ:   A = 600/2700 = 0,222', 170, 380, 40, 'blue', wt('eks2', 'A') - 0.1, we('eks2', 'to', 3));
+    text(3, 'B = 1000/7800 = 0,128', 330, 440, 40, 'blue', wt('eks2', 'B') - 0.1, we('eks2', 'et') + 0.6);
+    const k = text(3, 'B stærkest, men A vinder til letvægt', 170, 530, 40, 'red', L('konkl').start, we('konkl', 'A', 1));
+    under(k, 'red', we('konkl', 'A', 1), we('konkl', 'A', 1) + 0.3);
+    text(3, 'spørg: last · styrke · stivhed · miljø · vægt · fremstilling · pris', 170, 630, 28, 'black', L('spoergsmaal').start, we('spoergsmaal', 'koste'));
+  }
+
+  B.goto('tjek_q', 4);
+  B.tjek(4, ['Samme E/ρ, men det ene', 'er halvt så tungt. Og E?'], ['det lette har halvt så stort E', 'E/ρ ens ⇒ halv ρ = halv E'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 5);
+  B.slut(5, 'Abou-Hayt (2026), MEM1 Chapter 3, slide 25–30 og 37 · Hamrock, Schmid & Jacobson, kap. 3', 'fremstilling og materialevalg', 'slut');
+  text(5, 'afvej egenskaberne', 200, 270, 42, 'blue', L('slut').start + 0.4, we('slut', 'egenskaberne'));
+  text(5, 'letvægt: S/ρ og E/ρ', 200, 350, 42, 'red', wt('slut', 'S') - 0.1, we('slut', 'letvægt'));
+  text(5, 'diagram → kandidater', 200, 430, 42, 'green', wt('slut', 'diagrammet') - 0.1, we('slut', 'kandidater'));
+});
+
+</script>
+<script>BP.live({"duration":131.924,"audio":"materialevalg-diagram.mp3","order":["titel","afvejning","specifik","diagram","retning","brug","eks","eks2","konkl","spoergsmaal","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.575,"words":[["Materialevalg",0.64,1.607],["og",1.607,1.761],["materialediagrammer",1.761,3.089],["Det",3.966,4.044],["bedste",4.044,4.392],["materiale",4.392,5.036],["er",5.036,5.165],["sjældent",5.165,5.564],["det",5.564,5.706],["med",5.706,5.861],["den",5.861,6.028],["største",6.028,6.505],["enkelte",6.505,6.905],["egenskab",6.905,7.575]],"text":"Materialevalg og materialediagrammer. Det bedste materiale er sjældent det med den største enkelte egenskab."},"afvejning":{"start":8.818,"end":18.071,"words":[["Et",8.958,9.048],["materiale",9.048,9.718],["er",9.718,9.834],["sjældent",9.834,10.221],["bedst",10.221,10.53],["i",10.53,10.711],["alt",10.711,11.072],["Styrke",11.962,12.581],["stivhed",12.697,13.38],["lav",13.522,13.805],["densitet",13.805,14.54],["sejhed",14.681,15.39],["pris",15.532,15.88],["og",15.88,15.983],["fremstilling",15.983,16.601],["skal",16.602,16.795],["afvejes",16.795,17.297],["mod",17.297,17.491],["hinanden",17.491,18.071]],"text":"Et materiale er sjældent bedst i alt. Styrke, stivhed, lav densitet, sejhed, pris og fremstilling skal afvejes mod hinanden."},"specifik":{"start":19.296,"end":28.149,"words":[["Til",19.423,19.629],["letvægtsdesign",19.63,20.583],["bruger",20.583,20.931],["vi",20.931,21.073],["to",21.073,21.343],["forhold",21.343,21.872],["Specifik",22.775,23.342],["styrke",23.342,23.845],["er",23.845,24.064],["S",24.064,24.309],["divideret",24.309,24.811],["med",24.811,24.94],["rho",24.94,25.34],["og",25.482,25.662],["specifik",25.662,26.19],["stivhed",26.19,26.68],["er",26.68,26.848],["E",26.848,27.054],["divideret",27.054,27.685],["med",27.685,27.827],["rho",27.827,28.149]],"text":"Til letvægtsdesign bruger vi to forhold. Specifik styrke er S divideret med rho, og specifik stivhed er E divideret med rho."},"diagram":{"start":29.366,"end":36.336,"words":[["Et",29.506,29.622],["todimensionelt",29.622,30.357],["materialediagram",30.357,31.529],["viser",31.529,31.942],["to",31.942,32.238],["egenskaber",32.238,32.741],["på",32.741,32.895],["én",32.895,33.127],["gang",33.127,33.501],["for",33.643,33.81],["eksempel",33.81,34.236],["styrke",34.236,34.571],["op",34.571,34.919],["ad",34.919,35.086],["og",35.086,35.228],["densitet",35.228,35.808],["hen",35.808,36.014],["ad",36.014,36.336]],"text":"Et todimensionelt materialediagram viser to egenskaber på én gang, for eksempel styrke op ad og densitet hen ad."},"retning":{"start":37.564,"end":49.007,"words":[["Materialeklasserne",37.704,38.774],["ligger",38.774,39.096],["som",39.096,39.289],["skyer",39.289,39.843],["skum",39.985,40.385],["nederst",40.385,40.681],["til",40.681,40.784],["venstre",40.784,41.39],["så",41.532,41.751],["polymerer",41.751,42.446],["metaller",42.588,43.284],["og",43.284,43.4],["keramik",43.4,44.044],["Den",44.935,45.077],["gode",45.077,45.322],["retning",45.322,45.747],["er",45.747,45.902],["op",45.902,46.121],["mod",46.121,46.353],["venstre",46.353,46.971],["høj",47.113,47.487],["styrke",47.487,47.925],["ved",47.925,48.067],["lav",48.067,48.324],["densitet",48.324,49.007]],"text":"Materialeklasserne ligger som skyer: skum nederst til venstre, så polymerer, metaller og keramik. Den gode retning er op mod venstre, høj styrke ved lav densitet."},"brug":{"start":50.25,"end":60.804,"words":[["Diagrammet",50.364,50.919],["bruges",50.919,51.215],["til",51.215,51.344],["at",51.344,51.395],["finde",51.395,51.679],["kandidater",51.679,52.542],["ikke",52.658,52.929],["til",52.929,53.109],["den",53.109,53.367],["endelige",53.367,53.741],["beslutning",53.741,54.475],["I",55.366,55.43],["skal",55.43,55.585],["ikke",55.585,55.83],["bruge",55.83,56.139],["EduPack",56.139,56.771],["eller",56.771,57.054],["andre",57.054,57.389],["programmer",57.389,58.046],["men",58.188,58.394],["kunne",58.394,58.536],["læse",58.536,58.871],["akserne",58.871,59.399],["og",59.399,59.528],["forklare",59.528,60.018],["afvejningen",60.018,60.804]],"text":"Diagrammet bruges til at finde kandidater, ikke til den endelige beslutning. I skal ikke bruge EduPack eller andre programmer, men kunne læse akserne og forklare afvejningen."},"eks":{"start":62.024,"end":74.769,"words":[["Et",62.164,62.267],["eksempel",62.267,62.912],["fra",62.912,63.079],["slides",63.079,63.685],["Materiale",64.588,65.181],["A",65.181,65.49],["har",65.49,65.658],["styrken",65.658,66.148],["seks",66.148,66.444],["hundrede",66.444,66.676],["megapascal",66.676,67.475],["og",67.475,67.578],["densiteten",67.578,68.403],["to",68.403,68.686],["tusind",68.686,69.086],["syv",69.086,69.382],["hundrede",69.382,69.898],["Materiale",70.8,71.328],["B",71.328,71.65],["har",71.65,71.844],["tusind",71.844,72.204],["megapascal",72.204,73.042],["og",73.042,73.171],["syv",73.171,73.467],["tusind",73.467,73.931],["otte",73.931,74.253],["hundrede",74.253,74.769]],"text":"Et eksempel fra slides. Materiale A har styrken seks hundrede megapascal og densiteten to tusind syv hundrede. Materiale B har tusind megapascal og syv tusind otte hundrede."},"eks2":{"start":76.006,"end":85.657,"words":[["A",76.146,76.288],["giver",76.288,76.559],["seks",76.559,76.868],["hundrede",76.868,77.1],["divideret",77.1,77.744],["med",77.744,78.028],["to",78.028,78.285],["tusind",78.285,78.556],["syv",78.556,78.788],["hundrede",78.788,79.355],["altså",79.445,79.845],["nul",79.845,80.077],["komma",80.077,80.412],["to",80.412,80.669],["to",80.669,80.888],["to.",80.888,81.12],["B",81.12,81.455],["giver",81.455,81.713],["tusind",81.713,82.061],["divideret",82.061,82.705],["med",82.705,82.925],["syv",82.925,83.221],["tusind",83.221,83.53],["otte",83.53,83.814],["hundrede",83.814,84.355],["altså",84.445,84.819],["nul",84.819,85.051],["komma",85.051,85.489],["et",85.489,85.657]],"text":"A giver seks hundrede divideret med to tusind syv hundrede, altså nul komma to to to. B giver tusind divideret med syv tusind otte hundrede, altså nul komma et to otte."},"konkl":{"start":81.036,"end":88.523,"words":[["B",81.163,81.331],["har",81.331,81.473],["den",81.473,81.64],["største",81.64,82.04],["styrke",82.04,82.607],["men",82.684,82.967],["A",82.967,83.225],["har",83.225,83.444],["den",83.444,83.599],["største",83.599,84.024],["specifikke",84.024,84.63],["styrke",84.63,85.158],["Til",86.049,86.229],["en",86.229,86.332],["let",86.332,86.5],["konstruktion",86.5,87.325],["vinder",87.325,87.789],["A.",87.789,88.523]],"text":"B har den største styrke, men A har den største specifikke styrke. Til en let konstruktion vinder A."},"spoergsmaal":{"start":89.738,"end":100.716,"words":[["Stil",89.852,90.239],["altid",90.239,90.587],["de",90.587,90.664],["samme",90.664,90.974],["spørgsmål",90.974,91.682],["hvilke",91.811,92.211],["laster",92.211,92.765],["hvilken",92.881,93.293],["styrke",93.293,93.718],["og",93.718,93.783],["stivhed",93.783,94.35],["hvilken",94.479,94.955],["temperatur",94.956,95.626],["og",95.626,95.754],["hvilket",95.754,96.09],["miljø",96.09,96.631],["er",96.824,96.94],["vægten",96.94,97.314],["vigtig",97.314,97.816],["hvordan",97.958,98.345],["skal",98.345,98.551],["emnet",98.551,98.873],["fremstilles",98.873,99.595],["og",99.749,99.852],["hvad",99.852,99.981],["må",99.981,100.097],["det",100.097,100.175],["koste",100.175,100.716]],"text":"Stil altid de samme spørgsmål: hvilke laster, hvilken styrke og stivhed, hvilken temperatur og hvilket miljø, er vægten vigtig, hvordan skal emnet fremstilles, og hvad må det koste?"},"tjek_q":{"start":101.944,"end":110.887,"words":[["Tjek",102.045,102.367],["dig",102.367,102.547],["selv",102.547,102.985],["To",103.877,104.096],["materialer",104.096,104.715],["har",104.715,104.934],["samme",104.934,105.294],["specifikke",105.294,105.874],["stivhed",105.874,106.416],["men",106.557,106.751],["det",106.751,106.892],["ene",106.892,107.253],["er",107.253,107.382],["halvt",107.382,107.64],["så",107.64,107.795],["tungt",107.795,108.246],["Hvordan",109.122,109.534],["er",109.534,109.702],["deres",109.702,110.075],["E-moduler",110.075,110.887]],"text":"Tjek dig selv. To materialer har samme specifikke stivhed, men det ene er halvt så tungt. Hvordan er deres E-moduler?"},"tjek_a":{"start":114.76,"end":121.113,"words":[["Det",114.874,114.952],["lette",114.952,115.364],["har",115.364,115.635],["det",115.635,115.764],["halve",115.764,116.24],["E-modul",116.24,116.975],["E",117.879,118.072],["over",118.072,118.265],["rho",118.265,118.574],["er",118.574,118.665],["ens",118.665,119.193],["så",119.335,119.631],["halv",119.631,119.812],["rho",119.812,120.095],["betyder",120.095,120.546],["halv",120.546,120.804],["E.",120.804,121.113]],"text":"Det lette har det halve E-modul. E over rho er ens, så halv rho betyder halv E."},"slut":{"start":122.334,"end":129.51,"words":[["Kort",122.461,122.68],["sagt",122.68,123.183],["afvej",123.299,123.763],["egenskaberne",123.763,124.588],["brug",124.716,124.974],["S",124.974,125.193],["over",125.193,125.451],["rho",125.451,125.709],["og",125.709,125.747],["E",125.747,126.005],["over",126.005,126.237],["rho",126.237,126.456],["til",126.456,126.611],["letvægt",126.611,127.178],["og",127.345,127.461],["brug",127.461,127.706],["diagrammet",127.706,128.209],["til",128.209,128.363],["at",128.363,128.402],["finde",128.402,128.686],["kandidater",128.686,129.51]],"text":"Kort sagt: afvej egenskaberne, brug S over rho og E over rho til letvægt, og brug diagrammet til at finde kandidater."}}}, { audio: 'materialevalg-diagram.mp3', id: 'materialevalg-diagram' });</script>
+</body>
+</html>

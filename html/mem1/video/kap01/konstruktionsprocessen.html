@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Konstruktionsprocessen · video</title>
+<meta name="description" content="Hvad konstruktion er, maskinelementer, de seks trin i processen og forskellen på analyse og design.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 1: videoer</a><h1>Konstruktionsprocessen</h1><span class="meta">MEM1 · kapitel 1 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Konstruktionsprocessen"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Hvad konstruktion er, maskinelementer, de seks trin i processen og forskellen på analyse og design.</p><div class="chips"><a href="../../Kapitel01_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l01">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Konstruktionsprocessen (MEM1 kap. 1, slides 3–8)
+BP.scene({ header: 'MEM1 · kap. 1' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, hatch, rect, PI, TAU } = B;
+
+  B.titel(0, 'Konstruktionsprocessen', 'MEM1 · kapitel 1 · begreb (slide 3–8)', 'titel');
+  text(0, 'fra idé til et element, der holder', 640, 520, 40, 'red', wt('titel', 'idé') - 0.3, we('titel', 'holder'), { align: 'center' });
+
+  // ---------------- 1 hvad er konstruktion ----------------
+  B.goto('design', 1);
+  {
+    const t0 = L('design').start;
+    text(1, 'idé', 170, 180, 48, 'blue', t0 + 0.4, wt('design', 'idé') + 0.4);
+    arrow(1, [[260, 168], [420, 168]], 'black', 3, wt('design', 'idé') + 0.3, wt('design', 'brugbar'), 14);
+    text(1, 'maskine · komponent · system', 450, 180, 40, 'blue', wt('design', 'brugbar') - 0.1, we('design', 'system'));
+    text(1, 'tekniske + praktiske beslutninger', 170, 260, 36, 'black', wt('design', 'tekniske') - 0.2, we('design', 'beslutninger'));
+    const items = [['funktion og ydelse', 'funktion'], ['laster og driftsforhold', 'laster'], ['materiale og fremstilling', 'materiale'],
+      ['styrke og deformation', 'styrke'], ['pålidelighed og sikkerhed', 'pålidelighed'], ['pris, størrelse, vægt', 'pris']];
+    items.forEach(([s, w], i) => {
+      const x = i < 3 ? 170 : 680, y = 380 + 70 * (i % 3), t = wt('hensyn', w) - 0.2;
+      dot(1, x - 20, y - 12, 6, 'red', t);
+      text(1, s, x, y, 36, 'black', t, we('hensyn', w) + 0.6);
+    });
+  }
+
+  // ---------------- 2 maskinelementer og kæden ----------------
+  B.goto('elementer', 2);
+  {
+    const t0 = L('elementer').start;
+    text(2, 'Maskinelementer', 640, 140, 44, 'blue', t0, wt('elementer', 'grundlæggende'), { align: 'center' });
+    const cell = (i) => [230 + 410 * (i % 3), 240 + 190 * Math.floor(i / 3)];
+    const tegn = [
+      ['aksel', 'aksel', (x, y, a, b) => { line(2, [[x - 110, y - 18], [x - 20, y - 18], [x - 20, y - 30], [x + 110, y - 30], [x + 110, y + 30], [x - 20, y + 30], [x - 20, y + 18], [x - 110, y + 18], [x - 110, y - 16]], 'black', 3, a, b); }],
+      ['tandhjul', 'tandhjul', (x, y, a, b) => { const P = []; for (let j = 0; j <= 64; j++) { const an = j / 64 * TAU, r = (j % 4 < 2) ? 62 : 50; P.push([x + r * Math.cos(an), y + r * Math.sin(an)]); } line(2, P, 'black', 2.8, a, b); line(2, ell(x, y, 14, 14, 0, TAU), 'black', 2.6, b - 0.2, b); }],
+      ['leje', 'leje', (x, y, a, b) => { line(2, ell(x, y, 62, 62, 0, TAU), 'black', 3, a, a + (b - a) / 2); line(2, ell(x, y, 30, 30, 0, TAU), 'black', 3, a + (b - a) / 2, b); for (let j = 0; j < 8; j++) dot(2, x + 46 * Math.cos(j * TAU / 8), y + 46 * Math.sin(j * TAU / 8), 8, 'blue', b - 0.1 + j * 0.02); }],
+      ['bolt', 'bolt', (x, y, a, b) => { line(2, [[x - 90, y - 34], [x - 50, y - 34], [x - 50, y + 34], [x - 90, y + 34], [x - 90, y - 32]], 'black', 3, a, a + (b - a) * 0.4); line(2, [[x - 50, y - 16], [x + 100, y - 16], [x + 100, y + 16], [x - 50, y + 16]], 'black', 3, a + (b - a) * 0.4, b); hatch(2, rect(x + 20, y - 16, 80, 32), 'black', b - 0.2, b, { gap: 8, ang: PI / 3 }); }],
+      ['fjeder', 'fjeder', (x, y, a, b) => { const P = [[x - 110, y]]; for (let j = 0; j < 9; j++) P.push([x - 95 + j * 23, y + (j % 2 ? 34 : -34)]); P.push([x + 110, y]); line(2, P, 'black', 3, a, b); }],
+      ['kobling', 'kobling', (x, y, a, b) => { line(2, [[x - 110, y - 14], [x - 20, y - 14]], 'black', 3, a, a + 0.15); line(2, [[x - 20, y - 50], [x - 6, y - 50], [x - 6, y + 50], [x - 20, y + 50], [x - 20, y - 48]], 'black', 3, a + 0.1, a + 0.3); line(2, [[x + 6, y - 50], [x + 20, y - 50], [x + 20, y + 50], [x + 6, y + 50], [x + 6, y - 48]], 'black', 3, a + 0.2, a + 0.4); line(2, [[x + 20, y - 14], [x + 110, y - 14]], 'black', 3, a + 0.3, b); line(2, [[x - 110, y + 14], [x - 20, y + 14]], 'black', 3, a + 0.1, b); line(2, [[x + 20, y + 14], [x + 110, y + 14]], 'black', 3, a + 0.2, b); }],
+    ];
+    tegn.forEach(([navn, w, f], i) => {
+      const [x, y] = cell(i), t = wt('elementer', w) - 0.15;
+      f(x, y, t, t + 0.6);
+      text(2, navn, x, y + 92, 32, 'blue', t + 0.2, t + 0.6, { align: 'center' });
+    });
+    const kaede = [['funktion', 'funktion'], ['last', 'last'], ['materiale', 'materiale'], ['geometri', 'geometri', 1], ['spænding, levetid', 'levetid'], ['verifikation', 'verifikation']];
+    let x = 120;
+    kaede.forEach(([s, w, n], i) => {
+      const t = wt('kaede', w, n || 0) - 0.2;
+      if (i) { arrow(2, [[x, 660], [x + 30, 660]], 'black', 2.4, t - 0.2, t, 11); x += 40; }
+      const it = text(2, s, x, 672, 27, i === 5 ? 'red' : 'black', t, t + 0.5);
+      x = B.endX(it, 10);
+    });
+  }
+
+  // ---------------- 3 processen som løkke ----------------
+  B.goto('proces', 3);
+  {
+    const cx = 420, cy = 400, R = 210, t0 = L('proces').start;
+    bubble(3, 'Seks trin', 760, 150, 54, 'blue', t0, t0 + 0.8);
+    const trin = [['Definér', 'Definér'], ['Koncept', 'koncept'], ['Analysér', 'Analysér'], ['Dimensionér', 'Dimensionér'], ['Evaluér', 'Evaluér'], ['Forfin', 'forfin']];
+    trin.forEach(([s, w], i) => {
+      const an = -PI / 2 + i * TAU / 6, x = cx + R * Math.cos(an), y = cy + R * Math.sin(an), t = wt('proces', w) - 0.2;
+      line(3, ell(x, y, 92, 40, 0, TAU), i === 5 ? 'red' : 'blue', 2.8, t, t + 0.5);
+      text(3, s, x, y + 12, 30, i === 5 ? 'red' : 'blue', t + 0.2, t + 0.6, { align: 'center' });
+      const a0 = an + 0.42, a1 = an + TAU / 6 - 0.42;
+      if (i < 5) { const P = ell(cx, cy, R, R, a0, a1); line(3, P, 'black', 2.4, t + 0.5, t + 0.8); line(3, B.head(B.seg(P, 3), 13, 0.5), 'black', 2.4, t + 0.8, t + 0.85); }
+    });
+    const ex = [['hvad skal elementet gøre?', 'Definér'], ['hvilken type element?', 'koncept'], ['laster og spændinger', 'Analysér'], ['materiale og mål', 'Dimensionér'], ['styrke, stivhed, levetid', 'Evaluér'], ['ændr, hvis kravene ikke holder', 'forfin']];
+    ex.forEach(([s, w], i) => text(3, s, 760, 250 + 58 * i, 30, 'black', wt('proces', w) + 0.2, we('proces', w) + 1.2));
+    const ti = L('iterativ').start;
+    const P = ell(cx, cy, R, R, -PI / 2 + 5 * TAU / 6 + 0.42, -PI / 2 + TAU - 0.42);
+    line(3, P, 'red', 3.4, ti, ti + 0.8); line(3, B.head(B.seg(P, 3), 15, 0.5), 'red', 3.4, ti + 0.8, ti + 0.9);
+    text(3, 'iterér', cx, cy + 12, 44, 'red', wt('iterativ', 'iterativ') - 0.2, we('iterativ', 'iterativ') + 0.3, { align: 'center' });
+    text(3, 'flere gange rundt i løkken', 760, 630, 32, 'red', wt('iterativ', 'flere') - 0.1, we('iterativ', 'løkken'));
+  }
+
+  // ---------------- 4 krav og analyse mod design ----------------
+  B.goto('krav', 4);
+  {
+    const t0 = L('krav').start;
+    const krav = ['funktion', 'styrke', 'stivhed', 'levetid', 'sikkerhed', 'pris'];
+    text(4, 'Krav på samme tid:', 140, 150, 38, 'black', t0, wt('krav', 'funktion'));
+    krav.forEach((k, i) => text(4, k, 140 + 180 * i, 220, 32, 'red', wt('krav', k) - 0.1, we('krav', k) + 0.3));
+    const ta = wt('analyse', 'analyse', 1) - 0.2, td = wt('analyse', 'design', 1) - 0.2;
+    box(4, 120, 300, 480, 340, 'blue', ta, ta + 0.6);
+    bubble(4, 'Analyse', 360, 360, 44, 'blue', ta + 0.2, ta + 0.8, { align: 'center' });
+    text(4, 'givet:', 150, 430, 30, 'black', wt('analyse', 'kender') - 0.1, wt('analyse', 'kender') + 0.2);
+    text(4, 'geometri + materiale + last', 150, 480, 32, 'black', wt('analyse', 'geometri') - 0.1, we('analyse', 'last'));
+    text(4, 'find:', 150, 550, 30, 'black', wt('analyse', 'finder') - 0.1, wt('analyse', 'finder') + 0.2);
+    text(4, 'spænding, deformation', 150, 600, 32, 'red', wt('analyse', 'spænding') - 0.1, we('analyse', 'deformation'));
+    box(4, 680, 300, 480, 340, 'green', td, td + 0.6);
+    bubble(4, 'Design', 920, 360, 44, 'green', td + 0.2, td + 0.8, { align: 'center' });
+    text(4, 'givet:', 710, 430, 30, 'black', wt('analyse', 'kender', 1) - 0.1, wt('analyse', 'kender', 1) + 0.2);
+    text(4, 'funktion + last + krav', 710, 480, 32, 'black', wt('analyse', 'funktion') - 0.1, we('analyse', 'krav'));
+    text(4, 'find:', 710, 550, 30, 'black', wt('analyse', 'finde') - 0.1, wt('analyse', 'finde') + 0.2);
+    text(4, 'geometri + materiale', 710, 600, 32, 'red', wt('analyse', 'geometri', 1) - 0.1, we('analyse', 'materiale', 1));
+  }
+
+  B.goto('tjek_q', 5);
+  B.tjek(5, ['d og lasten er kendt, du finder σ.', 'Analyse eller design?'], ['Analyse.', 'design = at finde d'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 6);
+  B.slut(6, 'Abou-Hayt (2026), MEM1 Chapter 1, slide 3–8 · Hamrock, Schmid & Jacobson, kap. 1', 'laster og brudformer', 'slut');
+  text(6, 'definér → koncept → analysér → dimensionér → evaluér → forfin', 200, 290, 28, 'blue', L('slut').start + 0.4, we('slut', 'forfin'));
+  text(6, 'en løkke mellem analyse og design', 200, 370, 40, 'red', wt('slut', 'løkke') - 0.2, we('slut', 'design', 1));
+});
+
+</script>
+<script>BP.live({"duration":141.27,"audio":"konstruktionsprocessen.mp3","order":["titel","design","hensyn","elementer","kaede","proces","iterativ","krav","analyse","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":6.621,"words":[["Konstruktionsprocessen",0.64,2.019],["Hvordan",2.897,3.219],["går",3.219,3.399],["man",3.4,3.58],["fra",3.58,3.76],["en",3.76,3.85],["idé",3.85,4.16],["til",4.16,4.327],["et",4.327,4.392],["maskinelement",4.392,5.255],["der",5.397,5.526],["virker",5.526,6.003],["og",6.003,6.131],["holder",6.131,6.621]],"text":"Konstruktionsprocessen. Hvordan går man fra en idé til et maskinelement, der virker og holder?"},"design":{"start":7.834,"end":16.726,"words":[["Konstruktion",7.961,8.657],["er",8.657,8.812],["at",8.812,8.941],["omsætte",8.941,9.495],["en",9.495,9.598],["idé",9.598,9.894],["til",9.894,10.049],["en",10.049,10.152],["brugbar",10.152,10.564],["maskine",10.564,11.196],["komponent",11.338,12.046],["eller",12.046,12.291],["et",12.291,12.407],["system",12.407,13.0],["Det",13.891,13.955],["kræver",13.955,14.29],["både",14.29,14.587],["tekniske",14.587,15.244],["og",15.244,15.373],["praktiske",15.373,15.94],["beslutninger",15.94,16.726]],"text":"Konstruktion er at omsætte en idé til en brugbar maskine, komponent eller et system. Det kræver både tekniske og praktiske beslutninger."},"hensyn":{"start":17.952,"end":28.878,"words":[["Vi",18.092,18.182],["skal",18.182,18.324],["tænke",18.324,18.646],["på",18.646,18.827],["funktion",18.827,19.316],["og",19.316,19.419],["ydelse",19.42,20.064],["laster",20.18,20.721],["og",20.721,20.824],["driftsforhold",20.824,21.649],["materiale",21.791,22.512],["og",22.512,22.615],["fremstilling",22.615,23.35],["styrke",23.479,23.968],["og",23.968,24.072],["deformation",24.072,24.858],["pålidelighed",24.999,25.618],["og",25.618,25.644],["sikkerhed",25.644,26.249],["og",26.404,26.533],["til",26.533,26.662],["sidst",26.662,26.997],["pris",26.997,27.461],["størrelse",27.602,28.298],["og",28.298,28.453],["vægt",28.453,28.878]],"text":"Vi skal tænke på funktion og ydelse, laster og driftsforhold, materiale og fremstilling, styrke og deformation, pålidelighed og sikkerhed, og til sidst pris, størrelse og vægt."},"elementer":{"start":30.11,"end":38.227,"words":[["Et",30.237,30.366],["maskinelement",30.366,31.152],["er",31.152,31.268],["en",31.268,31.371],["grundlæggende",31.371,31.874],["komponent",31.874,32.608],["for",32.75,32.918],["eksempel",32.918,33.343],["en",33.343,33.459],["aksel",33.459,34.052],["et",34.193,34.348],["tandhjul",34.348,34.98],["et",35.121,35.289],["leje",35.289,35.766],["en",35.907,36.101],["bolt",36.101,36.513],["en",36.668,36.822],["fjeder",36.822,37.157],["eller",37.157,37.492],["en",37.492,37.647],["kobling",37.647,38.227]],"text":"Et maskinelement er en grundlæggende komponent, for eksempel en aksel, et tandhjul, et leje, en bolt, en fjeder eller en kobling."},"kaede":{"start":39.46,"end":50.025,"words":[["Konstruktionen",39.6,40.335],["af",40.335,40.489],["et",40.489,40.567],["element",40.567,41.018],["forbinder",41.018,41.456],["funktionen",41.456,42.165],["med",42.165,42.345],["den",42.345,42.538],["endelige",42.538,42.925],["geometri",42.925,43.647],["funktion",43.775,44.458],["last",44.6,45.193],["materiale",45.335,46.134],["geometri",46.275,46.997],["spænding",47.139,47.641],["og",47.641,47.77],["levetid",47.77,48.402],["og",48.582,48.711],["til",48.711,48.84],["sidst",48.84,49.162],["verifikation",49.162,50.025]],"text":"Konstruktionen af et element forbinder funktionen med den endelige geometri: funktion, last, materiale, geometri, spænding og levetid, og til sidst verifikation."},"proces":{"start":51.258,"end":71.284,"words":[["Processen",51.372,51.939],["har",51.939,52.12],["seks",52.12,52.468],["trin",52.468,52.932],["Definér",53.796,54.492],["hvad",54.634,54.943],["elementet",54.943,55.497],["skal",55.497,55.69],["gøre",55.69,56.257],["Find",57.121,57.494],["et",57.494,57.623],["koncept",57.623,58.268],["Analysér",59.17,59.699],["laster",59.699,60.266],["og",60.266,60.382],["spændinger",60.382,61.065],["Dimensionér",61.954,62.701],["med",62.701,62.92],["materiale",62.92,63.616],["og",63.616,63.771],["mål",63.771,64.209],["Evaluér",65.124,65.588],["styrke",65.588,66.155],["stivhed",66.297,66.915],["og",66.915,67.018],["levetid",67.018,67.74],["Og",68.655,68.719],["forfin",68.719,69.325],["hvis",69.467,69.673],["kravene",69.673,70.163],["ikke",70.163,70.485],["er",70.485,70.639],["opfyldt",70.639,71.284]],"text":"Processen har seks trin. Definér, hvad elementet skal gøre. Find et koncept. Analysér laster og spændinger. Dimensionér med materiale og mål. Evaluér styrke, stivhed og levetid. Og forfin, hvis kravene ikke er opfyldt."},"iterativ":{"start":72.512,"end":79.213,"words":[["Det",72.613,72.832],["er",72.832,72.999],["en",72.999,73.244],["iterativ",73.244,73.901],["proces",73.901,74.533],["Man",75.437,75.579],["går",75.579,75.824],["ofte",75.824,76.12],["flere",76.12,76.417],["gange",76.417,76.7],["rundt",76.7,76.932],["i",76.932,76.984],["løkken",76.984,77.473],["før",77.602,77.86],["designet",77.86,78.427],["er",78.427,78.556],["godt",78.556,78.814],["nok",78.814,79.213]],"text":"Det er en iterativ proces. Man går ofte flere gange rundt i løkken, før designet er godt nok."},"krav":{"start":80.446,"end":88.099,"words":[["Et",80.573,80.676],["maskinelement",80.676,81.411],["skal",81.411,81.604],["opfylde",81.604,82.081],["mange",82.081,82.39],["krav",82.39,82.661],["på",82.661,82.751],["samme",82.751,83.099],["tid",83.099,83.473],["funktion",83.602,84.298],["styrke",84.439,85.084],["stivhed",85.225,85.87],["levetid",86.011,86.707],["sikkerhed",86.849,87.468],["og",87.468,87.596],["pris",87.597,88.099]],"text":"Et maskinelement skal opfylde mange krav på samme tid: funktion, styrke, stivhed, levetid, sikkerhed og pris."},"analyse":{"start":89.316,"end":104.316,"words":[["Bemærk",89.443,89.765],["forskellen",89.766,90.332],["på",90.332,90.526],["analyse",90.526,91.17],["og",91.17,91.325],["design",91.325,91.93],["Ved",92.834,92.976],["analyse",92.976,93.465],["kender",93.465,93.788],["vi",93.788,94.007],["geometri",94.007,94.767],["materiale",94.909,95.63],["og",95.63,95.695],["last",95.695,96.223],["og",96.391,96.494],["vi",96.494,96.61],["finder",96.61,96.868],["spænding",96.868,97.409],["og",97.409,97.538],["deformation",97.538,98.311],["Ved",99.213,99.329],["design",99.329,99.754],["kender",99.754,100.063],["vi",100.063,100.205],["funktion",100.205,100.888],["last",101.017,101.455],["og",101.455,101.52],["krav",101.52,101.958],["og",102.1,102.241],["vi",102.241,102.331],["skal",102.331,102.512],["finde",102.512,102.795],["geometri",102.795,103.44],["og",103.44,103.543],["materiale",103.543,104.316]],"text":"Bemærk forskellen på analyse og design. Ved analyse kender vi geometri, materiale og last, og vi finder spænding og deformation. Ved design kender vi funktion, last og krav, og vi skal finde geometri og materiale."},"tjek_q":{"start":105.53,"end":113.623,"words":[["Tjek",105.631,105.953],["dig",105.953,106.133],["selv",106.133,106.559],["Du",107.437,107.515],["kender",107.515,107.85],["akslens",107.85,108.339],["diameter",108.339,108.906],["og",108.906,108.958],["lasten",108.958,109.551],["og",109.551,109.692],["beregner",109.692,110.131],["spændingen",110.131,110.814],["Er",111.703,111.806],["det",111.806,111.999],["analyse",111.999,112.759],["eller",112.759,113.017],["design",113.017,113.623]],"text":"Tjek dig selv. Du kender akslens diameter og lasten og beregner spændingen. Er det analyse eller design?"},"tjek_a":{"start":117.506,"end":126.616,"words":[["Det",117.607,117.852],["er",117.852,118.006],["analyse",118.006,118.844],["Geometri",119.735,120.418],["materiale",120.547,121.295],["og",121.295,121.385],["last",121.385,121.733],["er",121.733,121.784],["givet",121.784,122.287],["og",122.429,122.532],["du",122.532,122.648],["finder",122.648,122.957],["spændingen",122.957,123.588],["Design",124.451,124.941],["ville",124.941,125.16],["være",125.16,125.405],["at",125.405,125.43],["finde",125.431,125.778],["diameteren",125.778,126.616]],"text":"Det er analyse. Geometri, materiale og last er givet, og du finder spændingen. Design ville være at finde diameteren."},"slut":{"start":127.84,"end":138.858,"words":[["Kort",127.967,128.199],["sagt",128.199,128.702],["definér",128.831,129.501],["koncept",129.643,130.3],["analysér",130.454,131.215],["dimensionér",131.357,132.22],["evaluér",132.4,133.032],["og",133.032,133.161],["forfin",133.161,133.805],["Design",134.696,135.134],["er",135.134,135.301],["en",135.301,135.392],["løkke",135.392,135.843],["der",135.984,136.1],["hele",136.1,136.397],["tiden",136.397,136.693],["skifter",136.693,137.054],["mellem",137.054,137.363],["analyse",137.363,138.098],["og",138.098,138.252],["design",138.252,138.858]],"text":"Kort sagt: definér, koncept, analysér, dimensionér, evaluér og forfin. Design er en løkke, der hele tiden skifter mellem analyse og design."}}}, { audio: 'konstruktionsprocessen.mp3', id: 'konstruktionsprocessen' });</script>
+</body>
+</html>

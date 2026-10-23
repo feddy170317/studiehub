@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dimensionering med sikkerhedsfaktor · video</title>
+<meta name="description" content="Eget eksempel: diameter på en trækstang i S235 med n_d = 2. Resultatet er 11,4 mm, rundet op til 12 mm.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 1: videoer</a><h1>Dimensionering med sikkerhedsfaktor</h1><span class="meta">MEM1 · kapitel 1 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Dimensionering med sikkerhedsfaktor"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Eget eksempel: diameter på en trækstang i S235 med n_d = 2. Resultatet er 11,4 mm, rundet op til 12 mm.</p><div class="chips"><a href="sikkerhedsfaktor.html">Se først: Sikkerhedsfaktor</a><a href="../../Kapitel01_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l01">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Dimensionering med sikkerhedsfaktor (eget eksempel, MEM1 kap. 1 slides 12 og 17): F = 12 kN, S235, n_d = 2 → d = 11,4 → 12 mm
+BP.scene({ header: 'MEM1 · kap. 1' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, hatch, PI, TAU } = B;
+
+  B.titel(0, 'Dimensionering med n', 'MEM1 · kapitel 1 · opgave (slide 12 og 17)', 'titel');
+  text(0, 'find diameteren, så stangen holder', 640, 520, 40, 'red', wt('titel', 'diameteren') - 0.2, we('titel', 'sikkerhed'), { align: 'center' });
+
+  // ---------------- 1 data ----------------
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start;
+    line(1, [[200, 200], [700, 200], [700, 260], [200, 260], [200, 202]], 'black', 3.2, t0, t0 + 0.6);
+    arrow(1, [[704, 230], [820, 230]], 'red', 4.4, wt('data', 'tolv') - 0.3, wt('data', 'tolv') + 0.2);
+    arrow(1, [[196, 230], [90 + 40, 230]], 'red', 4.4, wt('data', 'tolv') - 0.1, wt('data', 'tolv') + 0.4);
+    text(1, 'F = 12 kN', 840, 242, 40, 'red', wt('data', 'tolv'), we('data', 'kilonewton'));
+    text(1, 'd = ?', 420, 320, 44, 'blue', t0 + 0.6, t0 + 1.0);
+    text(1, 'S235:  S_y = 235 MPa', 180, 420, 42, 'black', wt('data', 'S') - 0.1, we('data', 'megapascal'));
+    text(1, 'n_d = 2', 760, 420, 42, 'black', wt('data', 'sikkerhedsfaktor') - 0.2, we('data', 'to', 2));
+    text(1, 'eget eksempel · formler fra slide 12, kraft fra slide 17', 180, 560, 30, 'blue', L('note').start, we('note', 'sytten'));
+  }
+
+  // ---------------- 2 løsning ----------------
+  B.goto('tilladt', 2);
+  {
+    const s = 40;
+    text(2, '1)  σ_{tilladt} = S_y / n_d = 235 / 2 = 117,5 MPa', 140, 160, s, 'blue', L('tilladt').start + 0.2, we('tilladt', 'megapascal'));
+    text(2, '2)  A = F / σ_{tilladt} = 12 000 / 117,5 = 102,1 mm²', 140, 250, s, 'blue', wt('areal', 'nødvendige') - 0.2, we('areal', 'kvadratmillimeter'));
+    text(2, '3)  A = π d² / 4   ⇒   d = √(4A / π) = 11,4 mm', 140, 340, s, 'blue', wt('diameter', 'Arealet') - 0.1, we('diameter', 'millimeter'));
+    const r = text(2, '4)  vælg d = 12 mm   (rund op!)', 140, 440, 44, 'red', wt('valg', 'runder') - 0.2, we('valg', 'millimeter'));
+    text(2, 'ned ⇒ σ for høj', 900, 440, 32, 'red', wt('valg', 'aldrig') - 0.1, we('valg', 'høj'));
+    const tk = L('kontrol').start;
+    box(2, 120, 500, 1040, 150, 'green', tk, tk + 0.7);
+    text(2, 'Kontrol:  σ = 12 000 / (π · 12² / 4) = 106,1 MPa', 150, 560, 36, 'green', tk + 0.3, we('kontrol', 'megapascal'));
+    text(2, 'n = 235 / 106,1 = 2,2  >  2   ✓', 150, 620, 36, 'green', wt('kontrol', 'sikkerhedsfaktoren') - 0.1, we('kontrol', 'opfyldt'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Hvis n_d = 4,', 'hvor meget større skal A være?'], ['dobbelt så stor (σ_{tilladt} halveres)', 'd bliver √2 gange større ≈ 16 mm'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 1, slide 12 og 17 · eget eksempel med S235', '', 'slut');
+  text(4, 'σ_{tilladt} = S_y / n_d   →   A = F / σ_{tilladt}', 200, 280, 40, 'blue', L('slut').start + 0.4, we('slut', 'spænding', 1));
+  text(4, 'd = √(4A/π)   →   rund op   →   kontrollér', 200, 370, 40, 'red', wt('slut', 'find') - 0.1, we('slut', 'Kontrollér'));
+});
+
+</script>
+<script>BP.live({"duration":106.48,"audio":"opg-dimensionering-n.mp3","order":["titel","data","note","tilladt","areal","diameter","valg","kontrol","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.6,"words":[["Dimensionering",0.601,1.49],["med",1.49,1.657],["sikkerhedsfaktor",1.657,2.804],["Vi",3.722,3.825],["finder",3.825,4.108],["diameteren",4.108,4.727],["på",4.727,4.894],["en",4.894,4.972],["trækstang",4.972,5.616],["så",5.758,5.964],["den",5.964,6.106],["holder",6.106,6.363],["med",6.363,6.544],["en",6.544,6.66],["given",6.66,6.956],["sikkerhed",6.956,7.6]],"text":"Dimensionering med sikkerhedsfaktor. Vi finder diameteren på en trækstang, så den holder med en given sikkerhed."},"data":{"start":8.842,"end":18.855,"words":[["Stangen",8.956,9.485],["bærer",9.485,9.742],["tolv",9.742,10.052],["kilonewton",10.052,10.889],["Den",11.806,11.961],["er",11.961,12.128],["af",12.128,12.154],["stål",12.154,12.618],["S",12.618,12.837],["to",12.837,13.069],["tre",13.069,13.327],["fem",13.327,13.662],["med",13.662,13.894],["flydespændingen",13.894,14.628],["to",14.628,14.873],["hundrede",14.873,15.066],["og",15.066,15.079],["femogtredive",15.079,15.659],["megapascal",15.659,16.522],["og",16.664,16.896],["vi",16.896,17.012],["vil",17.012,17.128],["have",17.128,17.257],["en",17.257,17.334],["sikkerhedsfaktor",17.334,18.275],["på",18.275,18.43],["to.",18.43,18.855]],"text":"Stangen bærer tolv kilonewton. Den er af stål S to tre fem med flydespændingen to hundrede og femogtredive megapascal, og vi vil have en sikkerhedsfaktor på to."},"note":{"start":20.088,"end":25.074,"words":[["Det",20.228,20.357],["er",20.357,20.512],["et",20.512,20.641],["eget",20.641,20.924],["eksempel",20.924,21.53],["men",21.659,21.813],["det",21.813,21.891],["bruger",21.891,22.174],["formlerne",22.174,22.638],["fra",22.638,22.793],["slides",22.793,23.244],["og",23.244,23.398],["kraften",23.398,24.004],["fra",24.004,24.159],["slide",24.159,24.507],["sytten",24.507,25.074]],"text":"Det er et eget eksempel, men det bruger formlerne fra slides og kraften fra slide sytten."},"tilladt":{"start":26.294,"end":32.62,"words":[["Først",26.421,26.731],["den",26.731,26.911],["tilladte",26.911,27.285],["spænding",27.285,27.8],["to",27.916,28.174],["hundrede",28.174,28.38],["og",28.38,28.406],["femogtredive",28.406,29.012],["divideret",29.012,29.707],["med",29.707,29.926],["to",29.926,30.261],["er",30.262,30.3],["hundrede",30.3,30.545],["og",30.545,30.558],["sytten",30.558,31.048],["komma",31.048,31.37],["fem",31.37,31.692],["megapascal",31.692,32.62]],"text":"Først den tilladte spænding: to hundrede og femogtredive divideret med to er hundrede og sytten komma fem megapascal."},"areal":{"start":33.844,"end":41.252,"words":[["Så",33.958,34.165],["det",34.165,34.255],["nødvendige",34.255,34.757],["areal",34.757,35.389],["tolv",35.531,35.814],["tusind",35.814,36.098],["newton",36.098,36.6],["divideret",36.6,37.206],["med",37.206,37.451],["hundrede",37.451,37.747],["og",37.747,37.773],["sytten",37.773,38.134],["komma",38.134,38.404],["fem",38.404,38.778],["giver",38.778,39.049],["hundrede",39.049,39.281],["og",39.281,39.293],["to",39.293,39.629],["komma",39.629,40.015],["en",40.015,40.17],["kvadratmillimeter",40.17,41.252]],"text":"Så det nødvendige areal: tolv tusind newton divideret med hundrede og sytten komma fem giver hundrede og to komma en kvadratmillimeter."},"diameter":{"start":42.474,"end":52.165,"words":[["Arealet",42.601,43.168],["af",43.168,43.297],["en",43.297,43.374],["cirkel",43.374,43.877],["er",43.877,44.045],["pi",44.045,44.302],["d",44.302,44.496],["i",44.496,44.702],["anden",44.702,45.101],["over",45.101,45.372],["fire",45.372,45.887],["Diameteren",46.765,47.384],["er",47.384,47.513],["derfor",47.513,47.861],["kvadratroden",47.861,48.531],["af",48.531,48.685],["fire",48.685,49.02],["A",49.02,49.252],["over",49.252,49.51],["pi",49.51,49.948],["altså",50.09,50.515],["elleve",50.515,50.837],["komma",50.837,51.147],["fire",51.147,51.456],["millimeter",51.456,52.165]],"text":"Arealet af en cirkel er pi d i anden over fire. Diameteren er derfor kvadratroden af fire A over pi, altså elleve komma fire millimeter."},"valg":{"start":53.384,"end":60.214,"words":[["Vi",53.511,53.627],["runder",53.627,53.924],["op",53.924,54.13],["til",54.13,54.297],["et",54.297,54.375],["standardmål",54.375,55.199],["tolv",55.341,55.638],["millimeter",55.638,56.346],["Vi",57.25,57.366],["må",57.366,57.546],["aldrig",57.546,57.92],["runde",57.92,58.178],["ned",58.178,58.552],["for",58.693,58.861],["så",58.861,59.041],["bliver",59.041,59.234],["spændingen",59.235,59.711],["for",59.711,59.866],["høj",59.866,60.214]],"text":"Vi runder op til et standardmål, tolv millimeter. Vi må aldrig runde ned, for så bliver spændingen for høj."},"kontrol":{"start":61.438,"end":72.43,"words":[["Kontrol",61.578,62.029],["med",62.029,62.3],["tolv",62.3,62.57],["millimeter",62.57,63.318],["spændingen",63.447,64.001],["bliver",64.001,64.233],["hundrede",64.233,64.503],["og",64.503,64.529],["seks",64.529,64.813],["komma",64.813,65.186],["en",65.186,65.367],["megapascal",65.367,66.23],["og",66.372,66.565],["sikkerhedsfaktoren",66.565,67.648],["bliver",67.648,67.88],["to",67.88,68.15],["komma",68.15,68.408],["to.",68.408,68.833],["Det",69.75,69.904],["er",69.904,70.059],["over",70.059,70.33],["to",70.33,70.794],["så",70.935,71.193],["kravet",71.193,71.631],["er",71.631,71.786],["opfyldt",71.786,72.43]],"text":"Kontrol med tolv millimeter: spændingen bliver hundrede og seks komma en megapascal, og sikkerhedsfaktoren bliver to komma to. Det er over to, så kravet er opfyldt."},"tjek_q":{"start":73.644,"end":80.074,"words":[["Tjek",73.744,74.079],["dig",74.079,74.26],["selv",74.26,74.698],["Hvis",75.59,75.745],["vi",75.744,75.835],["krævede",75.835,76.157],["en",76.157,76.286],["sikkerhedsfaktor",76.286,77.214],["på",77.214,77.355],["fire",77.355,77.897],["hvor",78.025,78.18],["meget",78.18,78.451],["større",78.451,78.734],["skulle",78.734,78.992],["arealet",78.992,79.456],["så",79.456,79.61],["være",79.61,80.074]],"text":"Tjek dig selv. Hvis vi krævede en sikkerhedsfaktor på fire, hvor meget større skulle arealet så være?"},"tjek_a":{"start":83.94,"end":92.613,"words":[["Dobbelt",84.067,84.389],["så",84.39,84.531],["stort",84.531,85.021],["fordi",85.15,85.549],["den",85.549,85.743],["tilladte",85.743,86.142],["spænding",86.142,86.567],["halveres",86.567,87.25],["Diameteren",88.128,88.747],["bliver",88.747,88.966],["kvadratroden",88.966,89.662],["af",89.662,89.816],["to",89.816,90.1],["gange",90.1,90.345],["større",90.345,90.873],["cirka",90.989,91.427],["seksten",91.427,91.891],["millimeter",91.891,92.613]],"text":"Dobbelt så stort, fordi den tilladte spænding halveres. Diameteren bliver kvadratroden af to gange større, cirka seksten millimeter."},"slut":{"start":93.842,"end":104.047,"words":[["Kort",93.969,94.188],["sagt",94.188,94.652],["tilladt",94.768,95.129],["spænding",95.129,95.542],["er",95.542,95.735],["S",95.735,96.005],["y",96.005,96.173],["over",96.173,96.405],["n",96.405,96.637],["d",96.637,97.011],["areal",97.152,97.59],["er",97.59,97.668],["kraft",97.668,98.003],["over",98.003,98.248],["tilladt",98.248,98.57],["spænding",98.57,99.098],["find",99.227,99.472],["diameteren",99.472,100.206],["og",100.374,100.503],["rund",100.503,100.735],["op",100.735,100.928],["til",100.928,101.083],["et",101.083,101.16],["standardmål",101.16,101.92],["Kontrollér",102.785,103.416],["til",103.416,103.571],["sidst",103.571,104.047]],"text":"Kort sagt: tilladt spænding er S y over n d, areal er kraft over tilladt spænding, find diameteren, og rund op til et standardmål. Kontrollér til sidst."}}}, { audio: 'opg-dimensionering-n.mp3', id: 'opg-dimensionering-n' });</script>
+</body>
+</html>

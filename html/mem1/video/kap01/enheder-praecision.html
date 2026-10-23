@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Enheder og betydende cifre · video</title>
+<meta name="description" content="Standarder, N og mm giver MPa, enhedskontrol og betydende cifre med eksemplet fra slide 17.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 1: videoer</a><h1>Enheder og betydende cifre</h1><span class="meta">MEM1 · kapitel 1 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Enheder og betydende cifre"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Standarder, N og mm giver MPa, enhedskontrol og betydende cifre med eksemplet fra slide 17.</p><div class="chips"><a href="../../Kapitel01_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l01">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Enheder og betydende cifre (MEM1 kap. 1, slides 14–17). Eksempel slide 17: F = 12,0 kN, d = 20,0 mm → σ = 38,2 MPa
+BP.scene({ header: 'MEM1 · kap. 1' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, strike, ell, PI, TAU } = B;
+
+  B.titel(0, 'Enheder og cifre', 'MEM1 · kapitel 1 · begreb (slide 14–17)', 'titel');
+  text(0, 'to vaner, der fanger regnefejl', 640, 520, 40, 'red', wt('titel', 'vaner') - 0.4, we('titel', 'regnefejl'), { align: 'center' });
+
+  // ---------------- 1 standarder og værktøjer ----------------
+  B.goto('standarder', 1);
+  {
+    const t0 = L('standarder').start;
+    bubble(1, 'Standarder', 150, 140, 54, 'blue', t0, t0 + 0.8);
+    text(1, 'standardkomponenter · standardmål · standardmaterialer', 160, 230, 32, 'black', wt('standarder', 'standardkomponenter') - 0.2, we('standarder', 'standardmaterialer'));
+    text(1, 'ISO · DIN · EN · ASME', 160, 290, 34, 'blue', wt('standarder', 'standarder') - 0.2, we('standarder', 'standarder') + 0.6);
+    text(1, 'bolte, kiler og lejer: fra kataloget', 160, 350, 34, 'black', wt('standarder', 'Bolte') - 0.1, we('standarder', 'kataloger'));
+    const tv = L('vaerktoej').start;
+    text(1, 'CAD · beregningsark · FEM', 160, 470, 38, 'blue', wt('vaerktoej', 'CAD') - 0.2, we('vaerktoej', 'elementmetodeberegninger'));
+    const s = text(1, 'computeren erstatter ingeniørens dømmekraft', 160, 560, 36, 'red', wt('vaerktoej', 'erstatter') - 0.4, we('vaerktoej', 'erstatter') + 0.6);
+    strike(s, wt('vaerktoej', 'aldrig') - 0.1, wt('vaerktoej', 'aldrig') + 0.3);
+    text(1, 'aldrig!', 160, 630, 44, 'red', wt('vaerktoej', 'aldrig'), we('vaerktoej', 'ingeniørdømmekraft'));
+  }
+
+  // ---------------- 2 konsistente enheder ----------------
+  B.goto('enheder', 2);
+  {
+    const t0 = L('enheder').start;
+    bubble(2, 'Ét sæt enheder', 150, 140, 54, 'blue', t0, t0 + 0.8);
+    text(2, 'F [N]', 170, 250, 48, 'black', wt('enheder', 'kraft') - 0.1, we('enheder', 'newton'));
+    text(2, 'A [mm²]', 420, 250, 48, 'black', wt('enheder', 'areal') - 0.1, we('enheder', 'kvadratmillimeter'));
+    text(2, '⇒  σ [MPa]', 700, 250, 48, 'red', wt('mpa', 'spændingen') - 0.1, we('mpa', 'megapascal'));
+    text(2, '1 N/mm² = 1 MPa', 170, 350, 48, 'red', wt('mpa', 'fordi') - 0.1, we('mpa', 'megapascal', 1));
+    const tc = L('check').start;
+    box(2, 150, 430, 900, 200, 'green', tc, tc + 0.8);
+    text(2, 'Enhedskontrol:', 180, 490, 36, 'green', tc + 0.2, we('check', 'regnefejl'));
+    text(2, '[σ] = [F] / [A] = N / mm² = MPa', 180, 560, 44, 'black', wt('check', 'Tjek') - 0.1, we('check', 'passer'));
+  }
+
+  // ---------------- 3 betydende cifre ----------------
+  B.goto('cifre', 3);
+  {
+    const t0 = L('cifre').start;
+    bubble(3, 'Betydende cifre', 150, 140, 54, 'blue', t0, t0 + 0.8);
+    text(3, 'behold alle decimaler undervejs', 170, 230, 38, 'black', wt('cifre', 'Behold') - 0.1, we('cifre', 'undervejs'));
+    text(3, 'afrund kun til sidst: 3–4 betydende cifre', 170, 290, 38, 'red', wt('cifre', 'afrund') - 0.1, we('cifre', 'cifre'));
+    const te = L('eks').start;
+    text(3, 'F = 12,0 kN,   d = 20,0 mm', 170, 390, 42, 'black', wt('eks', 'tolv') - 0.1, we('eks', 'millimeter'));
+    text(3, 'A = π · 20² / 4 = 314,2 mm²', 170, 460, 42, 'blue', wt('eks2', 'Arealet') - 0.1, we('eks2', 'kvadratmillimeter'));
+    text(3, 'σ = 12 000 / 314,2', 170, 530, 42, 'blue', wt('eks2', 'Spændingen') - 0.1, we('eks2', 'det'));
+    const s = text(3, '= 38,19718634...', 560, 530, 42, 'black', wt('eks3', 'Lommeregneren') - 0.1, we('eks3', 'videre'));
+    strike(s, we('eks3', 'videre'), we('eks3', 'videre') + 0.4);
+    const r = text(3, 'σ = 38,2 MPa', 560, 610, 50, 'red', wt('eks3', 'skriver') - 0.1, we('eks3', 'megapascal'));
+    ring(r, 'red', we('eks3', 'megapascal'), we('eks3', 'megapascal') + 0.5);
+  }
+
+  B.goto('tjek_q', 4);
+  B.tjek(4, ['F i kN, A i mm².', 'Hvilken enhed får σ?'], ['kN/mm² = 1000 MPa', '→ regn F om til N først'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 5);
+  B.slut(5, 'Abou-Hayt (2026), MEM1 Chapter 1, slide 14–17 · Hamrock, Schmid & Jacobson, kap. 1', 'dimensionering med sikkerhedsfaktor', 'slut');
+  text(5, 'N og mm ⇒ MPa', 200, 280, 46, 'blue', L('slut').start + 0.4, we('slut', 'megapascal'));
+  text(5, 'altid enhedskontrol', 200, 360, 46, 'green', wt('slut', 'enhedskontrol') - 0.4, we('slut', 'enhedskontrol'));
+  text(5, 'afrund til sidst: 3–4 cifre', 200, 440, 46, 'red', wt('slut', 'afrund') - 0.1, we('slut', 'cifre'));
+});
+
+</script>
+<script>BP.live({"duration":132.02,"audio":"enheder-praecision.mp3","order":["titel","standarder","vaerktoej","enheder","mpa","check","cifre","eks","eks2","eks3","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":6.415,"words":[["Enheder",0.614,1.233],["og",1.233,1.375],["betydende",1.375,1.852],["cifre",1.852,2.444],["To",3.335,3.58],["små",3.58,3.863],["vaner",3.863,4.34],["der",4.482,4.598],["fanger",4.598,4.997],["rigtig",4.997,5.358],["mange",5.358,5.668],["regnefejl",5.668,6.415]],"text":"Enheder og betydende cifre. To små vaner, der fanger rigtig mange regnefejl."},"standarder":{"start":7.642,"end":19.69,"words":[["Først",7.756,8.117],["en",8.117,8.272],["kort",8.272,8.53],["ting",8.53,8.852],["om",8.852,9.032],["standarder",9.032,9.792],["Brug",10.709,10.902],["standardkomponenter",10.902,12.191],["standardmål",12.294,13.157],["og",13.157,13.273],["standardmaterialer",13.273,14.472],["når",14.614,14.794],["det",14.794,14.974],["er",14.974,15.026],["muligt",15.026,15.541],["Bolte",16.404,16.92],["kiler",17.036,17.538],["og",17.538,17.654],["lejer",17.654,18.028],["findes",18.028,18.337],["færdige",18.337,18.84],["i",18.84,18.969],["kataloger",18.969,19.69]],"text":"Først en kort ting om standarder. Brug standardkomponenter, standardmål og standardmaterialer, når det er muligt. Bolte, kiler og lejer findes færdige i kataloger."},"vaerktoej":{"start":20.904,"end":29.448,"words":[["Computeren",21.044,21.727],["er",21.727,21.882],["et",21.882,21.933],["godt",21.933,22.152],["værktøj",22.152,22.552],["til",22.552,22.694],["CAD",22.694,23.209],["beregningsark",23.351,24.24],["og",24.24,24.459],["elementmetodeberegninger",24.459,25.877],["Men",26.78,26.922],["den",26.922,27.077],["erstatter",27.077,27.605],["aldrig",27.605,27.953],["sund",27.953,28.262],["ingeniørdømmekraft",28.262,29.448]],"text":"Computeren er et godt værktøj til CAD, beregningsark og elementmetodeberegninger. Men den erstatter aldrig sund ingeniørdømmekraft."},"enheder":{"start":30.662,"end":40.185,"words":[["Brug",30.802,31.021],["ét",31.021,31.099],["konsistent",31.099,31.73],["sæt",31.73,32.078],["enheder",32.078,32.503],["gennem",32.503,32.851],["hele",32.851,33.16],["beregningen",33.16,33.934],["I",34.824,34.889],["maskinkonstruktion",34.889,36.061],["er",36.061,36.19],["det",36.19,36.268],["praktisk",36.268,36.783],["at",36.783,36.886],["regne",36.886,37.208],["kraft",37.208,37.543],["i",37.543,37.634],["newton",37.634,38.214],["og",38.214,38.394],["areal",38.394,38.961],["i",38.961,39.077],["kvadratmillimeter",39.077,40.185]],"text":"Brug ét konsistent sæt enheder gennem hele beregningen. I maskinkonstruktion er det praktisk at regne kraft i newton og areal i kvadratmillimeter."},"mpa":{"start":41.404,"end":47.949,"words":[["Så",41.518,41.725],["får",41.725,41.815],["spændingen",41.815,42.304],["direkte",42.304,42.833],["enheden",42.833,43.335],["megapascal",43.335,44.289],["fordi",44.418,44.83],["en",44.83,44.972],["newton",44.972,45.397],["pr.",45.397,45.616],["kvadratmillimeter",45.616,46.737],["er",46.737,46.931],["en",46.931,47.06],["megapascal",47.06,47.949]],"text":"Så får spændingen direkte enheden megapascal, fordi en newton pr. kvadratmillimeter er en megapascal."},"check":{"start":49.17,"end":57.224,"words":[["En",49.297,49.413],["enhedskontrol",49.413,50.38],["er",50.38,50.496],["det",50.496,50.676],["enkleste",50.676,51.14],["forsvar",51.14,51.746],["mod",51.746,52.016],["regnefejl",52.016,52.777],["Tjek",53.655,54.093],["at",54.247,54.453],["enhederne",54.454,54.943],["på",54.943,55.085],["begge",55.085,55.381],["sider",55.381,55.832],["af",55.832,55.935],["lighedstegnet",55.935,56.644],["passer",56.644,57.224]],"text":"En enhedskontrol er det enkleste forsvar mod regnefejl. Tjek, at enhederne på begge sider af lighedstegnet passer."},"cifre":{"start":58.448,"end":69.595,"words":[["Resultatet",58.575,59.233],["må",59.233,59.426],["ikke",59.426,59.709],["se",59.709,59.915],["mere",59.916,60.186],["præcist",60.186,60.727],["ud",60.727,60.972],["end",60.972,61.153],["inddata",61.153,61.913],["Behold",62.804,63.164],["alle",63.164,63.435],["decimaler",63.435,64.028],["undervejs",64.028,64.75],["og",64.891,65.007],["afrund",65.007,65.407],["kun",65.407,65.626],["det",65.626,65.793],["endelige",65.793,66.167],["resultat",66.167,66.889],["typisk",67.03,67.494],["til",67.494,67.649],["tre",67.649,68.036],["eller",68.036,68.255],["fire",68.255,68.551],["betydende",68.551,69.028],["cifre",69.028,69.595]],"text":"Resultatet må ikke se mere præcist ud end inddata. Behold alle decimaler undervejs, og afrund kun det endelige resultat, typisk til tre eller fire betydende cifre."},"eks":{"start":70.822,"end":77.431,"words":[["Eksemplet",70.962,71.491],["fra",71.491,71.645],["slides",71.645,72.199],["en",72.328,72.496],["kraft",72.496,72.805],["på",72.805,72.985],["tolv",72.985,73.256],["komma",73.256,73.501],["nul",73.501,73.707],["kilonewton",73.707,74.429],["på",74.429,74.609],["en",74.609,74.674],["stang",74.674,75.009],["med",75.009,75.189],["diameteren",75.189,75.808],["tyve",75.808,76.194],["komma",76.194,76.491],["nul",76.491,76.735],["millimeter",76.735,77.431]],"text":"Eksemplet fra slides: en kraft på tolv komma nul kilonewton på en stang med diameteren tyve komma nul millimeter."},"eks2":{"start":78.66,"end":89.059,"words":[["Arealet",78.8,79.38],["er",79.38,79.56],["pi",79.56,79.805],["gange",79.805,80.063],["tyve",80.063,80.463],["i",80.463,80.669],["anden",80.669,80.991],["divideret",80.991,81.584],["med",81.584,81.764],["fire",81.764,82.318],["altså",82.447,82.872],["tre",82.872,83.13],["hundrede",83.13,83.323],["og",83.323,83.336],["fjorten",83.336,83.839],["komma",83.839,84.135],["to",84.135,84.393],["kvadratmillimeter",84.393,85.45],["Spændingen",86.34,86.933],["er",86.933,87.101],["tolv",87.101,87.384],["tusind",87.384,87.745],["divideret",87.745,88.441],["med",88.441,88.686],["det",88.686,89.059]],"text":"Arealet er pi gange tyve i anden divideret med fire, altså tre hundrede og fjorten komma to kvadratmillimeter. Spændingen er tolv tusind divideret med det."},"eks3":{"start":90.29,"end":98.447,"words":[["Lommeregneren",90.404,91.113],["siger",91.113,91.474],["otteogtredive",91.474,92.196],["komma",92.196,92.556],["et",92.557,92.776],["ni",92.776,92.995],["syv",92.995,93.304],["en",93.304,93.626],["otte",93.626,93.91],["og",93.91,93.935],["så",93.935,94.09],["videre",94.09,94.631],["Vi",95.535,95.625],["skriver",95.625,96.012],["otteogtredive",96.012,96.733],["komma",96.733,97.055],["to",97.055,97.416],["megapascal",97.416,98.447]],"text":"Lommeregneren siger otteogtredive komma et ni syv en otte og så videre. Vi skriver otteogtredive komma to megapascal."},"tjek_q":{"start":99.664,"end":107.77,"words":[["Tjek",99.765,100.087],["dig",100.087,100.267],["selv",100.267,100.693],["Du",101.584,101.7],["har",101.7,101.79],["kraften",101.79,102.216],["i",102.216,102.344],["kilonewton",102.344,103.092],["og",103.092,103.285],["arealet",103.285,103.968],["i",103.968,104.097],["kvadratmillimeter",104.097,105.205],["Hvilken",106.107,106.571],["enhed",106.571,107.035],["får",107.035,107.164],["spændingen",107.164,107.77]],"text":"Tjek dig selv. Du har kraften i kilonewton og arealet i kvadratmillimeter. Hvilken enhed får spændingen?"},"tjek_a":{"start":111.64,"end":119.192,"words":[["Kilonewton",111.78,112.399],["pr.",112.399,112.644],["kvadratmillimeter",112.644,113.803],["som",113.945,114.203],["er",114.203,114.267],["tusind",114.267,114.77],["megapascal",114.77,115.749],["Regn",116.64,116.936],["hellere",116.936,117.233],["kraften",117.233,117.851],["om",117.851,118.045],["til",118.045,118.199],["newton",118.199,118.689],["først",118.689,119.192]],"text":"Kilonewton pr. kvadratmillimeter, som er tusind megapascal. Regn hellere kraften om til newton først."},"slut":{"start":120.414,"end":129.588,"words":[["Kort",120.541,120.747],["sagt",120.748,121.211],["newton",121.353,121.869],["og",121.869,122.01],["millimeter",122.01,122.68],["giver",122.681,122.938],["megapascal",122.938,123.853],["lav",123.995,124.356],["altid",124.356,124.717],["en",124.717,124.897],["enhedskontrol",124.897,125.851],["og",126.005,126.121],["afrund",126.121,126.534],["kun",126.534,126.766],["til",126.766,126.882],["sidst",126.882,127.345],["til",127.5,127.655],["tre",127.655,128.016],["eller",128.016,128.235],["fire",128.235,128.531],["betydende",128.531,129.008],["cifre",129.008,129.588]],"text":"Kort sagt: newton og millimeter giver megapascal, lav altid en enhedskontrol, og afrund kun til sidst, til tre eller fire betydende cifre."}}}, { audio: 'enheder-praecision.mp3', id: 'enheder-praecision' });</script>
+</body>
+</html>

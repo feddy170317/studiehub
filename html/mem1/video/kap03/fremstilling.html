@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fremstilling og materialevalg · video</title>
+<meta name="description" content="Hvordan fremstillingen påvirker egenskaberne, de typiske processer og koblingen til materialevalget.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 3: videoer</a><h1>Fremstilling og materialevalg</h1><span class="meta">MEM1 · kapitel 3 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Fremstilling og materialevalg"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Hvordan fremstillingen påvirker egenskaberne, de typiske processer og koblingen til materialevalget.</p><div class="chips"><a href="../../Kapitel03_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l03">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Fremstilling og materialevalg (MEM1 kap. 3, slides 31–36)
+BP.scene({ header: 'MEM1 · kap. 3' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, hatch, rect, PI } = B;
+
+  B.titel(0, 'Fremstilling', 'MEM1 · kapitel 3 · begreb (slide 31–36)', 'titel');
+  text(0, 'egenskaber afhænger også af processen', 640, 520, 38, 'red', wt('titel', 'også') - 0.2, we('titel', 'lavet'), { align: 'center' });
+
+  B.goto('paavirker', 1);
+  {
+    const t0 = L('paavirker').start;
+    text(1, 'Fremstillingen påvirker:', 140, 150, 40, 'blue', t0, wt('paavirker', 'styrke'));
+    const p = ['styrke', 'duktilitet', 'sejhed', 'hårdhed', 'overfladen', 'restspændinger', 'målnøjagtighed', 'geometri'];
+    p.forEach((w, i) => text(1, '· ' + w, 160 + 280 * (i % 4), 220 + 50 * Math.floor(i / 4), 32, 'black', wt('paavirker', w) - 0.2, we('paavirker', w) + 0.3));
+    const tr = L('ruter').start;
+    const r = [['støbning', 'støbning'], ['formgivning', 'formgivning'], ['spåntagning', 'spåntagning'], ['varmebehandling', 'varmebehandling'], ['overflade', 'overfladebehandling'], ['samling', 'samling']];
+    r.forEach(([s, w], i) => {
+      const x = 115 + 182 * i, t = wt('ruter', w) - 0.2;
+      box(1, x, 380, 170, 80, 'blue', t, t + 0.4, { off: 8 });
+      text(1, s, x + 85, 428, s.length > 11 ? 20 : 26, 'blue', t + 0.1, t + 0.5, { align: 'center' });
+    });
+    text(1, 'valg: geometri · antal · egenskaber · nøjagtighed · finish · pris', 140, 560, 28, 'black', L('valg').start, we('valg', 'pris'));
+  }
+
+  B.goto('smedning', 2);
+  {
+    const t0 = L('smedning').start;
+    // smedning i trin
+    const st = (x, h, t) => line(2, [[x, 260 - h / 2], [x + 90 + (60 - h) * 1.2, 260 - h / 2], [x + 90 + (60 - h) * 1.2, 260 + h / 2], [x, 260 + h / 2], [x, 262 - h / 2]], 'black', 3, t, t + 0.4);
+    st(150, 80, t0 + 0.2); arrow(2, [[290, 260], [330, 260]], 'black', 2.4, t0 + 0.5, t0 + 0.7, 11);
+    st(350, 56, t0 + 0.7); arrow(2, [[520, 260], [560, 260]], 'black', 2.4, t0 + 1.0, t0 + 1.2, 11);
+    st(580, 36, t0 + 1.2);
+    text(2, 'smedning i flere trin', 150, 360, 34, 'blue', t0, we('smedning', 'trin'));
+    text(2, 'stort trin ⇒ højt værktøjstryk, mere slid', 150, 420, 28, 'red', wt('smedning', 'meget') - 0.1, we('smedning', 'hurtigere'));
+    // strengpresning: matrice og profil
+    const ts = L('strengpres').start;
+    hatch(2, rect(880, 150, 60, 80), 'black', ts, ts + 0.4, { gap: 6 }); hatch(2, rect(880, 290, 60, 80), 'black', ts + 0.1, ts + 0.5, { gap: 6 });
+    line(2, [[760, 180], [880, 230], [880, 290], [760, 340]], 'black', 3, ts + 0.3, ts + 0.7);
+    line(2, [[940, 230], [1180, 230], [1180, 290], [940, 290]], 'blue', 3.6, ts + 0.6, ts + 1.2);
+    arrow(2, [[700, 260], [760, 260]], 'red', 4, ts + 0.4, ts + 0.7);
+    text(2, 'strengpresning:', 800, 420, 32, 'blue', ts, wt('strengpres', 'konstant'));
+    text(2, 'konstant tværsnit', 800, 470, 32, 'blue', wt('strengpres', 'konstant') - 0.1, we('strengpres', 'tværsnit'));
+    const tp = L('praecision').start;
+    const tr = [['model', 'model'], ['samling', 'samling'], ['belægning', 'belægning'], ['form', 'form'], ['udstøbning', 'udstøbning'], ['udslagning', 'udslagning']];
+    text(2, 'præcisionsstøbning:', 150, 560, 32, 'green', tp, wt('praecision', 'Trinene'));
+    let x = 150;
+    tr.forEach(([s, w], i) => { const t = wt('praecision', w) - 0.2; if (i) { arrow(2, [[x, 612], [x + 24, 612]], 'black', 2, t - 0.1, t, 9); x += 32; } const it = text(2, s, x, 622, 28, 'green', t, t + 0.4); x = B.endX(it, 8); });
+  }
+
+  B.goto('kobling', 3);
+  {
+    const t0 = L('kobling').start;
+    bubble(3, 'Materiale ↔ fremstilling', 150, 140, 48, 'blue', t0, t0 + 0.8);
+    text(3, '· stærkt materiale, svært at forme', 170, 250, 38, 'black', wt('kobling', 'stærkt') - 0.2, we('kobling', 'forme'));
+    text(3, '· polymer: let at støbe, svag ved høj temperatur', 170, 320, 38, 'black', wt('kobling', 'polymer') - 0.2, we('kobling', 'temperatur'));
+    text(3, '· stål: kan kræve korrosionsbeskyttelse', 170, 390, 38, 'black', wt('kobling', 'stål') - 0.2, we('kobling', 'korrosionsbeskyttelse'));
+    text(3, 'koblede beslutninger', 170, 500, 44, 'red', we('kobling', 'korrosionsbeskyttelse'), we('kobling', 'korrosionsbeskyttelse') + 0.1);
+  }
+
+  B.goto('tjek_q', 4);
+  B.tjek(4, ['5000 ens aluminiumsprofiler,', 'konstant tværsnit. Proces?'], ['Strengpresning', 'konstant tværsnit, store serier'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 5);
+  B.slut(5, 'Abou-Hayt (2026), MEM1 Chapter 3, slide 31–36 · Hamrock, Schmid & Jacobson, kap. 3', '', 'slut');
+  text(5, 'materiale og proces vælges sammen', 200, 280, 42, 'blue', L('slut').start + 0.4, we('slut', 'beslutninger'));
+  text(5, 'geometri · antal · egenskaber · pris', 200, 360, 42, 'red', wt('slut', 'Vælg') - 0.1, we('slut', 'pris'));
+});
+
+</script>
+<script>BP.live({"duration":108.016,"audio":"fremstilling.mp3","order":["titel","paavirker","ruter","valg","smedning","strengpres","praecision","kobling","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":9.405,"words":[["Fremstilling",0.614,1.388],["og",1.388,1.529],["materialevalg",1.529,2.509],["Et",3.425,3.528],["materiales",3.528,4.16],["egenskaber",4.16,4.933],["afhænger",4.933,5.423],["ikke",5.423,5.706],["kun",5.706,5.925],["af",5.925,5.99],["kemien",5.99,6.57],["men",6.711,7.124],["også",7.124,7.536],["af",7.536,7.845],["hvordan",8.0,8.438],["emnet",8.438,8.838],["er",8.838,8.928],["lavet",8.928,9.405]],"text":"Fremstilling og materialevalg. Et materiales egenskaber afhænger ikke kun af kemien, men også af, hvordan emnet er lavet."},"paavirker":{"start":10.618,"end":19.985,"words":[["Fremstillingen",10.732,11.415],["kan",11.415,11.544],["påvirke",11.544,12.021],["styrke",12.021,12.588],["duktilitet",12.704,13.529],["sejhed",13.671,14.392],["hårdhed",14.534,15.268],["overfladen",15.41,16.183],["restspændinger",16.325,17.369],["målnøjagtighed",17.511,18.645],["og",18.645,18.761],["den",18.761,18.941],["endelige",18.941,19.328],["geometri",19.328,19.985]],"text":"Fremstillingen kan påvirke styrke, duktilitet, sejhed, hårdhed, overfladen, restspændinger, målnøjagtighed og den endelige geometri."},"ruter":{"start":21.216,"end":28.56,"words":[["Typiske",21.343,21.833],["fremstillingsveje",21.833,22.671],["er",22.671,22.748],["støbning",22.748,23.379],["formgivning",23.495,24.372],["spåntagning",24.513,25.377],["varmebehandling",25.493,26.549],["overfladebehandling",26.678,27.787],["og",27.787,27.928],["samling",27.928,28.56]],"text":"Typiske fremstillingsveje er støbning, formgivning, spåntagning, varmebehandling, overfladebehandling og samling."},"valg":{"start":29.774,"end":36.486,"words":[["Valget",29.914,30.314],["afhænger",30.314,30.816],["af",30.816,30.881],["geometri",30.881,31.654],["antal",31.783,32.401],["krævede",32.543,32.904],["egenskaber",32.904,33.664],["nøjagtighed",33.806,34.708],["overfladefinish",34.85,35.829],["og",35.829,35.971],["pris",35.971,36.486]],"text":"Valget afhænger af geometri, antal, krævede egenskaber, nøjagtighed, overfladefinish og pris."},"smedning":{"start":37.708,"end":45.569,"words":[["Smedning",37.822,38.325],["sker",38.325,38.673],["ofte",38.673,39.137],["i",39.137,39.291],["flere",39.291,39.627],["trin",39.627,40.129],["En",41.033,41.136],["meget",41.136,41.381],["stor",41.381,41.638],["deformation",41.638,42.308],["i",42.309,42.476],["ét",42.476,42.54],["trin",42.54,42.824],["øger",42.824,43.133],["trykket",43.133,43.507],["på",43.507,43.649],["værktøjet",43.649,44.293],["og",44.293,44.422],["slider",44.422,44.757],["det",44.757,44.86],["hurtigere",44.86,45.569]],"text":"Smedning sker ofte i flere trin. En meget stor deformation i ét trin øger trykket på værktøjet og slider det hurtigere."},"strengpres":{"start":46.794,"end":53.287,"words":[["Strengpresning",46.908,47.759],["er",47.759,47.875],["god",47.875,48.133],["til",48.133,48.287],["profiler",48.287,48.751],["med",48.751,48.932],["konstant",48.932,49.408],["tværsnit",49.408,50.027],["som",50.169,50.452],["bjælkeprofiler",50.452,51.419],["stigevanger",51.56,52.385],["og",52.385,52.501],["køleribber",52.501,53.287]],"text":"Strengpresning er god til profiler med konstant tværsnit, som bjælkeprofiler, stigevanger og køleribber."},"praecision":{"start":54.512,"end":63.507,"words":[["Præcisionsstøbning",54.652,55.696],["gør",55.696,55.876],["komplekse",55.876,56.418],["former",56.418,56.791],["mulige",56.791,57.345],["Trinene",58.236,58.687],["er",58.687,58.79],["model",58.79,59.344],["samling",59.473,60.195],["belægning",60.337,61.02],["form",61.161,61.703],["udstøbning",61.844,62.592],["og",62.592,62.772],["udslagning",62.772,63.507]],"text":"Præcisionsstøbning gør komplekse former mulige. Trinene er model, samling, belægning, form, udstøbning og udslagning."},"kobling":{"start":64.726,"end":76.376,"words":[["Materiale",64.866,65.562],["og",65.562,65.704],["fremstilling",65.704,66.425],["hænger",66.426,66.748],["sammen",66.748,67.328],["Et",68.231,68.321],["stærkt",68.321,68.631],["materiale",68.631,69.223],["kan",69.223,69.391],["være",69.391,69.507],["svært",69.507,69.816],["at",69.816,69.855],["forme",69.855,70.383],["en",70.512,70.667],["polymer",70.667,71.118],["er",71.118,71.169],["let",71.169,71.375],["at",71.375,71.414],["støbe",71.414,71.839],["men",71.839,72.033],["taber",72.033,72.355],["egenskaber",72.355,72.948],["ved",72.948,73.076],["høj",73.077,73.283],["temperatur",73.283,73.979],["og",74.172,74.352],["stål",74.352,74.687],["kan",74.687,74.842],["kræve",74.842,75.138],["korrosionsbeskyttelse",75.138,76.376]],"text":"Materiale og fremstilling hænger sammen. Et stærkt materiale kan være svært at forme, en polymer er let at støbe men taber egenskaber ved høj temperatur, og stål kan kræve korrosionsbeskyttelse."},"tjek_q":{"start":77.604,"end":86.186,"words":[["Tjek",77.705,78.027],["dig",78.027,78.207],["selv",78.207,78.633],["Du",79.524,79.588],["skal",79.589,79.743],["lave",79.743,80.014],["fem",80.014,80.259],["tusind",80.259,80.568],["ens",80.568,80.8],["aluminiumsprofiler",80.8,82.05],["med",82.05,82.256],["konstant",82.256,82.771],["tværsnit",82.772,83.467],["Hvilken",84.357,84.756],["proces",84.756,85.233],["er",85.233,85.503],["oplagt",85.503,86.186]],"text":"Tjek dig selv. Du skal lave fem tusind ens aluminiumsprofiler med konstant tværsnit. Hvilken proces er oplagt?"},"tjek_a":{"start":90.084,"end":95.226,"words":[["Strengpresning",90.185,91.216],["Den",92.107,92.223],["laver",92.223,92.481],["konstant",92.481,92.958],["tværsnit",92.958,93.538],["effektivt",93.538,94.208],["i",94.208,94.324],["store",94.324,94.697],["mængder",94.697,95.226]],"text":"Strengpresning. Den laver konstant tværsnit effektivt i store mængder."},"slut":{"start":96.458,"end":105.582,"words":[["Kort",96.598,96.817],["sagt",96.817,97.359],["materialevalg",97.487,98.286],["og",98.286,98.364],["fremstilling",98.364,99.06],["er",99.06,99.188],["koblede",99.188,99.627],["beslutninger",99.627,100.413],["Vælg",101.316,101.574],["processen",101.574,102.154],["ud",102.154,102.334],["fra",102.334,102.515],["geometri",102.515,103.262],["antal",103.404,104.035],["egenskaber",104.203,104.937],["og",104.937,105.079],["pris",105.079,105.582]],"text":"Kort sagt: materialevalg og fremstilling er koblede beslutninger. Vælg processen ud fra geometri, antal, egenskaber og pris."}}}, { audio: 'fremstilling.mp3', id: 'fremstilling' });</script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Materialeklasser og kompositter · video</title>
+<meta name="description" content="De fire materialeklasser, fiberkompositter og blandingsreglen for E_c.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 3: videoer</a><h1>Materialeklasser og kompositter</h1><span class="meta">MEM1 · kapitel 3 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Materialeklasser og kompositter"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>De fire materialeklasser, fiberkompositter og blandingsreglen for E_c.</p><div class="chips"><a href="../../Kapitel03_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l03">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Materialeklasser og kompositter (MEM1 kap. 3, slides 8–9 og 24). Tjek: Ec = 3·0,5 + 230·0,5 = 116,5 GPa
+BP.scene({ header: 'MEM1 · kap. 3' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, hatch, rect, PI } = B;
+
+  B.titel(0, 'Materialeklasser', 'MEM1 · kapitel 3 · begreb (slide 8–9, 24)', 'titel');
+  text(0, 'og kompositter', 640, 470, 40, 'black', wt('titel', 'kompositter') - 0.3, we('titel', 'kompositter'), { align: 'center' });
+
+  B.goto('klasser', 1);
+  {
+    const k = [['Metaller og legeringer', 'metaller'], ['Keramik og glas', 'keramik'], ['Polymerer og elastomerer', 'polymerer'], ['Kompositter', 'kompositter']];
+    k.forEach(([s, w], i) => {
+      const x = 110 + 270 * i, t = wt('klasser', w) - 0.2;
+      box(1, x, 220, 250, 130, 'blue', t, t + 0.5);
+      text(1, s.split(' og ')[0], x + 125, 278, 32, 'blue', t + 0.2, t + 0.7, { align: 'center' });
+      if (s.includes(' og ')) text(1, 'og ' + s.split(' og ')[1], x + 125, 320, 26, 'blue', t + 0.4, t + 0.8, { align: 'center' });
+    });
+    const ts = L('spredning').start;
+    text(1, 'klassen indsnævrer søgningen', 160, 470, 38, 'black', wt('spredning', 'indsnævrer') - 0.2, we('spredning', 'søgningen'));
+    text(1, 'egenskaberne afgør valget', 160, 540, 38, 'red', wt('spredning', 'egenskaberne') - 0.2, we('spredning', 'valget'));
+  }
+
+  B.goto('komposit', 2);
+  {
+    const t0 = L('komposit').start, x0 = 160, y0 = 180, w = 460, h = 220;
+    line(2, rect(x0, y0, w, h).concat([[x0, y0 + 2]]), 'black', 3, t0, t0 + 0.6);
+    hatch(2, rect(x0, y0, w, h), 'green', wt('komposit', 'Matricen') - 0.2, wt('komposit', 'Matricen') + 0.6, { gap: 12, alpha: 0.35, ang: PI / 3 });
+    for (let i = 0; i < 6; i++) line(2, [[x0 + 10, y0 + 30 + 32 * i], [x0 + w - 10, y0 + 30 + 32 * i]], 'blue', 5, wt('komposit', 'Fibrene') - 0.2 + i * 0.08, wt('komposit', 'Fibrene') + 0.4 + i * 0.08);
+    text(2, 'fibre: styrke og stivhed', 730, 240, 30, 'blue', wt('komposit', 'Fibrene') - 0.1, we('komposit', 'densitet'));
+    text(2, 'matrix: beskytter, overfører τ', 730, 300, 30, 'green', wt('komposit', 'Matricen') - 0.1, we('komposit', 'dem'));
+    text(2, 'høj S/ρ og høj E/ρ', 730, 380, 38, 'red', L('fordel').start, we('fordel', 'densitet', 1));
+    const tb = L('blanding').start;
+    arrow(2, [[x0 + w / 2 + 40, y0 + h + 58], [x0 + w / 2 + 140, y0 + h + 58]], 'red', 3.6, tb, tb + 0.4); arrow(2, [[x0 + w / 2 - 40, y0 + h + 58], [x0 + w / 2 - 140, y0 + h + 58]], 'red', 3.6, tb, tb + 0.4);
+    text(2, 'last langs fibrene', x0 + w / 2, y0 + h + 36, 28, 'red', wt('blanding', 'langs') - 0.1, we('blanding', 'fibrene'), { align: 'center' });
+    const f = text(2, 'E_c = E_m ν_m + E_f ν_f', 200, 540, 52, 'black', wt('blanding', 'E') - 0.1, we('blanding', 'f', 1));
+    box(2, 170, 480, 640, 90, 'red', we('blanding', 'f', 1), we('blanding', 'f', 1) + 0.6);
+    text(2, 'ν_m + ν_f = 1  (volumenandele)', 200, 640, 36, 'blue', L('symboler').start, we('symboler', 'en'));
+    text(2, 'matrix · fibre · fiberandel', 850, 540, 28, 'black', L('fortolk').start + 0.3, we('fortolk', 'der'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['E_f = 230 GPa, E_m = 3 GPa, ν_f = 0,5.', 'Hvad er E_c?'], ['E_c = 3 · 0,5 + 230 · 0,5', '= 116,5 GPa'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 3, slide 8–9 og 24 · Hamrock, Schmid & Jacobson, kap. 3', 'materialevalg og materialediagrammer', 'slut');
+  text(4, 'metaller · keramik · polymerer · kompositter', 200, 280, 38, 'blue', L('slut').start + 0.4, we('slut', 'materialeklasser'));
+  text(4, 'E_c = E_m ν_m + E_f ν_f', 200, 370, 46, 'red', wt('slut', 'komposit') - 0.1, we('slut', 'volumenandel'));
+});
+
+</script>
+<script>BP.live({"duration":101.56,"audio":"materialeklasser.mp3","order":["titel","klasser","spredning","komposit","fordel","blanding","symboler","fortolk","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":6.299,"words":[["Materialeklasser",0.64,1.736],["og",1.736,1.852],["kompositter",1.852,2.689],["Hvilke",3.593,3.902],["familier",3.902,4.508],["af",4.508,4.637],["materialer",4.637,5.242],["vælger",5.242,5.59],["vi",5.59,5.758],["imellem",5.758,6.299]],"text":"Materialeklasser og kompositter. Hvilke familier af materialer vælger vi imellem?"},"klasser":{"start":7.522,"end":14.273,"words":[["De",7.636,7.714],["store",7.714,8.049],["klasser",8.049,8.551],["er",8.551,8.667],["metaller",8.667,9.183],["og",9.183,9.247],["legeringer",9.247,10.033],["keramik",10.162,10.613],["og",10.613,10.729],["glas",10.729,11.27],["polymerer",11.412,12.044],["og",12.044,12.263],["elastomerer",12.263,13.126],["og",13.294,13.422],["kompositter",13.423,14.273]],"text":"De store klasser er metaller og legeringer, keramik og glas, polymerer og elastomerer, og kompositter."},"spredning":{"start":15.504,"end":24.434,"words":[["Hver",15.644,15.889],["klasse",15.889,16.237],["rummer",16.237,16.559],["materialer",16.559,17.371],["med",17.371,17.577],["meget",17.577,17.874],["forskellige",17.874,18.453],["egenskaber",18.454,19.214],["Klassen",20.117,20.568],["indsnævrer",20.568,21.058],["søgningen",21.058,21.69],["men",21.818,22.05],["det",22.05,22.231],["er",22.231,22.373],["egenskaberne",22.373,23.236],["der",23.378,23.532],["afgør",23.532,23.932],["valget",23.932,24.434]],"text":"Hver klasse rummer materialer med meget forskellige egenskaber. Klassen indsnævrer søgningen, men det er egenskaberne, der afgør valget."},"komposit":{"start":25.67,"end":37.165,"words":[["En",25.797,25.913],["fiberforstærket",25.913,26.777],["polymer",26.777,27.434],["har",27.434,27.627],["to",27.627,27.936],["dele",27.937,28.4],["Fibrene",29.291,29.897],["giver",29.897,30.142],["høj",30.142,30.386],["styrke",30.386,30.825],["og",30.825,30.902],["stivhed",30.902,31.443],["ved",31.443,31.624],["lav",31.624,31.881],["densitet",31.881,32.577],["Matricen",33.492,34.149],["beskytter",34.149,34.575],["fibrene",34.575,35.155],["og",35.155,35.309],["overfører",35.309,35.876],["forskydning",35.876,36.482],["mellem",36.482,36.778],["dem",36.778,37.165]],"text":"En fiberforstærket polymer har to dele. Fibrene giver høj styrke og stivhed ved lav densitet. Matricen beskytter fibrene og overfører forskydning mellem dem."},"fordel":{"start":38.38,"end":42.876,"words":[["Kombinationen",38.52,39.345],["giver",39.345,39.628],["høj",39.628,39.86],["styrke",39.86,40.208],["pr.",40.208,40.427],["densitet",40.427,41.11],["og",41.11,41.265],["høj",41.265,41.497],["stivhed",41.497,41.948],["pr.",41.948,42.193],["densitet",42.193,42.876]],"text":"Kombinationen giver høj styrke pr. densitet og høj stivhed pr. densitet."},"blanding":{"start":44.106,"end":53.049,"words":[["Belastes",44.246,44.684],["kompositten",44.684,45.419],["langs",45.419,45.818],["fibrene",45.818,46.411],["bruger",46.553,46.836],["bogen",46.836,47.21],["blandingsreglen",47.21,48.125],["E",49.016,49.183],["c",49.183,49.467],["er",49.467,49.725],["E",49.725,49.956],["m",49.957,50.111],["gange",50.111,50.536],["ny",50.536,50.807],["m",50.807,51.013],["plus",51.013,51.297],["E",51.297,51.516],["f",51.516,51.709],["gange",51.709,52.147],["ny",52.147,52.341],["f.",52.341,53.049]],"text":"Belastes kompositten langs fibrene, bruger bogen blandingsreglen. E c er E m gange ny m plus E f gange ny f."},"symboler":{"start":54.296,"end":59.075,"words":[["Her",54.423,54.604],["er",54.604,54.63],["ny",54.63,54.861],["m",54.861,55.055],["og",55.055,55.093],["ny",55.093,55.312],["f",55.312,55.506],["volumenandelene",55.506,56.421],["af",56.421,56.524],["matrix",56.524,57.052],["og",57.052,57.142],["fibre",57.142,57.722],["og",57.89,58.006],["de",58.006,58.148],["summer",58.148,58.508],["til",58.508,58.702],["en",58.702,59.075]],"text":"Her er ny m og ny f volumenandelene af matrix og fibre, og de summer til en."},"fortolk":{"start":60.31,"end":66.12,"words":[["Stivheden",60.424,60.966],["afhænger",60.966,61.507],["altså",61.507,61.893],["af",61.893,61.932],["matricens",61.932,62.512],["stivhed",62.512,63.053],["fibrenes",63.169,63.736],["stivhed",63.736,64.226],["og",64.226,64.342],["hvor",64.342,64.432],["stor",64.432,64.729],["en",64.729,64.857],["andel",64.857,65.296],["fibre",65.296,65.656],["der",65.656,65.811],["er",65.811,66.12]],"text":"Stivheden afhænger altså af matricens stivhed, fibrenes stivhed og hvor stor en andel fibre der er."},"tjek_q":{"start":67.332,"end":78.361,"words":[["Tjek",67.433,67.755],["dig",67.755,67.935],["selv",67.935,68.348],["Fibrene",69.252,69.845],["har",69.845,70.167],["E",70.167,70.36],["lig",70.36,70.528],["to",70.528,70.76],["hundrede",70.76,70.979],["og",70.979,71.005],["tredive",71.005,71.378],["gigapascal",71.378,72.28],["matricen",72.422,73.067],["tre",73.067,73.324],["gigapascal",73.324,74.201],["og",74.342,74.484],["fiberandelen",74.484,75.438],["er",75.438,75.605],["en",75.605,75.708],["halv",75.708,76.069],["Hvad",76.944,77.395],["er",77.395,77.704],["E",77.704,77.91],["c",77.91,78.361]],"text":"Tjek dig selv. Fibrene har E lig to hundrede og tredive gigapascal, matricen tre gigapascal, og fiberandelen er en halv. Hvad er E c?"},"tjek_a":{"start":82.236,"end":89.916,"words":[["E",82.363,82.531],["c",82.531,82.84],["er",82.84,83.008],["tre",83.008,83.304],["gange",83.304,83.704],["en",83.704,83.871],["halv",83.871,84.09],["plus",84.09,84.335],["to",84.335,84.567],["hundrede",84.567,84.773],["og",84.773,84.799],["tredive",84.799,85.198],["gange",85.198,85.624],["en",85.624,85.804],["halv",85.804,86.139],["Det",87.043,87.12],["giver",87.12,87.455],["hundrede",87.455,87.751],["og",87.751,87.777],["seksten",87.777,88.318],["komma",88.318,88.641],["fem",88.641,88.95],["gigapascal",88.95,89.916]],"text":"E c er tre gange en halv plus to hundrede og tredive gange en halv. Det giver hundrede og seksten komma fem gigapascal."},"slut":{"start":91.13,"end":99.144,"words":[["Kort",91.257,91.489],["sagt",91.489,92.018],["fire",92.134,92.469],["materialeklasser",92.469,93.59],["og",93.732,93.976],["for",93.976,94.118],["en",94.118,94.208],["komposit",94.208,94.724],["langs",94.724,95.072],["fibrene",95.072,95.574],["er",95.574,95.819],["E",95.819,96.0],["c",96.0,96.219],["summen",96.219,96.721],["af",96.721,96.863],["hver",96.863,97.095],["dels",97.095,97.443],["E",97.443,97.61],["gange",97.61,97.984],["dens",97.984,98.255],["volumenandel",98.255,99.144]],"text":"Kort sagt: fire materialeklasser, og for en komposit langs fibrene er E c summen af hver dels E gange dens volumenandel."}}}, { audio: 'materialeklasser.mp3', id: 'materialeklasser' });</script>
+</body>
+</html>

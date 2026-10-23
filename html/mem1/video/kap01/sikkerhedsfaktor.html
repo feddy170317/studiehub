@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sikkerhedsfaktor · video</title>
+<meta name="description" content="Hvorfor vi har en margin, n = S_y/σ, den tilladte spænding og afvejningen mellem sikkerhed og pris.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 1: videoer</a><h1>Sikkerhedsfaktor</h1><span class="meta">MEM1 · kapitel 1 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Sikkerhedsfaktor"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Hvorfor vi har en margin, n = S_y/σ, den tilladte spænding og afvejningen mellem sikkerhed og pris.</p><div class="chips"><a href="../../Kapitel01_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l01">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Sikkerhedsfaktor (MEM1 kap. 1, slides 11–13). Eksempel: S235, σ = 38,2 MPa (fra slide 17) → n = 6,15
+BP.scene({ header: 'MEM1 · kap. 1' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, frac, plot, dashed, PI } = B;
+
+  B.titel(0, 'Sikkerhedsfaktor', 'MEM1 · kapitel 1 · begreb (slide 11–13)', 'titel');
+  text(0, 'margin mellem styrke og spænding', 640, 520, 40, 'red', wt('titel', 'margin') - 0.2, we('titel', 'for'), { align: 'center' });
+
+  // ---------------- 1 usikkerheder ----------------
+  B.goto('usikkerhed', 1);
+  {
+    const t0 = L('usikkerhed').start;
+    bubble(1, 'Hvorfor en margin?', 150, 140, 54, 'blue', t0, t0 + 0.9);
+    const items = [['usikre laster', 'usikre'], ['spredning i materialet', 'spredning'], ['tolerancer fra fremstillingen', 'tolerancer'], ['forenklede modeller', 'forenklede'], ['følgerne af et svigt', 'følgerne']];
+    items.forEach(([s, w], i) => { const t = wt('usikkerhed', w) - 0.2; dot(1, 170, 240 + 70 * i - 12, 6, 'red', t); text(1, s, 194, 240 + 70 * i, 40, 'black', t, we('usikkerhed', w) + 0.6); });
+  }
+
+  // ---------------- 2 definition og kriterium ----------------
+  B.goto('def', 2);
+  {
+    const t0 = L('def').start;
+    text(2, 'n =', 150, 230, 60, 'red', wt('def', 'n') - 0.1, wt('def', 'n') + 0.3);
+    frac(2, 'materialets styrke', 'beregnet spænding', 420, 212, 34, 'black', wt('def', 'flydespændingen') - 0.2, we('def', 'sigma'));
+    text(2, '=', 640, 230, 60, 'red', we('def', 'sigma'), we('def', 'sigma') + 0.2);
+    frac(2, 'S_y', 'σ', 740, 212, 56, 'red', we('def', 'sigma'), we('def', 'sigma') + 0.6);
+    const ts = L('symboler').start;
+    text(2, 'S_y = flydespænding [MPa]', 170, 320, 32, 'black', ts, we('symboler', 'megapascal'));
+    text(2, 'σ = beregnet spænding [MPa]', 600, 320, 32, 'black', wt('symboler', 'sigma') - 0.1, we('symboler', 'spænding'));
+    text(2, 'n > 1', 1020, 232, 48, 'red', wt('symboler', 'n') - 0.1, we('symboler', 'en'));
+    const tk = L('kriterium').start;
+    box(2, 130, 410, 1020, 140, 'blue', tk, tk + 0.8);
+    text(2, 'Designkriterium:', 170, 470, 36, 'blue', tk + 0.2, wt('kriterium', 'sigma'));
+    text(2, 'σ ≤ σ_{tilladt} = S_y / n_d', 470, 480, 48, 'red', wt('kriterium', 'sigma') - 0.1, we('kriterium', 'd'));
+    text(2, 'n_d = den ønskede sikkerhedsfaktor', 470, 530, 28, 'black', wt('kriterium', 'ønskede') - 0.1, we('kriterium', 'd'));
+  }
+
+  // ---------------- 3 valg af n: en afvejning ----------------
+  B.goto('valg', 3);
+  {
+    const t0 = L('valg').start;
+    text(3, 'større n, når:', 140, 150, 40, 'blue', t0, t0 + 0.6);
+    const items = [['lasten er usikker', 'usikker'], ['materialet er uensartet', 'uensartet'], ['modellen er forenklet', 'forenklet'], ['et svigt kan koste liv', 'liv']];
+    items.forEach(([s, w], i) => text(3, '· ' + s, 170, 220 + 58 * i, 36, 'black', wt('valg', w) - 0.4, we('valg', w) + 0.2));
+    // vippe: sikkerhed mod vægt/pris
+    const tp = L('pris').start, cx = 900, cy = 400;
+    line(3, [[cx - 40, cy + 100], [cx, cy + 30], [cx + 40, cy + 100], [cx - 40, cy + 100]], 'black', 3, tp, tp + 0.4);
+    line(3, [[cx - 260, cy + 10], [cx + 260, cy + 50]], 'black', 3.4, tp + 0.3, tp + 0.8);
+    text(3, 'sikkerhed', cx - 250, cy - 20, 36, 'green', tp + 0.3, tp + 0.8);
+    text(3, 'mål, vægt, pris', cx + 40, cy + 20, 36, 'red', wt('pris', 'mål') - 0.1, we('pris', 'pris'));
+    text(3, 'det er en afvejning', cx - 160, cy + 200, 38, 'blue', wt('pris', 'afvejning') - 0.4, we('pris', 'afvejning'));
+  }
+
+  // ---------------- 4 eksempel ----------------
+  B.goto('eks', 4);
+  {
+    const t0 = L('eks').start;
+    bubble(4, 'Eksempel', 150, 140, 54, 'blue', t0, t0 + 0.7);
+    text(4, 'stål S235:  S_y = 235 MPa', 170, 240, 42, 'black', wt('eks', 'S') - 0.1, we('eks', 'megapascal'));
+    text(4, 'beregnet:  σ = 38,2 MPa  (slide 17)', 170, 320, 42, 'black', wt('eks', 'beregnede') - 0.1, we('eks', 'megapascal', 1));
+    const r = text(4, 'n = 235 / 38,2 = 6,2', 170, 440, 52, 'red', wt('eks2', 'n') - 0.1, we('eks2', 'to', 2));
+    box(4, 150, 385, 620, 85, 'red', we('eks2', 'to', 2), we('eks2', 'to', 2) + 0.5);
+    text(4, 'meget sikker, måske for sikker', 170, 560, 38, 'blue', wt('eks2', 'meget') - 0.1, we('eks2', 'sikker', 1));
+  }
+
+  B.goto('tjek_q', 5);
+  B.tjek(5, ['Hvad betyder n = 0,8?'], ['σ > S_y', 'elementet flyder', 'designet holder ikke'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 6);
+  B.slut(6, 'Abou-Hayt (2026), MEM1 Chapter 1, slide 11–13 · Hamrock, Schmid & Jacobson, kap. 1', 'enheder og betydende cifre', 'slut');
+  text(6, 'n = S_y / σ  >  1', 200, 290, 48, 'red', L('slut').start + 0.4, we('slut', 'en'));
+  text(6, 'σ_{tilladt} = S_y / n_d', 200, 380, 48, 'blue', wt('slut', 'tilladte') - 0.1, we('slut', 'd'));
+});
+
+</script>
+<script>BP.live({"duration":113.55,"audio":"sikkerhedsfaktor.mp3","order":["titel","usikkerhed","def","symboler","kriterium","valg","pris","eks","eks2","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":8.271,"words":[["Sikkerhedsfaktoren",0.601,2.044],["Hvor",2.936,3.116],["stor",3.116,3.387],["en",3.387,3.464],["margin",3.464,3.902],["skal",3.902,4.07],["der",4.07,4.147],["være",4.147,4.289],["mellem",4.289,4.598],["det",4.598,4.92],["materialet",5.062,5.693],["kan",5.693,5.835],["tåle",5.835,6.363],["og",6.557,6.698],["det",6.698,7.033],["det",7.175,7.291],["bliver",7.291,7.536],["udsat",7.536,7.948],["for",7.948,8.271]],"text":"Sikkerhedsfaktoren. Hvor stor en margin skal der være mellem det, materialet kan tåle, og det, det bliver udsat for?"},"usikkerhed":{"start":9.49,"end":21.681,"words":[["Sikkerhed",9.604,10.262],["er",10.262,10.416],["en",10.416,10.545],["del",10.545,10.906],["af",10.906,11.048],["hele",11.048,11.383],["designet",11.383,12.092],["Vi",12.982,13.06],["skal",13.06,13.201],["tage",13.201,13.446],["højde",13.446,13.717],["for",13.717,13.91],["usikre",13.91,14.387],["laster",14.387,14.928],["spredning",15.07,15.572],["i",15.572,15.65],["materialet",15.65,16.436],["tolerancer",16.578,17.209],["fra",17.209,17.364],["fremstillingen",17.364,18.15],["forenklede",18.279,18.82],["modeller",18.82,19.451],["og",19.451,19.58],["hvor",19.58,19.748],["alvorlige",19.748,20.237],["følgerne",20.237,20.766],["af",20.766,20.959],["et",20.959,21.023],["svigt",21.024,21.333],["er",21.333,21.681]],"text":"Sikkerhed er en del af hele designet. Vi skal tage højde for usikre laster, spredning i materialet, tolerancer fra fremstillingen, forenklede modeller og hvor alvorlige følgerne af et svigt er."},"def":{"start":22.896,"end":30.394,"words":[["For",23.023,23.139],["statisk",23.139,23.655],["last",23.655,24.016],["på",24.016,24.183],["et",24.183,24.248],["sejt",24.248,24.518],["materiale",24.518,25.175],["er",25.175,25.266],["sikkerhedsfaktoren",25.266,26.374],["n",26.374,26.554],["lig",26.554,26.735],["flydespændingen",26.735,27.495],["S",27.495,27.766],["y",27.766,27.907],["divideret",27.907,28.59],["med",28.59,28.796],["den",28.797,28.951],["beregnede",28.951,29.454],["spænding",29.454,29.853],["sigma",29.853,30.394]],"text":"For statisk last på et sejt materiale er sikkerhedsfaktoren n lig flydespændingen S y divideret med den beregnede spænding sigma."},"symboler":{"start":31.622,"end":37.832,"words":[["S",31.762,32.007],["y",32.007,32.226],["er",32.226,32.342],["flydespændingen",32.342,33.051],["i",33.051,33.18],["megapascal",33.18,34.108],["sigma",34.236,34.765],["er",34.765,34.894],["den",34.894,35.061],["beregnede",35.061,35.525],["spænding",35.525,36.066],["og",36.234,36.363],["n",36.363,36.53],["skal",36.53,36.711],["være",36.711,36.852],["større",36.852,37.265],["end",37.265,37.471],["en",37.471,37.832]],"text":"S y er flydespændingen i megapascal, sigma er den beregnede spænding, og n skal være større end en."},"kriterium":{"start":39.052,"end":47.465,"words":[["Som",39.166,39.398],["designkriterium",39.398,40.275],["vælger",40.275,40.623],["vi",40.623,40.752],["målene",40.752,41.344],["så",41.486,41.679],["sigma",41.679,42.053],["højst",42.053,42.349],["er",42.349,42.44],["den",42.44,42.607],["tilladte",42.607,42.981],["spænding",42.981,43.496],["som",43.638,43.909],["er",43.909,44.038],["S",44.038,44.295],["y",44.295,44.411],["divideret",44.411,45.068],["med",45.068,45.262],["den",45.262,45.442],["ønskede",45.442,45.855],["sikkerhedsfaktor",45.855,46.808],["n",46.808,47.04],["d.",47.04,47.465]],"text":"Som designkriterium vælger vi målene, så sigma højst er den tilladte spænding, som er S y divideret med den ønskede sikkerhedsfaktor n d."},"valg":{"start":48.69,"end":57.129,"words":[["En",48.817,48.908],["større",48.908,49.217],["sikkerhedsfaktor",49.217,50.119],["er",50.119,50.222],["rimelig",50.222,50.75],["når",50.892,51.124],["lasten",51.124,51.524],["er",51.523,51.627],["usikker",51.627,52.271],["materialet",52.413,53.07],["er",53.07,53.199],["uensartet",53.199,53.998],["modellen",54.114,54.59],["er",54.591,54.668],["forenklet",54.668,55.325],["eller",55.467,55.699],["når",55.699,55.841],["et",55.841,55.905],["svigt",55.905,56.214],["kan",56.214,56.356],["koste",56.356,56.768],["liv",56.768,57.129]],"text":"En større sikkerhedsfaktor er rimelig, når lasten er usikker, materialet er uensartet, modellen er forenklet, eller når et svigt kan koste liv."},"pris":{"start":58.376,"end":65.025,"words":[["Men",58.516,58.658],["en",58.658,58.748],["større",58.748,59.057],["sikkerhedsfaktor",59.057,60.037],["giver",60.037,60.282],["større",60.282,60.604],["mål",60.604,61.029],["mere",61.171,61.48],["vægt",61.48,61.789],["og",61.789,61.957],["højere",61.957,62.292],["pris",62.292,62.82],["Det",63.685,63.916],["er",63.916,64.084],["en",64.084,64.264],["afvejning",64.264,65.025]],"text":"Men en større sikkerhedsfaktor giver større mål, mere vægt og højere pris. Det er en afvejning."},"eks":{"start":66.262,"end":76.971,"words":[["Et",66.376,66.531],["lille",66.531,66.879],["eksempel",66.879,67.588],["En",68.478,68.582],["stang",68.582,68.917],["i",68.917,69.007],["stål",69.007,69.406],["S",69.406,69.625],["to",69.625,69.857],["tre",69.857,70.102],["fem",70.102,70.489],["har",70.489,70.682],["flydespændingen",70.682,71.378],["to",71.378,71.623],["hundrede",71.623,71.829],["og",71.829,71.855],["femogtredive",71.855,72.435],["megapascal",72.435,73.298],["og",73.44,73.582],["den",73.582,73.723],["beregnede",73.723,74.149],["spænding",74.149,74.587],["er",74.587,74.806],["otteogtredive",74.806,75.54],["komma",75.54,75.837],["to",75.837,76.133],["megapascal",76.133,76.971]],"text":"Et lille eksempel. En stang i stål S to tre fem har flydespændingen to hundrede og femogtredive megapascal, og den beregnede spænding er otteogtredive komma to megapascal."},"eks2":{"start":78.204,"end":86.476,"words":[["Så",78.331,78.602],["er",78.602,78.731],["n",78.731,78.937],["lig",78.937,79.104],["to",79.104,79.324],["hundrede",79.324,79.517],["og",79.517,79.53],["femogtredive",79.53,80.187],["divideret",80.187,80.78],["med",80.78,81.05],["otteogtredive",81.05,81.759],["komma",81.759,82.043],["to",82.043,82.481],["altså",82.623,83.086],["seks",83.086,83.409],["komma",83.409,83.679],["to.",83.679,83.911],["Stangen",83.911,84.324],["er",84.324,84.452],["meget",84.452,84.749],["sikker",84.749,85.264],["måske",85.393,85.831],["for",85.831,85.947],["sikker",85.947,86.476]],"text":"Så er n lig to hundrede og femogtredive divideret med otteogtredive komma to, altså seks komma to. Stangen er meget sikker, måske for sikker."},"tjek_q":{"start":87.698,"end":92.634,"words":[["Tjek",87.799,88.121],["dig",88.121,88.301],["selv",88.301,88.727],["Hvad",89.644,89.76],["betyder",89.76,90.172],["en",90.172,90.301],["sikkerhedsfaktor",90.301,91.306],["på",91.306,91.551],["nul",91.551,91.809],["komma",91.809,92.17],["otte",92.17,92.634]],"text":"Tjek dig selv. Hvad betyder en sikkerhedsfaktor på nul komma otte?"},"tjek_a":{"start":96.506,"end":102.64,"words":[["At",96.633,96.685],["spændingen",96.685,97.252],["er",97.252,97.355],["større",97.355,97.87],["end",97.87,98.038],["flydespændingen",98.038,99.004],["Elementet",99.908,100.385],["flyder",100.385,100.978],["og",101.119,101.235],["designet",101.235,101.828],["holder",101.828,102.163],["ikke",102.163,102.64]],"text":"At spændingen er større end flydespændingen. Elementet flyder, og designet holder ikke."},"slut":{"start":103.864,"end":111.118,"words":[["Kort",103.991,104.197],["sagt",104.198,104.687],["n",104.816,104.984],["er",104.984,105.035],["styrke",105.035,105.422],["divideret",105.422,105.95],["med",105.95,106.066],["spænding",106.066,106.594],["n",106.736,106.891],["skal",106.891,107.058],["være",107.058,107.213],["større",107.213,107.574],["end",107.574,107.78],["en",107.78,108.128],["og",108.283,108.411],["den",108.411,108.579],["tilladte",108.579,108.953],["spænding",108.953,109.429],["er",109.429,109.623],["S",109.623,109.919],["y",109.919,110.138],["over",110.138,110.409],["n",110.409,110.679],["d.",110.679,111.118]],"text":"Kort sagt: n er styrke divideret med spænding, n skal være større end en, og den tilladte spænding er S y over n d."}}}, { audio: 'sikkerhedsfaktor.mp3', id: 'sikkerhedsfaktor' });</script>
+</body>
+</html>

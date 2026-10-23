@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opgave 3.39: indsnøring ved ε = n · video</title>
+<meta name="description" content="Vis at indsnøringen begynder ved ε = n for potensmodellen σ = Kεⁿ.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 3: videoer</a><h1>Opgave 3.39: indsnøring ved ε = n</h1><span class="meta">MEM1 · kapitel 3 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Opgave 3.39: indsnøring ved ε = n"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Vis at indsnøringen begynder ved ε = n for potensmodellen σ = Kεⁿ.</p><div class="chips"><a href="e-modul-poisson.html">Se først: E-modul og Poissons forhold</a><a href="../../Kapitel03_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l03">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Opgave 3.39: indsnøring for σ = Kεⁿ ved ε = n (MEM1 kap. 3, slides 22–23 og 39)
+BP.scene({ header: 'MEM1 · kap. 3' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, strike, axes, plot, dashed, PI } = B;
+
+  B.titel(0, 'Opgave 3.39', 'MEM1 · kapitel 3 · opgave (slide 23 og 39)', 'titel');
+  text(0, 'indsnøring ved ε = n', 640, 520, 44, 'red', wt('titel', 'indsnøringen') - 0.2, we('titel', 'n'), { align: 'center' });
+
+  B.goto('model', 1);
+  {
+    const t0 = L('model').start;
+    text(1, 'Potensmodel:', 140, 160, 38, 'black', t0, wt('model', 'Sigma'));
+    text(1, 'σ = K εⁿ', 420, 165, 54, 'blue', wt('model', 'Sigma') - 0.1, we('model', 'n'));
+    const tb = L('betingelse').start;
+    text(1, 'hærdning kan ikke følge med arealets fald', 140, 260, 32, 'black', wt('betingelse', 'hærdning') - 0.2, we('betingelse', 'fald'));
+    const b = text(1, 'Betingelse:   dσ/dε = σ', 140, 340, 46, 'red', wt('betingelse', 'Betingelsen') - 0.1, we('betingelse', 'sigma', 1));
+    box(1, 120, 290, 620, 80, 'red', we('betingelse', 'sigma', 1), we('betingelse', 'sigma', 1) + 0.6);
+    const ta = L('afled').start;
+    text(1, 'dσ/dε = K n εⁿ⁻¹', 140, 450, 48, 'blue', wt('afled', 'D') - 0.1, we('afled', 'en'));
+    const ti = L('indsaet').start;
+    text(1, 'K n εⁿ⁻¹ = K εⁿ', 140, 540, 48, 'black', ti + 0.4, we('indsaet', 'n', 2));
+    const tf = L('forkort').start;
+    text(1, '÷ K εⁿ⁻¹', 560, 540, 40, 'green', wt('forkort', 'dividerer') - 0.1, we('forkort', 'en'));
+    const r = text(1, 'n = ε', 140, 640, 60, 'red', wt('forkort', 'står') - 0.1, we('forkort', 'epsilon', 1));
+    ring(r, 'red', L('resultat').start, L('resultat').start + 0.6);
+  }
+
+  B.goto('resultat', 2);
+  {
+    const ox = 160, oy = 620, t0 = L('resultat').start;
+    axes(2, ox, oy, 760, 150, 'ε', 'F', t0);
+    const P = []; for (let j = 0; j <= 50; j++) { const u = j / 50; P.push([ox + 560 * u, oy - 420 * Math.pow(u + 0.001, 0.3) * Math.exp(-u * 0.9)]); }
+    plot(2, P, 'blue', t0 + 0.2, t0 + 1.4);
+    const um = 0.3 / 0.9, xm = ox + 560 * um;
+    dashed(2, [xm, 150], [xm, oy], 'red', wt('resultat', 'epsilon') - 0.1, we('resultat', 'n'));
+    text(2, 'ε = n', xm + 10, oy + 40, 36, 'red', wt('resultat', 'epsilon'), we('resultat', 'n'));
+    text(2, 'indsnøring starter', xm + 20, 180, 30, 'red', wt('resultat', 'Indsnøringen') - 0.1, we('resultat', 'n'));
+    text(2, 'stor n ⇒ kan strækkes langt', 770, 330, 30, 'blue', wt('resultat', 'stor') - 0.1, we('resultat', 'ind'));
+    text(2, 'gælder for sand σ og sand ε', 770, 420, 30, 'black', L('note').start, we('note', 'beskriver'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Stål med n = 0,22.', 'Hvornår starter indsnøringen?'], ['ved ε = 0,22', '(22 % sand tøjning)'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 3, slide 22–23 og 39 · Hamrock, Schmid & Jacobson, opgave 3.39', '', 'slut');
+  text(4, 'dσ/dε = σ   →   K n εⁿ⁻¹ = K εⁿ   →   ε = n', 200, 300, 40, 'blue', L('slut').start + 0.4, we('slut', 'n'));
+});
+
+</script>
+<script>BP.live({"duration":97.12,"audio":"opg-3-39-necking.mp3","order":["titel","model","betingelse","afled","indsaet","forkort","resultat","note","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":9.521,"words":[["Opgave",0.653,1.078],["tre",1.078,1.478],["komma",1.478,1.8],["niogtredive",1.8,2.612],["Vi",3.528,3.644],["viser",3.644,4.198],["at",4.34,4.533],["indsnøringen",4.534,5.126],["begynder",5.126,5.783],["når",5.925,6.157],["tøjningen",6.157,6.673],["er",6.673,6.776],["lig",6.776,6.956],["deformationshærdningseksponenten",6.956,8.85],["n.",8.851,9.521]],"text":"Opgave tre komma niogtredive. Vi viser, at indsnøringen begynder, når tøjningen er lig deformationshærdningseksponenten n."},"model":{"start":10.738,"end":17.271,"words":[["Materialet",10.878,11.626],["følger",11.626,12.038],["potensmodellen",12.038,13.12],["Sigma",14.011,14.449],["er",14.449,14.604],["K",14.604,14.849],["gange",14.849,15.171],["epsilon",15.171,15.815],["opløftet",15.815,16.447],["til",16.447,16.601],["n.",16.601,17.271]],"text":"Materialet følger potensmodellen. Sigma er K gange epsilon opløftet til n."},"betingelse":{"start":18.504,"end":27.989,"words":[["Indsnøringen",18.631,19.185],["begynder",19.185,19.843],["når",19.984,20.152],["materialets",20.152,20.77],["hærdning",20.771,21.247],["ikke",21.247,21.531],["længere",21.531,21.853],["kan",21.853,21.995],["følge",21.995,22.304],["med",22.304,22.497],["arealets",22.497,23.142],["fald",23.142,23.502],["Betingelsen",24.406,24.96],["er",24.96,25.308],["at",25.45,25.605],["d",25.605,25.798],["sigma",25.798,26.184],["d",26.184,26.442],["epsilon",26.442,27.086],["er",27.086,27.215],["lig",27.215,27.447],["sigma",27.447,27.989]],"text":"Indsnøringen begynder, når materialets hærdning ikke længere kan følge med arealets fald. Betingelsen er, at d sigma d epsilon er lig sigma."},"afled":{"start":29.222,"end":37.263,"words":[["Vi",29.362,29.491],["differentierer",29.491,30.316],["potensmodellen",30.316,31.398],["D",32.302,32.444],["sigma",32.444,32.843],["d",32.843,33.062],["epsilon",33.062,33.707],["er",33.707,33.848],["K",33.848,34.106],["gange",34.106,34.415],["n",34.415,34.609],["gange",34.609,34.905],["epsilon",34.905,35.459],["opløftet",35.459,36.052],["til",36.052,36.31],["n",36.31,36.503],["minus",36.503,36.889],["en",36.89,37.263]],"text":"Vi differentierer potensmodellen. D sigma d epsilon er K gange n gange epsilon opløftet til n minus en."},"indsaet":{"start":38.476,"end":43.784,"words":[["Vi",38.616,38.706],["sætter",38.706,38.99],["det",38.99,39.08],["lig",39.08,39.273],["sigma",39.273,39.802],["K",39.918,40.188],["n",40.188,40.343],["epsilon",40.343,40.949],["i",40.949,41.103],["n",41.103,41.194],["minus",41.194,41.67],["en",41.67,41.864],["er",41.864,41.915],["lig",41.915,42.134],["K",42.134,42.405],["epsilon",42.405,43.036],["i",43.036,43.165],["n.",43.165,43.784]],"text":"Vi sætter det lig sigma: K n epsilon i n minus en er lig K epsilon i n."},"forkort":{"start":45.018,"end":52.131,"words":[["K",45.132,45.39],["går",45.39,45.635],["ud",45.635,45.854],["på",45.854,46.009],["begge",46.009,46.318],["sider",46.318,46.872],["Vi",47.776,47.866],["dividerer",47.866,48.304],["med",48.304,48.523],["epsilon",48.523,49.167],["i",49.167,49.348],["n",49.348,49.477],["minus",49.477,49.812],["en",49.812,50.134],["og",50.276,50.443],["så",50.443,50.598],["står",50.598,50.868],["der",50.869,50.997],["n",50.997,51.204],["lig",51.204,51.448],["epsilon",51.448,52.131]],"text":"K går ud på begge sider. Vi dividerer med epsilon i n minus en, og så står der n lig epsilon."},"resultat":{"start":53.36,"end":61.543,"words":[["Indsnøringen",53.5,54.067],["begynder",54.067,54.467],["altså",54.467,54.815],["ved",54.815,55.034],["epsilon",55.034,55.73],["lig",55.73,56.013],["n.",56.013,56.657],["Et",57.574,57.664],["materiale",57.664,58.218],["med",58.218,58.347],["stor",58.347,58.734],["n",58.734,59.017],["kan",59.017,59.185],["strækkes",59.185,59.584],["langt",59.584,59.997],["før",60.125,60.396],["det",60.396,60.46],["snører",60.461,60.796],["sig",60.796,60.989],["ind.",60.989,61.543]],"text":"Indsnøringen begynder altså ved epsilon lig n. Et materiale med stor n kan strækkes langt, før det snører sig ind."},"note":{"start":62.758,"end":68.195,"words":[["Bemærk",62.898,63.375],["at",63.543,63.684],["det",63.684,63.762],["gælder",63.762,64.032],["for",64.032,64.161],["sand",64.161,64.432],["spænding",64.432,64.844],["og",64.844,64.973],["sand",64.973,65.244],["tøjning",65.244,65.759],["som",65.901,66.171],["er",66.171,66.223],["dem",66.223,66.584],["potensmodellen",66.726,67.524],["beskriver",67.524,68.195]],"text":"Bemærk, at det gælder for sand spænding og sand tøjning, som er dem, potensmodellen beskriver."},"tjek_q":{"start":69.42,"end":76.624,"words":[["Tjek",69.521,69.843],["dig",69.843,70.023],["selv",70.023,70.449],["Et",71.353,71.443],["stål",71.443,71.752],["har",71.752,71.92],["n",71.92,72.049],["lig",72.049,72.281],["nul",72.281,72.539],["komma",72.539,72.886],["to",72.886,73.157],["to.",73.157,73.557],["Ved",74.459,74.575],["hvilken",74.575,74.923],["tøjning",74.923,75.374],["begynder",75.374,75.838],["indsnøringen",75.838,76.624]],"text":"Tjek dig selv. Et stål har n lig nul komma to to. Ved hvilken tøjning begynder indsnøringen?"},"tjek_a":{"start":80.508,"end":85.326,"words":[["Ved",80.648,80.816],["epsilon",80.816,81.499],["lig",81.499,81.756],["nul",81.756,81.963],["komma",81.963,82.246],["to",82.246,82.491],["to",82.491,82.891],["altså",83.032,83.445],["toogtyve",83.445,83.999],["procent",83.999,84.45],["sand",84.45,84.798],["tøjning",84.798,85.326]],"text":"Ved epsilon lig nul komma to to, altså toogtyve procent sand tøjning."},"slut":{"start":86.57,"end":94.676,"words":[["Kort",86.71,86.916],["sagt",86.916,87.406],["sæt",87.522,87.806],["hældningen",87.806,88.205],["lig",88.205,88.398],["spændingen",88.398,89.043],["differentiér",89.159,89.726],["potensmodellen",89.726,90.666],["og",90.86,90.976],["forkort",90.976,91.633],["Så",92.524,92.73],["får",92.73,92.859],["du",92.859,93.026],["epsilon",93.026,93.709],["lig",93.709,93.993],["n.",93.993,94.676]],"text":"Kort sagt: sæt hældningen lig spændingen, differentiér potensmodellen, og forkort. Så får du epsilon lig n."}}}, { audio: 'opg-3-39-necking.mp3', id: 'opg-3-39-necking' });</script>
+</body>
+</html>

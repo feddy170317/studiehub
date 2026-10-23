@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duktile og sprøde materialer · video</title>
+<meta name="description" content="Duktile og sprøde materialer, forskellen på kurverne, og hvorfor sprøde materialer tåler tryk bedre end træk.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 3: videoer</a><h1>Duktile og sprøde materialer</h1><span class="meta">MEM1 · kapitel 3 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Duktile og sprøde materialer"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Duktile og sprøde materialer, forskellen på kurverne, og hvorfor sprøde materialer tåler tryk bedre end træk.</p><div class="chips"><a href="../../../../lab/mem1/bjaelke-brud.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel03_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l03">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Duktile og sprøde materialer (MEM1 kap. 3, slides 4–7 og 12)
+BP.scene({ header: 'MEM1 · kap. 3' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, axes, plot, ell, PI, TAU } = B;
+
+  B.titel(0, 'Duktil eller sprød', 'MEM1 · kapitel 3 · begreb (slide 4–7, 12)', 'titel');
+  text(0, 'samme styrke, helt forskelligt brud', 640, 520, 40, 'red', wt('titel', 'alligevel') - 0.2, we('titel', 'stykker'), { align: 'center' });
+
+  // ---------------- 1 hvorfor materialet betyder noget ----------------
+  B.goto('hvorfor', 1);
+  {
+    const t0 = L('hvorfor').start;
+    text(1, 'samme geometri + samme last', 640, 200, 40, 'black', t0 + 0.4, we('hvorfor', 'last', 1), { align: 'center' });
+    arrow(1, [[640, 230], [640, 300]], 'black', 3, we('hvorfor', 'last', 1), we('hvorfor', 'last', 1) + 0.3, 14);
+    const ord = ['styrke', 'stivhed', 'duktilitet', 'sejhed'];
+    ord.forEach((w, i) => text(1, w, 230 + 270 * i, 380, 42, 'red', wt('hvorfor', w) - 0.1, we('hvorfor', w) + 0.3, { align: 'center' }));
+    text(1, 'kan være vidt forskellige', 640, 470, 36, 'blue', wt('hvorfor', 'vidt') - 0.1, we('hvorfor', 'forskellig'), { align: 'center' });
+  }
+
+  // ---------------- 2 de to kurver ----------------
+  B.goto('duktil', 2);
+  {
+    const ox = 160, oy = 620, t0 = L('duktil').start;
+    axes(2, ox, oy, 1180, 130, 'ε', 'σ', t0);
+    const td = wt('duktil', 'flyder') - 0.6;
+    const D = [[ox, oy], [260, 330], [300, 318]];
+    for (let j = 1; j <= 30; j++) { const u = j / 30; D.push([300 + 720 * u, 318 - 120 * Math.sin(u * PI * 0.8) + (u > 0.75 ? 160 * (u - 0.75) : 0)]); }
+    plot(2, D, 'blue', td, we('duktil', 'sidst'));
+    line(2, [[1012, 250], [1032, 274]], 'blue', 3.4, we('duktil', 'brister', 1) - 0.1, we('duktil', 'brister', 1)); line(2, [[1032, 250], [1012, 274]], 'blue', 3.4, we('duktil', 'brister', 1), we('duktil', 'brister', 1) + 0.1);
+    text(2, 'duktil', 720, 180, 40, 'blue', wt('duktil', 'duktilt') - 0.1, we('duktil', 'duktilt'));
+    text(2, 'flydning', 250, 290, 28, 'blue', wt('duktil', 'flyder') - 0.1, we('duktil', 'flyder'));
+    text(2, 'plastisk deformation', 520, 270, 28, 'blue', wt('duktil', 'plastisk', 1) - 0.1, we('duktil', 'plastisk', 1) + 0.4);
+    const ts = L('skoer').start;
+    plot(2, [[ox, oy], [250, 250]], 'red', ts + 0.2, ts + 1.0);
+    line(2, [[240, 236], [262, 262]], 'red', 3.4, wt('skoer', 'brud') - 0.2, wt('skoer', 'brud')); line(2, [[262, 236], [240, 262]], 'red', 3.4, wt('skoer', 'brud'), wt('skoer', 'brud') + 0.1);
+    text(2, 'sprød', 200, 210, 40, 'red', wt('skoer', 'sprødt') - 0.1, we('skoer', 'sprødt'));
+    const tk = L('kurver').start;
+    text(2, 'lille ε_f', 260, 660, 30, 'red', wt('kurver', 'lille') - 0.1, we('kurver', 'tøjning'));
+    text(2, 'stor ε_f', 990, 660, 30, 'blue', wt('kurver', 'langt') - 0.1, we('kurver', 'ud'));
+  }
+
+  // ---------------- 3 fordele og sprøde materialer ----------------
+  B.goto('fordel', 3);
+  {
+    const t0 = L('fordel').start;
+    bubble(3, 'Duktilitet er nyttig', 150, 140, 52, 'blue', t0, t0 + 0.8);
+    const f = [['formning', 'formes'], ['tåler lokal deformation', 'lokal'], ['advarer før brud', 'advarsel']];
+    f.forEach(([s, w], i) => text(3, '· ' + s, 170, 220 + 55 * i, 36, 'black', wt('fordel', w) - 0.2, we('fordel', w) + 0.4));
+    text(3, 'duktil ≠ stærkest', 760, 275, 40, 'red', wt('fordel', 'Men') - 0.1, we('fordel', 'stærkeste'));
+    const tt = L('tryk').start;
+    text(3, 'Sprøde (keramik, støbejern):', 170, 430, 34, 'black', tt, we('tryk', 'materialer', 1));
+    text(3, 'tryk  ≫  træk', 170, 490, 44, 'red', wt('tryk', 'stærkere') - 0.2, we('tryk', 'træk'));
+    // fejl i træk og tryk
+    const tf = L('fejl').start;
+    line(3, ell(960, 520, 40, 10, 0, TAU), 'black', 2.6, tf, tf + 0.4);
+    arrow(3, [[960, 500], [960, 420]], 'red', 3.4, wt('fejl', 'træk') - 0.1, wt('fejl', 'træk') + 0.3, 13); arrow(3, [[960, 540], [960, 620]], 'red', 3.4, wt('fejl', 'træk'), wt('fejl', 'træk') + 0.4, 13);
+    line(3, ell(960, 520, 46, 24, 0, TAU), 'red', 2.4, wt('fejl', 'åbner') - 0.1, we('fejl', 'vokser'));
+    text(3, 'træk: åbner', 960, 395, 28, 'red', wt('fejl', 'åbner') - 0.1, we('fejl', 'vokser'), { align: 'center' });
+    line(3, ell(1150, 520, 40, 10, 0, TAU), 'black', 2.6, wt('fejl', 'tryk') - 0.2, wt('fejl', 'tryk') + 0.2);
+    arrow(3, [[1150, 420], [1150, 498]], 'blue', 3.4, wt('fejl', 'tryk'), wt('fejl', 'tryk') + 0.3, 13); arrow(3, [[1150, 620], [1150, 542]], 'blue', 3.4, wt('fejl', 'tryk') + 0.1, wt('fejl', 'tryk') + 0.4, 13);
+    text(3, 'tryk: lukkes', 1150, 395, 28, 'blue', wt('fejl', 'klemt') - 0.2, we('fejl', 'sammen'), { align: 'center' });
+    text(3, 'lastens retning er vigtig', 170, 590, 36, 'blue', wt('fejl', 'lastens') - 0.1, we('fejl', 'materiale'));
+  }
+
+  B.goto('tjek_q', 4);
+  B.tjek(4, ['Støbejern: godt til fundamenter,', 'sjældent til trækstænger. Hvorfor?'], ['sprødt og stærkest i tryk', 'fundament = tryk, trækstang = træk'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 5);
+  B.slut(5, 'Abou-Hayt (2026), MEM1 Chapter 3, slide 4–7 og 12 · Hamrock, Schmid & Jacobson, kap. 3', 'spændings-tøjningskurven', 'slut');
+  text(5, 'duktil: stor plastisk deformation før brud', 200, 280, 40, 'blue', L('slut').start + 0.4, we('slut', 'brud'));
+  text(5, 'sprød: næsten ingen · tryk ≫ træk', 200, 360, 40, 'red', wt('slut', 'sprødt') - 0.1, we('slut', 'træk'));
+});
+
+</script>
+<script>BP.live({"duration":116.104,"audio":"duktil-skoer.mp3","order":["titel","hvorfor","duktil","skoer","kurver","fordel","tryk","fejl","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":8.696,"words":[["Duktile",0.614,1.233],["og",1.233,1.375],["sprøde",1.375,1.787],["materialer",1.787,2.56],["To",3.451,3.657],["materialer",3.657,4.237],["kan",4.237,4.405],["have",4.405,4.495],["samme",4.495,4.83],["styrke",4.83,5.281],["og",5.281,5.461],["alligevel",5.461,5.951],["opføre",5.951,6.415],["sig",6.415,6.595],["helt",6.595,6.814],["forskelligt",6.814,7.42],["når",7.562,7.729],["de",7.729,7.832],["går",7.832,8.103],["i",8.103,8.142],["stykker",8.142,8.696]],"text":"Duktile og sprøde materialer. To materialer kan have samme styrke og alligevel opføre sig helt forskelligt, når de går i stykker."},"hvorfor":{"start":9.922,"end":20.592,"words":[["Materialet",10.062,10.616],["bestemmer",10.616,11.286],["hvordan",11.428,12.034],["elementet",12.034,12.652],["reagerer",12.652,13.245],["på",13.245,13.4],["last",13.4,13.902],["Samme",14.78,15.18],["geometri",15.18,15.76],["og",15.76,15.824],["samme",15.824,16.172],["last",16.172,16.61],["kan",16.61,16.778],["give",16.778,16.932],["vidt",16.932,17.1],["forskellig",17.1,17.525],["styrke",17.525,18.092],["stivhed",18.234,18.917],["duktilitet",19.059,19.819],["og",19.819,19.961],["sejhed",19.961,20.592]],"text":"Materialet bestemmer, hvordan elementet reagerer på last. Samme geometri og samme last kan give vidt forskellig styrke, stivhed, duktilitet og sejhed."},"duktil":{"start":21.84,"end":30.1,"words":[["Et",21.98,22.122],["duktilt",22.122,22.547],["materiale",22.547,23.153],["deformeres",23.153,23.771],["plastisk",23.771,24.235],["meget",24.235,24.686],["før",24.828,25.124],["det",25.125,25.215],["brister",25.215,25.808],["Det",26.685,26.788],["flyder",26.788,27.085],["først",27.085,27.626],["deformeres",27.755,28.27],["så",28.27,28.386],["plastisk",28.386,28.979],["og",28.979,29.134],["brister",29.134,29.508],["til",29.508,29.636],["sidst",29.636,30.1]],"text":"Et duktilt materiale deformeres plastisk meget, før det brister. Det flyder først, deformeres så plastisk og brister til sidst."},"skoer":{"start":31.334,"end":38.525,"words":[["Et",31.461,31.564],["sprødt",31.564,31.874],["materiale",31.874,32.505],["deformeres",32.505,33.162],["næsten",33.162,33.704],["ikke",33.704,34.0],["plastisk",34.0,34.657],["Det",35.548,35.638],["går",35.638,35.857],["direkte",35.857,36.398],["fra",36.398,36.63],["elastisk",36.63,37.159],["deformation",37.159,37.893],["til",37.893,38.048],["brud",38.048,38.525]],"text":"Et sprødt materiale deformeres næsten ikke plastisk. Det går direkte fra elastisk deformation til brud."},"kurver":{"start":39.772,"end":49.579,"words":[["På",39.899,39.977],["spændings-tøjningskurven",39.977,41.214],["ses",41.214,41.6],["forskellen",41.6,42.167],["tydeligt",42.167,42.734],["Den",43.638,43.754],["sprøde",43.754,44.102],["kurve",44.102,44.579],["stopper",44.579,44.927],["brat",44.927,45.184],["ved",45.184,45.442],["en",45.442,45.558],["lille",45.558,45.842],["tøjning",45.842,46.396],["Den",47.311,47.44],["duktile",47.44,47.865],["kurve",47.865,48.187],["fortsætter",48.187,48.857],["langt",48.857,49.244],["ud",49.244,49.579]],"text":"På spændings-tøjningskurven ses forskellen tydeligt. Den sprøde kurve stopper brat ved en lille tøjning. Den duktile kurve fortsætter langt ud."},"fordel":{"start":50.826,"end":63.249,"words":[["Duktilitet",50.94,51.572],["er",51.572,51.688],["nyttig",51.688,52.178],["når",52.319,52.564],["et",52.564,52.654],["emne",52.654,52.912],["skal",52.912,53.067],["formes",53.067,53.685],["når",53.827,53.995],["det",53.995,54.098],["skal",54.098,54.252],["tåle",54.252,54.549],["lokal",54.549,54.897],["deformation",54.897,55.708],["eller",55.85,56.082],["når",56.082,56.198],["det",56.198,56.301],["skal",56.301,56.469],["give",56.469,56.649],["en",56.649,56.739],["advarsel",56.739,57.461],["før",57.59,57.873],["det",57.873,57.951],["bryder",57.951,58.247],["sammen",58.247,58.763],["Men",59.666,59.821],["et",59.821,59.937],["duktilt",59.937,60.362],["materiale",60.362,61.135],["er",61.135,61.341],["ikke",61.341,61.638],["nødvendigvis",61.638,62.372],["det",62.372,62.501],["stærkeste",62.501,63.249]],"text":"Duktilitet er nyttig, når et emne skal formes, når det skal tåle lokal deformation, eller når det skal give en advarsel, før det bryder sammen. Men et duktilt materiale er ikke nødvendigvis det stærkeste."},"tryk":{"start":64.472,"end":73.183,"words":[["Sprøde",64.586,64.986],["materialer",64.986,65.566],["som",65.566,65.798],["keramik",65.798,66.3],["og",66.3,66.442],["mange",66.442,66.764],["støbte",66.764,67.074],["materialer",67.074,67.808],["er",67.808,67.95],["meget",67.95,68.22],["stærkere",68.22,68.749],["i",68.749,68.865],["tryk",68.865,69.264],["end",69.264,69.432],["i",69.432,69.496],["træk",69.496,69.999],["Grunden",70.89,71.173],["er",71.173,71.276],["porer",71.276,71.74],["og",71.74,71.869],["fejl",71.869,72.243],["i",72.243,72.359],["materialet",72.359,73.183]],"text":"Sprøde materialer som keramik og mange støbte materialer er meget stærkere i tryk end i træk. Grunden er porer og fejl i materialet."},"fejl":{"start":74.398,"end":84.205,"words":[["I",74.525,74.616],["træk",74.616,75.067],["åbner",75.067,75.427],["en",75.427,75.556],["fejl",75.556,75.827],["sig",75.827,76.201],["og",76.201,76.355],["vokser",76.355,76.961],["I",77.852,77.929],["tryk",77.929,78.251],["bliver",78.251,78.483],["den",78.483,78.689],["klemt",78.689,78.973],["sammen",78.973,79.54],["Derfor",80.416,80.816],["er",80.816,80.88],["lastens",80.88,81.318],["retning",81.318,81.705],["vigtig",81.705,82.22],["når",82.362,82.529],["man",82.529,82.697],["vælger",82.697,83.019],["et",83.019,83.161],["sprødt",83.161,83.444],["materiale",83.444,84.205]],"text":"I træk åbner en fejl sig og vokser. I tryk bliver den klemt sammen. Derfor er lastens retning vigtig, når man vælger et sprødt materiale."},"tjek_q":{"start":85.428,"end":91.626,"words":[["Tjek",85.529,85.851],["dig",85.851,86.031],["selv",86.031,86.457],["Hvorfor",87.361,87.632],["bruges",87.632,87.915],["støbejern",87.915,88.495],["gerne",88.495,88.804],["til",88.804,88.972],["maskinfundamenter",88.972,90.119],["men",90.26,90.441],["sjældent",90.441,90.776],["til",90.776,90.905],["trækstænger",90.905,91.626]],"text":"Tjek dig selv. Hvorfor bruges støbejern gerne til maskinfundamenter, men sjældent til trækstænger?"},"tjek_a":{"start":95.508,"end":102.866,"words":[["Fordi",95.635,95.996],["støbejern",95.996,96.563],["er",96.563,96.692],["sprødt",96.692,97.13],["og",97.13,97.285],["meget",97.285,97.581],["stærkere",97.581,98.122],["i",98.122,98.251],["tryk",98.251,98.741],["Et",99.632,99.735],["fundament",99.735,100.263],["er",100.263,100.328],["mest",100.328,100.663],["i",100.663,100.714],["tryk",100.714,101.178],["en",101.32,101.5],["trækstang",101.5,102.119],["er",102.119,102.273],["i",102.273,102.351],["træk",102.351,102.866]],"text":"Fordi støbejern er sprødt og meget stærkere i tryk. Et fundament er mest i tryk, en trækstang er i træk."},"slut":{"start":104.09,"end":113.69,"words":[["Kort",104.23,104.436],["sagt",104.436,104.913],["duktilt",105.029,105.442],["betyder",105.442,105.802],["stor",105.802,106.086],["plastisk",106.086,106.524],["deformation",106.524,107.181],["før",107.181,107.4],["brud",107.4,107.787],["sprødt",107.929,108.302],["betyder",108.302,108.715],["næsten",108.715,109.166],["ingen",109.166,109.643],["Sprøde",110.52,110.92],["materialer",110.92,111.654],["tåler",111.654,112.028],["tryk",112.028,112.299],["langt",112.299,112.595],["bedre",112.595,113.02],["end",113.02,113.188],["træk",113.188,113.69]],"text":"Kort sagt: duktilt betyder stor plastisk deformation før brud, sprødt betyder næsten ingen. Sprøde materialer tåler tryk langt bedre end træk."}}}, { audio: 'duktil-skoer.mp3', id: 'duktil-skoer' });</script>
+</body>
+</html>

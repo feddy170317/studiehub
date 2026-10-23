@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resiliens og sejhed · video</title>
+<meta name="description" content="Resiliens som elastisk energi, U_r = S_y²/(2E), og sejhed som hele arealet frem til brud.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 3: videoer</a><h1>Resiliens og sejhed</h1><span class="meta">MEM1 · kapitel 3 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Resiliens og sejhed"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Resiliens som elastisk energi, U_r = S_y²/(2E), og sejhed som hele arealet frem til brud.</p><div class="chips"><a href="spaendings-toejningskurve.html">Se først: Spændings-tøjningskurven</a><a href="../../Kapitel03_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l03">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Resiliens og sejhed (MEM1 kap. 3, slides 18–20)
+BP.scene({ header: 'MEM1 · kap. 3' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, axes, plot, dashed, hatch, frac, PI } = B;
+
+  B.titel(0, 'Resiliens og sejhed', 'MEM1 · kapitel 3 · begreb (slide 18–20)', 'titel');
+  text(0, 'hvor meget energi kan materialet optage?', 640, 520, 38, 'red', wt('titel', 'energi') - 0.4, we('titel', 'optage'), { align: 'center' });
+
+  B.goto('begge', 1);
+  {
+    const ox = 160, oy = 620, t0 = L('begge').start;
+    axes(1, ox, oy, 720, 140, 'ε', 'σ', t0 - 0.3);
+    const C = [[ox, oy], [230, 340]]; for (let j = 1; j <= 30; j++) { const u = j / 30; C.push([230 + 420 * u, 340 - 140 * Math.sin(u * PI * 0.75)]); }
+    plot(1, C, 'black', t0, t0 + 1.4);
+    line(1, [[650, C[C.length - 1][1]], [650, oy]], 'black', 2, t0 + 1.2, t0 + 1.5, { alpha: 0.5 });
+    text(1, 'areal under kurven = energi pr. volumen', 640, 140, 30, 'black', wt('begge', 'arealer') - 0.2, we('begge', 'spændings-tøjningskurven'), { align: 'center' });
+    // resiliens: trekant under det elastiske stykke
+    const tr = L('resiliens').start;
+    hatch(1, [[ox, oy], [230, 340], [230, oy]], 'blue', wt('resiliens', 'elastiske') - 0.3, we('resiliens', 'aflaster'), { gap: 7 });
+    text(1, 'resiliens', 760, 300, 40, 'blue', tr, we('resiliens', 'resiliensen') + 0.2);
+    text(1, 'elastisk, kommer tilbage', 760, 350, 30, 'blue', wt('resiliens', 'elastiske') - 0.1, we('resiliens', 'aflaster'));
+    const tu = L('ur').start;
+    text(1, 'U_r =', 760, 440, 44, 'blue', wt('ur', 'resiliensmodulet') - 0.1, we('ur', 'r'));
+    frac(1, 'S_y²', '2E', 930, 424, 44, 'blue', wt('ur', 'S') - 0.1, we('ur', 'E'));
+    text(1, 'fx en fjeder', 760, 560, 32, 'black', wt('fjeder', 'fjeder') - 0.4, we('fjeder', 'fjeder'));
+  }
+
+  B.goto('sejhed', 2);
+  {
+    const ox = 160, oy = 620, t0 = L('sejhed').start;
+    axes(2, ox, oy, 720, 140, 'ε', 'σ', t0 - 0.3);
+    const C = [[ox, oy], [230, 340]]; for (let j = 1; j <= 30; j++) { const u = j / 30; C.push([230 + 420 * u, 340 - 140 * Math.sin(u * PI * 0.75)]); }
+    plot(2, C, 'black', t0, t0 + 1.0);
+    hatch(2, C.concat([[650, oy]]), 'red', wt('sejhed', 'hele') - 0.3, we('sejhed', 'kurven'), { gap: 9 });
+    text(2, 'sejhed', 760, 280, 40, 'red', t0 + 0.2, we('sejhed', 'Sejheden') + 0.3);
+    text(2, 'energi frem til brud', 760, 330, 30, 'red', wt('sejhed', 'brud') - 0.4, we('sejhed', 'brud'));
+    text(2, 'U_t = ∫ σ dε   (0 til ε_f)', 760, 420, 40, 'red', wt('sejhed', 'integralet') - 0.1, we('sejhed', 'brudtøjningen'));
+    text(2, 'ε_f', 640, 660, 30, 'black', wt('sejhed', 'brudtøjningen') - 0.3, we('sejhed', 'brudtøjningen'));
+    const ts = L('sammen').start;
+    text(2, 'lang kurve ⇒ stor sejhed', 760, 500, 32, 'black', wt('sammen', 'Duktile') - 0.1, we('sammen', 'lang'));
+    const te = L('enhed').start;
+    box(2, 740, 545, 460, 90, 'green', te, te + 0.6);
+    text(2, '1 MPa = 1 MJ/m³', 770, 605, 40, 'green', wt('enhed', 'megapascal') - 0.2, we('enhed', 'kubikmeter'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['S_y fordobles, E uændret.', 'Hvad sker der med U_r?'], ['4 gange så stor', 'S_y indgår i anden'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 3, slide 18–20 · Hamrock, Schmid & Jacobson, kap. 3', 'materialeklasser og kompositter', 'slut');
+  text(4, 'resiliens: U_r = S_y² / (2E)', 200, 280, 44, 'blue', L('slut').start + 0.4, we('slut', 'E'));
+  text(4, 'sejhed: hele arealet frem til brud', 200, 370, 44, 'red', wt('slut', 'sejhed') - 0.1, we('slut', 'brud'));
+});
+
+</script>
+<script>BP.live({"duration":97.384,"audio":"resiliens-sejhed.mp3","order":["titel","begge","resiliens","ur","fjeder","sejhed","sammen","enhed","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":6.544,"words":[["Resiliens",0.614,1.336],["og",1.336,1.478],["sejhed",1.478,2.122],["To",3.013,3.271],["mål",3.271,3.49],["for",3.49,3.902],["hvor",4.044,4.198],["meget",4.198,4.508],["energi",4.508,5.036],["et",5.036,5.165],["materiale",5.165,5.758],["kan",5.758,5.938],["optage",5.938,6.544]],"text":"Resiliens og sejhed. To mål for, hvor meget energi et materiale kan optage."},"begge":{"start":7.762,"end":12.219,"words":[["Begge",7.889,8.16],["er",8.16,8.224],["arealer",8.224,8.817],["under",8.817,9.049],["spændings-tøjningskurven",9.049,10.364],["men",10.505,10.686],["over",10.686,10.956],["forskellige",10.956,11.549],["områder",11.549,12.219]],"text":"Begge er arealer under spændings-tøjningskurven, men over forskellige områder."},"resiliens":{"start":13.44,"end":19.946,"words":[["Resiliensen",13.567,14.379],["er",14.379,14.521],["den",14.521,14.701],["energi",14.701,15.333],["der",15.475,15.578],["lagres",15.578,15.926],["i",15.926,16.08],["det",16.08,16.209],["elastiske",16.209,16.789],["område",16.789,17.395],["og",17.575,17.691],["som",17.691,17.884],["kommer",17.884,18.116],["tilbage",18.116,18.722],["når",18.877,19.057],["vi",19.057,19.199],["aflaster",19.199,19.946]],"text":"Resiliensen er den energi, der lagres i det elastiske område, og som kommer tilbage, når vi aflaster."},"ur":{"start":21.182,"end":32.587,"words":[["For",21.309,21.438],["lineært",21.438,21.825],["elastisk",21.825,22.353],["opførsel",22.353,22.907],["op",22.907,23.113],["til",23.113,23.255],["flydegrænsen",23.255,24.015],["er",24.015,24.157],["resiliensmodulet",24.157,25.227],["U",25.227,25.459],["r",25.459,25.639],["lig",25.639,25.91],["S",25.91,26.18],["y",26.18,26.374],["i",26.374,26.593],["anden",26.593,26.954],["divideret",26.954,27.624],["med",27.624,27.817],["to",27.817,28.139],["E.",28.139,28.436],["Det",29.339,29.481],["er",29.481,29.623],["arealet",29.623,30.19],["af",30.19,30.319],["trekanten",30.319,31.118],["under",31.118,31.375],["den",31.375,31.569],["elastiske",31.569,32.187],["del.",32.187,32.587]],"text":"For lineært elastisk opførsel op til flydegrænsen er resiliensmodulet U r lig S y i anden divideret med to E. Det er arealet af trekanten under den elastiske del."},"fjeder":{"start":33.82,"end":39.759,"words":[["Et",33.947,34.05],["stort",34.05,34.373],["resiliensmodul",34.373,35.275],["er",35.275,35.339],["godt",35.339,35.764],["når",35.906,36.112],["et",36.112,36.202],["emne",36.202,36.46],["skal",36.46,36.653],["optage",36.653,37.117],["energi",37.117,37.517],["elastisk",37.517,38.213],["for",38.355,38.522],["eksempel",38.522,39.05],["en",39.05,39.231],["fjeder",39.231,39.759]],"text":"Et stort resiliensmodul er godt, når et emne skal optage energi elastisk, for eksempel en fjeder."},"sejhed":{"start":40.986,"end":51.501,"words":[["Sejheden",41.113,41.732],["er",41.732,41.861],["den",41.861,42.067],["energi",42.067,42.673],["materialet",42.814,43.497],["optager",43.497,44.0],["helt",44.0,44.296],["frem",44.296,44.58],["til",44.58,44.709],["brud",44.709,45.147],["Det",46.05,46.166],["er",46.166,46.218],["hele",46.218,46.489],["arealet",46.489,47.043],["under",47.043,47.275],["kurven",47.275,47.829],["integralet",47.971,48.628],["af",48.628,48.705],["sigma",48.705,49.105],["d",49.105,49.375],["epsilon",49.375,50.084],["fra",50.084,50.264],["nul",50.264,50.535],["til",50.535,50.677],["brudtøjningen",50.677,51.501]],"text":"Sejheden er den energi, materialet optager helt frem til brud. Det er hele arealet under kurven, integralet af sigma d epsilon fra nul til brudtøjningen."},"sammen":{"start":52.712,"end":61.552,"words":[["Et",52.852,52.968],["sejt",52.968,53.252],["materiale",53.252,53.87],["kan",53.87,54.102],["optage",54.102,54.553],["meget",54.553,54.863],["energi",54.863,55.507],["før",55.636,55.932],["det",55.932,56.022],["brister",56.022,56.628],["Duktile",57.519,57.918],["materialer",57.918,58.575],["har",58.575,58.846],["ofte",58.846,59.194],["stor",59.194,59.477],["sejhed",59.477,60.044],["fordi",60.186,60.56],["kurven",60.56,61.062],["er",61.063,61.191],["lang",61.191,61.552]],"text":"Et sejt materiale kan optage meget energi, før det brister. Duktile materialer har ofte stor sejhed, fordi kurven er lang."},"enhed":{"start":62.782,"end":69.586,"words":[["Enheden",62.922,63.399],["er",63.399,63.631],["energi",63.631,64.159],["pr.",64.159,64.404],["volumen",64.404,65.048],["En",65.939,66.042],["megapascal",66.042,66.931],["er",66.931,67.06],["det",67.06,67.138],["samme",67.138,67.486],["som",67.486,67.692],["en",67.692,67.808],["megajoule",67.808,68.388],["pr.",68.388,68.697],["kubikmeter",68.697,69.586]],"text":"Enheden er energi pr. volumen. En megapascal er det samme som en megajoule pr. kubikmeter."},"tjek_q":{"start":70.812,"end":77.977,"words":[["Tjek",70.913,71.235],["dig",71.235,71.415],["selv",71.415,71.841],["Hvad",72.745,72.861],["sker",72.861,73.144],["der",73.144,73.26],["med",73.26,73.492],["resiliensmodulet",73.492,74.73],["hvis",74.858,75.09],["flydespændingen",75.09,75.76],["fordobles",75.76,76.534],["og",76.753,76.946],["E",76.946,77.204],["er",77.204,77.333],["uændret",77.333,77.977]],"text":"Tjek dig selv. Hvad sker der med resiliensmodulet, hvis flydespændingen fordobles, og E er uændret?"},"tjek_a":{"start":81.852,"end":85.639,"words":[["Det",81.966,82.044],["bliver",82.044,82.25],["fire",82.25,82.546],["gange",82.546,82.83],["så",82.83,82.959],["stort",82.959,83.435],["fordi",83.564,84.028],["S",84.028,84.312],["y",84.312,84.518],["indgår",84.518,85.021],["i",85.021,85.214],["anden",85.214,85.639]],"text":"Det bliver fire gange så stort, fordi S y indgår i anden."},"slut":{"start":86.858,"end":94.936,"words":[["Kort",86.985,87.191],["sagt",87.192,87.668],["resiliens",87.784,88.351],["er",88.351,88.441],["elastisk",88.441,88.918],["energi",88.918,89.575],["U",89.717,89.949],["r",89.949,90.246],["er",90.246,90.4],["S",90.4,90.722],["y",90.722,90.89],["i",90.89,91.083],["anden",91.083,91.444],["over",91.444,91.702],["to",91.702,92.063],["E",92.063,92.346],["og",92.501,92.655],["sejhed",92.655,93.145],["er",93.145,93.197],["hele",93.197,93.493],["arealet",93.493,94.06],["frem",94.06,94.344],["til",94.344,94.485],["brud",94.485,94.936]],"text":"Kort sagt: resiliens er elastisk energi, U r er S y i anden over to E, og sejhed er hele arealet frem til brud."}}}, { audio: 'resiliens-sejhed.mp3', id: 'resiliens-sejhed' });</script>
+</body>
+</html>
