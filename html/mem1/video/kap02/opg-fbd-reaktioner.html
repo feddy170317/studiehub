@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reaktionerne på bjælken fra slide 14 · video</title>
+<meta name="description" content="Reaktionerne på bjælken fra slide 14 med fordelt last og skrå kraft, inkl. kontrol.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 2: videoer</a><h1>Reaktionerne på bjælken fra slide 14</h1><span class="meta">MEM1 · kapitel 2 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Reaktionerne på bjælken fra slide 14"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Reaktionerne på bjælken fra slide 14 med fordelt last og skrå kraft, inkl. kontrol.</p><div class="chips"><a href="fbd-ligevaegt.html">Se først: Understøtninger, ligevægt og frit legeme</a><a href="../../Kapitel02_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l02">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Reaktionerne på bjælken fra slide 14 (MEM1 kap. 2). Tal kontrolleret: R_Ax = 12,5, R_By = 29,16, R_Ay = 42,49 kN
+BP.scene({ header: 'MEM1 · kap. 2' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, beam, pin, roller, distLoad, dashed, ell, PI } = B;
+  const X = (m) => 240 + 100 * m; // 1 m = 100 px
+
+  B.titel(0, 'Reaktioner fra slide 14', 'MEM1 · kapitel 2 · opgave (slide 14)', 'titel');
+  text(0, 'frit legeme + tre ligninger', 640, 520, 40, 'red', wt('titel', 'tegner') - 0.1, we('titel', 'ligevægtsligninger'), { align: 'center' });
+
+  // ---------------- 1 opgaven ----------------
+  B.goto('opgave', 1);
+  {
+    const t0 = L('opgave').start, y = 330;
+    beam(1, X(0), y, X(8), 30, 'black', t0, t0 + 0.6);
+    text(1, 'A', X(0) - 30, y - 10, 38, 'black', wt('opgave', 'A') - 0.1, wt('opgave', 'A') + 0.2);
+    pin(1, X(0), y + 30, wt('opgave', 'charnier') - 0.1);
+    text(1, 'B', X(8) + 18, y - 10, 38, 'black', wt('opgave', 'B') - 0.1, wt('opgave', 'B') + 0.2);
+    roller(1, X(8), y + 30, wt('opgave', 'rulle') - 0.1);
+    const tw = wt('opgave', 'fordelt') - 0.3;
+    distLoad(1, X(0) + 4, X(5), y, 80, 'blue', tw, tw + 1.4, 10);
+    text(1, 'w = 10 kN/m', X(2.5), y - 100, 38, 'blue', wt('opgave', 'ti') - 0.1, we('opgave', 'meter', 2), { align: 'center' });
+    const tp = wt('opgave', 'skrå') - 0.2, a = PI / 3;
+    arrow(1, [[X(5) + 170 * Math.cos(a), y - 170 * Math.sin(a)], [X(5) + 4, y - 4]], 'red', 4.4, tp, tp + 0.6);
+    text(1, 'P = 25 kN', X(5) + 100, y - 175, 38, 'red', wt('opgave', 'femogtyve') - 0.1, we('opgave', 'kilonewton', 1));
+    line(1, ell(X(5), y, 60, 60, -a, 0), 'red', 2.4, wt('opgave', 'tres') - 0.2, wt('opgave', 'tres') + 0.3);
+    text(1, '60°', X(5) + 70, y - 20, 32, 'red', wt('opgave', 'tres'), we('opgave', 'grader'));
+    const td = wt('opgave', 'fem') - 0.2;
+    arrow(1, [[X(0), 450], [X(5) - 4, 450]], 'black', 2.2, td, td + 0.4, 12); arrow(1, [[X(5) + 4, 450], [X(8), 450]], 'black', 2.2, td + 0.2, td + 0.6, 12);
+    text(1, '5 m', X(2.5), 490, 34, 'black', td + 0.3, td + 0.6, { align: 'center' });
+    text(1, '3 m', X(6.5), 490, 34, 'black', td + 0.5, td + 0.8, { align: 'center' });
+    text(1, 'L = 8 m', X(4), 560, 34, 'black', wt('opgave', 'otte') - 0.1, we('opgave', 'lang'), { align: 'center' });
+  }
+
+  // ---------------- 2 det frie legeme ----------------
+  B.goto('fbd', 2);
+  {
+    const t0 = L('fbd').start, y = 330;
+    beam(2, X(0), y, X(8), 30, 'black', t0, t0 + 0.6);
+    text(2, 'A', X(0) - 26, y - 14, 36, 'black', t0 + 0.4, t0 + 0.6); text(2, 'B', X(8) + 14, y - 14, 36, 'black', t0 + 0.5, t0 + 0.7);
+    arrow(2, [[X(0) - 120, y + 15], [X(0) - 6, y + 15]], 'red', 4, wt('fbd', 'x') - 0.3, wt('fbd', 'x'));
+    text(2, 'R_{Ax}', X(0) - 120, y + 60, 34, 'red', wt('fbd', 'x'), wt('fbd', 'x') + 0.3);
+    arrow(2, [[X(0), y + 150], [X(0), y + 36]], 'red', 4, wt('fbd', 'y') - 0.3, wt('fbd', 'y'));
+    text(2, 'R_{Ay}', X(0) + 14, y + 150, 34, 'red', wt('fbd', 'y'), wt('fbd', 'y') + 0.3);
+    arrow(2, [[X(8), y + 150], [X(8), y + 36]], 'red', 4, wt('fbd', 'y', 1) - 0.3, wt('fbd', 'y', 1));
+    text(2, 'R_{By}', X(8) + 14, y + 150, 34, 'red', wt('fbd', 'y', 1), wt('fbd', 'y', 1) + 0.3);
+    // resultant af den fordelte last
+    const tr = L('fordelt').start;
+    distLoad(2, X(0) + 4, X(5), y, 60, 'blue', tr, tr + 0.8, 10);
+    arrow(2, [[X(2.5), y - 190], [X(2.5), y - 70]], 'blue', 4.6, wt('fordelt', 'halvtreds') - 0.4, wt('fordelt', 'halvtreds'));
+    text(2, '10 · 5 = 50 kN', X(2.5) - 16, y - 160, 34, 'blue', wt('fordelt', 'ti') - 0.1, we('fordelt', 'kilonewton'), { align: 'right' });
+    dashed(2, [X(2.5), y + 40], [X(2.5), y + 110], 'blue', wt('fordelt', 'midt') - 0.2, wt('fordelt', 'midt') + 0.3);
+    arrow(2, [[X(0) + 30, y + 100], [X(2.5) - 4, y + 100]], 'blue', 2.2, wt('fordelt', 'to') - 0.2, wt('fordelt', 'to') + 0.3, 12);
+    text(2, '2,5 m', X(1.3), y + 92, 30, 'blue', wt('fordelt', 'to'), we('fordelt', 'fem', 1), { align: 'center' });
+    // komposanter af P
+    const ts = L('skraa').start;
+    arrow(2, [[X(5) + 140, y - 6], [X(5) + 6, y - 6]], 'green', 4, wt('skraa', 'vandrette') - 0.2, wt('skraa', 'vandrette') + 0.3);
+    text(2, '25 cos 60° = 12,5', X(5) + 30, y - 40, 32, 'green', wt('skraa', 'femogtyve') - 0.1, we('skraa', 'fem'));
+    arrow(2, [[X(5) + 6, y - 190], [X(5) + 6, y - 8]], 'green', 4, wt('skraa', 'lodrette') - 0.2, wt('skraa', 'lodrette') + 0.3);
+    text(2, '25 sin 60° = 21,65', X(5) + 24, y - 150, 32, 'green', wt('skraa', 'femogtyve', 1) - 0.1, we('skraa', 'kilonewton'));
+  }
+
+  // ---------------- 3 ligevægt ----------------
+  B.goto('vandret', 3);
+  {
+    const s = 36;
+    text(3, 'ΣF_x = 0:', 120, 160, s, 'black', L('vandret').start, L('vandret').start + 0.6);
+    text(3, 'R_{Ax} = 12,5 kN  →', 360, 160, s, 'red', wt('vandret', 'R') - 0.1, we('vandret', 'højre'));
+    text(3, 'ΣM_A = 0:', 120, 260, s, 'black', L('moment').start, wt('moment', 'fjerner'));
+    text(3, '8 · R_{By} = 50 · 2,5 + 21,65 · 5', 360, 260, s, 'blue', wt('moment', 'R', 2) - 0.1, we('moment', 'fem', 2));
+    text(3, 'R_{By} = 233,25 / 8 = 29,2 kN', 360, 340, s, 'red', wt('rby', 'R') - 0.1, we('rby', 'kilonewton'));
+    text(3, 'ΣF_y = 0:', 120, 440, s, 'black', L('lodret').start, L('lodret').start + 0.6);
+    const r = text(3, 'R_{Ay} = 50 + 21,65 − 29,2 = 42,5 kN', 360, 440, s, 'red', wt('lodret', 'R') - 0.1, we('lodret', 'kilonewton'));
+    box(3, 340, 395, 760, 70, 'red', we('lodret', 'kilonewton'), we('lodret', 'kilonewton') + 0.6);
+    const tk = L('kontrol').start;
+    text(3, 'Kontrol, ΣM_B:', 120, 570, 34, 'green', tk, tk + 0.8);
+    text(3, '42,5 · 8 = 50 · 5,5 + 21,65 · 3', 400, 570, 34, 'green', wt('kontrol', 'toogfyrre') - 0.1, we('kontrol', 'tre'));
+    text(3, '340 ≈ 340  ✓', 400, 630, 38, 'green', wt('kontrol', 'Begge') - 0.1, we('kontrol', 'passer'));
+  }
+
+  B.goto('tjek_q', 4);
+  B.tjek(4, ['Hvorfor tage momentet om A', 'og ikke om midten?'], ['R_{Ax} og R_{Ay} angriber i A', '→ kun én ukendt i ligningen'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 5);
+  B.slut(5, 'Abou-Hayt (2026), MEM1 Chapter 2, slide 14–15 · Hamrock, Schmid & Jacobson, kap. 2', '', 'slut');
+  text(5, 'understøtning → reaktioner', 200, 270, 40, 'blue', L('slut').start + 0.4, we('slut', 'reaktioner'));
+  text(5, 'fordelt last → resultant i midten', 200, 340, 40, 'blue', wt('slut', 'fordelt') - 0.1, we('slut', 'resultant'));
+  text(5, 'skrå kraft → komposanter', 200, 410, 40, 'blue', wt('slut', 'skrå') - 0.1, we('slut', 'komposanter'));
+  text(5, 'moment om punktet med flest ukendte', 200, 490, 40, 'red', wt('slut', 'momentet') - 0.1, we('slut', 'angriber'));
+});
+
+</script>
+<script>BP.live({"duration":144.332,"audio":"opg-fbd-reaktioner.mp3","order":["titel","opgave","fbd","fordelt","skraa","vandret","moment","rby","lodret","kontrol","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.343,"words":[["Reaktionerne",0.627,1.323],["på",1.323,1.465],["bjælken",1.465,2.058],["fra",2.058,2.212],["slide",2.212,2.586],["fjorten",2.586,3.205],["Vi",4.082,4.198],["tegner",4.198,4.546],["det",4.546,4.649],["frie",4.649,4.907],["legeme",4.907,5.423],["og",5.423,5.564],["bruger",5.564,5.861],["de",5.861,5.99],["tre",5.99,6.312],["ligevægtsligninger",6.312,7.343]],"text":"Reaktionerne på bjælken fra slide fjorten. Vi tegner det frie legeme og bruger de tre ligevægtsligninger."},"opgave":{"start":8.554,"end":23.528,"words":[["Bjælken",8.694,9.042],["er",9.042,9.197],["otte",9.197,9.493],["meter",9.493,9.725],["lang",9.725,10.099],["med",10.099,10.318],["et",10.318,10.395],["charnier",10.395,10.924],["i",10.924,11.168],["A",11.168,11.491],["og",11.491,11.645],["en",11.645,11.761],["rulle",11.761,12.122],["i",12.122,12.341],["B",12.341,12.715],["De",13.606,13.683],["første",13.683,14.031],["fem",14.031,14.327],["meter",14.327,14.83],["bærer",14.83,15.087],["en",15.088,15.178],["fordelt",15.178,15.59],["last",15.59,15.977],["på",15.977,16.118],["ti",16.118,16.389],["kilonewton",16.389,17.085],["pr.",17.085,17.33],["meter",17.33,17.858],["Ved",18.76,18.876],["fem",18.876,19.134],["meter",19.134,19.572],["virker",19.572,19.907],["en",19.907,20.023],["skrå",20.023,20.332],["kraft",20.332,20.68],["P",20.68,21.002],["på",21.002,21.17],["femogtyve",21.17,21.737],["kilonewton",21.737,22.484],["under",22.484,22.742],["tres",22.742,23.013],["grader",23.013,23.528]],"text":"Bjælken er otte meter lang med et charnier i A og en rulle i B. De første fem meter bærer en fordelt last på ti kilonewton pr. meter. Ved fem meter virker en skrå kraft P på femogtyve kilonewton under tres grader."},"fbd":{"start":24.744,"end":30.799,"words":[["I",24.871,24.949],["det",24.949,25.052],["frie",25.052,25.309],["legeme",25.309,25.76],["erstatter",25.76,26.263],["vi",26.263,26.405],["charnieret",26.405,26.985],["med",26.985,27.32],["R",27.32,27.577],["A",27.577,27.848],["x",27.848,28.106],["og",28.106,28.209],["R",28.209,28.544],["A",28.544,28.699],["y",28.699,29.008],["og",29.163,29.291],["rullen",29.291,29.73],["med",29.73,30.039],["R",30.039,30.232],["B",30.232,30.503],["y",30.503,30.799]],"text":"I det frie legeme erstatter vi charnieret med R A x og R A y, og rullen med R B y."},"fordelt":{"start":32.03,"end":42.326,"words":[["Den",32.17,32.312],["fordelte",32.312,32.711],["last",32.711,33.072],["erstattes",33.072,33.755],["af",33.755,33.949],["en",33.949,34.09],["resultant",34.09,34.799],["Den",35.69,35.819],["er",35.819,35.935],["ti",35.935,36.192],["gange",36.192,36.45],["fem",36.45,36.85],["altså",36.953,37.313],["halvtreds",37.314,37.726],["kilonewton",37.726,38.473],["og",38.615,38.731],["den",38.731,38.899],["virker",38.899,39.182],["midt",39.182,39.375],["på",39.375,39.504],["lasten",39.504,40.11],["to",40.239,40.509],["komma",40.509,40.806],["fem",40.806,41.063],["meter",41.064,41.527],["fra",41.527,41.772],["A.",41.772,42.326]],"text":"Den fordelte last erstattes af en resultant. Den er ti gange fem, altså halvtreds kilonewton, og den virker midt på lasten, to komma fem meter fra A."},"skraa":{"start":43.54,"end":58.256,"words":[["Den",43.654,43.809],["skrå",43.809,44.131],["kraft",44.131,44.544],["deles",44.544,45.02],["i",45.02,45.162],["komposanter",45.162,46.051],["Den",46.942,47.097],["vandrette",47.097,47.522],["del",47.522,47.87],["er",47.87,48.012],["femogtyve",48.012,48.579],["gange",48.579,48.888],["cosinus",48.888,49.403],["tres",49.403,49.893],["altså",50.035,50.409],["tolv",50.409,50.731],["komma",50.731,51.066],["fem.",51.066,51.697],["Den",52.586,52.741],["lodrette",52.741,53.192],["del",53.192,53.54],["er",53.54,53.669],["femogtyve",53.669,54.249],["gange",54.249,54.532],["sinus",54.532,54.893],["tres",54.893,55.383],["altså",55.525,55.976],["enogtyve",55.976,56.581],["komma",56.581,56.903],["seks",56.903,57.277],["fem",57.277,57.496],["kilonewton",57.496,58.256]],"text":"Den skrå kraft deles i komposanter. Den vandrette del er femogtyve gange cosinus tres, altså tolv komma fem. Den lodrette del er femogtyve gange sinus tres, altså enogtyve komma seks fem kilonewton."},"vandret":{"start":59.49,"end":67.17,"words":[["Vandret",59.591,60.145],["ligevægt",60.145,60.867],["Kraften",61.784,62.196],["P",62.196,62.467],["skubber",62.467,62.866],["mod",62.866,63.098],["venstre",63.098,63.704],["så",63.833,64.103],["R",64.103,64.348],["A",64.348,64.4],["x",64.4,64.683],["er",64.683,64.799],["tolv",64.799,65.096],["komma",65.096,65.392],["fem",65.392,65.65],["kilonewton",65.65,66.359],["mod",66.359,66.655],["højre",66.655,67.17]],"text":"Vandret ligevægt. Kraften P skubber mod venstre, så R A x er tolv komma fem kilonewton mod højre."},"moment":{"start":68.384,"end":77.777,"words":[["Moment",68.524,68.859],["om",68.859,69.014],["A",69.014,69.053],["fjerner",69.053,69.529],["både",69.529,69.903],["R",69.903,70.174],["A",70.174,70.431],["x",70.431,70.676],["og",70.676,70.754],["R",70.754,71.14],["A",71.14,71.449],["y",71.449,71.772],["R",71.772,72.029],["B",72.029,72.287],["y",72.287,72.506],["gange",72.506,72.867],["otte",72.867,73.292],["er",73.292,73.46],["lig",73.46,73.705],["halvtreds",73.705,74.065],["gange",74.065,74.375],["to",74.375,74.671],["komma",74.671,75.045],["fem",75.045,75.303],["plus",75.303,75.547],["enogtyve",75.547,76.217],["komma",76.217,76.54],["seks",76.54,76.888],["fem",76.888,77.081],["gange",77.081,77.377],["fem.",77.377,77.777]],"text":"Moment om A fjerner både R A x og R A y. R B y gange otte er lig halvtreds gange to komma fem plus enogtyve komma seks fem gange fem."},"rby":{"start":79.006,"end":86.208,"words":[["Det",79.12,79.198],["giver",79.198,79.649],["R",79.649,79.881],["B",79.881,80.126],["y",80.126,80.396],["lig",80.396,80.641],["to",80.641,80.886],["hundrede",80.886,81.079],["og",81.079,81.105],["treogtredive",81.105,81.788],["komma",81.788,82.097],["to",82.097,82.355],["fem",82.355,82.587],["divideret",82.587,83.141],["med",83.141,83.334],["otte",83.334,83.811],["altså",83.94,84.275],["niogtyve",84.275,84.919],["komma",84.919,85.216],["to",85.216,85.474],["kilonewton",85.474,86.208]],"text":"Det giver R B y lig to hundrede og treogtredive komma to fem divideret med otte, altså niogtyve komma to kilonewton."},"lodret":{"start":87.444,"end":97.431,"words":[["Lodret",87.558,88.048],["ligevægt",88.048,88.654],["giver",88.654,88.976],["resten",88.976,89.594],["R",90.498,90.704],["A",90.704,90.794],["y",90.794,91.052],["er",91.052,91.181],["halvtreds",91.181,91.619],["plus",91.619,91.89],["enogtyve",91.89,92.508],["komma",92.508,92.805],["seks",92.805,93.14],["fem",93.14,93.333],["minus",93.333,93.72],["niogtyve",93.72,94.235],["komma",94.235,94.519],["to",94.519,94.944],["altså",95.073,95.421],["toogfyrre",95.421,96.117],["komma",96.117,96.413],["fem",96.413,96.684],["kilonewton",96.684,97.431]],"text":"Lodret ligevægt giver resten. R A y er halvtreds plus enogtyve komma seks fem minus niogtyve komma to, altså toogfyrre komma fem kilonewton."},"kontrol":{"start":98.666,"end":111.925,"words":[["Kontrol",98.806,99.231],["med",99.231,99.438],["moment",99.438,99.811],["om",99.811,99.953],["B",99.953,100.34],["toogfyrre",100.456,101.036],["komma",101.036,101.332],["fem",101.332,101.59],["gange",101.59,101.886],["otte",101.886,102.286],["er",102.286,102.44],["lig",102.44,102.685],["halvtreds",102.685,103.059],["gange",103.059,103.394],["fem",103.394,103.69],["komma",103.69,104.038],["fem",104.038,104.309],["plus",104.309,104.566],["enogtyve",104.567,105.275],["komma",105.275,105.585],["seks",105.585,105.932],["fem",105.932,106.139],["gange",106.139,106.435],["tre",106.435,106.847],["Begge",107.725,107.97],["sider",107.97,108.408],["giver",108.408,108.705],["omkring",108.705,109.169],["tre",109.169,109.465],["hundrede",109.465,109.723],["og",109.723,109.748],["fyrre",109.748,110.303],["Det",111.164,111.332],["passer",111.332,111.925]],"text":"Kontrol med moment om B: toogfyrre komma fem gange otte er lig halvtreds gange fem komma fem plus enogtyve komma seks fem gange tre. Begge sider giver omkring tre hundrede og fyrre. Det passer."},"tjek_q":{"start":113.152,"end":118.191,"words":[["Tjek",113.253,113.575],["dig",113.575,113.755],["selv",113.755,114.193],["Hvorfor",115.111,115.343],["tager",115.343,115.562],["vi",115.562,115.665],["momentet",115.665,116.167],["om",116.167,116.374],["A",116.374,116.696],["og",116.696,116.876],["ikke",116.876,117.147],["om",117.147,117.301],["midten",117.301,117.611],["af",117.611,117.675],["bjælken",117.675,118.191]],"text":"Tjek dig selv. Hvorfor tager vi momentet om A og ikke om midten af bjælken?"},"tjek_a":{"start":122.056,"end":129.426,"words":[["Fordi",122.17,122.505],["to",122.506,122.763],["af",122.763,122.841],["de",122.841,122.969],["ukendte",122.969,123.627],["R",123.756,124.0],["A",124.0,124.258],["x",124.258,124.49],["og",124.49,124.554],["R",124.554,124.864],["A",124.864,125.121],["y",125.121,125.444],["angriber",125.585,126.114],["i",126.114,126.243],["A.",126.243,126.861],["Så",126.861,127.093],["indeholder",127.093,127.544],["momentligningen",127.544,128.292],["kun",128.292,128.627],["én",128.627,128.884],["ukendt",128.884,129.426]],"text":"Fordi to af de ukendte, R A x og R A y, angriber i A. Så indeholder momentligningen kun én ukendt."},"slut":{"start":130.662,"end":141.912,"words":[["Kort",130.789,131.021],["sagt",131.021,131.498],["erstat",131.64,132.13],["understøtninger",132.13,132.838],["med",132.838,133.044],["reaktioner",133.044,133.856],["fordelt",133.985,134.436],["last",134.436,134.771],["med",134.771,134.939],["en",134.939,135.042],["resultant",135.042,135.648],["og",135.648,135.764],["skrå",135.764,136.086],["kræfter",136.086,136.614],["med",136.614,136.782],["komposanter",136.782,137.658],["Tag",138.549,138.781],["så",138.781,138.935],["momentet",138.935,139.464],["om",139.464,139.67],["et",139.67,139.773],["punkt",139.773,140.185],["hvor",140.353,140.52],["de",140.52,140.675],["ukendte",140.675,141.203],["angriber",141.203,141.912]],"text":"Kort sagt: erstat understøtninger med reaktioner, fordelt last med en resultant og skrå kræfter med komposanter. Tag så momentet om et punkt, hvor de ukendte angriber."}}}, { audio: 'opg-fbd-reaktioner.mp3', id: 'opg-fbd-reaktioner' });</script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opgave 2.41: bjælke med punktlast · video</title>
+<meta name="description" content="V- og M-diagram for en simpelt understøttet bjælke med punktlast i L/3. M_max = 2PL/9.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 2: videoer</a><h1>Opgave 2.41: bjælke med punktlast</h1><span class="meta">MEM1 · kapitel 2 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Opgave 2.41: bjælke med punktlast"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>V- og M-diagram for en simpelt understøttet bjælke med punktlast i L/3. M_max = 2PL/9.</p><div class="chips"><a href="snitkraefter-v-m.html">Se først: Forskydningskraft- og momentdiagrammer</a><a href="../../Kapitel02_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l02">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Opgave 2.41: simpelt understøttet bjælke med punktlast i L/3 (MEM1 kap. 2, slides 25–27)
+BP.scene({ header: 'MEM1 · kap. 2' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, beam, pin, roller, moment, plot, dashed, frac, ell, PI } = B;
+  const X = (u) => 200 + 840 * u; // u = x / L
+
+  B.titel(0, 'Opgave 2.41', 'MEM1 · kapitel 2 · opgave (slide 25–27)', 'titel');
+  text(0, 'V- og M-diagram · M_{max}', 640, 520, 40, 'red', wt('titel', 'diagrammerne') - 0.4, we('titel', 'moment'), { align: 'center' });
+
+  // ---------------- 1 opgave og reaktioner ----------------
+  B.goto('opgave', 1);
+  {
+    const t0 = L('opgave').start, y = 220;
+    beam(1, X(0), y, X(1), 28, 'black', t0, t0 + 0.6);
+    text(1, 'A', X(0) - 30, y - 6, 36, 'black', wt('opgave', 'A') - 0.1, wt('opgave', 'A') + 0.2); pin(1, X(0), y + 28, wt('opgave', 'charnier') - 0.1, 'black', 0.8);
+    text(1, 'B', X(1) + 16, y - 6, 36, 'black', wt('opgave', 'B') - 0.1, wt('opgave', 'B') + 0.2); roller(1, X(1), y + 28, wt('opgave', 'rulle') - 0.1, 'black', 0.8);
+    const tp = wt('opgave', 'Kraften') - 0.2;
+    arrow(1, [[X(1 / 3), y - 120], [X(1 / 3), y - 4]], 'blue', 4.4, tp, tp + 0.5); text(1, 'P', X(1 / 3) + 14, y - 90, 40, 'blue', tp + 0.3, tp + 0.5);
+    const td = wt('opgave', 'tredjedel') - 0.2;
+    arrow(1, [[X(0), 330], [X(1 / 3) - 4, 330]], 'black', 2.2, td, td + 0.4, 12); arrow(1, [[X(1 / 3) + 4, 330], [X(1), 330]], 'black', 2.2, td + 0.2, td + 0.6, 12);
+    text(1, 'L/3', X(1 / 6), 368, 32, 'black', td + 0.3, td + 0.6, { align: 'center' });
+    text(1, '2L/3', X(2 / 3), 368, 32, 'black', td + 0.4, td + 0.7, { align: 'center' });
+    const tr = L('reaktioner').start;
+    text(1, 'ΣM_B = 0:   A_y · L = P · 2L/3', 160, 470, 38, 'black', tr + 0.2, we('reaktioner', 'L', 1));
+    const a = text(1, 'A_y = 2P/3', 160, 545, 44, 'red', wt('reaktioner', 'Altså') - 0.1, we('reaktioner', 'P', 1));
+    text(1, 'ΣF_y = 0:   B_y = P/3', 640, 545, 40, 'red', wt('reaktioner', 'Lodret') - 0.1, we('reaktioner', 'P', 2));
+    arrow(1, [[X(0) + 30, 300], [X(0) + 30, 260]], 'red', 3.4, wt('reaktioner', 'Altså'), wt('reaktioner', 'Altså') + 0.3, 12);
+    arrow(1, [[X(1) - 30, 300], [X(1) - 30, 260]], 'red', 3.4, wt('reaktioner', 'Lodret'), wt('reaktioner', 'Lodret') + 0.3, 12);
+  }
+
+  // ---------------- 2 to snit ----------------
+  B.goto('snit1', 2);
+  {
+    const piece = (y, t, len, lab) => {
+      beam(2, 150, y, 150 + len, 26, 'black', t, t + 0.4); pin(2, 150, y + 26, t + 0.3, 'black', 0.7);
+      arrow(2, [[150, y + 140], [150, y + 70]], 'red', 3.4, t + 0.4, t + 0.6, 12); text(2, 'A_y', 166, y + 140, 30, 'red', t + 0.5, t + 0.7);
+      B.dashed(2, [150 + len, y - 40], [150 + len, y + 70], 'red', t + 0.3, t + 0.6);
+      arrow(2, [[150 + len + 20, y - 30], [150 + len + 20, y + 60]], 'red', 3.4, t + 0.6, t + 0.9, 13); text(2, 'V', 150 + len + 34, y + 70, 32, 'red', t + 0.8, t + 1.0);
+      moment(2, 150 + len, y + 13, 46, 0.75 * PI, 1.4 * PI, 'green', t + 0.7, t + 1.0); text(2, 'M', 150 + len - 80, y - 30, 32, 'green', t + 0.9, t + 1.1);
+      arrow(2, [[150, y + 52], [150 + len, y + 52]], 'black', 2, t + 0.2, t + 0.5, 11); text(2, 'x', 150 + len / 2, y + 86, 30, 'black', t + 0.4, t + 0.6);
+      text(2, lab, 150, y - 100, 30, 'blue', t, t + 0.6);
+    };
+    const t1 = L('snit1').start;
+    piece(220, t1, 200, '0 < x < L/3');
+    text(2, 'V = +2P/3', 560, 230, 42, 'red', wt('snit1', 'Forskydningskraften') - 0.1, we('snit1', 'P'));
+    text(2, 'M = (2P/3) · x', 860, 230, 42, 'green', wt('snit1', 'momentet') - 0.1, we('snit1', 'x'));
+    const t2 = L('snit2').start;
+    piece(500, t2, 300, 'L/3 < x < L');
+    arrow(2, [[150 + 140, 500 - 80], [150 + 140, 496]], 'blue', 3.6, t2 + 0.4, t2 + 0.7, 13); text(2, 'P', 150 + 154, 450, 32, 'blue', t2 + 0.6, t2 + 0.8);
+    text(2, 'V = −P/3', 560, 520, 42, 'red', wt('snit2', 'forskydningskraften') - 0.1, we('snit2', 'P'));
+    text(2, 'M = (P/3)(L − x)', 860, 520, 42, 'green', wt('snit2', 'momentet') - 0.1, we('snit2', 'x'));
+  }
+
+  // ---------------- 3 diagrammerne ----------------
+  B.goto('vdiagram', 3);
+  {
+    const t0 = L('vdiagram').start, yv = 300, ym = 600, xp = X(1 / 3);
+    beam(3, X(0), 110, X(1), 20, 'black', t0, t0 + 0.4);
+    arrow(3, [[xp, 60], [xp, 106]], 'blue', 3.4, t0 + 0.2, t0 + 0.5, 12);
+    text(3, 'V', 140, yv - 10, 40, 'red', t0, t0 + 0.3);
+    line(3, [[X(0), yv], [X(1), yv]], 'black', 2.2, t0, t0 + 0.4);
+    plot(3, [[X(0), yv], [X(0), yv - 90], [xp, yv - 90], [xp, yv + 45], [X(1), yv + 45], [X(1), yv]], 'red', wt('vdiagram', 'konstant') - 0.3, we('vdiagram', 'stykke'));
+    text(3, '+2P/3', X(1 / 6), yv - 104, 32, 'red', wt('vdiagram', 'konstant'), wt('vdiagram', 'konstant') + 0.4, { align: 'center' });
+    text(3, '−P/3', X(2 / 3), yv + 90, 32, 'red', wt('vdiagram', 'hvert') - 0.1, we('vdiagram', 'stykke'), { align: 'center' });
+    arrow(3, [[xp + 30, yv - 86], [xp + 30, yv + 40]], 'blue', 2.6, wt('vdiagram', 'springer') - 0.1, wt('vdiagram', 'springer') + 0.4, 12);
+    text(3, 'spring = P', xp + 44, yv - 20, 30, 'blue', wt('vdiagram', 'springer'), we('vdiagram', 'P'));
+    const tm = L('mdiagram').start;
+    text(3, 'M', 140, ym - 90, 40, 'green', tm, tm + 0.3);
+    line(3, [[X(0), ym], [X(1), ym]], 'black', 2.2, tm, tm + 0.4);
+    plot(3, [[X(0), ym], [xp, ym - 150]], 'green', wt('mdiagram', 'stiger') - 0.2, we('mdiagram', 'A'));
+    plot(3, [[xp, ym - 150], [X(1), ym]], 'green', wt('mdiagram', 'falder') - 0.2, we('mdiagram', 'B'));
+    const tx = L('mmax').start;
+    dashed(3, [xp, 130], [xp, ym + 20], 'black', wt('mmax', 'skifter') - 0.3, we('mmax', 'fortegn'));
+    dot(3, xp, ym - 150, 8, 'green', wt('mmax', 'Toppen'));
+    const mm = text(3, 'M_{max} = 2PL/9', xp + 30, ym - 160, 44, 'green', wt('mmax', 'M') - 0.1, we('mmax', 'L', 1));
+    ring(mm, 'red', wt('kritisk', 'kritiske') - 0.2, we('kritisk', 'bøjning'));
+    text(3, 'kritisk snit', xp + 40, ym + 50, 34, 'red', wt('kritisk', 'kritiske') - 0.1, we('kritisk', 'størst'));
+  }
+
+  B.goto('tjek_q', 4);
+  B.tjek(4, ['Hvis P sad midt på bjælken,', 'hvad var M_{max} så?'], ['A_y = B_y = P/2', 'M_{max} = (P/2)(L/2) = PL/4'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 5);
+  B.slut(5, 'Abou-Hayt (2026), MEM1 Chapter 2, slide 25–27 · Hamrock, Schmid & Jacobson, opgave 2.41', '', 'slut');
+  text(5, 'reaktioner → ét snit pr. stykke', 200, 280, 40, 'blue', L('slut').start + 0.4, we('slut', 'stykke'));
+  text(5, 'M_{max} hvor V skifter fortegn', 200, 360, 42, 'red', wt('slut', 'største') - 0.1, we('slut', 'fortegn'));
+  text(5, 'M_{max} = 2PL/9', 200, 450, 48, 'green', wt('slut', 'Her') - 0.1, we('slut', 'L'));
+});
+
+</script>
+<script>BP.live({"duration":113.622,"audio":"opg-2-41.mp3","order":["titel","opgave","reaktioner","snit1","snit2","vdiagram","mdiagram","mmax","kritisk","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":9.714,"words":[["Opgave",0.653,1.091],["to",1.091,1.465],["komma",1.465,1.864],["enogfyrre",1.864,2.702],["En",3.606,3.722],["simpelt",3.722,4.224],["understøttet",4.224,4.804],["bjælke",4.804,5.32],["med",5.32,5.552],["en",5.552,5.68],["punktlast",5.68,6.389],["Vi",7.291,7.407],["finder",7.407,7.704],["diagrammerne",7.704,8.464],["og",8.464,8.619],["det",8.619,8.709],["største",8.709,9.173],["moment",9.173,9.714]],"text":"Opgave to komma enogfyrre. En simpelt understøttet bjælke med en punktlast. Vi finder diagrammerne og det største moment."},"opgave":{"start":10.93,"end":17.501,"words":[["Bjælken",11.057,11.379],["har",11.38,11.495],["længden",11.495,11.856],["L",11.856,12.23],["et",12.372,12.526],["charnier",12.526,13.029],["i",13.029,13.287],["A",13.287,13.596],["og",13.596,13.751],["en",13.751,13.841],["rulle",13.841,14.15],["i",14.15,14.33],["B",14.331,14.678],["Kraften",14.678,15.155],["P",15.155,15.439],["virker",15.439,15.8],["en",15.8,15.903],["tredjedel",15.903,16.508],["inde",16.508,16.766],["på",16.766,16.895],["bjælken",16.895,17.501]],"text":"Bjælken har længden L, et charnier i A og en rulle i B. Kraften P virker en tredjedel inde på bjælken."},"reaktioner":{"start":18.72,"end":28.035,"words":[["Moment",18.847,19.157],["om",19.157,19.298],["B",19.298,19.53],["giver",19.53,19.84],["A",19.84,20.072],["y",20.072,20.252],["gange",20.252,20.613],["L",20.613,20.806],["lig",20.806,20.974],["P",20.974,21.167],["gange",21.167,21.489],["to",21.489,21.747],["tredjedele",21.747,22.262],["L.",22.262,22.662],["Altså",22.662,23.229],["er",23.229,23.461],["A",23.461,23.693],["y",23.693,23.873],["to",23.873,24.105],["tredjedele",24.105,24.595],["P",24.595,24.981],["Lodret",24.981,25.381],["ligevægt",25.381,25.858],["giver",25.858,26.077],["så",26.077,26.257],["B",26.257,26.489],["y",26.489,26.695],["lig",26.695,26.966],["en",26.966,27.133],["tredjedel",27.133,27.636],["P",27.636,28.035]],"text":"Moment om B giver A y gange L lig P gange to tredjedele L. Altså er A y to tredjedele P. Lodret ligevægt giver så B y lig en tredjedel P."},"snit1":{"start":29.27,"end":39.566,"words":[["Første",29.384,29.797],["snit",29.797,30.235],["mellem",30.364,30.866],["A",30.866,31.111],["og",31.111,31.201],["lasten",31.201,31.833],["Vi",32.736,32.827],["ser",32.827,33.072],["på",33.072,33.188],["den",33.188,33.394],["venstre",33.394,33.742],["del.",33.742,33.961],["Forskydningskraften",33.961,34.992],["er",34.992,35.146],["plus",35.146,35.43],["to",35.43,35.662],["tredjedele",35.662,36.203],["P",36.203,36.564],["og",36.706,36.938],["momentet",36.938,37.479],["er",37.479,37.621],["to",37.621,37.891],["tredjedele",37.891,38.484],["P",38.484,38.716],["gange",38.716,39.09],["x",39.09,39.566]],"text":"Første snit, mellem A og lasten. Vi ser på den venstre del. Forskydningskraften er plus to tredjedele P, og momentet er to tredjedele P gange x."},"snit2":{"start":40.78,"end":50.458,"words":[["Andet",40.92,41.152],["snit",41.152,41.59],["mellem",41.719,42.119],["lasten",42.119,42.621],["og",42.621,42.75],["B",42.75,43.137],["Nu",44.027,44.246],["er",44.246,44.388],["forskydningskraften",44.388,45.406],["minus",45.406,45.806],["en",45.806,45.999],["tredjedel",45.999,46.515],["P",46.515,46.901],["og",47.043,47.262],["momentet",47.262,47.79],["er",47.79,47.919],["en",47.919,48.009],["tredjedel",48.009,48.538],["P",48.538,48.77],["gange",48.77,49.195],["L",49.195,49.466],["minus",49.466,49.955],["x",49.955,50.458]],"text":"Andet snit, mellem lasten og B. Nu er forskydningskraften minus en tredjedel P, og momentet er en tredjedel P gange L minus x."},"vdiagram":{"start":51.69,"end":58.713,"words":[["I",51.817,51.882],["forskydningskraftdiagrammet",51.882,53.364],["er",53.364,53.531],["V",53.531,53.776],["konstant",53.776,54.356],["på",54.356,54.523],["hvert",54.523,54.781],["stykke",54.781,55.31],["Ved",56.213,56.303],["lasten",56.303,56.729],["springer",56.729,57.064],["den",57.064,57.27],["ned",57.27,57.605],["med",57.605,57.824],["præcis",57.824,58.314],["P",58.314,58.713]],"text":"I forskydningskraftdiagrammet er V konstant på hvert stykke. Ved lasten springer den ned med præcis P."},"mdiagram":{"start":59.96,"end":66.609,"words":[["Momentdiagrammet",60.1,60.938],["består",60.938,61.428],["af",61.428,61.556],["to",61.556,61.904],["rette",61.904,62.188],["linjer",62.188,62.703],["Det",63.581,63.646],["stiger",63.646,63.955],["fra",63.955,64.2],["nul",64.2,64.496],["i",64.496,64.728],["A",64.728,65.05],["og",65.05,65.179],["falder",65.179,65.463],["til",65.463,65.656],["nul",65.656,66.03],["i",66.03,66.262],["B",66.262,66.609]],"text":"Momentdiagrammet består af to rette linjer. Det stiger fra nul i A og falder til nul i B."},"mmax":{"start":67.822,"end":76.727,"words":[["Toppen",67.949,68.349],["ligger",68.349,68.658],["under",68.658,68.851],["lasten",68.851,69.483],["hvor",69.625,70.076],["V",70.076,70.333],["skifter",70.333,70.733],["fortegn",70.733,71.403],["Indsæt",72.307,72.796],["x",72.796,73.08],["lig",73.08,73.286],["L",73.286,73.582],["over",73.582,73.84],["tre",73.84,74.304],["M",74.433,74.665],["max",74.665,75.026],["er",75.026,75.206],["to",75.206,75.477],["niendedele",75.477,76.044],["P",76.044,76.314],["L.",76.314,76.727]],"text":"Toppen ligger under lasten, hvor V skifter fortegn. Indsæt x lig L over tre: M max er to niendedele P L."},"kritisk":{"start":77.94,"end":82.888,"words":[["Det",78.08,78.222],["er",78.222,78.364],["det",78.364,78.48],["kritiske",78.48,79.021],["snit",79.021,79.369],["for",79.369,79.549],["bøjning",79.549,80.155],["Her",81.059,81.239],["bliver",81.239,81.471],["bøjningsspændingen",81.471,82.347],["størst",82.347,82.888]],"text":"Det er det kritiske snit for bøjning. Her bliver bøjningsspændingen størst."},"tjek_q":{"start":84.122,"end":89.792,"words":[["Tjek",84.223,84.545],["dig",84.545,84.725],["selv",84.725,85.163],["Hvis",86.055,86.223],["lasten",86.222,86.57],["i",86.57,86.622],["stedet",86.622,86.944],["sad",86.944,87.202],["midt",87.202,87.408],["på",87.408,87.537],["bjælken",87.537,88.078],["hvad",88.259,88.439],["ville",88.439,88.697],["M",88.697,88.916],["max",88.916,89.186],["så",89.186,89.315],["være",89.315,89.792]],"text":"Tjek dig selv. Hvis lasten i stedet sad midt på bjælken, hvad ville M max så være?"},"tjek_a":{"start":93.674,"end":100.167,"words":[["Så",93.788,94.033],["er",94.033,94.072],["begge",94.072,94.394],["reaktioner",94.394,95.013],["P",95.013,95.27],["halve",95.27,95.747],["og",95.889,96.044],["M",96.044,96.25],["max",96.25,96.559],["er",96.559,96.727],["P",96.727,96.959],["halve",96.959,97.242],["gange",97.242,97.629],["L",97.629,97.835],["halve",97.835,98.363],["altså",98.479,98.866],["P",98.866,99.111],["L",99.111,99.394],["over",99.394,99.665],["fire",99.665,100.167]],"text":"Så er begge reaktioner P halve, og M max er P halve gange L halve, altså P L over fire."},"slut":{"start":101.392,"end":111.199,"words":[["Kort",101.519,101.738],["sagt",101.738,102.241],["reaktioner",102.37,102.975],["først",102.975,103.478],["ét",103.62,103.762],["snit",103.762,104.019],["for",104.019,104.187],["hvert",104.187,104.393],["stykke",104.393,104.883],["og",105.024,105.153],["det",105.153,105.244],["største",105.244,105.656],["moment",105.656,105.965],["sidder",105.965,106.481],["hvor",106.61,106.919],["V",106.919,107.151],["skifter",107.151,107.524],["fortegn",107.524,108.182],["Her",109.072,109.266],["er",109.266,109.356],["det",109.356,109.536],["to",109.536,109.833],["niendedele",109.833,110.451],["P",110.451,110.722],["L.",110.722,111.199]],"text":"Kort sagt: reaktioner først, ét snit for hvert stykke, og det største moment sidder, hvor V skifter fortegn. Her er det to niendedele P L."}}}, { audio: 'opg-2-41.mp3', id: 'opg-2-41' });</script>
+</body>
+</html>

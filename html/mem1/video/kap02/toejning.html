@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tøjning · video</title>
+<meta name="description" content="Normaltøjning, forskellen på deformation og tøjning, forskydningstøjning og eksemplet fra slide 48.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 2: videoer</a><h1>Tøjning</h1><span class="meta">MEM1 · kapitel 2 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Tøjning"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Normaltøjning, forskellen på deformation og tøjning, forskydningstøjning og eksemplet fra slide 48.</p><div class="chips"><a href="../../Kapitel02_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l02">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Tøjning (MEM1 kap. 2, slides 45–48)
+BP.scene({ header: 'MEM1 · kap. 2' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, dashed, frac, ell, PI } = B;
+
+  B.titel(0, 'Tøjning', 'MEM1 · kapitel 2 · begreb (slide 45–48)', 'titel');
+  text(0, 'spænding = belastning · tøjning = deformation', 640, 520, 36, 'red', wt('titel', 'Tøjning', 1) - 0.1, we('titel', 'deformeres'), { align: 'center' });
+
+  // ---------------- 1 normaltøjning ----------------
+  B.goto('def', 1);
+  {
+    const t0 = L('def').start;
+    line(1, [[160, 230], [600, 230], [600, 300], [160, 300], [160, 232]], 'black', 3, t0, t0 + 0.6, { alpha: 0.45 });
+    line(1, [[160, 330], [700, 330], [700, 400], [160, 400], [160, 332]], 'blue', 3.4, wt('def', 'forlængelsen') - 0.3, wt('def', 'forlængelsen') + 0.4);
+    dashed(1, [600, 220], [600, 420], 'black', wt('def', 'forlængelsen'), wt('def', 'delta'));
+    arrow(1, [[606, 440], [696, 440]], 'red', 3, wt('def', 'delta') - 0.2, wt('def', 'delta') + 0.2, 12);
+    text(1, 'δ', 640, 480, 42, 'red', wt('def', 'delta'), wt('def', 'delta') + 0.3);
+    arrow(1, [[164, 190], [596, 190]], 'black', 2.4, wt('def', 'oprindelige') - 0.2, wt('def', 'l'), 12);
+    text(1, 'l', 380, 180, 40, 'black', wt('def', 'l') - 0.1, wt('def', 'l') + 0.2);
+    frac(1, 'δ', 'l', 930, 300, 56, 'red', wt('def', 'divideret') - 0.3, we('def', 'l'));
+    text(1, 'ε =', 790, 318, 56, 'red', wt('def', 'Normaltøjningen'), wt('def', 'Normaltøjningen') + 0.4);
+    text(1, 'strækkes eller trykkes sammen', 180, 600, 34, 'black', wt('def', 'strækkes') - 0.1, we('def', 'sammen'));
+  }
+
+  // ---------------- 2 deformation og tøjning ----------------
+  B.goto('forskel', 2);
+  {
+    const t0 = L('forskel').start;
+    bubble(2, 'Pas på', 150, 140, 56, 'red', t0, t0 + 0.6);
+    box(2, 150, 210, 440, 190, 'blue', wt('forskel', 'Deformationen') - 0.2, wt('forskel', 'Deformationen') + 0.5);
+    text(2, 'Deformation δ', 180, 270, 40, 'blue', wt('forskel', 'Deformationen'), we('forskel', 'delta'));
+    text(2, 'en længde, fx mm', 180, 340, 34, 'black', wt('forskel', 'længde') - 0.1, we('forskel', 'millimeter'));
+    box(2, 690, 210, 440, 190, 'red', wt('forskel', 'Tøjningen') - 0.2, wt('forskel', 'Tøjningen') + 0.5);
+    text(2, 'Tøjning ε = δ/l', 720, 270, 40, 'red', wt('forskel', 'Tøjningen'), we('forskel', 'længde', 1));
+    text(2, 'ingen enhed', 720, 340, 34, 'black', wt('forskel', 'ingen') - 0.1, we('forskel', 'enhed'));
+    const tf = L('fortegn').start;
+    text(2, 'ε > 0 : forlængelse', 180, 500, 40, 'red', tf, we('fortegn', 'forlængelse'));
+    text(2, 'ε < 0 : sammentrykning', 640, 500, 40, 'blue', wt('fortegn', 'negativ') - 0.1, we('fortegn', 'sammentrykning'));
+  }
+
+  // ---------------- 3 forskydningstøjning ----------------
+  B.goto('forsk', 3);
+  {
+    const t0 = L('forsk').start, x = 300, y = 520, s = 220, d = 50;
+    line(3, [[x, y], [x + s, y], [x + s, y - s], [x, y - s], [x, y - 2]], 'black', 2.6, t0, t0 + 0.6, { alpha: 0.45 });
+    line(3, [[x, y], [x + s, y], [x + s + d, y - s], [x + d, y - s], [x, y - 2]], 'blue', 3.4, wt('forsk', 'vinkelændring') - 0.4, we('forsk', 'vinkelændring'));
+    line(3, ell(x, y, 170, 170, -PI / 2, -PI / 2 + Math.atan(d / s)), 'red', 3, wt('forsk', 'vinkelændring'), wt('forsk', 'vinkelændring') + 0.4);
+    text(3, 'γ', x + 14, y - 182, 44, 'red', wt('forsk', 'gamma') - 0.1, wt('forsk', 'gamma') + 0.3);
+    text(3, 'γ ≈ θ', 760, 330, 56, 'red', wt('forsk', 'små') - 0.1, we('forsk', 'theta'));
+    text(3, '(θ i radianer, små vinkler)', 720, 410, 34, 'black', wt('forsk', 'målt') - 0.1, we('forsk', 'radianer'));
+  }
+
+  // ---------------- 4 eksemplet fra slide 48 ----------------
+  B.goto('eks', 4);
+  {
+    const t0 = L('eks').start;
+    bubble(4, 'Eksempel (slide 48)', 150, 140, 54, 'blue', t0, t0 + 0.9);
+    text(4, 'l = 300 mm,   δ = 0,2768 mm', 170, 240, 42, 'black', wt('eks', 'tre') - 0.2, we('eks', 'millimeter', 1));
+    text(4, 'ε = 0,2768 / 300', 170, 340, 46, 'red', wt('eks2', 'epsilon') - 0.1, we('eks2', 'hundrede'));
+    text(4, '= 9,23 · 10⁻⁴', 560, 340, 46, 'red', wt('eks2', 'altså') - 0.1, we('eks2', 'fjerde'));
+    const r = text(4, '= 923 µm/m  (mikrostrain)', 560, 430, 44, 'red', wt('eks3', 'ni') - 0.1, we('eks3', 'meter'));
+    under(r, 'blue', we('eks3', 'meter'), we('eks3', 'meter') + 0.3);
+    text(4, 'samme enhed i tæller og nævner', 170, 560, 34, 'blue', wt('eks3', 'mikrometer') - 0.3, we('eks3', 'meter'));
+  }
+
+  B.goto('tjek_q', 5);
+  B.tjek(5, ['l = 2 m forlænges 1 mm.', 'Hvad er ε?'], ['ε = 1 / 2000 = 5 · 10⁻⁴', '= 500 µm/m'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 6);
+  B.slut(6, 'Abou-Hayt (2026), MEM1 Chapter 2, slide 45–48 · Hamrock, Schmid & Jacobson, kap. 2', '', 'slut');
+  text(6, 'ε = δ / l   (uden enhed)', 200, 290, 46, 'red', L('slut').start + 0.4, we('slut', 'enhed'));
+  text(6, 'γ ≈ θ  i radianer', 200, 380, 46, 'blue', wt('slut', 'gamma') - 0.1, we('slut', 'radianer'));
+});
+
+</script>
+<script>BP.live({"duration":100.696,"audio":"toejning.mp3","order":["titel","def","forskel","fortegn","forsk","eks","eks2","eks3","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":8.928,"words":[["Tøjning",0.6,1.244],["Spænding",2.124,2.549],["fortæller",2.549,3.206],["hvor",3.348,3.554],["hårdt",3.554,3.799],["materialet",3.799,4.521],["er",4.521,4.649],["belastet",4.649,5.397],["Tøjning",6.286,6.686],["fortæller",6.686,7.369],["hvor",7.51,7.691],["meget",7.691,8.0],["det",8.0,8.116],["deformeres",8.116,8.928]],"text":"Tøjning. Spænding fortæller, hvor hårdt materialet er belastet. Tøjning fortæller, hvor meget det deformeres."},"def":{"start":10.162,"end":19.208,"words":[["Normaltøjningen",10.302,11.114],["er",11.114,11.256],["forlængelsen",11.256,11.849],["delta",11.849,12.261],["divideret",12.261,12.995],["med",12.995,13.202],["den",13.202,13.356],["oprindelige",13.356,13.833],["længde",13.833,14.155],["l.",14.155,14.658],["Den",15.549,15.677],["måler",15.677,16.154],["hvor",16.296,16.451],["meget",16.451,16.773],["et",16.773,16.915],["linjestykke",16.915,17.482],["strækkes",17.482,18.074],["eller",18.074,18.306],["trykkes",18.306,18.693],["sammen",18.693,19.208]],"text":"Normaltøjningen er forlængelsen delta divideret med den oprindelige længde l. Den måler, hvor meget et linjestykke strækkes eller trykkes sammen."},"forskel":{"start":20.424,"end":30.733,"words":[["Pas",20.525,20.808],["på",20.808,20.976],["forskellen",20.976,21.723],["Deformationen",22.628,23.324],["delta",23.324,23.826],["er",23.826,23.981],["en",23.981,24.11],["længde",24.11,24.599],["målt",24.741,25.128],["i",25.128,25.231],["millimeter",25.231,25.952],["Tøjningen",26.842,27.357],["epsilon",27.357,28.001],["er",28.001,28.13],["deformation",28.13,28.813],["pr.",28.813,29.006],["længde",29.006,29.522],["og",29.522,29.689],["har",29.689,29.857],["ingen",29.857,30.218],["enhed",30.218,30.733]],"text":"Pas på forskellen. Deformationen delta er en længde, målt i millimeter. Tøjningen epsilon er deformation pr. længde og har ingen enhed."},"fortegn":{"start":31.982,"end":37.354,"words":[["Positiv",32.109,32.689],["epsilon",32.689,33.308],["betyder",33.308,33.72],["forlængelse",33.72,34.493],["og",34.635,34.803],["negativ",34.803,35.395],["epsilon",35.395,36.014],["betyder",36.014,36.452],["sammentrykning",36.452,37.354]],"text":"Positiv epsilon betyder forlængelse, og negativ epsilon betyder sammentrykning."},"forsk":{"start":38.572,"end":46.356,"words":[["Forskydningstøjningen",38.699,39.73],["gamma",39.73,40.207],["er",40.207,40.413],["en",40.413,40.594],["vinkelændring",40.594,41.457],["For",42.335,42.477],["små",42.477,42.773],["vinkler",42.773,43.25],["er",43.25,43.366],["gamma",43.366,43.714],["lig",43.714,43.959],["vinklen",43.959,44.332],["theta",44.332,44.925],["målt",45.054,45.505],["i",45.505,45.647],["radianer",45.647,46.356]],"text":"Forskydningstøjningen gamma er en vinkelændring. For små vinkler er gamma lig vinklen theta, målt i radianer."},"eks":{"start":47.586,"end":55.125,"words":[["Et",47.726,47.829],["eksempel",47.829,48.474],["fra",48.474,48.641],["slides",48.641,49.247],["En",50.138,50.241],["stang",50.241,50.601],["er",50.601,50.756],["tre",50.756,51.027],["hundrede",51.027,51.246],["millimeter",51.246,51.658],["lang",51.658,52.058],["og",52.058,52.174],["forlænges",52.174,52.625],["nul",52.625,52.818],["komma",52.818,53.153],["to",53.153,53.449],["syv",53.449,53.72],["seks",53.72,54.081],["otte",54.081,54.39],["millimeter",54.39,55.125]],"text":"Et eksempel fra slides. En stang er tre hundrede millimeter lang og forlænges nul komma to syv seks otte millimeter."},"eks2":{"start":56.336,"end":64.144,"words":[["Så",56.463,56.773],["er",56.773,56.914],["epsilon",56.914,57.597],["nul",57.597,57.829],["komma",57.829,58.126],["to",58.126,58.383],["syv",58.383,58.602],["seks",58.603,58.95],["otte",58.95,59.273],["divideret",59.273,59.917],["med",59.917,60.149],["tre",60.149,60.432],["hundrede",60.432,60.987],["altså",61.09,61.45],["ni",61.45,61.695],["komma",61.695,61.992],["to",61.992,62.236],["tre",62.237,62.468],["gange",62.468,62.778],["ti",62.778,63.139],["i",63.139,63.267],["minus",63.267,63.654],["fjerde",63.654,64.144]],"text":"Så er epsilon nul komma to syv seks otte divideret med tre hundrede, altså ni komma to tre gange ti i minus fjerde."},"eks3":{"start":65.374,"end":70.501,"words":[["Det",65.501,65.566],["skrives",65.566,65.952],["ofte",65.952,66.287],["som",66.287,66.558],["ni",66.558,66.764],["hundrede",66.764,66.983],["og",66.983,67.009],["treogtyve",67.009,67.576],["mikrostrain",67.576,68.375],["altså",68.517,68.929],["mikrometer",68.929,69.702],["pr.",69.702,69.96],["meter",69.96,70.501]],"text":"Det skrives ofte som ni hundrede og treogtyve mikrostrain, altså mikrometer pr. meter."},"tjek_q":{"start":71.724,"end":78.489,"words":[["Tjek",71.825,72.147],["dig",72.147,72.327],["selv",72.327,72.753],["En",73.644,73.747],["stang",73.747,74.044],["på",74.044,74.185],["to",74.185,74.443],["meter",74.443,74.959],["forlænges",74.959,75.526],["en",75.526,75.719],["millimeter",75.719,76.44],["Hvad",77.303,77.651],["er",77.651,77.819],["tøjningen",77.819,78.489]],"text":"Tjek dig selv. En stang på to meter forlænges en millimeter. Hvad er tøjningen?"},"tjek_a":{"start":82.356,"end":90.178,"words":[["Epsilon",82.496,83.115],["er",83.115,83.257],["en",83.256,83.372],["divideret",83.372,83.978],["med",83.978,84.236],["to",84.236,84.519],["tusind",84.519,85.048],["altså",85.189,85.679],["fem",85.679,85.95],["hundrede",85.95,86.208],["mikrostrain",86.208,86.968],["Husk",87.859,88.116],["samme",88.116,88.438],["enhed",88.438,88.941],["i",88.941,89.044],["tæller",89.044,89.495],["og",89.495,89.637],["nævner",89.637,90.178]],"text":"Epsilon er en divideret med to tusind, altså fem hundrede mikrostrain. Husk samme enhed i tæller og nævner."},"slut":{"start":91.394,"end":98.261,"words":[["Kort",91.521,91.753],["sagt",91.753,92.243],["tøjning",92.372,92.836],["er",92.836,92.99],["deformation",92.99,93.648],["divideret",93.648,94.163],["med",94.163,94.279],["længde",94.279,94.807],["den",94.949,95.104],["er",95.104,95.181],["uden",95.181,95.503],["enhed",95.503,95.98],["og",96.173,96.315],["gamma",96.315,96.702],["er",96.702,96.844],["en",96.843,96.959],["vinkel",96.959,97.41],["i",97.41,97.552],["radianer",97.552,98.261]],"text":"Kort sagt: tøjning er deformation divideret med længde, den er uden enhed, og gamma er en vinkel i radianer."}}}, { audio: 'toejning.mp3', id: 'toejning' });</script>
+</body>
+</html>

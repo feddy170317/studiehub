@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spænding og spændingselementet · video</title>
+<meta name="description" content="Normal- og forskydningsspænding, spændingselementet, τxy = τyx og plan spænding med tre tal.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 2: videoer</a><h1>Spænding og spændingselementet</h1><span class="meta">MEM1 · kapitel 2 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Spænding og spændingselementet"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Normal- og forskydningsspænding, spændingselementet, τxy = τyx og plan spænding med tre tal.</p><div class="chips"><a href="../../Kapitel02_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l02">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Spænding og spændingselementet (MEM1 kap. 2, slides 30 og 32–36)
+BP.scene({ header: 'MEM1 · kap. 2' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, hatch, beam, PI } = B;
+
+  B.titel(0, 'Spænding', 'MEM1 · kapitel 2 · begreb (slide 30, 32–36)', 'titel');
+  text(0, 'hvor koncentreret er kraften?', 640, 520, 40, 'red', wt('titel', 'koncentreret') - 0.2, we('titel', 'punkt'), { align: 'center' });
+
+  // ---------------- 1 kraft pr. areal ----------------
+  B.goto('middel', 1);
+  {
+    const tm = L('middel').start;
+    // stang med snitflade
+    line(1, [[180, 260], [520, 260], [560, 230], [560, 330], [520, 360], [180, 360], [180, 260]], 'black', 3.2, tm, tm + 0.8);
+    line(1, [[520, 260], [520, 360]], 'black', 3, tm + 0.6, tm + 0.8);
+    hatch(1, [[520, 260], [560, 230], [560, 330], [520, 360]], 'blue', wt('middel', 'arealet') - 0.2, wt('middel', 'arealet') + 0.4, { gap: 6 });
+    text(1, 'A', 580, 300, 40, 'blue', wt('middel', 'A') - 0.1, wt('middel', 'A') + 0.3);
+    arrow(1, [[560, 300], [700, 300]], 'red', 4.4, wt('middel', 'kraften') - 0.2, wt('middel', 'kraften') + 0.3);
+    text(1, 'P', 710, 312, 44, 'red', wt('middel', 'P'), wt('middel', 'P') + 0.3);
+    text(1, 'σ_{avg} = P / A', 800, 240, 46, 'blue', wt('middel', 'gennemsnitlige') - 0.1, we('middel', 'A'));
+    text(1, '[σ] = Pa = N/m²', 800, 320, 38, 'black', wt('middel', 'Enheden') - 0.1, we('middel', 'kvadratmeter'));
+    const tp = L('punkt').start;
+    text(1, 'i et punkt:', 180, 500, 38, 'black', tp, tp + 0.6);
+    text(1, 'σ = lim  ΔP / ΔA', 420, 500, 46, 'blue', wt('punkt', 'arealet') - 0.2, we('punkt', 'areal', 0));
+    text(1, 'ΔA → 0', 500, 548, 28, 'blue', wt('punkt', 'nul') - 0.2, we('punkt', 'nul'));
+  }
+
+  // ---------------- 2 normal og forskydning ----------------
+  B.goto('normal_forsk', 2);
+  {
+    const tn = L('normal_forsk').start;
+    const flade = [[260, 420], [560, 420], [660, 300], [360, 300], [260, 420]];
+    line(2, flade, 'black', 3, tn, tn + 0.8);
+    hatch(2, flade.slice(0, 4), 'black', tn + 0.6, tn + 1.0, { gap: 10, alpha: 0.4 });
+    const ts = wt('normal_forsk', 'Normalspændingen') - 0.2;
+    arrow(2, [[460, 360], [460, 170]], 'red', 4.4, ts, ts + 0.5);
+    text(2, 'σ', 480, 200, 48, 'red', wt('normal_forsk', 'sigma') - 0.1, wt('normal_forsk', 'sigma') + 0.3);
+    text(2, 'vinkelret på fladen', 700, 200, 38, 'red', wt('normal_forsk', 'vinkelret') - 0.1, we('normal_forsk', 'fladen'));
+    const tt = wt('normal_forsk', 'Forskydningsspændingen') - 0.2;
+    arrow(2, [[460, 360], [640, 360]], 'green', 4.4, tt, tt + 0.5);
+    text(2, 'τ', 650, 376, 48, 'green', wt('normal_forsk', 'tau') - 0.1, wt('normal_forsk', 'tau') + 0.3);
+    text(2, 'langs fladen', 700, 280, 38, 'green', wt('normal_forsk', 'langs') - 0.1, we('normal_forsk', 'fladen', 1));
+    const tf = L('fortegn').start;
+    text(2, 'σ > 0 : træk', 260, 560, 42, 'red', tf, we('fortegn', 'træk'));
+    text(2, 'σ < 0 : tryk', 640, 560, 42, 'blue', wt('fortegn', 'negativ') - 0.1, we('fortegn', 'tryk'));
+  }
+
+  // ---------------- 3 spændingselementet ----------------
+  B.goto('element', 3);
+  {
+    const cx = 380, cy = 400, h = 110, te = L('element').start;
+    line(3, [[cx - h, cy - h], [cx + h, cy - h], [cx + h, cy + h], [cx - h, cy + h], [cx - h, cy - h + 2]], 'black', 3.4, te, te + 1.2);
+    arrow(3, [[cx - h - 40, cy + h + 60], [cx - h + 40, cy + h + 60]], 'black', 2.2, te + 0.8, te + 1.1, 12); text(3, 'x', cx - h + 50, cy + h + 70, 30, 'black', te + 1.0, te + 1.2);
+    arrow(3, [[cx - h - 40, cy + h + 60], [cx - h - 40, cy + h - 20]], 'black', 2.2, te + 0.9, te + 1.2, 12); text(3, 'y', cx - h - 50, cy + h - 26, 30, 'black', te + 1.1, te + 1.3, { align: 'right' });
+    const tx = wt('element', 'virker') - 0.1;
+    arrow(3, [[cx + h + 8, cy], [cx + h + 100, cy]], 'red', 4, tx, tx + 0.5); arrow(3, [[cx - h - 8, cy], [cx - h - 100, cy]], 'red', 4, tx + 0.2, tx + 0.7);
+    text(3, 'σ_x', cx + h + 110, cy + 14, 42, 'red', wt('element', 'sigma') - 0.1, wt('element', 'sigma') + 0.6);
+    const ty = wt('element', 'virker', 1) - 0.1;
+    arrow(3, [[cx, cy - h - 8], [cx, cy - h - 90]], 'red', 4, ty, ty + 0.5); arrow(3, [[cx, cy + h + 8], [cx, cy + h + 90]], 'red', 4, ty + 0.2, ty + 0.7);
+    text(3, 'σ_y', cx + 14, cy - h - 70, 42, 'red', wt('element', 'sigma', 1) - 0.1, wt('element', 'sigma', 1) + 0.5);
+    const t1 = wt('element', 'tau') - 0.2;
+    arrow(3, [[cx + h + 18, cy + 60], [cx + h + 18, cy - 60]], 'green', 3.6, t1, t1 + 0.4, 16);
+    arrow(3, [[cx - h - 18, cy - 60], [cx - h - 18, cy + 60]], 'green', 3.6, t1 + 0.2, t1 + 0.6, 16);
+    text(3, 'τ_{xy}', cx + h + 30, cy - 70, 38, 'green', t1 + 0.2, t1 + 0.8);
+    const t2 = wt('element', 'tau', 1) - 0.2;
+    arrow(3, [[cx - 60, cy - h - 18], [cx + 60, cy - h - 18]], 'green', 3.6, t2, t2 + 0.4, 16);
+    arrow(3, [[cx + 60, cy + h + 18], [cx - 60, cy + h + 18]], 'green', 3.6, t2 + 0.2, t2 + 0.6, 16);
+    text(3, 'τ_{yx}', cx + 70, cy - h - 30, 38, 'green', t2 + 0.2, t2 + 0.8);
+    const tsym = L('symmetri').start;
+    text(3, 'momentligevægt  ⇒', 760, 300, 36, 'black', tsym + 0.1, we('symmetri', 'element'));
+    const s = text(3, 'τ_{xy} = τ_{yx}', 780, 400, 56, 'green', wt('symmetri', 'Derfor') - 0.1, we('symmetri', 'x', 1));
+    ring(s, 'red', we('symmetri', 'x', 1), we('symmetri', 'x', 1) + 0.6);
+  }
+
+  // ---------------- 4 plan spænding og hvor tallene kommer fra ----------------
+  B.goto('plan', 4);
+  {
+    const tp = L('plan').start;
+    bubble(4, 'Plan spænding', 150, 140, 56, 'blue', tp, tp + 0.9);
+    text(4, 'σ_z = τ_{xz} = τ_{yz} = 0', 170, 240, 42, 'black', wt('plan', 'alle') - 0.1, we('plan', 'nul'));
+    text(4, 'kun tre tal:  σ_x,  σ_y,  τ_{xy}', 170, 320, 46, 'red', wt('plan', 'tre') - 0.2, we('plan', 'y', 1));
+    const ti = L('input').start;
+    text(4, 'normalkraft + bøjning:', 170, 430, 34, 'black', wt('input', 'Normalspændingen') - 0.2, we('input', 'bøjning'));
+    text(4, 'σ = P/A ± My/I', 560, 430, 40, 'red', wt('input', 'P') - 0.1, we('input', 'I'));
+    text(4, 'vridning + tværkraft:', 170, 510, 34, 'black', wt('input', 'Forskydningen') - 0.2, we('input', 'tværkraft'));
+    text(4, 'τ = Tr/J ± VQ/(It)', 560, 510, 40, 'green', wt('input', 'T') - 0.1, we('input', 't', 1));
+    text(4, 'de kommer fra de elementære formler:', 170, 380, 32, 'blue', ti, we('input', 'formler'));
+  }
+
+  B.goto('tjek_q', 5);
+  B.tjek(5, ['Hvor mange tal beskriver', 'en plan spændingstilstand?'], ['Tre: σ_x, σ_y og τ_{xy}', '(τ_{yx} = τ_{xy})'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 6);
+  B.slut(6, 'Abou-Hayt (2026), MEM1 Chapter 2, slide 30 og 32–36 · Hamrock, Schmid & Jacobson, kap. 2', 'Mohrs cirkel', 'slut');
+  text(6, 'σ = P/A   ·   σ ⊥ fladen,  τ ∥ fladen', 200, 290, 40, 'blue', L('slut').start + 0.5, we('slut', 'fladen'));
+  text(6, 'plan spænding: σ_x, σ_y, τ_{xy}', 200, 380, 42, 'red', wt('slut', 'plan') - 0.1, we('slut', 'tal'));
+});
+
+</script>
+<script>BP.live({"duration":117.606,"audio":"spaending-element.mp3","order":["titel","middel","punkt","normal_forsk","fortegn","element","symmetri","plan","input","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.407,"words":[["Spænding",0.614,1.22],["og",1.22,1.349],["spændingselementet",1.349,2.56],["Spænding",3.438,3.889],["beskriver",3.889,4.546],["hvor",4.688,4.894],["koncentreret",4.894,5.526],["den",5.526,5.783],["indre",5.784,6.119],["kraft",6.119,6.518],["er",6.518,6.698],["i",6.698,6.866],["et",6.866,6.969],["punkt",6.969,7.407]],"text":"Spænding og spændingselementet. Spænding beskriver, hvor koncentreret den indre kraft er i et punkt."},"middel":{"start":8.626,"end":16.253,"words":[["Den",8.753,8.882],["gennemsnitlige",8.882,9.436],["normalspænding",9.436,10.132],["er",10.132,10.261],["kraften",10.261,10.686],["P",10.686,11.047],["divideret",11.047,11.563],["med",11.563,11.769],["arealet",11.769,12.374],["A.",12.374,12.916],["Enheden",12.916,13.367],["er",13.367,13.47],["pascal",13.47,14.05],["altså",14.191,14.565],["newton",14.565,15.029],["pr.",15.029,15.338],["kvadratmeter",15.338,16.253]],"text":"Den gennemsnitlige normalspænding er kraften P divideret med arealet A. Enheden er pascal, altså newton pr. kvadratmeter."},"punkt":{"start":17.472,"end":24.147,"words":[["I",17.612,17.702],["et",17.702,17.909],["punkt",17.909,18.244],["lader",18.244,18.604],["vi",18.604,18.785],["arealet",18.785,19.416],["gå",19.416,19.571],["mod",19.571,19.803],["nul",19.803,20.241],["Så",21.132,21.364],["er",21.364,21.39],["spændingen",21.39,21.866],["grænseværdien",21.866,22.678],["af",22.678,22.82],["kraft",22.82,23.168],["pr.",23.168,23.516],["areal",23.516,24.147]],"text":"I et punkt lader vi arealet gå mod nul. Så er spændingen grænseværdien af kraft pr. areal."},"normal_forsk":{"start":25.382,"end":34.145,"words":[["Der",25.483,25.702],["er",25.702,25.792],["to",25.792,26.127],["slags",26.127,26.681],["Normalspændingen",27.598,28.397],["sigma",28.397,28.836],["virker",28.836,29.158],["vinkelret",29.158,29.776],["på",29.776,29.931],["fladen",29.931,30.498],["Forskydningsspændingen",31.387,32.495],["tau",32.495,32.843],["virker",32.843,33.217],["langs",33.217,33.604],["fladen",33.604,34.145]],"text":"Der er to slags. Normalspændingen sigma virker vinkelret på fladen. Forskydningsspændingen tau virker langs fladen."},"fortegn":{"start":35.38,"end":39.077,"words":[["Positiv",35.494,36.049],["sigma",36.049,36.461],["er",36.461,36.564],["træk",36.564,37.041],["og",37.183,37.389],["negativ",37.389,37.93],["sigma",37.93,38.42],["er",38.42,38.587],["tryk",38.587,39.077]],"text":"Positiv sigma er træk, og negativ sigma er tryk."},"element":{"start":40.29,"end":51.476,"words":[["For",40.417,40.598],["at",40.598,40.624],["se",40.624,40.83],["spændingstilstanden",40.83,41.693],["tegner",41.693,42.183],["vi",42.183,42.44],["et",42.441,42.518],["lille",42.518,42.814],["element",42.814,43.304],["omkring",43.304,43.742],["punktet",43.742,44.296],["På",45.187,45.354],["x-fladerne",45.354,46.089],["virker",46.089,46.437],["sigma",46.437,46.875],["x",46.875,47.133],["og",47.133,47.171],["tau",47.171,47.506],["x",47.506,47.842],["y",47.842,48.151],["og",48.293,48.434],["på",48.434,48.576],["y-fladerne",48.576,49.104],["virker",49.104,49.414],["sigma",49.414,49.942],["y",49.942,50.2],["og",50.2,50.277],["tau",50.277,50.728],["y",50.728,50.986],["x",50.986,51.476]],"text":"For at se spændingstilstanden tegner vi et lille element omkring punktet. På x-fladerne virker sigma x og tau x y, og på y-fladerne virker sigma y og tau y x."},"symmetri":{"start":52.688,"end":61.85,"words":[["Momentligevægt",52.828,53.563],["af",53.563,53.692],["det",53.692,53.82],["lille",53.82,54.13],["element",54.13,54.503],["kræver",54.503,55.058],["at",55.199,55.341],["forskydningerne",55.341,55.998],["på",55.998,56.14],["de",56.14,56.243],["to",56.243,56.514],["sæt",56.514,56.694],["flader",56.694,57.094],["udligner",57.094,57.545],["hinanden",57.545,58.163],["Derfor",59.027,59.414],["er",59.414,59.466],["tau",59.466,59.852],["x",59.852,60.2],["y",60.2,60.406],["lig",60.406,60.69],["tau",60.69,61.115],["y",61.115,61.36],["x",61.36,61.85]],"text":"Momentligevægt af det lille element kræver, at forskydningerne på de to sæt flader udligner hinanden. Derfor er tau x y lig tau y x."},"plan":{"start":63.07,"end":72.683,"words":[["I",63.197,63.275],["plan",63.275,63.571],["spænding",63.571,64.074],["er",64.074,64.267],["alle",64.267,64.525],["spændinger",64.525,65.105],["i",65.105,65.22],["z-retningen",65.221,65.929],["nul",65.929,66.303],["Så",67.194,67.426],["er",67.426,67.464],["tilstanden",67.464,67.967],["beskrevet",67.967,68.392],["af",68.392,68.469],["kun",68.469,68.714],["tre",68.714,68.998],["tal",68.998,69.397],["sigma",69.539,70.016],["x",70.016,70.531],["sigma",70.66,71.201],["y",71.201,71.485],["og",71.485,71.575],["tau",71.575,71.988],["x",71.988,72.335],["y",72.335,72.683]],"text":"I plan spænding er alle spændinger i z-retningen nul. Så er tilstanden beskrevet af kun tre tal: sigma x, sigma y og tau x y."},"input":{"start":73.908,"end":86.511,"words":[["De",74.022,74.125],["tre",74.126,74.396],["tal",74.396,74.808],["kommer",74.808,75.144],["fra",75.144,75.311],["de",75.311,75.479],["elementære",75.479,76.136],["formler",76.136,76.741],["Normalspændingen",77.645,78.38],["fra",78.38,78.56],["normalkraft",78.56,79.23],["og",79.23,79.346],["bøjning",79.346,79.862],["P",80.003,80.248],["over",80.248,80.48],["A",80.48,80.519],["plus",80.519,80.802],["M",80.802,80.996],["y",80.996,81.279],["over",81.279,81.614],["I",81.614,81.795],["Forskydningen",81.795,82.387],["fra",82.387,82.555],["vridning",82.555,82.954],["og",82.954,83.07],["tværkraft",83.07,83.779],["T",83.908,84.204],["r",84.204,84.462],["over",84.462,84.72],["J",84.72,85.055],["og",85.055,85.132],["V",85.132,85.313],["Q",85.313,85.622],["over",85.622,85.893],["I",85.893,85.983],["t.",85.983,86.511]],"text":"De tre tal kommer fra de elementære formler. Normalspændingen fra normalkraft og bøjning, P over A plus M y over I. Forskydningen fra vridning og tværkraft, T r over J og V Q over I t."},"tjek_q":{"start":87.722,"end":92.993,"words":[["Tjek",87.823,88.145],["dig",88.145,88.325],["selv",88.325,88.751],["Hvor",89.655,89.771],["mange",89.771,90.042],["tal",90.042,90.274],["skal",90.274,90.441],["du",90.441,90.518],["bruge",90.518,90.802],["for",90.802,90.982],["at",90.982,91.021],["beskrive",91.021,91.511],["en",91.511,91.73],["plan",91.73,92.026],["spændingstilstand",92.026,92.993]],"text":"Tjek dig selv. Hvor mange tal skal du bruge for at beskrive en plan spændingstilstand?"},"tjek_a":{"start":96.89,"end":103.19,"words":[["Tre",97.004,97.43],["sigma",97.559,98.01],["x",98.01,98.512],["sigma",98.641,99.182],["y",99.182,99.427],["og",99.427,99.479],["tau",99.479,99.878],["x",99.878,100.213],["y",100.213,100.419],["Tau",100.419,100.729],["y",100.729,100.948],["x",100.948,101.373],["er",101.373,101.515],["den",101.515,101.656],["samme",101.656,101.966],["som",101.966,102.159],["tau",102.159,102.507],["x",102.507,102.855],["y",102.855,103.19]],"text":"Tre: sigma x, sigma y og tau x y. Tau y x er den samme som tau x y."},"slut":{"start":104.416,"end":115.189,"words":[["Kort",104.543,104.762],["sagt",104.762,105.226],["spænding",105.355,105.819],["er",105.819,105.948],["kraft",105.948,106.27],["pr.",106.27,106.502],["areal",106.502,107.146],["sigma",107.275,107.726],["virker",107.726,107.997],["vinkelret",107.997,108.564],["og",108.564,108.693],["tau",108.693,108.951],["langs",108.951,109.247],["fladen",109.247,109.672],["og",109.827,109.969],["i",109.969,110.007],["plan",110.007,110.291],["spænding",110.291,110.677],["er",110.677,110.806],["tilstanden",110.806,111.425],["givet",111.425,111.695],["ved",111.695,111.786],["tre",111.786,112.082],["tal",112.082,112.494],["Dem",113.398,113.553],["bruger",113.553,113.901],["vi",113.901,114.171],["i",114.171,114.274],["Mohrs",114.274,114.622],["cirkel",114.622,115.189]],"text":"Kort sagt: spænding er kraft pr. areal, sigma virker vinkelret og tau langs fladen, og i plan spænding er tilstanden givet ved tre tal. Dem bruger vi i Mohrs cirkel."}}}, { audio: 'spaending-element.mp3', id: 'spaending-element' });</script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lasttyper og fortegn · video</title>
+<meta name="description" content="Statisk, vedvarende, stød og cyklisk last, punkt- og fordelt last, P, V, M og T, og fortegnsreglerne.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 2: videoer</a><h1>Lasttyper og fortegn</h1><span class="meta">MEM1 · kapitel 2 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Lasttyper og fortegn"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Statisk, vedvarende, stød og cyklisk last, punkt- og fordelt last, P, V, M og T, og fortegnsreglerne.</p><div class="chips"><a href="../../Kapitel02_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l02">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Lasttyper og fortegn (MEM1 kap. 2, slides 7–11)
+BP.scene({ header: 'MEM1 · kap. 2' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, under, beam, distLoad, moment, plot, ell, PI } = B;
+
+  B.titel(0, 'Lasttyper og fortegn', 'MEM1 · kapitel 2 · begreb (slide 7–11)', 'titel');
+  text(0, 'hvad slags last · hvilken vej', 640, 520, 40, 'red', wt('titel', 'hvad') - 0.1, we('titel', 'peger'), { align: 'center' });
+
+  // ---------------- 1 efter tid ----------------
+  B.goto('tid', 1);
+  {
+    const celler = [['Statisk', 'Statisk', 120, 130], ['Vedvarende', 'Vedvarende', 680, 130], ['Stød', 'Stødlast', 120, 420], ['Cyklisk', 'cyklisk', 680, 420]];
+    celler.forEach(([navn, w, x, y], i) => {
+      const t = wt('tid', w) - 0.2;
+      text(1, navn, x, y + 30, 38, 'blue', t, t + 0.5);
+      const ox = x + 20, oy = y + 220, ex = x + 440;
+      arrow(1, [[ox, oy], [ex, oy]], 'black', 2.4, t + 0.2, t + 0.5, 12); text(1, 't', ex + 6, oy + 10, 30, 'black', t + 0.4, t + 0.6);
+      arrow(1, [[ox, oy], [ox, y + 60]], 'black', 2.4, t + 0.2, t + 0.5, 12); text(1, 'F', ox - 30, y + 80, 30, 'black', t + 0.4, t + 0.6);
+      let P;
+      if (i === 0) P = [[ox, oy], [ox + 150, oy - 120], [ex - 20, oy - 120]];
+      else if (i === 1) P = [[ox, oy - 110], [ex - 20, oy - 110]];
+      else if (i === 2) P = [[ox, oy - 4], [ox + 150, oy - 4], [ox + 170, oy - 140], [ox + 195, oy - 4], [ex - 20, oy - 4]];
+      else { P = []; for (let j = 0; j <= 80; j++) { const u = j / 80; P.push([ox + u * 400, oy - 80 - 60 * Math.sin(u * 6 * PI)]); } }
+      plot(1, P, 'red', t + 0.5, t + 1.6);
+    });
+    text(1, 'langsomt', 300, 290, 28, 'black', we('tid', 'langsomt') - 0.3, we('tid', 'langsomt'));
+    text(1, 'lang tid', 900, 300, 28, 'black', wt('tid', 'lang') - 0.1, we('tid', 'tid', 1));
+    text(1, 'hurtigt, tilfører energi', 340, 560, 28, 'black', wt('tid', 'hurtigt') - 0.1, we('tid', 'energi'));
+    text(1, 'kan skifte retning', 920, 450, 28, 'black', wt('tid', 'skifte') - 0.1, we('tid', 'retning'));
+  }
+
+  // ---------------- 2 efter areal og virkemåde ----------------
+  B.goto('areal', 2);
+  {
+    const ta = wt('areal', 'koncentreret') - 0.2;
+    beam(2, 140, 220, 540, 30, 'black', ta - 0.4, ta);
+    arrow(2, [[340, 110], [340, 216]], 'red', 4, ta, ta + 0.5);
+    text(2, 'koncentreret', 340, 300, 34, 'red', ta + 0.2, we('areal', 'punkt'), { align: 'center' });
+    const tf = wt('areal', 'fordelt') - 0.2;
+    beam(2, 740, 220, 1140, 30, 'black', tf - 0.4, tf);
+    distLoad(2, 760, 1120, 220, 80, 'red', tf, tf + 1.0, 9);
+    text(2, 'fordelt', 940, 300, 34, 'red', tf + 0.4, we('areal', 'længde'), { align: 'center' });
+    // P, V, M, T
+    const sk = [['P', 'normalkraften', 'normal'], ['V', 'forskydningskraften', 'forskydning'], ['M', 'bøjningsmomentet', 'bøjning'], ['T', 'vridningsmomentet', 'vridning']];
+    sk.forEach(([s, w, navn], i) => {
+      const x = 150 + 270 * i, t = wt('fire', w) - 0.2, y = 470;
+      beam(2, x + 40, y, x + 200, 40, 'black', t, t + 0.4);
+      if (i === 0) { arrow(2, [[x + 204, y + 20], [x + 270, y + 20]], 'blue', 3.6, t + 0.4, t + 0.8); arrow(2, [[x + 36, y + 20], [x - 30, y + 20]], 'blue', 3.6, t + 0.4, t + 0.8); }
+      if (i === 1) { arrow(2, [[x + 200, y + 100], [x + 200, y + 44]], 'blue', 3.6, t + 0.4, t + 0.8); arrow(2, [[x + 40, y - 60], [x + 40, y - 4]], 'blue', 3.6, t + 0.4, t + 0.8); }
+      if (i === 2) { moment(2, x + 40, y + 20, 42, 0.6 * PI, 1.4 * PI, 'blue', t + 0.4, t + 0.8); moment(2, x + 200, y + 20, 42, 0.4 * PI, -0.4 * PI, 'blue', t + 0.4, t + 0.8); }
+      if (i === 3) { line(2, ell(x + 220, y + 20, 14, 40, -0.6 * PI, 0.9 * PI), 'blue', 3.2, t + 0.4, t + 0.8); arrow(2, [[x + 214, y + 58], [x + 206, y + 60]], 'blue', 3.2, t + 0.8, t + 0.85, 12); }
+      text(2, s, x + 120, y + 125, 44, 'blue', wt('fire', s) - 0.1, wt('fire', s) + 0.3, { align: 'center' });
+      text(2, navn, x + 120, y + 165, 28, 'black', t + 0.2, t + 0.8, { align: 'center' });
+    });
+    text(2, 'kombineret = sammensat last', 640, 690, 32, 'green', wt('fire', 'Kombineres') - 0.1, we('fire', 'last'), { align: 'center' });
+  }
+
+  // ---------------- 3 fortegn for P og V ----------------
+  B.goto('normal_fortegn', 3);
+  {
+    const tn = L('normal_fortegn').start;
+    arrow(3, [[130, 260], [230, 260]], 'black', 2.6, tn, tn + 0.3, 13); text(3, 'x', 238, 270, 30, 'black', tn + 0.2, tn + 0.4);
+    arrow(3, [[130, 260], [130, 160]], 'black', 2.6, tn + 0.2, tn + 0.5, 13); text(3, 'y', 120, 150, 30, 'black', tn + 0.4, tn + 0.6, { align: 'right' });
+    text(3, 'koordinatsystem først', 110, 335, 28, 'black', tn + 0.3, we('normal_fortegn', 'koordinatsystem'));
+    const tt = wt('normal_fortegn', 'trækkende') - 0.2;
+    beam(3, 520, 160, 760, 40, 'black', tt, tt + 0.4);
+    arrow(3, [[764, 180], [860, 180]], 'red', 4, tt + 0.3, tt + 0.7); arrow(3, [[516, 180], [420, 180]], 'red', 4, tt + 0.3, tt + 0.7);
+    text(3, 'træk:  P > 0', 900, 192, 40, 'red', wt('normal_fortegn', 'positiv') - 0.2, we('normal_fortegn', 'positiv'));
+    const tr = wt('normal_fortegn', 'trykkende') - 0.2;
+    beam(3, 520, 280, 760, 40, 'black', tr, tr + 0.4);
+    arrow(3, [[860, 300], [766, 300]], 'blue', 4, tr + 0.3, tr + 0.7); arrow(3, [[420, 300], [514, 300]], 'blue', 4, tr + 0.3, tr + 0.7);
+    text(3, 'tryk:  P < 0', 900, 312, 40, 'blue', wt('normal_fortegn', 'negativ') - 0.2, we('normal_fortegn', 'negativ'));
+    // V
+    const tv = L('v_fortegn').start;
+    text(3, 'V > 0, når kraft og udadrettet normal', 120, 470, 36, 'black', tv + 0.2, we('v_fortegn', 'normal'));
+    text(3, 'begge er + eller begge er −', 160, 530, 36, 'green', wt('v_fortegn', 'begge') - 0.1, we('v_fortegn', 'negative'));
+    const tx = wt('v_fortegn', 'normal') - 0.4;
+    line(3, [[940, 440], [1080, 440], [1080, 600], [940, 600], [940, 442]], 'black', 3, tx, tx + 0.6);
+    arrow(3, [[1084, 520], [1170, 520]], 'green', 3.2, wt('v_fortegn', 'udadrettede'), wt('v_fortegn', 'udadrettede') + 0.4, 14);
+    text(3, 'n +', 1176, 530, 30, 'green', wt('v_fortegn', 'udadrettede') + 0.3, wt('v_fortegn', 'udadrettede') + 0.6);
+    arrow(3, [[1096, 580], [1096, 470]], 'red', 3.6, wt('v_fortegn', 'begge') - 0.2, wt('v_fortegn', 'begge') + 0.2, 14);
+    text(3, 'V +', 1110, 466, 30, 'red', wt('v_fortegn', 'positive'), wt('v_fortegn', 'positive') + 0.3);
+    arrow(3, [[936, 520], [850, 520]], 'green', 3.2, wt('v_fortegn', 'negative') - 0.6, wt('v_fortegn', 'negative') - 0.2, 14);
+    arrow(3, [[924, 470], [924, 580]], 'red', 3.6, wt('v_fortegn', 'negative') - 0.3, wt('v_fortegn', 'negative'), 14);
+  }
+
+  // ---------------- 4 fortegn for M ----------------
+  B.goto('m_fortegn', 4);
+  {
+    const tm = wt('m_fortegn', 'positivt') - 0.2;
+    const bue = (x0, x1, y, d) => { const P = []; for (let j = 0; j <= 40; j++) { const u = j / 40; P.push([x0 + (x1 - x0) * u, y + d * 4 * u * (1 - u)]); } return P; };
+    plot(4, bue(170, 530, 250, 40), 'black', tm, tm + 0.5, 3.2); plot(4, bue(170, 530, 300, 40), 'black', tm + 0.2, tm + 0.7, 3.2);
+    line(4, [[170, 250], [170, 300]], 'black', 3, tm + 0.6, tm + 0.7); line(4, [[530, 250], [530, 300]], 'black', 3, tm + 0.6, tm + 0.7);
+    moment(4, 170, 275, 48, 0.6 * PI, 1.4 * PI, 'red', tm + 0.6, tm + 1.0); moment(4, 530, 275, 48, 0.4 * PI, -0.4 * PI, 'red', tm + 0.6, tm + 1.0);
+    text(4, 'M', 100, 220, 34, 'red', tm + 0.9, tm + 1.1); text(4, 'M', 590, 220, 34, 'red', tm + 0.9, tm + 1.1);
+    text(4, 'positivt M', 350, 170, 40, 'red', tm, tm + 0.5, { align: 'center' });
+    const tb = wt('m_fortegn', 'bunden') - 0.3;
+    text(4, 'træk i bunden', 350, 400, 34, 'red', tb, tb + 0.5, { align: 'center' });
+    text(4, 'smiler', 350, 450, 30, 'black', wt('m_fortegn', 'smiler') - 0.1, we('m_fortegn', 'smiler'), { align: 'center' });
+    const tg = wt('m_fortegn', 'negativt') - 0.2;
+    plot(4, bue(750, 1110, 290, -40), 'black', tg, tg + 0.5, 3.2); plot(4, bue(750, 1110, 340, -40), 'black', tg + 0.2, tg + 0.7, 3.2);
+    line(4, [[750, 290], [750, 340]], 'black', 3, tg + 0.6, tg + 0.7); line(4, [[1110, 290], [1110, 340]], 'black', 3, tg + 0.6, tg + 0.7);
+    moment(4, 750, 315, 48, 1.4 * PI, 0.6 * PI, 'blue', tg + 0.6, tg + 1.0); moment(4, 1110, 315, 48, -0.4 * PI, 0.4 * PI, 'blue', tg + 0.6, tg + 1.0);
+    text(4, 'negativt M', 930, 170, 40, 'blue', tg, tg + 0.5, { align: 'center' });
+    text(4, 'træk i toppen', 930, 400, 34, 'blue', wt('m_fortegn', 'toppen') - 0.3, we('m_fortegn', 'toppen'), { align: 'center' });
+    const tk = L('konsistens').start;
+    box(4, 170, 520, 940, 110, 'black', tk, tk + 0.9);
+    text(4, 'Reglen er valgfri, men brug den samme hele vejen', 640, 588, 31, 'black', tk + 0.4, we('konsistens', 'igennem'), { align: 'center' });
+  }
+
+  B.goto('tjek_q', 5);
+  B.tjek(5, ['Bjælken får træk i toppen.', 'Er M positivt eller negativt?'], ['Negativt.', 'positivt M giver træk i bunden'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 6);
+  B.slut(6, 'Abou-Hayt (2026), MEM1 Chapter 2, slide 7–11 · Hamrock, Schmid & Jacobson, kap. 2', '', 'slut');
+  text(6, 'statisk · vedvarende · stød · cyklisk', 200, 280, 38, 'blue', L('slut').start + 0.5, we('slut', 'tid'));
+  text(6, 'punkt eller fordelt  ·  P, V, M, T', 200, 350, 38, 'blue', wt('slut', 'punkt') - 0.1, we('slut', 'T'));
+  text(6, 'træk > 0  ·  M > 0 giver træk i bunden', 200, 440, 40, 'red', wt('slut', 'Træk') - 0.1, we('slut', 'bunden'));
+});
+
+</script>
+<script>BP.live({"duration":118.168,"audio":"lasttyper-fortegn.mp3","order":["titel","tid","areal","fire","normal_fortegn","v_fortegn","m_fortegn","konsistens","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":8.077,"words":[["Lasttyper",0.614,1.375],["og",1.375,1.504],["fortegn",1.504,2.187],["For",3.064,3.219],["at",3.219,3.245],["kunne",3.245,3.425],["regne",3.425,3.747],["på",3.747,3.915],["en",3.915,3.992],["last",3.992,4.417],["skal",4.418,4.611],["vi",4.611,4.714],["vide",4.714,5.139],["hvad",5.281,5.461],["slags",5.461,5.809],["last",5.809,6.106],["det",6.106,6.235],["er",6.235,6.57],["og",6.711,6.84],["hvilken",6.84,7.188],["vej",7.188,7.394],["den",7.394,7.562],["peger",7.562,8.077]],"text":"Lasttyper og fortegn. For at kunne regne på en last skal vi vide, hvad slags last det er, og hvilken vej den peger."},"tid":{"start":9.298,"end":26.643,"words":[["Efter",9.438,9.722],["tid",9.722,9.967],["deler",9.967,10.289],["vi",10.289,10.43],["laster",10.43,10.959],["i",10.959,11.101],["fire",11.101,11.423],["typer",11.423,11.99],["Statisk",12.868,13.512],["last",13.512,13.886],["påføres",13.886,14.388],["langsomt",14.388,15.02],["Vedvarende",15.922,16.45],["last",16.45,16.888],["er",16.888,17.03],["næsten",17.03,17.429],["konstant",17.429,17.984],["i",17.984,18.138],["lang",18.138,18.422],["tid",18.422,18.821],["Stødlast",19.723,20.264],["påføres",20.264,20.767],["hurtigt",20.767,21.244],["og",21.244,21.373],["tilfører",21.373,21.94],["energi",21.94,22.584],["Og",23.499,23.551],["cyklisk",23.551,24.002],["last",24.002,24.337],["varierer",24.337,24.723],["periodisk",24.723,25.38],["og",25.38,25.535],["kan",25.535,25.651],["skifte",25.651,26.063],["retning",26.063,26.643]],"text":"Efter tid deler vi laster i fire typer. Statisk last påføres langsomt. Vedvarende last er næsten konstant i lang tid. Stødlast påføres hurtigt og tilfører energi. Og cyklisk last varierer periodisk og kan skifte retning."},"areal":{"start":27.864,"end":35.066,"words":[["Efter",28.004,28.275],["areal",28.275,28.739],["skelner",28.739,29.138],["vi",29.138,29.254],["mellem",29.254,29.538],["en",29.538,29.641],["koncentreret",29.641,30.246],["last",30.246,30.775],["der",30.929,31.045],["virker",31.045,31.393],["i",31.393,31.496],["et",31.496,31.574],["punkt",31.574,31.986],["og",32.179,32.308],["en",32.308,32.411],["fordelt",32.411,32.811],["last",32.811,33.313],["der",33.468,33.623],["er",33.623,33.636],["spredt",33.636,34.009],["ud",34.009,34.241],["over",34.241,34.473],["en",34.473,34.576],["længde",34.576,35.066]],"text":"Efter areal skelner vi mellem en koncentreret last, der virker i et punkt, og en fordelt last, der er spredt ud over en længde."},"fire":{"start":36.302,"end":47.77,"words":[["Efter",36.442,36.687],["virkemåde",36.687,37.28],["har",37.28,37.473],["vi",37.473,37.576],["fire",37.576,37.873],["grundtyper",37.873,38.646],["normalkraften",38.775,39.638],["P",39.638,39.844],["langs",39.844,40.179],["aksen",40.179,40.772],["forskydningskraften",40.901,41.906],["V",41.906,42.087],["på",42.087,42.215],["tværs",42.215,42.782],["bøjningsmomentet",42.924,43.788],["M",43.788,44.058],["og",44.058,44.213],["vridningsmomentet",44.213,45.012],["T.",45.012,45.373],["Kombineres",45.373,45.927],["de",45.927,46.236],["har",46.378,46.52],["vi",46.52,46.623],["en",46.623,46.726],["sammensat",46.726,47.28],["last",47.28,47.77]],"text":"Efter virkemåde har vi fire grundtyper: normalkraften P langs aksen, forskydningskraften V på tværs, bøjningsmomentet M og vridningsmomentet T. Kombineres de, har vi en sammensat last."},"normal_fortegn":{"start":48.988,"end":56.385,"words":[["Fortegn",49.115,49.76],["kræver",49.76,50.082],["først",50.082,50.43],["et",50.43,50.584],["koordinatsystem",50.584,51.706],["En",52.609,52.725],["trækkende",52.725,53.137],["normalkraft",53.137,53.808],["er",53.808,53.924],["positiv",53.924,54.658],["og",54.8,54.929],["en",54.929,55.045],["trykkende",55.045,55.573],["er",55.573,55.689],["negativ",55.689,56.385]],"text":"Fortegn kræver først et koordinatsystem. En trækkende normalkraft er positiv, og en trykkende er negativ."},"v_fortegn":{"start":57.618,"end":66.147,"words":[["For",57.732,57.887],["forskydningskraften",57.887,58.854],["gælder",58.854,59.421],["den",59.549,59.704],["er",59.704,59.781],["positiv",59.781,60.49],["hvis",60.632,60.825],["kraftens",60.825,61.25],["retning",61.25,61.689],["og",61.689,61.817],["fladens",61.817,62.204],["udadrettede",62.204,62.758],["normal",62.758,63.183],["enten",63.183,63.634],["begge",63.634,63.931],["er",63.931,64.008],["positive",64.008,64.781],["eller",64.781,64.988],["begge",64.988,65.336],["er",65.336,65.451],["negative",65.451,66.147]],"text":"For forskydningskraften gælder: den er positiv, hvis kraftens retning og fladens udadrettede normal enten begge er positive eller begge er negative."},"m_fortegn":{"start":67.376,"end":77.672,"words":[["Samme",67.503,67.903],["idé",67.903,68.302],["bruges",68.302,68.663],["for",68.663,68.779],["momentet",68.779,69.436],["Et",70.327,70.43],["positivt",70.43,71.036],["bøjningsmoment",71.036,71.783],["giver",71.783,72.041],["træk",72.041,72.363],["i",72.363,72.44],["bunden",72.44,72.956],["og",73.136,73.252],["bjælken",73.252,73.69],["smiler",73.69,74.27],["Et",75.172,75.275],["negativt",75.275,75.842],["moment",75.842,76.229],["giver",76.229,76.487],["træk",76.487,76.925],["i",76.925,77.08],["toppen",77.08,77.672]],"text":"Samme idé bruges for momentet. Et positivt bøjningsmoment giver træk i bunden, og bjælken smiler. Et negativt moment giver træk i toppen."},"konsistens":{"start":78.886,"end":85.702,"words":[["Selve",79.013,79.4],["fortegnsreglen",79.4,80.418],["er",80.418,80.56],["valgfri",80.56,81.165],["Det",82.042,82.171],["vigtige",82.171,82.609],["er",82.609,82.944],["at",83.099,83.241],["du",83.241,83.331],["bruger",83.331,83.615],["den",83.615,83.795],["samme",83.795,84.143],["regel",84.143,84.439],["hele",84.439,84.787],["vejen",84.787,85.097],["igennem",85.097,85.702]],"text":"Selve fortegnsreglen er valgfri. Det vigtige er, at du bruger den samme regel hele vejen igennem."},"tjek_q":{"start":86.916,"end":94.815,"words":[["Tjek",87.017,87.339],["dig",87.339,87.519],["selv",87.519,87.945],["En",88.849,88.978],["bjælke",88.978,89.3],["bøjer",89.3,89.815],["så",89.957,90.189],["den",90.189,90.357],["får",90.357,90.498],["træk",90.498,90.859],["i",90.859,91.001],["toppen",91.001,91.568],["Er",92.457,92.573],["momentet",92.573,93.089],["positivt",93.089,93.836],["eller",93.836,94.068],["negativt",94.068,94.815]],"text":"Tjek dig selv. En bjælke bøjer, så den får træk i toppen. Er momentet positivt eller negativt?"},"tjek_a":{"start":98.7,"end":105.298,"words":[["Negativt",98.801,99.664],["Positivt",100.556,101.123],["moment",101.123,101.496],["giver",101.496,101.728],["træk",101.728,102.05],["i",102.05,102.128],["bunden",102.128,102.618],["så",102.759,102.953],["træk",102.953,103.262],["i",103.262,103.339],["toppen",103.339,103.79],["betyder",103.79,104.19],["negativt",104.19,104.757],["moment",104.757,105.298]],"text":"Negativt. Positivt moment giver træk i bunden, så træk i toppen betyder negativt moment."},"slut":{"start":106.514,"end":115.752,"words":[["Kort",106.641,106.873],["sagt",106.873,107.376],["fire",107.492,107.827],["typer",107.827,108.252],["efter",108.252,108.51],["tid",108.51,108.922],["punkt",109.051,109.309],["eller",109.309,109.502],["fordelt",109.502,110.082],["og",110.224,110.366],["P",110.366,110.778],["V",110.907,111.358],["M",111.487,111.68],["og",111.68,111.744],["T.",111.744,112.067],["Træk",112.067,112.453],["er",112.453,112.569],["positivt",112.569,113.304],["og",113.445,113.587],["positivt",113.587,114.18],["moment",114.18,114.515],["giver",114.515,114.721],["træk",114.721,115.095],["i",115.095,115.237],["bunden",115.237,115.752]],"text":"Kort sagt: fire typer efter tid, punkt eller fordelt, og P, V, M og T. Træk er positivt, og positivt moment giver træk i bunden."}}}, { audio: 'lasttyper-fortegn.mp3', id: 'lasttyper-fortegn' });</script>
+</body>
+</html>

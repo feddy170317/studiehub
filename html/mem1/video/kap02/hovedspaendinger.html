@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hovedspændinger og største forskydning · video</title>
+<meta name="description" content="Transformationsligningerne, hovedspændinger, hovedretningen og den største forskydning 45° derfra.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 2: videoer</a><h1>Hovedspændinger og største forskydning</h1><span class="meta">MEM1 · kapitel 2 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Hovedspændinger og største forskydning"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Transformationsligningerne, hovedspændinger, hovedretningen og den største forskydning 45° derfra.</p><div class="chips"><a href="spaending-element.html">Se først: Spænding og spændingselementet</a><a href="../../../../lab/mem1/mohrs-cirkel.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel02_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l02">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Hovedspændinger og største forskydning (MEM1 kap. 2, slides 37–40)
+BP.scene({ header: 'MEM1 · kap. 2' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, PI } = B;
+  // drejet kvadrat og pile vinkelret på / langs dets flader
+  const sq = (cx, cy, h, a) => [[-1, -1], [1, -1], [1, 1], [-1, 1], [-1, -0.98]].map(([u, v]) => [cx + h * (u * Math.cos(a) - v * Math.sin(a)), cy + h * (u * Math.sin(a) + v * Math.cos(a))]);
+  const rot = (cx, cy, a, u, v) => [cx + u * Math.cos(a) - v * Math.sin(a), cy + u * Math.sin(a) + v * Math.cos(a)];
+  const normal = (k, cx, cy, h, a, side, len, col, t, out = true) => { // side 0 = +u, 1 = +v, 2 = −u, 3 = −v
+    const d = [[1, 0], [0, 1], [-1, 0], [0, -1]][side], p0 = rot(cx, cy, a, d[0] * (h + 8), d[1] * (h + 8)), p1 = rot(cx, cy, a, d[0] * (h + 8 + len), d[1] * (h + 8 + len));
+    arrow(k, out ? [p0, p1] : [p1, p0], col, 4, t, t + 0.4);
+  };
+  const shear = (k, cx, cy, h, a, side, s, col, t) => {
+    const d = [[1, 0], [0, 1], [-1, 0], [0, -1]][side], e = [-d[1], d[0]], o = h + 18;
+    const p0 = rot(cx, cy, a, d[0] * o - e[0] * 55 * s, d[1] * o - e[1] * 55 * s), p1 = rot(cx, cy, a, d[0] * o + e[0] * 55 * s, d[1] * o + e[1] * 55 * s);
+    arrow(k, [p0, p1], col, 3.4, t, t + 0.4, 15);
+  };
+
+  B.titel(0, 'Hovedspændinger', 'MEM1 · kapitel 2 · begreb (slide 37–40)', 'titel');
+  text(0, 'og den største forskydning', 640, 470, 40, 'black', wt('titel', 'største') - 0.4, we('titel', 'forskydning'), { align: 'center' });
+  text(0, 'nogle retninger er særlige', 640, 540, 40, 'red', wt('titel', 'Nogle') - 0.1, we('titel', 'særlige'), { align: 'center' });
+
+  // ---------------- 1 transformation ----------------
+  B.goto('transf', 1);
+  {
+    const t0 = L('transf').start, a = -PI / 7, cx = 300, cy = 420, h = 95;
+    line(1, sq(cx, cy, h, 0), 'black', 2.4, t0, t0 + 0.6, { alpha: 0.35 });
+    line(1, sq(cx, cy, h, a), 'blue', 3.4, wt('transf', 'drejet') - 0.2, wt('transf', 'drejet') + 0.5);
+    line(1, ell(cx, cy, 150, 150, 0, a), 'blue', 2.4, wt('transf', 'phi', 2) - 0.2, wt('transf', 'phi', 2) + 0.3);
+    text(1, 'φ', cx + 160, cy - 30, 38, 'blue', wt('transf', 'phi', 2), wt('transf', 'phi', 2) + 0.3);
+    normal(1, cx, cy, h, a, 0, 80, 'red', wt('transf', 'sigma') - 0.1);
+    text(1, 'σ_φ', rot(cx, cy, a, h + 100, 0)[0] + 10, rot(cx, cy, a, h + 100, 0)[1] + 10, 40, 'red', wt('transf', 'sigma'), wt('transf', 'phi') + 0.2);
+    shear(1, cx, cy, h, a, 0, -1, 'green', wt('transf', 'tau') - 0.1);
+    text(1, 'τ_φ', cx + 120, cy - 150, 40, 'green', wt('transf', 'tau'), wt('transf', 'phi', 1) + 0.2);
+    text(1, 'σ_φ = (σ_x + σ_y)/2', 560, 150, 32, 'red', wt('transf', 'giver') - 0.1, wt('transf', 'phi', 1));
+    text(1, '+ (σ_x − σ_y)/2 · cos 2φ + τ_{xy} sin 2φ', 600, 200, 30, 'red', wt('transf', 'phi', 1), we('transf', 'phi', 2));
+    text(1, 'τ_φ = −(σ_x − σ_y)/2 · sin 2φ + τ_{xy} cos 2φ', 560, 280, 30, 'green', wt('transf', 'giver') + 0.6, we('transf', 'phi', 2) + 0.4);
+    text(1, 'samme tilstand,', 640, 460, 40, 'black', wt('transf', 'Selve') - 0.1, we('transf', 'uændret'));
+    text(1, 'nye komponenter', 640, 520, 40, 'blue', wt('transf', 'komponenterne') - 0.2, we('transf', 'sig'));
+  }
+
+  // ---------------- 2 hovedspændingerne ----------------
+  B.goto('hovedplan', 2);
+  {
+    const t0 = L('hovedplan').start, a = -PI / 5, cx = 300, cy = 440, h = 80;
+    line(2, sq(cx, cy, h, a), 'blue', 3.4, t0, t0 + 0.7);
+    text(2, 'τ = 0', cx - 50, cy + 12, 38, 'green', wt('hovedplan', 'nul') - 0.2, we('hovedplan', 'nul'));
+    const ts = wt('hovedplan', 'hovedspændingerne') - 0.2;
+    normal(2, cx, cy, h, a, 0, 95, 'red', ts); normal(2, cx, cy, h, a, 2, 95, 'red', ts + 0.2);
+    normal(2, cx, cy, h, a, 1, 50, 'red', ts + 0.4); normal(2, cx, cy, h, a, 3, 50, 'red', ts + 0.6);
+    const p1 = rot(cx, cy, a, h + 120, 0), p2 = rot(cx, cy, a, 0, h + 80);
+    text(2, 'σ_1', p1[0] - 10, p1[1] - 8, 42, 'red', wt('hovedplan', 'et') - 0.1, wt('hovedplan', 'et') + 0.3);
+    text(2, 'σ_2', p2[0] + 10, p2[1] + 30, 42, 'red', wt('hovedplan', 'to') - 0.1, wt('hovedplan', 'to') + 0.3);
+    const tf = L('formel').start;
+    const f = text(2, 'σ_{1,2} = (σ_x + σ_y)/2 ± √[((σ_x − σ_y)/2)² + τ_{xy}²]', 520, 220, 32, 'red', tf + 0.2, we('formel', 'anden', 1));
+    text(2, 'σ_1 ≥ σ_2', 560, 285, 34, 'black', wt('formel', 'største') - 0.4, we('formel', 'største'));
+    const tv = L('vinkel').start;
+    text(2, 'tan 2φ_σ = 2τ_{xy} / (σ_x − σ_y)', 520, 400, 36, 'blue', wt('vinkel', 'tangens') - 0.1, we('vinkel', 'y', 1));
+    text(2, 'hovedretningerne står 90° fra hinanden', 520, 470, 32, 'black', wt('vinkel', 'De') - 0.1, we('vinkel', 'hinanden'));
+    line(2, ell(cx, cy, 30, 30, a, a + PI / 2), 'black', 2.4, wt('vinkel', 'vinkelret') - 0.2, we('vinkel', 'vinkelret'));
+  }
+
+  // ---------------- 3 største forskydning ----------------
+  B.goto('tmax', 3);
+  {
+    const t0 = L('tmax').start;
+    text(3, '|τ_{max}| = √[((σ_x − σ_y)/2)² + τ_{xy}²]', 120, 170, 38, 'green', t0 + 0.2, we('tmax', 'kvadratrod'));
+    text(3, '= (σ_1 − σ_2)/2', 400, 240, 40, 'green', wt('tmax', 'hovedspændingerne') - 0.1, we('tmax', 'to', 1));
+    // element drejet 45° i forhold til hovedretningen
+    const a0 = -PI / 5, a = a0 + PI / 4, cx = 330, cy = 470, h = 85;
+    line(3, sq(cx, cy, h, a0), 'blue', 2.4, L('vinkel45').start, L('vinkel45').start + 0.5, { alpha: 0.4 });
+    const ts = L('tmax_snit').start;
+    line(3, sq(cx, cy, h, a), 'green', 3.4, t0 + 0.6, t0 + 1.4);
+    [0, 1, 2, 3].forEach((s, i) => shear(3, cx, cy, h, a, s, 1, 'green', t0 + 1.4 + 0.2 * i));
+    [0, 1, 2, 3].forEach((s, i) => normal(3, cx, cy, h, a, s, 45, 'red', wt('tmax_snit', 'lig') - 0.2 + 0.15 * i));
+    text(3, 'σ = σ_c = (σ_x + σ_y)/2', 640, 420, 38, 'red', wt('tmax_snit', 'middelværdien') - 0.2, we('tmax_snit', 'to'));
+    text(3, 'normalspændingen er ikke nul', 640, 480, 32, 'black', wt('tmax_snit', 'normalspændingen') - 0.1, we('tmax_snit', 'nul'));
+    line(3, ell(cx, cy, 160, 160, a0, a), 'blue', 2.8, wt('tmax_snit', 'nul') + 0.4, L('vinkel45').end - 0.6);
+    text(3, '45°', cx + 160, cy - 10, 38, 'blue', wt('vinkel45', 'femogfyrre') - 0.1, we('vinkel45', 'grader'));
+    text(3, '45° fra hovedretningerne', 640, 570, 38, 'blue', wt('vinkel45', 'femogfyrre') - 0.1, we('vinkel45', 'hovedretningerne'));
+  }
+
+  B.goto('tjek_q', 4);
+  B.tjek(4, ['σ_x = σ_y  og  τ_{xy} = 0.', 'Hvor stor er τ_{max}?'], ['τ_{max} = 0', 'alle snit har samme σ'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 5);
+  B.slut(5, 'Abou-Hayt (2026), MEM1 Chapter 2, slide 37–40 · Hamrock, Schmid & Jacobson, kap. 2', 'Mohrs cirkel (den grafiske version)', 'slut');
+  text(5, 'hovedplan:  τ = 0', 200, 270, 40, 'blue', L('slut').start + 0.4, we('slut', 'nul'));
+  text(5, 'σ_{1,2} = σ_c ± √[((σ_x − σ_y)/2)² + τ_{xy}²]', 200, 350, 36, 'red', wt('slut', 'hovedspændingerne') - 0.1, we('slut', 'kvadratroden'));
+  text(5, '|τ_{max}| = den samme kvadratrod', 200, 430, 38, 'green', wt('slut', 'tau') - 0.1, we('slut', 'kvadratrod'));
+});
+
+</script>
+<script>BP.live({"duration":116.68,"audio":"hovedspaendinger.mp3","order":["titel","transf","hovedplan","formel","vinkel","tmax","tmax_snit","vinkel45","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":8.631,"words":[["Hovedspændinger",0.627,1.439],["og",1.439,1.555],["største",1.555,1.98],["forskydning",1.98,2.702],["Drejer",3.566,3.914],["vi",3.914,4.017],["snittet",4.017,4.597],["ændrer",4.726,5.061],["spændingerne",5.061,5.602],["sig",5.602,6.028],["Nogle",6.905,7.24],["retninger",7.24,7.858],["er",7.858,7.974],["særlige",7.974,8.631]],"text":"Hovedspændinger og største forskydning. Drejer vi snittet, ændrer spændingerne sig. Nogle retninger er særlige."},"transf":{"start":9.874,"end":21.214,"words":[["Transformationsligningerne",10.001,11.251],["giver",11.251,11.483],["sigma",11.483,11.896],["phi",11.896,12.166],["og",12.166,12.205],["tau",12.205,12.488],["phi",12.488,12.862],["på",12.862,13.055],["et",13.055,13.133],["snit",13.133,13.403],["drejet",13.403,13.777],["vinklen",13.777,14.215],["phi",14.215,14.602],["Selve",15.493,15.866],["spændingstilstanden",15.866,16.91],["er",16.91,17.09],["uændret",17.09,17.851],["Det",18.753,18.869],["er",18.869,18.933],["kun",18.933,19.204],["komponenterne",19.204,20.106],["der",20.248,20.402],["ændrer",20.402,20.763],["sig",20.763,21.214]],"text":"Transformationsligningerne giver sigma phi og tau phi på et snit drejet vinklen phi. Selve spændingstilstanden er uændret. Det er kun komponenterne, der ændrer sig."},"hovedplan":{"start":22.44,"end":29.953,"words":[["På",22.58,22.67],["hovedplanerne",22.67,23.456],["er",23.456,23.585],["forskydningen",23.585,24.281],["nul",24.281,24.694],["Normalspændingerne",25.597,26.551],["dér",26.551,26.77],["kalder",26.77,27.028],["vi",27.028,27.169],["hovedspændingerne",27.169,28.123],["sigma",28.239,28.729],["et",28.729,29.012],["og",29.012,29.141],["sigma",29.141,29.528],["to.",29.528,29.953]],"text":"På hovedplanerne er forskydningen nul. Normalspændingerne dér kalder vi hovedspændingerne, sigma et og sigma to."},"formel":{"start":31.19,"end":40.945,"words":[["Sigma",31.317,31.743],["et",31.743,31.833],["og",31.833,31.871],["to",31.871,32.297],["er",32.297,32.426],["middelværdien",32.426,33.031],["plus",33.031,33.263],["og",33.263,33.315],["minus",33.315,33.714],["kvadratroden",33.714,34.436],["af",34.436,34.578],["den",34.578,34.719],["halve",34.719,35.003],["forskel",35.003,35.557],["i",35.557,35.737],["anden",35.737,36.047],["plus",36.047,36.292],["tau",36.292,36.627],["x",36.627,36.962],["y",36.962,37.194],["i",37.194,37.4],["anden",37.4,37.851],["Sigma",38.729,39.257],["et",39.257,39.45],["er",39.45,39.592],["altid",39.592,40.107],["den",40.108,40.288],["største",40.288,40.945]],"text":"Sigma et og to er middelværdien plus og minus kvadratroden af den halve forskel i anden plus tau x y i anden. Sigma et er altid den største."},"vinkel":{"start":42.172,"end":53.074,"words":[["Hovedretningen",42.299,42.969],["findes",42.969,43.292],["af",43.292,43.395],["tangens",43.395,43.897],["til",43.897,44.065],["to",44.065,44.335],["phi",44.335,44.542],["sigma",44.542,45.044],["som",45.186,45.444],["er",45.444,45.508],["to",45.508,45.766],["tau",45.766,46.036],["x",46.036,46.32],["y",46.32,46.526],["divideret",46.526,47.145],["med",47.145,47.286],["sigma",47.286,47.737],["x",47.737,48.034],["minus",48.034,48.536],["sigma",48.536,48.987],["y",48.987,49.297],["De",50.2,50.291],["to",50.291,50.561],["hovedretninger",50.561,51.386],["står",51.386,51.695],["vinkelret",51.695,52.275],["på",52.275,52.43],["hinanden",52.43,53.074]],"text":"Hovedretningen findes af tangens til to phi sigma, som er to tau x y divideret med sigma x minus sigma y. De to hovedretninger står vinkelret på hinanden."},"tmax":{"start":54.306,"end":63.069,"words":[["Den",54.433,54.562],["største",54.562,54.987],["forskydningsspænding",54.987,55.98],["er",55.98,56.134],["den",56.134,56.289],["samme",56.289,56.65],["kvadratrod",56.65,57.41],["Udtrykt",58.314,58.752],["ved",58.752,58.919],["hovedspændingerne",58.919,59.731],["er",59.731,59.834],["den",59.834,60.028],["sigma",60.028,60.466],["et",60.466,60.646],["minus",60.646,60.968],["sigma",60.968,61.303],["to",61.303,61.742],["divideret",61.883,62.489],["med",62.489,62.644],["to.",62.644,63.069]],"text":"Den største forskydningsspænding er den samme kvadratrod. Udtrykt ved hovedspændingerne er den sigma et minus sigma to, divideret med to."},"tmax_snit":{"start":64.304,"end":73.093,"words":[["På",64.431,64.509],["snittet",64.509,64.882],["med",64.882,65.024],["størst",65.024,65.385],["forskydning",65.385,66.016],["er",66.016,66.171],["normalspændingen",66.171,67.125],["ikke",67.125,67.408],["nul",67.408,67.833],["Den",68.711,68.879],["er",68.879,68.956],["lig",68.956,69.162],["middelværdien",69.162,70.026],["sigma",70.142,70.67],["x",70.67,70.941],["plus",70.941,71.16],["sigma",71.16,71.624],["y",71.624,71.868],["divideret",71.868,72.526],["med",72.526,72.667],["to.",72.667,73.093]],"text":"På snittet med størst forskydning er normalspændingen ikke nul. Den er lig middelværdien, sigma x plus sigma y divideret med to."},"vinkel45":{"start":74.326,"end":78.654,"words":[["Og",74.466,74.544],["snittet",74.544,74.956],["med",74.956,75.085],["størst",75.085,75.42],["forskydning",75.42,76.116],["ligger",76.116,76.425],["femogfyrre",76.425,77.005],["grader",77.005,77.559],["fra",77.559,77.739],["hovedretningerne",77.739,78.654]],"text":"Og snittet med størst forskydning ligger femogfyrre grader fra hovedretningerne."},"tjek_q":{"start":79.884,"end":88.247,"words":[["Tjek",79.985,80.307],["dig",80.307,80.487],["selv",80.487,80.913],["Sigma",81.804,82.307],["x",82.307,82.577],["og",82.577,82.616],["sigma",82.616,83.003],["y",83.003,83.299],["er",83.299,83.389],["lige",83.389,83.647],["store",83.647,84.175],["og",84.317,84.459],["tau",84.459,84.781],["x",84.781,85.103],["y",85.103,85.322],["er",85.322,85.438],["nul",85.438,85.863],["Hvor",86.74,86.92],["stor",86.92,87.281],["er",87.281,87.41],["tau",87.41,87.68],["max",87.68,88.247]],"text":"Tjek dig selv. Sigma x og sigma y er lige store, og tau x y er nul. Hvor stor er tau max?"},"tjek_a":{"start":92.124,"end":101.235,"words":[["Nul",92.224,92.752],["Den",93.645,93.812],["halve",93.812,94.096],["forskel",94.096,94.572],["er",94.572,94.637],["nul",94.637,95.075],["og",95.217,95.384],["tau",95.384,95.719],["x",95.719,96.003],["y",96.003,96.196],["er",96.196,96.273],["nul",96.273,96.699],["så",96.84,97.047],["kvadratroden",97.047,97.73],["er",97.73,97.884],["nul",97.884,98.335],["Alle",99.237,99.431],["snit",99.431,99.817],["har",99.817,100.011],["samme",100.011,100.359],["normalspænding",100.359,101.235]],"text":"Nul. Den halve forskel er nul, og tau x y er nul, så kvadratroden er nul. Alle snit har samme normalspænding."},"slut":{"start":102.482,"end":114.247,"words":[["Kort",102.622,102.828],["sagt",102.828,103.331],["på",103.447,103.576],["hovedplanerne",103.576,104.272],["er",104.272,104.375],["forskydningen",104.375,104.993],["nul",104.993,105.406],["hovedspændingerne",105.535,106.437],["er",106.437,106.54],["middelværdien",106.54,107.21],["plus",107.21,107.455],["og",107.455,107.532],["minus",107.532,107.867],["kvadratroden",107.867,108.64],["og",108.834,108.975],["tau",108.975,109.22],["max",109.22,109.607],["er",109.607,109.748],["den",109.748,109.916],["samme",109.916,110.264],["kvadratrod",110.264,110.998],["Mohrs",111.889,112.224],["cirkel",112.224,112.766],["viser",112.766,113.152],["det",113.152,113.281],["hele",113.281,113.616],["grafisk",113.616,114.247]],"text":"Kort sagt: på hovedplanerne er forskydningen nul, hovedspændingerne er middelværdien plus og minus kvadratroden, og tau max er den samme kvadratrod. Mohrs cirkel viser det hele grafisk."}}}, { audio: 'hovedspaendinger.mp3', id: 'hovedspaendinger' });</script>
+</body>
+</html>

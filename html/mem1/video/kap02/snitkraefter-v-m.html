@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Forskydningskraft- og momentdiagrammer · video</title>
+<meta name="description" content="Bjælketyper, snitmetoden, sammenhængen mellem q, V og M, og hvorfor V = 0 peger på det største moment.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 2: videoer</a><h1>Forskydningskraft- og momentdiagrammer</h1><span class="meta">MEM1 · kapitel 2 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Forskydningskraft- og momentdiagrammer"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Bjælketyper, snitmetoden, sammenhængen mellem q, V og M, og hvorfor V = 0 peger på det største moment.</p><div class="chips"><a href="fbd-ligevaegt.html">Se først: Understøtninger, ligevægt og frit legeme</a><a href="../../Kapitel02_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l02">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Forskydningskraft- og momentdiagrammer (MEM1 kap. 2, slides 19–24 og 28)
+BP.scene({ header: 'MEM1 · kap. 2' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, beam, pin, roller, wall, moment, distLoad, plot, dashed, PI } = B;
+
+  B.titel(0, 'V- og M-diagrammer', 'MEM1 · kapitel 2 · begreb (slide 19–24, 28)', 'titel');
+  text(0, 'find |V|_{max} og |M|_{max}', 640, 520, 42, 'red', wt('titel', 'største') - 0.2, we('titel', 'moment'), { align: 'center' });
+
+  // ---------------- 1 bjælketyper og rækkefølge ----------------
+  B.goto('bjaelker', 1);
+  {
+    const t1 = wt('bjaelker', 'simpelt') - 0.2, t2 = wt('bjaelker', 'indspændte') - 0.2, t3 = wt('bjaelker', 'udhæng') - 0.4;
+    beam(1, 200, 160, 700, 26, 'blue', t1, t1 + 0.5); pin(1, 220, 186, t1 + 0.4, 'black', 0.8); roller(1, 680, 186, t1 + 0.5, 'black', 0.8);
+    text(1, 'simpelt understøttet', 760, 190, 36, 'black', t1 + 0.2, t1 + 1.0);
+    wall(1, 200, 280, 360, t2); beam(1, 200, 306, 700, 26, 'blue', t2 + 0.3, t2 + 0.8);
+    text(1, 'indspændt', 760, 330, 36, 'black', t2 + 0.2, t2 + 0.9);
+    beam(1, 200, 440, 700, 26, 'blue', t3, t3 + 0.5); pin(1, 220, 466, t3 + 0.4, 'black', 0.8); roller(1, 540, 466, t3 + 0.5, 'black', 0.8);
+    text(1, 'udhæng', 640, 430, 28, 'red', t3 + 0.5, t3 + 0.9, { align: 'center' });
+    text(1, 'med udhæng', 760, 470, 36, 'black', t3 + 0.2, t3 + 0.9);
+    const tr = L('raekkefolge').start;
+    const kaede = [['FBD', 'Frit'], ['reaktioner', 'reaktioner'], ['snit', 'snit'], ['V(x), M(x)', 'V'], ['diagrammer', 'diagrammerne']];
+    let x = 140;
+    kaede.forEach(([s, w], i) => {
+      const t = wt('raekkefolge', w) - 0.2;
+      if (i) { arrow(1, [[x - 4, 618], [x + 36, 618]], 'black', 2.6, t - 0.2, t, 12); x += 50; }
+      const it = text(1, s, x, 630, 34, i === 4 ? 'red' : 'blue', t, t + 0.6);
+      x = B.endX(it, 14);
+    });
+  }
+
+  // ---------------- 2 snitmetoden ----------------
+  B.goto('snitmetode', 2);
+  {
+    const ts = L('snitmetode').start;
+    beam(2, 200, 170, 1000, 30, 'black', ts, ts + 0.4); pin(2, 220, 200, ts + 0.3, 'black', 0.8); roller(2, 980, 200, ts + 0.4, 'black', 0.8);
+    arrow(2, [[760, 80], [760, 166]], 'blue', 4, ts + 0.4, ts + 0.8); text(2, 'P', 776, 110, 36, 'blue', ts + 0.6, ts + 0.8);
+    const tc = wt('snitmetode', 'skærer') - 0.1;
+    dashed(2, [500, 130], [500, 250], 'red', tc, tc + 0.4);
+    arrow(2, [[220, 270], [496, 270]], 'black', 2.2, wt('snitmetode', 'x') - 0.3, wt('snitmetode', 'x'), 12); text(2, 'x', 360, 300, 34, 'black', wt('snitmetode', 'x'), wt('snitmetode', 'x') + 0.3);
+    // venstre del
+    const tv = wt('snitmetode', 'venstre') - 0.2;
+    beam(2, 200, 400, 500, 30, 'black', tv, tv + 0.4); pin(2, 220, 430, tv + 0.3, 'black', 0.8);
+    arrow(2, [[220, 570], [220, 494]], 'red', 3.6, tv + 0.4, tv + 0.7, 14); text(2, 'R_A', 236, 570, 32, 'red', tv + 0.6, tv + 0.8);
+    const tl = wt('snitmetode', 'ligevægt') - 0.2;
+    arrow(2, [[504, 415], [590, 415]], 'blue', 3.6, tl, tl + 0.3, 14); text(2, 'N', 598, 426, 34, 'blue', tl + 0.2, tl + 0.4);
+    arrow(2, [[520, 380], [520, 470]], 'red', 3.6, tl + 0.2, tl + 0.5, 14); text(2, 'V', 532, 500, 34, 'red', wt('snitmetode', 'V') - 0.1, wt('snitmetode', 'V') + 0.2);
+    moment(2, 500, 415, 54, 0.75 * PI, 1.4 * PI, 'green', tl + 0.4, tl + 0.8); text(2, 'M', 430, 350, 34, 'green', wt('snitmetode', 'M') - 0.1, wt('snitmetode', 'M') + 0.2);
+    text(2, 'ΣF = 0 og ΣM = 0  →  V(x), M(x)', 680, 470, 34, 'black', tl, we('snitmetode', 'snittet'));
+    const tn = L('nye_snit').start;
+    dashed(2, [880, 130], [880, 250], 'red', tn + 0.3, tn + 0.7);
+    text(2, 'ny last ⇒ nyt snit', 680, 580, 36, 'red', tn + 0.2, we('nye_snit', 'snit'));
+    text(2, 'ét udtryk pr. stykke', 680, 635, 34, 'black', wt('nye_snit', 'udtryk') - 0.2, we('nye_snit', 'bjælken'));
+  }
+
+  // ---------------- 3 q, V og M hænger sammen ----------------
+  B.goto('sammenhaeng', 3);
+  {
+    const t0 = L('sammenhaeng').start, x0 = 160, x1 = 700;
+    // q
+    text(3, 'q', 110, 160, 36, 'blue', t0, t0 + 0.3);
+    line(3, [[x0, 170], [x1, 170]], 'black', 2.2, t0, t0 + 0.4);
+    plot(3, [[x0, 120], [x1, 120]], 'blue', t0 + 0.3, t0 + 0.8);
+    // V
+    const tv = wt('sammenhaeng', 'hældningen') - 0.2;
+    text(3, 'V', 110, 320, 36, 'red', tv, tv + 0.3);
+    line(3, [[x0, 320], [x1, 320]], 'black', 2.2, tv, tv + 0.4);
+    plot(3, [[x0, 250], [x1, 390]], 'red', tv + 0.3, we('sammenhaeng', 'q'));
+    // M
+    const tm = wt('sammenhaeng', 'hældningen', 1) - 0.2;
+    text(3, 'M', 110, 560, 36, 'green', tm, tm + 0.3);
+    line(3, [[x0, 600], [x1, 600]], 'black', 2.2, tm, tm + 0.4);
+    const P = []; for (let j = 0; j <= 40; j++) { const u = j / 40; P.push([x0 + (x1 - x0) * u, 600 - 150 * 4 * u * (1 - u)]); }
+    plot(3, P, 'green', tm + 0.3, we('sammenhaeng', 'V', 1));
+    text(3, 'dV/dx = −q', 750, 170, 40, 'red', wt('sammenhaeng', 'hældningen') - 0.1, we('sammenhaeng', 'q'));
+    text(3, 'dM/dx = −V', 750, 240, 40, 'green', wt('sammenhaeng', 'hældningen', 1) - 0.1, we('sammenhaeng', 'V', 1));
+    text(3, '(bogens fortegnsregel)', 750, 290, 28, 'black', wt('sammenhaeng', 'fortegnsregel') - 0.2, we('sammenhaeng', 'fortegnsregel'));
+    const tr = L('regler').start;
+    text(3, 'q konstant ⇒ V lineær', 750, 380, 32, 'black', wt('regler', 'Konstant') - 0.1, we('regler', 'lineær'));
+    text(3, 'V lineær ⇒ M parabel', 750, 432, 32, 'black', wt('regler', 'lineær', 1) - 0.1, we('regler', 'parabel'));
+    text(3, 'punktlast ⇒ spring i V', 750, 484, 32, 'black', wt('regler', 'punktlast') - 0.1, we('regler', 'V', 2));
+    // V = 0 ↔ M ekstremum
+    const tz = L('nul').start, xm = (x0 + x1) / 2;
+    dot(3, xm, 320, 8, 'red', wt('nul', 'nul') - 0.1);
+    dashed(3, [xm, 300], [xm, 620], 'black', wt('nul', 'nul'), wt('nul', 'ekstremum'));
+    dot(3, xm, 450, 8, 'green', wt('nul', 'ekstremum'));
+    text(3, 'V = 0  ⇒  M har ekstremum', 750, 570, 32, 'red', wt('nul', 'V') - 0.1, we('nul', 'ekstremum'));
+    const tk = L('kritisk').start;
+    box(3, 735, 605, 445, 70, 'red', tk, tk + 0.7);
+    text(3, '|M|_{max} → ofte kritisk snit', 755, 652, 30, 'red', tk + 0.3, we('kritisk', 'snit'));
+  }
+
+  B.goto('tjek_q', 4);
+  B.tjek(4, ['V er konstant på et stykke.', 'Hvordan ser M ud dér?'], ['En ret linje.', 'hældningen af M er givet ved V'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 5);
+  B.slut(5, 'Abou-Hayt (2026), MEM1 Chapter 2, slide 19–24 og 28 · Hamrock, Schmid & Jacobson, kap. 2', 'opgave 2.41', 'slut');
+  text(5, 'snit → ligevægt → V(x), M(x)', 200, 290, 40, 'blue', L('slut').start + 0.5, we('slut', 'x', 1));
+  text(5, 'V = 0  ⇒  led efter |M|_{max}', 200, 380, 42, 'red', wt('slut', 'Hvor') - 0.1, we('slut', 'moment'));
+});
+
+</script>
+<script>BP.live({"duration":114.942,"audio":"snitkraefter-v-m.mp3","order":["titel","bjaelker","raekkefolge","snitmetode","nye_snit","sammenhaeng","regler","nul","kritisk","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":8.979,"words":[["Forskydningskraft",0.614,1.684],["og",1.826,1.929],["momentdiagrammer",1.929,3.063],["Til",3.954,4.134],["styrkeberegning",4.134,4.984],["af",4.985,5.113],["en",5.113,5.204],["bjælke",5.204,5.719],["skal",5.719,5.912],["vi",5.912,6.015],["finde",6.015,6.299],["den",6.299,6.479],["største",6.479,6.892],["forskydningskraft",6.892,7.794],["og",7.794,7.948],["det",7.948,8.039],["største",8.039,8.464],["moment",8.464,8.979]],"text":"Forskydningskraft- og momentdiagrammer. Til styrkeberegning af en bjælke skal vi finde den største forskydningskraft og det største moment."},"bjaelker":{"start":10.21,"end":19.553,"words":[["En",10.35,10.466],["bjælke",10.466,10.801],["bærer",10.801,11.059],["last",11.059,11.42],["på",11.42,11.536],["tværs",11.536,11.961],["af",11.961,12.116],["sin",12.116,12.335],["akse",12.335,12.902],["Vi",13.792,13.896],["møder",13.896,14.179],["tre",14.179,14.475],["typer",14.475,15.042],["den",15.171,15.352],["simpelt",15.352,15.816],["understøttede",15.816,16.383],["bjælke",16.383,16.898],["den",17.027,17.207],["indspændte",17.207,17.697],["bjælke",17.697,18.187],["og",18.187,18.329],["bjælken",18.329,18.818],["med",18.818,18.999],["udhæng",18.999,19.553]],"text":"En bjælke bærer last på tværs af sin akse. Vi møder tre typer: den simpelt understøttede bjælke, den indspændte bjælke og bjælken med udhæng."},"raekkefolge":{"start":20.784,"end":30.14,"words":[["Rækkefølgen",20.911,21.697],["er",21.697,21.865],["altid",21.865,22.342],["den",22.342,22.509],["samme",22.509,23.038],["Frit",23.915,24.186],["legeme-diagram",24.186,25.114],["reaktioner",25.243,26.171],["snit",26.312,26.802],["V",26.931,27.253],["af",27.253,27.421],["x",27.421,27.717],["og",27.717,27.82],["M",27.82,28.026],["af",28.026,28.155],["x",28.155,28.606],["og",28.748,28.864],["til",28.864,28.993],["sidst",28.993,29.341],["diagrammerne",29.341,30.14]],"text":"Rækkefølgen er altid den samme. Frit legeme-diagram, reaktioner, snit, V af x og M af x, og til sidst diagrammerne."},"snitmetode":{"start":31.358,"end":40.095,"words":[["Med",31.498,31.64],["snitmetoden",31.64,32.426],["skærer",32.426,32.761],["vi",32.761,32.89],["bjælken",32.89,33.367],["over",33.367,33.676],["i",33.676,33.831],["afstanden",33.831,34.359],["x",34.359,34.849],["Vi",35.752,35.881],["isolerer",35.881,36.358],["den",36.358,36.551],["venstre",36.551,36.912],["del",36.912,37.286],["og",37.286,37.415],["bruger",37.415,37.672],["ligevægt",37.672,38.072],["til",38.072,38.227],["at",38.227,38.265],["finde",38.265,38.549],["V",38.549,38.884],["og",38.884,39.038],["M",39.038,39.348],["i",39.348,39.528],["snittet",39.528,40.095]],"text":"Med snitmetoden skærer vi bjælken over i afstanden x. Vi isolerer den venstre del og bruger ligevægt til at finde V og M i snittet."},"nye_snit":{"start":41.332,"end":48.072,"words":[["Hver",41.472,41.691],["gang",41.691,41.91],["lasten",41.91,42.336],["ændrer",42.336,42.671],["sig",42.671,43.057],["lægger",43.186,43.521],["vi",43.521,43.676],["et",43.676,43.766],["nyt",43.766,43.946],["snit",43.946,44.385],["Derfor",45.275,45.585],["får",45.585,45.765],["vi",45.765,45.907],["ét",45.907,46.036],["udtryk",46.036,46.474],["for",46.474,46.641],["hvert",46.641,46.899],["stykke",46.899,47.298],["af",47.298,47.427],["bjælken",47.427,48.072]],"text":"Hver gang lasten ændrer sig, lægger vi et nyt snit. Derfor får vi ét udtryk for hvert stykke af bjælken."},"sammenhaeng":{"start":49.314,"end":58.76,"words":[["De",49.428,49.544],["tre",49.544,49.854],["størrelser",49.854,50.511],["hænger",50.511,50.859],["sammen",50.859,51.439],["Med",52.342,52.484],["bogens",52.484,52.832],["fortegnsregel",52.832,53.605],["er",53.605,53.695],["hældningen",53.695,54.146],["af",54.146,54.224],["V",54.224,54.456],["lig",54.456,54.649],["minus",54.649,55.036],["lastintensiteten",55.036,56.015],["q",56.015,56.389],["og",56.582,56.698],["hældningen",56.698,57.162],["af",57.162,57.317],["M",57.317,57.626],["er",57.626,57.755],["lig",57.755,58.038],["minus",58.038,58.425],["V",58.425,58.76]],"text":"De tre størrelser hænger sammen. Med bogens fortegnsregel er hældningen af V lig minus lastintensiteten q, og hældningen af M er lig minus V."},"regler":{"start":59.984,"end":70.319,"words":[["Det",60.085,60.214],["giver",60.214,60.536],["nogle",60.536,60.819],["tommelfingerregler",60.819,61.94],["Konstant",62.845,63.27],["q",63.27,63.579],["giver",63.579,63.863],["en",63.863,63.979],["lineær",63.979,64.391],["V",64.391,64.636],["Lineær",64.636,65.087],["V",65.087,65.383],["giver",65.383,65.641],["et",65.641,65.77],["M",65.77,66.105],["der",66.247,66.44],["er",66.44,66.53],["en",66.53,66.646],["parabel",66.646,67.304],["Og",68.206,68.283],["en",68.283,68.386],["punktlast",68.386,69.03],["giver",69.03,69.353],["et",69.353,69.43],["spring",69.43,69.791],["i",69.791,69.997],["V",69.997,70.319]],"text":"Det giver nogle tommelfingerregler. Konstant q giver en lineær V. Lineær V giver et M, der er en parabel. Og en punktlast giver et spring i V."},"nul":{"start":71.542,"end":78.345,"words":[["Det",71.643,71.772],["vigtigste",71.772,72.493],["hvor",72.609,72.906],["V",72.906,73.112],["er",73.112,73.15],["nul",73.151,73.589],["har",73.73,74.014],["M",74.014,74.22],["et",74.22,74.375],["ekstremum",74.375,75.135],["Det",76.013,76.219],["er",76.219,76.322],["en",76.322,76.438],["kandidat",76.438,77.108],["til",77.108,77.289],["det",77.289,77.379],["kritiske",77.379,77.894],["snit",77.894,78.345]],"text":"Det vigtigste: hvor V er nul, har M et ekstremum. Det er en kandidat til det kritiske snit."},"kritisk":{"start":79.572,"end":84.648,"words":[["Til",79.699,79.841],["bøjningsspænding",79.841,80.588],["er",80.588,80.717],["snittet",80.717,81.117],["med",81.117,81.271],["den",81.272,81.439],["numerisk",81.439,81.864],["største",81.864,82.238],["værdi",82.238,82.728],["af",82.728,82.869],["M",82.869,83.114],["ofte",83.114,83.578],["det",83.578,83.707],["kritiske",83.707,84.21],["snit",84.21,84.648]],"text":"Til bøjningsspænding er snittet med den numerisk største værdi af M ofte det kritiske snit."},"tjek_q":{"start":85.874,"end":93.516,"words":[["Tjek",85.974,86.309],["dig",86.309,86.477],["selv",86.477,86.902],["Forskydningskraften",87.794,88.915],["er",88.915,89.07],["konstant",89.07,89.547],["på",89.547,89.701],["et",89.701,89.779],["stykke",89.779,90.165],["af",90.165,90.294],["bjælken",90.294,90.926],["Hvordan",91.802,92.15],["ser",92.15,92.407],["momentet",92.408,92.91],["ud",92.91,93.155],["dér",93.155,93.516]],"text":"Tjek dig selv. Forskydningskraften er konstant på et stykke af bjælken. Hvordan ser momentet ud dér?"},"tjek_a":{"start":97.394,"end":102.897,"words":[["Det",97.495,97.727],["er",97.727,97.933],["en",97.933,98.1],["ret",98.1,98.358],["linje",98.358,98.835],["Hældningen",99.739,100.152],["af",100.152,100.242],["M",100.242,100.577],["er",100.577,100.706],["bestemt",100.706,101.105],["af",101.105,101.183],["V",101.183,101.556],["og",101.698,101.827],["V",101.827,102.098],["er",102.098,102.201],["konstant",102.201,102.897]],"text":"Det er en ret linje. Hældningen af M er bestemt af V, og V er konstant."},"slut":{"start":104.128,"end":112.53,"words":[["Kort",104.229,104.499],["sagt",104.499,104.989],["snit",105.118,105.633],["ligevægt",105.762,106.458],["V",106.587,106.974],["af",106.974,107.154],["x",107.154,107.476],["og",107.476,107.566],["M",107.566,107.901],["af",107.901,108.056],["x",108.056,108.533],["Hvor",109.437,109.669],["V",109.669,109.888],["er",109.888,109.953],["nul",109.953,110.378],["skal",110.52,110.752],["du",110.752,110.829],["lede",110.829,111.125],["efter",111.125,111.422],["det",111.422,111.551],["største",111.551,112.002],["moment",112.002,112.53]],"text":"Kort sagt: snit, ligevægt, V af x og M af x. Hvor V er nul, skal du lede efter det største moment."}}}, { audio: 'snitkraefter-v-m.mp3', id: 'snitkraefter-v-m' });</script>
+</body>
+</html>

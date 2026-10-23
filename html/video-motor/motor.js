@@ -123,7 +123,7 @@ function runsOf(s) {
   const push = (t, m) => { if (t) out.push({ t, m }); };
   while (i < s.length) {
     const c = s[i];
-    const prevLetter = i > 0 && /[A-Za-zÆØÅæøåΑ-Ωα-ω)]/.test(s[i - 1]); // alle græske bogstaver (σ_x, τ_{xy}, φ ...)
+    const prevLetter = i > 0 && /[A-Za-zÆØÅæøåΑ-Ωα-ω)\]|]/.test(s[i - 1]); // alle græske bogstaver (σ_x, τ_{xy}, φ ...)
     if (((c === '_' && prevLetter) || c === '^') && i + 1 < s.length) {
       push(cur, 0); cur = '';
       let t;
@@ -341,6 +341,60 @@ function curArrow(k, p, q, label, a, b, o = {}) {
   arrow(k, [p, q], col, 3, a, b, 13);
   if (label) text(k, label, (p[0] + q[0]) / 2 + (o.lx ?? 0), (p[1] + q[1]) / 2 + (o.ly ?? -14), o.size || 32, col, b - 0.05, b + 0.3, { align: o.align || 'center' });
 }
+// ---------------------------------------------------------------- mekanik (lokale koordinater)
+// bjælke: rektangel fra x0 til x1, overside i y, højde h
+function beam(k, x0, y, x1, h, col, a, b) { return line(k, [[x0, y], [x1, y + 1], [x1 - 1, y + h], [x0, y + h - 1], [x0 + 1, y - 2]], col, 3.2, a, b); }
+// charnier: trekant med spidsen i (x, y) og skraveret fundament
+function pin(k, x, y, a, col = 'black', s = 1) {
+  const h = 34 * s, w = 24 * s;
+  line(k, [[x, y], [x + w, y + h], [x - w, y + h], [x, y + 1]], col, 3, a, a + 0.35);
+  line(k, [[x - w - 12, y + h], [x + w + 12, y + h]], col, 2.6, a + 0.35, a + 0.45);
+  hatch(k, rect(x - w - 12, y + h, 2 * w + 24, 12), col, a + 0.45, a + 0.6, { gap: 6 });
+}
+// rulle: trekant på to små hjul
+function roller(k, x, y, a, col = 'black', s = 1) {
+  const h = 26 * s, w = 22 * s, r = 6 * s;
+  line(k, [[x, y], [x + w, y + h], [x - w, y + h], [x, y + 1]], col, 3, a, a + 0.3);
+  for (const dx of [-w * 0.55, w * 0.55]) line(k, ell(x + dx, y + h + r, r, r, -PI / 2, 1.5 * PI), col, 2.4, a + 0.3, a + 0.42);
+  line(k, [[x - w - 12, y + h + 2 * r + 1], [x + w + 12, y + h + 2 * r + 1]], col, 2.6, a + 0.42, a + 0.5);
+}
+// indspænding: lodret væg i x fra y0 til y1; side -1 = skravering til venstre
+function wall(k, x, y0, y1, a, col = 'black', side = -1) {
+  line(k, [[x, y0], [x, y1]], col, 3.4, a, a + 0.3);
+  hatch(k, side < 0 ? rect(x - 20, y0, 20, y1 - y0) : rect(x, y0, 20, y1 - y0), col, a + 0.3, a + 0.5, { gap: 7 });
+}
+// fordelt last: n pile fra y - h ned til y mellem x0 og x1
+function distLoad(k, x0, x1, y, h, col, a, b, n = 8) {
+  line(k, [[x0, y - h], [x1, y - h]], col, 2.8, a, a + (b - a) * 0.3);
+  for (let i = 0; i < n; i++) {
+    const x = x0 + (x1 - x0) * i / (n - 1), t = a + (b - a) * (0.3 + 0.6 * i / n);
+    arrow(k, [[x, y - h], [x, y - 3]], col, 2.4, t, t + (b - a) * 0.1, 11);
+  }
+}
+// momentpil: bue om (cx, cy) fra vinkel a0 til a1 (radianer, skærmkoordinater: positiv = med uret); pilen sidder i a1
+function moment(k, cx, cy, r, a0, a1, col, a, b) {
+  const P = ell(cx, cy, r, r, a0, a1);
+  line(k, P, col, 3.2, a, b);
+  line(k, head(seg(P, 3), 15, 0.5), col, 3.2, b, b + 0.1);
+}
+// akser til en graf med origo i (x0, y0); x-akse til x1, y-akse op til y1 (eller ned, hvis y1 > y0)
+function axes(k, x0, y0, x1, y1, xl, yl, a, col = 'black') {
+  arrow(k, [[x0 - 10, y0], [x1, y0]], col, 2.6, a, a + 0.5, 15);
+  arrow(k, [[x0, y0 + (y1 < y0 ? 12 : -12)], [x0, y1]], col, 2.6, a + 0.2, a + 0.7, 15);
+  if (xl) text(k, xl, x1 + 8, y0 + 12, 34, col, a + 0.5, a + 0.8);
+  if (yl) text(k, yl, x0 - 14, y1 + (y1 < y0 ? 6 : 30), 34, col, a + 0.7, a + 1.0, { align: 'right' });
+}
+// graf/kurve gennem punkter (mindre rysten end en almindelig streg)
+function plot(k, pts, col, a, b, w = 3.6) { return line(k, pts, col, w, a, b, { wob: 0.35 }); }
+// stiplet linje (fx hjælpelinjer i grafer)
+function dashed(k, p, q, col, a, b, d = 14) {
+  const L = Math.hypot(q[0] - p[0], q[1] - p[1]), n = Math.max(1, Math.floor(L / (2 * d)));
+  for (let i = 0; i < n; i++) {
+    const u0 = (2 * i) / (2 * n), u1 = (2 * i + 1) / (2 * n), t = a + (b - a) * i / n;
+    line(k, [[p[0] + (q[0] - p[0]) * u0, p[1] + (q[1] - p[1]) * u0], [p[0] + (q[0] - p[0]) * u1, p[1] + (q[1] - p[1]) * u1]], col, 2, t, t + (b - a) / n, { wob: 0.2, alpha: 0.75 });
+  }
+}
+
 // ladningsprikker, der løber langs en polyline (prikker pr. sekund ~ strøm)
 function flow(k, pts, a, b, o = {}) {
   const S = mkStroke(W(k, pts), 1, SEED++, 0);
@@ -404,7 +458,8 @@ function slut(k, kilde, naeste, id) {
 }
 
 Object.assign(BP, { line, arrow, dot, text, bubble, hatch, box, rect, strike, ring, under, endX, startX, frac, matrix, capacitor, inductor, motorSym,
-  wire, resistor, source, ground, node, mesh, curArrow, flow, clock, goto, titel, seFoerst, tjek, slut, ink });
+  wire, resistor, source, ground, node, mesh, curArrow, flow, clock, goto, titel, seFoerst, tjek, slut, ink,
+  beam, pin, roller, wall, distLoad, moment, axes, plot, dashed });
 
 // ---------------------------------------------------------------- rendering
 function drawStroke(ctx, S, p1, p0 = 0) {

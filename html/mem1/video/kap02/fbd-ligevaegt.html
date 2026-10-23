@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Understøtninger, ligevægt og frit legeme · video</title>
+<meta name="description" content="Rulle, charnier og indspænding, de tre ligevægtsligninger, frit legeme-diagram og de indre størrelser N, V og M.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 2: videoer</a><h1>Understøtninger, ligevægt og frit legeme</h1><span class="meta">MEM1 · kapitel 2 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Understøtninger, ligevægt og frit legeme"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Rulle, charnier og indspænding, de tre ligevægtsligninger, frit legeme-diagram og de indre størrelser N, V og M.</p><div class="chips"><a href="../../Kapitel02_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l02">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Understøtninger, ligevægt og frit legeme (MEM1 kap. 2, slides 12–16)
+BP.scene({ header: 'MEM1 · kap. 2' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, beam, pin, roller, wall, moment, distLoad, PI } = B;
+
+  B.titel(0, 'Ligevægt og frit legeme', 'MEM1 · kapitel 2 · begreb (slide 12–16)', 'titel');
+  text(0, 'alle kræfter på elementet først', 640, 520, 40, 'red', wt('titel', 'Før') - 0.1, we('titel', 'elementet'), { align: 'center' });
+
+  // ---------------- 1 understøtninger ----------------
+  B.goto('reaktion', 1);
+  {
+    const tr = L('reaktion').start;
+    text(1, 'én ukendt pr. forhindret bevægelse', 640, 150, 42, 'blue', wt('reaktion', 'hver') - 0.2, we('reaktion', 'ukendt'), { align: 'center' });
+    // rulle
+    const t1 = L('rulle').start;
+    beam(1, 130, 300, 370, 30, 'black', t1, t1 + 0.4); roller(1, 250, 330, t1 + 0.4);
+    arrow(1, [[250, 470], [250, 390]], 'red', 4, wt('rulle', 'R') - 0.2, wt('rulle', 'R') + 0.2);
+    text(1, 'R_y', 266, 470, 36, 'red', wt('rulle', 'R'), we('rulle', 'y'));
+    text(1, 'Rulle', 250, 560, 38, 'black', t1 + 0.1, t1 + 0.6, { align: 'center' });
+    // charnier
+    const t2 = L('charnier').start;
+    beam(1, 520, 300, 760, 30, 'black', t2, t2 + 0.4); pin(1, 640, 330, t2 + 0.4);
+    arrow(1, [[640, 480], [640, 400]], 'red', 4, wt('charnier', 'y') - 0.3, wt('charnier', 'y'));
+    arrow(1, [[540, 350], [600, 350]], 'red', 4, wt('charnier', 'x') - 0.3, wt('charnier', 'x'));
+    text(1, 'R_x', 520, 345, 34, 'red', wt('charnier', 'x'), wt('charnier', 'x') + 0.3, { align: 'right' });
+    text(1, 'R_y', 656, 480, 36, 'red', wt('charnier', 'y'), wt('charnier', 'y') + 0.3);
+    text(1, 'Charnier', 640, 560, 38, 'black', t2 + 0.1, t2 + 0.6, { align: 'center' });
+    // indspænding
+    const t3 = L('indspaending').start;
+    wall(1, 930, 250, 380, t3); beam(1, 930, 300, 1160, 30, 'black', t3 + 0.3, t3 + 0.6);
+    arrow(1, [[970, 450], [970, 336]], 'red', 4, wt('indspaending', 'y') - 0.3, wt('indspaending', 'y'));
+    arrow(1, [[1050, 280], [970, 280]], 'red', 4, wt('indspaending', 'x') - 0.3, wt('indspaending', 'x'));
+    text(1, 'R_x', 1060, 270, 32, 'red', wt('indspaending', 'x'), wt('indspaending', 'x') + 0.3);
+    text(1, 'R_y', 986, 450, 34, 'red', wt('indspaending', 'y'), wt('indspaending', 'y') + 0.3);
+    moment(1, 930, 315, 56, -0.35 * PI, 0.35 * PI, 'red', wt('indspaending', 'moment') - 0.1, wt('indspaending', 'z'));
+    text(1, 'M_z', 1000, 395, 34, 'red', wt('indspaending', 'M'), we('indspaending', 'z'));
+    text(1, 'Indspænding', 1030, 560, 38, 'black', t3 + 0.1, t3 + 0.6, { align: 'center' });
+    text(1, '1', 250, 620, 40, 'blue', wt('rulle', 'én'), wt('rulle', 'én') + 0.3, { align: 'center' });
+    text(1, '2', 640, 620, 40, 'blue', wt('charnier', 'to'), wt('charnier', 'to') + 0.3, { align: 'center' });
+    text(1, '3', 1030, 620, 40, 'blue', wt('indspaending', 'rotation'), wt('indspaending', 'rotation') + 0.3, { align: 'center' });
+  }
+
+  // ---------------- 2 ligevægt ----------------
+  B.goto('ligevaegt', 2);
+  {
+    const tl = L('ligevaegt').start;
+    bubble(2, 'Statisk ligevægt', 150, 140, 56, 'blue', tl, tl + 0.9);
+    text(2, 'ΣF_x = 0', 170, 250, 48, 'black', wt('ligevaegt', 'x') - 0.4, we('ligevaegt', 'nul'));
+    text(2, 'ΣF_y = 0', 520, 250, 48, 'black', wt('ligevaegt', 'y') - 0.4, we('ligevaegt', 'nul', 1));
+    text(2, 'ΣM = 0', 870, 250, 48, 'black', wt('ligevaegt', 'momenter') - 0.4, we('ligevaegt', 'nul', 2));
+    text(2, 'ingen translation · ingen rotation', 170, 320, 32, 'blue', we('ligevaegt', 'nul', 1), we('ligevaegt', 'nul', 2) + 0.4);
+    // trick: moment om A
+    const tp = L('punkt').start;
+    beam(2, 200, 470, 1000, 30, 'black', tp, tp + 0.4);
+    pin(2, 220, 500, tp + 0.3, 'black', 0.8); roller(2, 980, 500, tp + 0.4, 'black', 0.8);
+    arrow(2, [[160, 512], [200, 512]], 'red', 3.6, tp + 0.6, tp + 0.9, 14);
+    arrow(2, [[220, 640], [220, 560]], 'red', 3.6, tp + 0.6, tp + 0.9, 14);
+    text(2, 'A', 220, 450, 36, 'black', tp + 0.4, tp + 0.6, { align: 'center' });
+    arrow(2, [[600, 380], [600, 466]], 'blue', 4, tp + 0.8, tp + 1.1);
+    arrow(2, [[980, 640], [980, 570]], 'red', 3.6, tp + 0.9, tp + 1.2, 14);
+    text(2, 'B', 980, 450, 36, 'black', tp + 0.5, tp + 0.7, { align: 'center' });
+    const ta = wt('punkt', 'ukendte') - 0.2;
+    line(2, B.ell(215, 545, 70, 80, 0, 2 * PI), 'green', 2.8, ta, ta + 0.6);
+    text(2, 'ΣM_A = 0', 330, 620, 40, 'green', wt('punkt', 'forsvinder') - 0.4, we('punkt', 'ligningen'));
+    text(2, '→ kun R_B er ukendt', 560, 620, 34, 'green', wt('punkt', 'forsvinder'), we('punkt', 'ligningen') + 0.3);
+  }
+
+  // ---------------- 3 frit legeme-diagram ----------------
+  B.goto('fbd', 3);
+  {
+    const tf = L('fbd').start;
+    bubble(3, 'Frit legeme', 150, 140, 56, 'blue', tf, tf + 0.9);
+    const trin = [['1.  isolér elementet', 'isolerer'], ['2.  understøtning → reaktioner', 'erstat'], ['3.  alle påførte kræfter og momenter', 'påførte'], ['4.  vælg koordinatsystem', 'koordinatsystem']];
+    trin.forEach(([s, w], i) => text(3, s, 170, 240 + 62 * i, 38, 'black', wt('fbd', w) - 0.3, we('fbd', w) + 0.5));
+    const tg = L('retning').start;
+    box(3, 150, 520, 980, 120, 'red', tg, tg + 0.9);
+    text(3, 'ukendt retning? gæt!', 190, 570, 38, 'red', wt('retning', 'gæt') - 0.6, we('retning', 'gæt'));
+    text(3, 'negativt resultat = den peger modsat', 190, 620, 34, 'black', wt('retning', 'negativt') - 0.1, we('retning', 'vej'));
+  }
+
+  // ---------------- 4 indre størrelser i et snit ----------------
+  B.goto('snit', 4);
+  {
+    const ts = L('snit').start;
+    beam(4, 120, 240, 1160, 50, 'black', ts, ts + 0.6);
+    const tc = wt('snit', 'skærer') - 0.1;
+    B.dashed(4, [640, 190], [640, 340], 'red', tc, tc + 0.4);
+    text(4, 'snit', 640, 180, 32, 'red', tc + 0.2, tc + 0.5, { align: 'center' });
+    // venstre del med N, V, M på den højre flade
+    const tn = wt('snit', 'normalkraften') - 0.2, tv = wt('snit', 'forskydningskraften') - 0.2, tm = wt('snit', 'bøjningsmomentet') - 0.2;
+    beam(4, 260, 450, 600, 50, 'black', tc + 0.4, tc + 0.9);
+    arrow(4, [[604, 475], [700, 475]], 'blue', 4, tn, tn + 0.4); text(4, 'N', 710, 488, 40, 'blue', tn + 0.3, tn + 0.5);
+    arrow(4, [[620, 430], [620, 520]], 'red', 4, tv, tv + 0.4); text(4, 'V', 632, 560, 40, 'red', tv + 0.3, tv + 0.5);
+    moment(4, 600, 475, 62, 0.75 * PI, 1.4 * PI, 'green', tm, tm + 0.5); text(4, 'M', 520, 400, 40, 'green', tm + 0.3, tm + 0.6);
+    // højre del med modsatte
+    beam(4, 860, 450, 1140, 50, 'black', tc + 0.6, tc + 1.1);
+    arrow(4, [[856, 475], [780, 475]], 'blue', 4, tn + 0.3, tn + 0.7);
+    arrow(4, [[840, 520], [840, 430]], 'red', 4, tv + 0.3, tv + 0.7);
+    moment(4, 860, 475, 62, 0.25 * PI, -0.4 * PI, 'green', tm + 0.3, tm + 0.8);
+  }
+
+  B.goto('tjek_q', 5);
+  B.tjek(5, ['Hvor mange ukendte reaktioner', 'giver en fast indspænding?'], ['Tre:', 'R_x, R_y og M_z'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 6);
+  B.slut(6, 'Abou-Hayt (2026), MEM1 Chapter 2, slide 12–16 · Hamrock, Schmid & Jacobson, kap. 2', 'reaktionerne på bjælken fra slide 14', 'slut');
+  text(6, 'rulle 1 · charnier 2 · indspænding 3', 200, 280, 40, 'blue', L('slut').start + 0.5, we('slut', 'bevægelse'));
+  text(6, 'ΣF_x = 0   ΣF_y = 0   ΣM = 0', 200, 360, 42, 'black', wt('slut', 'tre') - 0.1, we('slut', 'ligevægtsligninger'));
+  text(6, 'frit legeme-diagram før alt andet', 200, 440, 40, 'red', wt('slut', 'komplet') - 0.1, we('slut', 'andet'));
+});
+
+</script>
+<script>BP.live({"duration":128.132,"audio":"fbd-ligevaegt.mp3","order":["titel","reaktion","rulle","charnier","indspaending","ligevaegt","punkt","fbd","retning","snit","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":8.606,"words":[["Understøtninger",0.64,1.568],["ligevægt",1.697,2.367],["og",2.367,2.509],["frit",2.509,2.741],["legeme-diagram",2.741,3.72],["Før",4.611,4.894],["vi",4.894,4.985],["kan",4.985,5.126],["finde",5.126,5.371],["spændinger",5.371,6.015],["skal",6.157,6.389],["vi",6.389,6.466],["kende",6.466,6.827],["alle",6.827,7.085],["kræfter",7.085,7.562],["på",7.562,7.832],["elementet",7.832,8.606]],"text":"Understøtninger, ligevægt og frit legeme-diagram. Før vi kan finde spændinger, skal vi kende alle kræfter på elementet."},"reaktion":{"start":9.826,"end":18.177,"words":[["En",9.953,10.069],["understøtning",10.069,10.765],["giver",10.765,11.036],["en",11.036,11.139],["reaktion",11.139,11.835],["når",11.989,12.17],["den",12.17,12.337],["forhindrer",12.337,12.93],["en",12.93,13.098],["bevægelse",13.098,13.819],["For",14.697,14.865],["hver",14.865,15.109],["bevægelse",15.11,15.844],["den",15.986,16.166],["forhindrer",16.166,16.862],["får",17.004,17.171],["vi",17.171,17.352],["én",17.352,17.597],["ukendt",17.597,18.177]],"text":"En understøtning giver en reaktion, når den forhindrer en bevægelse. For hver bevægelse, den forhindrer, får vi én ukendt."},"rulle":{"start":19.416,"end":25.267,"words":[["En",19.543,19.659],["rulle",19.659,19.943],["forhindrer",19.943,20.497],["kun",20.497,20.78],["bevægelse",20.78,21.425],["på",21.425,21.579],["tværs",21.579,22.159],["Den",23.063,23.205],["giver",23.205,23.604],["én",23.604,23.836],["reaktion",23.836,24.558],["R",24.7,24.97],["y",24.97,25.267]],"text":"En rulle forhindrer kun bevægelse på tværs. Den giver én reaktion, R y."},"charnier":{"start":26.486,"end":33.328,"words":[["Et",26.626,26.716],["charnier",26.716,27.142],["forhindrer",27.142,27.618],["bevægelse",27.618,28.314],["i",28.314,28.469],["begge",28.469,28.804],["retninger",28.804,29.435],["Det",30.3,30.416],["giver",30.416,30.712],["to",30.712,30.97],["reaktioner",30.97,31.756],["R",31.898,32.155],["x",32.155,32.477],["og",32.478,32.697],["R",32.697,33.006],["y",33.006,33.328]],"text":"Et charnier forhindrer bevægelse i begge retninger. Det giver to reaktioner, R x og R y."},"indspaending":{"start":34.564,"end":42.077,"words":[["En",34.691,34.82],["fast",34.82,35.207],["indspænding",35.207,35.8],["forhindrer",35.8,36.444],["også",36.444,36.779],["rotation",36.779,37.501],["Den",38.391,38.559],["giver",38.559,38.945],["R",38.945,39.229],["x",39.229,39.744],["R",39.886,40.144],["y",40.144,40.363],["og",40.363,40.466],["et",40.466,40.672],["moment",40.672,41.239],["M",41.381,41.626],["z",41.626,42.077]],"text":"En fast indspænding forhindrer også rotation. Den giver R x, R y og et moment, M z."},"ligevaegt":{"start":43.314,"end":52.683,"words":[["I",43.441,43.519],["plan",43.519,43.828],["statisk",43.828,44.318],["ligevægt",44.318,44.91],["gælder",44.91,45.207],["tre",45.207,45.503],["ligninger",45.503,46.083],["Summen",46.961,47.322],["af",47.322,47.425],["kræfter",47.425,47.876],["i",47.876,48.095],["x",48.095,48.34],["er",48.34,48.404],["nul",48.404,48.829],["summen",48.958,49.358],["af",49.358,49.448],["kræfter",49.448,49.886],["i",49.886,50.067],["y",50.067,50.286],["er",50.286,50.337],["nul",50.337,50.775],["og",50.917,51.046],["summen",51.046,51.42],["af",51.42,51.536],["momenter",51.536,52.103],["er",52.103,52.257],["nul",52.257,52.683]],"text":"I plan statisk ligevægt gælder tre ligninger. Summen af kræfter i x er nul, summen af kræfter i y er nul, og summen af momenter er nul."},"punkt":{"start":53.912,"end":61.012,"words":[["Et",54.052,54.168],["godt",54.168,54.361],["trick",54.362,54.787],["tag",54.916,55.173],["momentet",55.173,55.689],["om",55.689,55.882],["et",55.882,55.985],["punkt",55.985,56.385],["hvor",56.539,56.758],["ukendte",56.758,57.248],["kræfter",57.248,57.725],["angriber",57.725,58.447],["Så",59.324,59.531],["forsvinder",59.531,59.982],["de",59.982,60.239],["fra",60.239,60.394],["ligningen",60.394,61.012]],"text":"Et godt trick: tag momentet om et punkt, hvor ukendte kræfter angriber. Så forsvinder de fra ligningen."},"fbd":{"start":62.23,"end":74.666,"words":[["Et",62.357,62.46],["frit",62.46,62.718],["legeme-diagram",62.718,63.685],["isolerer",63.685,64.368],["elementet",64.368,65.115],["Fjern",65.993,66.418],["understøtningerne",66.418,67.462],["og",67.604,67.745],["erstat",67.745,68.132],["dem",68.132,68.441],["med",68.441,68.635],["deres",68.635,68.892],["reaktioner",68.892,69.666],["Tegn",70.555,70.941],["alle",70.941,71.212],["påførte",71.212,71.663],["kræfter",71.663,72.114],["og",72.114,72.166],["momenter",72.166,72.81],["og",72.952,73.106],["vælg",73.106,73.428],["et",73.428,73.583],["koordinatsystem",73.583,74.666]],"text":"Et frit legeme-diagram isolerer elementet. Fjern understøtningerne, og erstat dem med deres reaktioner. Tegn alle påførte kræfter og momenter, og vælg et koordinatsystem."},"retning":{"start":75.9,"end":83.22,"words":[["Kender",76.04,76.272],["du",76.272,76.414],["ikke",76.414,76.659],["retningen",76.659,77.136],["på",77.136,77.29],["en",77.29,77.38],["reaktion",77.38,78.089],["så",78.231,78.489],["gæt",78.489,78.927],["Bliver",79.83,80.024],["resultatet",80.024,80.668],["negativt",80.668,81.39],["peger",81.519,81.789],["den",81.789,81.97],["bare",81.97,82.227],["den",82.227,82.511],["anden",82.511,82.859],["vej",82.859,83.22]],"text":"Kender du ikke retningen på en reaktion, så gæt. Bliver resultatet negativt, peger den bare den anden vej."},"snit":{"start":84.434,"end":95.813,"words":[["Når",84.574,84.767],["reaktionerne",84.768,85.451],["er",85.45,85.528],["kendt",85.528,85.979],["skærer",86.121,86.533],["vi",86.533,86.739],["elementet",86.739,87.409],["over",87.409,87.77],["i",87.77,87.976],["et",87.976,88.066],["snit",88.066,88.505],["I",89.395,89.46],["snittet",89.46,89.988],["virker",89.988,90.323],["tre",90.323,90.645],["indre",90.645,90.916],["størrelser",90.916,91.612],["normalkraften",91.754,92.604],["N",92.604,92.952],["forskydningskraften",93.094,94.138],["V",94.138,94.473],["og",94.473,94.576],["bøjningsmomentet",94.576,95.478],["M.",95.478,95.813]],"text":"Når reaktionerne er kendt, skærer vi elementet over i et snit. I snittet virker tre indre størrelser: normalkraften N, forskydningskraften V og bøjningsmomentet M."},"tjek_q":{"start":97.048,"end":102.654,"words":[["Tjek",97.149,97.471],["dig",97.471,97.651],["selv",97.651,98.077],["Hvor",98.981,99.11],["mange",99.11,99.393],["ukendte",99.393,99.844],["reaktioner",99.844,100.63],["giver",100.63,100.914],["en",100.914,101.03],["fast",101.03,101.391],["indspænding",101.391,101.958],["i",101.958,102.112],["planen",102.112,102.654]],"text":"Tjek dig selv. Hvor mange ukendte reaktioner giver en fast indspænding i planen?"},"tjek_a":{"start":106.528,"end":112.172,"words":[["Tre",106.628,107.169],["To",108.1,108.371],["kræfter",108.371,108.925],["R",109.067,109.286],["x",109.286,109.556],["og",109.556,109.659],["R",109.659,109.969],["y",109.969,110.291],["og",110.458,110.613],["et",110.613,110.793],["moment",110.793,111.348],["M",111.464,111.721],["z",111.721,112.172]],"text":"Tre. To kræfter, R x og R y, og et moment, M z."},"slut":{"start":113.406,"end":125.7,"words":[["Kort",113.533,113.752],["sagt",113.752,114.242],["én",114.371,114.564],["reaktion",114.564,115.054],["pr.",115.054,115.325],["forhindret",115.325,115.84],["bevægelse",115.84,116.562],["tre",116.691,117.0],["ligevægtsligninger",117.0,118.018],["og",118.16,118.366],["et",118.366,118.443],["komplet",118.443,118.855],["frit",118.855,119.087],["legeme-diagram",119.087,119.977],["før",119.977,120.312],["alt",120.312,120.556],["andet",120.557,121.008],["I",121.911,122.027],["opgavevideoen",122.027,123.084],["regner",123.084,123.496],["vi",123.496,123.677],["reaktionerne",123.677,124.347],["på",124.347,124.476],["bjælken",124.476,124.991],["fra",124.991,125.133],["slides",125.133,125.7]],"text":"Kort sagt: én reaktion pr. forhindret bevægelse, tre ligevægtsligninger, og et komplet frit legeme-diagram før alt andet. I opgavevideoen regner vi reaktionerne på bjælken fra slides."}}}, { audio: 'fbd-ligevaegt.mp3', id: 'fbd-ligevaegt' });</script>
+</body>
+</html>

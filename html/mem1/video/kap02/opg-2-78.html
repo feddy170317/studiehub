@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opgave 2.78: find a fra den tilladte forskydning · video</title>
+<meta name="description" content="Find a, når den største forskydning højst må være 100 MPa. Resultat: a = 282,8 MPa.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 2: videoer</a><h1>Opgave 2.78: find a fra den tilladte forskydning</h1><span class="meta">MEM1 · kapitel 2 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Opgave 2.78: find a fra den tilladte forskydning"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Find a, når den største forskydning højst må være 100 MPa. Resultat: a = 282,8 MPa.</p><div class="chips"><a href="hovedspaendinger.html">Se først: Hovedspændinger og største forskydning</a><a href="../../Kapitel02_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l02">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Opgave 2.78: σx = a, σy = a/2, τxy = a/4, |τmax| = 100 MPa → a = 282,8 MPa (MEM1 kap. 2, slide 51)
+BP.scene({ header: 'MEM1 · kap. 2' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under } = B;
+
+  B.titel(0, 'Opgave 2.78', 'MEM1 · kapitel 2 · opgave (slide 51)', 'titel');
+  text(0, 'hvor stor må belastningen være?', 640, 520, 40, 'red', wt('titel', 'hvor') - 0.1, we('titel', 'være'), { align: 'center' });
+
+  // ---------------- 1 data og formel ----------------
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start;
+    bubble(1, 'Givet', 150, 140, 54, 'blue', t0, t0 + 0.6);
+    text(1, 'σ_x = a', 170, 230, 44, 'black', wt('data', 'Sigma') - 0.1, wt('data', 'a', 1) + 0.2);
+    text(1, 'σ_y = a/2', 450, 230, 44, 'black', wt('data', 'sigma', 1) - 0.1, we('data', 'halve'));
+    text(1, 'τ_{xy} = a/4', 760, 230, 44, 'black', wt('data', 'tau') - 0.1, we('data', 'fjerdedele'));
+    text(1, '|τ_{max}| = 100 MPa', 170, 310, 44, 'red', wt('data', 'største') - 0.1, we('data', 'megapascal'));
+    const tf = L('formel').start;
+    text(1, '|τ_{max}| = √[((σ_x − σ_y)/2)² + τ_{xy}²]', 170, 430, 42, 'blue', tf + 0.4, we('formel', 'anden', 1));
+    const tg = L('forskel').start;
+    text(1, '(σ_x − σ_y)/2 = (a − a/2)/2 = a/4', 170, 530, 42, 'green', tg + 0.1, we('forskel', 'fjerdedele'));
+  }
+
+  // ---------------- 2 løs ----------------
+  B.goto('indsaet', 2);
+  {
+    const t0 = L('indsaet').start;
+    text(2, '|τ_{max}| = √[(a/4)² + (a/4)²]', 170, 170, 44, 'blue', t0 + 0.1, we('indsaet', 'anden', 1));
+    text(2, '= (a/4) · √2', 420, 250, 44, 'blue', wt('indsaet', 'Det') - 0.1, we('indsaet', 'to'));
+    const tl = L('loes').start;
+    text(2, '(a/4) · √2 = 100', 170, 350, 44, 'black', tl, we('loes', 'hundrede'));
+    const r = text(2, 'a = 400 / √2 = 282,8 MPa', 170, 440, 50, 'red', wt('loes', 'fire') - 0.1, we('loes', 'megapascal'));
+    box(2, 150, 390, 720, 80, 'red', we('loes', 'megapascal'), we('loes', 'megapascal') + 0.6);
+    const tk = L('kontrol').start;
+    text(2, 'Kontrol:  a/4 = 70,7 MPa', 170, 560, 38, 'green', tk, we('kontrol', 'syv'));
+    text(2, '√(70,7² + 70,7²) = 100 MPa  ✓', 170, 630, 38, 'green', wt('kontrol', 'Kvadratroden') - 0.1, we('kontrol', 'passer'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Hvis τ_{xy} = 0,', 'hvor stor måtte a så være?'], ['|τ_{max}| = a/4 = 100', '⇒ a = 400 MPa'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 2, slide 51 · Hamrock, Schmid & Jacobson, opgave 2.78', '', 'slut');
+  text(4, 'τ_{max}(a) = tilladt  ⇒  isolér a', 200, 280, 42, 'blue', wt('slut', 'skriv') - 0.1, we('slut', 'isolér'));
+  text(4, 'kontrollér ved at sætte ind igen', 200, 370, 42, 'red', wt('slut', 'Kontrollér') - 0.1, we('slut', 'igen'));
+});
+
+</script>
+<script>BP.live({"duration":97.106,"audio":"opg-2-78.mp3","order":["titel","data","formel","forskel","indsaet","loes","kontrol","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":8.412,"words":[["Opgave",0.653,1.091],["to",1.091,1.504],["komma",1.504,1.916],["otteoghalvfjerds",1.916,2.96],["Vi",3.863,3.966],["kender",3.966,4.263],["den",4.263,4.443],["tilladte",4.443,4.843],["forskydningsspænding",4.843,5.796],["og",5.796,5.938],["skal",5.938,6.106],["finde",6.106,6.557],["hvor",6.724,6.892],["stor",6.892,7.201],["belastningen",7.201,7.82],["må",7.82,7.923],["være",7.923,8.412]],"text":"Opgave to komma otteoghalvfjerds. Vi kender den tilladte forskydningsspænding og skal finde, hvor stor belastningen må være."},"data":{"start":9.634,"end":20.897,"words":[["Spændingerne",9.748,10.315],["er",10.315,10.38],["givet",10.38,10.625],["ved",10.625,10.754],["en",10.754,10.857],["parameter",10.857,11.398],["a.",11.398,11.913],["Sigma",11.913,12.326],["x",12.326,12.622],["er",12.622,12.803],["a",12.803,13.138],["sigma",13.266,13.743],["y",13.743,14.014],["er",14.014,14.194],["a",14.194,14.388],["halve",14.388,14.852],["og",14.993,15.135],["tau",15.135,15.431],["x",15.431,15.715],["y",15.715,15.986],["er",15.986,16.166],["a",16.166,16.333],["fjerdedele",16.333,17.055],["Den",17.959,18.075],["største",18.075,18.513],["forskydning",18.513,19.247],["må",19.247,19.441],["være",19.441,19.621],["hundrede",19.621,19.956],["megapascal",19.956,20.897]],"text":"Spændingerne er givet ved en parameter a. Sigma x er a, sigma y er a halve, og tau x y er a fjerdedele. Den største forskydning må være hundrede megapascal."},"formel":{"start":22.128,"end":28.222,"words":[["Vi",22.255,22.358],["bruger",22.358,22.642],["formlen",22.642,23.054],["for",23.054,23.209],["tau",23.209,23.454],["max",23.454,23.956],["kvadratroden",24.098,24.781],["af",24.781,24.91],["den",24.91,25.052],["halve",25.052,25.335],["forskel",25.335,25.928],["i",25.928,26.108],["anden",26.108,26.405],["plus",26.405,26.663],["tau",26.663,26.998],["x",26.998,27.346],["y",27.346,27.577],["i",27.577,27.784],["anden",27.784,28.222]],"text":"Vi bruger formlen for tau max: kvadratroden af den halve forskel i anden plus tau x y i anden."},"forskel":{"start":29.438,"end":35.507,"words":[["Den",29.565,29.681],["halve",29.681,29.965],["forskel",29.965,30.558],["er",30.558,30.79],["a",30.79,31.009],["minus",31.009,31.344],["a",31.344,31.421],["halve",31.421,31.936],["divideret",32.078,32.658],["med",32.658,32.787],["to.",32.787,33.212],["Det",34.089,34.218],["giver",34.218,34.605],["a",34.605,34.695],["fjerdedele",34.695,35.507]],"text":"Den halve forskel er a minus a halve, divideret med to. Det giver a fjerdedele."},"indsaet":{"start":36.82,"end":45.583,"words":[["Så",36.947,37.179],["er",37.179,37.282],["tau",37.282,37.553],["max",37.553,37.849],["kvadratroden",37.849,38.507],["af",38.507,38.739],["a",38.739,38.932],["fjerdedele",38.932,39.589],["i",39.589,39.769],["anden",39.77,40.001],["plus",40.001,40.311],["a",40.311,40.491],["fjerdedele",40.491,41.174],["i",41.174,41.38],["anden",41.38,41.818],["Det",42.722,42.89],["er",42.89,43.122],["a",43.122,43.353],["fjerdedele",43.354,43.921],["gange",43.921,44.217],["kvadratroden",44.217,44.964],["af",44.964,45.119],["to.",45.119,45.583]],"text":"Så er tau max kvadratroden af a fjerdedele i anden plus a fjerdedele i anden. Det er a fjerdedele gange kvadratroden af to."},"loes":{"start":46.818,"end":56.444,"words":[["Sæt",46.919,47.202],["det",47.202,47.331],["lig",47.331,47.576],["hundrede",47.576,48.053],["og",48.195,48.349],["isolér",48.349,49.045],["Så",49.937,50.233],["er",50.233,50.362],["a",50.362,50.607],["fire",50.607,50.89],["hundrede",50.89,51.161],["divideret",51.161,51.754],["med",51.754,51.96],["kvadratroden",51.96,52.591],["af",52.591,52.656],["to",52.656,53.107],["altså",53.236,53.687],["to",53.687,53.944],["hundrede",53.944,54.138],["og",54.138,54.15],["toogfirs",54.15,54.846],["komma",54.846,55.246],["otte",55.246,55.581],["megapascal",55.581,56.444]],"text":"Sæt det lig hundrede, og isolér. Så er a fire hundrede divideret med kvadratroden af to, altså to hundrede og toogfirs komma otte megapascal."},"kontrol":{"start":57.656,"end":69.613,"words":[["Kontrol",57.783,58.337],["med",58.466,58.698],["den",58.698,58.917],["værdi",58.917,59.317],["er",59.317,59.407],["både",59.407,59.691],["den",59.691,59.884],["halve",59.884,60.193],["forskel",60.193,60.786],["og",60.786,60.889],["tau",60.889,61.211],["x",61.211,61.508],["y",61.508,61.714],["halvfjerds",61.714,62.307],["komma",62.307,62.629],["syv",62.629,63.067],["Kvadratroden",63.97,64.666],["af",64.666,64.86],["to",64.86,65.13],["gange",65.13,65.388],["halvfjerds",65.388,65.826],["komma",65.826,66.084],["syv",66.084,66.509],["i",66.509,66.702],["anden",66.702,67.14],["giver",67.141,67.45],["hundrede",67.45,67.978],["Det",68.853,69.02],["passer",69.02,69.613]],"text":"Kontrol: med den værdi er både den halve forskel og tau x y halvfjerds komma syv. Kvadratroden af to gange halvfjerds komma syv i anden giver hundrede. Det passer."},"tjek_q":{"start":70.846,"end":75.988,"words":[["Tjek",70.947,71.256],["dig",71.256,71.436],["selv",71.436,71.875],["Hvis",72.779,72.934],["tau",72.934,73.243],["x",73.243,73.539],["y",73.539,73.733],["var",73.733,73.939],["nul",73.939,74.377],["hvor",74.506,74.66],["stor",74.66,74.944],["måtte",74.944,75.189],["a",75.189,75.369],["så",75.369,75.511],["være",75.511,75.988]],"text":"Tjek dig selv. Hvis tau x y var nul, hvor stor måtte a så være?"},"tjek_a":{"start":79.87,"end":84.134,"words":[["Så",79.984,80.229],["er",80.229,80.307],["tau",80.307,80.59],["max",80.59,80.938],["bare",80.938,81.222],["a",81.222,81.247],["fjerdedele",81.247,82.021],["og",82.162,82.291],["a",82.291,82.317],["må",82.317,82.472],["være",82.472,82.678],["fire",82.678,82.974],["hundrede",82.974,83.258],["megapascal",83.258,84.134]],"text":"Så er tau max bare a fjerdedele, og a må være fire hundrede megapascal."},"slut":{"start":85.356,"end":94.673,"words":[["Kort",85.496,85.702],["sagt",85.702,86.166],["skriv",86.295,86.669],["tau",86.669,86.901],["max",86.901,87.223],["som",87.223,87.429],["funktion",87.429,87.893],["af",87.893,87.97],["a",87.97,88.293],["sæt",88.421,88.718],["den",88.718,88.885],["lig",88.885,89.066],["den",89.066,89.246],["tilladte",89.246,89.62],["værdi",89.62,90.135],["og",90.29,90.432],["isolér",90.432,91.089],["Kontrollér",91.98,92.547],["ved",92.547,92.766],["at",92.766,92.792],["sætte",92.792,93.101],["resultatet",93.101,93.938],["ind",93.938,94.158],["igen",94.158,94.673]],"text":"Kort sagt: skriv tau max som funktion af a, sæt den lig den tilladte værdi, og isolér. Kontrollér ved at sætte resultatet ind igen."}}}, { audio: 'opg-2-78.mp3', id: 'opg-2-78' });</script>
+</body>
+</html>

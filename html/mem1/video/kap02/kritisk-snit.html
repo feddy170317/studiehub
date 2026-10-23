@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kritisk snit · video</title>
+<meta name="description" content="Kæden last, snitkræfter, spænding og tøjning, hvor det kritiske snit typisk ligger, og fremgangsmåden i fem trin.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 2: videoer</a><h1>Kritisk snit</h1><span class="meta">MEM1 · kapitel 2 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Kritisk snit"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Kæden last, snitkræfter, spænding og tøjning, hvor det kritiske snit typisk ligger, og fremgangsmåden i fem trin.</p><div class="chips"><a href="../../Kapitel02_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l02">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Kritisk snit (MEM1 kap. 2, slides 2–6)
+BP.scene({ header: 'MEM1 · kap. 2' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, hatch, rect, dashed, pin, plot, ell, PI } = B;
+
+  B.titel(0, 'Kritisk snit', 'MEM1 · kapitel 2 · begreb (slide 2–6)', 'titel');
+  text(0, 'hvor går det i stykker?', 640, 520, 40, 'red', wt('titel', 'stykker') - 0.4, we('titel', 'snit', 1), { align: 'center' });
+
+  // ---------------- 1 kæden ----------------
+  B.goto('kaede', 1);
+  {
+    const ord = [['Last', 'lasten'], ['Snitkræfter', 'belastning'], ['Spænding', 'spændingen'], ['Tøjning', 'tøjningen']];
+    ord.forEach(([s, w], i) => {
+      const x = 60 + 295 * i, t = wt('kaede', w) - 0.15;
+      box(1, x, 200, 250, 100, i === 0 ? 'red' : 'blue', t, t + 0.6);
+      text(1, s, x + 125, 265, 32, i === 0 ? 'red' : 'blue', t + 0.2, t + 0.8, { align: 'center' });
+      if (i) arrow(1, [[x - 40, 250], [x - 6, 250]], 'black', 3, t - 0.2, t, 14);
+    });
+    text(1, 'N, V, M i et snit', 485, 350, 28, 'blue', wt('kaede', 'snit') - 0.1, we('kaede', 'snit') + 0.4, { align: 'center' });
+    const th = L('hvorfor').start;
+    const h = text(1, 'Første skridt: bestem lasten præcist', 120, 470, 42, 'black', th + 0.1, we('hvorfor', 'præcist'));
+    under(h, 'red', we('hvorfor', 'præcist'), we('hvorfor', 'præcist') + 0.3);
+    text(1, 'forkert last  ⇒  alt andet er forkert', 120, 560, 42, 'red', wt('hvorfor', 'Er') - 0.1, we('hvorfor', 'forkert', 1));
+  }
+
+  // ---------------- 2 definition og kandidater ----------------
+  B.goto('definition', 2);
+  {
+    const td = L('definition').start;
+    text(2, 'Kritisk snit = største indre belastning', 120, 150, 42, 'blue', td + 0.1, we('definition', 'opstår'));
+    text(2, '→ her er brud mest sandsynligt', 160, 205, 36, 'black', wt('definition', 'brud') - 0.2, we('definition', 'sandsynligt'));
+    // trinaksel
+    const tk = L('kandidater').start;
+    line(2, [[200, 330], [640, 330], [640, 360], [1000, 360], [1000, 460], [640, 460], [640, 490], [200, 490], [200, 330]], 'black', 3.2, tk, tk + 1.4);
+    dashed(2, [170, 410], [1030, 410], 'black', tk + 1.0, tk + 1.6);
+    // 1 diameterspring
+    const t1 = wt('kandidater', 'diameterspring') - 0.2;
+    line(2, ell(640, 350, 34, 34, 0, 2 * PI), 'red', 2.8, t1, t1 + 0.5);
+    text(2, '1', 690, 318, 36, 'red', t1 + 0.4, t1 + 0.6);
+    // 2 last påføres
+    const t2 = wt('kandidater', 'lasten') - 0.2;
+    arrow(2, [[900, 230], [900, 352]], 'red', 4, t2, t2 + 0.5);
+    text(2, 'F', 915, 260, 38, 'red', t2 + 0.3, t2 + 0.5);
+    text(2, '2', 860, 300, 36, 'red', t2 + 0.4, t2 + 0.6);
+    // 3 materialeovergang: et nav presset på akslen
+    const t3 = wt('kandidater', 'overgange') - 0.2;
+    line(2, [[300, 300], [420, 300], [420, 520], [300, 520], [300, 302]], 'green', 3, t3, t3 + 0.6);
+    hatch(2, rect(300, 300, 120, 30), 'green', t3 + 0.5, t3 + 0.8, { gap: 6 });
+    hatch(2, rect(300, 490, 120, 30), 'green', t3 + 0.6, t3 + 0.9, { gap: 6 });
+    text(2, '3', 360, 285, 36, 'red', t3 + 0.6, t3 + 0.8, { align: 'center' });
+    // liste
+    text(2, '1  diameterspring, hulkehl', 140, 590, 32, 'black', t1, wt('kandidater', 'steder') - 0.1);
+    text(2, '2  hvor lasten sættes på', 140, 640, 32, 'black', t2, t2 + 1.0);
+    text(2, '3  materialeovergange', 640, 590, 32, 'black', t3, t3 + 0.9);
+  }
+
+  // ---------------- 3 ikke det oplagte snit ----------------
+  B.goto('ikke_oplagt', 3);
+  {
+    const ti = L('ikke_oplagt').start;
+    bubble(3, 'Ikke altid det oplagte snit', 640, 150, 52, 'red', ti + 0.4, we('ikke_oplagt', 'snit'), { align: 'center' });
+    const te = L('eks').start;
+    // aksel med skulder, simpelt understøttet, last på midten
+    line(3, [[160, 255], [380, 255], [380, 230], [900, 230], [900, 255], [1120, 255], [1120, 305], [900, 305], [900, 330], [380, 330], [380, 305], [160, 305], [160, 255]],
+      'black', 3.2, te, wt('eks', 'skulderspring') + 0.4);
+    pin(3, 200, 307, wt('eks', 'skulderspring'), 'black', 0.7);
+    pin(3, 1080, 307, wt('eks', 'skulderspring') + 0.2, 'black', 0.7);
+    arrow(3, [[640, 120 + 40], [640, 226]], 'red', 4, wt('eks', 'Momentet') - 0.3, wt('eks', 'Momentet'));
+    text(3, 'F', 656, 190, 36, 'red', wt('eks', 'Momentet'), wt('eks', 'Momentet') + 0.2);
+    // momentdiagram
+    const tm = wt('eks', 'Momentet');
+    line(3, [[200, 560], [1080, 560]], 'black', 2.4, tm, tm + 0.4);
+    plot(3, [[200, 560], [640, 410], [1080, 560]], 'blue', tm + 0.3, we('eks', 'midten'));
+    text(3, 'M', 160, 520, 36, 'blue', tm + 0.3, tm + 0.5);
+    text(3, 'M størst', 640, 395, 32, 'blue', wt('eks', 'størst') - 0.1, we('eks', 'midten'), { align: 'center' });
+    // snit ved springet
+    const ts = wt('eks', 'springet') - 0.2;
+    dashed(3, [380, 200], [380, 600], 'red', ts, ts + 0.6);
+    line(3, ell(380, 255, 22, 22, 0, 2 * PI), 'red', 2.6, wt('eks', 'hjørnet') - 0.1, wt('eks', 'hjørnet') + 0.4);
+    text(3, 'mindre d + hjørne', 400, 640, 32, 'red', wt('eks', 'tværsnittet') - 0.2, we('eks', 'spændingen'));
+    dashed(3, [640, 200], [640, 600], 'blue', wt('eks', 'begge') - 0.3, wt('eks', 'begge') + 0.3);
+    text(3, '→ regn begge snit', 800, 640, 34, 'black', wt('eks', 'begge') - 0.1, we('eks', 'igennem'));
+  }
+
+  // ---------------- 4 fremgangsmåden ----------------
+  B.goto('procedure', 4);
+  {
+    const tp = L('procedure').start;
+    bubble(4, 'Fremgangsmåde', 150, 140, 58, 'blue', tp, tp + 1.0);
+    const trin = [['1.  elementets funktion', 'funktion'], ['2.  den ydre last', 'ydre'], ['3.  mulige kritiske steder', 'mulige'],
+      ['4.  indre belastning i hvert snit', 'indre'], ['5.  sammenlign spændingerne', 'sammenlign']];
+    trin.forEach(([s, w], i) => text(4, s, 170, 240 + 70 * i, 40, i === 4 ? 'red' : 'black', wt('procedure', w) - 0.4, we('procedure', w) + 0.4));
+  }
+
+  B.goto('tjek_q', 5);
+  B.tjek(5, ['Er det kritiske snit altid', 'der, hvor M er størst?'], ['Nej.', 'mindre tværsnit eller et spring', 'kan give større spænding'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 6);
+  B.slut(6, 'Abou-Hayt (2026), MEM1 Chapter 2, slide 2–6 · Hamrock, Schmid & Jacobson, kap. 2', 'lasttyper og fortegn', 'slut');
+  text(6, 'Last → Snitkræfter → Spænding → Tøjning', 200, 300, 40, 'blue', L('slut').start + 0.6, we('slut', 'tøjning'));
+  text(6, 'find kandidaterne · regn dem alle igennem', 200, 390, 38, 'red', wt('slut', 'Find') - 0.1, we('slut', 'igennem'));
+});
+
+</script>
+<script>BP.live({"duration":120.04,"audio":"kritisk-snit.mp3","order":["titel","kaede","hvorfor","definition","kandidater","ikke_oplagt","eks","procedure","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":9.842,"words":[["Kritisk",0.601,1.116],["snit",1.116,1.542],["Før",2.433,2.716],["vi",2.716,2.807],["kan",2.807,3.052],["dimensionere",3.052,3.735],["et",3.735,3.85],["maskinelement",3.85,4.727],["skal",4.856,5.088],["vi",5.088,5.204],["vide",5.204,5.629],["hvor",5.771,5.925],["det",5.925,6.041],["vil",6.041,6.144],["gå",6.144,6.35],["i",6.351,6.389],["stykker",6.389,6.943],["Det",7.806,7.948],["sted",7.948,8.27],["kalder",8.27,8.618],["vi",8.618,8.772],["det",8.772,8.875],["kritiske",8.876,9.391],["snit",9.391,9.842]],"text":"Kritisk snit. Før vi kan dimensionere et maskinelement, skal vi vide, hvor det vil gå i stykker. Det sted kalder vi det kritiske snit."},"kaede":{"start":11.074,"end":19.656,"words":[["Hele",11.175,11.497],["kapitlet",11.497,12.167],["følger",12.167,12.631],["én",12.631,12.889],["kæde",12.889,13.378],["Først",14.27,14.644],["lasten",14.644,15.159],["så",15.301,15.507],["den",15.507,15.7],["indre",15.7,15.971],["belastning",15.971,16.564],["i",16.564,16.718],["et",16.718,16.796],["snit",16.796,17.208],["så",17.363,17.569],["spændingen",17.569,18.2],["og",18.381,18.535],["til",18.535,18.677],["sidst",18.677,19.012],["tøjningen",19.012,19.656]],"text":"Hele kapitlet følger én kæde. Først lasten, så den indre belastning i et snit, så spændingen, og til sidst tøjningen."},"hvorfor":{"start":20.88,"end":27.968,"words":[["Første",21.007,21.407],["skridt",21.407,21.819],["er",21.819,21.974],["altid",21.974,22.476],["at",22.476,22.579],["bestemme",22.58,22.992],["lasten",22.992,23.456],["præcist",23.456,24.074],["Er",24.965,25.068],["lasten",25.068,25.468],["forkert",25.468,26.022],["er",26.164,26.267],["alt",26.267,26.499],["det",26.499,26.653],["andet",26.653,27.04],["også",27.04,27.375],["forkert",27.375,27.968]],"text":"Første skridt er altid at bestemme lasten præcist. Er lasten forkert, er alt det andet også forkert."},"definition":{"start":29.198,"end":35.06,"words":[["Det",29.312,29.39],["kritiske",29.39,29.892],["snit",29.892,30.214],["er",30.214,30.318],["stedet",30.318,30.794],["hvor",30.936,31.129],["den",31.129,31.271],["største",31.271,31.722],["indre",31.722,32.006],["belastning",32.006,32.56],["opstår",32.56,33.178],["og",33.397,33.513],["hvor",33.513,33.629],["brud",33.629,33.964],["er",33.964,34.08],["mest",34.08,34.39],["sandsynligt",34.39,35.06]],"text":"Det kritiske snit er stedet, hvor den største indre belastning opstår, og hvor brud er mest sandsynligt."},"kandidater":{"start":36.292,"end":46.638,"words":[["Typiske",36.419,36.896],["kandidater",36.896,37.721],["er",37.721,37.863],["geometriske",37.863,38.636],["ændringer",38.636,39.254],["som",39.383,39.615],["et",39.615,39.692],["diameterspring",39.693,40.504],["eller",40.504,40.749],["en",40.749,40.839],["hulkehl",40.839,41.484],["steder",41.625,42.038],["hvor",42.038,42.18],["lasten",42.18,42.566],["sættes",42.566,42.875],["på",42.875,43.146],["eller",43.146,43.404],["overføres",43.404,44.164],["og",44.345,44.486],["overgange",44.486,45.04],["mellem",45.04,45.388],["forskellige",45.388,45.878],["materialer",45.878,46.638]],"text":"Typiske kandidater er geometriske ændringer, som et diameterspring eller en hulkehl, steder hvor lasten sættes på eller overføres, og overgange mellem forskellige materialer."},"ikke_oplagt":{"start":47.874,"end":53.505,"words":[["Men",47.975,48.271],["pas",48.271,48.568],["på",48.568,48.993],["Det",49.897,49.962],["kritiske",49.962,50.49],["snit",50.49,50.928],["er",50.928,51.083],["ikke",51.083,51.379],["nødvendigvis",51.379,52.075],["det",52.075,52.191],["mest",52.191,52.526],["oplagte",52.526,53.054],["snit",53.054,53.505]],"text":"Men pas på. Det kritiske snit er ikke nødvendigvis det mest oplagte snit."},"eks":{"start":54.752,"end":66.621,"words":[["Tænk",54.879,55.124],["på",55.124,55.266],["en",55.266,55.382],["aksel",55.382,56.013],["med",56.013,56.245],["et",56.245,56.335],["skulderspring",56.335,57.109],["Momentet",58.025,58.554],["er",58.554,58.631],["størst",58.631,58.966],["på",58.966,59.082],["midten",59.082,59.559],["men",59.688,59.958],["ved",59.958,60.035],["springet",60.036,60.435],["er",60.435,60.487],["tværsnittet",60.487,61.079],["mindre",61.079,61.621],["og",61.762,61.891],["hjørnet",61.891,62.304],["koncentrerer",62.304,62.909],["spændingen",62.909,63.554],["Derfor",64.43,64.739],["skal",64.739,64.92],["begge",64.92,65.242],["snit",65.242,65.512],["regnes",65.512,65.976],["igennem",65.976,66.621]],"text":"Tænk på en aksel med et skulderspring. Momentet er størst på midten, men ved springet er tværsnittet mindre, og hjørnet koncentrerer spændingen. Derfor skal begge snit regnes igennem."},"procedure":{"start":67.846,"end":84.044,"words":[["Fremgangsmåden",67.973,68.862],["har",68.862,69.056],["fem",69.056,69.352],["trin",69.352,69.79],["Bestem",70.681,71.171],["elementets",71.171,71.802],["funktion",71.802,72.421],["Bestem",73.296,73.734],["den",73.734,74.005],["ydre",74.005,74.288],["last",74.289,74.83],["Find",75.693,76.002],["de",76.002,76.093],["mulige",76.093,76.479],["kritiske",76.479,76.982],["steder",76.982,77.549],["Bestem",78.452,78.825],["den",78.825,79.044],["indre",79.044,79.354],["belastning",79.354,80.088],["i",80.088,80.256],["hvert",80.256,80.488],["snit",80.488,80.913],["Og",81.815,82.176],["sammenlign",82.176,82.769],["til",82.769,82.923],["sidst",82.923,83.336],["spændingerne",83.336,84.044]],"text":"Fremgangsmåden har fem trin. Bestem elementets funktion. Bestem den ydre last. Find de mulige kritiske steder. Bestem den indre belastning i hvert snit. Og sammenlign til sidst spændingerne."},"tjek_q":{"start":85.284,"end":90.439,"words":[["Tjek",85.385,85.707],["dig",85.707,85.887],["selv",85.887,86.313],["Er",87.191,87.294],["det",87.294,87.397],["kritiske",87.397,87.926],["snit",87.926,88.287],["altid",88.287,88.673],["der",88.673,88.995],["hvor",89.137,89.305],["momentet",89.305,89.807],["er",89.807,89.884],["størst",89.885,90.439]],"text":"Tjek dig selv. Er det kritiske snit altid der, hvor momentet er størst?"},"tjek_a":{"start":94.308,"end":103.78,"words":[["Nej",94.408,94.936],["Et",95.842,95.945],["mindre",95.945,96.28],["tværsnit",96.28,96.911],["eller",96.911,97.156],["et",97.156,97.233],["geometrisk",97.233,97.839],["spring",97.839,98.225],["kan",98.226,98.38],["give",98.38,98.535],["en",98.535,98.612],["større",98.612,98.934],["spænding",98.934,99.411],["et",99.411,99.591],["andet",99.592,99.901],["sted",99.901,100.378],["Derfor",101.267,101.602],["sammenligner",101.602,102.349],["man",102.349,102.607],["flere",102.607,102.942],["kandidater",102.942,103.78]],"text":"Nej. Et mindre tværsnit eller et geometrisk spring kan give en større spænding et andet sted. Derfor sammenligner man flere kandidater."},"slut":{"start":105.002,"end":117.618,"words":[["Kort",105.129,105.348],["sagt",105.348,105.838],["last",105.967,106.585],["indre",106.689,106.998],["belastning",106.998,107.707],["spænding",107.848,108.441],["og",108.441,108.583],["tøjning",108.583,109.163],["Find",110.041,110.311],["kandidaterne",110.311,111.046],["til",111.046,111.213],["det",111.213,111.291],["kritiske",111.291,111.793],["snit",111.793,112.193],["og",112.334,112.489],["regn",112.489,112.786],["dem",112.786,113.043],["alle",113.043,113.314],["igennem",113.314,113.92],["Næste",114.822,115.157],["video",115.157,115.479],["handler",115.479,115.891],["om",115.891,116.084],["lasttyper",116.084,116.793],["og",116.793,116.922],["fortegn",116.922,117.618]],"text":"Kort sagt: last, indre belastning, spænding og tøjning. Find kandidaterne til det kritiske snit, og regn dem alle igennem. Næste video handler om lasttyper og fortegn."}}}, { audio: 'kritisk-snit.mp3', id: 'kritisk-snit' });</script>
+</body>
+</html>

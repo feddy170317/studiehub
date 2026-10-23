@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opgave 2.63: kvadratisk stang · video</title>
+<meta name="description" content="Kvadratisk stang med P = 10 kN og σ = 90 MPa. Sidelængden bliver 10,54 mm.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 2: videoer</a><h1>Opgave 2.63: kvadratisk stang</h1><span class="meta">MEM1 · kapitel 2 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Opgave 2.63: kvadratisk stang"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Kvadratisk stang med P = 10 kN og σ = 90 MPa. Sidelængden bliver 10,54 mm.</p><div class="chips"><a href="spaending-element.html">Se først: Spænding og spændingselementet</a><a href="../../Kapitel02_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l02">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Opgave 2.63: kvadratisk stang, P = 10 kN, σ = 90 MPa → l = 10,54 mm (MEM1 kap. 2, slide 49)
+BP.scene({ header: 'MEM1 · kap. 2' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, hatch, rect } = B;
+
+  B.titel(0, 'Opgave 2.63', 'MEM1 · kapitel 2 · opgave (slide 49)', 'titel');
+  text(0, 'dimensionér en kvadratisk stang', 640, 520, 40, 'red', wt('titel', 'dimensionerer') - 0.1, we('titel', 'stål'), { align: 'center' });
+
+  // ---------------- 1 opgave og formel ----------------
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start;
+    line(1, [[200, 200], [620, 200], [620, 280], [200, 280], [200, 202]], 'black', 3.2, t0, t0 + 0.6);
+    arrow(1, [[624, 240], [740, 240]], 'red', 4.4, wt('data', 'trækkraft') - 0.2, wt('data', 'trækkraft') + 0.3);
+    arrow(1, [[196, 240], [80 + 40, 240]], 'red', 4.4, wt('data', 'trækkraft'), wt('data', 'trækkraft') + 0.5);
+    text(1, 'P = 10 kN', 760, 252, 40, 'red', wt('data', 'P') - 0.1, we('data', 'kilonewton'));
+    text(1, 'σ = 90 MPa', 760, 320, 40, 'blue', wt('data', 'normalspændingen') - 0.1, we('data', 'megapascal'));
+    // tværsnit
+    const tf = L('formel').start;
+    line(1, rect(260, 380, 140, 140).concat([[260, 382]]), 'black', 3.2, wt('formel', 'kvadrat') - 0.3, wt('formel', 'kvadrat') + 0.4);
+    hatch(1, rect(260, 380, 140, 140), 'blue', wt('formel', 'kvadrat') + 0.2, wt('formel', 'kvadrat') + 0.6, { gap: 9 });
+    text(1, 'l', 330, 560, 38, 'black', wt('formel', 'siden') - 0.1, wt('formel', 'siden') + 0.3, { align: 'center' });
+    text(1, 'l', 420, 462, 38, 'black', wt('formel', 'l') - 0.1, wt('formel', 'l') + 0.3);
+    text(1, 'σ = P / A', 560, 430, 44, 'black', tf + 0.1, we('formel', 'A'));
+    text(1, 'A = l²', 560, 500, 44, 'black', wt('formel', 'arealet') - 0.1, we('formel', 'anden'));
+    const ti = L('isoler').start;
+    text(1, '⇒  A = P / σ', 820, 430, 44, 'blue', wt('isoler', 'Først') - 0.1, we('isoler', 'sigma'));
+    const r = text(1, '⇒  l = √(P / σ)', 820, 500, 44, 'red', wt('isoler', 'l', 1) - 0.1, we('isoler', 'sigma', 1));
+    under(r, 'red', we('isoler', 'sigma', 1), we('isoler', 'sigma', 1) + 0.3);
+  }
+
+  // ---------------- 2 tal ind ----------------
+  B.goto('enheder', 2);
+  {
+    const t0 = L('enheder').start;
+    bubble(2, 'Pas på enhederne', 150, 140, 54, 'red', t0, t0 + 0.9);
+    text(2, 'P = 10 kN = 10 000 N', 170, 240, 42, 'black', wt('enheder', 'Ti') - 0.1, we('enheder', 'newton'));
+    text(2, 'σ = 90 MPa = 90 N/mm²', 170, 310, 42, 'black', wt('enheder', 'halvfems') - 0.1, we('enheder', 'kvadratmillimeter'));
+    text(2, 'A = 10 000 / 90 = 111,1 mm²', 170, 410, 42, 'blue', wt('areal', 'arealet') - 0.1, we('areal', 'kvadratmillimeter'));
+    const r = text(2, 'l = √111,1 = 10,54 mm', 170, 500, 48, 'red', wt('resultat', 'siden') - 0.1, we('resultat', 'millimeter'));
+    box(2, 150, 450, 560, 76, 'red', we('resultat', 'millimeter'), we('resultat', 'millimeter') + 0.6);
+    const tp = L('praksis').start;
+    text(2, 'vælg standardmål ≥ 10,54 mm', 170, 610, 38, 'blue', tp + 0.2, we('praksis', 'større'));
+    text(2, 'mindre ⇒ σ for høj', 800, 610, 36, 'red', wt('praksis', 'Mindre') - 0.1, we('praksis', 'høj'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Hvad sker der med σ,', 'hvis siden l halveres?'], ['A bliver 1/4', '⇒ σ bliver 4 gange så stor'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 2, slide 49 · Hamrock, Schmid & Jacobson, opgave 2.63', '', 'slut');
+  text(4, 'σ = P / A  ⇒  A = P / σ', 200, 280, 44, 'blue', L('slut').start + 0.4, we('slut', 'arealet'));
+  text(4, 'N og mm  ⇒  MPa direkte', 200, 370, 44, 'red', wt('slut', 'newton') - 0.1, we('slut', 'direkte'));
+});
+
+</script>
+<script>BP.live({"duration":86.704,"audio":"opg-2-63.mp3","order":["titel","data","formel","isoler","enheder","areal","resultat","praksis","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":8.915,"words":[["Opgave",0.653,1.091],["to",1.091,1.491],["komma",1.491,1.813],["treogtres",1.813,2.676],["Vi",3.58,3.683],["dimensionerer",3.683,4.327],["en",4.327,4.495],["kvadratisk",4.495,5.075],["stang",5.075,5.384],["i",5.384,5.5],["rustfrit",5.5,5.899],["stål",5.899,6.351],["så",6.492,6.698],["normalspændingen",6.698,7.485],["bliver",7.485,7.691],["præcis",7.691,8.155],["den",8.155,8.335],["tilladte",8.335,8.915]],"text":"Opgave to komma treogtres. Vi dimensionerer en kvadratisk stang i rustfrit stål, så normalspændingen bliver præcis den tilladte."},"data":{"start":10.138,"end":15.832,"words":[["Stangen",10.265,10.678],["bærer",10.678,10.923],["en",10.923,11.038],["trækkraft",11.038,11.554],["P",11.554,11.799],["på",11.799,11.979],["ti",11.979,12.237],["kilonewton",12.237,12.959],["og",13.1,13.229],["normalspændingen",13.229,14.054],["skal",14.054,14.234],["være",14.234,14.402],["halvfems",14.402,14.879],["megapascal",14.879,15.832]],"text":"Stangen bærer en trækkraft P på ti kilonewton, og normalspændingen skal være halvfems megapascal."},"formel":{"start":17.064,"end":22.745,"words":[["Normalspændingen",17.204,17.9],["er",17.9,17.99],["P",17.99,18.248],["divideret",18.248,18.751],["med",18.751,18.983],["A",18.983,19.33],["og",19.472,19.614],["arealet",19.614,20.129],["af",20.129,20.22],["et",20.22,20.284],["kvadrat",20.284,20.696],["med",20.696,20.825],["siden",20.825,21.173],["l",21.173,21.521],["er",21.521,21.74],["l",21.74,22.075],["i",22.075,22.307],["anden",22.307,22.745]],"text":"Normalspændingen er P divideret med A, og arealet af et kvadrat med siden l er l i anden."},"isoler":{"start":23.966,"end":29.97,"words":[["Vi",24.106,24.248],["isolerer",24.248,24.686],["l.",24.686,24.97],["Først",24.97,25.343],["er",25.343,25.562],["A",25.562,25.756],["lig",25.756,25.936],["P",25.936,26.245],["over",26.245,26.464],["sigma",26.464,27.031],["og",27.173,27.418],["så",27.418,27.663],["er",27.663,27.727],["l",27.727,27.921],["lig",27.921,28.101],["kvadratroden",28.101,28.745],["af",28.745,28.874],["P",28.874,29.171],["over",29.171,29.415],["sigma",29.415,29.97]],"text":"Vi isolerer l. Først er A lig P over sigma, og så er l lig kvadratroden af P over sigma."},"enheder":{"start":31.204,"end":39.735,"words":[["Pas",31.305,31.601],["på",31.601,31.846],["enhederne",31.846,32.555],["Ti",33.524,33.756],["kilonewton",33.756,34.451],["er",34.451,34.606],["ti",34.606,34.864],["tusind",34.864,35.186],["newton",35.186,35.74],["og",35.882,36.024],["halvfems",36.024,36.449],["megapascal",36.449,37.261],["er",37.261,37.377],["halvfems",37.377,37.853],["newton",37.853,38.292],["pr.",38.292,38.627],["kvadratmillimeter",38.627,39.735]],"text":"Pas på enhederne. Ti kilonewton er ti tusind newton, og halvfems megapascal er halvfems newton pr. kvadratmillimeter."},"areal":{"start":40.962,"end":46.978,"words":[["Så",41.089,41.373],["er",41.373,41.424],["arealet",41.424,42.082],["ti",42.082,42.365],["tusind",42.365,42.713],["divideret",42.713,43.267],["med",43.267,43.473],["halvfems",43.473,44.169],["altså",44.311,44.659],["hundrede",44.659,44.93],["og",44.93,44.968],["elleve",44.968,45.329],["komma",45.329,45.728],["en",45.728,45.896],["kvadratmillimeter",45.896,46.978]],"text":"Så er arealet ti tusind divideret med halvfems, altså hundrede og elleve komma en kvadratmillimeter."},"resultat":{"start":48.2,"end":52.541,"words":[["Og",48.327,48.379],["siden",48.379,48.688],["er",48.688,48.791],["kvadratroden",48.791,49.487],["af",49.487,49.655],["det",49.655,50.015],["altså",50.144,50.595],["ti",50.595,50.866],["komma",50.866,51.214],["fem",51.214,51.497],["fire",51.497,51.807],["millimeter",51.807,52.541]],"text":"Og siden er kvadratroden af det, altså ti komma fem fire millimeter."},"praksis":{"start":53.758,"end":61.825,"words":[["I",53.885,53.963],["praksis",53.963,54.465],["vælger",54.465,54.749],["man",54.749,54.929],["den",54.929,55.097],["nærmeste",55.097,55.522],["standardstørrelse",55.522,56.643],["der",56.811,56.991],["er",56.991,57.017],["større",57.017,57.597],["Mindre",58.5,58.874],["må",58.874,59.003],["stangen",59.003,59.415],["ikke",59.415,59.75],["være",59.75,60.214],["for",60.33,60.498],["så",60.498,60.665],["bliver",60.665,60.846],["spændingen",60.846,61.31],["for",61.31,61.464],["høj",61.464,61.825]],"text":"I praksis vælger man den nærmeste standardstørrelse, der er større. Mindre må stangen ikke være, for så bliver spændingen for høj."},"tjek_q":{"start":63.06,"end":67.57,"words":[["Tjek",63.161,63.483],["dig",63.483,63.663],["selv",63.663,64.089],["Hvad",64.993,65.109],["sker",65.109,65.405],["der",65.405,65.521],["med",65.521,65.637],["spændingen",65.637,66.256],["hvis",66.398,66.578],["siden",66.578,66.874],["halveres",66.874,67.57]],"text":"Tjek dig selv. Hvad sker der med spændingen, hvis siden halveres?"},"tjek_a":{"start":71.436,"end":75.378,"words":[["Arealet",71.563,72.066],["bliver",72.066,72.285],["en",72.285,72.388],["fjerdedel",72.388,73.045],["så",73.187,73.406],["spændingen",73.406,73.934],["bliver",73.934,74.166],["fire",74.166,74.501],["gange",74.501,74.811],["så",74.811,74.94],["stor",74.94,75.378]],"text":"Arealet bliver en fjerdedel, så spændingen bliver fire gange så stor."},"slut":{"start":76.61,"end":84.289,"words":[["Kort",76.737,76.956],["sagt",76.956,77.407],["sigma",77.523,78.013],["er",78.013,78.116],["P",78.116,78.4],["over",78.4,78.683],["A.",78.683,79.25],["Isolér",79.25,79.727],["arealet",79.727,80.449],["og",80.59,80.732],["regn",80.732,81.029],["i",81.029,81.106],["newton",81.106,81.544],["og",81.544,81.66],["millimeter",81.66,82.369],["så",82.511,82.73],["får",82.73,82.846],["du",82.846,82.936],["megapascal",82.936,83.606],["direkte",83.606,84.289]],"text":"Kort sagt: sigma er P over A. Isolér arealet, og regn i newton og millimeter, så får du megapascal direkte."}}}, { audio: 'opg-2-63.mp3', id: 'opg-2-63' });</script>
+</body>
+</html>
