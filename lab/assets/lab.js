@@ -334,7 +334,7 @@
     (c.side || []).forEach(function (t, i) { h += '<div class="card" id="side' + i + '"><h2>' + t + '</h2></div>'; });
     h += '</aside></main>';
     if (c.graphs && c.graphs.length) {
-      h += '<section class="lab-graphs" style="grid-template-columns:repeat(' + c.graphs.length + ',minmax(0,1fr))">';
+      h += '<section class="lab-graphs" style="--gc:' + c.graphs.length + '">';
       c.graphs.forEach(function (g) { h += '<div class="graph"><h3><span class="gt">' + g.title + '</span>' + (g.sub ? ' <span>' + g.sub + '</span>' : '') + '</h3><canvas id="' + g.id + '"></canvas>' + (g.extra || '') + '</div>'; });
       h += '</section>';
     }
