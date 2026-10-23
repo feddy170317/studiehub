@@ -9,7 +9,7 @@
 <body>
 <header>
   <h1>Øvelseslab · Dag 7</h1>
-  <p>Kompleks effekt, effektfaktorkorrektion og jævnstrømsmotoren</p>
+  <p>DC-motorens ankermoment, kompleks effekt (eksempel 7.4–7.7) og supplement fra bogen: effektfaktorkorrektion og DC-motoren i drift</p>
   <div class="toplinks">
     <a href="../dag/Dag07_Studienote.pdf" target="_blank">📖 Studienote</a>
     <a href="../../../quiz/ele1/Dag07_Quiz.html" target="_blank">📝 Quiz</a>
@@ -25,9 +25,110 @@
 (function () {
   var fu = Lab.fu, fmt = Lab.fmt, C = Lab.COL, Cx = Lab.Cx, deg = Lab.deg, rad = Lab.rad, PI = Math.PI;
 
+  /* ---------- Øvelse 1: ankermoment (slide 13) ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Øvelse', title: 'Øvelse 1: ankermomentet i en DC-motor (slide 12–13)', short: 'Ankermoment',
+      text: 'En DC-motor har I_a = 8 A, fluxen pr. pol Φ = 0,02 Wb, P = 4 poler, Z = 800 ledere og A = 2 parallelle veje. Beregn ankermomentet T_a.',
+      learn: 'momentet er proportionalt med både flux og ankerstrøm. Konstruktionsdata P, Z og A kan samles i én konstant k_T = PZ/(2πA), som er bogens T = k_T·φ·I_a.' });
+    Lab.slider(T, { key: 'Ia', label: 'Ankerstrøm I_a', min: 0, max: 40, step: 0.5, value: 8, unit: 'A', noPrefix: true });
+    Lab.slider(T, { key: 'Phi', label: 'Flux pr. pol Φ', min: 0.005, max: 0.1, step: 0.001, value: 0.02, unit: 'Wb', noPrefix: true });
+    Lab.select(T, { key: 'P', label: 'Antal poler P', options: [['2', '2'], ['4', '4'], ['6', '6'], ['8', '8']], value: '4' });
+    Lab.slider(T, { key: 'Z', label: 'Antal ledere Z', min: 100, max: 2000, step: 50, value: 800, noPrefix: true });
+    Lab.select(T, { key: 'A', label: 'Parallelle veje A', options: [['2', '2'], ['4', '4'], ['6', '6'], ['8', '8']], value: '2' });
+    var cv = Lab.canvas(T.stage, 0.45);
+    var out = Lab.readout(T, [{ key: 'kT', label: 'k_T = PZ/(2πA)', color: C.cyan }, { key: 'Ta', label: 'Ankermoment T_a', color: C.green }, { key: 'I', label: 'Strøm pr. leder I_a/A', color: C.gold }]);
+    function calc(p) { var P = Number(p.P), A = Number(p.A), kT = P * p.Z / (2 * PI * A); return { P: P, A: A, kT: kT, Ta: kT * p.Phi * p.Ia }; }
+    T.on(function (p) {
+      var c = calc(p), Imax = 40;
+      Lab.plot(cv, { x: [0, Imax], y: [0, c.kT * p.Phi * Imax * 1.05], xlabel: 'Ankerstrøm I_a [A]', ylabel: 'T_a [N·m]',
+        series: [{ fn: function (i) { return c.kT * p.Phi * i; }, color: C.cyan, label: 'T_a = k_T·Φ·I_a' }],
+        markers: [{ x: p.Ia, y: c.Ta, color: C.red, label: 'opgavens punkt' }] });
+      out({ kT: fmt(c.kT, 4), Ta: fu(c.Ta, 'N·m', 4), I: fu(p.Ia / c.A, 'A') });
+    });
+    Lab.check(T, [{ q: 'Ankermomentet T_a', unit: 'N·m', answer: function (p) { return calc(p).Ta; } }]);
+    Lab.steps(T, function (p) {
+      var c = calc(p);
+      return ['Formlen fra slide 12: <span class="f">T_a = P·Φ·Z·I_a / (2π·A)</span>. Den kommer af T_a = Z·B·I·L·r med B = Φ/(2πrL/P) og I = I_a/A, så L og r går ud.',
+        'Tæller: <span class="f">' + c.P + ' · ' + fmt(p.Phi) + ' · ' + fmt(p.Z) + ' · ' + fmt(p.Ia) + '</span> = ' + fmt(c.P * p.Phi * p.Z * p.Ia, 4) + '. Nævner: <span class="f">2π · ' + c.A + '</span> = ' + fmt(2 * PI * c.A, 4),
+        '<span class="res">T_a = ' + fu(c.Ta, 'N·m', 4) + '</span>',
+        'Kontrol med bogens form: <span class="f">k_T = PZ/(2πA) = ' + fmt(c.kT, 4) + '</span>, og <span class="f">T = k_T·Φ·I_a = ' + fmt(c.kT, 4) + ' · ' + fmt(p.Phi) + ' · ' + fmt(p.Ia) + '</span> = ' + fu(c.Ta, 'N·m', 4) + ' ✓'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Eksempel 7.4: S ud fra v(t) og i(t) ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Eksempel', title: 'Eksempel 7.4: kompleks effekt ud fra v(t) og i(t) (bogens 6.4)', short: 'Eks. 7.4',
+      text: 'v(t) = 100 cos(ωt + 0,262) V og i(t) = 2 cos(ωt − 0,262) A, ω = 377 rad/s. Find den komplekse effekt S = P + jQ.',
+      learn: 'tallene foran cosinus er amplituder og skal divideres med √2 først. Vinklen i S er θ_V − θ_I, altså impedansvinklen. Lad strømmen føre spændingen, så bliver Q negativ (kapacitiv last).' });
+    Lab.slider(T, { key: 'Vm', label: 'Amplitude V', min: 10, max: 400, step: 5, value: 100, unit: 'V', noPrefix: true });
+    Lab.slider(T, { key: 'tv', label: 'Spændingens fase θ_V', min: -1.57, max: 1.57, step: 0.001, value: 0.262, unit: 'rad', noPrefix: true });
+    Lab.slider(T, { key: 'Im', label: 'Amplitude I', min: 0.1, max: 20, step: 0.1, value: 2, unit: 'A', noPrefix: true });
+    Lab.slider(T, { key: 'ti', label: 'Strømmens fase θ_I', min: -1.57, max: 1.57, step: 0.001, value: -0.262, unit: 'rad', noPrefix: true });
+    var cv = Lab.canvas(T.stage, 0.5);
+    var out = Lab.readout(T, [{ key: 'V', label: 'Ṽ (RMS)', color: C.cyan }, { key: 'I', label: 'Ĩ (RMS)', color: C.red }, { key: 'S', label: 'S = Ṽ·Ĩ*', color: C.gold },
+      { key: 'P', label: 'P', color: C.green }, { key: 'Q', label: 'Q', color: C.purple }, { key: 'pf', label: 'Effektfaktor', color: C.cyan }]);
+    function calc(p) { var V = Cx.polar(p.Vm / Math.SQRT2, p.tv), I = Cx.polar(p.Im / Math.SQRT2, p.ti); return { V: V, I: I, S: Cx.mul(V, Cx.conj(I)) }; }
+    T.on(function (p) {
+      var c = calc(p), pf = c.S.re / Cx.abs(c.S);
+      Lab.phasor(cv, [{ z: Lab.C(c.S.re, 0), color: C.green, label: 'P', width: 2 }, { z: Lab.C(0, c.S.im), from: Lab.C(c.S.re, 0), color: C.purple, label: 'Q', width: 2 }, { z: c.S, color: C.gold, label: 'S' }],
+        { note: 'Effekttrekanten for S = Ṽ·Ĩ*.' });
+      out({ V: Lab.fp(c.V, 'V', 4, true), I: Lab.fp(c.I, 'A', 4, true), S: Lab.fp(c.S, 'VA', 4, true) + ' = ' + Lab.fc(c.S, 'VA', 4), P: fu(c.S.re, 'W', 4), Q: fmt(c.S.im, 4) + ' VAR',
+        pf: fmt(pf, 3) + (c.S.im > 0 ? ' haltende' : c.S.im < 0 ? ' førende' : '') });
+    });
+    Lab.check(T, [{ q: 'Den aktive effekt P', unit: 'W', answer: function (p) { return calc(p).S.re; } }, { q: 'Den reaktive effekt Q', unit: 'VAR', answer: function (p) { return calc(p).S.im; } }]);
+    Lab.steps(T, function (p) {
+      var c = calc(p);
+      return ['RMS-fasorer (divider amplituderne med √2): <span class="f">Ṽ = ' + fmt(p.Vm) + '/√2 ∠' + fmt(p.tv, 3) + '</span> = ' + Lab.fp(c.V, 'V', 4, true) + ' og <span class="f">Ĩ = ' + fmt(p.Im) + '/√2 ∠' + fmt(p.ti, 3) + '</span> = ' + Lab.fp(c.I, 'A', 4, true),
+        'Konjugér strømmen (vend fortegnet på vinklen): <span class="f">Ĩ* = ' + Lab.fp(Cx.conj(c.I), 'A', 4, true) + '</span>',
+        '<span class="f">S = Ṽ·Ĩ*</span>: gang længderne og læg vinklerne sammen = ' + Lab.fp(c.S, 'VA', 4, true) + ' = <span class="res">' + Lab.fc(c.S, 'VA', 4) + '</span>',
+        'Altså <span class="res">P = ' + fu(c.S.re, 'W', 4) + '</span> og <span class="res">Q = ' + fmt(c.S.im, 4) + ' VAR</span>. Uden RMS-omregningen ville man få det dobbelte.'];
+    });
+    T.ready();
+  })();
+
+  /* ---------- Eksempel 7.5 + øvelse 2: effekt i R og C over tid ---------- */
+  (function () {
+    var T = Lab.task({ tag: 'Eksempel', title: 'Eksempel 7.5 og øvelse 2: aktiv og reaktiv effekt med kilde-modstand (bogens 6.5)', short: 'Eks. 7.5',
+      text: 'Ṽ_S = 110∠0 V (RMS), R_S = 2 Ω, belastningen er R = 5 Ω i serie med C = 2000 µF, ω = 377 rad/s. Find S i belastningen. Grafen viser de momentane effekter, som du skal se i LTspice i øvelse 2.',
+      learn: 'modstandens effekt svinger mellem 0 og 2P og har middelværdien P. Kondensatorens effekt svinger mellem +|Q| og −|Q| og har middelværdien nul: energien sendes frem og tilbage. I LTspice skal kilden have amplituden 155,6 V, ikke 110 V.' });
+    Lab.slider(T, { key: 'V', label: 'Ṽ_S (RMS)', min: 10, max: 240, step: 1, value: 110, unit: 'V', noPrefix: true });
+    Lab.slider(T, { key: 'Rs', label: 'R_S', min: 0, max: 10, step: 0.1, value: 2, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'R', label: 'R', min: 0.5, max: 20, step: 0.1, value: 5, unit: 'Ω', noPrefix: true });
+    Lab.slider(T, { key: 'Cu', label: 'C', min: 100, max: 5000, step: 50, value: 2000, unit: 'µF', noPrefix: true });
+    var cv = Lab.canvas(T.stage, 0.5);
+    var out = Lab.readout(T, [{ key: 'Z', label: 'Z_o = R − j/(ωC)', color: C.gold }, { key: 'Vo', label: 'Ṽ_o', color: C.cyan }, { key: 'Io', label: 'Ĩ_o', color: C.red },
+      { key: 'S', label: 'S = Ṽ_o·Ĩ_o*', color: C.green }, { key: 'sp', label: 'LTspice SINE-kilde', color: C.purple }]);
+    var w = 377;
+    function calc(p) {
+      var Zo = Lab.C(p.R, -1 / (w * p.Cu * 1e-6)), Vs = Lab.C(p.V, 0), Vo = Cx.mul(Vs, Cx.div(Zo, Cx.add(Zo, Lab.C(p.Rs, 0)))), Io = Cx.div(Vo, Zo);
+      return { Zo: Zo, Vo: Vo, Io: Io, S: Cx.mul(Vo, Cx.conj(Io)) };
+    }
+    T.on(function (p) {
+      var c = calc(p), Tms = 2 * PI / w * 1000, Ia = Cx.abs(c.Io) * Math.SQRT2, ai = Cx.arg(c.Io), VC = Cx.mul(c.Io, Lab.C(0, c.Zo.im));
+      function i(t) { return Ia * Math.cos(w * t / 1000 + ai); }
+      function vc(t) { return Cx.abs(VC) * Math.SQRT2 * Math.cos(w * t / 1000 + Cx.arg(VC)); }
+      Lab.plot(cv, { x: [0, 2 * Tms], xlabel: 't [ms]', ylabel: 'p(t) [W]',
+        series: [{ fn: function (t) { return p.R * i(t) * i(t); }, color: C.green, label: 'p_R(t) i modstanden' }, { fn: function (t) { return vc(t) * i(t); }, color: C.purple, label: 'p_C(t) i kondensatoren' }],
+        hlines: [{ y: c.S.re, color: C.green, label: 'P = middelværdi' }] });
+      out({ Z: Lab.fc(c.Zo, 'Ω', 4) + ' = ' + Lab.fp(c.Zo, 'Ω', 4, true), Vo: Lab.fp(c.Vo, 'V', 4, true), Io: Lab.fp(c.Io, 'A', 4, true), S: Lab.fc(c.S, 'VA', 4),
+        sp: 'amplitude ' + fmt(p.V * Math.SQRT2, 4) + ' V, 60 Hz, Series Resistance ' + fmt(p.Rs) + ' Ω' });
+    });
+    Lab.check(T, [{ q: 'Den aktive effekt P i belastningen', unit: 'W', answer: function (p) { return calc(p).S.re; } }, { q: 'Den reaktive effekt Q i belastningen', unit: 'VAR', answer: function (p) { return calc(p).S.im; } }]);
+    Lab.steps(T, function (p) {
+      var c = calc(p);
+      return ['Belastningen: <span class="f">Z_o = R + 1/(jωC) = ' + fmt(p.R) + ' − j/(377 · ' + fmt(p.Cu) + '·10⁻⁶)</span> = ' + Lab.fc(c.Zo, 'Ω', 4) + ' = ' + Lab.fp(c.Zo, 'Ω', 4, true),
+        'Spændingsdeling: <span class="f">Ṽ_o = Z_o/(R_S + Z_o) · Ṽ_S</span> = ' + Lab.fp(c.Vo, 'V', 4, true),
+        'Strøm: <span class="f">Ĩ_o = Ṽ_o/Z_o</span> = ' + Lab.fp(c.Io, 'A', 4, true),
+        '<span class="f">S = Ṽ_o·Ĩ_o*</span> = <span class="res">' + Lab.fc(c.S, 'VA', 4) + '</span>. Q < 0, så belastningen er kapacitiv.',
+        'Kontrol: <span class="f">Ĩ²R = ' + fmt(Cx.abs(c.Io), 4) + '² · ' + fmt(p.R) + '</span> = ' + fu(Cx.abs(c.Io) * Cx.abs(c.Io) * p.R, 'W', 4) + ' ✓'];
+    });
+    T.ready();
+  })();
+
   /* ---------- Kompleks effekt og effekttrekant ---------- */
   (function () {
-    var T = Lab.task({ tag: 'Eksempel', title: 'Kompleks effekt og effekttrekant (bogens eksempel 6.7)', short: 'S = P + jQ',
+    var T = Lab.task({ tag: 'Eksempel', title: 'Eksempel 7.7 (øvelse 3): kompleks effekt og effekttrekant (bogens 6.7)', short: 'Eks. 7.7',
       text: 'R = 3 Ω, jX_L = j9 Ω og jX_C = −j5 Ω i serie på Ṽ = 60∠0 V (RMS). Find P, Q, |S| og effektfaktoren.',
       learn: 'spolen og kondensatoren har reaktiv effekt med modsat fortegn, og de trækkes fra hinanden. Gør X_C lige så stor som X_L: så forsvinder Q, og effektfaktoren bliver 1.' });
     Lab.slider(T, { key: 'V', label: 'Ṽ (RMS)', min: 10, max: 240, step: 5, value: 60, unit: 'V', noPrefix: true });
@@ -67,7 +168,7 @@
 
   /* ---------- Effektfaktorkorrektion ---------- */
   (function () {
-    var T = Lab.task({ tag: 'Øvelse', title: 'Effektfaktorkorrektion med en parallel kondensator', short: 'pf-korrektion',
+    var T = Lab.task({ tag: 'Øvelse', title: 'Supplement: effektfaktorkorrektion med en parallel kondensator', short: 'pf-korrektion',
       text: 'En enfaset motor optager P = 2,0 kW ved 230 V og 50 Hz med effektfaktor 0,80 haltende. Find den kondensator, der hæver effektfaktoren til 0,95, og se strømmen falde. (Bogens eksempel 6.10: 100 kW, pf 0,7 → 1, 480 V, 60 Hz kan indstilles med skyderne.)',
       learn: 'P er uændret, men Q og dermed |S| og strømmen bliver mindre. At gå helt til pf = 1 kræver en meget større kondensator for en lille ekstra gevinst.' });
     Lab.slider(T, { key: 'P', label: 'Aktiv effekt P', min: 500, max: 120000, log: true, value: 2000, unit: 'W' });
@@ -104,7 +205,7 @@
 
   /* ---------- PM-jævnstrømsmotor ---------- */
   (function () {
-    var T = Lab.task({ tag: 'Øvelse', title: 'PM-jævnstrømsmotoren: moment, hastighed og virkningsgrad', short: 'DC-motor',
+    var T = Lab.task({ tag: 'Øvelse', title: 'Supplement: PM-jævnstrømsmotoren, moment, hastighed og virkningsgrad', short: 'DC-motor',
       text: 'En PM-motor har V_s = 24 V, R_a = 0,5 Ω og motorkonstanten k = 0,1 V·s/rad. Find tomgangshastigheden, det stillestående moment og driftspunktet ved belastningsmomentet 1 N·m.',
       learn: 'kurven er en ret linje fra tomgangshastigheden til det stillestående moment. Mere belastning giver mere strøm, større spændingsfald i R_a og lavere hastighed. Højere spænding parallelforskyder linjen opad.' });
     Lab.slider(T, { key: 'V', label: 'Forsyningsspænding V_s', min: 6, max: 48, step: 1, value: 24, unit: 'V', noPrefix: true });
@@ -140,7 +241,7 @@
 /* ===== Eksempel: seriemotor (Rizzoni og Kearns 2022, eksempel 13.6) ===== */
 (function () {
   var fu = Lab.fu, fmt = Lab.fmt, C = Lab.COL, PI = Math.PI;
-  var T = Lab.task({ tag: 'Eksempel', title: 'Seriemotoren: moment vokser med strømmen i anden (bogens eksempel 13.6)', short: 'Seriemotor',
+  var T = Lab.task({ tag: 'Eksempel', title: 'Supplement: seriemotoren, moment vokser med strømmen i anden (bogens eksempel 13.6)', short: 'Seriemotor',
     text: 'En seriemotor på 10 hk (7460 W) og 115 V kører 1800 o/min ved fuld last og trækker da 40 A. Find momentet, når strømmen stiger til 60 A.',
     learn: 'i en seriemotor er fluxen proportional med strømmen, så momentet går med I². 50 % mere strøm giver 125 % mere moment; derfor bruges seriemotorer, hvor der kræves stort startmoment.' });
   Lab.slider(T, { key: 'P', label: 'Mærkeeffekt', min: 1, max: 20, step: 0.01, value: 7.46, unit: 'kW', noPrefix: true, sig: 4 });

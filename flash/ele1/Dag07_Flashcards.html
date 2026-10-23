@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="da"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Flashcards — Dag 7: Kompleks effekt, effektfaktorkorrektion & DC-motorer</title>
+<title>Flashcards — Dag 7: Elektriske maskiner, DC-motoren & kompleks effekt</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <style>
@@ -36,7 +36,7 @@
   .katex{color:#eaf2fb}
   .done{color:var(--good)}
 </style></head><body><div class="wrap">
-  <header><h1>🃏 Dag 7: Kompleks effekt, effektfaktorkorrektion & DC-motorer</h1><div class="sub">ELE1-A26 · Dag 7 · Flashcards</div></header>
+  <header><h1>🃏 Dag 7: Elektriske maskiner, DC-motoren & kompleks effekt</h1><div class="sub">ELE1-A26 · Dag 7 · Flashcards</div></header>
   <div class="modes">
     <button id="m-nf" onclick="setMode('nf')">Navn → Formel</button>
     <button id="m-fn" onclick="setMode('fn')">Formel → Navn</button>
@@ -58,7 +58,7 @@
   </div>
 </div>
 <script>
-const CARDS=[{"n": "Kompleks effekt", "f": "\\mathbf S=\\tilde{\\mathbf V}\\,\\tilde{\\mathbf I}^*=P+jQ", "note": "Konjugér strømmen"}, {"n": "Effekttrekant", "f": "|\\mathbf S|^2=P^2+Q^2", "note": "pf = P/|S|"}, {"n": "Reaktiv effekt", "f": "Q=P\\tan\\theta", "note": "Q > 0 induktiv, Q < 0 kapacitiv"}, {"n": "S via strøm og impedans", "f": "\\mathbf S=\\tilde I^2\\mathbf Z=\\tilde I^2R+j\\tilde I^2X", "note": "P i R, Q i X"}, {"n": "Effektfaktorkorrektion", "f": "C=\\frac{Q_1-Q_2}{\\omega\\tilde V^2}", "note": "Kondensator parallelt med lasten"}, {"n": "DC-motor: moment", "f": "T=k_T\\,\\phi\\,I_a", "note": "N·m"}, {"n": "DC-motor: modspænding", "f": "E_b=k_a\\,\\phi\\,\\omega_m", "note": "Nul ved stilstand"}, {"n": "Ankerkredsen", "f": "V_a=R_aI_a+E_b", "note": "KVL"}, {"n": "Effektbalance", "f": "E_bI_a=T\\,\\omega_m", "note": "Elektrisk → mekanisk"}, {"n": "Moment-hastighed", "f": "\\omega_m=\\frac{V_s}{k\\phi}-\\frac{R_a}{(k\\phi)^2}T", "note": "Ret linje"}, {"n": "Seriemotor", "f": "T=k_ak_S\\,I_a^2", "note": "Stort startmoment"}];
+const CARDS=[{"n": "Kompleks effekt", "f": "\\mathbf S=\\tilde{\\mathbf V}\\,\\tilde{\\mathbf I}^*=P+jQ", "note": "Konjugér strømmen"}, {"n": "Effekttrekant", "f": "|\\mathbf S|^2=P^2+Q^2", "note": "pf = P/|S|"}, {"n": "Reaktiv effekt", "f": "Q=P\\tan\\theta", "note": "Q > 0 induktiv, Q < 0 kapacitiv"}, {"n": "S via strøm og impedans", "f": "\\mathbf S=\\tilde I^2\\mathbf Z=\\tilde I^2R+j\\tilde I^2X", "note": "P i R, Q i X"}, {"n": "Effektfaktorkorrektion", "f": "C=\\frac{Q_1-Q_2}{\\omega\\tilde V^2}", "note": "Kondensator parallelt med lasten"}, {"n": "Kraft på leder", "f": "F=B\\,I\\,L", "note": "Flemings venstrehåndsregel"}, {"n": "Ankermoment", "f": "T_a=\frac{P\\,\\Phi\\,Z\\,I_a}{2\\pi A}", "note": "P poler, Z ledere, A parallelle veje"}, {"n": "Flemings håndregler", "f": "\text{venstre: motor}\\quad\text{højre: generator}", "note": "Tommel = kraft/bevægelse, pege = felt, lang = strøm/emf"}, {"n": "Momentan effekt i Z = R + jX", "f": "p=\tilde I^2R(1+\\cos2\\omega t)+\tilde I^2X\\sin2\\omega t", "note": "Spændingen som reference"}, {"n": "Middeleffekt", "f": "P_{av}=\tilde I^2R", "note": "Reaktansens led har middelværdi 0"}, {"n": "DC-motor: moment", "f": "T=k_T\\,\\phi\\,I_a", "note": "N·m"}, {"n": "DC-motor: modspænding", "f": "E_b=k_a\\,\\phi\\,\\omega_m", "note": "Nul ved stilstand"}, {"n": "Ankerkredsen", "f": "V_a=R_aI_a+E_b", "note": "KVL"}, {"n": "Effektbalance", "f": "E_bI_a=T\\,\\omega_m", "note": "Elektrisk → mekanisk"}, {"n": "Moment-hastighed", "f": "\\omega_m=\\frac{V_s}{k\\phi}-\\frac{R_a}{(k\\phi)^2}T", "note": "Ret linje"}, {"n": "Seriemotor", "f": "T=k_ak_S\\,I_a^2", "note": "Stort startmoment"}];
 let mode='nf', order=[], dir=[], i=0, flipped=false;
 const $=id=>document.getElementById(id);
 function fmt(l){ try{ if(typeof katex!=='undefined') return katex.renderToString(l,{throwOnError:false,displayMode:true}); }catch(e){} return '<code>'+l+'</code>'; }
