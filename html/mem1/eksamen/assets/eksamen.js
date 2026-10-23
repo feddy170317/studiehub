@@ -209,11 +209,11 @@ var Eks = (function () {
     var h = '<section id="spm">' + secHead('&#128196;', 'Spørgsmålet, som det står i PDF&apos;en');
     h += '<div class="qbox"><div class="qh">Spørgsmål ' + d.nr + ': ' + esc(d.titel) +
          '  &middot;  Kilde: Kapitel ' + d.kapitel + ', ' + esc(d.kapitelNavn) + '</div>';
-    h += '<div class="qp"><span class="tag">(a)</span><b>Teori og udledning:</b> ' + rich(d.spmA) + '</div>';
+    h += '<div class="qp"><span class="tag">(a)</span><b>Teori &amp; forklaring:</b> ' + rich(d.spmA) + '</div>';
     h += '<div class="qp"><span class="tag">(b)</span><b>Designopgave:</b> ' + rich(d.spmB) + '</div></div>';
     if (d.bog) h += '<div class="note"><b>&#128214; Find det i bogen</b> (Hamrock, Schmid &amp; Jacobson, <i>Fundamentals of Machine Elements</i>, 3. udg., trykte sidetal): ' + rich(d.bog) + '</div>';
-    var pdfu = url('pdf/Svarvejledning_' + (d.nr < 10 ? '0' : '') + d.nr + '.pdf');
-    h += '<div class="note gr"><b>&#128196; Svarvejledning som PDF:</b> <a style="color:var(--cy)" href="' + pdfu + '">Svarvejledning_' + (d.nr < 10 ? '0' : '') + d.nr + '.pdf</a> &mdash; samme gennemgang i eksamens-layout, til print og noter.</div>';
+    var pdfn = d.pdf || ('pdf/Svarvejledning_' + (d.nr < 10 ? '0' : '') + d.nr + '.pdf'), pdfu = url(pdfn);
+    h += '<div class="note gr"><b>&#128196; Svarvejledning som PDF:</b> <a style="color:var(--cy)" href="' + pdfu + '">' + pdfn.split('/').pop() + '</a> &mdash; samme gennemgang i eksamens-layout, til print og noter.</div>';
     h += '</section>';
     return h;
   }
@@ -414,7 +414,7 @@ var Eks = (function () {
     var nav = '<div class="topbar"><a href="' + url('index.html') + '">&#8592; Alle 16 spørgsmål</a>' +
       (d.prev ? '<a href="' + url(d.prev) + '">&#8249; Forrige</a>' : '') +
       (d.next ? '<a href="' + url(d.next) + '">Næste &#8250;</a>' : '') +
-      '<span class="sp"></span><span class="now">Spm ' + d.nr + '/16 &middot; Kap. ' + d.kapitel + '</span></div>';
+      '<span class="sp"></span><span class="now">' + (d.udgaaet ? 'Udgået (ikke pensum)' : 'Spm ' + d.nr + '/15') + ' &middot; Kap. ' + d.kapitel + '</span></div>';
 
     var hero = '<header class="hero"><div class="nr">MUNDTLIG EKSAMEN &middot; SPØRGSMÅL ' + d.nr + '</div>' +
       '<h1>' + esc(d.titel) + '</h1><div class="kap">Kapitel ' + d.kapitel + ' &middot; ' + esc(d.kapitelNavn) + '</div></header>';
