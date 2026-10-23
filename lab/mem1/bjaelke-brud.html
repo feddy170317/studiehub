@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bjælke til brud · 3D-lab</title>
+<meta name="description" content="Udkraget bjælke med endelast: skru op for lasten og se bøjningsspænding, flydning, plastisk zone, blivende deformation og brud — med live spændings-tøjnings-kurve.">
+<link rel="stylesheet" href="../assets/lab.css">
+</head>
+<body>
+<header class="lab-top">
+  <a class="back" href="../index.html">← 3D-lab</a>
+  <span class="chip">MEM1 · kap. 2–5</span>
+  <h1>Bjælke belastet til brud</h1>
+  <span class="src">Hamrock: σ = Mc/I, τ = VQ/(Ib) (slides kap. 4) · σ–ε-kurve (slides kap. 3) · eksamensspm. 2, 3 og 4</span>
+</header>
+
+<main class="lab-main">
+  <section class="lab-stage" id="stage">
+    <div class="lab-hud">
+      <div class="lab-status" id="status">Elastisk</div>
+      <div class="lab-note" id="scaleNote"></div>
+    </div>
+    <div class="lab-legend">
+      <div>Bøjningsspænding σ / S<sub>y</sub></div>
+      <div class="bar" style="background:linear-gradient(90deg,#5ec8ff,#7d8fa3,#ff5e5e)"></div>
+      <div class="ends"><span>−1 (tryk)</span><span>0</span><span>+1 (træk)</span></div>
+      <div class="key" style="margin-top:.35rem"><span class="sw" style="background:linear-gradient(90deg,#ffa500,#fff2a8)"></span>har flydt (blivende tøjning)</div>
+    </div>
+    <div class="lab-hint">Træk = drej · hjul/knib = zoom · højreklik/shift = panorér · dobbeltklik = nulstil visning</div>
+  </section>
+
+  <aside class="lab-side">
+    <div class="card" id="loadCard"><h2>Last</h2></div>
+    <div class="card" id="geoCard"><h2>Bjælke og materiale</h2></div>
+    <div class="card" id="viewCard"><h2>Visning og eksempler</h2></div>
+    <div class="card" id="roCard"><h2>Aflæsning</h2></div>
+  </aside>
+</main>
+
+<section class="lab-graphs">
+  <div class="graph"><h3>Spændings-tøjnings-kurve <span>yderfiber ved indspændingen</span></h3><canvas id="gSE"></canvas>
+    <label class="chk" style="margin:.35rem 0 0"><input type="checkbox" id="chkAll"> vis hele kurven</label>
+    <label class="chk" style="margin:0"><input type="checkbox" id="chkArea"> vis resiliens og sejhed (arealer)</label>
+  </div>
+  <div class="graph"><h3>Momentkurve M(x) <span>udkraget bjælke, endelast</span></h3><canvas id="gM"></canvas></div>
+  <div class="graph"><h3>Tværsnit ved indspændingen <span>σ(y) og τ(y)</span></h3>
+    <div style="display:flex;gap:6px"><canvas id="gS" style="flex:1.4;min-width:0;width:0"></canvas><canvas id="gT" style="flex:1;min-width:0;width:0"></canvas></div>
+  </div>
+</section>
+
+<section class="lab-text">
+  <div class="card">
+    <h2>Formler med dine tal</h2>
+    <div id="formulas"></div>
+  </div>
+  <div class="card">
+    <h2>Hvad skal du lægge mærke til?</h2>
+    <ul>
+      <li><b>Elastisk:</b> σ vokser lineært over tværsnittet (σ = My/I), og bjælken går helt tilbage, når du fjerner lasten.</li>
+      <li><b>Første flydning</b> sker i yderfibrene ved indspændingen, hvor M er størst. Den guldfarvede zone breder sig derfra mod neutralaksen og ud langs bjælken.</li>
+      <li><b>Efter flydning</b> passer σ = Mc/I ikke længere. Sammenlign den stiplede lineære fordeling med den rigtige i tværsnitsgrafen.</li>
+      <li><b>Skru lasten ned igen</b> efter flydning: kurven går ned ad en ret linje med hældning E, og bjælken får en blivende udbøjning. Tværsnittet får restspændinger.</li>
+      <li><b>τ<sub>maks</sub></b> ligger i neutralaksen, hvor σ = 0. Det er derfor, eksamensspm. 3 tjekker σ og τ hvert sit sted.</li>
+    </ul>
+    <h2 style="margin-top:.8rem">Model og antagelser</h2>
+    <ul>
+      <li>Euler-Bernoulli-bjælke (plane snit forbliver plane), rektangulært tværsnit, ligevægt i udeformeret geometri.</li>
+      <li>E fra Hamrock tabel 3.1. S<sub>y</sub>, S<sub>u</sub> og brudforlængelse fra Hamrock appendix A. <span class="est">ESTIMAT:</span> kurveformen mellem punkterne (hærdning til S<sub>u</sub> ved 65 % af brudforlængelsen og derefter indsnøring) er en glat model, ikke målt.</li>
+      <li>Yderfiberen antages at følge trækprøvens kurve. Brud markeres, når den når brudforlængelsen, eller når tværsnittet ikke kan bære mere moment. En rigtig sej stålbjælke folder sig typisk sammen i et plastisk hængsel, før den revner.</li>
+      <li>Støbejern er modelleret lineært til brud i træk (S<sub>ut</sub> = 214 MPa). Det er langt stærkere i tryk (752 MPa).</li>
+      <li>Aflastning sker elastisk med hældning E. Omvendt flydning ved aflastning er ignoreret.</li>
+    </ul>
+  </div>
+</section>
+
+<script src="../assets/three.min.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+'use strict';
+var F = Lab.fmt, MPa = 1e6;
+
+/* ---------- materialer (Hamrock) ---------- */
+var MAT = {
+  s1020: { label: 'AISI 1020 varmvalset', E: 196e9, Sy: 205e6, Su: 380e6, ef: 0.25, src: 'appendix A.2, tabel 3.1' },
+  s1040: { label: 'AISI 1040 varmvalset', E: 196e9, Sy: 290e6, Su: 525e6, ef: 0.18, src: 'appendix A.2, tabel 3.1' },
+  s4340: { label: 'AISI 4340 Q&T 540 °C', E: 200e9, Sy: 1080e6, Su: 1170e6, ef: 0.13, src: 'appendix A.1, tabel 3.1' },
+  al6061: { label: 'Aluminium 6061-T6', E: 70e9, Sy: 275e6, Su: 310e6, ef: 0.15, src: 'appendix A.5, tabel 3.1' },
+  gj30: { label: 'Gråt støbejern ASTM 30 (sprødt)', E: 109e9, Su: 214e6, Suc: 752e6, brittle: true, src: 'appendix A.3, tabel 3.1' }
+};
+function prep(m) {
+  m.ey = m.brittle ? m.Su / m.E : m.Sy / m.E;
+  if (m.brittle) { m.Sy = m.Su; m.ef = m.ey; m.eu = m.ey; }
+  else m.eu = 0.65 * m.ef;
+  return m;
+}
+for (var k in MAT) prep(MAT[k]);
+
+function sigma(m, e) { // spænding [Pa] ved tøjning e (symmetrisk, sprødt: lineært)
+  var s = e < 0 ? -1 : 1, a = Math.abs(e);
+  if (m.brittle) return m.E * e;
+  if (a <= m.ey) return m.E * e;
+  if (a <= m.eu) { var t = (a - m.ey) / (m.eu - m.ey); return s * (m.Sy + (m.Su - m.Sy) * (1 - Math.pow(1 - t, 3))); }
+  if (a <= m.ef) { var u = (a - m.eu) / (m.ef - m.eu); return s * m.Su * (1 - 0.2 * u * u); }
+  return s * m.Su * 0.8;
+}
+
+/* ---------- tilstand ---------- */
+var S = { mat: MAT.s1020, L: 1.0, b: 0.020, h: 0.040, P: 0 };
+var NS = 120;              // stationer langs bjælken
+var Mhist = new Float64Array(NS + 1), kap = new Float64Array(NS + 1);
+var tab = null;            // M-κ-tabel
+var broken = null, hist = [];
+
+function section() {
+  var b = S.b, h = S.h, c = h / 2, I = b * h * h * h / 12;
+  return { b: b, h: h, c: c, I: I, A: b * h, EI: S.mat.E * I };
+}
+function buildTable() {
+  var m = S.mat, sec = section(), N = 520, kf = m.ef / sec.c;
+  var K = new Float64Array(N + 1), M = new Float64Array(N + 1), Me = new Float64Array(N + 1);
+  var n = 160, dy = sec.c / n;
+  for (var i = 0; i <= N; i++) {
+    var kk = kf * Math.pow(i / N, 2.4), sum = 0;
+    for (var j = 0; j <= n; j++) { var y = j * dy, w = (j === 0 || j === n) ? 1 : (j % 2 ? 4 : 2); sum += w * sigma(m, kk * y) * y; }
+    K[i] = kk; M[i] = 2 * sec.b * sum * dy / 3; Me[i] = i ? Math.max(Me[i - 1], M[i]) : 0;
+  }
+  var My = m.Sy * sec.I / sec.c, Mp = m.Sy * sec.b * sec.h * sec.h / 4;
+  tab = { K: K, M: M, Me: Me, N: N, Mcap: Me[N], My: My, Mp: m.brittle ? My : Mp, sec: sec };
+}
+function kappaOf(M) { // krumning på belastningskurven for moment M (−1 = brud)
+  var Me = tab.Me, N = tab.N;
+  if (M <= 0) return 0;
+  if (M > tab.Mcap) return -1;
+  var lo = 0, hi = N;
+  while (hi - lo > 1) { var mid = (lo + hi) >> 1; if (Me[mid] >= M) hi = mid; else lo = mid; }
+  var t = (M - Me[lo]) / Math.max(Me[hi] - Me[lo], 1e-12);
+  return tab.K[lo] + t * (tab.K[hi] - tab.K[lo]);
+}
+function fiber(i, y) { // [ε, σ] i fiber y ved station i (inkl. aflastning)
+  var m = S.mat, kmax = kappaOf(Mhist[i]), kc = kap[i];
+  if (kc >= kmax - 1e-12) return [kc * y, sigma(m, kc * y)];
+  return [kc * y, sigma(m, kmax * y) - m.E * (kmax - kc) * y];
+}
+function maxFiberStrain(i, y) { return kappaOf(Mhist[i]) * Math.abs(y); }
+
+function solve() { // returnerer false hvis bjælken brækker
+  var L = S.L, EI = tab.sec.EI;
+  for (var i = 0; i <= NS; i++) {
+    var x = i / NS * L, M = S.P * (L - x);
+    if (M > Mhist[i]) {
+      if (kappaOf(M) < 0) return false;
+      Mhist[i] = M;
+    }
+    var kmax = kappaOf(Mhist[i]);
+    kap[i] = Math.max(0, kmax - (Mhist[i] - M) / EI);
+  }
+  return true;
+}
+
+/* ---------- 3D ---------- */
+var stage = document.getElementById('stage');
+var lab = Lab.scene(stage, { view: { theta: 0.55, phi: 1.2, radius: 2 } });
+var T3 = THREE;
+var beamGeo = new T3.BoxGeometry(1, 1, 1, NS, 16, 4);
+var base = beamGeo.attributes.position.array.slice();
+beamGeo.setAttribute('color', new T3.BufferAttribute(new Float32Array(base.length), 3));
+var beamMat = new T3.MeshStandardMaterial({ vertexColors: true, roughness: 0.5, metalness: 0.18 });
+var beam = new T3.Mesh(beamGeo, beamMat);
+var piece = new T3.Group(); piece.add(beam); lab.scene.add(piece);
+var wall = new T3.Mesh(new T3.BoxGeometry(1, 1, 1), new T3.MeshStandardMaterial({ color: 0x34495e, roughness: 0.9 }));
+lab.scene.add(wall);
+var stub = new T3.Mesh(new T3.BoxGeometry(1, 1, 1), new T3.MeshStandardMaterial({ color: 0xffb02e, roughness: 0.6, metalness: 0.2 }));
+stub.visible = false; lab.scene.add(stub);
+var floor = new T3.Mesh(new T3.PlaneGeometry(1, 1), new T3.MeshStandardMaterial({ color: 0x0f2438, roughness: 1 }));
+floor.rotation.x = -Math.PI / 2; lab.scene.add(floor);
+var grid = null;
+var arrow = Lab.arrow(0xffa500); lab.scene.add(arrow);
+var tagP = Lab.tag(lab, '', '#ffa500');
+var tagWall = Lab.tag(lab, 'indspænding', '#8fa3b8');
+var sparks = null;
+
+var view = { k: 1, mode: 'auto' }, refS = 1, floorY = -0.5;
+function layout() {
+  var L = S.L, sec = tab.sec;
+  refS = Math.max(L, 3 * sec.h);
+  var wt = 0.06 * refS, wd = Math.max(4 * sec.b, 0.32 * refS), top = Math.max(3 * sec.h, 0.22 * refS);
+  floorY = -1.0 * refS;
+  wall.scale.set(wt, top - floorY, wd); wall.position.set(-wt / 2, (top + floorY) / 2, 0); // væggen står på gulvet
+  floor.scale.set(4 * refS, 3 * refS, 1); floor.position.set(L / 2, floorY, 0);
+  if (grid) lab.scene.remove(grid);
+  grid = new T3.GridHelper(4 * refS, 20, 0x2a4560, 0x1a3248); grid.position.set(L / 2, floorY + 1e-4 * refS, 0); lab.scene.add(grid);
+  arrow.scale.setScalar(refS);
+  lab.setView({ target: new T3.Vector3(L * 0.45, -0.3 * refS, 0), radius: 2.2 * refS, theta: 0.5, phi: 1.25 }, true);
+  // visningsforstørrelse: udbøjningen ved første flydning vises som ca. 8 % af L
+  var dy = tab.My * L * L / (3 * sec.EI);
+  view.kAuto = Lab.clamp(0.08 * L / Math.max(dy, 1e-9), 1, 400);
+}
+
+var cl = { X: new Float64Array(NS + 1), Y: new Float64Array(NS + 1), th: new Float64Array(NS + 1) };
+var trueTip = 0, compressed = false;
+function shape() {
+  var L = S.L, ds = L / NS, k = view.mode === 'true' ? 1 : view.kAuto, soft = 1.2, th = 0, thT = 0, X = 0, Y = 0, YT = 0;
+  view.k = k; compressed = false;
+  cl.X[0] = 0; cl.Y[0] = 0; cl.th[0] = 0;
+  for (var i = 1; i <= NS; i++) {
+    var kk = 0.5 * (kap[i] + kap[i - 1]);
+    var thTn = thT - kk * ds;
+    YT += ds * Math.sin(0.5 * (thT + thTn)); thT = thTn;
+    var raw = k * thTn, thn = -soft * Math.tanh(-raw / soft);
+    if (Math.abs(raw) > 0.6) compressed = true;
+    X += ds * Math.cos(0.5 * (th + thn)); Y += ds * Math.sin(0.5 * (th + thn)); th = thn;
+    cl.X[i] = X; cl.Y[i] = Y; cl.th[i] = th;
+  }
+  trueTip = -YT;
+}
+
+var cGrey = new T3.Color(0x7d8fa3), cBlue = new T3.Color(0x5ec8ff), cRed = new T3.Color(0xff5e5e), cGold = new T3.Color(0xffa500), cPale = new T3.Color(0xfff2a8), tmp = new T3.Color();
+function paint() {
+  var pos = beamGeo.attributes.position.array, col = beamGeo.attributes.color.array, sec = tab.sec, m = S.mat;
+  for (var v = 0; v < pos.length; v += 3) {
+    var u = base[v] + 0.5, y0 = base[v + 1] * sec.h, z0 = base[v + 2] * sec.b;
+    var f = u * NS, i = Math.min(NS - 1, Math.floor(f)), t = f - i;
+    var X = cl.X[i] + t * (cl.X[i + 1] - cl.X[i]), Y = cl.Y[i] + t * (cl.Y[i + 1] - cl.Y[i]), th = cl.th[i] + t * (cl.th[i + 1] - cl.th[i]);
+    pos[v] = X - y0 * Math.sin(th); pos[v + 1] = Y + y0 * Math.cos(th); pos[v + 2] = z0;
+    var ii = t < 0.5 ? i : i + 1, fs = fiber(ii, y0), emax = maxFiberStrain(ii, y0);
+    if (!m.brittle && emax > m.ey * 1.0005) {
+      tmp.copy(cGold).lerp(cPale, Lab.clamp((emax - m.ey) / (m.ef - m.ey), 0, 1) * 1.6);
+    } else {
+      var s = Lab.clamp(fs[1] / m.Sy, -1, 1);
+      tmp.copy(cGrey).lerp(s < 0 ? cBlue : cRed, Math.abs(s));
+    }
+    col[v] = tmp.r; col[v + 1] = tmp.g; col[v + 2] = tmp.b;
+  }
+  beamGeo.attributes.position.needsUpdate = true; beamGeo.attributes.color.needsUpdate = true;
+  beamGeo.computeVertexNormals(); beamGeo.computeBoundingSphere();
+}
+
+/* ---------- brud ---------- */
+function breakBeam() {
+  var sec = tab.sec;
+  broken = { t: 0, P: S.P, rest: false };
+  // stykket fjedrer elastisk tilbage og beholder kun den plastiske (blivende) krumning
+  for (var i = 0; i <= NS; i++) kap[i] = kres(i);
+  shape(); paint(); beamGeo.computeBoundingBox();
+  // slutstilling: korden fra revne til spids vandret, liggende på gulvet
+  var a = Math.atan2(cl.Y[NS], cl.X[NS]);
+  piece.position.set(0, 0, 0); piece.rotation.set(0, 0, -a); piece.updateMatrixWorld(true);
+  var box = new T3.Box3().setFromObject(beam);
+  broken.r1 = -a; broken.p1 = new T3.Vector3(0.1 * S.L, floorY - box.min.y, 0);
+  piece.rotation.set(0, 0, 0); piece.updateMatrixWorld(true);
+  stub.visible = true; stub.scale.set(Math.min(0.02 * S.L, sec.h * 0.6), sec.h, sec.b); stub.position.set(stub.scale.x / 2, 0, 0);
+  beam.position.x = 0;
+  // gnister ved revnen
+  var n = 70, g = new T3.BufferGeometry(), p = new Float32Array(n * 3), vel = [];
+  for (var i = 0; i < n; i++) { p[i * 3] = 0.01 * refS; p[i * 3 + 1] = sec.h / 2; p[i * 3 + 2] = 0; vel.push(new T3.Vector3((Math.random() * 0.8 + 0.2) * refS, (Math.random() * 1.2 + 0.2) * refS, (Math.random() - 0.5) * 0.8 * refS)); }
+  g.setAttribute('position', new T3.BufferAttribute(p, 3));
+  sparks = new T3.Points(g, new T3.PointsMaterial({ color: 0xffd27a, size: 0.012 * refS, transparent: true, opacity: 1, depthWrite: false, blending: T3.AdditiveBlending }));
+  sparks.vel = vel; sparks.age = 0; lab.scene.add(sparks);
+  pSlider.el.disabled = true; pSlider.set(broken.P / 1000, true);
+  statusEl.textContent = 'BRUD'; statusEl.className = 'lab-status bad';
+}
+var gAcc = 9.81;
+function stepBreak(dt) {
+  if (!broken || broken.rest) return;
+  var b = broken, T = 0.95; b.t += dt;
+  var u = Math.min(b.t / T, 1), sm = u * u * (3 - 2 * u);
+  piece.rotation.z = b.r1 * sm;
+  piece.position.x = b.p1.x * sm;
+  piece.position.y = b.p1.y * u * u; // falder med tiltagende fart
+  if (b.t > T) { // lille hop ved landing
+    var v = (b.t - T) / 0.25;
+    piece.position.y = b.p1.y + (v < 1 ? 0.025 * refS * Math.sin(Math.PI * v) : 0);
+    if (v >= 1) b.rest = true;
+  }
+}
+function stepSparks(dt) {
+  if (!sparks) return;
+  sparks.age += dt; var p = sparks.geometry.attributes.position.array;
+  for (var i = 0; i < sparks.vel.length; i++) { var v = sparks.vel[i]; v.y -= gAcc * refS * dt * 0.4; p[i * 3] += v.x * dt; p[i * 3 + 1] += v.y * dt; p[i * 3 + 2] += v.z * dt; }
+  sparks.geometry.attributes.position.needsUpdate = true; sparks.material.opacity = Math.max(0, 1 - sparks.age / 1.1);
+  if (sparks.age > 1.2) { lab.scene.remove(sparks); sparks.geometry.dispose(); sparks = null; }
+}
+
+/* ---------- kontroller ---------- */
+var loadCard = document.getElementById('loadCard'), geoCard = document.getElementById('geoCard'), viewCard = document.getElementById('viewCard');
+var statusEl = document.getElementById('status'), scaleNote = document.getElementById('scaleNote');
+var pSlider = Lab.slider(loadCard, { label: 'Endelast <i>P</i>', min: 0, max: 1, step: 0.001, value: 0, unit: 'kN', fmt: function (x) { return F(x, x < 1 ? 3 : x < 10 ? 2 : 1); },
+  onInput: function (v) { S.P = v * 1000; update(); } });
+var btnRow = document.createElement('div'); btnRow.className = 'btns'; loadCard.appendChild(btnRow);
+Lab.button(btnRow, 'Fjern lasten', '', function () { if (!broken) pSlider.set(0); });
+Lab.button(btnRow, '↺ Ny bjælke', 'primary', function () { reset(true); });
+
+var matSel = Lab.select(geoCard, { label: 'Materiale', options: Object.keys(MAT).map(function (k) { return { value: k, label: MAT[k].label }; }), value: 's1020', onChange: function (v) { S.mat = MAT[v]; reset(true); } });
+var matSub = document.createElement('div'); matSub.className = 'ctl'; matSub.innerHTML = '<div class="sub" id="matInfo"></div>'; geoCard.appendChild(matSub);
+var Ls = Lab.slider(geoCard, { label: 'Længde <i>L</i>', min: 0.04, max: 2, step: 0.005, value: 1, unit: 'm', fmt: function (x) { return F(x, 3); }, onInput: function (v) { S.L = v; reset(true); } });
+var bs = Lab.slider(geoCard, { label: 'Bredde <i>b</i>', min: 5, max: 60, step: 1, value: 20, unit: 'mm', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.b = v / 1000; reset(true); } });
+var hs = Lab.slider(geoCard, { label: 'Højde <i>h</i>', min: 5, max: 80, step: 1, value: 40, unit: 'mm', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.h = v / 1000; reset(true); } });
+
+var scaleSeg = Lab.seg(viewCard, { label: 'Udbøjning vist', value: 'auto', options: [{ value: 'auto', label: 'Forstørret' }, { value: 'true', label: 'Sand skala' }], onChange: function (v) { view.mode = v; update(); } });
+var pr = document.createElement('div'); pr.className = 'btns'; viewCard.appendChild(pr);
+Lab.button(pr, '<b>Eksamensspm. 3:</b> b = 10 mm, h = 30 mm, V = 10 kN, M = 450 N·m', 'preset', function () {
+  preset('s1040', 0.045, 10, 30, 10);
+});
+Lab.button(pr, '<b>Sejt vs. sprødt:</b> samme bjælke i støbejern', 'preset', function () { preset('gj30', 1, 20, 40, 0); });
+Lab.button(pr, '<b>Standard:</b> stål, 1 m, 20 × 40 mm', 'preset', function () { preset('s1020', 1, 20, 40, 0); });
+
+function preset(mk, L, b, h, PkN) {
+  S.mat = MAT[mk]; S.L = L; S.b = b / 1000; S.h = h / 1000;
+  matSel.set(mk, true); Ls.set(L, true); bs.set(b, true); hs.set(h, true);
+  reset(true); pSlider.set(PkN);
+}
+
+var ro = Lab.readouts(document.getElementById('roCard'), [
+  ['M', 'Moment ved indspænding <i>M</i> = <i>PL</i>'],
+  ['sel', 'σ<sub>maks</sub> = <i>Mc/I</i> (elastisk formel)'],
+  ['smod', 'σ i yderfiber (model)'],
+  ['tau', 'τ<sub>maks</sub> = 3<i>V</i>/(2<i>A</i>)'],
+  ['ny', 'Sikkerhed mod flydning <i>n</i><sub>y</sub>'],
+  '-',
+  ['del', 'δ = <i>PL</i>³/(3<i>EI</i>) (elastisk)'],
+  ['dmod', 'δ<sub>spids</sub> (model)'],
+  ['perm', 'Blivende udbøjning'],
+  '-',
+  ['Py', '<i>P</i> ved første flydning'],
+  ['Pb', '<i>P</i> ved brud'],
+  ['zone', 'Plastisk zone fra væggen']
+]);
+
+/* ---------- grafer ---------- */
+var gSE = Lab.plot(document.getElementById('gSE')), gM = Lab.plot(document.getElementById('gM')), gS = Lab.plot(document.getElementById('gS')), gT = Lab.plot(document.getElementById('gT'));
+var chkAll = document.getElementById('chkAll'), chkArea = document.getElementById('chkArea');
+chkAll.onchange = chkArea.onchange = function () { dirty = true; };
+var seX = 1, dirty = true;
+
+function curvePts(m, emax) {
+  var pts = [], N = 220;
+  for (var i = 0; i <= N; i++) { var e = emax * i / N; if (e > m.ef) break; pts.push([e * 100, sigma(m, e) / MPa]); }
+  return pts;
+}
+function drawGraphs(dt) {
+  var m = S.mat, sec = tab.sec;
+  // 1) σ–ε
+  var top = fiber(0, sec.c), emaxH = maxFiberStrain(0, sec.c);
+  var target = chkAll.checked ? m.ef * 1.08 : Lab.clamp(Math.max(6 * m.ey, 1.6 * emaxH, 1.6 * Math.abs(top[0])), 0, m.ef * 1.08);
+  if (broken) target = m.ef * 1.08;
+  seX += (target - seX) * Math.min(1, (dt || 0.016) * 5); if (Math.abs(seX - target) / target > 0.002) dirty = true;
+  var ymax = (m.brittle ? m.Su : m.Su) / MPa * 1.15;
+  gSE.begin({ xmin: 0, xmax: seX * 100, ymin: 0, ymax: ymax, xlabel: 'ε [%]', ylabel: 'σ [MPa]', fx: function (x) { return F(x, seX * 100 < 1 ? 2 : seX * 100 < 5 ? 1 : 0); } });
+  var cp = curvePts(m, Math.min(seX, m.ef));
+  if (chkArea.checked) {
+    var tough = cp.concat([[cp[cp.length - 1][0], 0]]); gSE.fill([[0, 0]].concat(tough), 'rgba(255,165,0,.13)');
+    gSE.fill([[0, 0], [m.ey * 100, m.Sy / MPa], [m.ey * 100, 0]], 'rgba(94,200,255,.35)');
+    var ur = m.Sy * m.Sy / (2 * m.E), ut = 0, N = 400;
+    for (var i = 0; i < N; i++) { var e1 = m.ef * i / N, e2 = m.ef * (i + 1) / N; ut += 0.5 * (sigma(m, e1) + sigma(m, e2)) * (e2 - e1); }
+    gSE.text(seX * 100 * 0.97, ymax * 0.12, 'u_r = S_y²/2E = ' + F(ur / 1e3, 0) + ' kJ/m³   sejhed ≈ ' + F(ut / 1e6, 0) + ' MJ/m³', '#cfe6ff', 'right');
+  }
+  gSE.line(cp, '#5ec8ff', 2.2);
+  if (!m.brittle) gSE.hline(m.Sy / MPa, 'rgba(255,94,94,.8)', 'S_y = ' + F(m.Sy / MPa, 0));
+  gSE.hline(m.Su / MPa, 'rgba(217,132,255,.8)', (m.brittle ? 'S_ut = ' : 'S_u = ') + F(m.Su / MPa, 0));
+  if (m.ef <= seX) gSE.vline(m.ef * 100, 'rgba(255,94,94,.7)', 'brud ' + F(m.ef * 100, m.brittle ? 2 : 0) + ' %');
+  if (hist.length > 1) gSE.line(hist, 'rgba(255,242,168,.9)', 1.6);
+  if (!broken) gSE.dot(top[0] * 100, top[1] / MPa, '#ffa500', 5.5);
+  else gSE.dot(m.ef * 100, sigma(m, m.ef * 0.999) / MPa, '#ff5e5e', 6);
+  gSE.end();
+
+  // 2) M(x)
+  var Mmax = Math.max(tab.Mcap, S.P * S.L) * 1.12, L = S.L;
+  gM.begin({ xmin: 0, xmax: L, ymin: 0, ymax: Mmax, xlabel: 'x [m]', ylabel: 'M [N·m]', fx: function (x) { return F(x, L < 0.2 ? 3 : 2); } });
+  var M0 = broken ? broken.P * L : S.P * L;
+  if (M0 > tab.My && !m.brittle) { var xz = L * (1 - tab.My / M0); gM.fill([[0, 0], [0, M0], [xz, tab.My], [xz, 0]], 'rgba(255,165,0,.22)'); }
+  gM.line([[0, M0], [L, 0]], '#ffa500', 2.4);
+  gM.hline(tab.My, 'rgba(255,94,94,.85)', (m.brittle ? 'M ved brud' : 'M_y første flydning') + ' = ' + F(tab.My, 0));
+  if (!m.brittle) gM.hline(tab.Mcap, 'rgba(217,132,255,.85)', 'M ved brud = ' + F(tab.Mcap, 0));
+  gM.end();
+
+  // 3) tværsnit σ(y), τ(y)
+  var c = sec.c * 1000, smax = Math.max(m.Su, Math.abs(S.P * S.L * sec.c / sec.I)) / MPa * 1.05;
+  gS.begin({ xmin: -smax, xmax: smax, ymin: -c * 1.1, ymax: c * 1.1, xlabel: 'σ [MPa]', ylabel: 'y [mm]', fx: function (x) { return F(x, 0); }, fy: function (y) { return F(y, c < 10 ? 1 : 0); } });
+  if (!broken) {
+    var pts = [], n = 60;
+    for (var j = -n; j <= n; j++) { var y = j / n * sec.c; pts.push([fiber(0, y)[1] / MPa, y * 1000]); }
+    gS.fill([[0, -c]].concat(pts, [[0, c]]), 'rgba(255,165,0,.25)');
+    gS.line(pts, '#ffa500', 2.2);
+    var sl = S.P * S.L * sec.c / sec.I / MPa;
+    gS.line([[-sl, -c], [sl, c]], 'rgba(227,233,239,.7)', 1.3, [5, 4]);
+    if (!m.brittle) { gS.vline(m.Sy / MPa, 'rgba(255,94,94,.6)', 'S_y'); gS.vline(-m.Sy / MPa, 'rgba(255,94,94,.6)'); }
+  }
+  gS.end();
+  var tmax = 1.5 * S.P / sec.A / MPa, tsc = Math.max(tmax, 1) * 1.25;
+  gT.begin({ xmin: 0, xmax: tsc, ymin: -c * 1.1, ymax: c * 1.1, xlabel: 'τ [MPa]', ylabel: '', fx: function (x) { return F(x, tsc < 10 ? 1 : 0); }, fy: function () { return ''; } });
+  if (!broken) {
+    var tp = []; for (var q = -40; q <= 40; q++) { var yy = q / 40 * c; tp.push([tmax * (1 - (yy / c) * (yy / c)), yy]); }
+    gT.fill([[0, -c]].concat(tp, [[0, c]]), 'rgba(0,217,132,.18)'); gT.line(tp, '#00d984', 2);
+    gT.text(tmax, 0, ' τ_maks', '#00d984');
+  }
+  gT.end();
+}
+
+/* ---------- opdatering ---------- */
+function reset(full) {
+  if (sparks) { lab.scene.remove(sparks); sparks = null; }
+  broken = null; piece.position.set(0, 0, 0); piece.rotation.set(0, 0, 0); stub.visible = false; pSlider.el.disabled = false;
+  Mhist.fill(0); kap.fill(0); hist = []; histEmax = 0;
+  buildTable(); layout();
+  var Pb = tab.Mcap / S.L / 1000;
+  pSlider.range(0, +(Pb * 1.15).toPrecision(3), 'any');
+  if (full) pSlider.set(0, true);
+  S.P = pSlider.get() * 1000;
+  var m = S.mat;
+  document.getElementById('matInfo').innerHTML = 'E = ' + F(m.E / 1e9, 0) + ' GPa · ' + (m.brittle ? 'S<sub>ut</sub> = ' + F(m.Su / MPa, 0) + ' MPa, S<sub>uc</sub> = ' + F(m.Suc / MPa, 0) + ' MPa' : 'S<sub>y</sub> = ' + F(m.Sy / MPa, 0) + ' MPa · S<sub>u</sub> = ' + F(m.Su / MPa, 0) + ' MPa · brudforl. ' + F(m.ef * 100, 0) + ' %') + '<br>Hamrock ' + m.src;
+  update();
+}
+function update() {
+  if (broken) return;
+  var ok = solve();
+  if (!ok) { // brud: lås tilstanden lige før brud og lad stykket falde
+    S.P = tab.Mcap / S.L * 0.9999; solve(); shape(); paint(); recordHist(); breakBeam(); refresh(); dirty = true; return;
+  }
+  shape(); paint(); recordHist(); refresh(); dirty = true;
+}
+var histEmax = 0;
+function recordHist() {
+  var m = S.mat, top = fiber(0, tab.sec.c), p = [top[0] * 100, top[1] / MPa], l = hist[hist.length - 1];
+  var emax = maxFiberStrain(0, tab.sec.c);
+  if (emax > histEmax + 1e-9) { // ny belastning ud over tidligere maks: genbelast elastisk og følg kurven
+    if (!hist.length) hist.push([0, 0]);
+    for (var j = 1; j <= 40; j++) { var e = histEmax + (emax - histEmax) * j / 40; hist.push([e * 100, sigma(m, e) / MPa]); }
+    histEmax = emax;
+  }
+  if (!l || Math.abs(l[0] - p[0]) > 1e-5 || Math.abs(l[1] - p[1]) > 1e-3) hist.push(p);
+  if (hist.length > 4000) hist.shift();
+}
+function refresh() {
+  var m = S.mat, sec = tab.sec, P = broken ? broken.P : S.P, L = S.L, M = P * L;
+  var sel = M * sec.c / sec.I, top = fiber(0, sec.c), tau = 1.5 * P / sec.A, del = P * L * L * L / (3 * sec.EI);
+  ro.set('M', F(M, M < 10 ? 2 : 0) + ' N·m');
+  ro.set('sel', F(sel / MPa, 1) + ' MPa', sel > m.Sy ? 'bad' : 'hi');
+  ro.set('smod', broken ? '–' : F(top[1] / MPa, 1) + ' MPa');
+  ro.set('tau', F(tau / MPa, 1) + ' MPa');
+  var ny = m.Sy / sel; ro.set('ny', P > 0 ? F(ny, 2) : '∞', ny < 1 ? 'bad' : ny < 1.5 ? 'hi' : 'ok');
+  ro.set('del', F(del * 1000, 2) + ' mm');
+  ro.set('dmod', broken ? '–' : F(trueTip * 1000, 2) + ' mm');
+  var perm = 0;
+  if (!broken && !m.brittle) { // udbøjning hvis lasten fjernes nu
+    var th = 0, Y = 0, ds = L / NS;
+    for (var i = 1; i <= NS; i++) { var kp = 0.5 * (kres(i) + kres(i - 1)), thn = th - kp * ds; Y += ds * Math.sin(0.5 * (th + thn)); th = thn; }
+    perm = -Y;
+  }
+  ro.set('perm', broken ? '–' : F(perm * 1000, 2) + ' mm', perm > 1e-6 ? 'hi' : '');
+  ro.set('Py', F(tab.My / L / 1000, 3) + ' kN');
+  ro.set('Pb', F(tab.Mcap / L / 1000, 3) + ' kN');
+  var zone = (!m.brittle && M > tab.My) ? L * (1 - tab.My / M) : 0;
+  ro.set('zone', zone > 0 ? F(zone * 1000, 0) + ' mm' : 'ingen');
+
+  if (!broken) {
+    var anyPlastic = Mhist[0] > tab.My * 1.0005 && !m.brittle;
+    if (M > tab.Mcap * 0.95) { statusEl.textContent = 'Tæt på brud'; statusEl.className = 'lab-status bad'; }
+    else if (M > tab.My * 1.0005 && M >= Mhist[0] - 1e-9) { statusEl.textContent = 'Flydning: plastisk zone vokser'; statusEl.className = 'lab-status warn'; }
+    else if (anyPlastic) { statusEl.textContent = 'Aflastet elastisk: blivende deformation'; statusEl.className = 'lab-status warn'; }
+    else { statusEl.textContent = P > 0 ? 'Elastisk: går helt tilbage uden last' : 'Ubelastet'; statusEl.className = 'lab-status'; }
+  } else {
+    statusEl.textContent = 'BRUD ved P = ' + F(broken.P / 1000, 3) + ' kN'; statusEl.className = 'lab-status bad';
+  }
+  scaleNote.textContent = view.mode === 'true' ? 'Udbøjning i sand skala' : 'Udbøjning vist ×' + F(view.k, 0) + (compressed ? ' (store vinkler komprimeret)' : '');
+
+  var fm = document.getElementById('formulas'), n = function (x, d) { return '<span class="num">' + F(x, d) + '</span>'; };
+  fm.innerHTML =
+    '<div class="f"><i>I</i> = <i>bh</i>³/12 = ' + n(sec.b * 1000, 0) + '·' + n(sec.h * 1000, 0) + '³/12 = ' + n(sec.I * 1e12 / 1e3, 1) + '·10³ mm⁴,&nbsp;&nbsp; <i>c</i> = <i>h</i>/2 = ' + n(sec.c * 1000, 1) + ' mm</div>' +
+    '<div class="where">hvor <i>b</i> er bredden og <i>h</i> højden i bøjningsretningen (Hamrock kap. 4, slides 22–26).</div>' +
+    '<div class="f">σ<sub>maks</sub> = <i>Mc</i>/<i>I</i> = ' + n(M * 1000, 0) + ' N·mm · ' + n(sec.c * 1000, 1) + ' mm / ' + n(sec.I * 1e12 / 1e3, 1) + '·10³ mm⁴ = ' + n(sel / MPa, 1) + ' MPa</div>' +
+    '<div class="where">hvor <i>M</i> = <i>PL</i> er momentet ved indspændingen. Gælder kun, så længe materialet er elastisk (σ ≤ <i>S</i><sub>y</sub> = ' + F(m.Sy / MPa, 0) + ' MPa).</div>' +
+    '<div class="f">τ<sub>maks</sub> = <i>VQ</i>/(<i>Ib</i>) = 3<i>V</i>/(2<i>A</i>) = 3 · ' + n(P, 0) + ' N / (2 · ' + n(sec.A * 1e6, 0) + ' mm²) = ' + n(tau / MPa, 1) + ' MPa</div>' +
+    '<div class="where">i neutralaksen (y = 0), hvor <i>Q</i> = <i>A</i>′ȳ′ er størst. Her er <i>V</i> = <i>P</i> langs hele bjælken (Hamrock kap. 4, slides 27–28).</div>' +
+    '<div class="f">δ = <i>PL</i>³/(3<i>EI</i>) = ' + n(P, 0) + ' · ' + n(L, 3) + '³ / (3 · ' + n(sec.EI, 0) + ' N·m²) = ' + n(del * 1000, 2) + ' mm</div>' +
+    '<div class="where">udkraget bjælke med endelast, fx via Castiglianos sætning med <i>M</i>(x) = <i>Px</i> (Hamrock kap. 5, eksamensspm. 4). Elastisk.</div>' +
+    '<div class="f"><i>n</i><sub>y</sub> = <i>S</i><sub>y</sub>/σ<sub>maks</sub> = ' + n(m.Sy / MPa, 0) + ' / ' + n(sel / MPa, 1) + ' = ' + n(P > 0 ? m.Sy / sel : Infinity, 2) + '</div>' +
+    '<div class="where">sikkerhedsfaktor mod flydning (Hamrock kap. 1). Under 1 flyder yderfibrene.</div>';
+}
+function kres(i) { // restkrumning ved station i, hvis lasten fjernes
+  var kmax = kappaOf(Mhist[i]); return Math.max(0, kmax - Mhist[i] / tab.sec.EI);
+}
+
+/* ---------- løkke ---------- */
+var placeTagV = new T3.Vector3();
+Lab.loop(function (dt, rdt) {
+  if (broken) { stepBreak(rdt); stepSparks(rdt); }
+  var sec = tab.sec, n = NS;
+  // lastpil ved spidsen
+  if (!broken && S.P > 0) {
+    var len = (0.08 + 0.25 * S.P / (tab.Mcap / S.L)) ;
+    var tip = new T3.Vector3(cl.X[n] - (sec.h / 2) * Math.sin(cl.th[n]), cl.Y[n] + (sec.h / 2) * Math.cos(cl.th[n]), 0);
+    arrow.visible = true; arrow.set(tip.clone().add(new T3.Vector3(0, len * refS, 0)), new T3.Vector3(0, -len, 0));
+    tagP.visible = true; tagP.set(tip.clone().add(new T3.Vector3(0, (len + 0.04) * refS, 0)), 'P = ' + F(S.P / 1000, S.P < 1000 ? 3 : 2) + ' kN');
+  } else { arrow.visible = false; tagP.visible = false; }
+  tagWall.set(placeTagV.set(-0.03 * refS, Math.max(3 * sec.h, 0.22 * refS) + 0.02 * refS, 0));
+  if (dirty || broken) { drawGraphs(rdt); dirty = false; } else drawGraphs(rdt);
+  lab.render(rdt);
+});
+
+window.addEventListener('resize', function () { dirty = true; });
+reset(true);
+})();
+</script>
+</body>
+</html>

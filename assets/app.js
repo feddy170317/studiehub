@@ -120,6 +120,9 @@ function renderHome() {
         <a class="btn-course" style="display:block;text-decoration:none" href="html/videnskort/index.html">
           🧠 Videnskort — Begrebsgraf på tværs af fag
         </a>
+        <a class="btn-course" style="display:block;text-decoration:none" href="lab/index.html">
+          🧪 3D-laboratorium — Leg med kursusmaterialet i 3D
+        </a>
         <a class="btn-course" style="display:block;text-decoration:none" href="path/index.html">
           🎮 Læringsstier — DYN2 / ELE1 / MEM1
         </a>

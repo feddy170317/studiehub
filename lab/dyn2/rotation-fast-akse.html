@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rotation om fast akse · 3D-lab</title>
+<meta name="description" content="Stift legeme om fast akse i 3D: ω og α som vektorer langs aksen, v = ω × r, a_t = α × r og a_n = −ω²r i et punkt — plus tandhjul og remdrev.">
+<link rel="stylesheet" href="../assets/lab.css">
+</head>
+<body>
+<header class="lab-top">
+  <a class="back" href="../index.html">← 3D-lab</a>
+  <span class="chip">DYN2 · HI 16.3</span>
+  <h1>Rotation om fast akse</h1>
+  <span class="src">Slides: Intro til rotation om fast akse + Kinematik I (HI 16.3, ligning 16-8 til 16-14)</span>
+</header>
+
+<main class="lab-main">
+  <section class="lab-stage" id="stage">
+    <div class="lab-hud">
+      <div class="lab-status" id="status"></div>
+      <div class="lab-note" id="note"></div>
+    </div>
+    <div class="lab-paused" id="pausedFlag">PAUSE · mellemrum fortsætter</div>
+    <div class="lab-legend" id="legend"></div>
+    <div class="lab-hint">Træk = drej · hjul/knib = zoom · dobbeltklik = nulstil visning · mellemrum = pause</div>
+  </section>
+
+  <aside class="lab-side">
+    <div class="card" id="modeCard"><h2>Opstilling</h2></div>
+    <div class="card" id="motionCard"><h2>Bevægelse (konstant α)</h2></div>
+    <div class="card" id="geoCard"><h2>Geometri og visning</h2></div>
+    <div class="card" id="roCard"><h2>Aflæsning</h2></div>
+  </aside>
+</main>
+
+<section class="lab-graphs">
+  <div class="graph"><h3>Vinkelhastighed ω(t) <span>hældning = α</span></h3><canvas id="gW"></canvas></div>
+  <div class="graph"><h3>Vinkel θ(t) <span>hældning = ω</span></h3><canvas id="gT"></canvas></div>
+  <div class="graph"><h3 id="gAtitle">Acceleration i P <span>|a<sub>t</sub>|, |a<sub>n</sub>|, |a|</span></h3><canvas id="gA"></canvas></div>
+</section>
+
+<section class="lab-text">
+  <div class="card"><h2>Formler med dine tal</h2><div id="formulas"></div></div>
+  <div class="card">
+    <h2>Hvad skal du lægge mærke til?</h2>
+    <ul id="notes"></ul>
+    <h2 style="margin-top:.8rem">Model og antagelser</h2>
+    <ul>
+      <li>Stift legeme om en fast <i>z</i>-akse (bogens <b>k̂</b> peger op i 3D-visningen). <b>î</b> og <b>ĵ</b> ligger i skivens plan som på slides.</li>
+      <li>Konstant vinkelacceleration α<sub>c</sub>, så ω(t) = ω<sub>0</sub> + α<sub>c</sub>t og θ(t) = θ<sub>0</sub> + ω<sub>0</sub>t + ½α<sub>c</sub>t².</li>
+      <li>Pilenes længde er skaleret: hastigheder og accelerationer har hver sin skala (se skyderne). De præcise tal står ved pilene og i aflæsningen.</li>
+      <li>Tandhjul og remdrev: ingen glidning, stive tænder og stiv rem, som på slide 11.</li>
+    </ul>
+  </div>
+</section>
+
+<script src="../assets/three.min.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+'use strict';
+var F = Lab.fmt, T3 = THREE, PI = Math.PI;
+function B(x, y, z) { return new T3.Vector3(x, z || 0, -y); } // bogens (x, y, z) → 3D-verden (z op)
+
+var S = { mode: 'disk', w0: 10, al: -2, r: 0.5, thP: -30 * PI / 180, t: 0, tempo: 0.25, sv: 0.08, sa: 0.008, R1: 0.5, R2: 0.3, body: 'disk' };
+var Rdisk = 0.75;
+
+/* ---------- 3D ---------- */
+var lab = Lab.scene(document.getElementById('stage'), { view: { target: new T3.Vector3(0, 0.12, 0), theta: 0.38, phi: 0.9, radius: 2.9 } });
+var sc = lab.scene;
+var floorGrid = new T3.GridHelper(8, 16, 0x2a4560, 0x1a3248); floorGrid.position.y = -0.62; sc.add(floorGrid);
+
+// faste akser î, ĵ, k̂ (bogens koordinater)
+var axI = Lab.arrow(0x8fa3b8, { radius: 0.006 }), axJ = Lab.arrow(0x8fa3b8, { radius: 0.006 });
+axI.set(B(0, 0, 0.03), B(1.1, 0, 0)); axJ.set(B(0, 0, 0.03), B(0, 1.1, 0)); sc.add(axI); sc.add(axJ);
+var tI = Lab.tag(lab, 'x (î)', '#8fa3b8').set(B(1.24, 0, 0.03)), tJ = Lab.tag(lab, 'y (ĵ)', '#8fa3b8').set(B(0, 1.24, 0.03));
+
+// én skive
+var diskGroup = new T3.Group(); sc.add(diskGroup);
+var steel = new T3.MeshStandardMaterial({ color: 0x8a9db3, metalness: 0.55, roughness: 0.38 });
+var dark = new T3.MeshStandardMaterial({ color: 0x3a4d63, metalness: 0.4, roughness: 0.6 });
+var disk = new T3.Mesh(new T3.CylinderGeometry(Rdisk, Rdisk, 0.05, 72), steel); diskGroup.add(disk);
+var arm = new T3.Mesh(new T3.BoxGeometry(0.88, 0.05, 0.1), steel); arm.position.x = 0.38; diskGroup.add(arm);
+for (var k = 0; k < 6; k++) { // spor på skiven, så rotationen kan ses
+  var mk = new T3.Mesh(new T3.BoxGeometry(0.6, 0.012, 0.022), dark); mk.position.y = 0.031;
+  var g = new T3.Group(); g.rotation.y = k * PI / 3; mk.position.x = 0.4; g.add(mk); disk.add(g);
+}
+var hub = new T3.Mesh(new T3.CylinderGeometry(0.045, 0.045, 0.78, 24), dark); hub.position.y = -0.19; sc.add(hub);
+var bearing = new T3.Mesh(new T3.CylinderGeometry(0.16, 0.2, 0.12, 24), dark); bearing.position.y = -0.56; sc.add(bearing);
+var Pdot = new T3.Mesh(new T3.SphereGeometry(0.035, 20, 14), new T3.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.5 }));
+sc.add(Pdot);
+var tP = Lab.tag(lab, 'P', '#ffffff');
+
+var vR = Lab.arrow(0xe3e9ef, { radius: 0.007 }), vV = Lab.arrow(0x00d984), vAt = Lab.arrow(0xffa500), vAn = Lab.arrow(0xd984ff), vA = Lab.arrow(0xff5e5e);
+[vR, vV, vAt, vAn, vA].forEach(function (a) { sc.add(a); });
+var tR = Lab.tag(lab, '', '#e3e9ef'), tV = Lab.tag(lab, '', '#00d984'), tAt = Lab.tag(lab, '', '#ffa500'), tAn = Lab.tag(lab, '', '#d984ff'), tA = Lab.tag(lab, '', '#ff5e5e');
+var vW = Lab.arrow(0x5ec8ff, { radius: 0.016 }), vAl = Lab.arrow(0xffd27a, { radius: 0.012 });
+var arcW = Lab.arc(0x5ec8ff, { thick: 0.012 }), arcAl = Lab.arc(0xffd27a, { thick: 0.009 });
+[vW, vAl, arcW, arcAl].forEach(function (a) { sc.add(a); });
+var tW = Lab.tag(lab, '', '#5ec8ff'), tAl = Lab.tag(lab, '', '#ffd27a');
+
+// spor af P
+var trailN = 160, trailPos = new Float32Array(trailN * 3), trailGeo = new T3.BufferGeometry();
+trailGeo.setAttribute('position', new T3.BufferAttribute(trailPos, 3));
+var trail = new T3.Line(trailGeo, new T3.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.35 })); sc.add(trail);
+var trailCount = 0;
+
+// tandhjul og remdrev
+var pairGroup = new T3.Group(); sc.add(pairGroup);
+var M = 0.1; // modul [m]: R = N·M/2
+function gearGeo(R) {
+  var N = Math.round(2 * R / M), p = 2 * PI / N, rt = R + 0.5 * M, rr = R - 0.6 * M, sh = new T3.Shape();
+  for (var i = 0; i < N; i++) {
+    var a = i * p, pts = [[rr, a - 0.5 * p], [rr, a - 0.25 * p], [rt, a - 0.12 * p], [rt, a + 0.12 * p], [rr, a + 0.25 * p]];
+    pts.forEach(function (q, j) { var x = q[0] * Math.cos(q[1]), y = q[0] * Math.sin(q[1]); if (i === 0 && j === 0) sh.moveTo(x, y); else sh.lineTo(x, y); });
+  }
+  sh.closePath();
+  var hole = new T3.Path(); hole.absarc(0, 0, 0.06, 0, 2 * PI, true); sh.holes.push(hole);
+  var geo = new T3.ExtrudeGeometry(sh, { depth: 0.07, bevelEnabled: false, curveSegments: 6 });
+  geo.rotateX(-PI / 2); geo.translate(0, -0.035, 0);
+  return { geo: geo, N: N };
+}
+function pulleyGeo(R) {
+  var g = new T3.CylinderGeometry(R, R, 0.09, 64); return g;
+}
+var w1 = new T3.Mesh(undefined, steel), w2 = new T3.Mesh(undefined, new T3.MeshStandardMaterial({ color: 0x9fb9a6, metalness: 0.5, roughness: 0.4 }));
+var w1mark = new T3.Mesh(new T3.BoxGeometry(1, 0.012, 0.03), dark), w2mark = new T3.Mesh(new T3.BoxGeometry(1, 0.012, 0.03), dark);
+w1.add(w1mark); w2.add(w2mark);
+var shaft1 = new T3.Mesh(new T3.CylinderGeometry(0.05, 0.05, 1.1, 20), dark), shaft2 = shaft1.clone();
+pairGroup.add(w1, w2, shaft1, shaft2);
+var belt = null, beltMarks = [], beltPath = null;
+var tW1 = Lab.tag(lab, '', '#5ec8ff'), tW2 = Lab.tag(lab, '', '#5ec8ff'), tVc = Lab.tag(lab, '', '#00d984');
+var vC1 = Lab.arrow(0x00d984), vW1 = Lab.arrow(0x5ec8ff, { radius: 0.014 }), vW2 = Lab.arrow(0x5ec8ff, { radius: 0.014 });
+sc.add(vC1); sc.add(vW1); sc.add(vW2);
+var pair = { N1: 0, N2: 0, c1: 0, c2: 0 };
+
+function buildPair() {
+  if (belt) { pairGroup.remove(belt); belt.geometry.dispose(); belt = null; }
+  beltMarks.forEach(function (m) { pairGroup.remove(m); }); beltMarks = [];
+  var R1 = S.R1, R2 = S.R2, gear = S.mode === 'gear';
+  var d = gear ? R1 + R2 : R1 + R2 + 0.7;
+  pair.c1 = -d / 2; pair.c2 = pair.c1 + d; pair.d = d;
+  if (gear) { var g1 = gearGeo(R1), g2 = gearGeo(R2); w1.geometry = g1.geo; w2.geometry = g2.geo; pair.N1 = g1.N; pair.N2 = g2.N; }
+  else { w1.geometry = pulleyGeo(R1); w2.geometry = pulleyGeo(R2); }
+  w1.position.copy(B(pair.c1, 0, 0)); w2.position.copy(B(pair.c2, 0, 0));
+  shaft1.position.copy(B(pair.c1, 0, -0.5)); shaft2.position.copy(B(pair.c2, 0, -0.5));
+  w1mark.scale.x = R1 * 0.8; w1mark.position.set(R1 * 0.45, 0.05, 0);
+  w2mark.scale.x = R2 * 0.8; w2mark.position.set(R2 * 0.45, 0.05, 0);
+  if (!gear) { // åben rem: ydre tangenter
+    var sg = (R1 - R2) / d, cg = Math.sqrt(1 - sg * sg), gam = Math.asin(sg), pts = [], i, n = 60;
+    var a0 = PI / 2 - gam, a1 = 3 * PI / 2 + gam; // remmen ligger om venstre side af hjul 1 ...
+    for (i = 0; i <= n; i++) { var a = a0 + (a1 - a0) * i / n; pts.push([pair.c1 + R1 * Math.cos(a), R1 * Math.sin(a)]); }
+    var b0 = -(PI / 2 - gam), b1 = PI / 2 - gam; // ... og om højre side af hjul 2
+    for (i = 0; i <= n; i++) { var bb = b0 + (b1 - b0) * i / n; pts.push([pair.c2 + R2 * Math.cos(bb), R2 * Math.sin(bb)]); }
+    var cum = [0]; for (i = 1; i <= pts.length; i++) { var p = pts[i % pts.length], q = pts[i - 1]; cum.push(cum[i - 1] + Math.hypot(p[0] - q[0], p[1] - q[1])); }
+    beltPath = { pts: pts, cum: cum, len: cum[cum.length - 1] };
+    var curve = new T3.CatmullRomCurve3(pts.map(function (p) { return B(p[0], p[1], 0); }), true);
+    belt = new T3.Mesh(new T3.TubeGeometry(curve, 300, 0.018, 6, true), new T3.MeshStandardMaterial({ color: 0x2b2f36, roughness: 0.85 }));
+    pairGroup.add(belt);
+    for (i = 0; i < 26; i++) { var m = new T3.Mesh(new T3.BoxGeometry(0.03, 0.045, 0.03), new T3.MeshStandardMaterial({ color: 0xffd27a, emissive: 0x6b4b00 })); pairGroup.add(m); beltMarks.push(m); }
+  }
+}
+function beltPoint(s) {
+  var P = beltPath, L = P.len; s = ((s % L) + L) % L;
+  var lo = 0, hi = P.cum.length - 1;
+  while (hi - lo > 1) { var mid = (lo + hi) >> 1; if (P.cum[mid] <= s) lo = mid; else hi = mid; }
+  var a = P.pts[lo], b = P.pts[(lo + 1) % P.pts.length], t = (s - P.cum[lo]) / Math.max(P.cum[lo + 1] - P.cum[lo], 1e-9);
+  return B(a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, 0);
+}
+
+/* ---------- kontroller ---------- */
+var modeSeg = Lab.seg(document.getElementById('modeCard'), { value: 'disk', options: [{ value: 'disk', label: 'Ét legeme' }, { value: 'gear', label: 'Tandhjul' }, { value: 'belt', label: 'Remdrev' }], onChange: function (v) { S.mode = v; applyMode(); } });
+var bodySeg = Lab.seg(document.getElementById('modeCard'), { label: 'Legeme', value: 'disk', options: [{ value: 'disk', label: 'Skive' }, { value: 'arm', label: 'Arm' }], onChange: function (v) { S.body = v; applyMode(); } });
+var pr = document.createElement('div'); pr.className = 'btns'; document.getElementById('modeCard').appendChild(pr);
+Lab.button(pr, '<b>Slide-eksempel (HI 16.3):</b> ω = 10 rad/s, α = −2 rad/s², r = 0,5 m, P under −30°', 'preset', function () { preset(10, -2, 0.5, -30); });
+Lab.button(pr, '<b>Opstart fra hvile:</b> ω₀ = 0, α = 3 rad/s²', 'preset', function () { preset(0, 3, 0.7, 0); });
+
+var mc = document.getElementById('motionCard');
+var sW0 = Lab.slider(mc, { label: 'ω<sub>0</sub> (ved t = 0)', min: -15, max: 15, step: 0.5, value: S.w0, unit: 'rad/s', fmt: function (x) { return F(x, 1); }, onInput: function (v) { S.w0 = v; S.t = 0; resetTrail(); } });
+var sAl = Lab.slider(mc, { label: 'α<sub>c</sub> (konstant)', min: -6, max: 6, step: 0.5, value: S.al, unit: 'rad/s²', fmt: function (x) { return F(x, 1); }, onInput: function (v) { S.al = v; S.t = 0; resetTrail(); } });
+var sTempo = Lab.slider(mc, { label: 'Afspilningstempo', min: 0.02, max: 1, step: 0.01, value: S.tempo, unit: '× realtid', fmt: function (x) { return F(x, 2); }, onInput: function (v) { S.tempo = v; }, sub: 'Sæt tempoet ned for at følge pilene. Tiden t i formlerne er den rigtige.' });
+var mb = document.createElement('div'); mb.className = 'btns'; mc.appendChild(mb);
+var pauseBtn = Lab.button(mb, '⏸ Pause', '', function () {});
+Lab.button(mb, '↺ t = 0', 'primary', function () { S.t = 0; resetTrail(); });
+
+var gc = document.getElementById('geoCard');
+var diskCtl = document.createElement('div'); gc.appendChild(diskCtl);
+var sR = Lab.slider(diskCtl, { label: 'Afstand <i>r</i> fra aksen til P', min: 0.1, max: 0.75, step: 0.05, value: S.r, unit: 'm', fmt: function (x) { return F(x, 2); }, onInput: function (v) { S.r = v; resetTrail(); } });
+var sThP = Lab.slider(diskCtl, { label: 'P\'s vinkel ved t = 0', min: -180, max: 180, step: 5, value: -30, unit: '°', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.thP = v * PI / 180; resetTrail(); } });
+var pairCtl = document.createElement('div'); gc.appendChild(pairCtl);
+var sR1 = Lab.slider(pairCtl, { label: '<i>R</i><sub>1</sub> (drivende hjul)', min: 0.2, max: 0.8, step: 0.05, value: S.R1, unit: 'm', fmt: function (x) { return F(x, 2); }, onInput: function (v) { S.R1 = v; buildPair(); } });
+var sR2 = Lab.slider(pairCtl, { label: '<i>R</i><sub>2</sub> (drevne hjul)', min: 0.2, max: 0.8, step: 0.05, value: S.R2, unit: 'm', fmt: function (x) { return F(x, 2); }, onInput: function (v) { S.R2 = v; buildPair(); } });
+var sSv = Lab.slider(gc, { label: 'Pileskala, hastighed', min: 0.02, max: 0.3, step: 0.01, value: S.sv, unit: 'm pr. m/s', fmt: function (x) { return F(x, 2); }, onInput: function (v) { S.sv = v; } });
+var sSa = Lab.slider(gc, { label: 'Pileskala, acceleration', min: 0.002, max: 0.15, step: 0.001, value: 0.008, unit: 'm pr. m/s²', fmt: function (x) { return F(x, 3); }, onInput: function (v) { S.sa = v; } });
+var chkComp = Lab.check(gc, { label: 'Vis a<sub>t</sub> og a<sub>n</sub> (komposanter)', value: true });
+var chkTrail = Lab.check(gc, { label: 'Vis P\'s bane', value: true });
+
+var roDisk = document.createElement('div'), roPair = document.createElement('div');
+document.getElementById('roCard').appendChild(roDisk); document.getElementById('roCard').appendChild(roPair);
+var ro = Lab.readouts(roDisk, [
+  ['t', 'Tid <i>t</i>'], ['th', 'Drejet vinkel θ − θ<sub>0</sub>'], ['w', 'ω<sub>z</sub> = ω<sub>0</sub> + α<sub>c</sub><i>t</i>'], ['al', 'α<sub>z</sub>'], '-',
+  ['r', '<b>r</b> (O → P)'], ['v', '<b>v</b> = <b>ω</b> × <b>r</b>'], ['vm', '|<b>v</b>| = ω<i>r</i>'], '-',
+  ['at', '<b>a</b><sub>t</sub> = <b>α</b> × <b>r</b>'], ['an', '<b>a</b><sub>n</sub> = −ω²<b>r</b>'], ['a', '<b>a</b> = <b>a</b><sub>t</sub> + <b>a</b><sub>n</sub>'], ['am', '|<b>a</b>|']
+]);
+var ro2 = Lab.readouts(roPair, [
+  ['t', 'Tid <i>t</i>'], ['w1', 'ω<sub>1</sub> (drivende)'], ['w2', 'ω<sub>2</sub> = (<i>R</i><sub>1</sub>/<i>R</i><sub>2</sub>)·ω<sub>1</sub>'], ['ratio', 'Udveksling <i>R</i><sub>1</sub>/<i>R</i><sub>2</sub>'], '-',
+  ['vc', '<i>v</i> = ω<sub>1</sub><i>R</i><sub>1</sub> = ω<sub>2</sub><i>R</i><sub>2</sub>'], ['a1', 'α<sub>1</sub>'], ['a2', 'α<sub>2</sub> = (<i>R</i><sub>1</sub>/<i>R</i><sub>2</sub>)·α<sub>1</sub>'], ['ac', '<i>a</i><sub>t</sub> i kontakt / rem']
+]);
+
+function preset(w0, al, r, thDeg) {
+  if (S.mode !== 'disk') modeSeg.set('disk');
+  S.w0 = w0; S.al = al; S.r = r; S.thP = thDeg * PI / 180; S.t = 0;
+  sW0.set(w0, true); sAl.set(al, true); sR.set(r, true); sThP.set(thDeg, true);
+  resetTrail(); loop.pause();
+}
+function applyMode() {
+  var disk1 = S.mode === 'disk';
+  diskGroup.visible = disk1; Pdot.visible = disk1; trail.visible = disk1; hub.visible = disk1; bearing.visible = disk1;
+  disk.visible = S.body === 'disk'; arm.visible = S.body === 'arm';
+  pairGroup.visible = !disk1; diskCtl.style.display = disk1 ? '' : 'none'; pairCtl.style.display = disk1 ? 'none' : '';
+  roDisk.style.display = disk1 ? '' : 'none'; roPair.style.display = disk1 ? 'none' : '';
+  bodySeg.set(S.body, true); document.querySelectorAll('#modeCard .ctl')[1].style.display = disk1 ? '' : 'none';
+  [vR, vV, vAt, vAn, vA, tR, tV, tAt, tAn, tA, tP, vW, vAl, arcW, arcAl, tW, tAl].forEach(function (o) { o.visible = disk1; });
+  [vC1, vW1, vW2, tW1, tW2, tVc].forEach(function (o) { o.visible = !disk1; });
+  if (!disk1) buildPair();
+  document.getElementById('gAtitle').innerHTML = disk1 ? 'Acceleration i P <span>|a<sub>t</sub>|, |a<sub>n</sub>|, |a|</span>' : 'ω<sub>1</sub> og ω<sub>2</sub> <span>udvekslingen er konstant</span>';
+  document.getElementById('legend').innerHTML = disk1
+    ? key('#5ec8ff', '<b>ω</b> langs aksen') + key('#ffd27a', '<b>α</b> langs aksen') + key('#00d984', '<b>v</b> = <b>ω</b>×<b>r</b>') + key('#ffa500', '<b>a</b><sub>t</sub> = <b>α</b>×<b>r</b>') + key('#d984ff', '<b>a</b><sub>n</sub> = −ω²<b>r</b>') + key('#ff5e5e', '<b>a</b> = <b>a</b><sub>t</sub>+<b>a</b><sub>n</sub>')
+    : key('#5ec8ff', '<b>ω</b><sub>1</sub>, <b>ω</b><sub>2</sub> langs akserne') + key('#00d984', '<i>v</i> i kontaktpunkt / rem');
+  notes();
+  resetTrail(); dirtyFormulas = true;
+}
+function key(c, t) { return '<div class="key"><span class="sw" style="background:' + c + '"></span><span>' + t + '</span></div>'; }
+function notes() {
+  document.getElementById('notes').innerHTML = S.mode === 'disk' ?
+    '<li><b>θ, ω og α er fælles</b> for hele legemet. Kun <i>r</i> varierer fra punkt til punkt. Flyt P udad, og se <b>v</b> og <b>a</b> vokse lineært med <i>r</i> (slide 10).</li>' +
+    '<li><b>ω og α er vektorer langs aksen</b> (<b>k̂</b>). Drej kameraet og tjek med højrehåndsreglen: tommelfingeren langs <b>ω</b>, fingrene krummer i omløbsretningen.</li>' +
+    '<li>Med negativ α (slide-eksemplet) peger <b>α</b> nedad, og <b>a</b><sub>t</sub> peger <i>imod</i> bevægelsen. Skiven bremser, står stille ved t = ω<sub>0</sub>/|α| og drejer derefter den anden vej.</li>' +
+    '<li><b>a</b><sub>n</sub> peger altid ind mod aksen og vokser med ω². Ved store ω dominerer den fuldstændig over <b>a</b><sub>t</sub>.</li>' +
+    '<li>Tryk på slide-eksemplet og pause: aflæsningen gengiver <b>v</b> = 2,5<b>î</b> + 4,3<b>ĵ</b> m/s og <b>a</b> = −44<b>î</b> + 24<b>ĵ</b> m/s² fra slides 9–10.</li>'
+  : '<li><b>Ingen glidning ⇔ samme tangentielle hastighed og acceleration</b> i kontaktpunktet: ω<sub>1</sub><i>R</i><sub>1</sub> = <i>v</i> = ω<sub>2</sub><i>R</i><sub>2</sub> (slide 11).</li>' +
+    '<li>Det lille hjul drejer hurtigst. Gør <i>R</i><sub>2</sub> mindre og se ω<sub>2</sub> stige.</li>' +
+    '<li><b>Tandhjul vender omløbsretningen</b> (ω<sub>2</sub>-vektoren peger modsat ω<sub>1</sub>). <b>Remdrev bevarer den.</b></li>' +
+    '<li>Samme forhold gælder for α: α<sub>2</sub> = (<i>R</i><sub>1</sub>/<i>R</i><sub>2</sub>)·α<sub>1</sub>.</li>';
+}
+function resetTrail() { trailCount = 0; histW = []; dirtyFormulas = true; }
+
+/* ---------- grafer ---------- */
+var gW = Lab.plot(document.getElementById('gW')), gT = Lab.plot(document.getElementById('gT')), gA = Lab.plot(document.getElementById('gA'));
+var histW = [], dirtyFormulas = true;
+
+/* ---------- løkke ---------- */
+var statusEl = document.getElementById('status'), noteEl = document.getElementById('note'), lastFormulaT = -1;
+var up = new T3.Vector3(0, 1, 0);
+var loop = Lab.loop(function (dt, rdt) {
+  S.t += dt * S.tempo;
+  var w = S.w0 + S.al * S.t;
+  if (Math.abs(w) > 30) { S.t = 0; resetTrail(); w = S.w0; }
+  var dth = S.w0 * S.t + 0.5 * S.al * S.t * S.t;
+  if (!histW.length || S.t - histW[histW.length - 1][0] > 0.01 || S.t < histW[histW.length - 1][0]) { if (histW.length && S.t < histW[histW.length - 1][0]) histW = []; histW.push([S.t, w, dth]); }
+  if (histW.length > 3000) histW.shift();
+
+  if (S.mode === 'disk') stepDisk(w, dth); else stepPair(w, dth);
+  if (dt > 0 || dirtyFormulas || Math.abs(S.t - lastFormulaT) > 1e-9) { formulas(w, dth); lastFormulaT = S.t; dirtyFormulas = false; }
+  graphs(w, dth);
+  lab.render(rdt);
+}, { button: pauseBtn, flag: document.getElementById('pausedFlag') });
+
+function cross(a, b) { return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]]; }
+function vecTxt(v, d) { return F(v[0], d) + '<b>î</b> ' + (v[1] < 0 ? '− ' : '+ ') + F(Math.abs(v[1]), d) + '<b>ĵ</b>'; }
+var K = { r: null };
+
+function stepDisk(w, dth) {
+  var th = S.thP + dth, r = S.r, al = S.al;
+  diskGroup.rotation.y = dth;
+  var rv = [r * Math.cos(th), r * Math.sin(th), 0], wv = [0, 0, w], av = [0, 0, al];
+  var v = cross(wv, rv), at = cross(av, rv), an = [-w * w * rv[0], -w * w * rv[1], 0], a = [at[0] + an[0], at[1] + an[1], 0];
+  K = { rv: rv, v: v, at: at, an: an, a: a, w: w, th: th };
+  var h = 0.05, P = B(rv[0], rv[1], h), O = B(0, 0, h);
+  Pdot.position.copy(P);
+  vR.set(O, B(rv[0], rv[1], 0)); tR.set(B(rv[0] * 0.55 + 0.1 * Math.sin(th), rv[1] * 0.55 - 0.1 * Math.cos(th), h), '<i>r</i> = ' + F(r, 2) + ' m');
+  vV.set(P, B(v[0] * S.sv, v[1] * S.sv, 0));
+  var vm = Math.hypot(v[0], v[1]);
+  tV.visible = vm > 1e-6; tV.set(B(rv[0] + v[0] * S.sv * 1.12, rv[1] + v[1] * S.sv * 1.12, h + 0.05), 'v = ' + F(vm, 2) + ' m/s');
+  var comp = chkComp.get();
+  vAt.visible = comp; vAn.visible = comp; tAt.visible = comp && Math.abs(al) > 0; tAn.visible = comp && Math.abs(w) > 0;
+  if (comp) {
+    vAt.set(P, B(at[0] * S.sa, at[1] * S.sa, 0)); vAn.set(P, B(an[0] * S.sa, an[1] * S.sa, 0));
+    tAt.set(B(rv[0] + at[0] * S.sa * 1.25, rv[1] + at[1] * S.sa * 1.25, h + 0.1), 'a<sub>t</sub> = ' + F(Math.abs(al) * r, 2));
+    tAn.set(B(rv[0] + an[0] * S.sa * 0.55, rv[1] + an[1] * S.sa * 0.55, h + 0.16), 'a<sub>n</sub> = ' + F(w * w * r, 1));
+  }
+  vA.set(P, B(a[0] * S.sa, a[1] * S.sa, 0));
+  var amag = Math.hypot(a[0], a[1]);
+  tA.visible = amag > 1e-6; tA.set(B(rv[0] + a[0] * S.sa * 1.08, rv[1] + a[1] * S.sa * 1.08, h - 0.08), 'a = ' + F(amag, 1) + ' m/s²');
+  tP.set(B(rv[0], rv[1], h + 0.12));
+
+  // ω og α langs aksen + buede pile
+  var topY = 0.21;
+  vW.set(new T3.Vector3(0, topY, 0), new T3.Vector3(0, 0.06 * w, 0));
+  tW.visible = Math.abs(w) > 0.05; tW.set(new T3.Vector3(0.12, topY + 0.06 * w + (w > 0 ? 0.08 : -0.08), 0), '<b>ω</b> = ' + F(w, 2) + ' <b>k̂</b> rad/s');
+  arcW.set(new T3.Vector3(0, topY + 0.03 * w, 0), up, 0.17, Math.abs(w) > 0.05 ? Math.sign(w) : 0, 4.3);
+  vAl.position.x = 0.0;
+  vAl.set(new T3.Vector3(-0.18, topY, 0.12), new T3.Vector3(0, 0.1 * al, 0));
+  tAl.visible = Math.abs(al) > 0.01; tAl.set(new T3.Vector3(-0.3, topY + 0.1 * al + (al > 0 ? 0.07 : -0.07), 0.12), '<b>α</b> = ' + F(al, 1) + ' <b>k̂</b> rad/s²');
+  arcAl.set(new T3.Vector3(-0.18, topY + 0.05 * al, 0.12), up, 0.09, Math.abs(al) > 0.01 ? Math.sign(al) : 0, 3.6);
+
+  // bane
+  if (chkTrail.get()) {
+    var n = Math.min(trailCount, trailN - 1);
+    for (var i = n; i > 0; i--) { trailPos[i * 3] = trailPos[(i - 1) * 3]; trailPos[i * 3 + 1] = trailPos[(i - 1) * 3 + 1]; trailPos[i * 3 + 2] = trailPos[(i - 1) * 3 + 2]; }
+    trailPos[0] = P.x; trailPos[1] = P.y; trailPos[2] = P.z; trailCount = Math.min(trailCount + 1, trailN);
+    trailGeo.setDrawRange(0, trailCount); trailGeo.attributes.position.needsUpdate = true; trail.visible = true;
+  } else trail.visible = false;
+
+  var st = Math.abs(w) < 0.05 ? 'Står stille i dette øjeblik' : (w * al > 0 ? 'Accelererer (ω og α samme vej)' : al === 0 ? 'Konstant ω' : 'Bremser (α modsat ω)');
+  statusEl.textContent = st; statusEl.className = 'lab-status' + (w * al < 0 ? ' warn' : '');
+  noteEl.textContent = 't = ' + F(S.t, 2) + ' s · tempo ×' + F(S.tempo, 2);
+}
+
+function stepPair(w1, dth1) {
+  var gear = S.mode === 'gear', ratio = S.R1 / S.R2, w2 = (gear ? -1 : 1) * ratio * w1, dth2 = (gear ? -1 : 1) * ratio * dth1;
+  w1mesh().rotation.y = dth1;
+  w2mesh().rotation.y = gear ? (PI + PI / pair.N2 + dth2) : dth2;
+  var v = w1 * S.R1;
+  // kontaktpunkt (tandhjul) eller rem
+  if (gear) {
+    var cp = B(pair.c1 + S.R1, 0, 0.08), tang = B(0, v * S.sv, 0);
+    vC1.visible = Math.abs(v) > 1e-6; vC1.set(cp, tang);
+    tVc.visible = true; tVc.set(cp.clone().add(B(0.1, v * S.sv + (v > 0 ? 0.1 : -0.1), 0.05)), 'v = ' + F(Math.abs(v), 2) + ' m/s');
+  } else {
+    vC1.visible = Math.abs(v) > 1e-6;
+    var sTop = beltPath.len - 0.5 * Math.sqrt(pair.d * pair.d - (S.R1 - S.R2) * (S.R1 - S.R2)); // midt på øverste part
+    var pTop = beltPoint(sTop), pAh = beltPoint(sTop + 0.05), dir = pAh.sub(pTop.clone()).normalize();
+    vC1.set(pTop.clone().add(new T3.Vector3(0, 0.05, 0)), dir.multiplyScalar(v * S.sv));
+    tVc.visible = true; tVc.set(pTop.clone().add(new T3.Vector3(0, 0.2, 0)), 'v<sub>rem</sub> = ' + F(Math.abs(v), 2) + ' m/s');
+    var off = dth1 * S.R1; // hjul 1 drejer mod uret ⇒ remmen løber i banens positive retning
+    for (var i = 0; i < beltMarks.length; i++) beltMarks[i].position.copy(beltPoint(off + i * beltPath.len / beltMarks.length)).add(new T3.Vector3(0, 0.0, 0));
+  }
+  var y0 = 0.1;
+  vW1.set(B(pair.c1, 0, y0), new T3.Vector3(0, 0.05 * w1, 0)); vW2.set(B(pair.c2, 0, y0), new T3.Vector3(0, 0.05 * w2, 0));
+  tW1.visible = tW2.visible = true;
+  tW1.set(B(pair.c1, 0, y0 + 0.05 * w1 + (w1 >= 0 ? 0.1 : -0.1)), 'ω<sub>1</sub> = ' + F(w1, 2) + ' rad/s');
+  tW2.set(B(pair.c2, 0, y0 + 0.05 * w2 + (w2 >= 0 ? 0.1 : -0.1)), 'ω<sub>2</sub> = ' + F(w2, 2) + ' rad/s');
+  K = { w1: w1, w2: w2, v: v, ratio: ratio, gear: gear };
+  statusEl.textContent = gear ? 'Tandhjul: modsat omløbsretning' : 'Remdrev: samme omløbsretning'; statusEl.className = 'lab-status';
+  noteEl.textContent = 't = ' + F(S.t, 2) + ' s · tempo ×' + F(S.tempo, 2);
+}
+function w1mesh() { return w1; }
+function w2mesh() { return w2; }
+
+function formulas(w, dth) {
+  var fm = document.getElementById('formulas'), n = function (x, d) { return '<span class="num">' + F(x, d) + '</span>'; };
+  var html = '<div class="f">ω(<i>t</i>) = ω<sub>0</sub> + α<sub>c</sub><i>t</i> = ' + n(S.w0, 1) + ' + (' + n(S.al, 1) + ')·' + n(S.t, 2) + ' = ' + n(S.w0 + S.al * S.t, 2) + ' rad/s</div>' +
+    '<div class="f">θ − θ<sub>0</sub> = ω<sub>0</sub><i>t</i> + ½α<sub>c</sub><i>t</i>² = ' + n(dth, 3) + ' rad = ' + n(dth * 180 / PI, 1) + '°</div>' +
+    '<div class="f">ω² = ω<sub>0</sub>² + 2α<sub>c</sub>(θ − θ<sub>0</sub>):&nbsp; ' + n(w * w, 2) + ' = ' + n(S.w0 * S.w0, 2) + ' + 2·(' + n(S.al, 1) + ')·' + n(dth, 3) + ' ✓</div>' +
+    '<div class="where">Konstant vinkelacceleration (slide Kinematik I s. 7). Den tredje ligning forbinder ω og θ uden <i>t</i>.</div>';
+  if (S.mode === 'disk' && K.rv) {
+    var rx = K.rv[0], ry = K.rv[1];
+    html += '<div class="f"><b>r</b> = ' + n(S.r, 2) + ' m·(cos ' + n(K.th * 180 / PI, 1) + '° <b>î</b> + sin ' + n(K.th * 180 / PI, 1) + '° <b>ĵ</b>) = ' + vecTxt(K.rv, 3) + ' m</div>' +
+      '<div class="f"><b>v</b> = <b>ω</b> × <b>r</b> = ' + n(w, 2) + '<b>k̂</b> × (' + vecTxt(K.rv, 3) + ') = ' + n(w * rx, 2) + '<b>ĵ</b> − (' + n(w * ry, 2) + ')<b>î</b> = ' + vecTxt(K.v, 2) + ' m/s</div>' +
+      '<div class="where">med <b>k̂</b> × <b>î</b> = <b>ĵ</b> og <b>k̂</b> × <b>ĵ</b> = −<b>î</b> (16-9). |<b>v</b>| = ω<i>r</i> = ' + F(Math.abs(w) * S.r, 2) + ' m/s (16-8).</div>' +
+      '<div class="f"><b>a</b><sub>t</sub> = <b>α</b> × <b>r</b> = ' + n(S.al, 1) + '<b>k̂</b> × (' + vecTxt(K.rv, 3) + ') = ' + vecTxt(K.at, 2) + ' m/s²</div>' +
+      '<div class="f"><b>a</b><sub>n</sub> = −ω²<b>r</b> = −' + n(w * w, 2) + ' · (' + vecTxt(K.rv, 3) + ') = ' + vecTxt(K.an, 2) + ' m/s²</div>' +
+      '<div class="f"><b>a</b> = <b>a</b><sub>t</sub> + <b>a</b><sub>n</sub> = ' + vecTxt(K.a, 1) + ' m/s²,&nbsp; |<b>a</b>| = ' + n(Math.hypot(K.a[0], K.a[1]), 1) + ' m/s²</div>' +
+      '<div class="where"><i>a</i><sub>t</sub> = α<i>r</i> og <i>a</i><sub>n</sub> = ω²<i>r</i> (16-11, 16-12). <b>a</b> = <b>α</b> × <b>r</b> − ω²<b>r</b> (16-14), som på slides 9–10.</div>';
+  } else if (K.w1 !== undefined) {
+    html += '<div class="f">ω<sub>1</sub><i>R</i><sub>1</sub> = <i>v</i> = ω<sub>2</sub><i>R</i><sub>2</sub> ⇒ ω<sub>2</sub> = (<i>R</i><sub>1</sub>/<i>R</i><sub>2</sub>)·ω<sub>1</sub> = (' + n(S.R1, 2) + '/' + n(S.R2, 2) + ')·' + n(Math.abs(K.w1), 2) + ' = ' + n(Math.abs(K.w2), 2) + ' rad/s</div>' +
+      '<div class="f">α<sub>2</sub> = (<i>R</i><sub>1</sub>/<i>R</i><sub>2</sub>)·α<sub>1</sub> = ' + n(K.ratio * Math.abs(S.al), 2) + ' rad/s²,&nbsp; <i>v</i> = ω<sub>1</sub><i>R</i><sub>1</sub> = ' + n(Math.abs(K.v), 2) + ' m/s</div>' +
+      '<div class="where">Ingen glidning: samme tangentielle hastighed og acceleration i kontaktpunktet (tandhjul) eller i remmen (remdrev). Slide 11, "Intro til rotation om fast akse".</div>';
+  }
+  fm.innerHTML = html;
+
+  if (S.mode === 'disk' && K.rv) {
+    ro.set('t', F(S.t, 2) + ' s'); ro.set('th', F(dth, 2) + ' rad'); ro.set('w', F(w, 2) + ' rad/s', 'hi'); ro.set('al', F(S.al, 1) + ' rad/s²');
+    ro.set('r', vecTxt(K.rv, 3) + ' m'); ro.set('v', vecTxt(K.v, 2) + ' m/s', 'ok'); ro.set('vm', F(Math.abs(w) * S.r, 2) + ' m/s');
+    ro.set('at', vecTxt(K.at, 2) + ' m/s²'); ro.set('an', vecTxt(K.an, 2) + ' m/s²'); ro.set('a', vecTxt(K.a, 1) + ' m/s²', 'bad'); ro.set('am', F(Math.hypot(K.a[0], K.a[1]), 1) + ' m/s²');
+  } else if (K.w1 !== undefined) {
+    ro2.set('t', F(S.t, 2) + ' s'); ro2.set('w1', F(K.w1, 2) + ' rad/s', 'hi'); ro2.set('w2', F(K.w2, 2) + ' rad/s', 'hi'); ro2.set('ratio', F(K.ratio, 2));
+    ro2.set('vc', F(Math.abs(K.v), 2) + ' m/s', 'ok'); ro2.set('a1', F(S.al, 1) + ' rad/s²'); ro2.set('a2', F((K.gear ? -1 : 1) * K.ratio * S.al, 2) + ' rad/s²'); ro2.set('ac', F(Math.abs(S.al) * S.R1, 2) + ' m/s²');
+  }
+}
+
+function graphs(w, dth) {
+  var tmax = Math.max(5, S.t * 1.15), wmax = Math.max(Math.abs(S.w0), Math.abs(w), 1) * 1.25;
+  gW.begin({ xmin: 0, xmax: tmax, ymin: -wmax, ymax: wmax, xlabel: 't [s]', ylabel: 'ω [rad/s]' });
+  var t2 = Math.max(tmax, 5); gW.line([[0, S.w0], [t2, S.w0 + S.al * t2]], 'rgba(94,200,255,.3)', 1.5, [5, 4]);
+  gW.line(histW.map(function (p) { return [p[0], p[1]]; }), '#5ec8ff', 2.2); gW.dot(S.t, w, '#5ec8ff');
+  gW.end();
+  var thv = histW.map(function (p) { return [p[0], p[2]]; }), thAbs = Math.max(1, Math.abs(dth) * 1.2);
+  thv.forEach(function (p) { thAbs = Math.max(thAbs, Math.abs(p[1]) * 1.1); });
+  gT.begin({ xmin: 0, xmax: tmax, ymin: -thAbs, ymax: thAbs, xlabel: 't [s]', ylabel: 'θ − θ₀ [rad]' });
+  gT.line(thv, '#ffd27a', 2.2); gT.dot(S.t, dth, '#ffd27a'); gT.end();
+  if (S.mode === 'disk') {
+    var amax = Math.max(1, (Math.max(Math.abs(S.w0), Math.abs(w)) ** 2) * S.r * 1.2);
+    histW.forEach(function (p) { amax = Math.max(amax, p[1] * p[1] * S.r * 1.15); });
+    gA.begin({ xmin: 0, xmax: tmax, ymin: 0, ymax: amax, xlabel: 't [s]', ylabel: 'a [m/s²]' });
+    gA.line(histW.map(function (p) { return [p[0], Math.abs(S.al) * S.r]; }), '#ffa500', 2);
+    gA.line(histW.map(function (p) { return [p[0], p[1] * p[1] * S.r]; }), '#d984ff', 2);
+    gA.line(histW.map(function (p) { return [p[0], Math.hypot(S.al * S.r, p[1] * p[1] * S.r)]; }), '#ff5e5e', 2.2);
+    gA.text(tmax * 0.02, amax * 0.92, '|a_t| = αr (konstant)', '#ffa500'); gA.text(tmax * 0.02, amax * 0.8, '|a_n| = ω²r', '#d984ff'); gA.text(tmax * 0.02, amax * 0.68, '|a|', '#ff5e5e');
+    gA.end();
+  } else {
+    var ratio = S.R1 / S.R2, sg = S.mode === 'gear' ? -1 : 1, m2 = Math.max(wmax, wmax * ratio);
+    gA.begin({ xmin: 0, xmax: tmax, ymin: -m2, ymax: m2, xlabel: 't [s]', ylabel: 'ω [rad/s]' });
+    gA.line(histW.map(function (p) { return [p[0], p[1]]; }), '#5ec8ff', 2.2);
+    gA.line(histW.map(function (p) { return [p[0], sg * ratio * p[1]]; }), '#9fb9a6', 2.2);
+    gA.text(tmax * 0.02, m2 * 0.85, 'ω₁', '#5ec8ff'); gA.text(tmax * 0.1, m2 * 0.85, 'ω₂ = ' + (sg < 0 ? '−' : '') + '(R₁/R₂)·ω₁', '#9fb9a6');
+    gA.end();
+  }
+}
+
+applyMode();
+preset(10, -2, 0.5, -30);
+})();
+</script>
+</body>
+</html>
