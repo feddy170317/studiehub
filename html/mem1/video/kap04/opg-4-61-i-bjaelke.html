@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opgave 4.61: I-bjælke med bøjning og forskydning · video</title>
+<meta name="description" content="I-bjælke med M = 3000 Nm og V = 1000 N: σ_max = 19,7 MPa og τ_max = 1,74 MPa.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 4: videoer</a><h1>Opgave 4.61: I-bjælke med bøjning og forskydning</h1><span class="meta">MEM1 · kapitel 4 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Opgave 4.61: I-bjælke med bøjning og forskydning"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>I-bjælke med M = 3000 Nm og V = 1000 N: σ_max = 19,7 MPa og τ_max = 1,74 MPa.</p><div class="chips"><a href="forskydning-tvaerkraft.html">Se først: Forskydning fra tværkraft</a><a href="../../Kapitel04_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l04">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Opgave 4.61: I-profil 160×100, flanger 10, krop 4 mm, M = 3000 Nm, V = 1000 N → σ = 19,7, τ = 1,74 MPa (slide 41)
+BP.scene({ header: 'MEM1 · kap. 4' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, hatch, rect, dashed, PI } = B;
+
+  B.titel(0, 'Opgave 4.61', 'MEM1 · kapitel 4 · opgave (slide 41)', 'titel');
+  text(0, 'I-bjælke: σ_{max} og τ_{max}', 640, 520, 42, 'red', wt('titel', 'normal') - 0.4, we('titel', 'forskydningsspænding'), { align: 'center' });
+
+  const s = 2.6, x0 = 200, y0 = 150, P = (x, y) => [x0 + x * s, y0 + y * s];
+  const prof = [[0, 0], [100, 0], [100, 10], [52, 10], [52, 150], [100, 150], [100, 160], [0, 160], [0, 150], [48, 150], [48, 10], [0, 10], [0, 0.5]].map(([x, y]) => P(x, y));
+
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start;
+    line(1, prof, 'black', 3, t0, t0 + 1.0);
+    text(1, '100', x0 + 130, y0 - 14, 28, 'black', wt('data', 'hundrede', 1) - 0.1, wt('data', 'bredt'), { align: 'center' });
+    text(1, '160', x0 - 16, y0 + 210, 28, 'black', wt('data', 'tres') - 0.1, wt('data', 'højt'), { align: 'right' });
+    text(1, '10', x0 + 270, y0 + 20, 26, 'black', wt('data', 'ti') - 0.1, wt('data', 'tykke'));
+    text(1, '4', x0 + 150, y0 + 200, 26, 'black', wt('data', 'fire') - 0.1, wt('data', 'fire') + 0.3);
+    text(1, 'M = 3000 N·m', 620, 200, 40, 'red', wt('data', 'M') - 0.1, we('data', 'newtonmeter'));
+    text(1, 'V = 1000 N', 620, 260, 40, 'green', wt('data', 'V') - 0.1, we('data', 'newton'));
+    const ti = L('i').start;
+    hatch(1, [P(0, 10), P(48, 10), P(48, 150), P(0, 150)], 'red', ti + 0.4, ti + 1.2, { gap: 8 });
+    hatch(1, [P(52, 10), P(100, 10), P(100, 150), P(52, 150)], 'red', ti + 0.8, ti + 1.6, { gap: 8 });
+    text(1, 'I = 100·160³/12 − 96·140³/12', 620, 360, 36, 'blue', ti + 0.3, we('i', 'tolv', 1));
+    text(1, '= 12,18 · 10⁶ mm⁴', 700, 420, 40, 'blue', L('i2').start, we('i2', 'fjerde'));
+  }
+
+  B.goto('sigma', 2);
+  {
+    const t0 = L('sigma').start;
+    line(2, prof, 'black', 2.6, t0 - 0.6, t0 + 0.2, { alpha: 0.6 });
+    dashed(2, P(-10, 80), P(110, 80), 'black', t0, t0 + 0.4);
+    arrow(2, [P(108, 80), P(108, 2)], 'red', 2.4, wt('sigma', 'firs') - 0.2, wt('sigma', 'firs') + 0.2, 10); text(2, 'c = 80', x0 + 300, y0 + 110, 28, 'red', wt('sigma', 'firs'), wt('sigma', 'firs') + 0.4);
+    text(2, 'σ_{max} = M c / I = 3·10⁶ · 80 / 12,18·10⁶', 620, 200, 32, 'red', wt('sigma', 'Sigma') - 0.1, we('sigma', 'I'));
+    text(2, '= 19,7 MPa', 900, 260, 46, 'red', wt('sigma', 'altså') - 0.1, we('sigma', 'megapascal'));
+    const tq = L('q').start;
+    hatch(2, [P(0, 0), P(100, 0), P(100, 10), P(0, 10)], 'green', wt('q', 'flangen') - 0.2, wt('q', 'flangen') + 0.4, { gap: 5 });
+    hatch(2, [P(48, 10), P(52, 10), P(52, 80), P(48, 80)], 'green', wt('q', 'krop') - 0.2, wt('q', 'krop') + 0.4, { gap: 3 });
+    text(2, 'Q = 100·10·75 + 4·70·35 = 84 800 mm³', 620, 380, 32, 'green', wt('q', 'Q') - 0.1, we('q', 'hundrede', 1));
+    text(2, 'τ_{max} = V Q / (I b),  b = 4 mm', 620, 460, 34, 'green', wt('tau', 'Bredden') - 0.1, we('tau', 'fire'));
+    text(2, '= 1000 · 84 800 / (12,18·10⁶ · 4) = 1,74 MPa', 620, 520, 30, 'green', wt('tau', 'Tau') - 0.1, we('tau', 'megapascal'));
+    text(2, 'kroppen: forskydning · flangerne: bøjning', 140, 640, 36, 'blue', L('pointe').start + 0.2, we('pointe', 'bøjningen'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Hvorfor b = 4 mm og ikke 100,', 'når τ beregnes i N.A.?'], ['b er bredden lige der,', 'og i N.A. er det kun kroppen'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 4, slide 41 · Hamrock, Schmid & Jacobson, opgave 4.61', '', 'slut');
+  text(4, 'I = ydre rektangel − huller', 200, 280, 42, 'blue', L('slut').start + 0.4, we('slut', 'hullerne'));
+  text(4, 'σ_{max} = 19,7 MPa  ·  τ_{max} = 1,74 MPa', 200, 370, 42, 'red', wt('slut', 'Her') - 0.1, we('slut', 'megapascal'));
+});
+
+</script>
+<script>BP.live({"duration":128.632,"audio":"opg-4-61-i-bjaelke.mp3","order":["titel","data","i","i2","sigma","q","tau","pointe","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":10.874,"words":[["Opgave",0.653,1.181],["fire",1.181,1.555],["komma",1.555,1.968],["enogtres",1.968,2.779],["En",3.683,3.812],["I-bjælke",3.812,4.405],["bærer",4.405,4.727],["både",4.727,5.036],["et",5.036,5.165],["bøjningsmoment",5.165,6.015],["og",6.015,6.196],["en",6.196,6.299],["tværkraft",6.299,7.046],["Vi",7.948,8.052],["finder",8.052,8.348],["den",8.348,8.554],["største",8.554,8.979],["normal",8.979,9.546],["og",9.688,9.804],["forskydningsspænding",9.804,10.874]],"text":"Opgave fire komma enogtres. En I-bjælke bærer både et bøjningsmoment og en tværkraft. Vi finder den største normal- og forskydningsspænding."},"data":{"start":12.106,"end":25.263,"words":[["Profilet",12.246,12.826],["er",12.826,12.994],["hundrede",12.994,13.29],["og",13.29,13.316],["tres",13.316,13.599],["millimeter",13.599,14.115],["højt",14.115,14.45],["og",14.45,14.617],["hundrede",14.617,14.965],["bredt",14.965,15.429],["Flangerne",16.307,16.835],["er",16.835,16.99],["ti",16.99,17.235],["millimeter",17.235,17.647],["tykke",17.647,18.137],["og",18.279,18.498],["kroppen",18.498,19.013],["er",19.013,19.155],["fire",19.155,19.464],["millimeter",19.464,20.186],["Snittet",21.075,21.5],["bærer",21.5,21.9],["M",21.9,22.132],["lig",22.132,22.274],["tre",22.274,22.544],["tusind",22.544,22.879],["newtonmeter",22.879,23.73],["og",23.73,23.884],["V",23.884,24.116],["lig",24.116,24.297],["tusind",24.297,24.683],["newton",24.683,25.263]],"text":"Profilet er hundrede og tres millimeter højt og hundrede bredt. Flangerne er ti millimeter tykke, og kroppen er fire millimeter. Snittet bærer M lig tre tusind newtonmeter og V lig tusind newton."},"i":{"start":26.496,"end":38.532,"words":[["Inertimomentet",26.636,27.616],["finder",27.616,27.951],["vi",27.951,28.067],["som",28.067,28.273],["det",28.273,28.402],["ydre",28.402,28.75],["rektangel",28.75,29.239],["minus",29.239,29.665],["de",29.665,29.832],["to",29.832,30.09],["tomme",30.09,30.335],["rum",30.335,30.67],["ved",30.67,30.811],["siden",30.811,31.159],["af",31.159,31.25],["kroppen",31.25,31.804],["Hundrede",32.694,32.991],["gange",32.991,33.261],["hundrede",33.261,33.481],["og",33.481,33.506],["tres",33.506,33.816],["i",33.816,33.944],["tredje",33.944,34.499],["over",34.499,34.769],["tolv",34.769,35.053],["minus",35.053,35.375],["seksoghalvfems",35.375,36.161],["gange",36.161,36.522],["hundrede",36.522,36.741],["og",36.741,36.754],["fyrre",36.754,37.243],["i",37.243,37.385],["tredje",37.385,37.862],["over",37.862,38.107],["tolv",38.107,38.532]],"text":"Inertimomentet finder vi som det ydre rektangel minus de to tomme rum ved siden af kroppen. Hundrede gange hundrede og tres i tredje over tolv minus seksoghalvfems gange hundrede og fyrre i tredje over tolv."},"i2":{"start":39.782,"end":42.938,"words":[["Det",39.909,39.974],["giver",39.974,40.309],["tolv",40.309,40.579],["komma",40.579,40.837],["to",40.837,41.082],["millioner",41.082,41.533],["millimeter",41.533,42.242],["i",42.242,42.409],["fjerde",42.409,42.938]],"text":"Det giver tolv komma to millioner millimeter i fjerde."},"sigma":{"start":44.164,"end":56.11,"words":[["Bøjningsspændingen",44.304,45.064],["er",45.064,45.155],["størst",45.155,45.503],["i",45.503,45.657],["yderfibrene",45.657,46.585],["firs",46.714,47.062],["millimeter",47.062,47.784],["fra",47.784,47.977],["den",47.977,48.132],["neutrale",48.132,48.673],["akse",48.673,49.201],["Sigma",50.079,50.53],["max",50.53,50.994],["er",50.994,51.136],["tre",51.136,51.406],["millioner",51.406,51.819],["gange",51.819,52.141],["firs",52.141,52.399],["divideret",52.399,52.978],["med",52.978,53.262],["I",53.262,53.661],["altså",53.777,54.216],["nitten",54.216,54.576],["komma",54.576,54.873],["syv",54.873,55.221],["megapascal",55.221,56.11]],"text":"Bøjningsspændingen er størst i yderfibrene, firs millimeter fra den neutrale akse. Sigma max er tre millioner gange firs divideret med I, altså nitten komma syv megapascal."},"q":{"start":57.33,"end":71.066,"words":[["Forskydningen",57.457,58.076],["er",58.076,58.14],["størst",58.14,58.604],["i",58.604,58.746],["den",58.746,58.926],["neutrale",58.926,59.493],["akse",59.493,60.048],["Q",60.938,61.222],["er",61.222,61.325],["flangen",61.325,61.866],["hundrede",62.008,62.407],["gange",62.407,62.704],["ti",62.704,62.923],["gange",62.923,63.206],["femoghalvfjerds",63.206,64.121],["plus",64.263,64.534],["den",64.534,64.701],["halve",64.701,64.959],["krop",64.959,65.384],["fire",65.513,65.861],["gange",65.861,66.157],["halvfjerds",66.157,66.608],["gange",66.608,66.918],["femogtredive",66.918,67.717],["Det",68.579,68.708],["giver",68.708,69.03],["fireogfirs",69.03,69.7],["tusind",69.7,70.229],["otte",70.229,70.538],["hundrede",70.538,71.066]],"text":"Forskydningen er størst i den neutrale akse. Q er flangen, hundrede gange ti gange femoghalvfjerds, plus den halve krop, fire gange halvfjerds gange femogtredive. Det giver fireogfirs tusind otte hundrede."},"tau":{"start":72.296,"end":84.371,"words":[["Bredden",72.436,72.874],["i",72.874,73.029],["den",73.029,73.184],["neutrale",73.184,73.673],["akse",73.673,74.202],["er",74.202,74.356],["kroppens",74.356,74.833],["fire",74.833,75.155],["millimeter",75.155,75.89],["Tau",76.781,77.012],["max",77.012,77.451],["er",77.451,77.618],["tusind",77.618,77.966],["gange",77.966,78.224],["fireogfirs",78.224,78.842],["tusind",78.842,79.216],["otte",79.216,79.5],["hundrede",79.5,79.744],["divideret",79.744,80.427],["med",80.427,80.724],["I",80.724,80.84],["gange",80.84,81.162],["fire",81.162,81.665],["altså",81.793,82.257],["en",82.257,82.489],["komma",82.489,82.85],["syv",82.85,83.159],["fire",83.159,83.482],["megapascal",83.482,84.371]],"text":"Bredden i den neutrale akse er kroppens fire millimeter. Tau max er tusind gange fireogfirs tusind otte hundrede divideret med I gange fire, altså en komma syv fire megapascal."},"pointe":{"start":85.582,"end":91.186,"words":[["Bemærk",85.722,86.199],["at",86.354,86.495],["det",86.495,86.663],["er",86.663,86.753],["den",86.753,86.946],["tynde",86.946,87.243],["krop",87.243,87.681],["der",87.823,87.939],["bærer",87.939,88.184],["forskydningen",88.184,88.982],["og",89.163,89.369],["flangerne",89.369,90.013],["der",90.155,90.271],["bærer",90.271,90.529],["bøjningen",90.529,91.186]],"text":"Bemærk, at det er den tynde krop, der bærer forskydningen, og flangerne, der bærer bøjningen."},"tjek_q":{"start":92.412,"end":99.989,"words":[["Tjek",92.513,92.835],["dig",92.835,93.015],["selv",93.015,93.441],["Hvorfor",94.345,94.628],["bruger",94.628,94.899],["vi",94.899,95.054],["b",95.054,95.26],["lig",95.26,95.453],["fire",95.453,95.724],["millimeter",95.724,96.433],["og",96.433,96.6],["ikke",96.6,96.884],["hundrede",96.884,97.373],["når",97.515,97.67],["vi",97.67,97.786],["beregner",97.786,98.237],["tau",98.237,98.61],["i",98.61,98.765],["den",98.765,98.945],["neutrale",98.946,99.435],["akse",99.435,99.989]],"text":"Tjek dig selv. Hvorfor bruger vi b lig fire millimeter og ikke hundrede, når vi beregner tau i den neutrale akse?"},"tjek_a":{"start":103.86,"end":112.159,"words":[["Fordi",103.987,104.361],["b",104.361,104.632],["er",104.632,104.76],["bredden",104.76,105.134],["præcis",105.134,105.585],["der",105.585,105.933],["hvor",106.075,106.255],["vi",106.255,106.371],["beregner",106.371,106.822],["spændingen",106.822,107.48],["I",108.37,108.448],["den",108.448,108.602],["neutrale",108.602,109.105],["akse",109.105,109.595],["er",109.595,109.736],["det",109.736,109.852],["kun",109.852,110.123],["kroppen",110.123,110.613],["der",110.767,110.922],["er",110.922,110.948],["fire",110.948,111.257],["millimeter",111.257,111.747],["bred",111.747,112.159]],"text":"Fordi b er bredden præcis der, hvor vi beregner spændingen. I den neutrale akse er det kun kroppen, der er fire millimeter bred."},"slut":{"start":113.402,"end":126.198,"words":[["Kort",113.529,113.748],["sagt",113.748,114.238],["I",114.367,114.47],["som",114.47,114.663],["ydre",114.663,114.934],["rektangel",114.934,115.411],["minus",115.411,115.746],["hullerne",115.746,116.261],["sigma",116.377,116.803],["max",116.803,117.138],["er",117.138,117.344],["M",117.344,117.55],["c",117.55,117.846],["over",117.846,118.168],["I",118.168,118.439],["og",118.581,118.8],["tau",118.8,119.045],["max",119.045,119.367],["er",119.367,119.509],["V",119.509,119.715],["Q",119.715,120.037],["over",120.037,120.321],["I",120.321,120.514],["b",120.514,120.836],["med",120.836,121.004],["kroppens",121.004,121.429],["bredde",121.429,121.931],["Her",122.822,123.015],["nitten",123.015,123.299],["komma",123.299,123.595],["syv",123.595,123.853],["og",123.853,123.879],["en",123.879,124.111],["komma",124.111,124.42],["syv",124.42,124.82],["fire",124.82,125.232],["megapascal",125.232,126.198]],"text":"Kort sagt: I som ydre rektangel minus hullerne, sigma max er M c over I, og tau max er V Q over I b med kroppens bredde. Her nitten komma syv og en komma syv fire megapascal."}}}, { audio: 'opg-4-61-i-bjaelke.mp3', id: 'opg-4-61-i-bjaelke' });</script>
+</body>
+</html>

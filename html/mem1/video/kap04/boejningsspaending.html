@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bøjningsspænding · video</title>
+<meta name="description" content="σ = My/I, den neutrale akse, modstandsmomentet S = I/c og bjælkens orientering.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 4: videoer</a><h1>Bøjningsspænding</h1><span class="meta">MEM1 · kapitel 4 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Bøjningsspænding"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>σ = My/I, den neutrale akse, modstandsmomentet S = I/c og bjælkens orientering.</p><div class="chips"><a href="tvaersnit-a-i-j-q.html">Se først: Tværsnitsstørrelser A, I, J og Q</a><a href="../../../../lab/mem1/bjaelke-brud.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel04_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l04">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Bøjningsspænding (MEM1 kap. 4, slides 22–26)
+BP.scene({ header: 'MEM1 · kap. 4' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, hatch, rect, dashed, moment, plot, PI } = B;
+
+  B.titel(0, 'Bøjningsspænding', 'MEM1 · kapitel 4 · begreb (slide 22–26)', 'titel');
+  text(0, 'træk på den ene side, tryk på den anden', 640, 520, 38, 'red', wt('titel', 'ene') - 0.2, we('titel', 'sammen'), { align: 'center' });
+
+  B.goto('formel', 1);
+  {
+    const t0 = L('formel').start, x0 = 200, y0 = 220, h = 240;
+    line(1, rect(x0, y0, 260, h).concat([[x0, y0 + 2]]), 'black', 3, t0, t0 + 0.6);
+    moment(1, x0, y0 + h / 2, 70, 0.65 * PI, 1.35 * PI, 'green', t0 + 0.4, t0 + 0.8); moment(1, x0 + 260, y0 + h / 2, 70, 0.35 * PI, -0.35 * PI, 'green', t0 + 0.5, t0 + 0.9);
+    text(1, 'M', x0 - 60, y0 + 40, 36, 'green', t0 + 0.7, t0 + 0.9); text(1, 'M', x0 + 300, y0 + 40, 36, 'green', t0 + 0.8, t0 + 1.0);
+    const tn = wt('lineaer', 'neutrale') - 0.3;
+    dashed(1, [x0 - 20, y0 + h / 2], [x0 + 560, y0 + h / 2], 'black', tn, tn + 0.5);
+    text(1, 'N.A.', x0 + 570, y0 + h / 2 + 10, 28, 'black', tn + 0.3, tn + 0.6);
+    // lineær fordeling til højre
+    const xs = 640, tl = wt('lineaer', 'lineært') - 0.2;
+    line(1, [[xs, y0], [xs, y0 + h]], 'black', 2.4, tl, tl + 0.3);
+    plot(1, [[xs - 110, y0], [xs + 110, y0 + h]], 'red', tl + 0.2, we('lineaer', 'tværsnittet'));
+    for (let i = 0; i <= 6; i++) { const yy = y0 + h * i / 6, v = 110 * (i / 3 - 1); if (Math.abs(v) > 5) arrow(1, [[xs, yy], [xs + v, yy]], v < 0 ? 'blue' : 'red', 2.2, tl + 0.3 + i * 0.05, tl + 0.5 + i * 0.05, 9); }
+    text(1, 'tryk', xs - 150, y0 + 10, 28, 'blue', tl + 0.4, tl + 0.7); text(1, 'træk', xs + 120, y0 + h, 28, 'red', tl + 0.4, tl + 0.7);
+    text(1, 'σ = M y / I', 860, 260, 50, 'red', wt('formel', 'sigma') - 0.1, we('formel', 'I'));
+    text(1, 'y = 0 ⇒ σ = 0', 860, 340, 38, 'black', wt('lineaer', 'nul') - 0.3, we('lineaer', 'nul', 1));
+    arrow(1, [[x0 + 280, y0 + h / 2], [x0 + 280, y0 + h]], 'black', 2, wt('max', 'c') - 0.3, wt('max', 'c'), 10); text(1, 'c', x0 + 290, y0 + h - 40, 32, 'black', wt('max', 'c'), wt('max', 'c') + 0.3);
+    text(1, 'σ_{max} = M c / I', 860, 420, 46, 'red', wt('max', 'Sigma') - 0.1, we('max', 'I'));
+    const ts = L('modstand').start;
+    box(1, 840, 470, 380, 160, 'blue', ts, ts + 0.7);
+    text(1, 'S = I / c', 870, 535, 44, 'blue', wt('modstand', 'S') - 0.1, we('modstand', 'c'));
+    text(1, 'σ_{max} = M / S', 870, 600, 44, 'blue', wt('modstand', 'Så') - 0.1, we('modstand', 'S', 1));
+  }
+
+  B.goto('toejning', 2);
+  {
+    const t0 = L('toejning').start;
+    text(2, 'ε = M y / (E I)', 160, 180, 50, 'red', wt('toejning', 'epsilon') - 0.1, we('toejning', 'I'));
+    text(2, 'også lineær i y', 640, 180, 38, 'black', wt('toejning', 'varierer') - 0.1, we('toejning', 'y'));
+    const to = L('orientering').start;
+    line(2, rect(250, 280, 90, 260).concat([[250, 282]]), 'black', 3, wt('orientering', 'stort') - 0.3, wt('orientering', 'stort') + 0.3);
+    text(2, 'stærk akse: stort I', 200, 600, 34, 'green', wt('orientering', 'stort') - 0.1, we('orientering', 'akse'));
+    line(2, rect(640, 380, 260, 90).concat([[640, 382]]), 'black', 3, wt('orientering', 'lille') - 0.3, wt('orientering', 'lille') + 0.3);
+    text(2, 'svag akse: lille I', 640, 600, 34, 'red', wt('orientering', 'lille') - 0.1, we('orientering', 'svage'));
+    arrow(2, [[295, 230], [295, 276]], 'blue', 3, wt('orientering', 'lille') + 0.3, wt('orientering', 'lille') + 0.5, 12); arrow(2, [[770, 330], [770, 376]], 'blue', 3, wt('orientering', 'lille') + 0.4, wt('orientering', 'lille') + 0.6, 12);
+    text(2, 'planke på højkant!', 960, 320, 36, 'blue', wt('orientering', 'planke') - 0.1, we('orientering', 'højkant'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['h = 3b. Hvor mange gange', 'større er I om den stærke akse?'], ['9 gange', 'I = b h³/12 ⇒ (h/b)² = 3²'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 4, slide 22–26 · Hamrock, Schmid & Jacobson, kap. 4', 'forskydning fra tværkraft', 'slut');
+  text(4, 'σ = M y / I     σ_{max} = M c / I = M / S', 200, 290, 42, 'red', L('slut').start + 0.4, we('slut', 'S'));
+  text(4, 'N.A.: σ = 0  ·  vend profilet rigtigt', 200, 380, 40, 'blue', wt('slut', 'nul') - 0.1, we('slut', 'rigtigt'));
+});
+
+</script>
+<script>BP.live({"duration":100.442,"audio":"boejningsspaending.mp3","order":["titel","formel","lineaer","max","modstand","toejning","orientering","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":6.737,"words":[["Bøjningsspænding",0.601,1.606],["Når",2.51,2.691],["en",2.691,2.807],["bjælke",2.807,3.116],["bøjer",3.116,3.644],["bliver",3.786,3.979],["den",3.979,4.16],["ene",4.16,4.405],["side",4.405,4.675],["trukket",4.675,5.178],["og",5.178,5.32],["den",5.32,5.5],["anden",5.5,5.822],["trykket",5.822,6.183],["sammen",6.183,6.737]],"text":"Bøjningsspænding. Når en bjælke bøjer, bliver den ene side trukket og den anden trykket sammen."},"formel":{"start":7.954,"end":16.264,"words":[["For",8.081,8.249],["en",8.249,8.326],["bjælke",8.326,8.648],["med",8.648,8.842],["bøjningsmomentet",8.842,9.744],["M",9.744,10.053],["er",10.053,10.195],["normalspændingen",10.195,10.942],["sigma",10.942,11.329],["lig",11.329,11.612],["M",11.612,11.806],["y",11.806,12.025],["divideret",12.025,12.656],["med",12.656,12.965],["I",12.965,13.3],["hvor",13.442,13.88],["y",13.88,14.138],["er",14.138,14.293],["afstanden",14.293,14.976],["fra",14.976,15.143],["den",15.143,15.272],["neutrale",15.272,15.736],["akse",15.736,16.264]],"text":"For en bjælke med bøjningsmomentet M er normalspændingen sigma lig M y divideret med I, hvor y er afstanden fra den neutrale akse."},"lineaer":{"start":17.496,"end":24.738,"words":[["Spændingen",17.623,18.255],["varierer",18.255,18.706],["lineært",18.706,19.324],["over",19.324,19.595],["tværsnittet",19.595,20.368],["I",21.259,21.336],["den",21.336,21.491],["neutrale",21.491,21.981],["akse",21.981,22.432],["er",22.432,22.676],["y",22.676,22.921],["nul",22.921,23.308],["og",23.45,23.566],["så",23.566,23.798],["er",23.798,23.823],["spændingen",23.823,24.326],["nul",24.326,24.738]],"text":"Spændingen varierer lineært over tværsnittet. I den neutrale akse er y nul, og så er spændingen nul."},"max":{"start":25.958,"end":31.743,"words":[["Den",26.085,26.227],["største",26.227,26.601],["spænding",26.601,27.09],["sidder",27.09,27.451],["i",27.451,27.58],["den",27.58,27.761],["yderste",27.761,28.096],["fiber",28.096,28.611],["i",28.753,28.895],["afstanden",28.895,29.397],["c.",29.397,29.629],["Sigma",29.629,29.951],["max",29.951,30.428],["er",30.428,30.608],["M",30.609,30.828],["c",30.828,31.111],["over",31.111,31.446],["I",31.446,31.743]],"text":"Den største spænding sidder i den yderste fiber, i afstanden c. Sigma max er M c over I."},"modstand":{"start":32.956,"end":43.149,"words":[["Vi",33.083,33.174],["samler",33.174,33.534],["geometrien",33.534,34.101],["i",34.101,34.192],["modstandsmomentet",34.192,35.119],["S",35.119,35.506],["som",35.648,35.944],["er",35.944,36.047],["I",36.047,36.125],["divideret",36.125,36.692],["med",36.692,36.872],["c.",36.872,37.194],["Så",37.194,37.465],["er",37.465,37.491],["sigma",37.491,37.967],["max",37.967,38.354],["lig",38.354,38.547],["M",38.547,38.844],["divideret",38.844,39.552],["med",39.552,39.797],["S",39.797,40.235],["Et",41.139,41.229],["større",41.229,41.758],["S",41.758,42.002],["giver",42.002,42.26],["lavere",42.26,42.608],["spænding",42.608,43.149]],"text":"Vi samler geometrien i modstandsmomentet S, som er I divideret med c. Så er sigma max lig M divideret med S. Et større S giver lavere spænding."},"toejning":{"start":44.394,"end":52.667,"words":[["Tøjningen",44.521,45.191],["følger",45.191,45.565],["med.",45.565,45.965],["Med",46.894,47.062],["Hookes",47.062,47.319],["lov",47.319,47.68],["er",47.68,47.848],["epsilon",47.848,48.44],["lig",48.44,48.737],["M",48.737,48.917],["y",48.917,49.11],["divideret",49.11,49.716],["med",49.716,49.974],["E",49.974,50.206],["I",50.206,50.502],["og",50.657,50.786],["den",50.786,50.928],["varierer",50.928,51.314],["også",51.314,51.649],["lineært",51.649,52.126],["med",52.126,52.345],["y",52.345,52.667]],"text":"Tøjningen følger med. Med Hookes lov er epsilon lig M y divideret med E I, og den varierer også lineært med y."},"orientering":{"start":53.888,"end":64.197,"words":[["Orienteringen",54.028,54.737],["betyder",54.737,55.214],["meget",55.214,55.716],["Det",56.607,56.697],["samme",56.697,57.032],["rektangel",57.032,57.548],["har",57.548,57.818],["et",57.818,57.883],["stort",57.883,58.205],["I",58.205,58.308],["om",58.308,58.45],["den",58.45,58.579],["stærke",58.579,58.978],["akse",58.978,59.532],["og",59.532,59.751],["et",59.751,59.829],["lille",59.829,60.19],["I",60.19,60.396],["om",60.396,60.563],["den",60.563,60.718],["svage",60.718,61.22],["Derfor",62.11,62.419],["skal",62.419,62.612],["en",62.612,62.715],["planke",62.715,63.076],["stå",63.076,63.385],["på",63.385,63.553],["højkant",63.553,64.197]],"text":"Orienteringen betyder meget. Det samme rektangel har et stort I om den stærke akse og et lille I om den svage. Derfor skal en planke stå på højkant."},"tjek_q":{"start":65.422,"end":74.404,"words":[["Tjek",65.523,65.845],["dig",65.845,66.025],["selv",66.025,66.451],["Et",67.355,67.458],["rektangel",67.458,68.077],["er",68.077,68.244],["tre",68.244,68.553],["gange",68.553,68.811],["så",68.811,68.979],["højt",68.979,69.211],["som",69.211,69.417],["bredt",69.417,69.868],["Hvor",70.757,70.873],["mange",70.873,71.144],["gange",71.144,71.401],["større",71.401,71.814],["er",71.814,71.968],["I",71.968,72.123],["om",72.123,72.291],["den",72.291,72.445],["stærke",72.445,72.87],["akse",72.87,73.347],["end",73.347,73.566],["om",73.566,73.734],["den",73.734,73.927],["svage",73.927,74.404]],"text":"Tjek dig selv. Et rektangel er tre gange så højt som bredt. Hvor mange gange større er I om den stærke akse end om den svage?"},"tjek_a":{"start":78.286,"end":85.889,"words":[["Ni",78.386,78.76],["gange",78.76,79.224],["I",80.206,80.335],["er",80.335,80.464],["b",80.464,80.696],["h",80.696,80.941],["i",80.941,81.108],["tredje",81.108,81.521],["over",81.521,81.778],["tolv",81.778,82.203],["og",82.345,82.539],["forholdet",82.539,82.964],["bliver",82.964,83.157],["h",83.157,83.415],["over",83.415,83.608],["b",83.608,83.84],["i",83.84,84.033],["anden",84.033,84.484],["altså",84.626,84.961],["tre",84.961,85.296],["i",85.296,85.464],["anden",85.464,85.889]],"text":"Ni gange. I er b h i tredje over tolv, og forholdet bliver h over b i anden, altså tre i anden."},"slut":{"start":87.108,"end":98.01,"words":[["Kort",87.235,87.454],["sagt",87.454,87.918],["sigma",88.034,88.537],["er",88.537,88.73],["M",88.73,88.962],["y",88.962,89.155],["over",89.155,89.439],["I",89.439,89.748],["størst",89.877,90.328],["i",90.328,90.47],["yderfiberen",90.47,91.14],["som",91.14,91.436],["M",91.436,91.63],["c",91.63,91.887],["over",91.887,92.21],["I",92.21,92.454],["eller",92.454,92.712],["M",92.712,92.957],["over",92.957,93.228],["S",93.228,93.64],["og",93.833,94.001],["nul",94.001,94.271],["i",94.271,94.452],["den",94.452,94.632],["neutrale",94.632,95.148],["akse",95.148,95.676],["Vend",96.554,96.786],["profilet",96.786,97.391],["rigtigt",97.392,98.01]],"text":"Kort sagt: sigma er M y over I, størst i yderfiberen som M c over I eller M over S, og nul i den neutrale akse. Vend profilet rigtigt."}}}, { audio: 'boejningsspaending.mp3', id: 'boejningsspaending' });</script>
+</body>
+</html>

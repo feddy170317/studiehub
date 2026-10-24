@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opgave 4.34: elevatorkabel · video</title>
+<meta name="description" content="Spænding og forlængelse i et elevatorkabel, først i hvile og så under acceleration.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 4: videoer</a><h1>Opgave 4.34: elevatorkabel</h1><span class="meta">MEM1 · kapitel 4 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Opgave 4.34: elevatorkabel"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Spænding og forlængelse i et elevatorkabel, først i hvile og så under acceleration.</p><div class="chips"><a href="aksial-belastning.html">Se først: Aksial belastning og fjederkonstant</a><a href="../../Kapitel04_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l04">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Opgave 4.34: elevatorkabel A = 250 mm², E = 70 GPa, L = 100 m, m = 1000 kg, a = 4 m/s² (MEM1 kap. 4, slide 39)
+// Kontrol: σ = 39,2 MPa, δ = 56,1 mm, Δδ = 22,9 mm, i alt 78,9 mm, σ = 55,2 MPa
+BP.scene({ header: 'MEM1 · kap. 4' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, rect, hatch, PI } = B;
+
+  B.titel(0, 'Opgave 4.34', 'MEM1 · kapitel 4 · opgave (slide 39)', 'titel');
+  text(0, 'elevatorkabel: vægt + acceleration', 640, 520, 40, 'red', wt('titel', 'elevatorkabel') - 0.2, we('titel', 'accelererer'), { align: 'center' });
+
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start;
+    hatch(1, rect(130, 110, 200, 20), 'black', t0, t0 + 0.3, { gap: 6 });
+    line(1, [[230, 130], [230, 470]], 'black', 3, t0 + 0.2, t0 + 0.8);
+    line(1, rect(160, 470, 140, 150).concat([[160, 472]]), 'black', 3.2, t0 + 0.6, t0 + 1.1);
+    text(1, '1000 kg', 230, 555, 30, 'black', wt('data', 'tusind') - 0.1, wt('data', 'kilo') + 0.2, { align: 'center' });
+    arrow(1, [[330, 600], [330, 500]], 'green', 3.6, wt('data', 'opad') - 0.2, wt('data', 'opad') + 0.2, 13); text(1, 'a = 4 m/s²', 346, 560, 30, 'green', wt('data', 'fire') - 0.1, we('data', 'anden'));
+    text(1, 'L = 100 m', 250, 300, 32, 'blue', wt('data', 'længden') - 0.1, we('data', 'meter', 0));
+    text(1, 'A = 250 mm²', 520, 200, 40, 'black', wt('data', 'arealet') - 0.1, we('data', 'kvadratmillimeter'));
+    text(1, 'E = 70 GPa', 520, 260, 40, 'black', wt('data', 'E') - 0.1, we('data', 'gigapascal'));
+    const tv = L('vaegt').start;
+    text(1, '1) W = m g = 1000 · 9,81 = 9810 N', 520, 380, 38, 'blue', wt('vaegt', 'Kraften') - 0.1, we('vaegt', 'newton'));
+    text(1, 'σ = 9810 / 250 = 39,2 MPa', 560, 450, 38, 'red', L('sigma').start + 0.2, we('sigma', 'megapascal'));
+    text(1, 'δ = 9810 · 100 000 / (250 · 70 000)', 560, 520, 34, 'red', wt('delta', 'Forlængelsen') - 0.1, we('delta', 'tusind', 2));
+    text(1, '= 56,1 mm', 900, 580, 42, 'red', wt('delta', 'Det') - 0.1, we('delta', 'millimeter', 1));
+  }
+
+  B.goto('acc', 2);
+  {
+    const t0 = L('acc').start;
+    text(2, '2) ekstra kraft: m a = 1000 · 4 = 4000 N', 140, 180, 40, 'green', wt('acc', 'ekstra') - 0.2, we('acc', 'newton'));
+    text(2, 'Δδ = 4000 · 100 000 / (250 · 70 000) = 22,9 mm', 140, 270, 38, 'green', L('delta2').start + 0.2, we('delta2', 'ekstra'));
+    const ts = L('samlet').start;
+    box(2, 120, 340, 1040, 160, 'red', ts, ts + 0.8);
+    text(2, 'i alt:  δ = 56,1 + 22,9 = 78,9 mm', 150, 405, 44, 'red', ts + 0.3, we('samlet', 'alt'));
+    text(2, 'σ = (9810 + 4000) / 250 = 55,2 MPa', 150, 470, 40, 'red', wt('samlet', 'spændingen') - 0.1, we('samlet', 'megapascal'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Elevatoren accelererer nedad.', 'Hvad sker der med δ?'], ['F = m(g − a): mindre kraft', 'δ bliver 22,9 mm mindre'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 4, slide 39 · Hamrock, Schmid & Jacobson, opgave 4.34', '', 'slut');
+  text(4, 'F = m g + m a', 200, 280, 46, 'blue', L('slut').start + 0.4, we('slut', 'a'));
+  text(4, 'σ = P / A     δ = P L / (A E)', 200, 370, 46, 'red', wt('slut', 'sigma') - 0.1, we('slut', 'E'));
+});
+
+</script>
+<script>BP.live({"duration":124.0,"audio":"opg-4-34-elevator.mp3","order":["titel","data","vaegt","sigma","delta","acc","delta2","samlet","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":9.611,"words":[["Opgave",0.653,1.181],["fire",1.181,1.568],["komma",1.568,1.993],["fireogtredive",1.993,2.831],["Et",3.747,3.863],["elevatorkabel",3.863,4.778],["strækkes",4.778,5.255],["af",5.255,5.474],["elevatorens",5.474,6.196],["vægt",6.196,6.428],["og",6.428,6.557],["strækkes",6.557,6.995],["ekstra",6.995,7.588],["når",7.742,7.961],["elevatoren",7.961,8.747],["accelererer",8.747,9.611]],"text":"Opgave fire komma fireogtredive. Et elevatorkabel strækkes af elevatorens vægt og strækkes ekstra, når elevatoren accelererer."},"data":{"start":10.834,"end":23.721,"words":[["Kablet",10.974,11.412],["har",11.412,11.631],["arealet",11.631,12.173],["to",12.173,12.43],["hundrede",12.43,12.637],["og",12.637,12.662],["halvtreds",12.662,13.01],["kvadratmillimeter",13.01,14.106],["E",14.247,14.466],["er",14.466,14.557],["halvfjerds",14.557,14.956],["gigapascal",14.956,15.832],["og",16.026,16.129],["længden",16.129,16.67],["er",16.67,16.786],["hundrede",16.786,17.134],["meter",17.134,17.624],["Elevatoren",18.527,19.184],["vejer",19.185,19.507],["tusind",19.507,19.867],["kilo",19.868,20.319],["og",20.319,20.473],["accelererer",20.473,21.143],["opad",21.143,21.569],["med",21.569,21.775],["fire",21.775,22.084],["meter",22.084,22.342],["pr.",22.342,22.574],["sekund",22.574,23.089],["i",23.089,23.27],["anden",23.27,23.721]],"text":"Kablet har arealet to hundrede og halvtreds kvadratmillimeter, E er halvfjerds gigapascal, og længden er hundrede meter. Elevatoren vejer tusind kilo og accelererer opad med fire meter pr. sekund i anden."},"vaegt":{"start":24.936,"end":33.48,"words":[["Først",25.037,25.514],["vægten",25.514,25.913],["alene",25.913,26.506],["Kraften",27.423,27.9],["er",27.9,28.145],["m",28.145,28.377],["g",28.377,28.75],["tusind",28.879,29.24],["gange",29.24,29.511],["ni",29.511,29.717],["komma",29.717,30.052],["otte",30.052,30.387],["en",30.387,30.748],["altså",30.89,31.354],["ni",31.354,31.598],["tusind",31.598,32.062],["otte",32.062,32.372],["hundrede",32.372,32.604],["og",32.604,32.616],["ti",32.616,32.887],["newton",32.887,33.48]],"text":"Først vægten alene. Kraften er m g, tusind gange ni komma otte en, altså ni tusind otte hundrede og ti newton."},"sigma":{"start":34.718,"end":42.875,"words":[["Spændingen",34.845,35.412],["er",35.412,35.606],["ni",35.606,35.85],["tusind",35.85,36.25],["otte",36.25,36.546],["hundrede",36.546,36.765],["og",36.765,36.778],["ti",36.778,37.075],["divideret",37.075,37.809],["med",37.809,38.041],["to",38.041,38.325],["hundrede",38.325,38.557],["og",38.557,38.595],["halvtreds",38.595,39.214],["Det",40.105,40.169],["giver",40.169,40.465],["niogtredive",40.465,41.135],["komma",41.136,41.458],["to",41.458,41.831],["megapascal",41.831,42.875]],"text":"Spændingen er ni tusind otte hundrede og ti divideret med to hundrede og halvtreds. Det giver niogtredive komma to megapascal."},"delta":{"start":44.092,"end":58.641,"words":[["Forlængelsen",44.206,44.902],["er",44.902,45.134],["P",45.134,45.418],["L",45.418,45.727],["over",45.727,46.165],["A",46.165,46.449],["E.",46.449,46.784],["Med",47.687,47.816],["længden",47.816,48.19],["i",48.19,48.267],["millimeter",48.267,49.002],["bliver",49.002,49.208],["det",49.208,49.324],["ni",49.324,49.53],["tusind",49.53,50.007],["otte",50.007,50.303],["hundrede",50.303,50.535],["og",50.535,50.548],["ti",50.548,50.78],["gange",50.78,51.064],["hundrede",51.064,51.308],["tusind",51.308,51.798],["divideret",51.798,52.52],["med",52.52,52.765],["to",52.765,53.022],["hundrede",53.022,53.229],["og",53.229,53.254],["halvtreds",53.254,53.654],["gange",53.654,54.092],["halvfjerds",54.092,54.556],["tusind",54.556,55.213],["Det",56.089,56.257],["er",56.257,56.412],["seksoghalvtreds",56.412,57.236],["komma",57.236,57.7],["et",57.7,57.894],["millimeter",57.894,58.641]],"text":"Forlængelsen er P L over A E. Med længden i millimeter bliver det ni tusind otte hundrede og ti gange hundrede tusind divideret med to hundrede og halvtreds gange halvfjerds tusind. Det er seksoghalvtreds komma et millimeter."},"acc":{"start":59.874,"end":70.995,"words":[["Når",60.014,60.195],["elevatoren",60.195,60.916],["accelererer",60.916,61.715],["opad",61.715,62.282],["skal",62.411,62.63],["kablet",62.63,63.107],["også",63.107,63.468],["give",63.468,63.661],["massen",63.661,64.125],["accelerationen",64.125,65.207],["Den",66.098,66.24],["ekstra",66.24,66.627],["kraft",66.627,67.026],["er",67.026,67.245],["m",67.245,67.529],["a",67.529,67.864],["tusind",67.993,68.392],["gange",68.392,68.65],["fire",68.65,69.165],["altså",69.294,69.732],["fire",69.732,70.042],["tusind",70.042,70.415],["newton",70.415,70.995]],"text":"Når elevatoren accelererer opad, skal kablet også give massen accelerationen. Den ekstra kraft er m a, tusind gange fire, altså fire tusind newton."},"delta2":{"start":72.224,"end":82.456,"words":[["Den",72.364,72.519],["ekstra",72.519,72.905],["forlængelse",72.905,73.627],["er",73.627,73.782],["fire",73.782,74.065],["tusind",74.065,74.413],["gange",74.413,74.697],["hundrede",74.697,74.941],["tusind",74.942,75.302],["divideret",75.302,76.024],["med",76.024,76.269],["to",76.269,76.527],["hundrede",76.527,76.733],["og",76.733,76.759],["halvtreds",76.759,77.158],["gange",77.158,77.557],["halvfjerds",77.557,77.996],["tusind",77.996,78.653],["Det",79.556,79.634],["giver",79.634,79.982],["toogtyve",79.982,80.587],["komma",80.587,80.897],["ni",80.897,81.18],["millimeter",81.18,81.786],["ekstra",81.786,82.456]],"text":"Den ekstra forlængelse er fire tusind gange hundrede tusind divideret med to hundrede og halvtreds gange halvfjerds tusind. Det giver toogtyve komma ni millimeter ekstra."},"samlet":{"start":83.686,"end":91.687,"words":[["Under",83.826,84.071],["accelerationen",84.071,85.038],["er",85.038,85.166],["kablet",85.166,85.695],["altså",85.695,86.03],["forlænget",86.03,86.455],["knap",86.455,86.79],["nioghalvfjerds",86.79,87.473],["millimeter",87.473,88.001],["i",88.001,88.169],["alt",88.169,88.517],["og",88.672,88.865],["spændingen",88.865,89.355],["er",89.355,89.445],["femoghalvtreds",89.445,90.218],["komma",90.218,90.566],["to",90.566,90.849],["megapascal",90.849,91.687]],"text":"Under accelerationen er kablet altså forlænget knap nioghalvfjerds millimeter i alt, og spændingen er femoghalvtreds komma to megapascal."},"tjek_q":{"start":92.916,"end":99.669,"words":[["Tjek",93.016,93.351],["dig",93.351,93.532],["selv",93.532,93.97],["Hvad",94.888,94.991],["sker",94.991,95.261],["der",95.261,95.352],["med",95.352,95.506],["den",95.506,95.751],["ekstra",95.751,96.125],["forlængelse",96.125,96.898],["hvis",97.027,97.246],["elevatoren",97.246,98.032],["accelererer",98.032,98.754],["nedad",98.754,99.14],["i",99.14,99.205],["stedet",99.205,99.669]],"text":"Tjek dig selv. Hvad sker der med den ekstra forlængelse, hvis elevatoren accelererer nedad i stedet?"},"tjek_a":{"start":103.548,"end":111.911,"words":[["Så",103.675,103.881],["bliver",103.882,104.088],["kraften",104.088,104.629],["mindre",104.629,105.106],["end",105.106,105.299],["vægten",105.299,105.905],["Forlængelsen",106.795,107.465],["bliver",107.466,107.723],["toogtyve",107.723,108.329],["komma",108.329,108.612],["ni",108.612,108.844],["millimeter",108.844,109.257],["mindre",109.257,109.63],["end",109.63,109.94],["når",110.107,110.301],["elevatoren",110.301,111.074],["holder",111.074,111.409],["stille",111.409,111.911]],"text":"Så bliver kraften mindre end vægten. Forlængelsen bliver toogtyve komma ni millimeter mindre end, når elevatoren holder stille."},"slut":{"start":113.138,"end":121.577,"words":[["Kort",113.265,113.497],["sagt",113.497,114.026],["kraft",114.154,114.502],["er",114.502,114.696],["m",114.696,114.953],["g",114.953,115.147],["plus",115.147,115.417],["m",115.417,115.662],["a",115.662,115.997],["sigma",116.139,116.654],["er",116.655,116.783],["P",116.783,117.054],["over",117.054,117.35],["A",117.35,117.673],["og",117.827,117.969],["delta",117.969,118.368],["er",118.368,118.51],["P",118.51,118.755],["L",118.755,118.923],["over",118.923,119.361],["A",119.361,119.58],["E.",119.58,119.799],["Regn",119.799,120.121],["i",120.121,120.224],["newton",120.224,120.765],["og",120.765,120.881],["millimeter",120.881,121.577]],"text":"Kort sagt: kraft er m g plus m a, sigma er P over A, og delta er P L over A E. Regn i newton og millimeter."}}}, { audio: 'opg-4-34-elevator.mp3', id: 'opg-4-34-elevator' });</script>
+</body>
+</html>

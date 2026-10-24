@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opgave 4.28: inertimoment for et rektangel · video</title>
+<meta name="description" content="Udledning af I_x = ab³/12, I_y = ba³/12 og J for et rektangel.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 4: videoer</a><h1>Opgave 4.28: inertimoment for et rektangel</h1><span class="meta">MEM1 · kapitel 4 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Opgave 4.28: inertimoment for et rektangel"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Udledning af I_x = ab³/12, I_y = ba³/12 og J for et rektangel.</p><div class="chips"><a href="tvaersnit-a-i-j-q.html">Se først: Tværsnitsstørrelser A, I, J og Q</a><a href="../../Kapitel04_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l04">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Opgave 4.28: Ix = ab³/12, Iy = ba³/12, J = Ix + Iy (MEM1 kap. 4, slide 38)
+BP.scene({ header: 'MEM1 · kap. 4' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, hatch, rect, dashed, PI } = B;
+
+  B.titel(0, 'Opgave 4.28', 'MEM1 · kapitel 4 · opgave (slide 38)', 'titel');
+  text(0, 'udled I for et rektangel', 640, 520, 42, 'red', wt('titel', 'udleder') - 0.2, we('titel', 'rektangel'), { align: 'center' });
+
+  B.goto('opsaet', 1);
+  {
+    const t0 = L('opsaet').start, cx = 330, cy = 390, a = 300, b = 200;
+    line(1, rect(cx - a / 2, cy - b / 2, a, b).concat([[cx - a / 2, cy - b / 2 + 2]]), 'black', 3.2, t0, t0 + 0.6);
+    arrow(1, [[cx - a / 2 - 40, cy], [cx + a / 2 + 60, cy]], 'black', 2.4, t0 + 0.5, t0 + 0.8, 12); text(1, 'x', cx + a / 2 + 66, cy + 10, 30, 'black', t0 + 0.7, t0 + 0.9);
+    arrow(1, [[cx, cy + b / 2 + 40], [cx, cy - b / 2 - 60]], 'black', 2.4, t0 + 0.6, t0 + 0.9, 12); text(1, 'y', cx + 10, cy - b / 2 - 60, 30, 'black', t0 + 0.8, t0 + 1.0);
+    text(1, 'a', cx, cy + b / 2 + 80, 36, 'blue', wt('opsaet', 'a') - 0.1, wt('opsaet', 'a') + 0.3, { align: 'center' });
+    text(1, 'b', cx - a / 2 - 50, cy + 10, 36, 'blue', wt('opsaet', 'b') - 0.1, wt('opsaet', 'b') + 0.3);
+    const ts = L('strimmel').start;
+    hatch(1, rect(cx - a / 2, cy - 70, a, 18), 'red', wt('strimmel', 'strimler') - 0.2, wt('strimmel', 'strimler') + 0.4, { gap: 4 });
+    text(1, 'dy', cx + a / 2 + 14, cy - 54, 28, 'red', wt('strimmel', 'd') - 0.1, we('strimmel', 'y'));
+    arrow(1, [[cx + 40, cy - 4], [cx + 40, cy - 56]], 'red', 2.2, wt('strimmel', 'strimler'), wt('strimmel', 'strimler') + 0.3, 9); text(1, 'y', cx + 50, cy - 20, 28, 'red', wt('strimmel', 'strimler') + 0.2, wt('strimmel', 'strimler') + 0.4);
+    text(1, 'dA = a · dy', 700, 260, 46, 'red', wt('strimmel', 'arealet') - 0.1, we('strimmel', 'y', 1));
+    const ti = L('integral').start;
+    text(1, 'I_x = ∫ y² dA', 700, 360, 44, 'blue', ti + 0.1, we('integral', 'A'));
+    text(1, '= ∫ a y² dy   (−b/2 til b/2)', 700, 430, 36, 'blue', wt('integral', 'bliver') - 0.1, we('integral', 'halve', 1));
+  }
+
+  B.goto('loes', 2);
+  {
+    const t0 = L('loes').start;
+    text(2, 'I_x = a [y³/3]  fra −b/2 til b/2', 150, 180, 44, 'blue', t0 + 0.1, we('loes', 'tre'));
+    text(2, '= (a/3) · 2 · (b/2)³', 150, 260, 44, 'blue', wt('loes', 'Indsat') - 0.1, we('loes', 'tredje'));
+    const r = text(2, 'I_x = a b³ / 12', 150, 350, 54, 'red', wt('loes', 'altså') - 0.1, we('loes', 'tolv'));
+    box(2, 125, 295, 460, 85, 'red', we('loes', 'tolv'), we('loes', 'tolv') + 0.6);
+    text(2, 'I_y = b a³ / 12', 680, 350, 48, 'blue', wt('iy', 'I') - 0.1, we('iy', 'tolv'));
+    text(2, 'J = I_x + I_y = a b (a² + b²) / 12', 150, 470, 44, 'green', wt('j', 'J') - 0.1, we('j', 'anden', 1));
+    text(2, 'mål ⊥ bøjningsaksen indgår i tredje', 150, 580, 38, 'red', wt('pointe', 'vinkelret') - 0.4, we('pointe', 'vigtig'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['20 × 60 mm, stærk akse.', 'Hvad er I?'], ['I = 20 · 60³ / 12', '= 360 000 mm⁴'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 4, slide 38 · Hamrock, Schmid & Jacobson, opgave 4.28', '', 'slut');
+  text(4, 'dA = a dy  →  ∫ y² a dy  →  I_x = a b³ / 12', 200, 290, 40, 'blue', L('slut').start + 0.4, we('slut', 'tolv'));
+  text(4, 'J = I_x + I_y', 200, 380, 46, 'red', wt('slut', 'J') - 0.1, we('slut', 'y'));
+});
+
+</script>
+<script>BP.live({"duration":109.288,"audio":"opg-4-28-inertimoment.mp3","order":["titel","opsaet","strimmel","integral","loes","iy","j","pointe","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":10.152,"words":[["Opgave",0.64,1.13],["fire",1.13,1.478],["komma",1.478,1.968],["otteogtyve",1.968,2.844],["Vi",3.747,3.902],["udleder",3.902,4.379],["inertimomentet",4.379,5.436],["for",5.436,5.668],["et",5.668,5.732],["rektangel",5.732,6.402],["Det",7.304,7.42],["er",7.42,7.536],["en",7.536,7.626],["typisk",7.626,8.077],["udledning",8.077,8.619],["til",8.619,8.812],["den",8.812,8.979],["mundtlige",8.979,9.405],["eksamen",9.405,10.152]],"text":"Opgave fire komma otteogtyve. Vi udleder inertimomentet for et rektangel. Det er en typisk udledning til den mundtlige eksamen."},"opsaet":{"start":11.362,"end":17.198,"words":[["Rektanglet",11.489,12.108],["har",12.108,12.237],["bredden",12.237,12.688],["a",12.688,12.907],["langs",12.907,13.345],["x",13.345,13.59],["og",13.59,13.641],["højden",13.641,14.092],["b",14.092,14.286],["langs",14.286,14.647],["y",14.647,14.956],["og",15.149,15.304],["akserne",15.304,15.832],["går",15.832,16.038],["gennem",16.038,16.348],["tyngdepunktet",16.348,17.198]],"text":"Rektanglet har bredden a langs x og højden b langs y, og akserne går gennem tyngdepunktet."},"strimmel":{"start":18.432,"end":26.293,"words":[["Vi",18.572,18.675],["deler",18.675,19.023],["arealet",19.023,19.513],["op",19.513,19.861],["i",19.861,19.977],["tynde",19.977,20.286],["vandrette",20.286,20.673],["strimler",20.673,21.253],["med",21.253,21.446],["højden",21.446,21.948],["d",21.949,22.206],["y",22.206,22.49],["Hver",23.393,23.625],["strimmel",23.625,23.973],["har",23.973,24.115],["arealet",24.115,24.63],["d",24.63,24.901],["A",24.901,24.927],["lig",24.927,25.275],["a",25.275,25.391],["gange",25.391,25.764],["d",25.764,25.996],["y",25.996,26.293]],"text":"Vi deler arealet op i tynde vandrette strimler med højden d y. Hver strimmel har arealet d A lig a gange d y."},"integral":{"start":27.518,"end":37.956,"words":[["Inertimomentet",27.658,28.457],["om",28.457,28.638],["x-aksen",28.638,29.295],["er",29.295,29.398],["integralet",29.398,30.158],["af",30.158,30.493],["y",30.493,30.712],["i",30.712,30.97],["anden",30.97,31.382],["d",31.382,31.64],["A.",31.64,32.065],["Det",32.943,33.021],["bliver",33.021,33.201],["integralet",33.201,33.832],["af",33.832,34.155],["a",34.155,34.283],["y",34.283,34.515],["i",34.515,34.747],["anden",34.747,35.095],["d",35.095,35.327],["y",35.327,35.585],["fra",35.585,35.804],["minus",35.804,36.178],["b",36.178,36.371],["halve",36.371,36.783],["til",36.783,36.964],["plus",36.964,37.286],["b",37.286,37.492],["halve",37.492,37.956]],"text":"Inertimomentet om x-aksen er integralet af y i anden d A. Det bliver integralet af a y i anden d y fra minus b halve til plus b halve."},"loes":{"start":39.172,"end":49.881,"words":[["Stamfunktionen",39.299,40.253],["er",40.253,40.498],["a",40.498,40.73],["y",40.73,40.949],["i",40.949,41.142],["tredje",41.142,41.645],["over",41.645,41.915],["tre",41.915,42.353],["Indsat",43.27,43.605],["i",43.605,43.669],["grænserne",43.669,44.314],["giver",44.314,44.559],["det",44.559,44.752],["a",44.752,45.035],["over",45.035,45.306],["tre",45.306,45.59],["gange",45.59,45.873],["to",45.873,46.105],["gange",46.105,46.414],["b",46.414,46.62],["halve",46.62,46.994],["i",46.994,47.123],["tredje",47.123,47.716],["altså",47.845,48.244],["a",48.244,48.283],["b",48.283,48.541],["i",48.541,48.708],["tredje",48.708,49.185],["over",49.185,49.443],["tolv",49.443,49.881]],"text":"Stamfunktionen er a y i tredje over tre. Indsat i grænserne giver det a over tre gange to gange b halve i tredje, altså a b i tredje over tolv."},"iy":{"start":51.114,"end":56.396,"words":[["På",51.241,51.306],["samme",51.306,51.615],["måde",51.615,52.015],["med",52.143,52.285],["lodrette",52.285,52.749],["strimler",52.749,53.316],["får",53.445,53.625],["vi",53.625,53.831],["I",53.832,54.051],["y",54.051,54.244],["lig",54.244,54.437],["b",54.437,54.721],["a",54.721,55.017],["i",55.017,55.21],["tredje",55.21,55.674],["over",55.674,55.932],["tolv",55.932,56.396]],"text":"På samme måde, med lodrette strimler, får vi I y lig b a i tredje over tolv."},"j":{"start":57.632,"end":66.292,"words":[["Det",57.759,57.837],["polære",57.837,58.288],["inertimoment",58.288,59.138],["er",59.138,59.267],["summen",59.267,59.873],["J",60.763,61.111],["er",61.111,61.292],["I",61.292,61.55],["x",61.55,61.807],["plus",61.807,62.117],["I",62.117,62.348],["y",62.348,62.684],["altså",62.825,63.186],["a",63.186,63.212],["b",63.212,63.521],["over",63.521,63.727],["tolv",63.727,63.998],["gange",63.998,64.359],["a",64.359,64.604],["i",64.604,64.836],["anden",64.836,65.158],["plus",65.158,65.441],["b",65.441,65.686],["i",65.686,65.867],["anden",65.867,66.292]],"text":"Det polære inertimoment er summen. J er I x plus I y, altså a b over tolv gange a i anden plus b i anden."},"pointe":{"start":67.51,"end":75.706,"words":[["Bemærk",67.637,68.114],["at",68.256,68.423],["den",68.423,68.642],["dimension",68.642,69.313],["der",69.48,69.596],["står",69.596,69.88],["vinkelret",69.88,70.331],["på",70.331,70.472],["bøjningsaksen",70.472,71.478],["indgår",71.606,72.109],["i",72.109,72.199],["tredje",72.199,72.573],["potens",72.573,73.166],["Derfor",74.044,74.456],["er",74.456,74.52],["højden",74.52,74.984],["så",74.984,75.19],["vigtig",75.19,75.706]],"text":"Bemærk, at den dimension, der står vinkelret på bøjningsaksen, indgår i tredje potens. Derfor er højden så vigtig."},"tjek_q":{"start":76.932,"end":84.959,"words":[["Tjek",77.033,77.355],["dig",77.355,77.535],["selv",77.535,77.961],["Et",78.878,78.981],["rektangel",78.981,79.522],["er",79.522,79.664],["tyve",79.664,79.973],["gange",79.973,80.257],["tres",80.257,80.527],["millimeter",80.527,81.236],["og",81.236,81.365],["bøjes",81.365,81.7],["om",81.7,81.893],["den",81.893,82.048],["stærke",82.048,82.486],["akse",82.486,83.04],["Hvad",83.902,84.34],["er",84.34,84.688],["I",84.688,84.959]],"text":"Tjek dig selv. Et rektangel er tyve gange tres millimeter og bøjes om den stærke akse. Hvad er I?"},"tjek_a":{"start":88.836,"end":94.492,"words":[["I",88.976,89.105],["er",89.105,89.195],["tyve",89.195,89.517],["gange",89.517,89.788],["tres",89.788,90.162],["i",90.162,90.316],["tredje",90.316,90.742],["over",90.742,90.999],["tolv",90.999,91.45],["altså",91.579,92.043],["tre",92.043,92.314],["hundrede",92.314,92.507],["og",92.507,92.533],["tres",92.533,92.816],["tusind",92.816,93.139],["millimeter",93.139,93.809],["i",93.809,93.976],["fjerde",93.976,94.492]],"text":"I er tyve gange tres i tredje over tolv, altså tre hundrede og tres tusind millimeter i fjerde."},"slut":{"start":95.714,"end":106.86,"words":[["Kort",95.841,96.06],["sagt",96.06,96.563],["d",96.692,96.95],["A",96.95,97.22],["er",97.22,97.413],["a",97.414,97.555],["d",97.555,97.826],["y",97.826,98.174],["integrér",98.316,98.973],["y",98.973,99.179],["i",99.179,99.398],["anden",99.398,99.707],["fra",99.707,99.913],["minus",99.913,100.287],["b",100.287,100.48],["halve",100.48,100.764],["til",100.764,100.983],["b",100.983,101.228],["halve",101.228,101.692],["og",101.834,101.962],["du",101.962,102.091],["får",102.091,102.272],["a",102.272,102.31],["b",102.31,102.542],["i",102.542,102.697],["tredje",102.697,103.109],["over",103.109,103.367],["tolv",103.367,103.792],["J",104.669,105.108],["er",105.108,105.301],["I",105.301,105.571],["x",105.571,105.919],["plus",105.919,106.319],["I",106.319,106.551],["y",106.551,106.86]],"text":"Kort sagt: d A er a d y, integrér y i anden fra minus b halve til b halve, og du får a b i tredje over tolv. J er I x plus I y."}}}, { audio: 'opg-4-28-inertimoment.mp3', id: 'opg-4-28-inertimoment' });</script>
+</body>
+</html>

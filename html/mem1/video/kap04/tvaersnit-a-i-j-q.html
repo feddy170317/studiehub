@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tværsnitsstørrelser A, I, J og Q · video</title>
+<meta name="description" content="Hvilken tværsnitsstørrelse styrer hvilken spænding, tyngdepunkt, I, J, Steiners sætning og I-profiler.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 4: videoer</a><h1>Tværsnitsstørrelser A, I, J og Q</h1><span class="meta">MEM1 · kapitel 4 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Tværsnitsstørrelser A, I, J og Q"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Hvilken tværsnitsstørrelse styrer hvilken spænding, tyngdepunkt, I, J, Steiners sætning og I-profiler.</p><div class="chips"><a href="../../Kapitel04_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l04">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Tværsnitsstørrelser A, I, J og Q (MEM1 kap. 4, slides 4–11)
+BP.scene({ header: 'MEM1 · kap. 4' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, hatch, rect, ell, dashed, PI, TAU } = B;
+
+  B.titel(0, 'A, I, J og Q', 'MEM1 · kapitel 4 · begreb (slide 4–11)', 'titel');
+  text(0, 'geometrien styrer spændingen', 640, 520, 42, 'red', wt('titel', 'Geometrien') - 0.2, we('titel', 'spændingen'), { align: 'center' });
+
+  // ---------------- 1 areal og de fire størrelser ----------------
+  B.goto('areal', 1);
+  {
+    const t0 = L('areal').start;
+    line(1, rect(200, 140, 300, 110).concat([[200, 142]]), 'black', 3, t0, t0 + 0.5);
+    arrow(1, [[504, 195], [590, 195]], 'red', 4, t0 + 0.4, t0 + 0.7); arrow(1, [[196, 195], [110 + 20, 195]], 'red', 4, t0 + 0.4, t0 + 0.7);
+    text(1, 'σ = P/A_1  (lav)', 620, 208, 36, 'blue', wt('areal', 'stort') - 0.1, we('areal', 'lav'));
+    line(1, rect(200, 290, 300, 40).concat([[200, 292]]), 'black', 3, wt('areal', 'lille') - 0.3, wt('areal', 'lille') + 0.2);
+    arrow(1, [[504, 310], [590, 310]], 'red', 4, wt('areal', 'lille'), wt('areal', 'lille') + 0.3); arrow(1, [[196, 310], [130, 310]], 'red', 4, wt('areal', 'lille'), wt('areal', 'lille') + 0.3);
+    text(1, 'σ = P/A_2  (høj!)', 620, 322, 36, 'red', wt('areal', 'høj') - 0.3, we('areal', 'spænding', 1));
+    const tl = L('liste').start;
+    const rk = [['A', 'træk og tryk', 'arealet'], ['J', 'vridning', 'polære'], ['I', 'bøjning', 'Inertimomentet'], ['Q', 'forskydning fra tværkraft', 'statiske']];
+    rk.forEach(([s, t, w], i) => {
+      const y = 430 + 62 * i, ta = wt('liste', w) - 0.2;
+      text(1, s, 200, y, 46, 'red', ta, ta + 0.3, { align: 'center' });
+      arrow(1, [[240, y - 14], [300, y - 14]], 'black', 2.4, ta + 0.2, ta + 0.4, 11);
+      text(1, t, 320, y, 36, 'black', ta + 0.3, ta + 0.9);
+    });
+  }
+
+  // ---------------- 2 tyngdepunkt og inertimoment ----------------
+  B.goto('tyngdepunkt', 2);
+  {
+    const t0 = L('tyngdepunkt').start;
+    line(2, [[150, 180], [450, 180], [450, 230], [325, 230], [325, 420], [275, 420], [275, 230], [150, 230], [150, 182]], 'black', 3, t0, t0 + 0.8);
+    dot(2, 300, 205, 6, 'blue', t0 + 0.6); text(2, 'A_1', 340, 214, 28, 'blue', t0 + 0.6, t0 + 0.8);
+    dot(2, 300, 325, 6, 'blue', t0 + 0.8); text(2, 'A_2', 340, 334, 28, 'blue', t0 + 0.8, t0 + 1.0);
+    text(2, 'ȳ = Σ A_i y_i / Σ A_i', 520, 250, 40, 'blue', wt('tyngdepunkt', 'summen') - 0.2, we('tyngdepunkt', 'arealerne'));
+    text(2, 'hul = negativt areal', 520, 320, 36, 'red', wt('tyngdepunkt', 'hul') - 0.2, we('tyngdepunkt', 'areal'));
+    const ti = L('inerti').start;
+    arrow(2, [[140, 600], [600, 600]], 'black', 2.4, ti, ti + 0.4, 13); text(2, 'x', 606, 610, 30, 'black', ti + 0.3, ti + 0.5);
+    line(2, ell(360, 500, 140, 70, 0, TAU), 'black', 2.6, ti + 0.2, ti + 0.7);
+    hatch(2, rect(400, 470, 30, 22), 'blue', ti + 0.6, ti + 0.8, { gap: 4 });
+    text(2, 'dA', 440, 480, 28, 'blue', ti + 0.7, ti + 0.9);
+    arrow(2, [[415, 596], [415, 496]], 'red', 2.6, wt('inerti', 'y') - 0.2, wt('inerti', 'y') + 0.2, 11); text(2, 'y', 425, 560, 30, 'red', wt('inerti', 'y'), wt('inerti', 'y') + 0.3);
+    text(2, 'I_x = ∫ y² dA', 700, 500, 48, 'red', wt('inerti', 'integralet') - 0.2, we('inerti', 'A'));
+    text(2, 'afstand i anden!', 700, 570, 36, 'black', wt('inerti', 'anden') - 0.3, we('inerti', 'meget'));
+  }
+
+  // ---------------- 3 J, Steiner og effektive profiler ----------------
+  B.goto('polaer', 3);
+  {
+    const t0 = L('polaer').start;
+    text(3, 'J = ∫ r² dA = I_x + I_y', 140, 170, 44, 'red', wt('polaer', 'integralet') - 0.2, we('polaer', 'y'));
+    line(3, ell(240, 300, 60, 60, 0, TAU), 'black', 3, wt('polaer', 'massiv') - 0.3, wt('polaer', 'massiv') + 0.3);
+    text(3, 'J = π d⁴ / 32', 340, 312, 44, 'blue', wt('polaer', 'pi') - 0.2, we('polaer', 'toogtredive'));
+    const ts = L('steiner').start;
+    line(3, rect(700, 220, 200, 100).concat([[700, 222]]), 'black', 3, ts, ts + 0.5);
+    dot(3, 800, 270, 6, 'blue', ts + 0.4); text(3, 'G', 812, 262, 28, 'blue', ts + 0.4, ts + 0.6);
+    dashed(3, [660, 270], [960, 270], 'blue', ts + 0.5, ts + 0.9);
+    line(3, [[660, 400], [960, 400]], 'black', 2.6, ts + 0.6, ts + 0.9);
+    arrow(3, [[930, 274], [930, 396]], 'red', 2.4, wt('steiner', 'd') - 0.2, wt('steiner', 'd') + 0.2, 11); text(3, 'd', 940, 350, 32, 'red', wt('steiner', 'd'), wt('steiner', 'd') + 0.3);
+    text(3, 'I = I_G + A d²', 700, 470, 46, 'red', wt('steiner', 'I') - 0.1, we('steiner', 'anden'));
+    const te = L('effektiv').start;
+    const x = 200, y = 450;
+    line(3, [[x, y], [x + 200, y], [x + 200, y + 24], [x + 112, y + 24], [x + 112, y + 186], [x + 200, y + 186], [x + 200, y + 210], [x, y + 210], [x, y + 186], [x + 88, y + 186], [x + 88, y + 24], [x, y + 24], [x, y + 2]], 'black', 3, te, te + 0.9);
+    hatch(3, rect(x, y, 200, 24), 'blue', te + 0.7, te + 1.0, { gap: 5 }); hatch(3, rect(x, y + 186, 200, 24), 'blue', te + 0.8, te + 1.1, { gap: 5 });
+    dashed(3, [x - 30, y + 105], [x + 230, y + 105], 'black', wt('effektiv', 'neutrale') - 0.3, wt('effektiv', 'neutrale') + 0.3);
+    text(3, 'N.A.', x + 240, y + 115, 28, 'black', wt('effektiv', 'neutrale'), we('effektiv', 'akse'));
+    text(3, 'materiale langt fra N.A.', 700, 600, 34, 'blue', wt('effektiv', 'langt') - 0.1, we('effektiv', 'gavn'));
+  }
+
+  B.goto('tjek_q', 4);
+  B.tjek(4, ['Massiv aksel: d fordobles.', 'Hvad sker der med J?'], ['16 gange større', 'J ∝ d⁴'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 5);
+  B.slut(5, 'Abou-Hayt (2026), MEM1 Chapter 4, slide 4–11 · Hamrock, Schmid & Jacobson, kap. 4', 'aksial belastning', 'slut');
+  text(5, 'A → træk · J → vridning · I → bøjning · Q → forskydning', 200, 280, 34, 'blue', L('slut').start + 0.4, we('slut', 'forskydning'));
+  text(5, 'I = I_G + A d²', 200, 370, 46, 'red', wt('slut', 'Steiners') - 0.1, we('slut', 'akse'));
+});
+
+</script>
+<script>BP.live({"duration":118.936,"audio":"tvaersnit-a-i-j-q.mp3","order":["titel","areal","liste","tyngdepunkt","inerti","polaer","steiner","effektiv","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":9.031,"words":[["Tværsnitsstørrelser",0.601,1.902],["Med",2.897,3.013],["samme",3.013,3.322],["last",3.322,3.76],["kan",3.76,3.992],["et",3.992,4.07],["andet",4.07,4.327],["tværsnit",4.327,4.856],["give",4.856,5.075],["en",5.075,5.152],["helt",5.152,5.513],["anden",5.513,5.822],["spænding",5.822,6.376],["Geometrien",7.278,7.987],["styrer",7.987,8.361],["spændingen",8.361,9.031]],"text":"Tværsnitsstørrelser. Med samme last kan et andet tværsnit give en helt anden spænding. Geometrien styrer spændingen."},"areal":{"start":10.258,"end":19.034,"words":[["Det",10.385,10.514],["enkleste",10.514,11.017],["eksempel",11.017,11.674],["er",11.674,11.841],["træk",11.841,12.383],["Sigma",13.273,13.763],["er",13.763,13.905],["P",13.905,14.188],["over",14.188,14.446],["A",14.446,14.781],["så",14.923,15.194],["et",15.194,15.258],["stort",15.258,15.503],["areal",15.503,15.877],["giver",15.877,16.096],["lav",16.096,16.34],["spænding",16.34,16.856],["og",17.036,17.178],["et",17.178,17.255],["lille",17.255,17.5],["areal",17.5,18.029],["giver",18.029,18.299],["høj",18.299,18.518],["spænding",18.518,19.034]],"text":"Det enkleste eksempel er træk. Sigma er P over A, så et stort areal giver lav spænding, og et lille areal giver høj spænding."},"liste":{"start":20.256,"end":35.952,"words":[["Vi",20.357,20.524],["bruger",20.524,20.911],["fire",20.911,21.246],["størrelser",21.246,21.968],["Arealet",22.872,23.452],["A",23.452,23.671],["styrer",23.671,24.006],["træk",24.006,24.444],["og",24.444,24.612],["tryk",24.612,25.101],["Det",25.991,26.068],["polære",26.068,26.48],["inertimoment",26.48,27.331],["J",27.331,27.627],["styrer",27.627,28.027],["vridning",28.027,28.568],["Inertimomentet",29.483,30.423],["I",30.424,30.565],["styrer",30.565,30.952],["bøjning",30.952,31.506],["Og",32.408,32.472],["det",32.472,32.588],["statiske",32.588,33.168],["moment",33.168,33.581],["Q",33.581,33.954],["styrer",33.954,34.302],["forskydning",34.302,34.998],["fra",34.998,35.192],["tværkraft",35.192,35.952]],"text":"Vi bruger fire størrelser. Arealet A styrer træk og tryk. Det polære inertimoment J styrer vridning. Inertimomentet I styrer bøjning. Og det statiske moment Q styrer forskydning fra tværkraft."},"tyngdepunkt":{"start":37.166,"end":46.857,"words":[["For",37.293,37.448],["et",37.448,37.512],["sammensat",37.512,38.002],["tværsnit",38.002,38.621],["finder",38.621,38.969],["vi",38.969,39.085],["tyngdepunktet",39.085,39.755],["som",39.755,39.935],["summen",39.935,40.283],["af",40.283,40.528],["A",40.528,40.747],["i",40.747,40.902],["gange",40.902,41.224],["y",41.224,41.481],["i",41.481,41.623],["divideret",41.623,42.332],["med",42.332,42.474],["summen",42.474,42.925],["af",42.925,43.067],["arealerne",43.067,43.711],["Et",44.614,44.718],["hul",44.718,44.911],["regnes",44.911,45.349],["med",45.349,45.568],["negativt",45.568,46.187],["areal",46.187,46.857]],"text":"For et sammensat tværsnit finder vi tyngdepunktet som summen af A i gange y i divideret med summen af arealerne. Et hul regnes med negativt areal."},"inerti":{"start":48.1,"end":56.307,"words":[["Inertimomentet",48.227,49.052],["I",49.052,49.258],["x",49.258,49.671],["er",49.671,49.825],["integralet",49.825,50.521],["af",50.521,50.792],["y",50.792,51.011],["i",51.011,51.256],["anden",51.256,51.578],["d",51.578,51.81],["A.",51.81,52.274],["Afstanden",52.274,52.828],["indgår",52.828,53.266],["i",53.266,53.446],["anden",53.446,53.846],["så",54.026,54.22],["materiale",54.22,54.709],["langt",54.709,54.941],["fra",54.941,55.109],["aksen",55.109,55.56],["tæller",55.56,55.856],["meget",55.856,56.307]],"text":"Inertimomentet I x er integralet af y i anden d A. Afstanden indgår i anden, så materiale langt fra aksen tæller meget."},"polaer":{"start":57.522,"end":68.733,"words":[["Det",57.636,57.714],["polære",57.714,58.075],["inertimoment",58.075,58.783],["J",58.783,59.17],["er",59.17,59.247],["integralet",59.247,59.995],["af",59.995,60.227],["r",60.227,60.484],["i",60.484,60.729],["anden",60.729,61.064],["d",61.064,61.322],["A",61.322,61.618],["og",61.799,61.928],["det",61.928,62.121],["er",62.121,62.211],["lig",62.211,62.52],["I",62.52,62.74],["x",62.74,63.062],["plus",63.062,63.448],["I",63.448,63.667],["y",63.667,63.964],["For",64.854,64.996],["en",64.996,65.061],["massiv",65.061,65.409],["aksel",65.409,65.885],["er",65.885,66.053],["J",66.053,66.324],["lig",66.324,66.504],["pi",66.504,66.736],["d",66.736,66.981],["i",66.981,67.161],["fjerde",67.161,67.651],["over",67.651,67.909],["toogtredive",67.909,68.733]],"text":"Det polære inertimoment J er integralet af r i anden d A, og det er lig I x plus I y. For en massiv aksel er J lig pi d i fjerde over toogtredive."},"steiner":{"start":69.968,"end":79.878,"words":[["Til",70.095,70.237],["sammensatte",70.237,70.804],["tværsnit",70.804,71.423],["bruger",71.423,71.783],["vi",71.783,72.003],["parallelakseteoremet",72.003,73.472],["I",74.349,74.53],["er",74.53,74.839],["I",74.839,75.058],["G",75.058,75.264],["plus",75.264,75.561],["A",75.561,75.69],["gange",75.69,76.102],["d",76.102,76.334],["i",76.334,76.566],["anden",76.566,77.004],["hvor",77.146,77.339],["d",77.339,77.571],["er",77.571,77.674],["afstanden",77.674,78.202],["fra",78.203,78.357],["tyngdepunktet",78.357,79.04],["til",79.04,79.221],["aksen",79.221,79.878]],"text":"Til sammensatte tværsnit bruger vi parallelakseteoremet. I er I G plus A gange d i anden, hvor d er afstanden fra tyngdepunktet til aksen."},"effektiv":{"start":81.094,"end":89.058,"words":[["Derfor",81.221,81.595],["er",81.595,81.698],["I-profiler",81.698,82.355],["og",82.355,82.394],["rør",82.394,82.729],["så",82.729,83.0],["effektive",83.0,83.618],["i",83.618,83.773],["bøjning",83.773,84.379],["Materialet",85.295,85.888],["sidder",85.888,86.146],["langt",86.146,86.429],["fra",86.429,86.584],["den",86.584,86.738],["neutrale",86.738,87.228],["akse",87.228,87.782],["hvor",87.924,88.066],["det",88.066,88.169],["gør",88.169,88.349],["mest",88.349,88.658],["gavn",88.658,89.058]],"text":"Derfor er I-profiler og rør så effektive i bøjning. Materialet sidder langt fra den neutrale akse, hvor det gør mest gavn."},"tjek_q":{"start":90.276,"end":96.062,"words":[["Tjek",90.377,90.699],["dig",90.699,90.879],["selv",90.879,91.305],["Hvad",92.209,92.325],["sker",92.325,92.596],["der",92.596,92.699],["med",92.699,92.828],["J",92.828,93.15],["for",93.15,93.343],["en",93.343,93.42],["massiv",93.42,93.846],["aksel",93.846,94.4],["hvis",94.541,94.748],["diameteren",94.748,95.34],["fordobles",95.34,96.062]],"text":"Tjek dig selv. Hvad sker der med J for en massiv aksel, hvis diameteren fordobles?"},"tjek_a":{"start":99.924,"end":104.458,"words":[["J",100.064,100.283],["bliver",100.283,100.489],["seksten",100.489,100.915],["gange",100.915,101.172],["så",101.172,101.301],["stor",101.301,101.765],["fordi",101.907,102.281],["diameteren",102.281,102.873],["indgår",102.874,103.402],["i",103.402,103.518],["fjerde",103.518,103.84],["potens",103.84,104.458]],"text":"J bliver seksten gange så stor, fordi diameteren indgår i fjerde potens."},"slut":{"start":105.674,"end":116.512,"words":[["Kort",105.801,106.033],["sagt",106.033,106.51],["A",106.639,106.832],["til",106.832,106.987],["træk",106.987,107.502],["J",107.618,107.94],["til",107.941,108.095],["vridning",108.095,108.662],["I",108.804,108.92],["til",108.92,109.049],["bøjning",109.049,109.551],["og",109.551,109.693],["Q",109.693,109.951],["til",109.951,110.093],["forskydning",110.093,110.788],["Afstand",111.666,112.092],["fra",112.092,112.272],["aksen",112.272,112.749],["tæller",112.749,113.071],["i",113.071,113.264],["anden",113.264,113.651],["og",113.818,114.012],["Steiners",114.012,114.45],["sætning",114.45,114.875],["flytter",114.875,115.365],["I",115.365,115.519],["til",115.519,115.687],["en",115.687,115.79],["ny",115.79,115.97],["akse",115.97,116.512]],"text":"Kort sagt: A til træk, J til vridning, I til bøjning og Q til forskydning. Afstand fra aksen tæller i anden, og Steiners sætning flytter I til en ny akse."}}}, { audio: 'tvaersnit-a-i-j-q.mp3', id: 'tvaersnit-a-i-j-q' });</script>
+</body>
+</html>

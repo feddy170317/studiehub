@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kombineret bøjning og vridning · video</title>
+<meta name="description" content="Spændingstilstanden på en akseloverflade med både M og T, hovedspændinger og Mohrs cirkel.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 4: videoer</a><h1>Kombineret bøjning og vridning</h1><span class="meta">MEM1 · kapitel 4 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Kombineret bøjning og vridning"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Spændingstilstanden på en akseloverflade med både M og T, hovedspændinger og Mohrs cirkel.</p><div class="chips"><a href="vridning.html">Se først: Vridning af aksler</a><a href="boejningsspaending.html">Se først: Bøjningsspænding</a><a href="../../../../lab/mem1/aksel.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel04_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l04">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Kombineret bøjning og vridning (MEM1 kap. 4, slides 32–36)
+BP.scene({ header: 'MEM1 · kap. 4' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, dashed, rect, PI, TAU } = B;
+
+  B.titel(0, 'Bøjning + vridning', 'MEM1 · kapitel 4 · begreb (slide 32–36)', 'titel');
+  text(0, 'M og T på samme tid', 640, 520, 42, 'red', wt('titel', 'både') - 0.2, we('titel', 'tid'), { align: 'center' });
+
+  B.goto('begge', 1);
+  {
+    const t0 = L('begge').start;
+    text(1, 'M → σ', 170, 180, 48, 'red', wt('begge', 'normalspænding') - 0.4, we('begge', 'normalspænding'));
+    text(1, 'V → τ', 520, 180, 48, 'green', wt('begge', 'forskydning') - 0.4, we('begge', 'forskydning'));
+    text(1, 'kritisk sted for σ ≠ kritisk sted for τ', 170, 260, 36, 'black', wt('begge', 'kritiske') - 0.2, we('begge', 'anden'));
+    const tw = L('workflow').start;
+    const tr = [['1. indre laster i snittet', 'indre'], ['2. hver spændingskomponent', 'spændingskomponent'], ['3. kritisk punkt', 'kritiske'], ['4. kombinér', 'kombinér'], ['5. tjek mod brudkriterium', 'brudkriterium']];
+    tr.forEach(([s, w], i) => text(1, s, 190, 360 + 58 * i, 36, i === 4 ? 'red' : 'blue', wt('workflow', w) - 0.3, we('workflow', w) + 0.3));
+  }
+
+  B.goto('punkt', 2);
+  {
+    const t0 = L('punkt').start;
+    line(2, [[140, 250], [600, 250]], 'black', 3, t0, t0 + 0.5); line(2, [[140, 370], [600, 370]], 'black', 3, t0 + 0.1, t0 + 0.6);
+    line(2, ell(600, 310, 22, 60, -PI / 2, PI / 2), 'black', 2.6, t0 + 0.5, t0 + 0.8);
+    line(2, rect(330, 222, 50, 50).concat([[330, 224]]), 'blue', 3, t0 + 0.6, t0 + 1.0);
+    arrow(2, [[384, 247], [450, 247]], 'red', 3.4, wt('punkt', 'Bøjningen') - 0.1, wt('punkt', 'Bøjningen') + 0.3, 12); arrow(2, [[326, 247], [260, 247]], 'red', 3.4, wt('punkt', 'Bøjningen'), wt('punkt', 'Bøjningen') + 0.4, 12);
+    arrow(2, [[330, 212], [380, 212]], 'green', 3, wt('punkt', 'Vridningen') - 0.1, wt('punkt', 'Vridningen') + 0.3, 11); arrow(2, [[390, 272], [390, 226]], 'green', 3, wt('punkt', 'Vridningen'), wt('punkt', 'Vridningen') + 0.4, 11);
+    text(2, 'σ_x = M c / I', 700, 230, 44, 'red', wt('punkt', 'sigma') - 0.1, we('punkt', 'I'));
+    text(2, 'τ_{xy} = T c / J', 700, 300, 44, 'green', wt('punkt', 'tau') - 0.1, we('punkt', 'J'));
+    text(2, 'σ_y = 0', 700, 370, 44, 'black', wt('punkt', 'sigma', 1) - 0.1, we('punkt', 'nul'));
+    const th = L('hoved').start;
+    text(2, 'σ_{1,2} = σ_x/2 ± √[(σ_x/2)² + τ_{xy}²]', 150, 500, 42, 'red', wt('hoved', 'Hovedspændingerne') - 0.1, we('hoved', 'anden', 1));
+    text(2, 'τ_{max} = √[(σ_x/2)² + τ_{xy}²]', 150, 580, 42, 'green', L('tmax').start, we('tmax', 'kvadratrod'));
+  }
+
+  B.goto('mohr', 3);
+  {
+    const t0 = L('mohr').start, ox = 380, oy = 380, s = 2.2, sx = 120, txy = 70, C = [ox + s * sx / 2, oy], R = s * Math.hypot(sx / 2, txy);
+    arrow(3, [[ox - 230, oy], [ox + 420, oy]], 'black', 2.6, t0, t0 + 0.4, 14); text(3, 'σ', ox + 410, oy - 14, 36, 'black', t0 + 0.3, t0 + 0.5);
+    arrow(3, [[ox, oy + 230], [ox, oy - 230]], 'black', 2.6, t0 + 0.1, t0 + 0.5, 14); text(3, 'τ', ox - 30, oy - 210, 36, 'black', t0 + 0.4, t0 + 0.6);
+    dot(3, C[0], C[1], 6, 'black', wt('mohr', 'centrum')); text(3, 'σ_x/2', C[0] - 30, C[1] + 40, 30, 'black', wt('mohr', 'centrum'), we('mohr', 'halve'));
+    line(3, ell(C[0], C[1], R, R, -PI / 2, 1.5 * PI), 'blue', 3.4, wt('mohr', 'radius') - 0.3, we('mohr', 'max'));
+    const X = [ox + s * sx, oy - s * txy];
+    dot(3, X[0], X[1], 7, 'blue', wt('mohr', 'radius')); line(3, [C, X], 'green', 2.6, wt('mohr', 'radius'), we('mohr', 'max'));
+    text(3, 'X(σ_x, τ_{xy})', X[0] + 12, X[1] - 10, 30, 'blue', wt('mohr', 'radius'), we('mohr', 'max'));
+    dot(3, C[0] + R, oy, 7, 'red', wt('mohr', 'Sigma')); dot(3, C[0] - R, oy, 7, 'red', wt('mohr', 'to'));
+    text(3, 'σ_1', C[0] + R + 8, oy + 40, 34, 'red', wt('mohr', 'Sigma'), wt('mohr', 'Sigma') + 0.3);
+    text(3, 'σ_2', C[0] - R - 50, oy + 40, 34, 'red', wt('mohr', 'to'), wt('mohr', 'to') + 0.3);
+    text(3, 'R = τ_{max}', 900, 200, 40, 'green', wt('mohr', 'radius') - 0.1, we('mohr', 'max'));
+    text(3, '→ Tresca / von Mises', 820, 600, 34, 'red', wt('brug', 'Tresca') - 0.2, we('brug', 'Mises'));
+  }
+
+  B.goto('tjek_q', 4);
+  B.tjek(4, ['Kun vridning, ingen bøjning.', 'Hvad er σ_1 og σ_2?'], ['σ_x = 0 ⇒ σ_{1,2} = ± τ_{xy}', 'ren forskydning'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 5);
+  B.slut(5, 'Abou-Hayt (2026), MEM1 Chapter 4, slide 32–36 · Hamrock, Schmid & Jacobson, kap. 4', 'flydekriterier (kapitel 6)', 'slut');
+  text(5, 'σ_x = M c / I     τ_{xy} = T c / J', 200, 290, 44, 'blue', L('slut').start + 0.4, we('slut', 'J'));
+  text(5, 'Mohrs cirkel → brudkriterium', 200, 380, 42, 'red', wt('slut', 'Mohrs') - 0.1, we('slut', 'brudkriteriet'));
+});
+
+</script>
+<script>BP.live({"duration":109.12,"audio":"kombineret-boejning-vridning.mp3","order":["titel","begge","workflow","punkt","hoved","tmax","mohr","brug","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.781,"words":[["Kombineret",0.64,1.207],["bøjning",1.207,1.748],["og",1.748,1.916],["vridning",1.916,2.496],["En",3.4,3.515],["aksel",3.515,4.018],["bærer",4.018,4.314],["ofte",4.314,4.649],["både",4.649,4.907],["et",4.907,4.985],["bøjningsmoment",4.985,5.822],["og",5.822,6.003],["et",6.003,6.08],["vridningsmoment",6.08,6.879],["på",6.879,7.008],["samme",7.008,7.369],["tid",7.369,7.781]],"text":"Kombineret bøjning og vridning. En aksel bærer ofte både et bøjningsmoment og et vridningsmoment på samme tid."},"begge":{"start":9.01,"end":19.848,"words":[["En",9.15,9.253],["bjælke",9.253,9.575],["med",9.575,9.743],["tværlast",9.743,10.362],["har",10.362,10.542],["både",10.542,10.864],["M",10.864,11.083],["og",11.083,11.173],["V",11.173,11.521],["M",11.521,11.766],["giver",11.766,12.024],["normalspænding",12.024,12.874],["og",13.016,13.145],["V",13.145,13.351],["giver",13.351,13.622],["forskydning",13.622,14.318],["Det",15.196,15.273],["kritiske",15.273,15.775],["sted",15.775,16.059],["for",16.059,16.239],["den",16.239,16.407],["ene",16.407,16.858],["er",16.858,17.077],["ikke",17.077,17.361],["nødvendigvis",17.361,18.018],["det",18.018,18.134],["kritiske",18.134,18.636],["sted",18.636,19.01],["for",19.01,19.19],["den",19.19,19.358],["anden",19.358,19.848]],"text":"En bjælke med tværlast har både M og V. M giver normalspænding, og V giver forskydning. Det kritiske sted for den ene er ikke nødvendigvis det kritiske sted for den anden."},"workflow":{"start":21.072,"end":30.761,"words":[["Fremgangsmåden",21.199,21.985],["er",21.985,22.32],["find",22.436,22.694],["de",22.694,22.81],["indre",22.81,23.106],["laster",23.107,23.467],["i",23.467,23.519],["snittet",23.519,24.047],["beregn",24.189,24.563],["hver",24.563,24.73],["spændingskomponent",24.73,25.826],["find",25.954,26.238],["det",26.238,26.315],["kritiske",26.315,26.805],["punkt",26.805,27.243],["kombinér",27.385,27.887],["spændingerne",27.887,28.583],["og",28.738,28.854],["tjek",28.854,29.112],["mod",29.112,29.318],["det",29.318,29.421],["rigtige",29.421,29.859],["brudkriterium",29.859,30.761]],"text":"Fremgangsmåden er: find de indre laster i snittet, beregn hver spændingskomponent, find det kritiske punkt, kombinér spændingerne, og tjek mod det rigtige brudkriterium."},"punkt":{"start":31.982,"end":43.129,"words":[["Se",32.096,32.38],["på",32.38,32.535],["et",32.535,32.612],["punkt",32.612,32.895],["på",32.895,33.089],["akslens",33.089,33.656],["overflade",33.656,34.429],["Bøjningen",35.332,35.719],["giver",35.719,35.938],["sigma",35.938,36.389],["x",36.389,36.686],["lig",36.686,36.879],["M",36.879,37.046],["c",37.046,37.433],["over",37.433,37.768],["I",37.768,37.91],["Vridningen",37.91,38.438],["giver",38.438,38.696],["tau",38.696,38.992],["x",38.992,39.25],["y",39.25,39.43],["lig",39.43,39.637],["T",39.637,39.856],["c",39.856,40.178],["over",40.178,40.423],["J",40.423,40.835],["Og",41.711,41.789],["sigma",41.789,42.265],["y",42.266,42.549],["er",42.549,42.678],["nul",42.678,43.129]],"text":"Se på et punkt på akslens overflade. Bøjningen giver sigma x lig M c over I. Vridningen giver tau x y lig T c over J. Og sigma y er nul."},"hoved":{"start":44.356,"end":54.124,"words":[["Det",44.496,44.638],["er",44.638,44.818],["en",44.818,44.973],["plan",44.973,45.295],["spændingstilstand",45.295,46.3],["Hovedspændingerne",47.204,47.951],["er",47.951,48.029],["sigma",48.029,48.493],["x",48.493,48.789],["halve",48.789,49.06],["plus",49.06,49.343],["og",49.343,49.395],["minus",49.395,49.962],["kvadratroden",49.962,50.606],["af",50.606,50.67],["sigma",50.67,51.109],["x",51.109,51.405],["halve",51.405,51.83],["i",51.83,52.023],["anden",52.024,52.307],["plus",52.307,52.565],["tau",52.565,52.913],["x",52.913,53.261],["y",53.261,53.48],["i",53.48,53.673],["anden",53.673,54.124]],"text":"Det er en plan spændingstilstand. Hovedspændingerne er sigma x halve plus og minus kvadratroden af sigma x halve i anden plus tau x y i anden."},"tmax":{"start":55.338,"end":58.171,"words":[["Den",55.465,55.594],["største",55.594,56.032],["forskydning",56.032,56.728],["er",56.728,56.896],["den",56.896,57.05],["samme",57.05,57.411],["kvadratrod",57.411,58.171]],"text":"Den største forskydning er den samme kvadratrod."},"mohr":{"start":59.408,"end":69.24,"words":[["På",59.535,59.626],["Mohrs",59.626,59.935],["cirkel",59.935,60.437],["ligger",60.437,60.721],["centrum",60.721,61.211],["i",61.211,61.275],["sigma",61.275,61.726],["x",61.726,62.035],["halve",62.035,62.486],["og",62.628,62.796],["radius",62.796,63.363],["er",63.363,63.504],["tau",63.504,63.775],["max",63.775,64.278],["Sigma",65.155,65.606],["et",65.606,65.851],["og",65.851,65.941],["sigma",65.942,66.405],["to",66.405,66.74],["er",66.74,66.792],["der",66.792,67.166],["hvor",67.295,67.449],["cirklen",67.449,67.952],["skærer",67.952,68.274],["sigma-aksen",68.274,69.24]],"text":"På Mohrs cirkel ligger centrum i sigma x halve, og radius er tau max. Sigma et og sigma to er der, hvor cirklen skærer sigma-aksen."},"brug":{"start":70.462,"end":76.736,"words":[["De",70.576,70.667],["værdier",70.667,71.027],["bruger",71.027,71.324],["vi",71.324,71.427],["senere",71.427,71.891],["i",71.891,71.968],["flydekriterierne",71.968,72.999],["Tresca",73.089,73.643],["og",73.643,73.798],["von",73.798,74.017],["Mises",74.017,74.61],["når",74.752,74.997],["akslen",74.997,75.628],["skal",75.628,75.808],["dimensioneres",75.808,76.736]],"text":"De værdier bruger vi senere i flydekriterierne, Tresca og von Mises, når akslen skal dimensioneres."},"tjek_q":{"start":77.964,"end":84.382,"words":[["Tjek",78.065,78.387],["dig",78.387,78.567],["selv",78.567,79.005],["Hvis",79.91,80.09],["akslen",80.09,80.593],["kun",80.593,80.851],["vrides",80.851,81.302],["og",81.302,81.508],["ikke",81.508,81.791],["bøjes",81.791,82.333],["hvad",82.461,82.655],["er",82.655,82.68],["så",82.68,82.809],["sigma",82.809,83.235],["et",83.235,83.454],["og",83.454,83.544],["sigma",83.544,83.93],["to",83.93,84.382]],"text":"Tjek dig selv. Hvis akslen kun vrides og ikke bøjes, hvad er så sigma et og sigma to?"},"tjek_a":{"start":88.26,"end":95.231,"words":[["Så",88.374,88.645],["er",88.645,88.671],["sigma",88.671,89.148],["x",89.148,89.418],["nul",89.418,89.818],["og",89.96,90.14],["hovedspændingerne",90.14,90.862],["bliver",90.862,91.106],["plus",91.106,91.403],["og",91.403,91.467],["minus",91.467,91.905],["tau",91.905,92.266],["x",92.266,92.614],["y",92.614,92.949],["Det",93.813,94.007],["er",94.007,94.135],["ren",94.135,94.406],["forskydning",94.406,95.231]],"text":"Så er sigma x nul, og hovedspændingerne bliver plus og minus tau x y. Det er ren forskydning."},"slut":{"start":96.458,"end":106.688,"words":[["Kort",96.585,96.817],["sagt",96.817,97.346],["på",97.474,97.616],["akseloverfladen",97.616,98.325],["er",98.325,98.389],["sigma",98.389,98.866],["x",98.866,99.163],["lig",99.163,99.343],["M",99.343,99.511],["c",99.511,99.884],["over",99.884,100.206],["I",100.206,100.413],["og",100.413,100.49],["tau",100.49,100.889],["x",100.889,101.224],["y",101.224,101.405],["lig",101.405,101.585],["T",101.585,101.791],["c",101.791,102.178],["over",102.178,102.436],["J",102.436,102.81],["Kombinér",102.81,103.299],["dem",103.299,103.505],["med",103.505,103.647],["Mohrs",103.647,103.956],["cirkel",103.956,104.459],["og",104.601,104.755],["brug",104.755,104.987],["resultatet",104.987,105.696],["i",105.696,105.825],["brudkriteriet",105.825,106.688]],"text":"Kort sagt: på akseloverfladen er sigma x lig M c over I og tau x y lig T c over J. Kombinér dem med Mohrs cirkel, og brug resultatet i brudkriteriet."}}}, { audio: 'kombineret-boejning-vridning.mp3', id: 'kombineret-boejning-vridning' });</script>
+</body>
+</html>

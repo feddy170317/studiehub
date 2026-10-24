@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Forskydning fra tværkraft · video</title>
+<meta name="description" content="τ = VQ/(Ib), fordelingen over tværsnittet og eksemplet fra slide 28.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 4: videoer</a><h1>Forskydning fra tværkraft</h1><span class="meta">MEM1 · kapitel 4 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Forskydning fra tværkraft"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>τ = VQ/(Ib), fordelingen over tværsnittet og eksemplet fra slide 28.</p><div class="chips"><a href="boejningsspaending.html">Se først: Bøjningsspænding</a><a href="../../Kapitel04_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l04">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Forskydning fra tværkraft (MEM1 kap. 4, slides 27–31). Eksempel slide 28: τmax = 2,25 MPa
+BP.scene({ header: 'MEM1 · kap. 4' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, hatch, rect, dashed, plot, PI } = B;
+
+  B.titel(0, 'Forskydning fra tværkraft', 'MEM1 · kapitel 4 · begreb (slide 27–31)', 'titel');
+  text(0, 'ikke jævnt fordelt', 640, 520, 42, 'red', wt('titel', 'ikke') - 0.2, we('titel', 'fordelt'), { align: 'center' });
+
+  B.goto('formel', 1);
+  {
+    const t0 = L('formel').start, x0 = 180, y0 = 200, w = 220, h = 340;
+    text(1, 'τ = V Q / (I b)', 700, 190, 52, 'red', wt('formel', 'tau') - 0.1, we('formel', 'b'));
+    line(1, rect(x0, y0, w, h).concat([[x0, y0 + 2]]), 'black', 3, t0, t0 + 0.6);
+    const tq = wt('formel', 'statiske') - 0.2;
+    hatch(1, rect(x0, y0, w, 100), 'blue', tq, tq + 0.5, { gap: 7 });
+    dashed(1, [x0 - 20, y0 + 100], [x0 + w + 20, y0 + 100], 'red', tq + 0.2, tq + 0.5);
+    text(1, "A'", x0 + w + 30, y0 + 60, 32, 'blue', wt('q', 'A') - 0.1, wt('q', 'A') + 0.3);
+    dot(1, x0 + w / 2, y0 + 50, 6, 'blue', wt('q', 'y') - 0.1);
+    dashed(1, [x0 - 30, y0 + h / 2], [x0 + w + 30, y0 + h / 2], 'black', t0 + 0.5, t0 + 0.9);
+    arrow(1, [[x0 - 40, y0 + h / 2], [x0 - 40, y0 + 54]], 'blue', 2.2, wt('q', 'afstanden') - 0.2, wt('q', 'afstanden') + 0.2, 10);
+    text(1, "ȳ'", x0 - 80, y0 + 120, 30, 'blue', wt('q', 'afstanden'), wt('q', 'afstanden') + 0.3);
+    text(1, "Q = A' · ȳ'", 700, 280, 44, 'blue', wt('q', 'Q') - 0.1, we('q', 'tyngdepunkt'));
+    text(1, 'b = bredden i punktet', 700, 350, 34, 'black', wt('formel', 'bredden') - 0.2, we('formel', 'punktet'));
+    // fordeling
+    const tf = L('fordeling').start, xs = 520;
+    const P = []; for (let j = 0; j <= 30; j++) { const u = j / 30; P.push([xs + 6 + 130 * 4 * u * (1 - u), y0 + h * u]); }
+    line(1, [[xs, y0], [xs, y0 + h]], 'black', 2.2, tf, tf + 0.3);
+    plot(1, P, 'red', wt('fordeling', 'neutrale') - 0.4, we('fordeling', 'størst', 1));
+    text(1, 'τ = 0', xs + 20, y0 + 10, 28, 'red', wt('fordeling', 'nul') - 0.2, we('fordeling', 'nul'));
+    text(1, 'τ_{max}', xs + 150, y0 + h / 2 + 10, 32, 'red', wt('fordeling', 'størst', 1) - 0.2, we('fordeling', 'størst', 1));
+    const tr = L('rektangel').start;
+    text(1, 'rektangel:  τ_{max} = 3V / (2A)', 700, 450, 36, 'red', wt('rektangel', 'tre') - 0.2, we('rektangel', 'A'));
+    text(1, '= 1,5 · middelværdien', 760, 500, 30, 'black', wt('rektangel', 'halvanden') - 0.1, we('rektangel', 'middelværdien'));
+    text(1, 'cirkel:  τ_{max} = 4V / (3A)', 700, 570, 36, 'blue', wt('cirkel', 'fire') - 0.2, we('cirkel', 'A'));
+    text(1, 'γ = τ / G', 700, 650, 40, 'green', wt('toejning', 'gamma') - 0.1, we('toejning', 'G'));
+  }
+
+  B.goto('eks', 2);
+  {
+    const t0 = L('eks').start;
+    bubble(2, 'Eksempel (slide 28)', 150, 140, 52, 'blue', t0, t0 + 0.8);
+    text(2, 'V = 30 kN,  b = 100 mm,  h = 200 mm', 170, 230, 40, 'black', wt('eks', 'bredden') - 0.2, we('eks', 'kilonewton'));
+    text(2, 'I = 100 · 200³ / 12 = 66,7 · 10⁶ mm⁴', 170, 320, 40, 'blue', wt('eks2', 'I') - 0.1, we('eks2', 'fjerde'));
+    text(2, 'Q = (100 · 100) · 50 = 500 · 10³ mm³', 170, 400, 40, 'blue', wt('eks2', 'Q') - 0.1, we('eks2', 'tusind'));
+    const r = text(2, 'τ_{max} = 30 000 · 500 · 10³ / (66,7 · 10⁶ · 100) = 2,25 MPa', 170, 500, 34, 'red', wt('eks3', 'tau') - 0.1, we('eks3', 'megapascal'));
+    text(2, '= 3V/(2A) = 3 · 30 000 / (2 · 20 000)  ✓', 170, 580, 36, 'green', wt('eks3', 'præcis') - 0.2, we('eks3', 'A'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Hvor sidder σ_{max} og τ_{max}', 'i et rektangel?'], ['σ_{max}: i yderfibrene', 'τ_{max}: i N.A., hvor σ = 0'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 4, slide 27–31 · Hamrock, Schmid & Jacobson, kap. 4', 'kombineret bøjning og vridning', 'slut');
+  text(4, 'τ = V Q / (I b)', 200, 280, 46, 'red', L('slut').start + 0.4, we('slut', 'b'));
+  text(4, 'nul ved overflader · størst i N.A.', 200, 360, 40, 'blue', wt('slut', 'nul') - 0.1, we('slut', 'akse'));
+  text(4, 'rektangel: τ_{max} = 3V / (2A)', 200, 440, 42, 'red', wt('slut', 'rektangel') - 0.1, we('slut', 'A'));
+});
+
+</script>
+<script>BP.live({"duration":127.628,"audio":"forskydning-tvaerkraft.mp3","order":["titel","formel","q","fordeling","rektangel","cirkel","eks","eks2","eks3","toejning","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.665,"words":[["Forskydning",0.627,1.375],["fra",1.375,1.555],["tværkraft",1.555,2.328],["En",3.219,3.335],["tværkraft",3.335,3.902],["V",3.902,4.108],["i",4.108,4.237],["bjælken",4.237,4.753],["giver",4.753,5.023],["forskydningsspændinger",5.023,6.196],["der",6.338,6.466],["ikke",6.466,6.776],["er",6.776,6.814],["jævnt",6.814,7.111],["fordelt",7.111,7.665]],"text":"Forskydning fra tværkraft. En tværkraft V i bjælken giver forskydningsspændinger, der ikke er jævnt fordelt."},"formel":{"start":8.89,"end":20.035,"words":[["Forskydningsspændingen",9.017,9.958],["er",9.958,10.074],["tau",10.074,10.345],["lig",10.345,10.538],["V",10.538,10.705],["Q",10.705,10.963],["divideret",10.963,11.62],["med",11.62,11.827],["I",11.827,11.981],["b",11.981,12.2],["Q",12.2,12.613],["er",12.613,12.742],["det",12.742,12.832],["statiske",12.832,13.386],["moment",13.386,13.708],["af",13.708,13.76],["arealet",13.76,14.43],["over",14.43,14.687],["det",14.687,14.778],["punkt",14.778,15.229],["vi",15.37,15.525],["ser",15.525,15.783],["på",15.783,16.169],["I",16.311,16.453],["er",16.453,16.504],["hele",16.504,16.788],["tværsnittets",16.788,17.368],["inertimoment",17.368,18.244],["og",18.425,18.553],["b",18.553,18.798],["er",18.798,18.876],["bredden",18.876,19.391],["i",19.391,19.494],["punktet",19.494,20.035]],"text":"Forskydningsspændingen er tau lig V Q divideret med I b. Q er det statiske moment af arealet over det punkt, vi ser på, I er hele tværsnittets inertimoment, og b er bredden i punktet."},"q":{"start":21.264,"end":27.19,"words":[["Q",21.404,21.675],["er",21.675,21.791],["arealet",21.791,22.525],["A",22.525,22.744],["mærke",22.744,23.067],["gange",23.067,23.389],["afstanden",23.389,23.93],["y",23.93,24.11],["streg",24.11,24.445],["mærke",24.445,24.884],["fra",24.884,25.051],["den",25.051,25.193],["neutrale",25.193,25.683],["akse",25.683,26.069],["til",26.069,26.237],["dets",26.237,26.456],["tyngdepunkt",26.456,27.19]],"text":"Q er arealet A mærke gange afstanden y streg mærke fra den neutrale akse til dets tyngdepunkt."},"fordeling":{"start":28.406,"end":38.329,"words":[["Ved",28.546,28.714],["over",28.714,29.178],["og",29.319,29.551],["undersiden",29.551,30.209],["er",30.209,30.363],["der",30.363,30.479],["intet",30.479,30.879],["areal",30.879,31.33],["udenfor",31.33,31.922],["så",32.064,32.309],["Q",32.309,32.593],["og",32.593,32.644],["tau",32.644,33.069],["er",33.069,33.224],["nul",33.224,33.649],["I",34.54,34.617],["den",34.617,34.772],["neutrale",34.772,35.275],["akse",35.275,35.7],["er",35.7,35.829],["Q",35.829,36.099],["størst",36.099,36.602],["og",36.769,36.885],["der",36.885,37.092],["er",37.092,37.117],["tau",37.117,37.478],["også",37.478,37.826],["størst",37.826,38.329]],"text":"Ved over- og undersiden er der intet areal udenfor, så Q og tau er nul. I den neutrale akse er Q størst, og der er tau også størst."},"rektangel":{"start":39.556,"end":48.06,"words":[["For",39.683,39.877],["et",39.877,39.941],["rektangel",39.941,40.456],["bliver",40.456,40.676],["fordelingen",40.676,41.243],["en",41.243,41.359],["parabel",41.359,42.054],["og",42.196,42.325],["den",42.325,42.48],["største",42.48,42.892],["værdi",42.892,43.292],["er",43.292,43.382],["tre",43.382,43.691],["V",43.691,44.0],["over",44.0,44.271],["to",44.271,44.593],["A.",44.593,45.121],["Det",45.986,46.192],["er",46.192,46.321],["halvanden",46.321,46.81],["gang",46.81,47.12],["middelværdien",47.12,48.06]],"text":"For et rektangel bliver fordelingen en parabel, og den største værdi er tre V over to A. Det er halvanden gang middelværdien."},"cirkel":{"start":49.29,"end":53.837,"words":[["For",49.417,49.572],["et",49.572,49.649],["massivt",49.649,49.997],["cirkulært",49.997,50.513],["tværsnit",50.513,51.131],["er",51.131,51.247],["tau",51.247,51.518],["max",51.518,51.853],["lig",51.853,52.059],["fire",52.059,52.33],["V",52.33,52.665],["over",52.665,52.935],["tre",52.935,53.245],["A.",53.245,53.837]],"text":"For et massivt cirkulært tværsnit er tau max lig fire V over tre A."},"eks":{"start":55.064,"end":61.248,"words":[["Eksemplet",55.191,55.758],["fra",55.758,55.913],["slides",55.913,56.493],["et",56.622,56.776],["rektangel",56.776,57.279],["med",57.279,57.459],["bredden",57.459,57.82],["hundrede",57.82,58.117],["og",58.117,58.142],["højden",58.142,58.645],["to",58.645,58.903],["hundrede",58.903,59.122],["millimeter",59.122,59.818],["bærer",59.818,60.062],["tredive",60.062,60.449],["kilonewton",60.449,61.248]],"text":"Eksemplet fra slides: et rektangel med bredden hundrede og højden to hundrede millimeter bærer tredive kilonewton."},"eks2":{"start":62.47,"end":74.944,"words":[["I",62.597,62.713],["er",62.713,62.791],["hundrede",62.791,63.061],["gange",63.061,63.371],["to",63.37,63.59],["hundrede",63.59,63.886],["i",63.886,63.963],["tredje",63.963,64.401],["over",64.401,64.659],["tolv",64.659,65.097],["altså",65.226,65.677],["seksogtres",65.677,66.334],["komma",66.334,66.631],["syv",66.631,66.914],["millioner",66.914,67.34],["millimeter",67.34,68.035],["i",68.035,68.203],["fjerde",68.203,68.731],["Q",69.635,69.906],["i",69.906,70.047],["den",70.047,70.228],["neutrale",70.228,70.743],["akse",70.743,71.259],["er",71.259,71.388],["hundrede",71.388,71.697],["gange",71.697,71.98],["hundrede",71.98,72.238],["gange",72.238,72.509],["halvtreds",72.509,73.153],["altså",73.295,73.746],["fem",73.746,74.016],["hundrede",74.016,74.3],["tusind",74.3,74.944]],"text":"I er hundrede gange to hundrede i tredje over tolv, altså seksogtres komma syv millioner millimeter i fjerde. Q i den neutrale akse er hundrede gange hundrede gange halvtreds, altså fem hundrede tusind."},"eks3":{"start":76.164,"end":87.259,"words":[["Så",76.291,76.536],["er",76.536,76.652],["tau",76.652,76.923],["max",76.923,77.232],["tredive",77.232,77.593],["tusind",77.593,77.954],["gange",77.954,78.353],["fem",78.353,78.624],["hundrede",78.624,78.843],["tusind",78.843,79.229],["divideret",79.229,79.964],["med",79.964,80.273],["I",80.273,80.441],["gange",80.441,80.763],["hundrede",80.763,81.253],["Det",82.156,82.221],["giver",82.221,82.491],["to",82.491,82.762],["komma",82.762,83.058],["to",83.058,83.329],["fem",83.329,83.574],["megapascal",83.574,84.424],["præcis",84.566,84.978],["det",84.978,85.069],["samme",85.069,85.391],["som",85.391,85.636],["tre",85.636,85.932],["V",85.932,86.228],["over",86.228,86.486],["to",86.486,86.783],["A.",86.783,87.259]],"text":"Så er tau max tredive tusind gange fem hundrede tusind divideret med I gange hundrede. Det giver to komma to fem megapascal, præcis det samme som tre V over to A."},"toejning":{"start":88.49,"end":94.12,"words":[["Forskydningstøjningen",88.617,89.61],["er",89.61,89.713],["gamma",89.713,90.073],["lig",90.073,90.28],["tau",90.28,90.628],["over",90.628,90.924],["G",90.924,91.311],["så",91.452,91.684],["den",91.684,91.826],["varierer",91.826,92.226],["på",92.226,92.367],["samme",92.367,92.715],["måde",92.715,93.076],["over",93.076,93.347],["tværsnittet",93.347,94.12]],"text":"Forskydningstøjningen er gamma lig tau over G, så den varierer på samme måde over tværsnittet."},"tjek_q":{"start":95.344,"end":102.354,"words":[["Tjek",95.445,95.767],["dig",95.767,95.947],["selv",95.947,96.373],["Hvor",97.29,97.445],["sidder",97.444,97.715],["den",97.715,97.908],["største",97.908,98.321],["bøjningsspænding",98.321,99.21],["og",99.352,99.506],["hvor",99.506,99.635],["sidder",99.635,99.945],["den",99.945,100.125],["største",100.125,100.537],["forskydningsspænding",100.537,101.478],["i",101.478,101.658],["et",101.658,101.749],["rektangel",101.749,102.354]],"text":"Tjek dig selv. Hvor sidder den største bøjningsspænding, og hvor sidder den største forskydningsspænding i et rektangel?"},"tjek_a":{"start":106.24,"end":113.946,"words":[["Bøjningsspændingen",106.38,107.218],["er",107.218,107.321],["størst",107.321,107.759],["i",107.759,107.952],["yderfibrene",107.952,108.803],["Forskydningen",109.694,110.274],["er",110.274,110.338],["størst",110.338,110.725],["i",110.725,110.84],["den",110.841,111.021],["neutrale",111.021,111.523],["akse",111.524,112.091],["hvor",112.232,112.387],["bøjningsspændingen",112.387,113.353],["er",113.353,113.495],["nul",113.495,113.946]],"text":"Bøjningsspændingen er størst i yderfibrene. Forskydningen er størst i den neutrale akse, hvor bøjningsspændingen er nul."},"slut":{"start":115.182,"end":125.195,"words":[["Kort",115.309,115.528],["sagt",115.528,116.018],["tau",116.147,116.469],["er",116.469,116.624],["V",116.624,116.856],["Q",116.856,117.165],["over",117.165,117.423],["I",117.423,117.629],["b",117.629,118.028],["nul",118.157,118.454],["ved",118.454,118.647],["overfladerne",118.647,119.369],["og",119.369,119.472],["størst",119.472,119.91],["i",119.91,120.039],["den",120.039,120.18],["neutrale",120.18,120.683],["akse",120.683,121.211],["For",122.102,122.27],["et",122.27,122.334],["rektangel",122.334,122.811],["er",122.811,122.914],["tau",122.914,123.185],["max",123.185,123.52],["tre",123.52,123.777],["V",123.777,124.125],["over",124.125,124.396],["to",124.396,124.718],["A.",124.718,125.195]],"text":"Kort sagt: tau er V Q over I b, nul ved overfladerne og størst i den neutrale akse. For et rektangel er tau max tre V over to A."}}}, { audio: 'forskydning-tvaerkraft.mp3', id: 'forskydning-tvaerkraft' });</script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vridning af aksler · video</title>
+<meta name="description" content="τ = Tr/J, τ_max for massive og hule aksler, vridningsvinklen θ = TL/(JG) og de to designkrav.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 4: videoer</a><h1>Vridning af aksler</h1><span class="meta">MEM1 · kapitel 4 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Vridning af aksler"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>τ = Tr/J, τ_max for massive og hule aksler, vridningsvinklen θ = TL/(JG) og de to designkrav.</p><div class="chips"><a href="tvaersnit-a-i-j-q.html">Se først: Tværsnitsstørrelser A, I, J og Q</a><a href="../../../../lab/mem1/aksel.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel04_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l04">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Vridning af aksler (MEM1 kap. 4, slides 17–21)
+BP.scene({ header: 'MEM1 · kap. 4' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, dashed, plot, PI, TAU } = B;
+
+  B.titel(0, 'Vridning af aksler', 'MEM1 · kapitel 4 · begreb (slide 17–21)', 'titel');
+  text(0, 'forskydning og vridningsvinkel', 640, 520, 42, 'red', wt('titel', 'forskydningsspændinger') - 0.2, we('titel', 'vridningsvinkel'), { align: 'center' });
+
+  B.goto('tau', 1);
+  {
+    const t0 = L('tau').start, cx = 330, cy = 380, R = 170;
+    line(1, ell(cx, cy, R, R, 0, TAU), 'black', 3.2, t0, t0 + 0.8);
+    dot(1, cx, cy, 6, 'black', t0 + 0.6);
+    // pile langs radius: længde ∝ r
+    for (let i = 1; i <= 5; i++) { const r = R * i / 5, t = wt('tau', 'lineært') - 0.6 + i * 0.12; arrow(1, [[cx + r, cy], [cx + r, cy - 28 * i]], 'red', 2.8, t, t + 0.2, 10); }
+    plot(1, [[cx, cy], [cx + R, cy - 140]], 'red', wt('tau', 'lineært') - 0.1, we('tau', 'radius'), 2.4);
+    text(1, 'τ(r) = T r / J', 620, 250, 50, 'red', wt('tau', 'tau') - 0.1, we('tau', 'J'));
+    text(1, 'vokser lineært med r', 620, 320, 34, 'black', wt('tau', 'vokser') - 0.1, we('tau', 'radius'));
+    text(1, 'τ = 0', cx - 50, cy + 44, 32, 'blue', wt('fordeling', 'nul') - 0.2, we('fordeling', 'centrum'));
+    text(1, 'τ_{max} = T R / J', 620, 420, 46, 'red', wt('fordeling', 'største') - 0.1, we('fordeling', 'J'));
+    const tm = L('massiv').start;
+    const r = text(1, 'massiv:  τ_{max} = 16 T / (π d³)', 620, 520, 40, 'red', wt('massiv', 'tau') - 0.2, we('massiv', 'tredje'));
+    box(1, 600, 470, 640, 75, 'red', we('massiv', 'tredje'), we('massiv', 'tredje') + 0.6);
+  }
+
+  B.goto('vinkel', 2);
+  {
+    const t0 = L('vinkel').start;
+    line(2, [[160, 260], [700, 260]], 'black', 3, t0, t0 + 0.5); line(2, [[160, 360], [700, 360]], 'black', 3, t0 + 0.1, t0 + 0.6);
+    line(2, ell(160, 310, 22, 50, 0, TAU), 'black', 2.6, t0 + 0.4, t0 + 0.7); line(2, ell(700, 310, 22, 50, -PI / 2, PI / 2), 'black', 2.6, t0 + 0.5, t0 + 0.8);
+    line(2, [[160, 262], [700, 300]], 'blue', 2.6, wt('vinkel', 'theta') - 0.3, wt('vinkel', 'theta') + 0.3);
+    text(2, 'θ', 720, 300, 40, 'blue', wt('vinkel', 'theta'), wt('vinkel', 'theta') + 0.3);
+    text(2, 'θ = T L / (J G)', 160, 470, 50, 'blue', wt('vinkel', 'T') - 0.1, we('vinkel', 'G'));
+    text(2, 'G = E / (2(1 + ν))', 640, 470, 44, 'green', wt('vinkel', 'isotropt') - 0.2, we('vinkel', 'ny'));
+    const th = L('hul').start;
+    line(2, ell(980, 300, 90, 90, 0, TAU), 'black', 3, th, th + 0.5); line(2, ell(980, 300, 60, 60, 0, TAU), 'black', 3, th + 0.4, th + 0.8);
+    text(2, 'J = π (d_o⁴ − d_i⁴) / 32', 160, 590, 44, 'red', wt('hul', 'pi') - 0.2, we('hul', 'fjerde'));
+    text(2, 'τ_{max} ved d_o / 2', 760, 590, 38, 'red', wt('hul', 'ydre', 1) - 0.4, we('hul', 'radius'));
+    text(2, 'midten bærer næsten intet', 840, 420, 28, 'black', wt('let', 'midten') - 0.2, we('let', 'intet'));
+  }
+
+  B.goto('design', 3);
+  {
+    const t0 = L('design').start;
+    bubble(3, 'To krav', 150, 150, 56, 'blue', t0, t0 + 0.6);
+    text(3, 'τ_{max} ≤ τ_{tilladt}', 170, 280, 50, 'red', wt('design', 'tau') - 0.1, we('design', 'spænding'));
+    text(3, 'styrke', 760, 280, 40, 'red', wt('design', 'tau') + 0.2, we('design', 'spænding'));
+    text(3, 'θ ≤ θ_{tilladt}', 170, 380, 50, 'blue', wt('design', 'theta') - 0.1, we('design', 'vinkel'));
+    text(3, 'stivhed', 760, 380, 40, 'blue', wt('design', 'theta') + 0.2, we('design', 'vinkel'));
+    text(3, 'lange aksler: ofte stivheden', 170, 500, 40, 'black', wt('design', 'Lange') - 0.1, we('design', 'stivheden'));
+  }
+
+  B.goto('tjek_q', 4);
+  B.tjek(4, ['Hvor stor er τ', 'i akslens centrum?'], ['τ = 0', 'τ ∝ r, og r = 0'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 5);
+  B.slut(5, 'Abou-Hayt (2026), MEM1 Chapter 4, slide 17–21 · Hamrock, Schmid & Jacobson, kap. 4', 'bøjningsspænding', 'slut');
+  text(5, 'τ = T r / J     τ_{max} = 16T/(πd³)', 200, 290, 42, 'red', L('slut').start + 0.4, we('slut', 'aksler'));
+  text(5, 'θ = T L / (J G)', 200, 380, 44, 'blue', wt('slut', 'theta') - 0.1, we('slut', 'G'));
+});
+
+</script>
+<script>BP.live({"duration":107.368,"audio":"vridning.mp3","order":["titel","tau","fordeling","massiv","vinkel","hul","let","design","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.665,"words":[["Vridning",0.601,1.219],["af",1.219,1.387],["aksler",1.387,2.057],["Et",2.974,3.077],["moment",3.077,3.451],["om",3.451,3.631],["akslens",3.631,4.211],["egen",4.211,4.572],["akse",4.572,5.049],["giver",5.049,5.32],["forskydningsspændinger",5.32,6.454],["og",6.454,6.634],["en",6.634,6.75],["vridningsvinkel",6.75,7.665]],"text":"Vridning af aksler. Et moment om akslens egen akse giver forskydningsspændinger og en vridningsvinkel."},"tau":{"start":8.89,"end":16.635,"words":[["For",9.017,9.159],["en",9.159,9.236],["cirkulær",9.236,9.739],["aksel",9.739,10.332],["er",10.332,10.474],["forskydningsspændingen",10.473,11.376],["tau",11.376,11.827],["af",11.827,12.033],["r",12.033,12.265],["lig",12.265,12.458],["T",12.458,12.716],["r",12.716,12.999],["over",12.999,13.283],["J",13.283,13.708],["Den",14.612,14.753],["vokser",14.753,15.114],["lineært",15.114,15.733],["med",15.733,15.952],["radius",15.952,16.635]],"text":"For en cirkulær aksel er forskydningsspændingen tau af r lig T r over J. Den vokser lineært med radius."},"fordeling":{"start":17.856,"end":24.609,"words":[["Derfor",17.983,18.344],["er",18.344,18.37],["spændingen",18.37,18.86],["nul",18.86,19.079],["i",19.079,19.156],["centrum",19.156,19.813],["og",19.813,19.942],["størst",19.942,20.303],["ved",20.303,20.445],["overfladen",20.445,21.231],["Den",22.121,22.237],["største",22.237,22.637],["spænding",22.637,23.152],["er",23.152,23.307],["T",23.307,23.603],["R",23.603,23.887],["over",23.887,24.183],["J",24.183,24.609]],"text":"Derfor er spændingen nul i centrum og størst ved overfladen. Den største spænding er T R over J."},"massiv":{"start":25.838,"end":32.074,"words":[["For",25.965,26.107],["en",26.107,26.171],["massiv",26.172,26.532],["aksel",26.532,26.867],["med",26.867,27.061],["diameteren",27.061,27.679],["d",27.679,28.053],["giver",28.053,28.298],["det",28.298,28.465],["tau",28.465,28.749],["max",28.749,29.058],["lig",29.058,29.213],["seksten",29.213,29.677],["T",29.677,29.909],["divideret",29.909,30.604],["med",30.604,30.824],["pi",30.824,31.094],["d",31.094,31.339],["i",31.339,31.507],["tredje",31.507,32.074]],"text":"For en massiv aksel med diameteren d giver det tau max lig seksten T divideret med pi d i tredje."},"vinkel":{"start":33.292,"end":44.452,"words":[["Vridningsvinklen",33.419,34.244],["theta",34.244,34.747],["er",34.747,34.876],["T",34.875,35.159],["L",35.159,35.443],["divideret",35.443,36.087],["med",36.087,36.306],["J",36.306,36.602],["G",36.602,36.989],["hvor",37.131,37.35],["G",37.35,37.646],["er",37.646,37.749],["forskydningsmodulet",37.749,38.973],["For",39.864,40.032],["et",40.032,40.122],["isotropt",40.122,40.624],["materiale",40.624,41.307],["er",41.307,41.462],["G",41.462,41.707],["lig",41.707,41.887],["E",41.887,42.068],["divideret",42.068,42.764],["med",42.764,43.008],["to",43.008,43.279],["gange",43.279,43.666],["en",43.666,43.846],["plus",43.846,44.13],["ny",44.13,44.452]],"text":"Vridningsvinklen theta er T L divideret med J G, hvor G er forskydningsmodulet. For et isotropt materiale er G lig E divideret med to gange en plus ny."},"hul":{"start":45.666,"end":56.336,"words":[["For",45.793,45.948],["en",45.948,46.012],["hul",46.012,46.219],["aksel",46.219,46.734],["er",46.734,46.876],["J",46.876,47.134],["lig",47.134,47.314],["pi",47.314,47.688],["over",47.688,47.932],["toogtredive",47.933,48.538],["gange",48.538,48.835],["forskellen",48.835,49.466],["mellem",49.466,49.801],["den",49.801,50.007],["ydre",50.007,50.355],["og",50.355,50.471],["den",50.471,50.703],["indre",50.703,51.012],["diameter",51.012,51.682],["i",51.682,51.837],["fjerde",51.837,52.365],["Den",53.256,53.372],["største",53.372,53.772],["spænding",53.772,54.287],["sidder",54.287,54.635],["stadig",54.635,55.035],["ved",55.035,55.163],["den",55.163,55.408],["ydre",55.408,55.705],["radius",55.705,56.336]],"text":"For en hul aksel er J lig pi over toogtredive gange forskellen mellem den ydre og den indre diameter i fjerde. Den største spænding sidder stadig ved den ydre radius."},"let":{"start":57.56,"end":67.328,"words":[["En",57.7,57.816],["hul",57.816,58.048],["aksel",58.048,58.538],["kan",58.538,58.692],["bære",58.692,58.873],["næsten",58.873,59.234],["samme",59.234,59.543],["moment",59.543,59.891],["som",59.891,60.071],["en",60.071,60.149],["massiv",60.149,60.561],["med",60.561,60.69],["samme",60.69,61.064],["ydre",61.064,61.36],["diameter",61.36,62.082],["men",62.223,62.404],["med",62.404,62.507],["langt",62.507,62.816],["mindre",62.816,63.164],["masse",63.164,63.692],["Materialet",64.596,65.253],["i",65.253,65.369],["midten",65.369,65.807],["bærer",65.807,66.104],["jo",66.104,66.246],["næsten",66.246,66.761],["intet",66.761,67.328]],"text":"En hul aksel kan bære næsten samme moment som en massiv med samme ydre diameter, men med langt mindre masse. Materialet i midten bærer jo næsten intet."},"design":{"start":68.542,"end":79.715,"words":[["En",68.682,68.798],["aksel",68.798,69.236],["skal",69.236,69.468],["opfylde",69.468,69.958],["to",69.958,70.203],["krav",70.203,70.615],["tau",70.744,71.002],["max",71.002,71.311],["må",71.311,71.479],["ikke",71.479,71.788],["overstige",71.788,72.265],["den",72.265,72.445],["tilladte",72.445,72.819],["spænding",72.819,73.347],["og",73.528,73.682],["theta",73.682,74.056],["må",74.056,74.236],["ikke",74.236,74.52],["overstige",74.52,75.074],["den",75.074,75.267],["tilladte",75.267,75.68],["vinkel",75.68,76.208],["Lange",77.086,77.485],["aksler",77.485,78.014],["styres",78.014,78.387],["ofte",78.387,78.864],["af",78.864,78.993],["stivheden",78.993,79.715]],"text":"En aksel skal opfylde to krav: tau max må ikke overstige den tilladte spænding, og theta må ikke overstige den tilladte vinkel. Lange aksler styres ofte af stivheden."},"tjek_q":{"start":80.94,"end":85.85,"words":[["Tjek",81.041,81.363],["dig",81.363,81.543],["selv",81.543,81.969],["Hvor",82.873,83.053],["stor",83.053,83.388],["er",83.388,83.504],["forskydningsspændingen",83.504,84.574],["i",84.574,84.767],["akslens",84.767,85.257],["centrum",85.257,85.85]],"text":"Tjek dig selv. Hvor stor er forskydningsspændingen i akslens centrum?"},"tjek_a":{"start":89.724,"end":94.632,"words":[["Den",89.838,89.98],["er",89.98,90.045],["nul",90.045,90.47],["fordi",90.599,90.96],["tau",90.96,91.269],["er",91.269,91.449],["proportional",91.449,92.119],["med",92.119,92.338],["r",92.338,92.686],["og",92.918,93.086],["r",93.086,93.356],["er",93.356,93.472],["nul",93.472,93.846],["i",93.846,93.949],["centrum",93.949,94.632]],"text":"Den er nul, fordi tau er proportional med r, og r er nul i centrum."},"slut":{"start":95.858,"end":104.942,"words":[["Kort",95.985,96.204],["sagt",96.204,96.707],["tau",96.836,97.145],["er",97.145,97.287],["T",97.287,97.532],["r",97.532,97.802],["over",97.802,98.086],["J",98.086,98.563],["tau",98.691,98.975],["max",98.975,99.349],["er",99.349,99.465],["seksten",99.465,99.954],["T",99.954,100.264],["over",100.264,100.521],["pi",100.521,100.753],["d",100.753,100.895],["i",100.895,101.024],["tredje",101.024,101.372],["for",101.372,101.514],["massive",101.514,101.874],["aksler",101.874,102.454],["og",102.596,102.764],["theta",102.764,103.202],["er",103.202,103.344],["T",103.344,103.614],["L",103.614,103.898],["over",103.898,104.194],["J",104.194,104.516],["G.",104.516,104.942]],"text":"Kort sagt: tau er T r over J, tau max er seksten T over pi d i tredje for massive aksler, og theta er T L over J G."}}}, { audio: 'vridning.mp3', id: 'vridning' });</script>
+</body>
+</html>

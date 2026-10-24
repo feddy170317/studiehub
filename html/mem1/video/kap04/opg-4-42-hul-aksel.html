@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opgave 4.42: hul aksel og vridningsvinkel · video</title>
+<meta name="description" content="Største længde af en hul stålaksel, når vridningsvinklen højst må være 5°. L_max = 1,26 m.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 4: videoer</a><h1>Opgave 4.42: hul aksel og vridningsvinkel</h1><span class="meta">MEM1 · kapitel 4 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Opgave 4.42: hul aksel og vridningsvinkel"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Største længde af en hul stålaksel, når vridningsvinklen højst må være 5°. L_max = 1,26 m.</p><div class="chips"><a href="vridning.html">Se først: Vridning af aksler</a><a href="../../../../lab/mem1/aksel.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel04_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l04">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Opgave 4.42: hul aksel do = 50, di = 40 mm, T = 2000 Nm, θ ≤ 5° → L = 1,258 m, τmax = 138 MPa (MEM1 kap. 4, slide 40)
+BP.scene({ header: 'MEM1 · kap. 4' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, PI, TAU } = B;
+
+  B.titel(0, 'Opgave 4.42', 'MEM1 · kapitel 4 · opgave (slide 40)', 'titel');
+  text(0, 'hvor lang må akslen være?', 640, 520, 42, 'red', wt('titel', 'lang') - 0.2, we('titel', 'grader'), { align: 'center' });
+
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start;
+    line(1, ell(250, 260, 100, 100, 0, TAU), 'black', 3.2, t0, t0 + 0.6); line(1, ell(250, 260, 80, 80, 0, TAU), 'black', 3, t0 + 0.4, t0 + 0.8);
+    text(1, 'd_o = 50 mm', 400, 220, 38, 'black', wt('data', 'ydre') - 0.1, we('data', 'halvtreds'));
+    text(1, 'd_i = 40 mm', 400, 280, 38, 'black', wt('data', 'indre') - 0.1, we('data', 'millimeter'));
+    text(1, 'T = 2000 N·m', 780, 220, 38, 'red', wt('data', 'Momentet') - 0.1, we('data', 'newtonmeter'));
+    text(1, 'E = 207 GPa,  ν = 0,3', 780, 280, 36, 'black', wt('data', 'E') - 0.1, we('data', 'tre'));
+    text(1, 'θ ≤ 5°', 400, 340, 40, 'blue', t0 + 0.3, t0 + 0.8);
+    const tg = L('g').start;
+    text(1, '1)  G = E / (2(1 + ν)) = 207 / 2,6 = 79,6 GPa', 140, 440, 38, 'green', tg + 0.2, we('g', 'gigapascal'));
+    text(1, '2)  J = π/32 · (50⁴ − 40⁴) = 362 300 mm⁴', 140, 520, 38, 'blue', L('j').start + 0.2, we('j', 'fjerde', 1));
+    text(1, '3)  θ = 5° = 0,08727 rad', 140, 600, 38, 'black', L('vinkel').start + 0.2, we('vinkel', 'radianer', 1));
+  }
+
+  B.goto('isoler', 2);
+  {
+    const t0 = L('isoler').start;
+    text(2, 'θ = T L / (J G)   ⇒   L = θ J G / T', 140, 170, 44, 'blue', t0 + 0.2, we('isoler', 'T', 1));
+    text(2, 'L = 0,08727 · 362 300 · 79 600 / 2 000 000', 140, 270, 38, 'black', L('tal').start + 0.2, we('tal', 'newtonmillimeter'));
+    const r = text(2, 'L_{max} = 1258 mm ≈ 1,26 m', 140, 370, 50, 'red', wt('resultat', 'tolv') - 0.1, we('resultat', 'lang'));
+    box(2, 120, 315, 660, 80, 'red', we('resultat', 'lang'), we('resultat', 'lang') + 0.6);
+    text(2, 'tjek:  τ_{max} = T c / J = 2 · 10⁶ · 25 / 362 300 = 138 MPa', 140, 500, 34, 'green', L('tau').start + 0.3, we('tau', 'megapascal'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Dobbelt så lang aksel,', 'samme vinkel. Og J?'], ['J skal fordobles', 'θ ∝ L / J'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 4, slide 40 · Hamrock, Schmid & Jacobson, opgave 4.42', '', 'slut');
+  text(4, 'G = E/(2(1+ν))  ·  J hul  ·  θ i rad', 200, 280, 42, 'blue', L('slut').start + 0.4, we('slut', 'radianer'));
+  text(4, 'L = θ J G / T = 1,26 m', 200, 370, 46, 'red', wt('slut', 'L') - 0.1, we('slut', 'meter'));
+});
+
+</script>
+<script>BP.live({"duration":123.03,"audio":"opg-4-42-hul-aksel.mp3","order":["titel","data","g","j","vinkel","isoler","tal","resultat","tau","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":8.18,"words":[["Opgave",0.653,1.194],["fire",1.194,1.555],["komma",1.555,1.864],["toogfyrre",1.864,2.676],["Hvor",3.58,3.773],["lang",3.773,4.031],["må",4.031,4.198],["en",4.198,4.276],["hul",4.276,4.521],["stålaksel",4.521,5.126],["være",5.126,5.616],["hvis",5.745,5.964],["vridningsvinklen",5.964,6.776],["højst",6.776,7.085],["må",7.085,7.227],["være",7.227,7.42],["fem",7.42,7.678],["grader",7.678,8.18]],"text":"Opgave fire komma toogfyrre. Hvor lang må en hul stålaksel være, hvis vridningsvinklen højst må være fem grader?"},"data":{"start":9.394,"end":21.855,"words":[["Akslen",9.534,10.011],["har",10.011,10.217],["ydre",10.217,10.526],["diameter",10.526,11.003],["halvtreds",11.003,11.583],["og",11.583,11.776],["indre",11.776,12.137],["diameter",12.137,12.833],["fyrre",12.833,13.194],["millimeter",13.194,13.903],["Momentet",14.806,15.373],["er",15.373,15.554],["to",15.554,15.812],["tusind",15.812,16.275],["newtonmeter",16.275,17.177],["For",18.067,18.196],["stål",18.196,18.608],["er",18.608,18.827],["E",18.827,19.033],["to",19.033,19.239],["hundrede",19.239,19.433],["og",19.433,19.446],["syv",19.446,19.716],["gigapascal",19.716,20.554],["og",20.554,20.708],["ny",20.708,20.902],["nul",20.902,21.147],["komma",21.147,21.43],["tre",21.43,21.855]],"text":"Akslen har ydre diameter halvtreds og indre diameter fyrre millimeter. Momentet er to tusind newtonmeter. For stål er E to hundrede og syv gigapascal og ny nul komma tre."},"g":{"start":23.088,"end":34.828,"words":[["Først",23.202,23.589],["forskydningsmodulet",23.589,24.903],["G",25.807,26.039],["er",26.039,26.258],["E",26.258,26.503],["over",26.503,26.696],["to",26.696,26.954],["gange",26.954,27.328],["en",27.328,27.521],["plus",27.521,27.817],["ny",27.817,28.165],["altså",28.294,28.732],["to",28.732,28.977],["hundrede",28.977,29.17],["og",29.17,29.183],["syv",29.183,29.454],["divideret",29.454,30.124],["med",30.124,30.343],["to",30.343,30.614],["komma",30.614,30.871],["seks",30.872,31.374],["Det",32.276,32.418],["er",32.418,32.521],["niogtres",32.521,33.152],["komma",33.152,33.5],["seks",33.5,33.861],["gigapascal",33.861,34.828]],"text":"Først forskydningsmodulet. G er E over to gange en plus ny, altså to hundrede og syv divideret med to komma seks. Det er niogtres komma seks gigapascal."},"j":{"start":36.062,"end":45.534,"words":[["Det",36.189,36.254],["polære",36.254,36.64],["inertimoment",36.64,37.375],["er",37.375,37.452],["pi",37.452,37.813],["over",37.813,38.097],["toogtredive",38.097,38.689],["gange",38.689,38.96],["halvtreds",38.96,39.514],["i",39.514,39.656],["fjerde",39.656,39.952],["minus",39.952,40.352],["fyrre",40.352,40.764],["i",40.764,40.919],["fjerde",40.919,41.447],["Det",42.338,42.415],["giver",42.415,42.763],["tre",42.763,43.059],["hundrede",43.059,43.253],["og",43.253,43.278],["toogtres",43.278,43.833],["tusind",43.833,44.155],["millimeter",44.155,44.825],["i",44.825,44.992],["fjerde",44.992,45.534]],"text":"Det polære inertimoment er pi over toogtredive gange halvtreds i fjerde minus fyrre i fjerde. Det giver tre hundrede og toogtres tusind millimeter i fjerde."},"vinkel":{"start":46.756,"end":53.47,"words":[["Vinklen",46.896,47.463],["skal",47.463,47.682],["være",47.682,48.004],["i",48.004,48.198],["radianer",48.198,48.984],["Fem",49.875,50.132],["grader",50.132,50.583],["er",50.583,50.738],["nul",50.738,50.996],["komma",50.996,51.369],["nul",51.369,51.692],["otte",51.692,52.104],["syv",52.104,52.452],["tre",52.452,52.722],["radianer",52.722,53.47]],"text":"Vinklen skal være i radianer. Fem grader er nul komma nul otte syv tre radianer."},"isoler":{"start":54.69,"end":61.48,"words":[["Fra",54.804,54.972],["theta",54.972,55.359],["lig",55.359,55.526],["T",55.526,55.745],["L",55.745,56.067],["over",56.067,56.325],["J",56.325,56.596],["G",56.596,56.84],["isolerer",56.841,57.304],["vi",57.304,57.407],["længden",57.408,57.987],["L",58.116,58.335],["er",58.335,58.49],["theta",58.49,58.941],["gange",58.941,59.315],["J",59.315,59.572],["gange",59.572,59.882],["G",59.882,60.114],["divideret",60.114,60.771],["med",60.771,60.938],["T.",60.938,61.48]],"text":"Fra theta lig T L over J G isolerer vi længden: L er theta gange J gange G divideret med T."},"tal":{"start":62.696,"end":72.875,"words":[["Med",62.836,63.004],["newton",63.004,63.468],["og",63.468,63.596],["millimeter",63.596,64.318],["nul",64.396,64.653],["komma",64.653,65.014],["nul",65.014,65.285],["otte",65.285,65.594],["syv",65.594,65.865],["tre",65.865,66.135],["gange",66.135,66.548],["tre",66.548,66.818],["hundrede",66.818,67.024],["og",67.024,67.05],["toogtres",67.05,67.617],["tusind",67.617,67.939],["gange",67.939,68.339],["niogtres",68.339,68.944],["tusind",68.944,69.267],["seks",69.267,69.55],["hundrede",69.55,70.053],["divideret",70.182,70.736],["med",70.736,70.929],["to",70.929,71.2],["millioner",71.2,71.805],["newtonmillimeter",71.805,72.875]],"text":"Med newton og millimeter: nul komma nul otte syv tre gange tre hundrede og toogtres tusind gange niogtres tusind seks hundrede, divideret med to millioner newtonmillimeter."},"resultat":{"start":74.11,"end":81.146,"words":[["Det",74.237,74.315],["giver",74.315,74.688],["tolv",74.688,74.972],["hundrede",74.972,75.255],["og",75.255,75.41],["otteoghalvtreds",75.41,76.132],["millimeter",76.132,76.853],["Akslen",77.757,78.195],["må",78.195,78.35],["altså",78.35,78.646],["højst",78.646,78.968],["være",78.968,79.316],["en",79.316,79.561],["komma",79.561,79.883],["to",79.883,80.154],["seks",80.154,80.463],["meter",80.463,80.772],["lang",80.772,81.146]],"text":"Det giver tolv hundrede og otteoghalvtreds millimeter. Akslen må altså højst være en komma to seks meter lang."},"tau":{"start":82.38,"end":92.599,"words":[["Lad",82.494,82.739],["os",82.739,82.92],["også",82.92,83.28],["tjekke",83.28,83.616],["spændingen",83.616,84.273],["Tau",85.164,85.383],["max",85.383,85.743],["er",85.743,85.95],["T",85.95,86.207],["c",86.207,86.529],["over",86.529,86.8],["J",86.8,87.277],["to",87.406,87.702],["millioner",87.702,88.14],["gange",88.14,88.462],["femogtyve",88.462,89.017],["divideret",89.017,89.532],["med",89.532,89.648],["J",89.648,90.125],["altså",90.267,90.615],["hundrede",90.615,90.937],["og",90.937,91.078],["otteogtredive",91.078,91.736],["megapascal",91.736,92.599]],"text":"Lad os også tjekke spændingen. Tau max er T c over J, to millioner gange femogtyve divideret med J, altså hundrede og otteogtredive megapascal."},"tjek_q":{"start":93.818,"end":99.939,"words":[["Tjek",93.919,94.241],["dig",94.241,94.421],["selv",94.421,94.859],["Hvis",95.764,95.944],["akslen",95.944,96.434],["skal",96.434,96.614],["være",96.614,96.782],["dobbelt",96.782,97.143],["så",97.143,97.284],["lang",97.284,97.555],["med",97.555,97.658],["samme",97.658,98.019],["vinkel",98.019,98.47],["hvad",98.599,98.766],["skal",98.766,98.934],["der",98.934,98.998],["så",98.998,99.14],["ske",99.14,99.398],["med",99.398,99.501],["J",99.501,99.939]],"text":"Tjek dig selv. Hvis akslen skal være dobbelt så lang med samme vinkel, hvad skal der så ske med J?"},"tjek_a":{"start":103.802,"end":108.208,"words":[["J",103.942,104.174],["skal",104.174,104.38],["fordobles",104.38,105.115],["fordi",105.231,105.617],["theta",105.617,106.068],["er",106.069,106.172],["proportional",106.172,106.983],["med",106.983,107.254],["L",107.254,107.499],["over",107.499,107.795],["J",107.795,108.208]],"text":"J skal fordobles, fordi theta er proportional med L over J."},"slut":{"start":109.432,"end":120.605,"words":[["Kort",109.559,109.791],["sagt",109.791,110.32],["G",110.448,110.655],["fra",110.655,110.977],["E",110.977,111.196],["og",111.196,111.351],["ny",111.351,111.698],["J",111.827,112.124],["for",112.124,112.304],["en",112.304,112.381],["hul",112.382,112.601],["aksel",112.601,113.18],["vinkel",113.296,113.709],["i",113.709,113.851],["radianer",113.851,114.611],["og",114.753,114.92],["L",114.92,115.139],["er",115.139,115.242],["theta",115.242,115.668],["J",115.668,115.938],["G",115.938,116.273],["over",116.273,116.531],["T.",116.531,117.034],["Her",117.924,118.156],["er",118.156,118.362],["L",118.362,118.581],["max",118.581,118.929],["en",118.929,119.161],["komma",119.161,119.496],["to",119.496,119.78],["seks",119.78,120.102],["meter",120.102,120.605]],"text":"Kort sagt: G fra E og ny, J for en hul aksel, vinkel i radianer, og L er theta J G over T. Her er L max en komma to seks meter."}}}, { audio: 'opg-4-42-hul-aksel.mp3', id: 'opg-4-42-hul-aksel' });</script>
+</body>
+</html>

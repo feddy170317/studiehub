@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eksamensspørgsmål 3b: håndtag med bøjning og forskydning · video</title>
+<meta name="description" content="Eksamensspørgsmål 3b: rektangulært håndtag, σ_max = 300 MPa og τ_max = 50 MPa.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 4: videoer</a><h1>Eksamensspørgsmål 3b: håndtag med bøjning og forskydning</h1><span class="meta">MEM1 · kapitel 4 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Eksamensspørgsmål 3b: håndtag med bøjning og forskydning"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Eksamensspørgsmål 3b: rektangulært håndtag, σ_max = 300 MPa og τ_max = 50 MPa.</p><div class="chips"><a href="boejningsspaending.html">Se først: Bøjningsspænding</a><a href="forskydning-tvaerkraft.html">Se først: Forskydning fra tværkraft</a><a href="../../../../lab/mem1/bjaelke-brud.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel04_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l04">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Eksamensspørgsmål 3b: b = 10, h = 30 mm, V = 10 kN, M = 450 Nm → σ = 300 MPa, τ = 50 MPa (MEM1 kap. 4, slide 42)
+BP.scene({ header: 'MEM1 · kap. 4' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, rect, dashed, plot, PI } = B;
+
+  B.titel(0, 'Eksamensspørgsmål 3b', 'MEM1 · kapitel 4 · opgave (slide 42)', 'titel');
+  text(0, 'bøjning og forskydning i et håndtag', 640, 520, 40, 'red', wt('titel', 'bøjning') - 0.2, we('titel', 'spændinger'), { align: 'center' });
+
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start, x0 = 280, y0 = 180, s = 9;
+    line(1, rect(x0, y0, 10 * s, 30 * s).concat([[x0, y0 + 2]]), 'black', 3.2, t0, t0 + 0.6);
+    text(1, 'b = 10', x0 + 45, y0 + 30 * s + 44, 30, 'black', wt('data', 'bredden') - 0.1, we('data', 'ti'), { align: 'center' });
+    text(1, 'h = 30', x0 - 14, y0 + 150, 30, 'black', wt('data', 'højden') - 0.1, we('data', 'tredive'), { align: 'right' });
+    text(1, 'V = 10 kN', 620, 220, 42, 'green', wt('data', 'tværkraft') - 0.1, we('data', 'kilonewton'));
+    text(1, 'M = 450 N·m', 620, 290, 42, 'red', wt('data', 'bøjningsmoment') - 0.1, we('data', 'newtonmeter'));
+    text(1, 'I = 10 · 30³ / 12 = 22 500 mm⁴', 620, 390, 38, 'blue', L('i').start + 0.2, we('i', 'fjerde'));
+    text(1, 'c = h/2 = 15 mm', 620, 460, 38, 'blue', L('c').start, we('c', 'millimeter'));
+    dashed(1, [x0 - 20, y0 + 135], [x0 + 110, y0 + 135], 'black', L('c').start, L('c').start + 0.4);
+  }
+
+  B.goto('sigma', 2);
+  {
+    const t0 = L('sigma').start, xs = 260, y0 = 170, H = 300;
+    line(2, [[xs, y0], [xs, y0 + H]], 'black', 2.4, t0, t0 + 0.3);
+    plot(2, [[xs - 100, y0], [xs + 100, y0 + H]], 'red', t0 + 0.2, t0 + 1.0);
+    text(2, 'σ', xs + 110, y0 + H, 36, 'red', t0 + 0.6, t0 + 0.9);
+    const Pq = []; for (let j = 0; j <= 30; j++) { const u = j / 30; Pq.push([xs + 300 + 140 * 4 * u * (1 - u), y0 + H * u]); }
+    line(2, [[xs + 300, y0], [xs + 300, y0 + H]], 'black', 2.4, L('tau').start, L('tau').start + 0.3);
+    plot(2, Pq, 'green', L('tau').start + 0.2, wt('tau', 'rektangel'));
+    text(2, 'τ', xs + 450, y0 + H / 2 + 10, 36, 'green', L('tau').start + 0.6, L('tau').start + 0.9);
+    text(2, 'σ_{max} = M c / I = 450 000 · 15 / 22 500 = 300 MPa', 120, 560, 34, 'red', wt('sigma', 'M') - 0.1, we('sigma', 'megapascal'));
+    text(2, 'τ_{max} = 3V / (2A) = 30 000 / 600 = 50 MPa', 120, 630, 34, 'green', wt('tau', 'tre') - 0.1, we('tau', 'megapascal'));
+    text(2, 'σ_{max} i yderfibrene', 860, 230, 32, 'red', L('steder').start + 0.4, we('steder', 'nul'));
+    text(2, 'τ_{max} i midten', 860, 330, 32, 'green', wt('steder', 'Tau') - 0.1, we('steder', 'nul', 1));
+    text(2, 'del a: se videoerne om bøjning og τ fra V', 820, 430, 28, 'blue', L('teori').start + 0.4, we('teori', 'tværkraft'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Håndtaget drejes, så 10 mm', 'er højden. Hvad sker med σ_{max}?'], ['I: 9× mindre, c: 3× mindre', '⇒ σ 3× større = 900 MPa'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 4, slide 42 (eksamensspm. 3) · Hamrock, Schmid & Jacobson, kap. 4', '', 'slut');
+  text(4, 'I = 22 500 mm⁴', 200, 270, 44, 'blue', L('slut').start + 0.4, we('slut', 'hundrede'));
+  text(4, 'σ_{max} = 300 MPa (yderfiber)', 200, 350, 44, 'red', wt('slut', 'sigma') - 0.1, we('slut', 'yderfibrene'));
+  text(4, 'τ_{max} = 50 MPa (N.A.)', 200, 430, 44, 'green', wt('slut', 'tau') - 0.1, we('slut', 'akse'));
+});
+
+</script>
+<script>BP.live({"duration":123.496,"audio":"eksamen-spm3.mp3","order":["titel","data","i","c","sigma","tau","steder","teori","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":9.43,"words":[["Eksamensspørgsmål",0.64,1.736],["tre",1.736,2.058],["b",2.058,2.419],["Et",3.322,3.425],["rektangulært",3.425,4.121],["håndtag",4.121,4.714],["bærer",4.714,4.959],["både",4.959,5.255],["bøjning",5.255,5.758],["og",5.758,5.912],["forskydning",5.912,6.621],["Vi",7.497,7.626],["finder",7.626,7.936],["de",7.936,8.09],["to",8.09,8.387],["største",8.387,8.773],["spændinger",8.773,9.43]],"text":"Eksamensspørgsmål tre b. Et rektangulært håndtag bærer både bøjning og forskydning. Vi finder de to største spændinger."},"data":{"start":10.666,"end":20.099,"words":[["Håndtaget",10.806,11.335],["har",11.335,11.489],["bredden",11.489,11.94],["ti",11.94,12.224],["og",12.224,12.288],["højden",12.288,12.855],["tredive",12.855,13.268],["millimeter",13.268,13.989],["Det",14.88,14.97],["bærer",14.97,15.254],["en",15.254,15.344],["tværkraft",15.344,15.911],["på",15.911,16.104],["ti",16.104,16.362],["kilonewton",16.362,17.096],["og",17.096,17.277],["et",17.277,17.341],["bøjningsmoment",17.341,18.102],["på",18.102,18.256],["fire",18.256,18.565],["hundrede",18.565,18.797],["og",18.797,18.823],["halvtreds",18.823,19.236],["newtonmeter",19.236,20.099]],"text":"Håndtaget har bredden ti og højden tredive millimeter. Det bærer en tværkraft på ti kilonewton og et bøjningsmoment på fire hundrede og halvtreds newtonmeter."},"i":{"start":21.336,"end":29.84,"words":[["Inertimomentet",21.476,22.352],["er",22.352,22.533],["b",22.533,22.778],["h",22.778,22.971],["i",22.971,23.126],["tredje",23.126,23.564],["over",23.564,23.822],["tolv",23.822,24.26],["ti",24.389,24.672],["gange",24.672,24.93],["tredive",24.93,25.329],["i",25.329,25.458],["tredje",25.458,25.832],["over",25.832,26.064],["tolv",26.064,26.489],["altså",26.618,27.043],["toogtyve",27.043,27.61],["tusind",27.61,28.035],["fem",28.035,28.293],["hundrede",28.293,28.512],["millimeter",28.512,29.169],["i",29.169,29.324],["fjerde",29.324,29.84]],"text":"Inertimomentet er b h i tredje over tolv: ti gange tredive i tredje over tolv, altså toogtyve tusind fem hundrede millimeter i fjerde."},"c":{"start":31.07,"end":35.54,"words":[["Den",31.197,31.339],["yderste",31.339,31.7],["fiber",31.7,32.215],["sidder",32.215,32.576],["i",32.576,32.731],["den",32.731,32.911],["halve",32.911,33.221],["højde",33.221,33.736],["c",33.865,34.264],["er",34.264,34.38],["femten",34.38,34.831],["millimeter",34.831,35.54]],"text":"Den yderste fiber sidder i den halve højde, c er femten millimeter."},"sigma":{"start":36.772,"end":47.919,"words":[["Bøjningsspændingen",36.912,37.711],["er",37.711,37.969],["M",37.969,38.188],["c",38.188,38.472],["over",38.472,38.845],["I",38.845,39.154],["fire",39.27,39.593],["hundrede",39.593,39.799],["og",39.799,39.825],["halvtreds",39.825,40.211],["tusind",40.211,40.585],["newtonmillimeter",40.585,41.423],["gange",41.423,41.732],["femten",41.732,42.234],["divideret",42.234,42.943],["med",42.943,43.175],["toogtyve",43.175,43.768],["tusind",43.768,44.245],["fem",44.245,44.541],["hundrede",44.541,45.031],["Det",45.921,45.999],["giver",45.999,46.372],["tre",46.373,46.669],["hundrede",46.669,46.952],["megapascal",46.952,47.919]],"text":"Bøjningsspændingen er M c over I: fire hundrede og halvtreds tusind newtonmillimeter gange femten divideret med toogtyve tusind fem hundrede. Det giver tre hundrede megapascal."},"tau":{"start":49.146,"end":63.399,"words":[["Forskydningen",49.273,49.892],["er",49.892,49.969],["størst",49.969,50.433],["i",50.433,50.575],["den",50.575,50.755],["neutrale",50.755,51.284],["akse",51.284,51.838],["For",52.728,52.909],["et",52.909,52.973],["rektangel",52.973,53.489],["er",53.489,53.682],["tau",53.682,53.966],["max",53.966,54.314],["tre",54.314,54.571],["V",54.571,54.906],["over",54.906,55.164],["to",55.164,55.46],["A.",55.46,55.808],["Arealet",55.808,56.517],["er",56.517,56.672],["tre",56.672,56.929],["hundrede",56.93,57.149],["kvadratmillimeter",57.149,58.244],["så",58.373,58.618],["tau",58.618,58.862],["max",58.862,59.223],["er",59.223,59.352],["tredive",59.352,59.713],["tusind",59.713,60.048],["divideret",60.048,60.628],["med",60.628,60.808],["seks",60.808,61.143],["hundrede",61.143,61.633],["altså",61.723,62.071],["halvtreds",62.071,62.509],["megapascal",62.509,63.399]],"text":"Forskydningen er størst i den neutrale akse. For et rektangel er tau max tre V over to A. Arealet er tre hundrede kvadratmillimeter, så tau max er tredive tusind divideret med seks hundrede, altså halvtreds megapascal."},"steder":{"start":64.616,"end":76.6,"words":[["Læg",64.73,64.924],["mærke",64.924,65.246],["til",65.246,65.607],["at",65.736,65.89],["de",65.89,66.006],["to",66.006,66.277],["maksima",66.277,66.831],["sidder",66.831,67.192],["forskellige",67.192,67.707],["steder",67.707,68.274],["Sigma",69.152,69.603],["max",69.603,69.887],["sidder",69.887,70.157],["i",70.157,70.286],["over",70.286,70.853],["og",70.995,71.188],["undersiden",71.188,71.897],["hvor",72.039,72.206],["tau",72.206,72.528],["er",72.528,72.593],["nul",72.593,73.005],["Tau",73.881,74.139],["max",74.139,74.436],["sidder",74.436,74.693],["i",74.693,74.732],["midten",74.732,75.222],["hvor",75.363,75.518],["sigma",75.518,76.021],["er",76.021,76.162],["nul",76.162,76.6]],"text":"Læg mærke til, at de to maksima sidder forskellige steder. Sigma max sidder i over- og undersiden, hvor tau er nul. Tau max sidder i midten, hvor sigma er nul."},"teori":{"start":77.83,"end":88.629,"words":[["Til",77.957,78.163],["del",78.164,78.408],["a",78.408,78.705],["skal",78.705,78.898],["du",78.898,78.988],["kunne",78.988,79.194],["udlede",79.194,79.555],["bøjningsformlen",79.555,80.367],["og",80.367,80.509],["forklare",80.509,81.192],["hvorfor",81.334,81.888],["forskydningen",81.888,82.506],["er",82.506,82.558],["størst",82.558,82.996],["i",82.996,83.125],["den",83.125,83.292],["neutrale",83.292,83.821],["akse",83.821,84.375],["Se",85.266,85.549],["videoerne",85.549,86.052],["om",86.052,86.193],["bøjning",86.193,86.696],["og",86.696,86.889],["om",86.889,87.018],["forskydning",87.018,87.688],["fra",87.688,87.869],["tværkraft",87.869,88.629]],"text":"Til del a skal du kunne udlede bøjningsformlen og forklare, hvorfor forskydningen er størst i den neutrale akse. Se videoerne om bøjning og om forskydning fra tværkraft."},"tjek_q":{"start":89.844,"end":96.468,"words":[["Tjek",89.945,90.267],["dig",90.267,90.447],["selv",90.447,90.873],["Hvad",91.79,91.893],["sker",91.893,92.176],["der",92.176,92.292],["med",92.292,92.473],["sigma",92.473,92.859],["max",92.859,93.414],["hvis",93.555,93.749],["håndtaget",93.749,94.187],["drejes",94.187,94.702],["så",94.844,95.05],["de",95.05,95.153],["ti",95.153,95.385],["millimeter",95.385,95.901],["er",95.901,95.926],["højden",95.926,96.468]],"text":"Tjek dig selv. Hvad sker der med sigma max, hvis håndtaget drejes, så de ti millimeter er højden?"},"tjek_a":{"start":100.332,"end":110.409,"words":[["Så",100.446,100.627],["bliver",100.627,100.859],["I",100.859,100.975],["ni",100.975,101.194],["gange",101.194,101.464],["mindre",101.464,102.006],["og",102.135,102.263],["c",102.263,102.521],["bliver",102.521,102.753],["tre",102.753,103.037],["gange",103.037,103.307],["mindre",103.307,103.861],["Spændingen",104.739,105.306],["bliver",105.306,105.551],["tre",105.551,105.847],["gange",105.847,106.092],["større",106.092,106.634],["altså",106.711,107.149],["ni",107.149,107.433],["hundrede",107.433,107.703],["megapascal",107.703,108.579],["Det",109.442,109.61],["holder",109.61,109.919],["ikke",109.919,110.409]],"text":"Så bliver I ni gange mindre, og c bliver tre gange mindre. Spændingen bliver tre gange større, altså ni hundrede megapascal. Det holder ikke."},"slut":{"start":111.722,"end":121.063,"words":[["Kort",111.849,112.055],["sagt",112.056,112.507],["I",112.635,112.79],["er",112.79,112.829],["toogtyve",112.829,113.383],["tusind",113.383,113.731],["fem",113.731,113.963],["hundrede",113.963,114.465],["sigma",114.555,114.994],["max",114.994,115.342],["er",115.342,115.483],["tre",115.483,115.754],["hundrede",115.754,115.96],["megapascal",115.96,116.63],["i",116.63,116.811],["yderfibrene",116.811,117.661],["og",117.803,117.945],["tau",117.945,118.177],["max",118.177,118.486],["er",118.486,118.576],["halvtreds",118.576,119.001],["megapascal",119.001,119.787],["i",119.787,119.903],["den",119.903,120.045],["neutrale",120.045,120.535],["akse",120.535,121.063]],"text":"Kort sagt: I er toogtyve tusind fem hundrede, sigma max er tre hundrede megapascal i yderfibrene, og tau max er halvtreds megapascal i den neutrale akse."}}}, { audio: 'eksamen-spm3.mp3', id: 'eksamen-spm3' });</script>
+</body>
+</html>
