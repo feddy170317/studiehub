@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Middelspænding, amplitude og R · video</title>
+<meta name="description" content="σm, σa og R, de tre standardtilfælde og eksemplet fra slide 11–12.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 7: videoer</a><h1>Middelspænding, amplitude og R</h1><span class="meta">MEM1 · kapitel 7 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Middelspænding, amplitude og R"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>σm, σa og R, de tre standardtilfælde og eksemplet fra slide 11–12.</p><div class="chips"><a href="udmattelse-intro.html">Se først: Hvad er udmattelse?</a><a href="../../../../lab/mem1/udmattelse-goodman.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel07_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l07">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Middelspænding, amplitude og R (MEM1 kap. 7, slides 6–8 og 11–12)
+BP.scene({ header: 'MEM1 · kap. 7' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, axes, plot, dashed, PI } = B;
+
+  B.titel(0, 'σ_m, σ_a og R', 'MEM1 · kapitel 7 · begreb (slide 6–8, 11–12)', 'titel');
+  text(0, 'tre tal for en svingende spænding', 640, 520, 40, 'red', wt('titel', 'Tre') - 0.2, we('titel', 'spænding'), { align: 'center' });
+
+  B.goto('kurve', 1);
+  {
+    const t0 = L('kurve').start, ox = 140, oy = 560, ymax = 200, ymin = 440, ym = (ymax + ymin) / 2;
+    axes(1, ox, oy, 640, 140, 't', 'σ', t0);
+    const P = []; for (let j = 0; j <= 80; j++) { const u = j / 80; P.push([ox + 10 + 470 * u, ym - (ym - ymax) * Math.sin(u * 6 * PI)]); }
+    plot(1, P, 'blue', t0 + 0.4, t0 + 1.6);
+    dashed(1, [ox, ymax], [630, ymax], 'black', wt('kurve', 'største') - 0.2, wt('kurve', 'største') + 0.4); text(1, 'σ_{max}', ox - 10, ymax + 10, 28, 'black', wt('kurve', 'max'), wt('kurve', 'max') + 0.3, { align: 'right' });
+    dashed(1, [ox, ymin], [630, ymin], 'black', wt('kurve', 'mindste') - 0.2, wt('kurve', 'mindste') + 0.4); text(1, 'σ_{min}', ox - 10, ymin + 10, 28, 'black', wt('kurve', 'min'), wt('kurve', 'min') + 0.3, { align: 'right' });
+    dashed(1, [ox, ym], [630, ym], 'red', L('middel').start + 0.2, L('middel').start + 0.6); text(1, 'σ_m', ox - 10, ym + 10, 30, 'red', L('middel').start + 0.4, L('middel').start + 0.7, { align: 'right' });
+    arrow(1, [[600, ym], [600, ymax + 4]], 'green', 2.6, L('amplitude').start + 0.2, L('amplitude').start + 0.5, 11); text(1, 'σ_a', 610, (ym + ymax) / 2, 30, 'green', L('amplitude').start + 0.4, L('amplitude').start + 0.7);
+    text(1, 'σ_m = (σ_{max} + σ_{min}) / 2', 720, 220, 38, 'red', wt('middel', 'Middelspændingen') - 0.1, we('middel', 'to'));
+    text(1, 'σ_a = (σ_{max} − σ_{min}) / 2', 720, 300, 38, 'green', wt('amplitude', 'Amplituden') - 0.1, we('amplitude', 'to'));
+    text(1, 'R = σ_{min} / σ_{max}', 720, 380, 40, 'blue', L('r').start + 0.2, we('r', 'max'));
+    text(1, 'σ_a driver revnen', 720, 470, 30, 'black', L('drivere').start + 0.3, we('drivere', 'amplituden'));
+    text(1, 'σ_m i træk gør det værre', 720, 520, 30, 'red', wt('drivere', 'middelspænding') - 0.2, we('drivere', 'værre'));
+  }
+
+  B.goto('fuldt', 2);
+  {
+    const t0 = L('fuldt').start;
+    const tilf = [['R = −1  fuldt vekslende', 'fuldt', -1, 'Fuldt'], ['R = 0  pulserende', 'puls', 0, 'Pulserende'], ['0 < R < 1  svingende', 'svingende', 0.4, 'svingende']];
+    tilf.forEach(([s, id, R, w], i) => {
+      const t = L(id).start, x0 = 140 + 360 * i, y0 = 470, amp = 70, mid = R === -1 ? 0 : R === 0 ? -amp : -amp * (1 + R) / (1 - R);
+      line(2, [[x0, y0], [x0 + 300, y0]], 'black', 2, t, t + 0.3);
+      const P = []; for (let j = 0; j <= 50; j++) { const u = j / 50; P.push([x0 + 300 * u, y0 + mid - amp * Math.sin(u * 4 * PI)]); }
+      plot(2, P, i === 0 ? 'red' : i === 1 ? 'green' : 'blue', t + 0.2, t + 1.0);
+      text(2, s, x0 + 150, 560, 28, 'black', t + 0.2, t + 1.0, { align: 'center' });
+    });
+    text(2, 'σ_m = 0: roterende aksel', 140 + 150, 610, 26, 'red', wt('fuldt', 'aksel') - 0.4, we('fuldt', 'aksel'), { align: 'center' });
+  }
+
+  B.goto('eks', 3);
+  {
+    const t0 = L('eks').start;
+    bubble(3, 'Eksempel (slide 11–12)', 150, 140, 50, 'blue', t0, t0 + 0.7);
+    text(3, 'σ_{max} = 180 MPa,   σ_{min} = 40 MPa', 160, 230, 40, 'black', wt('eks', 'sigma') - 0.1, we('eks', 'megapascal'));
+    text(3, 'σ_m = (180 + 40)/2 = 110 MPa', 160, 320, 42, 'red', wt('eks2', 'sigma') - 0.1, we('eks2', 'ti'));
+    text(3, 'σ_a = (180 − 40)/2 = 70 MPa', 160, 390, 42, 'green', wt('eks2', 'sigma', 1) - 0.1, we('eks2', 'halvfjerds'));
+    text(3, 'R = 40/180 = 0,22  →  svingende', 160, 460, 42, 'blue', wt('eks2', 'R') - 0.1, we('eks2', 'last'));
+    text(3, '±70 MPa om 110 MPa', 160, 550, 40, 'black', wt('eks2', 'plus') - 0.1, we('eks2', 'ti', 1));
+  }
+
+  B.goto('tjek_q', 4);
+  B.tjek(4, ['σ veksler mellem −100 og +100 MPa.', 'σ_m, σ_a og R?'], ['σ_m = 0,  σ_a = 100,  R = −1', 'fuldt vekslende'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 5);
+  B.slut(5, 'Abou-Hayt (2026), MEM1 Chapter 7, slide 6–8 og 11–12 · Hamrock, Schmid & Jacobson, kap. 7', 'S-N-kurven', 'slut');
+  text(5, 'σ_m = middel · σ_a = halv svingning · R = min/max', 200, 280, 36, 'blue', L('slut').start + 0.4, we('slut', 'max'));
+  text(5, 'R = −1 fuldt vekslende · R = 0 pulserende', 200, 360, 38, 'red', wt('slut', 'R', 1) - 0.1, we('slut', 'pulserende'));
+});
+
+</script>
+<script>BP.live({"duration":133.498,"audio":"cykliske-spaendinger.mp3","order":["titel","kurve","middel","amplitude","r","drivere","fuldt","puls","svingende","eks","eks2","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":6.93,"words":[["Middelspænding",0.64,1.478],["amplitude",1.607,2.38],["og",2.38,2.496],["spændingsforhold",2.496,3.45],["Tre",4.34,4.649],["tal",4.649,5.062],["der",5.204,5.307],["beskriver",5.307,5.809],["en",5.809,5.977],["svingende",5.977,6.389],["spænding",6.389,6.93]],"text":"Middelspænding, amplitude og spændingsforhold. Tre tal, der beskriver en svingende spænding."},"kurve":{"start":8.146,"end":16.78,"words":[["Tegn",8.273,8.557],["spændingen",8.557,9.162],["som",9.162,9.42],["funktion",9.42,9.987],["af",9.987,10.129],["tiden",10.129,10.696],["Den",11.587,11.703],["svinger",11.703,12.038],["mellem",12.038,12.295],["en",12.295,12.386],["største",12.386,12.772],["værdi",12.772,13.288],["sigma",13.378,13.777],["max",13.777,14.293],["og",14.46,14.589],["en",14.589,14.718],["mindste",14.718,15.066],["værdi",15.066,15.569],["sigma",15.685,16.136],["min.",16.136,16.78]],"text":"Tegn spændingen som funktion af tiden. Den svinger mellem en største værdi, sigma max, og en mindste værdi, sigma min."},"middel":{"start":18.0,"end":26.041,"words":[["Middelspændingen",18.14,18.772],["sigma",18.772,19.197],["m",19.197,19.545],["er",19.545,19.648],["sigma",19.648,20.099],["max",20.099,20.434],["plus",20.434,20.653],["sigma",20.653,21.181],["min",21.181,21.413],["divideret",21.413,21.993],["med",21.993,22.122],["to.",22.122,22.547],["Det",23.464,23.606],["er",23.606,23.735],["midtlinjen",23.735,24.495],["som",24.624,24.856],["spændingen",24.856,25.32],["svinger",25.32,25.719],["om",25.719,26.041]],"text":"Middelspændingen sigma m er sigma max plus sigma min divideret med to. Det er midtlinjen, som spændingen svinger om."},"amplitude":{"start":27.278,"end":35.332,"words":[["Amplituden",27.405,27.934],["sigma",27.934,28.385],["a",28.385,28.604],["er",28.604,28.655],["sigma",28.655,29.119],["max",29.119,29.454],["minus",29.454,29.789],["sigma",29.789,30.318],["min",30.318,30.537],["divideret",30.537,31.104],["med",31.104,31.233],["to.",31.233,31.658],["Det",32.549,32.665],["er",32.665,32.987],["hvor",33.129,33.309],["meget",33.309,33.567],["spændingen",33.567,34.005],["svinger",34.005,34.391],["op",34.391,34.662],["og",34.662,34.804],["ned.",34.804,35.332]],"text":"Amplituden sigma a er sigma max minus sigma min divideret med to. Det er, hvor meget spændingen svinger op og ned."},"r":{"start":36.556,"end":40.562,"words":[["Spændingsforholdet",36.683,37.624],["R",37.624,37.959],["er",37.959,38.075],["sigma",38.075,38.539],["min",38.539,38.745],["divideret",38.745,39.441],["med",39.441,39.609],["sigma",39.609,40.034],["max",40.034,40.562]],"text":"Spændingsforholdet R er sigma min divideret med sigma max."},"drivere":{"start":41.778,"end":52.177,"words":[["Revnevæksten",41.905,42.73],["drives",42.73,43.078],["især",43.078,43.581],["af",43.581,43.722],["amplituden",43.722,44.611],["En",45.502,45.605],["middelspænding",45.605,46.224],["i",46.224,46.288],["træk",46.288,46.765],["holder",46.765,47.152],["revnen",47.152,47.513],["åben",47.513,48.028],["og",48.028,48.17],["gør",48.17,48.35],["det",48.35,48.453],["værre",48.453,48.956],["En",49.845,49.948],["middelspænding",49.948,50.592],["i",50.592,50.721],["tryk",50.721,51.147],["holder",51.147,51.469],["den",51.469,51.649],["lukket",51.649,52.177]],"text":"Revnevæksten drives især af amplituden. En middelspænding i træk holder revnen åben og gør det værre. En middelspænding i tryk holder den lukket."},"fuldt":{"start":53.408,"end":62.828,"words":[["Der",53.522,53.703],["er",53.703,53.78],["tre",53.78,54.115],["standardtilfælde",54.115,55.198],["Fuldt",56.101,56.398],["vekslende",56.398,56.797],["last",56.797,57.248],["har",57.248,57.57],["R",57.57,57.725],["lig",57.725,57.944],["minus",57.944,58.369],["en",58.369,58.601],["og",58.601,58.73],["middelspænding",58.73,59.426],["nul",59.426,59.864],["Det",60.74,60.895],["er",60.895,60.96],["typisk",60.96,61.449],["en",61.449,61.617],["roterende",61.617,62.184],["aksel",62.184,62.828]],"text":"Der er tre standardtilfælde. Fuldt vekslende last har R lig minus en og middelspænding nul. Det er typisk en roterende aksel."},"puls":{"start":64.054,"end":69.801,"words":[["Pulserende",64.181,64.684],["last",64.684,65.122],["har",65.122,65.444],["R",65.444,65.637],["lig",65.637,65.857],["nul",65.857,66.23],["Spændingen",67.121,67.611],["går",67.611,67.843],["fra",67.843,68.036],["nul",68.036,68.307],["op",68.307,68.629],["til",68.629,68.796],["en",68.796,68.886],["top",68.886,69.17],["i",69.17,69.312],["træk",69.312,69.801]],"text":"Pulserende last har R lig nul. Spændingen går fra nul op til en top i træk."},"svingende":{"start":71.028,"end":77.69,"words":[["Og",71.168,71.22],["svingende",71.22,71.606],["last",71.606,72.07],["har",72.07,72.354],["R",72.354,72.573],["mellem",72.573,72.959],["nul",72.959,73.217],["og",73.217,73.307],["en",73.307,73.655],["Emnet",74.559,74.92],["er",74.92,75.036],["hele",75.036,75.332],["tiden",75.332,75.616],["i",75.616,75.667],["træk",75.667,76.131],["og",76.131,76.26],["kommer",76.26,76.595],["aldrig",76.595,76.93],["ned",76.93,77.149],["på",77.149,77.278],["nul",77.278,77.69]],"text":"Og svingende last har R mellem nul og en. Emnet er hele tiden i træk og kommer aldrig ned på nul."},"eks":{"start":78.914,"end":84.351,"words":[["Eksemplet",79.041,79.583],["fra",79.583,79.737],["slides",79.737,80.291],["sigma",80.407,80.858],["max",80.858,81.168],["er",81.168,81.258],["hundrede",81.258,81.567],["og",81.567,81.58],["firs",81.58,82.121],["og",82.263,82.405],["sigma",82.405,82.856],["min",82.856,83.049],["er",83.049,83.139],["fyrre",83.139,83.461],["megapascal",83.461,84.351]],"text":"Eksemplet fra slides: sigma max er hundrede og firs, og sigma min er fyrre megapascal."},"eks2":{"start":85.576,"end":98.604,"words":[["Så",85.69,85.961],["er",85.961,85.987],["sigma",85.987,86.464],["m",86.464,86.683],["hundrede",86.683,86.902],["og",86.902,86.915],["ti",86.915,87.353],["sigma",87.482,87.971],["a",87.971,87.997],["halvfjerds",87.997,88.641],["og",88.835,88.977],["R",88.977,89.196],["er",89.196,89.247],["fyrre",89.247,89.556],["divideret",89.556,90.136],["med",90.136,90.342],["hundrede",90.342,90.639],["og",90.639,90.652],["firs",90.652,91.18],["altså",91.322,91.773],["nul",91.773,92.031],["komma",92.031,92.379],["to",92.379,92.662],["to.",92.662,93.062],["Det",93.952,94.12],["er",94.12,94.223],["svingende",94.223,94.609],["last",94.61,95.177],["og",95.318,95.473],["spændingen",95.473,95.937],["svinger",95.937,96.298],["plus",96.298,96.594],["minus",96.594,96.89],["halvfjerds",96.89,97.457],["om",97.457,97.664],["hundrede",97.664,97.96],["og",97.96,97.986],["ti.",97.986,98.604]],"text":"Så er sigma m hundrede og ti, sigma a halvfjerds, og R er fyrre divideret med hundrede og firs, altså nul komma to to. Det er svingende last, og spændingen svinger plus minus halvfjerds om hundrede og ti."},"tjek_q":{"start":99.822,"end":108.61,"words":[["Tjek",99.923,100.245],["dig",100.245,100.425],["selv",100.425,100.851],["Spændingen",101.755,102.258],["svinger",102.258,102.644],["mellem",102.644,103.018],["minus",103.018,103.43],["hundrede",103.43,103.688],["og",103.688,103.727],["plus",103.727,104.01],["hundrede",104.01,104.281],["megapascal",104.281,105.196],["Hvad",106.058,106.329],["er",106.329,106.355],["sigma",106.355,106.78],["m",106.78,107.154],["sigma",107.283,107.824],["a",107.824,108.12],["og",108.12,108.249],["R",108.249,108.61]],"text":"Tjek dig selv. Spændingen svinger mellem minus hundrede og plus hundrede megapascal. Hvad er sigma m, sigma a og R?"},"tjek_a":{"start":112.494,"end":119.349,"words":[["Sigma",112.608,113.137],["m",113.137,113.356],["er",113.356,113.433],["nul",113.433,113.846],["sigma",113.987,114.49],["a",114.49,114.722],["er",114.722,114.786],["hundrede",114.786,115.327],["og",115.469,115.637],["R",115.637,115.907],["er",115.907,116.023],["minus",116.023,116.449],["en",116.449,116.784],["Det",117.648,117.841],["er",117.841,117.944],["fuldt",117.944,118.292],["vekslende",118.292,118.808],["last",118.808,119.349]],"text":"Sigma m er nul, sigma a er hundrede, og R er minus en. Det er fuldt vekslende last."},"slut":{"start":120.572,"end":131.075,"words":[["Kort",120.699,120.918],["sagt",120.918,121.395],["sigma",121.511,122.014],["m",122.014,122.31],["er",122.31,122.452],["middelværdien",122.452,123.315],["sigma",123.431,123.908],["a",123.908,124.192],["er",124.192,124.282],["den",124.282,124.462],["halve",124.462,124.746],["svingning",124.746,125.313],["og",125.48,125.635],["R",125.635,125.905],["er",125.905,126.034],["min",126.034,126.215],["over",126.215,126.511],["max",126.511,127.039],["R",127.93,128.046],["lig",128.046,128.239],["minus",128.24,128.691],["en",128.691,128.858],["er",128.858,128.91],["fuldt",128.91,129.167],["vekslende",129.167,129.734],["nul",129.85,130.211],["er",130.211,130.327],["pulserende",130.327,131.075]],"text":"Kort sagt: sigma m er middelværdien, sigma a er den halve svingning, og R er min over max. R lig minus en er fuldt vekslende, nul er pulserende."}}}, { audio: 'cykliske-spaendinger.mp3', id: 'cykliske-spaendinger' });</script>
+</body>
+</html>

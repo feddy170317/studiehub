@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hvad er udmattelse? · video</title>
+<meta name="description" content="Udmattelse under flydespændingen, de tre stadier, hvor revner starter, og hvorfor en roterende aksel skal tjekkes.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 7: videoer</a><h1>Hvad er udmattelse?</h1><span class="meta">MEM1 · kapitel 7 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Hvad er udmattelse?"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Udmattelse under flydespændingen, de tre stadier, hvor revner starter, og hvorfor en roterende aksel skal tjekkes.</p><div class="chips"><a href="../../../../lab/mem1/udmattelse-goodman.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel07_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l07">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Hvad er udmattelse? (MEM1 kap. 7, slides 2–5 og 9–10)
+BP.scene({ header: 'MEM1 · kap. 7' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, hatch, rect, plot, PI, TAU } = B;
+
+  B.titel(0, 'Hvad er udmattelse?', 'MEM1 · kapitel 7 · begreb (slide 2–5, 9–10)', 'titel');
+  text(0, 'brud under flydespændingen', 640, 520, 42, 'red', wt('titel', 'under') - 0.2, we('titel', 'gange'), { align: 'center' });
+
+  B.goto('def', 1);
+  {
+    const t0 = L('def').start;
+    text(1, 'gradvis skade under cykliske laster', 140, 160, 40, 'blue', t0 + 0.2, we('def', 'laster'));
+    const f = [['σ_{brud} ≪ S_y', 'under'], ['drevet af svingende σ', 'svingende'], ['skade hober sig op', 'hober'], ['pludseligt, sprødt brud', 'pludseligt']];
+    f.forEach(([s, w], i) => { const t = wt('traek', w) - 0.3; dot(1, 160, 240 + 60 * i - 12, 6, 'red', t); text(1, s, 184, 240 + 60 * i, 36, 'black', t, t + 0.9); });
+    const ta = L('andel').start;
+    text(1, '80–90 % af brud i maskiner', 760, 260, 38, 'red', ta + 0.2, we('andel', 'dele'));
+    text(1, 'aksler · fjedre · tandhjul · lejer · plejlstænger · bolte', 140, 560, 30, 'black', L('dele').start + 0.2, we('dele', 'boltesamlinger'));
+  }
+
+  B.goto('stadier', 2);
+  {
+    const t0 = L('stadier').start, x0 = 160, y0 = 200;
+    line(2, rect(x0, y0, 420, 300).concat([[x0, y0 + 2]]), 'black', 3, t0, t0 + 0.6);
+    const t1 = wt('stadier', 'mikroskopisk') - 0.2;
+    line(2, [[x0, y0 + 150], [x0 + 30, y0 + 120]], 'red', 3, t1, t1 + 0.4); text(2, '1', x0 - 30, y0 + 140, 34, 'red', t1, t1 + 0.3);
+    const t2 = wt('stadier', 'vokser') - 0.2;
+    line(2, [[x0 + 30, y0 + 120], [x0 + 230, y0 + 120]], 'red', 3, t2, t2 + 0.8);
+    for (let i = 1; i <= 5; i++) line(2, ell(x0, y0 + 130, 40 * i, 50 + 22 * i, -PI / 2.3, PI / 2.3), 'blue', 1.8, wt('stadier', 'strandmærker') - 0.4 + 0.1 * i, wt('stadier', 'strandmærker') + 0.1 * i, { alpha: 0.6 });
+    text(2, '2', x0 + 120, y0 + 100, 34, 'red', t2, t2 + 0.3);
+    const t3 = wt('stadier', 'resterende') - 0.2;
+    hatch(2, rect(x0 + 250, y0, 170, 300), 'black', t3, t3 + 0.6, { gap: 6 });
+    text(2, '3', x0 + 330, y0 - 14, 34, 'red', t3, t3 + 0.3);
+    text(2, '1  revne dannes (45°)', 660, 240, 34, 'black', t1, t1 + 0.8);
+    text(2, '2  revne vokser ⊥ σ, strandmærker', 660, 300, 34, 'black', t2, wt('stadier', 'strandmærker') + 0.4);
+    text(2, '3  restbrud: pludseligt', 660, 360, 34, 'black', t3, we('stadier', 'pludseligt'));
+    const ts = L('start').start;
+    text(2, 'start: ridser · skuldre · kilespor · huller · indeslutninger', 140, 580, 30, 'red', ts + 0.2, we('start', 'materialet'));
+    text(2, 'polér og brug store radier', 140, 650, 38, 'green', L('regel').start + 0.3, we('regel', 'store'));
+  }
+
+  B.goto('aksel', 3);
+  {
+    const t0 = L('aksel').start;
+    bubble(3, 'Roterende aksel', 150, 140, 52, 'blue', t0, t0 + 0.7);
+    text(3, 'σ = 180 MPa,  S_y = 350 MPa', 160, 230, 40, 'black', wt('aksel', 'hundrede') - 0.2, we('aksel', 'halvtreds'));
+    text(3, 'n_{statisk} = 350/180 = 1,94', 160, 300, 42, 'blue', wt('aksel', 'Statisk') - 0.1, we('aksel', 'fire'));
+    const ta = L('aksel2').start;
+    const P = []; for (let j = 0; j <= 80; j++) { const u = j / 80; P.push([700 + 440 * u, 470 - 90 * Math.sin(u * 6 * PI)]); }
+    line(3, [[700, 470], [1160, 470]], 'black', 2, ta, ta + 0.4);
+    plot(3, P, 'red', ta + 0.3, wt('aksel2', 'omdrejning'));
+    text(3, 'træk', 1170, 390, 28, 'red', ta + 0.6, ta + 0.9); text(3, 'tryk', 1170, 570, 28, 'blue', ta + 0.7, ta + 1.0);
+    text(3, 'R = −1: fuldt vekslende', 160, 420, 38, 'red', wt('aksel2', 'skifter') - 0.1, we('aksel2', 'omdrejning'));
+    const r = text(3, '⇒ udmattelse SKAL tjekkes', 160, 510, 44, 'red', wt('aksel2', 'Udmattelse') - 0.1, we('aksel2', 'undersøges'));
+    under(r, 'red', we('aksel2', 'undersøges'), we('aksel2', 'undersøges') + 0.3);
+  }
+
+  B.goto('tjek_q', 4);
+  B.tjek(4, ['Hvorfor er et statisk tjek', 'ikke nok for en roterende aksel?'], ['σ veksler mellem træk og tryk', 'revner vokser under S_y'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 5);
+  B.slut(5, 'Abou-Hayt (2026), MEM1 Chapter 7, slide 2–5 og 9–10 · Hamrock, Schmid & Jacobson, kap. 7', 'middelspænding, amplitude og R', 'slut');
+  text(5, 'gentagne laster under S_y → skade', 200, 280, 42, 'blue', L('slut').start + 0.4, we('slut', 'flydespændingen'));
+  text(5, 'tre stadier · starter ved K_t', 200, 360, 42, 'red', wt('slut', 'tre') - 0.1, we('slut', 'spændingskoncentrationer'));
+});
+
+</script>
+<script>BP.live({"duration":143.252,"audio":"udmattelse-intro.mp3","order":["titel","def","traek","andel","dele","stadier","start","regel","aksel","aksel2","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":8.863,"words":[["Hvad",0.601,0.962],["er",0.962,1.168],["udmattelse",1.168,2.057],["Et",3.039,3.142],["maskinelement",3.142,3.889],["kan",3.889,4.018],["knække",4.018,4.366],["ved",4.366,4.521],["en",4.521,4.598],["spænding",4.598,5.113],["der",5.268,5.423],["er",5.423,5.448],["langt",5.448,5.758],["under",5.758,5.938],["flydespændingen",5.938,6.776],["hvis",6.918,7.162],["lasten",7.162,7.562],["gentages",7.562,8.077],["mange",8.077,8.412],["gange",8.412,8.863]],"text":"Hvad er udmattelse? Et maskinelement kan knække ved en spænding, der er langt under flydespændingen, hvis lasten gentages mange gange."},"def":{"start":10.09,"end":15.114,"words":[["Udmattelse",10.217,10.926],["er",10.926,11.081],["en",11.081,11.197],["gradvis",11.197,11.699],["skade",11.699,12.047],["i",12.047,12.112],["materialet",12.112,12.82],["under",12.82,13.065],["gentagne",13.065,13.8],["cykliske",13.942,14.56],["laster",14.56,15.114]],"text":"Udmattelse er en gradvis skade i materialet under gentagne, cykliske laster."},"traek":{"start":16.344,"end":32.555,"words":[["Fire",16.445,16.831],["ting",16.831,17.141],["er",17.141,17.244],["særlige",17.244,17.875],["Bruddet",18.844,19.089],["sker",19.089,19.501],["under",19.501,19.759],["flydespændingen",19.759,20.725],["Det",21.588,21.781],["er",21.781,21.91],["de",21.91,22.013],["svingende",22.013,22.439],["spændinger",22.439,23.122],["der",23.263,23.405],["driver",23.405,23.727],["det",23.727,24.062],["Skaden",24.952,25.39],["hober",25.39,25.674],["sig",25.674,25.893],["op",25.893,26.228],["over",26.228,26.473],["lang",26.473,26.769],["tid",26.769,27.156],["Og",28.071,28.135],["det",28.135,28.264],["endelige",28.264,28.638],["brud",28.638,28.947],["kommer",28.947,29.243],["pludseligt",29.243,29.849],["uden",29.978,30.21],["synlig",30.21,30.571],["advarsel",30.571,31.267],["som",31.408,31.679],["et",31.679,31.756],["sprødt",31.756,32.066],["brud",32.066,32.555]],"text":"Fire ting er særlige. Bruddet sker under flydespændingen. Det er de svingende spændinger, der driver det. Skaden hober sig op over lang tid. Og det endelige brud kommer pludseligt, uden synlig advarsel, som et sprødt brud."},"andel":{"start":33.806,"end":39.436,"words":[["Udmattelse",33.933,34.655],["står",34.655,34.951],["for",34.951,35.132],["omkring",35.132,35.48],["firs",35.48,35.763],["til",35.763,35.879],["halvfems",35.879,36.292],["procent",36.292,36.743],["af",36.743,36.91],["alle",36.91,37.232],["brud",37.232,37.503],["i",37.503,37.593],["maskiner",37.593,38.25],["med",38.25,38.431],["bevægelige",38.431,38.959],["dele",38.959,39.436]],"text":"Udmattelse står for omkring firs til halvfems procent af alle brud i maskiner med bevægelige dele."},"dele":{"start":40.66,"end":47.772,"words":[["Typiske",40.774,41.277],["eksempler",41.277,41.883],["er",41.883,41.999],["roterende",41.999,42.501],["aksler",42.501,43.12],["skruefjedre",43.262,44.189],["tandhjul",44.331,44.988],["lejer",45.13,45.749],["plejlstænger",45.89,46.651],["og",46.651,46.78],["boltesamlinger",46.78,47.772]],"text":"Typiske eksempler er roterende aksler, skruefjedre, tandhjul, lejer, plejlstænger og boltesamlinger."},"stadier":{"start":49.002,"end":68.796,"words":[["Udmattelse",49.142,49.683],["sker",49.683,50.134],["i",50.134,50.276],["tre",50.276,50.585],["stadier",50.585,51.217],["Først",52.095,52.456],["dannes",52.456,52.804],["en",52.804,52.945],["mikroskopisk",52.945,53.693],["revne",53.693,54.182],["typisk",54.298,54.788],["langs",54.788,55.046],["planer",55.046,55.561],["med",55.561,55.716],["stor",55.716,56.038],["forskydning",56.038,56.747],["Så",57.623,57.816],["vokser",57.816,58.177],["revnen",58.177,58.59],["lidt",58.59,58.822],["for",58.822,58.989],["hver",58.989,59.182],["cyklus",59.182,59.878],["vinkelret",60.007,60.664],["på",60.664,60.819],["trækspændingen",60.819,61.67],["og",61.863,62.03],["efterlader",62.03,62.559],["de",62.559,62.675],["såkaldte",62.675,63.19],["strandmærker",63.19,63.95],["Til",64.827,64.994],["sidst",64.994,65.316],["er",65.316,65.458],["det",65.458,65.587],["resterende",65.587,66.115],["areal",66.115,66.515],["for",66.515,66.644],["lille",66.644,67.095],["og",67.275,67.417],["emnet",67.417,67.791],["brister",67.791,68.177],["pludseligt",68.177,68.796]],"text":"Udmattelse sker i tre stadier. Først dannes en mikroskopisk revne, typisk langs planer med stor forskydning. Så vokser revnen lidt for hver cyklus, vinkelret på trækspændingen, og efterlader de såkaldte strandmærker. Til sidst er det resterende areal for lille, og emnet brister pludseligt."},"start":{"start":70.016,"end":79.795,"words":[["Revner",70.143,70.465],["starter",70.466,71.032],["hvor",71.161,71.303],["spændingen",71.303,71.741],["er",71.741,71.806],["forstærket",71.806,72.502],["ridser",72.618,73.107],["og",73.107,73.146],["slibemærker",73.146,73.79],["i",73.79,73.932],["overfladen",73.932,74.628],["skarpe",74.757,75.169],["skuldre",75.169,75.736],["kilespor",75.865,76.612],["huller",76.754,77.128],["og",77.128,77.218],["hulkehle",77.218,77.901],["og",78.081,78.185],["fejl",78.185,78.558],["inde",78.558,78.893],["i",78.893,79.009],["materialet",79.009,79.795]],"text":"Revner starter, hvor spændingen er forstærket: ridser og slibemærker i overfladen, skarpe skuldre, kilespor, huller og hulkehle, og fejl inde i materialet."},"regel":{"start":81.022,"end":89.128,"words":[["Derfor",81.149,81.549],["er",81.549,81.639],["tommelfingerreglen",81.639,82.747],["polér",82.876,83.237],["overfladen",83.237,83.971],["og",83.972,84.1],["gør",84.1,84.268],["hulkehlsradierne",84.268,85.08],["store",85.08,85.621],["Så",86.499,86.705],["tager",86.705,86.937],["det",86.937,87.014],["længere",87.014,87.336],["tid",87.336,87.736],["før",87.865,88.187],["revnen",88.187,88.548],["starter",88.548,89.128]],"text":"Derfor er tommelfingerreglen: polér overfladen og gør hulkehlsradierne store. Så tager det længere tid, før revnen starter."},"aksel":{"start":90.348,"end":102.964,"words":[["Et",90.488,90.591],["eksempel",90.591,91.223],["fra",91.223,91.39],["slides",91.39,91.996],["En",92.887,92.99],["roterende",92.99,93.479],["aksel",93.479,94.021],["har",94.021,94.278],["en",94.278,94.381],["bøjningsspænding",94.382,95.09],["på",95.09,95.284],["hundrede",95.284,95.567],["og",95.567,95.593],["firs",95.593,95.915],["megapascal",95.915,96.766],["og",96.907,97.113],["S",97.113,97.41],["y",97.41,97.655],["er",97.655,97.771],["tre",97.771,98.067],["hundrede",98.067,98.286],["og",98.286,98.325],["halvtreds",98.325,98.93],["Statisk",99.807,100.4],["er",100.4,100.503],["sikkerhedsfaktoren",100.503,101.624],["en",101.624,101.881],["komma",101.882,102.217],["ni",102.217,102.448],["fire",102.449,102.964]],"text":"Et eksempel fra slides. En roterende aksel har en bøjningsspænding på hundrede og firs megapascal, og S y er tre hundrede og halvtreds. Statisk er sikkerhedsfaktoren en komma ni fire."},"aksel2":{"start":104.186,"end":114.882,"words":[["Men",104.326,104.481],["fordi",104.481,104.855],["akslen",104.855,105.267],["roterer",105.267,105.95],["skifter",106.092,106.594],["hver",106.594,106.788],["fiber",106.788,107.084],["mellem",107.084,107.367],["træk",107.367,107.767],["og",107.767,107.883],["tryk",107.883,108.295],["i",108.295,108.437],["hver",108.437,108.682],["omdrejning",108.682,109.416],["Udmattelse",110.307,110.9],["skal",110.9,111.08],["derfor",111.08,111.441],["undersøges",111.441,112.24],["selv",112.369,112.691],["om",112.691,112.794],["spændingen",112.794,113.31],["aldrig",113.31,113.799],["når",113.799,113.954],["flydegrænsen",113.954,114.882]],"text":"Men fordi akslen roterer, skifter hver fiber mellem træk og tryk i hver omdrejning. Udmattelse skal derfor undersøges, selv om spændingen aldrig når flydegrænsen."},"tjek_q":{"start":116.104,"end":121.181,"words":[["Tjek",116.205,116.527],["dig",116.527,116.707],["selv",116.707,117.133],["Hvorfor",118.037,118.333],["er",118.333,118.436],["et",118.436,118.501],["statisk",118.501,119.016],["tjek",119.016,119.429],["ikke",119.429,119.674],["nok",119.674,119.88],["for",119.88,120.034],["en",120.034,120.112],["roterende",120.112,120.653],["aksel",120.653,121.181]],"text":"Tjek dig selv. Hvorfor er et statisk tjek ikke nok for en roterende aksel?"},"tjek_a":{"start":125.056,"end":131.834,"words":[["Fordi",125.183,125.544],["spændingen",125.544,126.047],["svinger",126.047,126.446],["fuldt",126.446,126.717],["mellem",126.717,126.987],["træk",126.987,127.426],["og",127.426,127.593],["tryk",127.593,128.083],["Revner",128.974,129.309],["kan",129.309,129.45],["starte",129.45,129.927],["og",129.927,130.056],["vokse",130.056,130.623],["under",130.623,130.881],["flydespændingen",130.881,131.834]],"text":"Fordi spændingen svinger fuldt mellem træk og tryk. Revner kan starte og vokse under flydespændingen."},"slut":{"start":133.062,"end":140.831,"words":[["Kort",133.189,133.421],["sagt",133.421,133.924],["udmattelse",134.04,134.645],["er",134.645,134.723],["skade",134.723,135.097],["fra",135.097,135.251],["gentagne",135.251,135.779],["laster",135.78,136.243],["under",136.243,136.45],["flydespændingen",136.45,137.3],["i",137.442,137.571],["tre",137.571,137.867],["stadier",137.867,138.46],["og",138.602,138.718],["den",138.718,138.937],["starter",138.937,139.31],["ved",139.31,139.414],["spændingskoncentrationer",139.414,140.831]],"text":"Kort sagt: udmattelse er skade fra gentagne laster under flydespændingen, i tre stadier, og den starter ved spændingskoncentrationer."}}}, { audio: 'udmattelse-intro.mp3', id: 'udmattelse-intro' });</script>
+</body>
+</html>

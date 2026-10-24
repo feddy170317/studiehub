@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Miners regel for akkumuleret skade · video</title>
+<meta name="description" content="Palmgren-Miners lineære skadesregel med eksemplet D = 0,17.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 7: videoer</a><h1>Miners regel for akkumuleret skade</h1><span class="meta">MEM1 · kapitel 7 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Miners regel for akkumuleret skade"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Palmgren-Miners lineære skadesregel med eksemplet D = 0,17.</p><div class="chips"><a href="sn-kurve-marin.html">Se først: S-N-kurven og udmattelsesgrænsen</a><a href="../../Kapitel07_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l07">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Miners regel (MEM1 kap. 7, slide 26). D = 0,17
+BP.scene({ header: 'MEM1 · kap. 7' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, hatch, rect, plot, PI } = B;
+
+  B.titel(0, 'Miners regel', 'MEM1 · kapitel 7 · begreb (slide 26)', 'titel');
+  text(0, 'skade fra flere lastniveauer', 640, 520, 42, 'red', wt('titel', 'skifter') - 0.2, we('titel', 'niveauer'), { align: 'center' });
+
+  B.goto('ide', 1);
+  {
+    const t0 = L('ide').start;
+    text(1, 'hver cyklus bruger en del af levetiden', 140, 160, 38, 'blue', wt('ide', 'hver') - 0.2, we('ide', 'levetiden'));
+    text(1, 'brugt ved niveau i:  n_i / N_i', 140, 240, 40, 'black', wt('ide', 'n') - 0.2, we('ide', 'levetiden', 1));
+    const r = text(1, 'D = Σ n_i / N_i      brud ved D ≥ 1', 140, 360, 50, 'red', L('formel').start + 0.2, we('formel', 'en'));
+    box(1, 115, 300, 860, 90, 'red', we('formel', 'en'), we('formel', 'en') + 0.6);
+    // tre blokke
+    const te = L('eks').start, y0 = 660;
+    [['n_1 = 10⁴', 'N_1 = 10⁵', 'Første'], ['n_2 = 5·10⁴', 'N_2 = 10⁶', 'Anden'], ['n_3 = 2·10⁵', 'N_3 = 10⁷', 'Tredje']].forEach(([a, b, w], i) => {
+      const t = wt('eks', w) - 0.2, x = 140 + 340 * i, h = [110, 70, 40][i];
+      hatch(1, rect(x, y0 - h, 300, h), ['red', 'blue', 'green'][i], t, t + 0.6, { gap: 8 });
+      text(1, a, x + 10, y0 - h - 46, 28, 'black', t + 0.3, t + 0.9);
+      text(1, b, x + 10, y0 - h - 12, 28, 'black', t + 0.6, t + 1.2);
+    });
+  }
+
+  B.goto('eks2', 2);
+  {
+    const t0 = L('eks2').start;
+    text(2, 'D = 10⁴/10⁵ + 5·10⁴/10⁶ + 2·10⁵/10⁷', 140, 180, 42, 'blue', t0, wt('eks2', 'plus'));
+    text(2, '= 0,10 + 0,05 + 0,02 = 0,17', 140, 260, 46, 'red', wt('eks2', 'nul') - 0.1, we('eks2', 'syv'));
+    const k = text(2, '17 % af levetiden brugt → sikkert', 140, 360, 44, 'green', L('konkl').start + 0.2, we('konkl', 'sikkert'));
+    text(2, 'lineær, ignorerer rækkefølgen', 140, 480, 38, 'black', L('graense').start + 0.2, we('graense', 'lasterne'));
+    text(2, 'høj last først kan være værre', 140, 540, 34, 'red', wt('graense', 'høj') - 0.2, we('graense', 'bagefter'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Hvor mange gange kan forløbet', 'gentages, før brud forventes?'], ['1 / 0,17 ≈ 5,9 gange'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 7, slide 26 · Hamrock, Schmid & Jacobson, kap. 7', 'Goodman', 'slut');
+  text(4, 'D = Σ n_i / N_i', 200, 280, 50, 'blue', L('slut').start + 0.4, we('slut', 'i', 1));
+  text(4, 'brud ved D = 1', 200, 370, 46, 'red', wt('slut', 'brud') - 0.1, we('slut', 'en'));
+});
+
+</script>
+<script>BP.live({"duration":97.106,"audio":"miner.mp3","order":["titel","ide","formel","eks","eks2","konkl","graense","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":6.724,"words":[["Miners",0.6,1.077],["regel",1.077,1.476],["Hvordan",2.433,2.755],["regner",2.755,3.09],["vi",3.09,3.219],["med",3.219,3.412],["udmattelse",3.412,4.276],["når",4.418,4.598],["lasten",4.598,5.01],["skifter",5.01,5.358],["mellem",5.358,5.668],["forskellige",5.668,6.131],["niveauer",6.131,6.724]],"text":"Miners regel. Hvordan regner vi med udmattelse, når lasten skifter mellem forskellige niveauer?"},"ide":{"start":7.954,"end":20.699,"words":[["Palmgren",8.081,8.584],["og",8.584,8.713],["Miner",8.713,9.009],["foreslog",9.009,9.692],["at",9.885,10.027],["hver",10.027,10.233],["cyklus",10.233,10.684],["forbruger",10.684,11.135],["en",11.135,11.277],["lille",11.277,11.548],["del",11.548,11.883],["af",11.883,12.012],["levetiden",12.012,12.785],["Kører",13.689,13.972],["emnet",13.972,14.346],["n",14.346,14.526],["i",14.526,14.655],["cyklusser",14.655,15.325],["ved",15.325,15.531],["et",15.531,15.622],["niveau",15.622,16.124],["hvor",16.266,16.408],["levetiden",16.408,16.975],["er",16.975,17.091],["N",17.091,17.284],["i",17.284,17.619],["har",17.761,17.967],["det",17.967,18.031],["brugt",18.031,18.289],["n",18.289,18.457],["i",18.457,18.573],["divideret",18.573,19.204],["med",19.204,19.462],["N",19.462,19.694],["i",19.694,19.913],["af",19.913,19.964],["levetiden",19.964,20.699]],"text":"Palmgren og Miner foreslog, at hver cyklus forbruger en lille del af levetiden. Kører emnet n i cyklusser ved et niveau, hvor levetiden er N i, har det brugt n i divideret med N i af levetiden."},"formel":{"start":21.912,"end":28.484,"words":[["Skaden",22.026,22.439],["D",22.439,22.671],["er",22.671,22.748],["summen",22.748,23.135],["af",23.135,23.302],["n",23.302,23.547],["i",23.547,23.753],["over",23.753,24.037],["N",24.037,24.282],["i",24.282,24.539],["for",24.539,24.758],["alle",24.758,25.016],["niveauer",25.016,25.57],["Brud",26.474,26.628],["forventes",26.628,27.35],["når",27.492,27.724],["D",27.724,27.969],["når",27.969,28.162],["en",28.162,28.484]],"text":"Skaden D er summen af n i over N i for alle niveauer. Brud forventes, når D når en."},"eks":{"start":29.702,"end":46.79,"words":[["Eksemplet",29.842,30.409],["fra",30.409,30.564],["slides",30.564,31.105],["har",31.105,31.311],["tre",31.311,31.621],["blokke",31.621,32.11],["Første",33.001,33.4],["blok",33.4,33.658],["har",33.658,33.89],["ti",33.89,34.161],["tusind",34.161,34.47],["cyklusser",34.47,35.153],["ved",35.153,35.385],["et",35.385,35.449],["niveau",35.449,35.823],["med",35.823,36.029],["levetiden",36.029,36.687],["hundrede",36.687,37.06],["tusind",37.06,37.717],["Anden",38.62,38.877],["blok",38.877,39.225],["har",39.225,39.431],["halvtreds",39.431,39.831],["tusind",39.831,40.321],["ved",40.321,40.514],["en",40.514,40.604],["levetid",40.604,41.171],["på",41.171,41.339],["en",41.339,41.429],["million",41.429,42.022],["Tredje",42.911,43.246],["blok",43.246,43.581],["har",43.581,43.813],["to",43.813,44.071],["hundrede",44.071,44.277],["tusind",44.277,44.818],["ved",44.818,45.011],["en",45.011,45.101],["levetid",45.101,45.681],["på",45.681,45.836],["ti",45.836,46.12],["millioner",46.12,46.79]],"text":"Eksemplet fra slides har tre blokke. Første blok har ti tusind cyklusser ved et niveau med levetiden hundrede tusind. Anden blok har halvtreds tusind ved en levetid på en million. Tredje blok har to hundrede tusind ved en levetid på ti millioner."},"eks2":{"start":48.004,"end":54.343,"words":[["Så",48.118,48.376],["er",48.376,48.479],["D",48.479,48.698],["nul",48.698,48.879],["komma",48.879,49.317],["en",49.317,49.51],["plus",49.51,49.768],["nul",49.768,50.039],["komma",50.039,50.412],["nul",50.412,50.657],["fem",50.657,50.928],["plus",50.928,51.198],["nul",51.198,51.546],["komma",51.546,51.868],["nul",51.868,52.1],["to",52.1,52.526],["altså",52.667,53.093],["nul",53.093,53.337],["komma",53.337,53.724],["et",53.724,53.917],["syv",53.917,54.343]],"text":"Så er D nul komma en plus nul komma nul fem plus nul komma nul to, altså nul komma et syv."},"konkl":{"start":55.578,"end":58.824,"words":[["Emnet",55.731,56.027],["har",56.028,56.156],["brugt",56.156,56.414],["sytten",56.414,56.762],["procent",56.762,57.149],["af",57.149,57.213],["sin",57.213,57.419],["levetid",57.419,58.012],["og",58.012,58.18],["er",58.18,58.218],["sikkert",58.218,58.824]],"text":"Emnet har brugt sytten procent af sin levetid og er sikkert."},"graense":{"start":60.056,"end":71.28,"words":[["Reglen",60.183,60.634],["er",60.634,60.789],["lineær",60.789,61.408],["og",61.408,61.524],["tager",61.524,61.807],["ikke",61.807,62.065],["hensyn",62.065,62.464],["til",62.464,62.606],["rækkefølgen",62.606,63.341],["af",63.341,63.456],["lasterne",63.457,64.062],["I",64.953,65.017],["virkeligheden",65.017,65.559],["kan",65.559,65.713],["en",65.713,65.791],["høj",65.791,66.035],["last",66.035,66.358],["først",66.358,66.744],["være",66.744,66.989],["værre",66.989,67.337],["end",67.337,67.517],["bagefter",67.517,68.226],["Men",69.128,69.296],["reglen",69.296,69.656],["er",69.657,69.85],["enkel",69.85,70.339],["og",70.34,70.494],["meget",70.494,70.79],["brugt",70.791,71.28]],"text":"Reglen er lineær og tager ikke hensyn til rækkefølgen af lasterne. I virkeligheden kan en høj last først være værre end bagefter. Men reglen er enkel og meget brugt."},"tjek_q":{"start":72.502,"end":79.036,"words":[["Tjek",72.603,72.925],["dig",72.925,73.105],["selv",73.105,73.531],["Hvor",74.435,74.564],["mange",74.564,74.834],["gange",74.834,75.144],["kan",75.144,75.324],["hele",75.324,75.621],["lastforløbet",75.621,76.368],["fra",76.368,76.561],["eksemplet",76.561,77.038],["gentages",77.038,77.747],["før",77.863,78.133],["brud",78.133,78.34],["forventes",78.34,79.036]],"text":"Tjek dig selv. Hvor mange gange kan hele lastforløbet fra eksemplet gentages, før brud forventes?"},"tjek_a":{"start":82.918,"end":88.277,"words":[["Cirka",83.032,83.509],["fem",83.509,83.78],["komma",83.78,84.025],["ni",84.025,84.244],["gange",84.244,84.695],["fordi",84.811,85.197],["en",85.197,85.3],["divideret",85.3,85.88],["med",85.88,86.125],["nul",86.125,86.37],["komma",86.37,86.718],["et",86.718,86.911],["syv",86.911,87.298],["er",87.298,87.401],["fem",87.401,87.672],["komma",87.672,87.942],["ni",87.942,88.277]],"text":"Cirka fem komma ni gange, fordi en divideret med nul komma et syv er fem komma ni."},"slut":{"start":89.508,"end":94.674,"words":[["Kort",89.635,89.841],["sagt",89.842,90.344],["D",90.473,90.679],["er",90.679,90.731],["summen",90.731,91.117],["af",91.117,91.298],["n",91.298,91.543],["i",91.543,91.749],["over",91.749,92.019],["N",92.019,92.329],["i",92.329,92.651],["og",92.793,92.947],["brud",92.947,93.153],["forventes",93.153,93.682],["ved",93.682,93.836],["D",93.836,94.094],["lig",94.094,94.326],["en",94.326,94.674]],"text":"Kort sagt: D er summen af n i over N i, og brud forventes ved D lig en."}}}, { audio: 'miner.mp3', id: 'miner' });</script>
+</body>
+</html>

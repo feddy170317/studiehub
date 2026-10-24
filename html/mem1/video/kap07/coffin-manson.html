@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tøjnings-levetid og Coffin-Manson · video</title>
+<meta name="description" content="Tøjnings-levetid, Coffin-Manson og eksemplet med Nf = 10⁵.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 7: videoer</a><h1>Tøjnings-levetid og Coffin-Manson</h1><span class="meta">MEM1 · kapitel 7 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Tøjnings-levetid og Coffin-Manson"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Tøjnings-levetid, Coffin-Manson og eksemplet med Nf = 10⁵.</p><div class="chips"><a href="sn-kurve-marin.html">Se først: S-N-kurven og udmattelsesgrænsen</a><a href="../../Kapitel07_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l07">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Tøjnings-levetid og Coffin-Manson (MEM1 kap. 7, slides 13–17). Kontrol: 0,00159 + 0,00033 = 0,00192
+BP.scene({ header: 'MEM1 · kap. 7' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, axes, plot, dashed, PI } = B;
+
+  B.titel(0, 'Coffin-Manson', 'MEM1 · kapitel 7 · begreb (slide 13–17)', 'titel');
+  text(0, 'tøjningen styrer levetiden', 640, 520, 42, 'red', wt('titel', 'tøjningen') - 0.2, we('titel', 'levetiden'), { align: 'center' });
+
+  B.goto('hvornaar', 1);
+  {
+    const t0 = L('hvornaar').start;
+    text(1, 'lokal plastisk deformation (skarpe kærve)', 140, 160, 36, 'blue', t0 + 0.3, we('hvornaar', 'kærve'));
+    text(1, 'Δε_t/2 = Δε_e/2 + Δε_p/2', 140, 240, 44, 'black', L('opdel').start + 0.2, wt('opdel', 'Den'));
+    text(1, 'elastisk → HCF', 760, 230, 34, 'blue', wt('opdel', 'elastiske') - 0.2, we('opdel', 'udmattelse'));
+    text(1, 'plastisk → LCF', 760, 280, 34, 'red', wt('opdel', 'plastiske') - 0.2, we('opdel', 'udmattelse', 1));
+    const tl = L('ligning').start;
+    const r = text(1, "Δε_t/2 = (σ_f'/E)(2N_f)^b + ε_f'(2N_f)^c", 140, 370, 48, 'red', tl + 0.3, we('ligning', 'c'));
+    box(1, 115, 310, 900, 90, 'red', we('ligning', 'c'), we('ligning', 'c') + 0.6);
+    text(1, "σ_f': styrkekoefficient · ε_f': duktilitetskoefficient", 140, 460, 32, 'black', L('symboler').start, wt('symboler', 'b'));
+    text(1, 'b ≈ −0,05 … −0,12     c ≈ −0,5 … −0,7', 140, 520, 34, 'blue', wt('symboler', 'b') - 0.1, we('symboler', 'syv'));
+    text(1, '2N_f = antal vendinger', 140, 580, 34, 'black', wt('symboler', 'To') - 0.1, we('symboler', 'vendinger'));
+  }
+
+  B.goto('diagram', 2);
+  {
+    const t0 = L('diagram').start, ox = 160, oy = 620;
+    axes(2, ox, oy, 1140, 150, 'log 2N_f', 'log ε_a', t0);
+    plot(2, [[ox + 20, 220], [1100, 560]], 'blue', t0 + 0.3, t0 + 1.0);
+    plot(2, [[ox + 20, 180], [800, 640]], 'red', wt('diagram', 'plastiske') - 0.3, wt('diagram', 'stejlest'));
+    const C = []; for (let j = 0; j <= 40; j++) { const u = j / 40, x = ox + 20 + 1080 * u; const y1 = 220 + 340 * u, y2 = 180 + 460 * (x - ox - 20) / 780; C.push([x, Math.min(y1, y2) - 18 * Math.exp(-Math.abs(y1 - y2) / 40)]); }
+    plot(2, C, 'black', wt('diagram', 'summen') - 0.3, we('diagram', 'kurve'), 2.6);
+    text(2, 'elastisk', 1000, 520, 30, 'blue', t0 + 0.6, t0 + 1.0);
+    text(2, 'plastisk', 640, 600, 30, 'red', wt('diagram', 'plastiske'), wt('diagram', 'stejlest') + 0.3);
+    text(2, '2N_t', 420, oy + 40, 30, 'green', wt('diagram', 'overgangslevetiden') - 0.2, we('diagram', 'overgangslevetiden'));
+    text(2, 'LCF', 240, 300, 34, 'red', wt('diagram', 'krydser') - 0.2, wt('diagram', 'krydser') + 0.3);
+    text(2, 'HCF', 820, 380, 34, 'blue', wt('diagram', 'krydser'), wt('diagram', 'krydser') + 0.4);
+  }
+
+  B.goto('eks', 3);
+  {
+    const t0 = L('eks').start;
+    bubble(3, 'Eksempel (slide 16–17)', 150, 140, 50, 'blue', t0, t0 + 0.7);
+    text(3, "E = 210 GPa, σ_f' = 1000 MPa, b = −0,09, ε_f' = 0,5, c = −0,6", 140, 220, 30, 'black', wt('eks', 'E') - 0.1, we('eks', 'seks'));
+    text(3, 'N_f = 10⁵  ⇒  2N_f = 2 · 10⁵', 140, 280, 36, 'black', wt('eks', 'Levetiden') - 0.1, we('eks', 'vendinger'));
+    text(3, 'elastisk: (1000/210 000) · (2·10⁵)^{−0,09} ≈ 0,00159', 140, 370, 34, 'blue', L('eks2').start + 0.2, we('eks2', 'ni', 1));
+    text(3, 'plastisk: 0,5 · (2·10⁵)^{−0,6} ≈ 0,00033', 140, 440, 34, 'red', L('eks3').start + 0.2, we('eks3', 'tre', 1));
+    const r = text(3, 'Δε_t/2 ≈ 0,0019  (0,19 %)', 140, 540, 46, 'green', L('eks4').start + 0.2, we('eks4', 'procent'));
+    text(3, '≈ 5/6 elastisk → HCF', 760, 540, 36, 'blue', wt('eks4', 'fem') - 0.1, we('eks4', 'området'));
+  }
+
+  B.goto('tjek_q', 4);
+  B.tjek(4, ['Hvilket led dominerer', 'ved ca. 100 cyklusser?'], ['det plastiske', 'lavcyklus udmattelse'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 5);
+  B.slut(5, 'Abou-Hayt (2026), MEM1 Chapter 7, slide 13–17 · Hamrock, Schmid & Jacobson, kap. 7', "Miners regel", 'slut');
+  text(5, "Δε_t/2 = elastisk + plastisk led i 2N_f", 200, 280, 40, 'blue', L('slut').start + 0.4, we('slut', 'f'));
+  text(5, 'ε-N til LCF · S-N til HCF', 200, 360, 44, 'red', wt('slut', 'Brug') - 0.1, we('slut', 'højcyklus'));
+});
+
+</script>
+<script>BP.live({"duration":158.132,"audio":"coffin-manson.mp3","order":["titel","hvornaar","opdel","ligning","symboler","diagram","eks","eks2","eks3","eks4","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":8.619,"words":[["Tøjnings",0.627,1.091],["levetid",1.091,1.684],["og",1.684,1.774],["Coffin",1.774,2.174],["Manson",2.174,2.779],["Når",3.696,3.889],["et",3.889,3.979],["kærv",3.979,4.314],["giver",4.314,4.559],["lokal",4.559,4.933],["plastisk",4.933,5.384],["deformation",5.384,6.183],["er",6.389,6.492],["det",6.492,6.595],["tøjningen",6.595,7.24],["der",7.381,7.497],["styrer",7.497,7.871],["levetiden",7.871,8.619]],"text":"Tøjnings levetid og Coffin Manson. Når et kærv giver lokal plastisk deformation, er det tøjningen, der styrer levetiden."},"hvornaar":{"start":9.85,"end":17.207,"words":[["Tøjnings",9.977,10.467],["levetids",10.467,11.008],["metoden",11.008,11.433],["bruges",11.433,11.885],["når",12.026,12.194],["den",12.194,12.348],["cykliske",12.348,12.864],["last",12.864,13.238],["giver",13.238,13.457],["betydelig",13.457,13.895],["plastisk",13.895,14.346],["deformation",14.346,14.952],["lokalt",14.952,15.519],["typisk",15.699,16.189],["i",16.189,16.292],["skarpe",16.292,16.691],["kærve",16.691,17.207]],"text":"Tøjnings levetids metoden bruges, når den cykliske last giver betydelig plastisk deformation lokalt, typisk i skarpe kærve."},"opdel":{"start":18.432,"end":32.066,"words":[["Den",18.559,18.688],["totale",18.688,19.165],["tøjningsamplitude",19.165,20.144],["deles",20.144,20.57],["i",20.57,20.827],["en",20.827,20.93],["elastisk",20.93,21.575],["og",21.575,21.755],["en",21.755,21.884],["plastisk",21.884,22.412],["del.",22.412,22.799],["Den",23.703,23.819],["elastiske",23.819,24.373],["del",24.373,24.669],["følger",24.669,24.991],["Hookes",24.991,25.301],["lov",25.301,25.674],["og",25.674,25.816],["dominerer",25.816,26.254],["ved",26.254,26.422],["højcyklus",26.422,27.066],["udmattelse",27.066,27.839],["Den",28.728,28.87],["plastiske",28.87,29.437],["del",29.437,29.721],["dominerer",29.721,30.391],["ved",30.391,30.584],["lavcyklus",30.584,31.267],["udmattelse",31.267,32.066]],"text":"Den totale tøjningsamplitude deles i en elastisk og en plastisk del. Den elastiske del følger Hookes lov og dominerer ved højcyklus udmattelse. Den plastiske del dominerer ved lavcyklus udmattelse."},"ligning":{"start":33.302,"end":43.03,"words":[["Coffin",33.442,33.751],["Manson",33.752,34.177],["ligningen",34.177,34.602],["siger",34.602,35.053],["den",35.195,35.362],["halve",35.362,35.672],["totale",35.672,36.097],["tøjning",36.097,36.496],["er",36.496,36.612],["sigma",36.612,37.025],["f",37.025,37.231],["mærke",37.231,37.695],["over",37.695,37.991],["E",37.991,38.197],["gange",38.197,38.507],["to",38.507,38.777],["N",38.777,38.906],["f",38.906,39.087],["i",39.087,39.228],["b",39.228,39.602],["plus",39.731,40.066],["epsilon",40.066,40.697],["f",40.697,40.904],["mærke",40.904,41.226],["gange",41.226,41.587],["to",41.587,41.922],["N",41.922,42.128],["f",42.128,42.437],["i",42.437,42.643],["c.",42.643,43.03]],"text":"Coffin Manson ligningen siger: den halve totale tøjning er sigma f mærke over E gange to N f i b, plus epsilon f mærke gange to N f i c."},"symboler":{"start":44.26,"end":60.665,"words":[["Sigma",44.387,44.8],["f",44.8,44.954],["mærke",44.954,45.418],["er",45.418,45.599],["udmattelsesstyrkekoefficienten",45.599,47.403],["epsilon",47.506,48.06],["f",48.06,48.24],["mærke",48.24,48.588],["er",48.588,48.704],["duktilitetskoefficienten",48.704,50.225],["b",50.367,50.56],["ligger",50.56,50.766],["typisk",50.766,51.153],["mellem",51.153,51.423],["minus",51.423,51.771],["nul",51.771,51.939],["komma",51.939,52.261],["nul",52.261,52.48],["fem",52.48,52.725],["og",52.725,52.764],["minus",52.764,53.112],["nul",53.112,53.279],["komma",53.279,53.627],["et",53.627,53.769],["to",53.769,54.13],["og",54.323,54.439],["c",54.439,54.671],["mellem",54.671,54.954],["minus",54.954,55.315],["nul",55.315,55.47],["komma",55.47,55.843],["fem",55.844,56.114],["og",56.114,56.14],["minus",56.14,56.514],["nul",56.514,56.72],["komma",56.72,57.003],["syv",57.003,57.441],["To",58.319,58.629],["N",58.629,58.757],["f",58.757,59.105],["er",59.105,59.324],["antallet",59.324,59.956],["af",59.956,60.085],["vendinger",60.085,60.665]],"text":"Sigma f mærke er udmattelsesstyrkekoefficienten, epsilon f mærke er duktilitetskoefficienten, b ligger typisk mellem minus nul komma nul fem og minus nul komma et to, og c mellem minus nul komma fem og minus nul komma syv. To N f er antallet af vendinger."},"diagram":{"start":61.89,"end":72.65,"words":[["I",62.03,62.12],["et",62.12,62.301],["log",62.301,62.533],["log",62.533,62.739],["diagram",62.739,63.383],["er",63.383,63.486],["begge",63.486,63.796],["led",63.796,64.028],["rette",64.028,64.35],["linjer",64.35,64.878],["Den",65.756,65.923],["plastiske",65.924,66.478],["linje",66.478,66.903],["er",66.903,67.045],["stejlest",67.045,67.676],["De",68.565,68.655],["krydser",68.655,69.094],["i",69.094,69.274],["overgangslevetiden",69.274,70.46],["og",70.601,70.846],["summen",70.846,71.31],["er",71.31,71.465],["den",71.465,71.645],["totale",71.645,72.135],["kurve",72.135,72.65]],"text":"I et log log diagram er begge led rette linjer. Den plastiske linje er stejlest. De krydser i overgangslevetiden, og summen er den totale kurve."},"eks":{"start":73.88,"end":92.398,"words":[["Eksemplet",74.02,74.742],["fra",74.742,74.909],["slides",74.909,75.515],["Et",76.419,76.522],["legeret",76.522,76.883],["stål",76.883,77.308],["har",77.308,77.553],["E",77.553,77.707],["lig",77.707,77.862],["to",77.862,78.081],["hundrede",78.081,78.274],["og",78.274,78.287],["ti",78.287,78.506],["gigapascal",78.506,79.331],["sigma",79.46,79.924],["f",79.924,80.078],["mærke",80.078,80.375],["tusind",80.375,80.723],["megapascal",80.723,81.56],["b",81.702,81.883],["minus",81.883,82.192],["nul",82.192,82.359],["komma",82.359,82.643],["nul",82.643,82.875],["ni",82.875,83.261],["epsilon",83.39,83.996],["f",83.996,84.176],["mærke",84.176,84.486],["nul",84.486,84.692],["komma",84.692,85.001],["fem",85.001,85.259],["og",85.259,85.285],["c",85.285,85.529],["minus",85.529,85.955],["nul",85.955,86.187],["komma",86.187,86.47],["seks",86.47,86.96],["Levetiden",87.836,88.519],["skal",88.519,88.712],["være",88.712,88.893],["hundrede",88.893,89.228],["tusind",89.228,89.576],["cyklusser",89.576,90.323],["altså",90.452,90.929],["to",90.929,91.212],["hundrede",91.212,91.47],["tusind",91.47,91.857],["vendinger",91.857,92.398]],"text":"Eksemplet fra slides. Et legeret stål har E lig to hundrede og ti gigapascal, sigma f mærke tusind megapascal, b minus nul komma nul ni, epsilon f mærke nul komma fem og c minus nul komma seks. Levetiden skal være hundrede tusind cyklusser, altså to hundrede tusind vendinger."},"eks2":{"start":93.622,"end":104.447,"words":[["Det",93.749,93.84],["elastiske",93.84,94.381],["led",94.381,94.69],["er",94.69,94.793],["tusind",94.793,95.167],["divideret",95.167,95.85],["med",95.85,96.108],["to",96.108,96.365],["hundrede",96.365,96.559],["og",96.559,96.571],["ti",96.572,96.803],["tusind",96.803,97.126],["gange",97.126,97.538],["to",97.538,97.809],["hundrede",97.809,98.028],["tusind",98.028,98.556],["i",98.556,98.672],["minus",98.672,99.136],["nul",99.136,99.368],["komma",99.368,99.78],["nul",99.78,100.102],["ni",100.102,100.45],["Det",101.341,101.405],["giver",101.406,101.676],["cirka",101.676,102.153],["nul",102.153,102.436],["komma",102.436,102.875],["nul",102.875,103.171],["nul",103.171,103.48],["en",103.48,103.828],["fem",103.828,104.137],["ni",104.137,104.447]],"text":"Det elastiske led er tusind divideret med to hundrede og ti tusind gange to hundrede tusind i minus nul komma nul ni. Det giver cirka nul komma nul nul en fem ni."},"eks3":{"start":105.66,"end":113.249,"words":[["Det",105.787,105.852],["plastiske",105.852,106.406],["led",106.406,106.728],["er",106.728,106.857],["nul",106.857,107.102],["komma",107.102,107.437],["fem",107.437,107.707],["gange",107.707,108.094],["to",108.094,108.352],["hundrede",108.352,108.558],["tusind",108.558,108.957],["i",108.957,109.073],["minus",109.073,109.447],["nul",109.447,109.615],["komma",109.615,109.859],["seks",109.859,110.362],["cirka",110.504,110.955],["nul",110.955,111.187],["komma",111.187,111.599],["nul",111.599,111.87],["nul",111.87,112.218],["nul",112.218,112.54],["tre",112.54,112.823],["tre",112.823,113.249]],"text":"Det plastiske led er nul komma fem gange to hundrede tusind i minus nul komma seks, cirka nul komma nul nul nul tre tre."},"eks4":{"start":114.482,"end":129.302,"words":[["Summen",114.596,114.97],["er",114.97,115.06],["cirka",115.06,115.524],["nul",115.524,115.795],["komma",115.795,116.143],["nul",116.143,116.375],["nul",116.375,116.594],["en",116.594,116.774],["ni",116.774,117.148],["altså",117.29,117.728],["nul",117.728,117.973],["komma",117.973,118.269],["nitten",118.269,118.643],["procent",118.643,119.017],["tøjning",119.017,119.545],["Omkring",120.448,120.822],["fem",120.822,121.067],["sjettedele",121.067,121.698],["er",121.698,121.853],["elastisk",121.853,122.549],["så",122.729,122.936],["vi",122.936,123.103],["er",123.103,123.219],["i",123.219,123.335],["højcyklus",123.335,123.979],["området",123.979,124.649],["Slides",125.526,126.015],["afrunder",126.016,126.467],["lidt",126.467,126.75],["anderledes",126.75,127.51],["men",127.652,127.832],["resultatet",127.833,128.554],["er",128.554,128.696],["det",128.696,128.773],["samme",128.773,129.302]],"text":"Summen er cirka nul komma nul nul en ni, altså nul komma nitten procent tøjning. Omkring fem sjettedele er elastisk, så vi er i højcyklus området. Slides afrunder lidt anderledes, men resultatet er det samme."},"tjek_q":{"start":130.528,"end":136.237,"words":[["Tjek",130.629,130.951],["dig",130.951,131.131],["selv",131.131,131.557],["Hvilket",132.461,132.809],["led",132.809,133.015],["dominerer",133.015,133.531],["ved",133.531,133.698],["meget",133.698,133.994],["få",133.994,134.239],["cyklusser",134.239,134.961],["for",135.103,135.283],["eksempel",135.283,135.708],["hundrede",135.708,136.237]],"text":"Tjek dig selv. Hvilket led dominerer ved meget få cyklusser, for eksempel hundrede?"},"tjek_a":{"start":140.104,"end":145.594,"words":[["Det",140.205,140.347],["plastiske",140.347,140.952],["led",140.952,141.365],["Ved",142.282,142.385],["lavcyklus",142.385,143.016],["udmattelse",143.016,143.764],["er",143.764,143.918],["den",143.918,144.086],["plastiske",144.086,144.653],["tøjning",144.653,145.065],["størst",145.065,145.594]],"text":"Det plastiske led. Ved lavcyklus udmattelse er den plastiske tøjning størst."},"slut":{"start":146.814,"end":155.717,"words":[["Kort",146.941,147.147],["sagt",147.148,147.624],["den",147.753,147.908],["halve",147.908,148.178],["tøjning",148.178,148.617],["er",148.617,148.784],["et",148.784,148.848],["elastisk",148.849,149.364],["plus",149.364,149.647],["et",149.647,149.815],["plastisk",149.815,150.33],["led",150.331,150.601],["i",150.601,150.717],["to",150.717,151.013],["N",151.013,151.142],["f.",151.142,151.658],["Brug",151.658,151.877],["tøjnings",151.877,152.354],["levetid",152.354,152.83],["til",152.83,152.985],["lavcyklus",152.985,153.681],["og",153.681,153.823],["spændings",153.823,154.274],["levetid",154.274,154.802],["til",154.802,154.957],["højcyklus",154.957,155.717]],"text":"Kort sagt: den halve tøjning er et elastisk plus et plastisk led i to N f. Brug tøjnings levetid til lavcyklus og spændings levetid til højcyklus."}}}, { audio: 'coffin-manson.mp3', id: 'coffin-manson' });</script>
+</body>
+</html>

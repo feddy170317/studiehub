@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Goodman: middelspænding og amplitude · video</title>
+<meta name="description" content="Goodman-linjen, σa/Se + σm/Su = 1/n, og flerakset udmattelse med von Mises.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 7: videoer</a><h1>Goodman: middelspænding og amplitude</h1><span class="meta">MEM1 · kapitel 7 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Goodman: middelspænding og amplitude"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Goodman-linjen, σa/Se + σm/Su = 1/n, og flerakset udmattelse med von Mises.</p><div class="chips"><a href="cykliske-spaendinger.html">Se først: Middelspænding, amplitude og R</a><a href="sn-kurve-marin.html">Se først: S-N-kurven og udmattelsesgrænsen</a><a href="../../../../lab/mem1/udmattelse-goodman.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel07_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l07">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Goodman (MEM1 kap. 7, slides 27–28). Eksempel: n = 1,63
+BP.scene({ header: 'MEM1 · kap. 7' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, axes, plot, dashed, hatch, PI } = B;
+
+  B.titel(0, 'Goodman', 'MEM1 · kapitel 7 · begreb (slide 27–28)', 'titel');
+  text(0, 'amplitude + middelspænding', 640, 520, 42, 'red', wt('titel', 'amplitude') - 0.2, we('titel', 'middelværdi'), { align: 'center' });
+
+  B.goto('problem', 1);
+  {
+    const t0 = L('problem').start;
+    text(1, 'S-N gælder for σ_m = 0', 140, 150, 38, 'black', t0 + 0.2, we('problem', 'nul'));
+    text(1, 'σ_m i træk ⇒ tåler mindre σ_a', 640, 150, 38, 'red', wt('problem', 'middelspænding', 1) - 0.2, we('problem', 'tåle'));
+    const td = L('diagram').start, ox = 180, oy = 600, X = (s) => ox + s * 0.75, Y = (s) => oy - s * 1.2;
+    axes(1, ox, oy, X(680), Y(320), 'σ_m', 'σ_a', td);
+    plot(1, [[X(0), Y(250)], [X(600), Y(0)]], 'red', wt('diagram', 'Linjen') - 0.1, we('diagram', 'middelspændingsaksen'));
+    hatch(1, [[X(0), Y(0)], [X(0), Y(250)], [X(600), Y(0)]], 'green', wt('sikker', 'sikre') - 0.6, we('sikker', 'sikre'), { gap: 12, alpha: 0.4 });
+    text(1, 'S_e', X(0) - 14, Y(250) + 10, 32, 'red', wt('diagram', 'S') - 0.1, wt('diagram', 'e') + 0.2, { align: 'right' });
+    text(1, 'S_u', X(600) - 20, oy + 40, 32, 'red', wt('diagram', 'S', 1) - 0.1, wt('diagram', 'u') + 0.2);
+    text(1, 'sikkert', X(120), Y(60), 34, 'green', wt('sikker', 'sikre') - 0.3, we('sikker', 'sikre'));
+    const r = text(1, 'σ_a/S_e + σ_m/S_u = 1/n', 720, 290, 46, 'red', L('ligning').start + 0.2, we('ligning', 'n'));
+    box(1, 700, 235, 520, 85, 'red', we('ligning', 'n'), we('ligning', 'n') + 0.6);
+    dot(1, X(80), Y(120), 8, 'blue', L('eks').start + 0.5); text(1, '(80, 120)', X(80) + 12, Y(120) - 10, 28, 'blue', L('eks').start + 0.5, L('eks').start + 0.9);
+  }
+
+  B.goto('eks', 2);
+  {
+    const t0 = L('eks').start;
+    bubble(2, 'Eksempel (slide 27)', 150, 140, 50, 'blue', t0, t0 + 0.6);
+    text(2, 'σ_a = 120,  σ_m = 80,  S_e = 250,  S_u = 600 MPa', 140, 230, 36, 'black', wt('eks', 'sigma') - 0.1, we('eks', 'megapascal'));
+    text(2, '1/n = 120/250 + 80/600 = 0,480 + 0,133 = 0,613', 140, 320, 38, 'blue', L('eks2').start + 0.2, we('eks2', 'tre', 2));
+    const r = text(2, 'n = 1 / 0,613 = 1,63  ✓', 140, 410, 50, 'green', L('eks3').start + 0.2, we('eks3', 'sikkert'));
+    const tf = L('fleraksel').start;
+    text(2, 'flerakset: von Mises for σ_a og σ_m hver for sig', 140, 520, 34, 'red', tf + 0.2, we('fleraksel', 'Goodman'));
+    text(2, 'σ_v = √(σ_x² − σ_x σ_y + σ_y² + 3τ_{xy}²)', 140, 600, 40, 'red', L('vm').start + 0.2, we('vm', 'anden', 2));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Hvad bliver Goodman,', 'når σ_m = 0?'], ['σ_a/S_e = 1/n  ⇒  n = S_e/σ_a', 'det almindelige S-N-tjek'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 7, slide 27–28 · Hamrock, Schmid & Jacobson, kap. 7', 'stødlast', 'slut');
+  text(4, 'σ_a/S_e + σ_m/S_u = 1/n', 200, 280, 50, 'red', L('slut').start + 0.4, we('slut', 'n'));
+  text(4, 'flerakset: von Mises for σ_a og σ_m', 200, 370, 40, 'blue', wt('slut', 'flerakset') - 0.1, we('slut', 'middelværdi'));
+});
+
+</script>
+<script>BP.live({"duration":122.684,"audio":"goodman.mp3","order":["titel","problem","diagram","ligning","sikker","eks","eks2","eks3","fleraksel","vm","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":6.608,"words":[["Goodman",0.627,1.156],["relationen",1.156,2.019],["Hvad",2.936,3.09],["gør",3.09,3.258],["vi",3.258,3.567],["når",3.709,3.889],["spændingen",3.889,4.34],["har",4.34,4.43],["både",4.43,4.714],["en",4.714,4.843],["amplitude",4.843,5.577],["og",5.577,5.745],["en",5.745,5.861],["middelværdi",5.861,6.608]],"text":"Goodman relationen. Hvad gør vi, når spændingen har både en amplitude og en middelværdi?"},"problem":{"start":7.834,"end":16.481,"words":[["S",7.974,8.155],["N",8.155,8.296],["kurven",8.296,8.812],["gælder",8.812,9.082],["for",9.082,9.211],["fuldt",9.211,9.469],["vekslende",9.469,9.869],["last",9.869,10.32],["med",10.32,10.5],["middelspænding",10.5,11.157],["nul",11.157,11.57],["En",12.46,12.563],["middelspænding",12.563,13.169],["i",13.169,13.233],["træk",13.233,13.71],["reducerer",13.71,14.29],["den",14.29,14.535],["amplitude",14.535,15.347],["emnet",15.489,15.824],["kan",15.824,15.953],["tåle",15.953,16.481]],"text":"S N kurven gælder for fuldt vekslende last med middelspænding nul. En middelspænding i træk reducerer den amplitude, emnet kan tåle."},"diagram":{"start":17.712,"end":27.467,"words":[["I",17.839,17.917],["Goodman",17.917,18.316],["diagrammet",18.316,18.986],["har",18.986,19.205],["vi",19.205,19.308],["middelspændingen",19.308,19.991],["hen",19.991,20.236],["ad",20.236,20.468],["og",20.468,20.623],["amplituden",20.623,21.344],["op",21.344,21.615],["ad",21.615,21.976],["Linjen",22.854,23.215],["går",23.215,23.421],["fra",23.421,23.653],["S",23.653,23.936],["e",23.936,24.142],["på",24.142,24.361],["amplitudeaksen",24.361,25.341],["til",25.341,25.573],["S",25.573,25.843],["u",25.843,26.101],["på",26.101,26.256],["middelspændingsaksen",26.256,27.467]],"text":"I Goodman diagrammet har vi middelspændingen hen ad og amplituden op ad. Linjen går fra S e på amplitudeaksen til S u på middelspændingsaksen."},"ligning":{"start":28.694,"end":33.744,"words":[["Ligningen",28.808,29.195],["er",29.195,29.259],["sigma",29.259,29.698],["a",29.698,29.981],["over",29.981,30.303],["S",30.303,30.6],["e",30.6,30.741],["plus",30.741,30.973],["sigma",30.973,31.437],["m",31.437,31.708],["over",31.708,32.004],["S",32.004,32.301],["u",32.301,32.455],["lig",32.455,32.661],["en",32.662,32.919],["over",32.919,33.216],["n.",33.216,33.744]],"text":"Ligningen er sigma a over S e plus sigma m over S u lig en over n."},"sikker":{"start":34.972,"end":41.377,"words":[["Punkter",35.099,35.512],["under",35.512,35.731],["linjen",35.731,36.233],["er",36.233,36.349],["sikre",36.349,36.955],["Sikkerhedsfaktoren",37.833,38.941],["findes",38.941,39.328],["ved",39.328,39.521],["at",39.521,39.547],["løse",39.547,39.908],["ligningen",39.908,40.513],["for",40.513,40.694],["n.",40.694,41.377]],"text":"Punkter under linjen er sikre. Sikkerhedsfaktoren findes ved at løse ligningen for n."},"eks":{"start":42.594,"end":50.531,"words":[["Eksemplet",42.734,43.237],["fra",43.237,43.391],["slides",43.391,43.881],["har",43.881,44.074],["sigma",44.074,44.525],["a",44.525,44.719],["lig",44.719,44.899],["hundrede",44.899,45.118],["og",45.118,45.144],["tyve",45.144,45.659],["sigma",45.775,46.265],["m",46.265,46.484],["firs",46.484,46.987],["S",47.129,47.386],["e",47.386,47.541],["to",47.541,47.76],["hundrede",47.76,47.966],["og",47.966,47.992],["halvtreds",47.992,48.417],["og",48.417,48.585],["S",48.585,48.855],["u",48.855,49.087],["seks",49.087,49.409],["hundrede",49.409,49.68],["megapascal",49.68,50.531]],"text":"Eksemplet fra slides har sigma a lig hundrede og tyve, sigma m firs, S e to hundrede og halvtreds og S u seks hundrede megapascal."},"eks2":{"start":51.752,"end":62.783,"words":[["En",51.892,52.085],["over",52.086,52.382],["n",52.382,52.614],["er",52.614,52.665],["hundrede",52.665,52.884],["og",52.884,52.91],["tyve",52.91,53.426],["over",53.426,53.722],["to",53.722,53.967],["hundrede",53.967,54.16],["og",54.16,54.186],["halvtreds",54.186,54.573],["plus",54.573,54.843],["firs",54.843,55.217],["over",55.217,55.5],["seks",55.5,55.835],["hundrede",55.835,56.351],["altså",56.428,56.841],["nul",56.841,57.085],["komma",57.085,57.472],["fire",57.472,57.872],["otte",57.872,58.194],["plus",58.194,58.49],["nul",58.49,58.696],["komma",58.696,59.109],["et",59.109,59.315],["tre",59.315,59.585],["tre",59.585,59.985],["Det",60.889,61.03],["er",61.03,61.185],["nul",61.185,61.443],["komma",61.443,61.855],["seks",61.855,62.229],["et",62.229,62.371],["tre",62.371,62.783]],"text":"En over n er hundrede og tyve over to hundrede og halvtreds plus firs over seks hundrede, altså nul komma fire otte plus nul komma et tre tre. Det er nul komma seks et tre."},"eks3":{"start":64.03,"end":71.723,"words":[["Sikkerhedsfaktoren",64.144,65.214],["er",65.214,65.369],["en",65.369,65.472],["divideret",65.472,66.026],["med",66.026,66.245],["nul",66.245,66.49],["komma",66.49,66.851],["seks",66.851,67.186],["et",67.186,67.327],["tre",67.327,67.714],["altså",67.856,68.345],["en",68.345,68.603],["komma",68.603,68.938],["seks",68.938,69.273],["tre",69.273,69.686],["Emnet",70.55,71.014],["er",71.014,71.117],["sikkert",71.117,71.723]],"text":"Sikkerhedsfaktoren er en divideret med nul komma seks et tre, altså en komma seks tre. Emnet er sikkert."},"fleraksel":{"start":72.948,"end":80.253,"words":[["Ved",73.088,73.191],["flerakset",73.191,73.733],["udmattelse",73.733,74.287],["beregner",74.287,74.944],["vi",74.944,75.176],["en",75.176,75.33],["von",75.33,75.524],["Mises",75.524,75.872],["spænding",75.872,76.22],["for",76.22,76.439],["amplituden",76.439,77.083],["og",77.083,77.238],["en",77.238,77.495],["for",77.495,77.637],["middelværdien",77.637,78.449],["og",78.604,78.823],["sætter",78.823,79.132],["dem",79.132,79.364],["ind",79.364,79.57],["i",79.57,79.647],["Goodman",79.647,80.253]],"text":"Ved flerakset udmattelse beregner vi en von Mises spænding for amplituden og en for middelværdien, og sætter dem ind i Goodman."},"vm":{"start":81.482,"end":90.243,"words":[["Von",81.609,81.815],["Mises",81.816,82.279],["spændingen",82.279,82.73],["er",82.73,82.821],["kvadratroden",82.821,83.413],["af",83.413,83.465],["sigma",83.465,83.916],["x",83.916,84.225],["i",84.225,84.419],["anden",84.419,84.663],["minus",84.663,85.114],["sigma",85.114,85.643],["x",85.643,85.926],["sigma",85.926,86.352],["y",86.352,86.596],["plus",86.596,86.815],["sigma",86.815,87.241],["y",87.241,87.563],["i",87.563,87.769],["anden",87.769,88.078],["plus",88.078,88.336],["tre",88.336,88.645],["tau",88.645,89.019],["x",89.019,89.354],["y",89.354,89.573],["i",89.573,89.767],["anden",89.767,90.243]],"text":"Von Mises spændingen er kvadratroden af sigma x i anden minus sigma x sigma y plus sigma y i anden plus tre tau x y i anden."},"tjek_q":{"start":91.48,"end":96.416,"words":[["Tjek",91.581,91.903],["dig",91.903,92.083],["selv",92.083,92.509],["Hvad",93.413,93.568],["bliver",93.568,93.774],["Goodman",93.774,94.212],["ligningen",94.212,94.792],["når",94.934,95.127],["middelspændingen",95.127,95.874],["er",95.874,95.99],["nul",95.99,96.416]],"text":"Tjek dig selv. Hvad bliver Goodman ligningen, når middelspændingen er nul?"},"tjek_a":{"start":100.288,"end":108.831,"words":[["Så",100.402,100.634],["er",100.634,100.647],["sigma",100.647,101.034],["a",101.034,101.279],["over",101.279,101.575],["S",101.575,101.884],["e",101.884,102.026],["lig",102.026,102.232],["en",102.232,102.451],["over",102.451,102.774],["n",102.774,103.134],["altså",103.276,103.689],["n",103.689,103.908],["lig",103.908,104.114],["S",104.114,104.359],["e",104.359,104.629],["over",104.629,104.874],["sigma",104.874,105.312],["a.",105.312,105.841],["Det",106.705,106.898],["er",106.898,107.04],["det",107.04,107.233],["almindelige",107.233,107.903],["S",107.903,108.187],["N",108.187,108.38],["tjek",108.38,108.831]],"text":"Så er sigma a over S e lig en over n, altså n lig S e over sigma a. Det er det almindelige S N tjek."},"slut":{"start":110.046,"end":120.252,"words":[["Kort",110.173,110.379],["sagt",110.38,110.843],["sigma",110.959,111.41],["a",111.41,111.617],["over",111.617,111.887],["S",111.887,112.184],["e",112.184,112.338],["plus",112.338,112.57],["sigma",112.57,113.021],["m",113.021,113.279],["over",113.279,113.55],["S",113.55,113.846],["u",113.846,114.091],["er",114.091,114.271],["en",114.271,114.529],["over",114.529,114.787],["n.",114.787,115.367],["Ved",116.27,116.386],["flerakset",116.386,116.902],["last",116.902,117.378],["bruger",117.378,117.713],["vi",117.714,117.855],["von",117.855,118.061],["Mises",118.061,118.487],["for",118.487,118.68],["amplitude",118.68,119.402],["og",119.402,119.531],["middelværdi",119.531,120.252]],"text":"Kort sagt: sigma a over S e plus sigma m over S u er en over n. Ved flerakset last bruger vi von Mises for amplitude og middelværdi."}}}, { audio: 'goodman.mp3', id: 'goodman' });</script>
+</body>
+</html>

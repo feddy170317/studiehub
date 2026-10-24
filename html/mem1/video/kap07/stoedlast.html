@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stødlast · video</title>
+<meta name="description" content="Energibalance ved stød, stødfaktoren Vf og hvorfor den mindst er 2.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 7: videoer</a><h1>Stødlast</h1><span class="meta">MEM1 · kapitel 7 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Stødlast"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Energibalance ved stød, stødfaktoren Vf og hvorfor den mindst er 2.</p><div class="chips"><a href="../../Kapitel07_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l07">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Stødlast (MEM1 kap. 7, slide 29)
+BP.scene({ header: 'MEM1 · kap. 7' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, rect, hatch, dashed, PI } = B;
+
+  B.titel(0, 'Stødlast', 'MEM1 · kapitel 7 · begreb (slide 29)', 'titel');
+  text(0, 'pludselig last, store spændinger', 640, 520, 42, 'red', wt('titel', 'pludseligt') - 0.2, we('titel', 'langsomt'), { align: 'center' });
+
+  B.goto('energi', 1);
+  {
+    const t0 = L('energi').start, cx = 300;
+    line(1, rect(cx - 50, 120, 100, 70).concat([[cx - 50, 122]]), 'black', 3, wt('energi', 'vægt') - 0.2, wt('energi', 'vægt') + 0.3); text(1, 'W', cx, 168, 36, 'black', wt('energi', 'W'), wt('energi', 'W') + 0.3, { align: 'center' });
+    arrow(1, [[cx + 80, 190], [cx + 80, 330]], 'blue', 2.4, wt('energi', 'falder') - 0.1, wt('energi', 'falder') + 0.3, 12); text(1, 'h', cx + 96, 270, 34, 'blue', wt('energi', 'h'), wt('energi', 'h') + 0.3);
+    const P = [[cx, 340]]; for (let i = 0; i < 8; i++) P.push([cx + (i % 2 ? 30 : -30), 360 + 25 * i]); P.push([cx, 560]);
+    line(1, P, 'black', 3, wt('energi', 'fjederen') - 0.3, wt('energi', 'fjederen') + 0.3);
+    hatch(1, rect(cx - 80, 560, 160, 18), 'black', wt('energi', 'fjederen'), wt('energi', 'fjederen') + 0.3, { gap: 6 });
+    text(1, 'k', cx + 50, 460, 34, 'black', wt('energi', 'fjederen'), wt('energi', 'fjederen') + 0.3);
+    text(1, 'δ', cx - 70, 380, 34, 'red', wt('energi', 'delta') - 0.1, wt('energi', 'delta') + 0.3);
+    const tb = L('balance').start;
+    const r = text(1, 'W (h + δ) = ½ k δ²', 560, 230, 48, 'red', tb + 0.3, we('balance', 'anden'));
+    text(1, 'δ = δ_{st} (1 + √(1 + 2h/δ_{st}))', 560, 340, 42, 'blue', L('loes').start + 0.3, we('loes', 'statisk', 1));
+    const tf = L('faktor').start;
+    text(1, 'V_f = 1 + √(1 + 2h/δ_{st})', 560, 440, 42, 'green', tf + 0.2, wt('faktor', 'Den'));
+    text(1, 'F_{stød} = V_f · W', 560, 510, 42, 'green', wt('faktor', 'dynamiske') - 0.2, we('faktor', 'vægten'));
+    text(1, 'h = 0  ⇒  V_f = 2', 560, 610, 44, 'red', L('nul').start + 0.3, we('nul', 'to'));
+  }
+
+  B.goto('tjek_q', 2);
+  B.tjek(2, ['Meget stiv konstruktion,', 'lille δ_{st}. Og V_f?'], ['V_f bliver meget stor', '2h/δ_{st} vokser'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 3);
+  B.slut(3, 'Abou-Hayt (2026), MEM1 Chapter 7, slide 29 · Hamrock, Schmid & Jacobson, kap. 7', 'stødeksemplet', 'slut');
+  text(3, 'W(h + δ) = ½ k δ²', 200, 270, 46, 'blue', L('slut').start + 0.4, we('slut', 'anden'));
+  text(3, 'V_f = 1 + √(1 + 2h/δ_{st}) ≥ 2', 200, 360, 44, 'red', wt('slut', 'stødfaktoren') - 0.1, we('slut', 'to'));
+});
+
+</script>
+<script>BP.live({"duration":90.084,"audio":"stoedlast.mp3","order":["titel","energi","balance","loes","faktor","nul","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.369,"words":[["Stødlast",0.6,1.541],["Når",2.446,2.613],["en",2.613,2.691],["last",2.691,3.013],["rammer",3.013,3.309],["pludseligt",3.309,3.902],["bliver",4.044,4.211],["spændingerne",4.211,4.74],["langt",4.74,5.01],["større",5.01,5.371],["end",5.371,5.539],["ved",5.539,5.603],["samme",5.603,5.964],["last",5.964,6.312],["påført",6.312,6.737],["langsomt",6.737,7.369]],"text":"Stødlast. Når en last rammer pludseligt, bliver spændingerne langt større end ved samme last påført langsomt."},"energi":{"start":8.602,"end":19.079,"words":[["Ved",8.742,8.923],["et",8.923,9.0],["stød",9.0,9.387],["overføres",9.387,9.979],["kinetisk",9.979,10.598],["energi",10.598,11.1],["pludseligt",11.1,11.706],["Vi",12.583,12.751],["bruger",12.751,13.189],["energibevarelse",13.189,14.503],["En",15.419,15.522],["vægt",15.522,15.818],["W",15.818,16.334],["falder",16.334,16.579],["højden",16.579,16.901],["h",16.901,17.262],["og",17.262,17.378],["trykker",17.378,17.739],["fjederen",17.739,18.164],["delta",18.164,18.525],["sammen",18.525,19.079]],"text":"Ved et stød overføres kinetisk energi pludseligt. Vi bruger energibevarelse. En vægt W falder højden h og trykker fjederen delta sammen."},"balance":{"start":20.304,"end":28.266,"words":[["Vægtens",20.444,20.844],["potentielle",20.844,21.398],["energi",21.398,22.029],["W",22.132,22.596],["gange",22.596,22.906],["h",22.906,23.099],["plus",23.099,23.344],["delta",23.344,23.898],["bliver",24.052,24.233],["til",24.233,24.387],["tøjningsenergi",24.387,25.212],["i",25.212,25.277],["fjederen",25.277,25.792],["en",25.934,26.089],["halv",26.089,26.308],["gange",26.308,26.578],["k",26.578,26.81],["gange",26.81,27.107],["delta",27.107,27.635],["i",27.635,27.841],["anden",27.841,28.266]],"text":"Vægtens potentielle energi, W gange h plus delta, bliver til tøjningsenergi i fjederen, en halv gange k gange delta i anden."},"loes":{"start":29.486,"end":36.649,"words":[["Løser",29.613,29.987],["vi",29.987,30.18],["andengradsligningen",30.18,31.16],["får",31.301,31.456],["vi",31.456,31.546],["delta",31.546,31.894],["lig",31.894,32.049],["delta",32.049,32.384],["statisk",32.384,32.899],["gange",32.899,33.299],["en",33.299,33.466],["plus",33.466,33.724],["kvadratroden",33.724,34.433],["af",34.433,34.6],["en",34.6,34.703],["plus",34.704,34.948],["to",34.948,35.18],["h",35.18,35.464],["over",35.464,35.696],["delta",35.696,36.044],["statisk",36.044,36.649]],"text":"Løser vi andengradsligningen, får vi delta lig delta statisk gange en plus kvadratroden af en plus to h over delta statisk."},"faktor":{"start":37.876,"end":44.113,"words":[["Parentesen",38.016,38.802],["kaldes",38.802,39.176],["stødfaktoren",39.176,40.155],["Den",41.072,41.214],["dynamiske",41.214,41.768],["kraft",41.768,42.232],["er",42.232,42.361],["stødfaktoren",42.361,43.211],["gange",43.211,43.572],["vægten",43.572,44.113]],"text":"Parentesen kaldes stødfaktoren. Den dynamiske kraft er stødfaktoren gange vægten."},"nul":{"start":45.33,"end":55.974,"words":[["Selv",45.444,45.728],["hvis",45.728,45.895],["vægten",45.895,46.218],["bare",46.218,46.45],["slippes",46.45,46.862],["uden",46.862,47.158],["faldhøjde",47.158,47.854],["altså",47.97,48.331],["h",48.331,48.55],["lig",48.55,48.718],["nul",48.718,49.104],["er",49.285,49.401],["stødfaktoren",49.401,50.148],["to.",50.148,50.548],["En",51.451,51.567],["pludselig",51.567,51.954],["påført",51.954,52.508],["last",52.508,52.933],["giver",52.933,53.178],["dobbelt",53.178,53.526],["så",53.526,53.642],["stor",53.642,53.925],["udbøjning",53.925,54.531],["som",54.531,54.789],["en",54.789,54.866],["langsomt",54.866,55.356],["påført",55.356,55.974]],"text":"Selv hvis vægten bare slippes uden faldhøjde, altså h lig nul, er stødfaktoren to. En pludselig påført last giver dobbelt så stor udbøjning som en langsomt påført."},"tjek_q":{"start":57.2,"end":65.112,"words":[["Tjek",57.301,57.623],["dig",57.623,57.803],["selv",57.803,58.229],["Hvad",59.133,59.236],["sker",59.236,59.52],["der",59.52,59.623],["med",59.623,59.739],["stødfaktoren",59.739,60.679],["hvis",60.808,61.002],["den",61.002,61.169],["statiske",61.169,61.749],["udbøjning",61.749,62.277],["er",62.277,62.419],["meget",62.419,62.754],["lille",62.754,63.179],["altså",63.321,63.695],["en",63.695,63.811],["meget",63.811,64.081],["stiv",64.081,64.352],["konstruktion",64.352,65.112]],"text":"Tjek dig selv. Hvad sker der med stødfaktoren, hvis den statiske udbøjning er meget lille, altså en meget stiv konstruktion?"},"tjek_a":{"start":68.984,"end":76.458,"words":[["Den",69.111,69.24],["bliver",69.24,69.446],["meget",69.446,69.73],["stor",69.73,70.181],["fordi",70.323,70.683],["to",70.684,70.915],["h",70.915,71.173],["over",71.173,71.431],["delta",71.431,71.83],["statisk",71.83,72.346],["vokser",72.346,72.9],["Stive",73.791,74.177],["konstruktioner",74.177,75.131],["får",75.131,75.286],["store",75.286,75.659],["stødkræfter",75.659,76.458]],"text":"Den bliver meget stor, fordi to h over delta statisk vokser. Stive konstruktioner får store stødkræfter."},"slut":{"start":77.686,"end":87.646,"words":[["Kort",77.813,78.032],["sagt",78.032,78.509],["W",78.625,79.063],["gange",79.063,79.373],["h",79.373,79.592],["plus",79.592,79.836],["delta",79.837,80.352],["er",80.352,80.532],["en",80.532,80.635],["halv",80.636,80.829],["k",80.829,81.048],["delta",81.048,81.434],["i",81.434,81.628],["anden",81.628,82.053],["stødfaktoren",82.195,83.032],["er",83.032,83.174],["en",83.174,83.29],["plus",83.29,83.522],["kvadratroden",83.522,84.154],["af",84.154,84.295],["en",84.295,84.411],["plus",84.411,84.643],["to",84.643,84.875],["h",84.875,85.146],["over",85.146,85.378],["delta",85.378,85.726],["statisk",85.726,86.357],["og",86.512,86.641],["den",86.641,86.834],["er",86.834,86.911],["mindst",86.911,87.246],["to.",87.246,87.646]],"text":"Kort sagt: W gange h plus delta er en halv k delta i anden, stødfaktoren er en plus kvadratroden af en plus to h over delta statisk, og den er mindst to."}}}, { audio: 'stoedlast.mp3', id: 'stoedlast' });</script>
+</body>
+</html>

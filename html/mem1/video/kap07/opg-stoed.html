@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stødlast: eksempel fra slides · video</title>
+<meta name="description" content="Vægt på 500 N falder 0,2 m: Vf = 15,2 og en stødkraft på 7,6 kN.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 7: videoer</a><h1>Stødlast: eksempel fra slides</h1><span class="meta">MEM1 · kapitel 7 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Stødlast: eksempel fra slides"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Vægt på 500 N falder 0,2 m: Vf = 15,2 og en stødkraft på 7,6 kN.</p><div class="chips"><a href="stoedlast.html">Se først: Stødlast</a><a href="../../Kapitel07_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l07">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Stødeksempel fra slides 30–31: W = 500 N, h = 0,2 m, k = 2,5e5 N/m → δst = 2 mm, Vf = 15,2, δ = 30,4 mm, F = 7,6 kN
+BP.scene({ header: 'MEM1 · kap. 7' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under } = B;
+
+  B.titel(0, 'Stødlast i praksis', 'MEM1 · kapitel 7 · opgave (slide 30–31)', 'titel');
+  text(0, 'hvor stor bliver kraften?', 640, 520, 42, 'red', wt('titel', 'stor') - 0.2, we('titel', 'kraften'), { align: 'center' });
+
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start;
+    text(1, 'W = 500 N,  h = 0,2 m,  k = 2,5 · 10⁵ N/m', 140, 160, 40, 'black', t0 + 0.2, we('data', 'meter', 1));
+    text(1, 'δ_{st} = W/k = 500 / 250 000 = 2 mm', 140, 250, 42, 'blue', L('statisk').start + 0.2, we('statisk', 'millimeter'));
+    text(1, 'V_f = 1 + √(1 + 2 · 0,2 / 0,002) = 1 + √201 ≈ 15,2', 140, 340, 38, 'green', L('faktor').start + 0.2, we('faktor', 'to', 2));
+    text(1, 'δ_{max} = 2 · 15,2 = 30,4 mm', 140, 430, 42, 'blue', L('delta').start + 0.2, we('delta', 'millimeter', 1));
+    const r = text(1, 'F = k δ_{max} = 250 000 · 0,0304 ≈ 7,6 kN', 140, 530, 44, 'red', L('kraft').start + 0.2, we('kraft', 'kilonewton'));
+    box(1, 115, 475, 920, 85, 'red', we('kraft', 'kilonewton'), we('kraft', 'kilonewton') + 0.6);
+    text(1, '> 15 × vægten!', 140, 640, 44, 'red', L('konkl').start + 0.2, we('konkl', 'vægten'));
+  }
+
+  B.goto('tjek_q', 2);
+  B.tjek(2, ['Vægten sænkes langsomt.', 'Hvad er kraften?'], ['500 N', 'V_f = 1 ved langsom last'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 3);
+  B.slut(3, 'Abou-Hayt (2026), MEM1 Chapter 7, slide 30–31 · Hamrock, Schmid & Jacobson, kap. 7', 'eksamensspørgsmål 6', 'slut');
+  text(3, 'δ_{st} = 2 mm · V_f = 15,2 · δ = 30,4 mm', 200, 280, 40, 'blue', L('slut').start + 0.4, we('slut', 'millimeter', 1));
+  text(3, 'F_{stød} = 7,6 kN', 200, 370, 48, 'red', wt('slut', 'stødkraft') - 0.1, we('slut', 'kilonewton'));
+});
+
+</script>
+<script>BP.live({"duration":95.738,"audio":"opg-stoed.mp3","order":["titel","data","statisk","faktor","delta","kraft","konkl","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.459,"words":[["Et",0.64,0.73],["stødeksempel",0.73,1.62],["fra",1.62,1.787],["slides",1.787,2.38],["En",3.284,3.412],["vægt",3.412,3.657],["falder",3.657,3.928],["ned",3.928,4.263],["på",4.263,4.456],["en",4.456,4.533],["stålstang",4.534,5.229],["Hvor",6.119,6.325],["stor",6.325,6.647],["bliver",6.647,6.853],["kraften",6.853,7.459]],"text":"Et stødeksempel fra slides. En vægt falder ned på en stålstang. Hvor stor bliver kraften?"},"data":{"start":8.674,"end":17.862,"words":[["Vægten",8.814,9.252],["er",9.252,9.433],["fem",9.433,9.678],["hundrede",9.678,9.922],["newton",9.922,10.541],["og",10.721,10.837],["den",10.837,11.005],["falder",11.005,11.379],["nul",11.379,11.636],["komma",11.636,11.946],["to",11.946,12.229],["meter",12.229,12.719],["Stangen",13.61,14.022],["har",14.022,14.125],["stivheden",14.125,14.589],["to",14.589,14.834],["komma",14.834,15.156],["fem",15.156,15.414],["gange",15.414,15.684],["ti",15.684,16.071],["i",16.071,16.187],["femte",16.187,16.548],["newton",16.548,17.05],["pr.",17.05,17.321],["meter",17.321,17.862]],"text":"Vægten er fem hundrede newton, og den falder nul komma to meter. Stangen har stivheden to komma fem gange ti i femte newton pr. meter."},"statisk":{"start":19.08,"end":25.573,"words":[["Først",19.207,19.542],["den",19.542,19.749],["statiske",19.749,20.341],["udbøjning",20.341,21.011],["fem",21.127,21.424],["hundrede",21.424,21.669],["divideret",21.669,22.326],["med",22.326,22.622],["to",22.622,22.88],["hundrede",22.88,23.086],["og",23.086,23.112],["halvtreds",23.112,23.473],["tusind",23.473,24.014],["altså",24.156,24.555],["to",24.555,24.852],["millimeter",24.852,25.573]],"text":"Først den statiske udbøjning: fem hundrede divideret med to hundrede og halvtreds tusind, altså to millimeter."},"faktor":{"start":26.798,"end":39.027,"words":[["Stødfaktoren",26.925,27.75],["er",27.75,27.905],["en",27.905,28.021],["plus",28.021,28.278],["kvadratroden",28.278,28.974],["af",28.974,29.142],["en",29.142,29.245],["plus",29.245,29.503],["to",29.503,29.735],["gange",29.735,30.07],["nul",30.07,30.302],["komma",30.302,30.585],["to",30.585,30.985],["divideret",30.985,31.629],["med",31.629,31.874],["nul",31.874,32.131],["komma",32.131,32.531],["nul",32.531,32.814],["nul",32.814,33.008],["to.",33.008,33.42],["Det",34.324,34.491],["er",34.491,34.697],["en",34.697,34.852],["plus",34.852,35.11],["kvadratroden",35.11,35.806],["af",35.806,36.038],["to",36.038,36.308],["hundrede",36.308,36.54],["og",36.54,36.553],["en",36.553,36.914],["altså",37.056,37.391],["cirka",37.391,37.803],["femten",37.803,38.331],["komma",38.332,38.602],["to.",38.602,39.027]],"text":"Stødfaktoren er en plus kvadratroden af en plus to gange nul komma to divideret med nul komma nul nul to. Det er en plus kvadratroden af to hundrede og en, altså cirka femten komma to."},"delta":{"start":40.252,"end":46.384,"words":[["Den",40.379,40.521],["største",40.521,40.933],["udbøjning",40.933,41.513],["er",41.513,41.668],["to",41.668,41.926],["millimeter",41.926,42.402],["gange",42.403,42.75],["femten",42.75,43.227],["komma",43.227,43.524],["to",43.524,43.962],["altså",44.104,44.464],["tredive",44.464,44.967],["komma",44.967,45.315],["fire",45.315,45.65],["millimeter",45.65,46.384]],"text":"Den største udbøjning er to millimeter gange femten komma to, altså tredive komma fire millimeter."},"kraft":{"start":47.61,"end":57.443,"words":[["Stødkraften",47.724,48.51],["er",48.51,48.678],["k",48.678,48.936],["gange",48.936,49.271],["delta",49.271,49.632],["max",49.632,50.147],["to",50.276,50.534],["hundrede",50.534,50.74],["og",50.74,50.766],["halvtreds",50.766,51.152],["tusind",51.152,51.487],["gange",51.487,51.913],["nul",51.913,52.17],["komma",52.17,52.557],["nul",52.557,52.789],["tre",52.789,53.163],["nul",53.163,53.433],["fire",53.433,53.962],["Det",54.839,54.93],["giver",54.93,55.213],["cirka",55.213,55.664],["syv",55.664,55.986],["komma",55.986,56.296],["seks",56.296,56.631],["kilonewton",56.631,57.443]],"text":"Stødkraften er k gange delta max, to hundrede og halvtreds tusind gange nul komma nul tre nul fire. Det giver cirka syv komma seks kilonewton."},"konkl":{"start":58.688,"end":65.518,"words":[["Det",58.828,58.931],["er",58.931,58.996],["mere",58.996,59.357],["end",59.357,59.524],["femten",59.524,59.988],["gange",59.988,60.284],["vægten",60.284,60.864],["Dimensionerer",61.755,62.374],["man",62.374,62.606],["med",62.606,62.747],["den",62.747,62.915],["statiske",62.915,63.456],["last",63.456,63.971],["går",64.1,64.294],["det",64.294,64.371],["galt",64.371,64.706],["med",64.706,64.912],["det",64.912,64.99],["samme",64.99,65.518]],"text":"Det er mere end femten gange vægten. Dimensionerer man med den statiske last, går det galt med det samme."},"tjek_q":{"start":66.742,"end":72.322,"words":[["Tjek",66.842,67.177],["dig",67.177,67.345],["selv",67.345,67.77],["Hvad",68.675,68.817],["ville",68.817,69.01],["stødkraften",69.01,69.68],["være",69.68,70.183],["hvis",70.324,70.544],["vægten",70.544,70.917],["blev",70.917,71.098],["sænket",71.098,71.497],["langsomt",71.497,71.987],["ned",71.987,72.322]],"text":"Tjek dig selv. Hvad ville stødkraften være, hvis vægten blev sænket langsomt ned?"},"tjek_a":{"start":76.198,"end":82.409,"words":[["Fem",76.325,76.609],["hundrede",76.609,76.867],["newton",76.867,77.511],["bare",77.653,77.885],["vægten",77.885,78.439],["Stødfaktoren",79.329,80.257],["er",80.257,80.451],["en",80.451,80.567],["ved",80.567,80.811],["en",80.811,80.979],["langsomt",80.979,81.481],["påført",81.482,81.907],["last",81.907,82.409]],"text":"Fem hundrede newton, bare vægten. Stødfaktoren er en ved en langsomt påført last."},"slut":{"start":83.628,"end":93.304,"words":[["Kort",83.755,83.974],["sagt",83.974,84.464],["delta",84.58,84.915],["statisk",84.915,85.392],["to",85.392,85.611],["millimeter",85.611,86.307],["stødfaktor",86.384,87.119],["femten",87.119,87.544],["komma",87.544,87.815],["to",87.815,88.253],["delta",88.369,88.755],["max",88.755,89.065],["tredive",89.065,89.464],["komma",89.464,89.76],["fire",89.76,90.044],["millimeter",90.044,90.727],["og",90.727,90.907],["en",90.907,90.985],["stødkraft",90.985,91.565],["på",91.565,91.719],["syv",91.719,91.99],["komma",91.99,92.235],["seks",92.235,92.557],["kilonewton",92.557,93.304]],"text":"Kort sagt: delta statisk to millimeter, stødfaktor femten komma to, delta max tredive komma fire millimeter og en stødkraft på syv komma seks kilonewton."}}}, { audio: 'opg-stoed.mp3', id: 'opg-stoed' });</script>
+</body>
+</html>

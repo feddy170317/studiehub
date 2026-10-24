@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eksamensspørgsmål 6b: Goodman · video</title>
+<meta name="description" content="Eksamensspørgsmål 6b: σm = 150, σa = 100 MPa og Goodman giver n = 1,33.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 7: videoer</a><h1>Eksamensspørgsmål 6b: Goodman</h1><span class="meta">MEM1 · kapitel 7 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Eksamensspørgsmål 6b: Goodman"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Eksamensspørgsmål 6b: σm = 150, σa = 100 MPa og Goodman giver n = 1,33.</p><div class="chips"><a href="goodman.html">Se først: Goodman: middelspænding og amplitude</a><a href="../../../../lab/mem1/udmattelse-goodman.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel07_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l07">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Eksamensspørgsmål 6b: Se = 200, Sut = 600, σ 50–250 MPa → σm = 150, σa = 100, n = 1,33 (slide 32)
+BP.scene({ header: 'MEM1 · kap. 7' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, axes, plot, dashed, PI } = B;
+
+  B.titel(0, 'Eksamensspørgsmål 6b', 'MEM1 · kapitel 7 · opgave (slide 32)', 'titel');
+  text(0, 'Goodman med tal', 640, 520, 42, 'red', wt('titel', 'Goodman') - 0.4, we('titel', 'sikkerhedsfaktor'), { align: 'center' });
+
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start;
+    text(1, 'S_e = 200 MPa,  S_{ut} = 600 MPa', 140, 160, 40, 'black', wt('data', 'Udmattelsesgrænsen') - 0.1, we('data', 'hundrede', 1));
+    text(1, 'σ: 50 → 250 MPa', 140, 230, 40, 'black', wt('data', 'svinger') - 0.1, we('data', 'megapascal', 1));
+    text(1, 'σ_m = (250 + 50)/2 = 150 MPa', 140, 330, 42, 'red', L('middel').start + 0.2, we('middel', 'megapascal'));
+    text(1, 'σ_a = (250 − 50)/2 = 100 MPa', 140, 400, 42, 'green', L('amplitude').start + 0.2, we('amplitude', 'megapascal'));
+    text(1, '1/n = 100/200 + 150/600 = 0,5 + 0,25 = 0,75', 140, 500, 34, 'blue', L('goodman').start + 0.2, we('tal', 'fem', 2));
+    const r = text(1, 'n = 1/0,75 = 1,33  ✓', 140, 600, 50, 'red', L('n').start + 0.2, we('n', 'levetid'));
+    box(1, 115, 545, 560, 85, 'red', we('n', 'levetid'), we('n', 'levetid') + 0.6);
+    // lille diagram
+    const ox = 880, oy = 640, X = (s) => ox + s * 0.6, Y = (s) => oy - s * 1.2;
+    axes(1, ox, oy, X(640), Y(240), 'σ_m', 'σ_a', L('teori').start);
+    plot(1, [[X(0), Y(200)], [X(600), Y(0)]], 'red', L('teori').start + 0.4, wt('teori', 'middelspændingsaksen'));
+    dot(1, X(150), Y(100), 8, 'blue', wt('teori', 'middelspændingsaksen'));
+  }
+
+  B.goto('tjek_q', 2);
+  B.tjek(2, ['σ_m = 0, samme amplitude.', 'Hvad bliver n?'], ['n = S_e / σ_a = 200/100 = 2'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 3);
+  B.slut(3, 'Abou-Hayt (2026), MEM1 Chapter 7, slide 32 (eksamensspm. 6) · Hamrock, Schmid & Jacobson, kap. 7', '', 'slut');
+  text(3, 'σ_m = 150 · σ_a = 100 MPa', 200, 280, 44, 'blue', L('slut').start + 0.4, we('slut', 'hundrede', 1));
+  text(3, 'Goodman: n = 1,33', 200, 370, 48, 'red', wt('slut', 'Goodman') - 0.1, we('slut', 'tre', 1));
+});
+
+</script>
+<script>BP.live({"duration":99.856,"audio":"eksamen-spm6.mp3","order":["titel","data","middel","amplitude","goodman","tal","n","teori","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":10.448,"words":[["Eksamensspørgsmål",0.64,1.736],["seks",1.736,2.135],["b",2.135,2.509],["En",3.412,3.554],["del",3.554,3.902],["med",3.902,4.134],["svingende",4.134,4.598],["aksialspænding",4.598,5.552],["Vi",6.466,6.57],["finder",6.57,6.892],["middelspænding",6.892,7.716],["amplitude",7.832,8.541],["og",8.541,8.619],["sikkerhedsfaktor",8.619,9.675],["med",9.675,9.856],["Goodman",9.856,10.448]],"text":"Eksamensspørgsmål seks b. En del med svingende aksialspænding. Vi finder middelspænding, amplitude og sikkerhedsfaktor med Goodman."},"data":{"start":11.674,"end":22.421,"words":[["Udmattelsesgrænsen",11.801,12.897],["S",12.897,13.193],["e",13.193,13.451],["er",13.451,13.58],["to",13.58,13.837],["hundrede",13.837,14.069],["megapascal",14.069,14.894],["og",15.036,15.242],["trækstyrken",15.242,15.989],["S",15.989,16.247],["u",16.247,16.415],["t",16.415,16.776],["er",16.776,16.892],["seks",16.892,17.252],["hundrede",17.252,17.729],["Spændingen",18.62,19.135],["svinger",19.135,19.509],["mellem",19.509,19.767],["halvtreds",19.767,20.295],["og",20.295,20.463],["to",20.463,20.733],["hundrede",20.733,20.939],["og",20.939,20.965],["halvtreds",20.965,21.403],["megapascal",21.403,22.421]],"text":"Udmattelsesgrænsen S e er to hundrede megapascal, og trækstyrken S u t er seks hundrede. Spændingen svinger mellem halvtreds og to hundrede og halvtreds megapascal."},"middel":{"start":23.64,"end":29.888,"words":[["Middelspændingen",23.78,24.54],["er",24.54,24.772],["to",24.772,25.03],["hundrede",25.03,25.236],["og",25.236,25.262],["halvtreds",25.262,25.649],["plus",25.649,25.881],["halvtreds",25.881,26.422],["divideret",26.422,27.028],["med",27.028,27.195],["to",27.195,27.646],["altså",27.775,28.187],["hundrede",28.187,28.471],["og",28.471,28.497],["halvtreds",28.497,28.909],["megapascal",28.909,29.888]],"text":"Middelspændingen er to hundrede og halvtreds plus halvtreds divideret med to, altså hundrede og halvtreds megapascal."},"amplitude":{"start":31.118,"end":36.735,"words":[["Amplituden",31.245,31.941],["er",31.941,32.134],["to",32.134,32.379],["hundrede",32.379,32.585],["og",32.586,32.611],["halvtreds",32.611,33.011],["minus",33.011,33.32],["halvtreds",33.32,33.784],["divideret",33.784,34.377],["med",34.377,34.544],["to",34.544,34.995],["altså",35.124,35.524],["hundrede",35.524,35.859],["megapascal",35.859,36.735]],"text":"Amplituden er to hundrede og halvtreds minus halvtreds divideret med to, altså hundrede megapascal."},"goodman":{"start":37.948,"end":42.946,"words":[["Goodman",38.062,38.565],["en",38.681,38.913],["over",38.913,39.196],["n",39.196,39.39],["er",39.39,39.454],["hundrede",39.454,39.97],["over",39.97,40.266],["to",40.266,40.524],["hundrede",40.524,40.756],["plus",40.756,40.988],["hundrede",40.988,41.194],["og",41.194,41.22],["halvtreds",41.22,41.787],["over",41.787,42.096],["seks",42.096,42.457],["hundrede",42.457,42.946]],"text":"Goodman: en over n er hundrede over to hundrede plus hundrede og halvtreds over seks hundrede."},"tal":{"start":44.178,"end":49.035,"words":[["Det",44.318,44.434],["er",44.434,44.563],["nul",44.563,44.808],["komma",44.808,45.182],["fem",45.182,45.465],["plus",45.465,45.723],["nul",45.723,46.071],["komma",46.071,46.393],["to",46.393,46.664],["fem",46.664,47.024],["altså",47.166,47.591],["nul",47.591,47.836],["komma",47.836,48.133],["syv",48.133,48.403],["fem.",48.403,49.035]],"text":"Det er nul komma fem plus nul komma to fem, altså nul komma syv fem."},"n":{"start":50.264,"end":58.563,"words":[["Sikkerhedsfaktoren",50.378,51.448],["er",51.448,51.603],["en",51.603,51.706],["divideret",51.706,52.273],["med",52.273,52.505],["nul",52.505,52.75],["komma",52.75,53.085],["syv",53.085,53.355],["fem",53.355,53.716],["altså",53.858,54.335],["en",54.335,54.592],["komma",54.592,54.876],["tre",54.876,55.159],["tre",55.159,55.559],["Delen",56.437,56.913],["holder",56.913,57.249],["til",57.249,57.468],["uendelig",57.468,57.88],["levetid",57.88,58.563]],"text":"Sikkerhedsfaktoren er en divideret med nul komma syv fem, altså en komma tre tre. Delen holder til uendelig levetid."},"teori":{"start":59.806,"end":73.53,"words":[["Til",59.933,60.127],["del",60.127,60.371],["a",60.371,60.668],["skal",60.668,60.848],["du",60.848,60.926],["kunne",60.926,61.145],["forklare",61.145,61.557],["Marins",61.557,61.905],["faktorer",61.905,62.562],["og",62.562,62.73],["udlede",62.73,63.155],["Goodman",63.155,63.554],["linjen",63.554,64.07],["Linjen",64.961,65.309],["går",65.309,65.489],["gennem",65.489,65.772],["S",65.772,66.056],["e",66.056,66.262],["på",66.262,66.507],["amplitudeaksen",66.507,67.589],["og",67.59,67.783],["S",67.783,68.028],["u",68.028,68.195],["t",68.195,68.517],["på",68.517,68.672],["middelspændingsaksen",68.672,69.883],["Se",70.772,71.056],["videoerne",71.056,71.597],["om",71.597,71.894],["S",71.894,72.126],["N",72.126,72.267],["kurven",72.267,72.77],["og",72.77,72.912],["Goodman",72.912,73.53]],"text":"Til del a skal du kunne forklare Marins faktorer og udlede Goodman linjen. Linjen går gennem S e på amplitudeaksen og S u t på middelspændingsaksen. Se videoerne om S N kurven og Goodman."},"tjek_q":{"start":74.772,"end":80.339,"words":[["Tjek",74.873,75.195],["dig",75.195,75.375],["selv",75.375,75.801],["Hvad",76.705,76.873],["bliver",76.872,77.13],["n",77.13,77.491],["hvis",77.633,77.852],["middelspændingen",77.852,78.561],["var",78.561,78.741],["nul",78.741,79.025],["med",79.025,79.192],["samme",79.192,79.566],["amplitude",79.566,80.339]],"text":"Tjek dig selv. Hvad bliver n, hvis middelspændingen var nul med samme amplitude?"},"tjek_a":{"start":84.204,"end":89.653,"words":[["To",84.318,84.769],["fordi",84.898,85.285],["n",85.285,85.375],["så",85.375,85.749],["er",85.749,85.916],["S",85.916,86.251],["e",86.251,86.47],["over",86.471,86.728],["sigma",86.728,87.205],["a",87.205,87.579],["to",87.708,87.991],["hundrede",87.991,88.223],["divideret",88.223,88.919],["med",88.919,89.086],["hundrede",89.086,89.653]],"text":"To, fordi n så er S e over sigma a, to hundrede divideret med hundrede."},"slut":{"start":90.866,"end":97.424,"words":[["Kort",90.993,91.212],["sagt",91.212,91.689],["sigma",91.805,92.333],["m",92.334,92.565],["er",92.566,92.643],["hundrede",92.643,92.888],["og",92.888,92.926],["halvtreds",92.926,93.545],["sigma",93.687,94.163],["a",94.163,94.189],["hundrede",94.189,94.705],["og",94.846,95.001],["Goodman",95.001,95.452],["giver",95.452,95.736],["n",95.736,95.955],["lig",95.955,96.174],["en",96.174,96.431],["komma",96.431,96.741],["tre",96.741,97.024],["tre",97.024,97.424]],"text":"Kort sagt: sigma m er hundrede og halvtreds, sigma a hundrede, og Goodman giver n lig en komma tre tre."}}}, { audio: 'eksamen-spm6.mp3', id: 'eksamen-spm6' });</script>
+</body>
+</html>
