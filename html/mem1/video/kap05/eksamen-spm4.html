@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eksamensspørgsmål 4b: energi og udbøjning · video</title>
+<meta name="description" content="Eksamensspørgsmål 4b: U = 1,5 J og δ = 10 mm for en indspændt aksel.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 5: videoer</a><h1>Eksamensspørgsmål 4b: energi og udbøjning</h1><span class="meta">MEM1 · kapitel 5 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Eksamensspørgsmål 4b: energi og udbøjning"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Eksamensspørgsmål 4b: U = 1,5 J og δ = 10 mm for en indspændt aksel.</p><div class="chips"><a href="castigliano.html">Se først: Castiglianos sætning</a><a href="../../Kapitel05_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l05">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Eksamensspørgsmål 4b: L = 1 m, EI = 10 kNm², P = 300 N → U = 1,5 J, δ = 10 mm (MEM1 kap. 5, slide 35)
+BP.scene({ header: 'MEM1 · kap. 5' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, wall, beam, plot, PI } = B;
+
+  B.titel(0, 'Eksamensspørgsmål 4b', 'MEM1 · kapitel 5 · opgave (slide 35)', 'titel');
+  text(0, 'energi og udbøjning med Castigliano', 640, 520, 40, 'red', wt('titel', 'tøjningsenergien') - 0.2, we('titel', 'udbøjningen'), { align: 'center' });
+
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start;
+    wall(1, 200, 140, 280, t0); beam(1, 200, 195, 700, 28, 'black', t0 + 0.2, t0 + 0.7);
+    arrow(1, [[700, 100], [700, 191]], 'red', 4.2, wt('data', 'tre') - 0.2, wt('data', 'tre') + 0.3); text(1, 'P = 300 N', 716, 130, 34, 'red', wt('data', 'tre'), we('data', 'newton'));
+    text(1, 'L = 1 m', 400, 290, 34, 'black', wt('data', 'længden') - 0.1, we('data', 'meter'));
+    text(1, 'EI = 10 kN·m²', 800, 230, 38, 'blue', wt('data', 'bøjningsstivheden') - 0.1, we('data', 'kvadratmeter'));
+    text(1, 'M = P x  (x fra den frie ende)', 160, 400, 38, 'green', L('moment').start + 0.2, we('moment', 'x', 1));
+    text(1, 'U = ∫ (Px)² / (2EI) dx  [0; L]  = P² L³ / (6 E I)', 160, 480, 38, 'blue', L('energi').start + 0.2, we('energi', 'I', 1));
+    const r = text(1, 'U = 300² · 1³ / (6 · 10 000) = 1,5 J', 160, 570, 42, 'red', L('tal').start + 0.2, we('tal', 'joule'));
+  }
+
+  B.goto('delta', 2);
+  {
+    const t0 = L('delta').start;
+    text(2, 'δ = ∂U/∂P = P L³ / (3 E I)', 160, 180, 46, 'blue', t0 + 0.2, wt('delta', 'Det'));
+    const r = text(2, 'δ = 300 / 30 000 = 0,01 m = 10 mm', 160, 270, 46, 'red', wt('delta', 'Det') - 0.1, we('delta', 'millimeter'));
+    box(2, 135, 215, 820, 85, 'red', we('delta', 'millimeter'), we('delta', 'millimeter') + 0.6);
+    text(2, 'kontrol:  ½ P δ = ½ · 300 · 0,01 = 1,5 J  ✓', 160, 400, 40, 'green', L('kontrol').start + 0.2, we('kontrol', 'joule'));
+    text(2, 'del a: se videoerne om tøjningsenergi og Castigliano', 160, 520, 32, 'blue', L('teori').start + 0.5, we('teori', 'Castigliano'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Akslen er halvt så lang.', 'Hvad bliver δ?'], ['1/8 af 10 mm = 1,25 mm', 'δ ∝ L³'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 5, slide 35 (eksamensspm. 4) · Hamrock, Schmid & Jacobson, kap. 5', '', 'slut');
+  text(4, 'U = P² L³ / (6EI) = 1,5 J', 200, 280, 46, 'blue', L('slut').start + 0.4, we('slut', 'joule'));
+  text(4, 'δ = P L³ / (3EI) = 10 mm', 200, 370, 46, 'red', wt('slut', 'delta') - 0.1, we('slut', 'millimeter'));
+});
+
+</script>
+<script>BP.live({"duration":107.224,"audio":"eksamen-spm4.mp3","order":["titel","data","moment","energi","tal","delta","kontrol","teori","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":9.74,"words":[["Eksamensspørgsmål",0.64,1.748],["fire",1.748,2.148],["b",2.148,2.535],["En",3.438,3.567],["indspændt",3.567,4.057],["aktuatoraksel",4.057,5.126],["med",5.126,5.345],["en",5.345,5.513],["endelast",5.513,6.273],["Vi",7.175,7.278],["finder",7.278,7.6],["tøjningsenergien",7.601,8.722],["og",8.722,8.915],["udbøjningen",8.915,9.74]],"text":"Eksamensspørgsmål fire b. En indspændt aktuatoraksel med en endelast. Vi finder tøjningsenergien og udbøjningen."},"data":{"start":10.954,"end":19.343,"words":[["Akslen",11.094,11.507],["har",11.507,11.623],["længden",11.623,11.97],["en",11.97,12.074],["meter",12.074,12.55],["og",12.55,12.641],["bøjningsstivheden",12.641,13.594],["E",13.594,13.865],["I",13.865,14.045],["lig",14.045,14.277],["ti",14.277,14.496],["kilonewton",14.496,15.141],["kvadratmeter",15.141,16.043],["Lasten",16.92,17.397],["i",17.397,17.552],["enden",17.552,17.977],["er",17.977,18.132],["tre",18.132,18.415],["hundrede",18.415,18.699],["newton",18.699,19.343]],"text":"Akslen har længden en meter og bøjningsstivheden E I lig ti kilonewton kvadratmeter. Lasten i enden er tre hundrede newton."},"moment":{"start":20.568,"end":24.291,"words":[["Vi",20.682,20.798],["måler",20.798,21.133],["x",21.133,21.404],["fra",21.404,21.559],["den",21.559,21.726],["frie",21.726,22.061],["ende",22.061,22.461],["så",22.59,22.796],["momentet",22.796,23.324],["er",23.324,23.479],["P",23.479,23.814],["x",23.814,24.291]],"text":"Vi måler x fra den frie ende, så momentet er P x."},"energi":{"start":25.526,"end":34.778,"words":[["Energien",25.666,26.053],["er",26.053,26.143],["integralet",26.143,26.852],["af",26.852,27.097],["P",27.097,27.354],["x",27.354,27.612],["i",27.612,27.792],["anden",27.793,28.166],["over",28.166,28.463],["to",28.463,28.772],["E",28.772,28.978],["I",28.978,29.262],["fra",29.262,29.442],["nul",29.442,29.7],["til",29.7,29.854],["L.",29.854,30.292],["Det",31.157,31.286],["giver",31.286,31.711],["P",31.711,31.994],["i",31.994,32.239],["anden",32.239,32.561],["L",32.561,32.78],["i",32.78,32.974],["tredje",32.974,33.476],["over",33.476,33.824],["seks",33.824,34.237],["E",34.237,34.469],["I",34.469,34.778]],"text":"Energien er integralet af P x i anden over to E I fra nul til L. Det giver P i anden L i tredje over seks E I."},"tal":{"start":36.004,"end":43.8,"words":[["Med",36.131,36.286],["tal",36.286,36.698],["tre",36.84,37.136],["hundrede",37.136,37.407],["i",37.407,37.575],["anden",37.575,37.845],["gange",37.845,38.219],["en",38.219,38.374],["i",38.374,38.438],["tredje",38.438,38.812],["divideret",38.812,39.508],["med",39.508,39.688],["seks",39.688,40.023],["gange",40.023,40.332],["ti",40.332,40.577],["tusind",40.577,41.183],["Det",42.086,42.254],["er",42.254,42.434],["en",42.434,42.731],["komma",42.731,43.066],["fem",43.066,43.349],["joule",43.349,43.8]],"text":"Med tal: tre hundrede i anden gange en i tredje divideret med seks gange ti tusind. Det er en komma fem joule."},"delta":{"start":45.042,"end":57.542,"words":[["Udbøjningen",45.169,45.685],["er",45.685,45.788],["den",45.788,45.955],["afledte",45.955,46.484],["af",46.484,46.742],["U",46.742,46.999],["med",46.999,47.192],["hensyn",47.193,47.669],["til",47.669,47.811],["P",47.811,48.236],["P",48.352,48.61],["L",48.61,48.778],["i",48.778,48.958],["tredje",48.958,49.473],["over",49.473,49.783],["tre",49.783,50.144],["E",50.144,50.388],["I",50.388,50.711],["Det",51.614,51.73],["er",51.73,51.859],["tre",51.859,52.13],["hundrede",52.13,52.374],["divideret",52.374,52.993],["med",52.993,53.251],["tredive",53.251,53.637],["tusind",53.637,54.217],["altså",54.346,54.81],["nul",54.81,55.068],["komma",55.068,55.416],["nul",55.416,55.686],["en",55.686,55.854],["meter",55.854,56.344],["ti",56.485,56.795],["millimeter",56.795,57.542]],"text":"Udbøjningen er den afledte af U med hensyn til P: P L i tredje over tre E I. Det er tre hundrede divideret med tredive tusind, altså nul komma nul en meter, ti millimeter."},"kontrol":{"start":58.76,"end":68.103,"words":[["Kontrol",58.9,59.313],["med",59.313,59.506],["arbejdet",59.506,60.137],["en",60.24,60.395],["halv",60.395,60.601],["gange",60.601,60.872],["P",60.872,61.052],["gange",61.052,61.336],["delta",61.336,61.864],["er",61.864,62.057],["en",62.057,62.16],["halv",62.161,62.367],["gange",62.367,62.663],["tre",62.663,62.934],["hundrede",62.934,63.153],["gange",63.153,63.591],["nul",63.591,63.874],["komma",63.874,64.287],["nul",64.287,64.609],["en",64.609,64.983],["Det",65.873,65.951],["giver",65.951,66.273],["også",66.273,66.698],["en",66.698,66.995],["komma",66.995,67.342],["fem",67.342,67.639],["joule",67.639,68.103]],"text":"Kontrol med arbejdet: en halv gange P gange delta er en halv gange tre hundrede gange nul komma nul en. Det giver også en komma fem joule."},"teori":{"start":69.334,"end":78.587,"words":[["Til",69.461,69.642],["del",69.642,69.887],["a",69.887,70.183],["skal",70.183,70.363],["du",70.363,70.441],["kunne",70.441,70.66],["formulere",70.66,71.188],["Castiglianos",71.188,71.948],["anden",71.948,72.232],["sætning",72.232,72.799],["og",72.799,72.966],["udlede",72.966,73.392],["energien",73.392,73.985],["for",73.985,74.126],["bøjning",74.126,74.693],["Se",75.571,75.855],["videoerne",75.855,76.422],["om",76.422,76.615],["tøjningsenergi",76.615,77.594],["og",77.594,77.71],["Castigliano",77.71,78.587]],"text":"Til del a skal du kunne formulere Castiglianos anden sætning og udlede energien for bøjning. Se videoerne om tøjningsenergi og Castigliano."},"tjek_q":{"start":79.812,"end":84.812,"words":[["Tjek",79.913,80.235],["dig",80.235,80.415],["selv",80.415,80.841],["Hvad",81.745,81.9],["bliver",81.9,82.144],["udbøjningen",82.144,82.931],["hvis",83.072,83.382],["akslen",83.382,83.923],["er",83.923,84.052],["halvt",84.052,84.284],["så",84.284,84.4],["lang",84.4,84.812]],"text":"Tjek dig selv. Hvad bliver udbøjningen, hvis akslen er halvt så lang?"},"tjek_a":{"start":88.692,"end":94.18,"words":[["En",88.819,88.948],["ottendedel",88.948,89.696],["altså",89.824,90.288],["en",90.288,90.495],["komma",90.495,90.778],["to",90.778,91.036],["fem",91.036,91.242],["millimeter",91.242,91.925],["fordi",92.054,92.453],["delta",92.453,92.788],["går",92.788,93.033],["med",93.033,93.239],["L",93.239,93.446],["i",93.446,93.613],["tredje",93.613,94.18]],"text":"En ottendedel, altså en komma to fem millimeter, fordi delta går med L i tredje."},"slut":{"start":95.402,"end":104.795,"words":[["Kort",95.529,95.735],["sagt",95.736,96.225],["U",96.354,96.586],["er",96.586,96.741],["P",96.741,96.985],["i",96.985,97.217],["anden",97.217,97.514],["L",97.514,97.694],["i",97.694,97.862],["tredje",97.862,98.313],["over",98.313,98.622],["seks",98.622,99.009],["E",99.009,99.215],["I",99.215,99.563],["en",99.705,99.924],["komma",99.924,100.207],["fem",100.207,100.452],["joule",100.452,100.839],["og",100.993,101.135],["delta",101.135,101.522],["er",101.522,101.65],["P",101.65,101.882],["L",101.882,102.011],["i",102.011,102.153],["tredje",102.153,102.578],["over",102.578,102.849],["tre",102.849,103.158],["E",103.158,103.364],["I",103.364,103.674],["ti",103.815,104.086],["millimeter",104.086,104.795]],"text":"Kort sagt: U er P i anden L i tredje over seks E I, en komma fem joule, og delta er P L i tredje over tre E I, ti millimeter."}}}, { audio: 'eksamen-spm4.mp3', id: 'eksamen-spm4' });</script>
+</body>
+</html>

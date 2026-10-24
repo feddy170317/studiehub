@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Superposition · video</title>
+<meta name="description" content="Del lasten op i standardtilfælde, og læg udbøjningerne sammen med fortegn.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 5: videoer</a><h1>Superposition</h1><span class="meta">MEM1 · kapitel 5 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Superposition"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Del lasten op i standardtilfælde, og læg udbøjningerne sammen med fortegn.</p><div class="chips"><a href="elastisk-linje.html">Se først: Den elastiske linje</a><a href="../../Kapitel05_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l05">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Superposition (MEM1 kap. 5, slides 12–16)
+BP.scene({ header: 'MEM1 · kap. 5' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, beam, pin, roller, wall, moment, distLoad, plot, PI } = B;
+
+  B.titel(0, 'Superposition', 'MEM1 · kapitel 5 · begreb (slide 12–16)', 'titel');
+  text(0, 'del op, slå op, læg sammen', 640, 520, 42, 'red', wt('titel', 'dele') - 0.2, we('titel', 'sammen'), { align: 'center' });
+
+  B.goto('princip', 1);
+  {
+    const t0 = L('princip').start;
+    text(1, 'y_{total} = y_1 + y_2 + … + y_n', 160, 180, 50, 'red', wt('princip', 'summen') - 0.4, we('princip', 'sig'));
+    text(1, 'også hældning og spænding', 160, 250, 34, 'black', wt('princip', 'hældning') - 0.2, we('princip', 'spænding'));
+    const tk = L('krav').start;
+    text(1, 'Kun når:', 160, 360, 38, 'blue', tk, tk + 0.6);
+    text(1, '· udbøjningerne er små', 190, 420, 36, 'black', wt('krav', 'små') - 0.4, we('krav', 'udbøjninger'));
+    text(1, '· materialet er lineært elastisk (σ < S_y)', 190, 480, 36, 'black', wt('krav', 'lineær') - 0.1, we('krav', 'flydegrænsen'));
+    text(1, '· understøtningerne ikke ændres', 190, 540, 36, 'black', wt('krav', 'ændrer') - 0.4, we('krav', 'understøtningerne'));
+  }
+
+  B.goto('eks', 2);
+  {
+    const t0 = L('eks').start, y = 210;
+    const one = (x0, k, t, P, w, M) => {
+      wall(2, x0, y - 40, y + 70, t, 'black');
+      beam(2, x0, y, x0 + 300, 26, 'black', t + 0.2, t + 0.5);
+      if (w) distLoad(2, x0 + 10, x0 + 290, y, 50, 'blue', t + 0.4, t + 0.9, 7);
+      if (P) arrow(2, [[x0 + 300, y - 90], [x0 + 300, y - 4]], 'red', 3.6, t + 0.4, t + 0.7, 13);
+      if (M) moment(2, x0 + 300, y + 13, 40, -0.4 * PI, 0.4 * PI, 'green', t + 0.4, t + 0.8);
+    };
+    one(160, 2, t0 + 0.2, 1, 1, 1);
+    text(2, 'P + w + M', 560, y + 20, 38, 'black', t0 + 1.0, t0 + 1.4);
+    const ts = L('sum').start, y2 = 470;
+    const piece = (x0, t, kind, lab, col) => {
+      wall(2, x0, y2 - 30, y2 + 50, t, 'black'); beam(2, x0, y2, x0 + 220, 20, 'black', t + 0.1, t + 0.4);
+      if (kind === 'P') arrow(2, [[x0 + 220, y2 - 70], [x0 + 220, y2 - 4]], 'red', 3.2, t + 0.3, t + 0.6, 12);
+      if (kind === 'w') distLoad(2, x0 + 8, x0 + 212, y2, 40, 'blue', t + 0.3, t + 0.7, 6);
+      if (kind === 'M') moment(2, x0 + 220, y2 + 10, 34, -0.4 * PI, 0.4 * PI, 'green', t + 0.3, t + 0.6);
+      text(2, lab, x0 + 110, y2 + 110, 36, col, t + 0.4, t + 0.8, { align: 'center' });
+    };
+    piece(150, wt('sum', 'punktlasten') - 0.3, 'P', 'y_P', 'red');
+    text(2, '+', 430, y2 + 20, 48, 'black', wt('sum', 'plus') - 0.1, wt('sum', 'plus') + 0.2);
+    piece(500, wt('sum', 'fordelte') - 0.3, 'w', 'y_w', 'blue');
+    text(2, '+', 780, y2 + 20, 48, 'black', wt('sum', 'plus', 1) - 0.1, wt('sum', 'plus', 1) + 0.2);
+    piece(850, wt('sum', 'momentet') - 0.3, 'M', 'y_M', 'green');
+    text(2, 'hvert led fra en tabel', 640, 660, 34, 'black', wt('sum', 'tabel') - 0.6, we('sum', 'tabel'), { align: 'center' });
+  }
+
+  B.goto('procedure', 3);
+  {
+    const t0 = L('procedure').start;
+    bubble(3, 'Fem trin', 150, 140, 54, 'blue', t0, t0 + 0.6);
+    const tr = [['1. hele lasten + reaktioner', 'Tegn'], ['2. del i standardtilfælde', 'Del'], ['3. udbøjning fra hvert tilfælde', 'Find'], ['4. læg sammen MED fortegn', 'Læg'], ['5. tjek største udbøjning', 'tjek']];
+    tr.forEach(([s, w], i) => text(3, s, 170, 230 + 62 * i, 38, i === 3 ? 'red' : 'black', wt('procedure', w) - 0.2, we('procedure', w) + 0.8));
+    const tf = L('fortegn').start;
+    text(3, 'én last løfter, en anden trykker ned', 170, 540, 32, 'red', wt('fortegn', 'løfte') - 0.4, we('fortegn', 'ned'));
+    text(3, 'singularitetsfunktioner: ikke pensum', 170, 600, 32, 'green', L('singularitet').start + 0.3, we('singularitet', 'stedet'));
+  }
+
+  B.goto('tjek_q', 4);
+  B.tjek(4, ['2 mm ned + 0,5 mm op.', 'Samlet udbøjning?'], ['1,5 mm ned', 'fortegnet skal med'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 5);
+  B.slut(5, 'Abou-Hayt (2026), MEM1 Chapter 5, slide 12–16 · Hamrock, Schmid & Jacobson, kap. 5', 'tøjningsenergi', 'slut');
+  text(5, 'standardtilfælde → slå op → læg sammen', 200, 280, 40, 'blue', L('slut').start + 0.4, we('slut', 'fortegn'));
+  text(5, 'kun lineært elastisk', 200, 360, 42, 'red', wt('slut', 'lineært') - 0.1, we('slut', 'systemer'));
+});
+
+</script>
+<script>BP.live({"duration":118.888,"audio":"superposition.mp3","order":["titel","princip","krav","eks","sum","procedure","fortegn","singularitet","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":8.271,"words":[["Superposition",0.614,1.774],["Når",2.691,2.871],["en",2.871,2.974],["bjælke",2.974,3.309],["har",3.309,3.49],["flere",3.49,3.786],["laster",3.786,4.353],["kan",4.495,4.637],["vi",4.637,4.74],["dele",4.74,5.01],["dem",5.01,5.178],["op",5.178,5.41],["i",5.41,5.474],["standardtilfælde",5.474,6.544],["og",6.544,6.673],["lægge",6.673,6.995],["resultaterne",6.995,7.704],["sammen",7.704,8.271]],"text":"Superposition. Når en bjælke har flere laster, kan vi dele dem op i standardtilfælde og lægge resultaterne sammen."},"princip":{"start":9.49,"end":18.575,"words":[["For",9.617,9.798],["et",9.798,9.875],["lineært",9.875,10.249],["elastisk",10.249,10.764],["system",10.764,11.318],["er",11.318,11.46],["udbøjningen",11.46,12.027],["fra",12.027,12.182],["flere",12.182,12.465],["laster",12.465,12.942],["summen",12.942,13.316],["af",13.316,13.47],["udbøjningerne",13.47,14.256],["fra",14.256,14.424],["hver",14.424,14.682],["last",14.682,15.004],["for",15.004,15.159],["sig",15.159,15.558],["Det",16.449,16.513],["gælder",16.513,16.81],["også",16.81,17.17],["for",17.17,17.338],["hældning",17.338,17.853],["og",17.853,17.995],["spænding",17.995,18.575]],"text":"For et lineært elastisk system er udbøjningen fra flere laster summen af udbøjningerne fra hver last for sig. Det gælder også for hældning og spænding."},"krav":{"start":19.8,"end":27.286,"words":[["Det",19.927,19.992],["kræver",19.992,20.301],["tre",20.301,20.61],["ting",20.61,20.958],["små",21.087,21.5],["udbøjninger",21.5,22.298],["lineær",22.427,22.917],["elasticitet",22.917,23.664],["under",23.664,23.845],["flydegrænsen",23.845,24.695],["og",24.914,25.043],["at",25.043,25.082],["lasterne",25.082,25.623],["ikke",25.623,25.945],["ændrer",25.945,26.358],["understøtningerne",26.358,27.286]],"text":"Det kræver tre ting: små udbøjninger, lineær elasticitet under flydegrænsen, og at lasterne ikke ændrer understøtningerne."},"eks":{"start":28.502,"end":37.729,"words":[["Se",28.616,28.887],["på",28.887,29.055],["en",29.055,29.145],["bjælke",29.145,29.506],["med",29.506,29.699],["en",29.699,29.789],["punktlast",29.789,30.498],["en",30.64,30.794],["fordelt",30.794,31.194],["last",31.194,31.593],["og",31.593,31.761],["et",31.761,31.864],["moment",31.864,32.418],["I",33.309,33.36],["stedet",33.36,33.657],["for",33.657,33.798],["at",33.798,33.824],["løse",33.824,34.185],["den",34.185,34.365],["samlede",34.365,34.791],["differentialligning",34.791,35.873],["deler",36.015,36.298],["vi",36.298,36.427],["den",36.427,36.685],["i",36.685,36.814],["tre",36.814,37.11],["tilfælde",37.11,37.729]],"text":"Se på en bjælke med en punktlast, en fordelt last og et moment. I stedet for at løse den samlede differentialligning, deler vi den i tre tilfælde."},"sum":{"start":38.956,"end":47.422,"words":[["Den",39.083,39.199],["samlede",39.199,39.612],["udbøjning",39.612,40.14],["er",40.14,40.359],["y",40.359,40.578],["fra",40.578,40.733],["punktlasten",40.733,41.377],["plus",41.377,41.673],["y",41.674,41.983],["fra",41.983,42.176],["den",42.176,42.305],["fordelte",42.305,42.717],["last",42.717,43.091],["plus",43.091,43.375],["y",43.375,43.632],["fra",43.632,43.8],["momentet",43.8,44.496],["Hvert",45.399,45.657],["led",45.657,45.85],["slår",45.85,46.108],["vi",46.108,46.237],["op",46.237,46.572],["i",46.572,46.727],["en",46.727,46.868],["tabel",46.868,47.422]],"text":"Den samlede udbøjning er y fra punktlasten plus y fra den fordelte last plus y fra momentet. Hvert led slår vi op i en tabel."},"procedure":{"start":48.666,"end":65.728,"words":[["Fremgangsmåden",48.793,49.67],["har",49.67,49.863],["fem",49.863,50.159],["trin",50.159,50.597],["Tegn",51.488,51.772],["hele",51.772,52.004],["lasten",52.004,52.609],["og",52.609,52.751],["find",52.751,52.996],["reaktionerne",52.996,53.795],["Del",54.671,54.89],["den",54.89,55.083],["op",55.084,55.406],["i",55.406,55.535],["standardtilfælde",55.535,56.656],["Find",57.545,57.828],["udbøjningen",57.828,58.408],["fra",58.408,58.589],["hvert",58.589,58.808],["tilfælde",58.808,59.388],["i",59.388,59.529],["det",59.529,59.645],["rigtige",59.645,60.071],["punkt",60.071,60.509],["Læg",61.385,61.591],["dem",61.591,61.759],["sammen",61.759,62.236],["med",62.236,62.377],["fortegn",62.377,63.086],["Og",63.988,64.065],["tjek",64.065,64.349],["den",64.349,64.555],["største",64.555,65.006],["udbøjning",65.006,65.728]],"text":"Fremgangsmåden har fem trin. Tegn hele lasten og find reaktionerne. Del den op i standardtilfælde. Find udbøjningen fra hvert tilfælde i det rigtige punkt. Læg dem sammen med fortegn. Og tjek den største udbøjning."},"fortegn":{"start":66.968,"end":75.447,"words":[["Pas",67.069,67.352],["på",67.352,67.533],["fortegnene",67.533,68.28],["Læg",69.236,69.455],["ikke",69.455,69.713],["bare",69.713,69.983],["størrelserne",69.983,70.563],["sammen",70.563,71.182],["En",72.084,72.187],["last",72.187,72.496],["kan",72.496,72.599],["løfte",72.599,72.934],["bjælken",72.934,73.502],["mens",73.63,73.914],["en",73.914,74.043],["anden",74.043,74.391],["trykker",74.391,74.739],["den",74.739,74.958],["ned.",74.958,75.447]],"text":"Pas på fortegnene. Læg ikke bare størrelserne sammen. En last kan løfte bjælken, mens en anden trykker den ned."},"singularitet":{"start":76.678,"end":85.351,"words":[["Bogen",76.805,77.089],["bruger",77.089,77.411],["også",77.411,77.746],["singularitetsfunktioner",77.746,79.202],["men",79.331,79.524],["dem",79.524,79.692],["bruger",79.692,80.027],["vi",80.027,80.233],["ikke",80.233,80.504],["i",80.504,80.594],["kurset",80.594,81.238],["Vi",82.129,82.232],["bruger",82.232,82.529],["standardtilfælde",82.529,83.547],["og",83.547,83.675],["superposition",83.675,84.719],["i",84.719,84.835],["stedet",84.835,85.351]],"text":"Bogen bruger også singularitetsfunktioner, men dem bruger vi ikke i kurset. Vi bruger standardtilfælde og superposition i stedet."},"tjek_q":{"start":86.58,"end":97.998,"words":[["Tjek",86.681,87.003],["dig",87.003,87.183],["selv",87.183,87.609],["En",88.513,88.642],["bjælke",88.642,89.016],["har",89.016,89.248],["to",89.248,89.518],["punktlaster",89.518,90.33],["Den",91.219,91.361],["ene",91.361,91.67],["giver",91.67,91.928],["to",91.928,92.199],["millimeter",92.199,92.624],["ned",92.624,93.049],["den",93.191,93.358],["anden",93.358,93.655],["giver",93.655,93.977],["en",93.977,94.144],["halv",94.144,94.363],["millimeter",94.364,94.905],["op",94.905,95.278],["Hvad",96.181,96.425],["er",96.425,96.554],["den",96.554,96.786],["samlede",96.786,97.314],["udbøjning",97.315,97.998]],"text":"Tjek dig selv. En bjælke har to punktlaster. Den ene giver to millimeter ned, den anden giver en halv millimeter op. Hvad er den samlede udbøjning?"},"tjek_a":{"start":101.868,"end":105.062,"words":[["En",102.008,102.098],["komma",102.098,102.382],["fem",102.382,102.627],["millimeter",102.627,103.31],["ned.",103.31,103.722],["Fortegnet",103.722,104.457],["skal",104.457,104.676],["med.",104.676,105.062]],"text":"En komma fem millimeter ned. Fortegnet skal med."},"slut":{"start":106.298,"end":116.453,"words":[["Kort",106.438,106.644],["sagt",106.644,107.147],["del",107.263,107.508],["lasten",107.508,107.894],["op",107.894,108.165],["i",108.165,108.255],["standardtilfælde",108.255,109.376],["slå",109.479,109.879],["udbøjningerne",109.879,110.497],["op",110.497,110.845],["og",111.039,111.206],["læg",111.206,111.387],["dem",111.387,111.554],["sammen",111.554,111.967],["med",111.967,112.07],["fortegn",112.07,112.753],["Det",113.63,113.708],["virker",113.708,113.991],["kun",113.991,114.288],["for",114.288,114.507],["lineært",114.507,115.1],["elastiske",115.1,115.718],["systemer",115.718,116.453]],"text":"Kort sagt: del lasten op i standardtilfælde, slå udbøjningerne op, og læg dem sammen med fortegn. Det virker kun for lineært elastiske systemer."}}}, { audio: 'superposition.mp3', id: 'superposition' });</script>
+</body>
+</html>

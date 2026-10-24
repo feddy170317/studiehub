@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tresca: største forskydning · video</title>
+<meta name="description" content="Største forskydningsspænding: σ1 − σ3 = Sy og sekskanten.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 6: videoer</a><h1>Tresca: største forskydning</h1><span class="meta">MEM1 · kapitel 6 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Tresca: største forskydning"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Største forskydningsspænding: σ1 − σ3 = Sy og sekskanten.</p><div class="chips"><a href="svigt-statisk.html">Se først: Svigt ved statisk last</a><a href="../../../../lab/mem1/flydekriterier.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel06_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l06">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Tresca (MEM1 kap. 6, slides 17–20)
+BP.scene({ header: 'MEM1 · kap. 6' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, hatch, dashed, PI } = B;
+
+  B.titel(0, 'Tresca', 'MEM1 · kapitel 6 · begreb (slide 17–20)', 'titel');
+  text(0, 'største forskydningsspænding', 640, 520, 42, 'red', wt('titel', 'største') - 0.2, we('titel', 'forskydningsspænding'), { align: 'center' });
+
+  B.goto('ide', 1);
+  {
+    const t0 = L('ide').start;
+    text(1, 'flydning, når τ_{max} når en kritisk værdi', 140, 160, 38, 'blue', t0 + 0.3, we('ide', 'værdi'));
+    text(1, 'σ_1 ≥ σ_2 ≥ σ_3', 140, 250, 40, 'black', wt('tau', 'ordnet') - 0.2, we('tau', 'tre'));
+    text(1, 'τ_{max} = (σ_1 − σ_3) / 2', 520, 250, 46, 'red', wt('tau', 'største') - 0.1, we('tau', 'to', 1));
+    text(1, 'trækprøvning: σ_1 = S_y, σ_2 = σ_3 = 0', 140, 350, 38, 'black', L('traek').start + 0.2, we('traek', 'flydning'));
+    text(1, '⇒ τ_{kritisk} = S_y / 2', 140, 420, 44, 'blue', wt('traek', 'kritiske') - 0.2, we('traek', 'halve'));
+    const r = text(1, 'σ_1 − σ_3 = S_y', 140, 540, 60, 'red', wt('kriterium', 'Trescas') - 0.2, we('kriterium', 'y'));
+    box(1, 115, 475, 520, 95, 'red', we('kriterium', 'y'), we('kriterium', 'y') + 0.6);
+    // glideplan
+    const tf = L('fysik').start, cx = 940, cy = 470;
+    line(1, [[cx - 90, cy - 90], [cx + 90, cy - 90], [cx + 90, cy + 90], [cx - 90, cy + 90], [cx - 90, cy - 88]], 'black', 3, tf, tf + 0.6);
+    line(1, [[cx - 90, cy + 90], [cx + 90, cy - 90]], 'green', 3, wt('fysik', 'glider') - 0.2, wt('fysik', 'glider') + 0.4);
+    arrow(1, [[cx - 20, cy + 40], [cx + 40, cy - 20]], 'green', 3, wt('fysik', 'glider'), wt('fysik', 'glider') + 0.3, 12);
+    arrow(1, [[cx + 94, cy], [cx + 170, cy]], 'red', 3.4, tf + 0.4, tf + 0.7, 13); arrow(1, [[cx - 94, cy], [cx - 170, cy]], 'red', 3.4, tf + 0.4, tf + 0.7, 13);
+    text(1, '45°', cx + 10, cy + 70, 32, 'green', wt('fysik', 'femogfyrre') - 0.1, we('fysik', 'grader'));
+  }
+
+  B.goto('hexagon', 2);
+  {
+    const t0 = L('hexagon').start, cx = 400, cy = 390, s = 190;
+    const P = (a, b) => [cx + a * s, cy - b * s];
+    arrow(2, [P(-1.5, 0), P(1.6, 0)], 'black', 2.4, t0, t0 + 0.4, 13); text(2, 'σ_1', cx + 1.6 * s + 6, cy + 10, 32, 'black', t0 + 0.3, t0 + 0.5);
+    arrow(2, [P(0, -1.4), P(0, 1.5)], 'black', 2.4, t0 + 0.1, t0 + 0.5, 13); text(2, 'σ_2', cx + 10, cy - 1.5 * s, 32, 'black', t0 + 0.4, t0 + 0.6);
+    const hex = [P(1, 0), P(1, 1), P(0, 1), P(-1, 0), P(-1, -1), P(0, -1), P(1, 0)];
+    line(2, hex, 'red', 3.6, wt('hexagon', 'sekskant') - 0.3, wt('hexagon', 'sekskant') + 0.9);
+    text(2, 'S_y', P(1, 0)[0] + 8, cy + 36, 30, 'red', wt('hexagon', 'sekskant'), wt('hexagon', 'sekskant') + 0.3);
+    text(2, 'S_y', cx - 50, P(0, 1)[1] - 6, 30, 'red', wt('hexagon', 'sekskant'), wt('hexagon', 'sekskant') + 0.3);
+    text(2, '−S_y', P(-1, 0)[0] - 70, cy + 36, 30, 'red', wt('hexagon', 'sekskant'), wt('hexagon', 'sekskant') + 0.3);
+    hatch(2, [P(0, 0), P(1, 0), P(1, 1), P(0, 1)], 'blue', wt('hexagon', 'samme') - 0.2, wt('hexagon', 'samme') + 0.5, { gap: 10, alpha: 0.4 });
+    hatch(2, [P(0, 0), P(0, 1), P(-1, 0)], 'green', wt('hexagon', 'modsat') - 0.2, wt('hexagon', 'modsat') + 0.5, { gap: 10, alpha: 0.4 });
+    text(2, 'samme fortegn: |σ| ≤ S_y', 760, 230, 34, 'blue', wt('hexagon', 'samme') - 0.1, we('hexagon', 'hovedspænding'));
+    text(2, 'modsat fortegn: |σ_1 − σ_2| ≤ S_y', 760, 300, 34, 'green', wt('hexagon', 'modsat') - 0.1, we('hexagon', 'dem'));
+    text(2, 'inde i sekskanten: sikkert', 760, 420, 36, 'black', L('sikker').start + 0.2, we('sikker', 'sikre'));
+    text(2, 'n = S_y / (σ_1 − σ_3)', 760, 500, 44, 'red', wt('sikker', 'Sikkerhedsfaktoren') - 0.1, we('sikker', 'tre'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['σ_1 = 100, σ_2 = −100, σ_3 = 0.', 'σ_1 − σ_3 ifølge Tresca?'], ['ordnet: 100, 0, −100', '⇒ 200 MPa'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 6, slide 17–20 · Hamrock, Schmid & Jacobson, kap. 6', 'von Mises', 'slut');
+  text(4, 'σ_1 − σ_3 = S_y', 200, 280, 50, 'red', L('slut').start + 0.4, we('slut', 'y'));
+  text(4, 'ordn hovedspændingerne · σ_3 = 0 i plan spænding', 200, 370, 36, 'blue', wt('slut', 'Ordn') - 0.1, we('slut', 'spænding'));
+});
+
+</script>
+<script>BP.live({"duration":114.88,"audio":"tresca.mp3","order":["titel","ide","tau","traek","kriterium","fysik","hexagon","sikker","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.987,"words":[["Tresca",0.614,1.22],["kriteriet",1.362,1.98],["for",1.98,2.187],["den",2.187,2.367],["største",2.367,2.779],["forskydningsspænding",2.779,3.836],["Duktile",4.727,5.165],["metaller",5.165,5.564],["flyder",5.564,6.157],["når",6.299,6.492],["forskydningen",6.492,7.162],["bliver",7.162,7.407],["for",7.407,7.523],["stor",7.523,7.987]],"text":"Tresca, kriteriet for den største forskydningsspænding. Duktile metaller flyder, når forskydningen bliver for stor."},"ide":{"start":9.202,"end":15.154,"words":[["Henri",9.329,9.651],["Tresca",9.652,10.077],["antog",10.077,10.695],["at",10.876,11.03],["flydning",11.03,11.417],["begynder",11.417,12.061],["når",12.203,12.409],["den",12.409,12.551],["største",12.551,12.963],["forskydningsspænding",12.963,13.943],["når",13.943,14.149],["en",14.149,14.239],["kritisk",14.239,14.677],["værdi",14.677,15.154]],"text":"Henri Tresca antog, at flydning begynder, når den største forskydningsspænding når en kritisk værdi."},"tau":{"start":16.368,"end":25.039,"words":[["Med",16.508,16.689],["hovedspændingerne",16.689,17.41],["ordnet",17.41,17.926],["sigma",18.042,18.493],["et",18.493,18.57],["større",18.57,18.918],["end",18.918,19.06],["sigma",19.06,19.459],["to",19.459,19.73],["større",19.73,20.065],["end",20.065,20.22],["sigma",20.22,20.58],["tre",20.58,21.006],["er",21.147,21.263],["den",21.263,21.405],["største",21.405,21.792],["forskydning",21.792,22.294],["sigma",22.294,22.707],["et",22.707,22.861],["minus",22.861,23.183],["sigma",23.183,23.518],["tre",23.519,23.789],["divideret",23.789,24.433],["med",24.433,24.601],["to.",24.601,25.039]],"text":"Med hovedspændingerne ordnet, sigma et større end sigma to større end sigma tre, er den største forskydning sigma et minus sigma tre divideret med to."},"traek":{"start":26.27,"end":35.02,"words":[["I",26.41,26.488],["en",26.488,26.591],["trækprøvning",26.591,27.248],["er",27.248,27.351],["sigma",27.351,27.789],["et",27.789,27.944],["lig",27.944,28.189],["S",28.189,28.446],["y",28.446,28.756],["og",28.962,29.078],["de",29.078,29.207],["to",29.207,29.503],["andre",29.503,29.89],["er",29.89,29.993],["nul",29.993,30.418],["ved",30.56,30.714],["flydning",30.714,31.307],["Så",32.185,32.443],["er",32.443,32.494],["den",32.494,32.713],["kritiske",32.713,33.242],["forskydning",33.242,33.976],["S",33.976,34.285],["y",34.285,34.505],["halve",34.505,35.02]],"text":"I en trækprøvning er sigma et lig S y, og de to andre er nul, ved flydning. Så er den kritiske forskydning S y halve."},"kriterium":{"start":36.244,"end":42.209,"words":[["Sætter",36.358,36.706],["vi",36.706,36.822],["de",36.822,36.925],["to",36.925,37.196],["lig",37.196,37.338],["hinanden",37.338,37.905],["får",38.047,38.214],["vi",38.214,38.317],["Trescas",38.317,38.768],["kriterium",38.768,39.425],["sigma",39.541,40.005],["et",40.005,40.121],["minus",40.121,40.456],["sigma",40.456,40.804],["tre",40.804,41.204],["er",41.204,41.32],["lig",41.32,41.629],["S",41.629,41.887],["y",41.887,42.209]],"text":"Sætter vi de to lig hinanden, får vi Trescas kriterium: sigma et minus sigma tre er lig S y."},"fysik":{"start":43.434,"end":53.254,"words":[["Fysisk",43.548,44.206],["giver",44.206,44.528],["det",44.528,44.631],["god",44.631,44.927],["mening",44.927,45.404],["Plastisk",46.308,46.733],["deformation",46.733,47.364],["sker",47.364,47.674],["ved",47.674,47.97],["at",48.112,48.254],["krystallag",48.254,48.859],["glider",48.859,49.104],["langs",49.104,49.413],["planer",49.413,49.774],["med",49.774,49.903],["størst",49.903,50.238],["forskydning",50.238,50.921],["femogfyrre",51.05,51.656],["grader",51.656,52.184],["fra",52.184,52.352],["hovedretningerne",52.352,53.254]],"text":"Fysisk giver det god mening. Plastisk deformation sker ved, at krystallag glider langs planer med størst forskydning, femogfyrre grader fra hovedretningerne."},"hexagon":{"start":54.488,"end":67.774,"words":[["I",54.602,54.68],["plan",54.68,54.976],["spænding",54.976,55.479],["hvor",55.608,55.762],["sigma",55.762,56.187],["tre",56.188,56.484],["er",56.484,56.523],["nul",56.523,56.948],["bliver",57.09,57.283],["grænsen",57.283,57.734],["en",57.734,57.863],["sekskant",57.863,58.404],["i",58.404,58.455],["sigma",58.456,58.945],["et",58.945,59.1],["sigma",59.1,59.499],["to",59.499,59.744],["planen",59.744,60.298],["Med",61.202,61.331],["samme",61.331,61.653],["fortegn",61.653,62.297],["styrer",62.297,62.658],["den",62.658,62.851],["største",62.851,63.264],["hovedspænding",63.264,64.024],["Med",64.926,65.055],["modsat",65.055,65.48],["fortegn",65.48,66.125],["er",66.125,66.266],["det",66.266,66.357],["forskellen",66.357,67.014],["mellem",67.014,67.362],["dem",67.362,67.774]],"text":"I plan spænding, hvor sigma tre er nul, bliver grænsen en sekskant i sigma et sigma to planen. Med samme fortegn styrer den største hovedspænding. Med modsat fortegn er det forskellen mellem dem."},"sikker":{"start":68.998,"end":77.387,"words":[["Spændingstilstande",69.112,70.143],["inde",70.143,70.453],["i",70.453,70.543],["sekskanten",70.543,71.355],["er",71.355,71.471],["sikre",71.471,72.076],["Sikkerhedsfaktoren",72.967,74.024],["er",74.024,74.217],["S",74.217,74.513],["y",74.513,74.681],["divideret",74.681,75.222],["med",75.222,75.364],["sigma",75.364,75.841],["et",75.841,76.021],["minus",76.021,76.524],["sigma",76.524,76.949],["tre",76.949,77.387]],"text":"Spændingstilstande inde i sekskanten er sikre. Sikkerhedsfaktoren er S y divideret med sigma et minus sigma tre."},"tjek_q":{"start":78.612,"end":88.818,"words":[["Tjek",78.713,79.035],["dig",79.035,79.215],["selv",79.215,79.641],["Sigma",80.532,81.009],["et",81.009,81.189],["er",81.189,81.267],["hundrede",81.267,81.808],["sigma",81.898,82.362],["to",82.362,82.671],["er",82.671,82.736],["minus",82.736,83.071],["hundrede",83.071,83.535],["og",83.676,83.831],["sigma",83.831,84.243],["tre",84.243,84.553],["er",84.553,84.656],["nul",84.656,85.081],["Hvad",85.983,86.138],["er",86.138,86.164],["sigma",86.164,86.602],["et",86.602,86.769],["minus",86.769,87.104],["sigma",87.104,87.504],["tre",87.504,87.877],["ifølge",87.877,88.238],["Tresca",88.238,88.818]],"text":"Tjek dig selv. Sigma et er hundrede, sigma to er minus hundrede, og sigma tre er nul. Hvad er sigma et minus sigma tre ifølge Tresca?"},"tjek_a":{"start":92.7,"end":102.558,"words":[["Ordnet",92.814,93.253],["er",93.253,93.394],["det",93.394,93.523],["hundrede",93.523,94.064],["nul",94.142,94.503],["og",94.503,94.644],["minus",94.644,95.044],["hundrede",95.044,95.546],["Så",96.45,96.682],["er",96.682,96.721],["forskellen",96.721,97.416],["to",97.416,97.7],["hundrede",97.7,97.958],["megapascal",97.958,98.924],["Modsatte",99.826,100.329],["fortegn",100.329,101.012],["giver",101.012,101.321],["en",101.321,101.463],["stor",101.463,101.798],["forskydning",101.798,102.558]],"text":"Ordnet er det hundrede, nul og minus hundrede. Så er forskellen to hundrede megapascal. Modsatte fortegn giver en stor forskydning."},"slut":{"start":103.778,"end":112.449,"words":[["Kort",103.905,104.137],["sagt",104.137,104.614],["Tresca",104.743,105.142],["siger",105.142,105.387],["flydning",105.387,105.929],["når",106.057,106.225],["sigma",106.225,106.624],["et",106.624,106.727],["minus",106.728,107.037],["sigma",107.037,107.372],["tre",107.372,107.758],["er",107.758,107.874],["lig",107.874,108.184],["S",108.184,108.416],["y",108.416,108.596],["Ordn",108.596,108.918],["hovedspændingerne",108.918,109.846],["og",109.988,110.13],["husk",110.13,110.374],["sigma",110.374,110.735],["tre",110.735,111.019],["lig",111.019,111.212],["nul",111.212,111.534],["i",111.534,111.65],["plan",111.65,111.934],["spænding",111.934,112.449]],"text":"Kort sagt: Tresca siger flydning, når sigma et minus sigma tre er lig S y. Ordn hovedspændingerne, og husk sigma tre lig nul i plan spænding."}}}, { audio: 'tresca.mp3', id: 'tresca' });</script>
+</body>
+</html>

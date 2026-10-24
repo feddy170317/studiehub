@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Svigt ved statisk last · video</title>
+<meta name="description" content="Hvad svigt er, statisk last, duktil mod sprød og hvorfor vi har brug for brudkriterier.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 6: videoer</a><h1>Svigt ved statisk last</h1><span class="meta">MEM1 · kapitel 6 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Svigt ved statisk last"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Hvad svigt er, statisk last, duktil mod sprød og hvorfor vi har brug for brudkriterier.</p><div class="chips"><a href="../../../../lab/mem1/flydekriterier.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel06_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l06">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Svigt ved statisk last (MEM1 kap. 6, slides 4–13)
+BP.scene({ header: 'MEM1 · kap. 6' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, plot, axes, PI, TAU } = B;
+
+  B.titel(0, 'Svigt ved statisk last', 'MEM1 · kapitel 6 · begreb (slide 4–13)', 'titel');
+  text(0, 'hvorfor brudkriterier?', 640, 520, 42, 'red', wt('titel', 'brudkriterier') - 0.4, we('titel', 'brudkriterier'), { align: 'center' });
+
+  B.goto('svigt', 1);
+  {
+    const t0 = L('svigt').start;
+    text(1, 'svigt = kan ikke længere udføre sin funktion sikkert', 140, 160, 34, 'blue', wt('svigt', 'svigtet') - 0.3, we('svigt', 'sikkert'));
+    const f = [['flydning', 'flydning'], ['for stor udbøjning', 'udbøjning'], ['brud', 'brud'], ['instabilitet (knækning)', 'instabilitet']];
+    f.forEach(([s, w], i) => { const t = wt('former', w) - 0.2; box(1, 140 + 270 * i, 230, 250, 80, 'red', t, t + 0.4, { off: 8 }); text(1, s, 265 + 270 * i, 280, s.length > 14 ? 22 : 30, 'red', t + 0.1, t + 0.6, { align: 'center' }); });
+    const ts = L('statisk').start;
+    text(1, 'statisk last: F(t) = F_0 = konstant', 140, 410, 38, 'black', ts + 0.2, we('statisk', 'tid'));
+    text(1, 'beslag · maskinrammer · trykbeholdere · aksler', 140, 470, 32, 'black', wt('statisk', 'beslag') - 0.1, we('statisk', 'moment'));
+    text(1, 'pas på K_t ved huller, kærve, hulkehle', 140, 570, 36, 'red', L('kt').start + 0.2, we('kt', 'spænding'));
+  }
+
+  B.goto('kombineret', 2);
+  {
+    const t0 = L('kombineret').start;
+    text(2, 'flere laster → superposition → σ_1, σ_2, σ_3', 140, 160, 38, 'blue', t0 + 0.2, we('kombineret', 'cirkel'));
+    const td = L('duktil').start;
+    box(2, 130, 240, 480, 200, 'blue', td, td + 0.6);
+    bubble(2, 'Duktil', 370, 300, 40, 'blue', td + 0.2, td + 0.8, { align: 'center' });
+    text(2, 'stål, aluminium', 160, 360, 30, 'black', wt('duktil', 'stål') - 0.1, we('duktil', 'aluminium'));
+    text(2, 'svigter ved flydning (glidning)', 160, 410, 28, 'blue', wt('duktil', 'flydning') - 0.2, we('duktil', 'glider'));
+    box(2, 670, 240, 480, 200, 'red', wt('duktil', 'Sprøde') - 0.2, wt('duktil', 'Sprøde') + 0.4);
+    bubble(2, 'Sprød', 910, 300, 40, 'red', wt('duktil', 'Sprøde'), wt('duktil', 'Sprøde') + 0.6, { align: 'center' });
+    text(2, 'støbejern, keramik', 700, 360, 30, 'black', wt('duktil', 'støbejern') - 0.1, we('duktil', 'keramik'));
+    text(2, 'pludseligt brud i træk', 700, 410, 28, 'red', wt('duktil', 'pludseligt') - 0.1, we('duktil', 'træk'));
+    const th = L('hvorfor').start;
+    text(2, 'trækprøvning: ét tal, S_y', 140, 540, 38, 'black', wt('hvorfor', 'trækprøvning') - 0.2, we('hvorfor', 'y'));
+    text(2, 'emnet: σ_1, σ_2, σ_3', 640, 540, 38, 'red', wt('hvorfor', 'rigtigt') - 0.2, we('hvorfor', 'tre'));
+    text(2, 'kriterium: Tresca · von Mises · Mohr', 140, 630, 38, 'green', wt('kriterium', 'Tresca') - 0.3, we('kriterium', 'gør'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Bøjning + vridning:', 'hvorfor ikke bare σ_1 mod S_y?'], ['forskydningen bidrager også', 'kriteriet skal bruge hele tilstanden'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 6, slide 4–13 · Hamrock, Schmid & Jacobson, kap. 6', 'Tresca', 'slut');
+  text(4, 'svigt = tab af funktion', 200, 270, 42, 'blue', L('slut').start + 0.4, we('slut', 'funktion'));
+  text(4, 'duktil flyder · sprød brister', 200, 350, 42, 'red', wt('slut', 'duktile') - 0.1, we('slut', 'brister'));
+  text(4, 'kriterium: flerakset ↔ trækprøvning', 200, 430, 40, 'green', wt('slut', 'brudkriterium') - 0.1, we('slut', 'trækprøvningen'));
+});
+
+</script>
+<script>BP.live({"duration":129.534,"audio":"svigt-statisk.mp3","order":["titel","svigt","former","statisk","kt","kombineret","duktil","hvorfor","kriterium","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.317,"words":[["Svigt",0.601,1.013],["ved",1.013,1.181],["statisk",1.181,1.722],["last",1.722,2.212],["Hvornår",3.103,3.412],["går",3.412,3.657],["et",3.657,3.722],["maskinelement",3.722,4.482],["i",4.482,4.521],["stykker",4.521,5.075],["og",5.216,5.487],["hvorfor",5.487,5.784],["har",5.784,5.899],["vi",5.899,6.003],["brug",6.003,6.235],["for",6.235,6.415],["brudkriterier",6.415,7.317]],"text":"Svigt ved statisk last. Hvornår går et maskinelement i stykker, og hvorfor har vi brug for brudkriterier?"},"svigt":{"start":8.53,"end":16.545,"words":[["Svigt",8.631,8.992],["betyder",8.992,9.417],["ikke",9.417,9.752],["altid",9.752,10.345],["at",10.486,10.705],["emnet",10.705,11.053],["knækker",11.053,11.62],["Et",12.525,12.667],["element",12.667,13.118],["har",13.118,13.182],["svigtet",13.182,13.762],["når",13.904,14.071],["det",14.071,14.187],["ikke",14.187,14.419],["længere",14.419,14.703],["kan",14.703,14.896],["udføre",14.896,15.36],["sin",15.36,15.553],["funktion",15.553,16.004],["sikkert",16.004,16.545]],"text":"Svigt betyder ikke altid, at emnet knækker. Et element har svigtet, når det ikke længere kan udføre sin funktion sikkert."},"former":{"start":17.76,"end":29.01,"words":[["Det",17.887,17.965],["kan",17.965,18.055],["ske",18.055,18.313],["ved",18.313,18.429],["flydning",18.429,19.008],["altså",19.124,19.472],["blivende",19.472,19.859],["plastisk",19.859,20.387],["deformation",20.387,21.173],["Ved",22.077,22.219],["for",22.219,22.348],["stor",22.348,22.708],["udbøjning",22.708,23.456],["Ved",24.331,24.55],["brud",24.55,25.027],["Eller",25.943,26.162],["ved",26.162,26.368],["instabilitet",26.368,27.322],["som",27.464,27.734],["knækning",27.734,28.301],["under",28.301,28.533],["tryk",28.533,29.01]],"text":"Det kan ske ved flydning, altså blivende plastisk deformation. Ved for stor udbøjning. Ved brud. Eller ved instabilitet, som knækning under tryk."},"statisk":{"start":30.23,"end":40.333,"words":[["En",30.357,30.46],["statisk",30.46,30.976],["last",30.976,31.285],["påføres",31.285,31.762],["langsomt",31.762,32.368],["og",32.368,32.535],["er",32.535,32.574],["stort",32.574,32.857],["set",32.857,33.115],["konstant",33.115,33.592],["i",33.592,33.682],["tid",33.682,34.107],["Eksempler",35.024,35.642],["er",35.642,35.758],["beslag",35.758,36.364],["maskinrammer",36.493,37.446],["trykbeholdere",37.575,38.323],["og",38.323,38.477],["aksler",38.477,39.109],["med",39.109,39.289],["konstant",39.289,39.792],["moment",39.792,40.333]],"text":"En statisk last påføres langsomt og er stort set konstant i tid. Eksempler er beslag, maskinrammer, trykbeholdere og aksler med konstant moment."},"kt":{"start":41.572,"end":50.077,"words":[["Pas",41.673,41.943],["på",41.943,42.111],["huller",42.111,42.588],["kærve",42.729,43.155],["og",43.155,43.297],["hulkehle",43.296,43.992],["Spændingskoncentrationer",44.884,46.353],["kan",46.353,46.52],["give",46.52,46.675],["lokale",46.675,47.1],["spændinger",47.1,47.758],["der",47.899,48.067],["er",48.067,48.08],["langt",48.08,48.35],["større",48.35,48.776],["end",48.776,48.943],["den",48.943,49.098],["nominelle",49.098,49.536],["spænding",49.536,50.077]],"text":"Pas på huller, kærve og hulkehle. Spændingskoncentrationer kan give lokale spændinger, der er langt større end den nominelle spænding."},"kombineret":{"start":51.306,"end":61.126,"words":[["Et",51.446,51.562],["element",51.562,51.975],["har",51.975,52.078],["sjældent",52.078,52.451],["kun",52.451,52.786],["én",52.786,53.018],["last",53.018,53.508],["Vi",54.412,54.515],["finder",54.515,54.798],["først",54.798,55.133],["spændingerne",55.133,55.662],["med",55.662,55.881],["superposition",55.881,56.95],["og",57.105,57.324],["så",57.324,57.543],["hovedspændingerne",57.543,58.316],["med",58.316,58.574],["transformationsligningerne",58.574,59.992],["eller",59.992,60.236],["Mohrs",60.236,60.559],["cirkel",60.559,61.126]],"text":"Et element har sjældent kun én last. Vi finder først spændingerne med superposition, og så hovedspændingerne med transformationsligningerne eller Mohrs cirkel."},"duktil":{"start":62.336,"end":73.663,"words":[["Duktile",62.463,62.85],["materialer",62.85,63.417],["som",63.417,63.636],["stål",63.636,63.971],["og",63.971,64.113],["aluminium",64.113,64.822],["svigter",64.822,65.273],["ved",65.273,65.414],["flydning",65.414,65.994],["fordi",66.136,66.523],["lagene",66.523,66.961],["i",66.961,67.077],["krystallerne",67.077,67.657],["glider",67.657,68.185],["Sprøde",69.063,69.462],["materialer",69.462,70.029],["som",70.029,70.223],["støbejern",70.223,70.828],["og",70.828,70.957],["keramik",70.957,71.589],["svigter",71.589,72.091],["ved",72.091,72.233],["pludseligt",72.233,72.684],["brud",72.684,73.019],["i",73.019,73.161],["træk",73.161,73.663]],"text":"Duktile materialer som stål og aluminium svigter ved flydning, fordi lagene i krystallerne glider. Sprøde materialer som støbejern og keramik svigter ved pludseligt brud i træk."},"hvorfor":{"start":74.878,"end":85.162,"words":[["Problemet",75.018,75.534],["er",75.534,75.882],["at",76.023,76.191],["en",76.191,76.307],["trækprøvning",76.307,76.925],["kun",76.925,77.183],["giver",77.183,77.454],["ét",77.454,77.583],["tal",77.583,77.982],["flydespændingen",78.124,78.987],["S",78.987,79.284],["y",79.284,79.632],["Men",80.535,80.69],["et",80.69,80.78],["rigtigt",80.78,81.167],["emne",81.167,81.54],["har",81.54,81.772],["en",81.772,81.863],["flerakset",81.863,82.404],["spændingstilstand",82.404,83.28],["med",83.28,83.448],["sigma",83.448,83.924],["et",83.924,84.234],["to",84.35,84.672],["og",84.672,84.723],["tre",84.723,85.162]],"text":"Problemet er, at en trækprøvning kun giver ét tal, flydespændingen S y. Men et rigtigt emne har en flerakset spændingstilstand med sigma et, to og tre."},"kriterium":{"start":86.388,"end":96.117,"words":[["Et",86.528,86.644],["brudkriterium",86.644,87.546],["oversætter",87.546,88.088],["den",88.088,88.281],["fleraksede",88.281,88.848],["tilstand",88.848,89.325],["til",89.325,89.453],["noget",89.453,89.93],["vi",90.072,90.201],["kan",90.201,90.291],["sammenligne",90.291,90.961],["med",90.961,91.129],["trækprøvningen",91.129,92.031],["Det",92.895,93.101],["er",93.101,93.243],["det",93.243,93.604],["Tresca",93.733,94.39],["von",94.532,94.763],["Mises",94.764,95.266],["og",95.266,95.434],["Mohr",95.434,95.717],["gør",95.717,96.117]],"text":"Et brudkriterium oversætter den fleraksede tilstand til noget, vi kan sammenligne med trækprøvningen. Det er det, Tresca, von Mises og Mohr gør."},"tjek_q":{"start":97.346,"end":104.627,"words":[["Tjek",97.447,97.756],["dig",97.756,97.936],["selv",97.936,98.362],["Hvorfor",99.266,99.485],["kan",99.485,99.601],["vi",99.601,99.666],["ikke",99.666,99.82],["bare",99.82,100.039],["sammenligne",100.039,100.581],["sigma",100.581,101.044],["et",101.044,101.289],["med",101.289,101.547],["S",101.547,101.882],["y",101.882,102.127],["for",102.127,102.333],["en",102.333,102.436],["aksel",102.436,102.99],["med",102.99,103.209],["både",103.209,103.493],["bøjning",103.493,103.97],["og",103.97,104.111],["vridning",104.111,104.627]],"text":"Tjek dig selv. Hvorfor kan vi ikke bare sammenligne sigma et med S y for en aksel med både bøjning og vridning?"},"tjek_a":{"start":108.506,"end":116.96,"words":[["Fordi",108.633,109.007],["forskydningen",109.007,109.793],["også",109.793,110.154],["bidrager",110.154,110.682],["til",110.682,110.824],["flydning",110.824,111.443],["Kriteriet",112.346,112.823],["skal",112.823,113.003],["tage",113.003,113.287],["hele",113.287,113.583],["spændingstilstanden",113.583,114.447],["med",114.447,114.795],["ikke",114.924,115.181],["kun",115.181,115.465],["den",115.465,115.671],["største",115.671,116.109],["normalspænding",116.109,116.96]],"text":"Fordi forskydningen også bidrager til flydning. Kriteriet skal tage hele spændingstilstanden med, ikke kun den største normalspænding."},"slut":{"start":118.192,"end":127.108,"words":[["Kort",118.332,118.538],["sagt",118.538,119.015],["svigt",119.144,119.531],["er",119.531,119.634],["tab",119.634,119.917],["af",119.917,119.982],["funktion",119.982,120.652],["duktile",120.794,121.245],["materialer",121.245,121.799],["flyder",121.799,122.275],["og",122.275,122.391],["sprøde",122.391,122.727],["brister",122.727,123.281],["og",123.422,123.551],["et",123.551,123.616],["brudkriterium",123.616,124.44],["kobler",124.44,124.801],["den",124.801,124.995],["fleraksede",124.995,125.536],["tilstand",125.536,126.064],["til",126.064,126.219],["trækprøvningen",126.219,127.108]],"text":"Kort sagt: svigt er tab af funktion, duktile materialer flyder og sprøde brister, og et brudkriterium kobler den fleraksede tilstand til trækprøvningen."}}}, { audio: 'svigt-statisk.mp3', id: 'svigt-statisk' });</script>
+</body>
+</html>

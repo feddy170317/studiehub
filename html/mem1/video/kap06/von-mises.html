@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Von Mises: formændringsenergi · video</title>
+<meta name="description" content="Formændringsenergi, σv og ellipsen, ren forskydning ved 0,577 Sy.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 6: videoer</a><h1>Von Mises: formændringsenergi</h1><span class="meta">MEM1 · kapitel 6 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Von Mises: formændringsenergi"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Formændringsenergi, σv og ellipsen, ren forskydning ved 0,577 Sy.</p><div class="chips"><a href="svigt-statisk.html">Se først: Svigt ved statisk last</a><a href="../../../../lab/mem1/flydekriterier.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel06_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l06">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Von Mises (MEM1 kap. 6, slides 25–27)
+BP.scene({ header: 'MEM1 · kap. 6' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, hatch, dashed, PI, TAU } = B;
+
+  B.titel(0, 'Von Mises', 'MEM1 · kapitel 6 · begreb (slide 25–27)', 'titel');
+  text(0, 'formændringsenergi', 640, 520, 42, 'red', wt('titel', 'formændringsenergi') - 0.4, we('titel', 'formændringsenergi'), { align: 'center' });
+
+  B.goto('ide', 1);
+  {
+    const t0 = L('ide').start;
+    text(1, 'flydning, når formændringsenergien = trækprøvningens', 140, 160, 32, 'blue', t0 + 0.3, we('ide', 'trækprøvning'));
+    const to = L('opdel').start;
+    text(1, 'σ = σ_h (hydrostatisk) + σ_d (deviatorisk)', 140, 240, 38, 'black', to + 0.3, wt('opdel', 'hydrostatiske'));
+    text(1, 'σ_h: kun volumen, ingen flydning', 180, 300, 32, 'green', wt('opdel', 'hydrostatiske') - 0.1, we('opdel', 'metaller'));
+    text(1, 'σ_d: ændrer formen → flydning', 180, 350, 32, 'red', wt('opdel', 'deviatoriske') - 0.1, we('opdel', 'flydning', 1));
+    const tf = L('formel').start;
+    text(1, 'σ_v = √{[(σ_1 − σ_2)² + (σ_2 − σ_3)² + (σ_3 − σ_1)²] / 2}', 140, 450, 34, 'red', tf + 0.3, we('formel', 'to'));
+    const r = text(1, 'plan:  σ_v = √(σ_1² + σ_2² − σ_1 σ_2)', 140, 540, 44, 'red', L('plan').start + 0.2, we('plan', 'to', 1));
+    box(1, 115, 485, 800, 85, 'red', we('plan', 'to', 1), we('plan', 'to', 1) + 0.6);
+    text(1, 'flydning: σ_v = S_y     n = S_y / σ_v', 140, 640, 40, 'blue', L('kriterium').start + 0.2, we('kriterium', 'spændingen', 1));
+  }
+
+  B.goto('ellipse', 2);
+  {
+    const t0 = L('ellipse').start, cx = 420, cy = 380, s = 170;
+    const P = (a, b) => [cx + a * s, cy - b * s];
+    arrow(2, [P(-1.5, 0), P(1.6, 0)], 'black', 2.4, t0, t0 + 0.4, 13); text(2, 'σ_1', cx + 1.6 * s + 6, cy + 10, 32, 'black', t0 + 0.3, t0 + 0.5);
+    arrow(2, [P(0, -1.45), P(0, 1.5)], 'black', 2.4, t0 + 0.1, t0 + 0.5, 13); text(2, 'σ_2', cx + 10, cy - 1.5 * s, 32, 'black', t0 + 0.4, t0 + 0.6);
+    const E = []; for (let j = 0; j <= 120; j++) { const t = j / 120 * TAU, a = Math.SQRT2 * Math.cos(t), b = Math.sqrt(2 / 3) * Math.sin(t); const u = (a - b) / Math.SQRT2, v = (a + b) / Math.SQRT2; E.push(P(u, v)); }
+    line(2, E, 'blue', 3.6, t0 + 0.4, we('ellipse', 'grader'));
+    text(2, 'S_y', P(1, 0)[0] + 8, cy + 36, 30, 'blue', t0 + 1.0, t0 + 1.3);
+    dashed(2, P(-1.2, -1.2), P(1.3, 1.3), 'black', wt('ellipse', 'drejet') - 0.2, we('ellipse', 'grader'));
+    const tf = L('forskydning').start, q = 1 / Math.sqrt(3);
+    dashed(2, P(-0.9, 0.9), P(0.9, -0.9), 'green', tf + 0.2, tf + 0.8);
+    dot(2, P(q, -q)[0], P(q, -q)[1], 8, 'green', wt('forskydning', 'flyder') - 0.1);
+    text(2, 'ren forskydning', 790, 260, 34, 'green', wt('forskydning', 'ren') - 0.1, we('forskydning', 'forskydning'));
+    text(2, 'τ = S_y / √3 = 0,577 S_y', 790, 330, 40, 'green', wt('forskydning', 'tau') - 0.1, we('forskydning', 'y', 1));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['σ_1 = σ_2 = S_y.', 'Flyder materialet?'], ['lige på grænsen:', '√(S_y² + S_y² − S_y²) = S_y'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 6, slide 25–27 · Hamrock, Schmid & Jacobson, kap. 6', 'valg af brudkriterium', 'slut');
+  text(4, 'σ_v = √(σ_1² + σ_2² − σ_1 σ_2)', 200, 280, 46, 'red', L('slut').start + 0.4, we('slut', 'spænding'));
+  text(4, 'flydning når σ_v = S_y', 200, 370, 46, 'blue', wt('slut', 'flydning') - 0.1, we('slut', 'y'));
+});
+
+</script>
+<script>BP.live({"duration":115.528,"audio":"von-mises.mp3","order":["titel","ide","opdel","formel","plan","kriterium","ellipse","forskydning","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":8.335,"words":[["Von",0.614,0.846],["Mises",0.846,1.452],["kriteriet",1.594,2.187],["for",2.187,2.367],["formændringsenergi",2.367,3.591],["Det",4.482,4.637],["er",4.637,4.753],["det",4.753,4.881],["kriterium",4.881,5.616],["der",5.771,5.887],["passer",5.887,6.209],["bedst",6.209,6.531],["med",6.531,6.686],["forsøg",6.686,7.124],["på",7.124,7.265],["duktile",7.265,7.729],["metaller",7.729,8.335]],"text":"Von Mises, kriteriet for formændringsenergi. Det er det kriterium, der passer bedst med forsøg på duktile metaller."},"ide":{"start":9.562,"end":18.091,"words":[["Richard",9.689,10.089],["von",10.089,10.282],["Mises",10.282,10.694],["antog",10.694,11.236],["at",11.416,11.571],["flydning",11.571,11.944],["begynder",11.944,12.576],["når",12.718,12.975],["den",12.975,13.169],["energi",13.169,13.774],["der",13.942,14.084],["ændrer",14.084,14.47],["emnets",14.47,14.831],["form",14.831,15.218],["når",15.359,15.54],["den",15.54,15.669],["samme",15.669,15.991],["værdi",15.991,16.326],["som",16.326,16.506],["ved",16.506,16.584],["flydning",16.584,17.112],["i",17.112,17.254],["en",17.254,17.344],["trækprøvning",17.344,18.091]],"text":"Richard von Mises antog, at flydning begynder, når den energi, der ændrer emnets form, når den samme værdi som ved flydning i en trækprøvning."},"opdel":{"start":19.32,"end":32.477,"words":[["En",19.46,19.55],["spændingstilstand",19.55,20.478],["kan",20.478,20.62],["deles",20.62,21.045],["i",21.045,21.213],["to",21.213,21.496],["dele",21.496,21.947],["Den",22.838,22.954],["hydrostatiske",22.954,23.766],["del",23.766,24.165],["ændrer",24.165,24.5],["kun",24.5,24.745],["volumenet",24.745,25.377],["og",25.377,25.506],["giver",25.506,25.815],["ikke",25.815,26.124],["flydning",26.124,26.665],["i",26.665,26.781],["metaller",26.781,27.387],["Den",28.276,28.418],["deviatoriske",28.418,29.14],["del",29.14,29.475],["ændrer",29.475,29.784],["formen",29.784,30.351],["og",30.544,30.66],["det",30.66,30.866],["er",30.866,30.931],["den",30.931,31.305],["der",31.459,31.562],["giver",31.562,31.884],["flydning",31.884,32.477]],"text":"En spændingstilstand kan deles i to dele. Den hydrostatiske del ændrer kun volumenet og giver ikke flydning i metaller. Den deviatoriske del ændrer formen, og det er den, der giver flydning."},"formel":{"start":33.71,"end":44.43,"words":[["Det",33.824,33.915],["giver",33.915,34.237],["von",34.237,34.443],["Mises",34.443,34.804],["spændingen",34.804,35.384],["kvadratroden",35.513,36.157],["af",36.157,36.208],["summen",36.208,36.531],["af",36.531,36.582],["sigma",36.582,36.982],["et",36.982,37.098],["minus",37.098,37.42],["sigma",37.42,37.793],["to",37.793,38.09],["i",38.09,38.232],["anden",38.232,38.657],["sigma",38.786,39.224],["to",39.224,39.456],["minus",39.456,39.726],["sigma",39.726,40.023],["tre",40.023,40.332],["i",40.332,40.5],["anden",40.5,40.796],["og",40.796,40.86],["sigma",40.861,41.234],["tre",41.234,41.492],["minus",41.492,41.943],["sigma",41.943,42.407],["et",42.407,42.562],["i",42.562,42.69],["anden",42.69,43.129],["divideret",43.27,43.863],["med",43.863,44.005],["to.",44.005,44.43]],"text":"Det giver von Mises spændingen: kvadratroden af summen af sigma et minus sigma to i anden, sigma to minus sigma tre i anden og sigma tre minus sigma et i anden, divideret med to."},"plan":{"start":45.676,"end":53.845,"words":[["I",45.79,45.868],["plan",45.868,46.164],["spænding",46.164,46.68],["hvor",46.808,46.963],["sigma",46.963,47.363],["tre",47.363,47.659],["er",47.659,47.698],["nul",47.698,48.123],["bliver",48.265,48.445],["det",48.445,48.522],["kvadratroden",48.522,49.102],["af",49.102,49.154],["sigma",49.154,49.592],["et",49.592,49.759],["i",49.759,49.914],["anden",49.914,50.223],["plus",50.223,50.455],["sigma",50.455,50.816],["to",50.816,51.164],["i",51.164,51.332],["anden",51.332,51.564],["minus",51.564,52.053],["sigma",52.053,52.595],["et",52.595,52.749],["gange",52.749,53.058],["sigma",53.058,53.419],["to.",53.419,53.845]],"text":"I plan spænding, hvor sigma tre er nul, bliver det kvadratroden af sigma et i anden plus sigma to i anden minus sigma et gange sigma to."},"kriterium":{"start":55.074,"end":61.954,"words":[["Flydning",55.188,55.601],["sker",55.601,56.039],["når",56.181,56.374],["von",56.374,56.567],["Mises",56.567,56.915],["spændingen",56.915,57.469],["når",57.469,57.753],["S",57.753,57.972],["y",57.972,58.243],["Sikkerhedsfaktoren",58.243,59.325],["er",59.325,59.531],["S",59.531,59.815],["y",59.815,59.969],["divideret",59.969,60.601],["med",60.601,60.82],["von",60.82,61.026],["Mises",61.026,61.374],["spændingen",61.374,61.954]],"text":"Flydning sker, når von Mises spændingen når S y. Sikkerhedsfaktoren er S y divideret med von Mises spændingen."},"ellipse":{"start":63.176,"end":68.174,"words":[["I",63.29,63.355],["sigma",63.355,63.78],["et",63.78,63.935],["sigma",63.935,64.334],["to",64.334,64.579],["planen",64.579,65.056],["er",65.056,65.172],["grænsen",65.172,65.649],["en",65.649,65.816],["ellipse",65.816,66.409],["der",66.551,66.693],["er",66.693,66.731],["drejet",66.731,67.04],["femogfyrre",67.04,67.646],["grader",67.646,68.174]],"text":"I sigma et sigma to planen er grænsen en ellipse, der er drejet femogfyrre grader."},"forskydning":{"start":69.406,"end":80.888,"words":[["Ved",69.546,69.701],["ren",69.701,69.933],["forskydning",69.933,70.616],["hvor",70.732,70.899],["sigma",70.899,71.312],["et",71.312,71.479],["er",71.479,71.556],["minus",71.557,71.917],["sigma",71.917,72.252],["to",72.252,72.69],["flyder",72.819,73.167],["materialet",73.167,73.773],["ved",73.773,74.031],["tau",74.031,74.327],["lig",74.327,74.546],["S",74.546,74.83],["y",74.83,75.062],["divideret",75.062,75.68],["med",75.68,75.886],["kvadratroden",75.886,76.608],["af",76.608,76.763],["tre",76.763,77.188],["Det",78.092,78.233],["er",78.233,78.401],["nul",78.401,78.659],["komma",78.659,79.045],["fem",79.045,79.316],["syv",79.316,79.574],["syv",79.574,79.818],["gange",79.818,80.218],["S",80.218,80.54],["y",80.54,80.888]],"text":"Ved ren forskydning, hvor sigma et er minus sigma to, flyder materialet ved tau lig S y divideret med kvadratroden af tre. Det er nul komma fem syv syv gange S y."},"tjek_q":{"start":82.116,"end":89.036,"words":[["Tjek",82.217,82.539],["dig",82.539,82.719],["selv",82.719,83.157],["Sigma",84.049,84.5],["et",84.5,84.732],["og",84.732,84.848],["sigma",84.848,85.273],["to",85.273,85.686],["er",85.686,85.802],["begge",85.802,86.124],["lig",86.124,86.381],["S",86.381,86.626],["y",86.626,86.923],["Flyder",86.923,87.296],["materialet",87.296,87.902],["ifølge",87.902,88.276],["von",88.276,88.482],["Mises",88.482,89.036]],"text":"Tjek dig selv. Sigma et og sigma to er begge lig S y. Flyder materialet ifølge von Mises?"},"tjek_a":{"start":92.916,"end":101.859,"words":[["Nej",93.056,93.481],["lige",93.597,93.907],["præcis",93.907,94.396],["på",94.396,94.538],["grænsen",94.538,95.234],["Kvadratroden",96.138,96.73],["af",96.73,96.975],["S",96.975,97.272],["y",97.272,97.452],["i",97.452,97.71],["anden",97.71,98.058],["plus",98.058,98.328],["S",98.328,98.573],["y",98.573,98.882],["i",98.882,99.102],["anden",99.102,99.424],["minus",99.424,99.991],["S",99.991,100.274],["y",100.274,100.455],["i",100.455,100.661],["anden",100.661,101.073],["er",101.073,101.241],["S",101.241,101.524],["y",101.524,101.859]],"text":"Nej, lige præcis på grænsen. Kvadratroden af S y i anden plus S y i anden minus S y i anden er S y."},"slut":{"start":103.082,"end":113.106,"words":[["Kort",103.209,103.428],["sagt",103.428,103.905],["von",104.034,104.227],["Mises",104.227,104.55],["spændingen",104.55,104.975],["er",104.975,105.091],["kvadratroden",105.091,105.722],["af",105.722,105.774],["sigma",105.774,106.212],["et",106.212,106.379],["i",106.379,106.534],["anden",106.534,106.843],["plus",106.843,107.062],["sigma",107.062,107.423],["to",107.423,107.745],["i",107.745,107.913],["anden",107.913,108.145],["minus",108.145,108.66],["sigma",108.66,109.124],["et",109.124,109.24],["sigma",109.24,109.601],["to",109.601,109.897],["i",109.897,109.962],["plan",109.962,110.22],["spænding",110.22,110.722],["og",110.864,111.019],["flydning",111.019,111.431],["sker",111.431,111.856],["når",111.998,112.178],["den",112.178,112.372],["når",112.372,112.578],["S",112.578,112.784],["y",112.784,113.106]],"text":"Kort sagt: von Mises spændingen er kvadratroden af sigma et i anden plus sigma to i anden minus sigma et sigma to i plan spænding, og flydning sker, når den når S y."}}}, { audio: 'von-mises.mp3', id: 'von-mises' });</script>
+</body>
+</html>

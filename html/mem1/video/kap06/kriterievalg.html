@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tresca, von Mises og sprøde materialer · video</title>
+<meta name="description" content="Tresca mod von Mises, Rankine og Mohr-kriterier til sprøde materialer.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 6: videoer</a><h1>Tresca, von Mises og sprøde materialer</h1><span class="meta">MEM1 · kapitel 6 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Tresca, von Mises og sprøde materialer"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Tresca mod von Mises, Rankine og Mohr-kriterier til sprøde materialer.</p><div class="chips"><a href="tresca.html">Se først: Tresca: største forskydning</a><a href="von-mises.html">Se først: Von Mises: formændringsenergi</a><a href="../../../../lab/mem1/flydekriterier.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel06_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l06">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Valg af brudkriterium + sprøde materialer (MEM1 kap. 6, slides 14–16, 28, 31–33)
+BP.scene({ header: 'MEM1 · kap. 6' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, hatch, dashed, PI, TAU } = B;
+  const env = (k, cx, cy, s, t0) => {
+    const P = (a, b) => [cx + a * s, cy - b * s];
+    arrow(k, [P(-1.5, 0), P(1.6, 0)], 'black', 2.4, t0, t0 + 0.4, 13); text(k, 'σ_1', cx + 1.6 * s + 6, cy + 10, 30, 'black', t0 + 0.3, t0 + 0.5);
+    arrow(k, [P(0, -1.45), P(0, 1.5)], 'black', 2.4, t0 + 0.1, t0 + 0.5, 13); text(k, 'σ_2', cx + 10, cy - 1.5 * s, 30, 'black', t0 + 0.4, t0 + 0.6);
+    return P;
+  };
+
+  B.titel(0, 'Valg af brudkriterium', 'MEM1 · kapitel 6 · begreb (slide 14–16, 28, 31–33)', 'titel');
+  text(0, 'Tresca · von Mises · Rankine · Mohr', 640, 520, 40, 'red', wt('titel', 'Tresca') - 0.2, we('titel', 'materialer'), { align: 'center' });
+
+  B.goto('sammenlign', 1);
+  {
+    const t0 = L('sammenlign').start, P = env(1, 380, 380, 170, t0);
+    line(1, [P(1, 0), P(1, 1), P(0, 1), P(-1, 0), P(-1, -1), P(0, -1), P(1, 0)], 'red', 3.4, wt('sammenlign', 'sekskant') - 0.2, wt('sammenlign', 'sekskant') + 0.8);
+    const E = []; for (let j = 0; j <= 120; j++) { const t = j / 120 * TAU, a = Math.SQRT2 * Math.cos(t), b = Math.sqrt(2 / 3) * Math.sin(t); E.push(P((a - b) / Math.SQRT2, (a + b) / Math.SQRT2)); }
+    line(1, E, 'blue', 3, wt('sammenlign', 'ellipsen') - 0.3, wt('sammenlign', 'ellipsen') + 0.9);
+    text(1, 'Tresca (sekskant)', 760, 200, 36, 'red', wt('sammenlign', 'sekskant') - 0.1, we('sammenlign', 'sekskant'));
+    text(1, 'von Mises (ellipse)', 760, 260, 36, 'blue', wt('sammenlign', 'ellipsen') - 0.1, we('sammenlign', 'ellipsen'));
+    text(1, 'Tresca: konservativ', 760, 360, 34, 'red', wt('konservativ', 'konservative') - 0.4, we('konservativ', 'valg'));
+    text(1, 'von Mises: passer med forsøg', 760, 410, 34, 'blue', wt('konservativ', 'forsøg') - 0.6, we('konservativ', 'forsøg'));
+    text(1, 'ren τ: 0,50 S_y  mod  0,577 S_y', 760, 480, 34, 'green', wt('konservativ', 'forskydning') - 0.2, we('konservativ', 'y', 1));
+    const tr = L('rankine').start;
+    text(1, 'Rankine: max|σ| = S_y → kun sprøde', 740, 590, 28, 'black', tr + 0.3, we('rankine', 'materialer'));
+  }
+
+  B.goto('skoer', 2);
+  {
+    const t0 = L('skoer').start;
+    text(2, 'sprøde: lidt plasticitet · pludseligt brud', 140, 150, 34, 'red', t0 + 0.4, we('skoer', 'pludseligt'));
+    text(2, 'S_{uc} ≫ S_{ut}', 860, 150, 44, 'red', wt('skoer', 'S') - 0.1, we('skoer', 't', 0));
+    const tm = L('mohr').start, P = env(2, 380, 400, 60, tm);
+    line(2, [P(2, 0), P(2, 2), P(0, 2), P(-6.5 / 2, 0), P(-6.5 / 2, -6.5 / 2), P(0, -6.5 / 2), P(2, 0)].map(([x, y]) => [x, y]), 'red', 3.4, wt('mohr', 'Coulomb') - 0.2, we('mohr', 'kriterium'));
+    text(2, 'S_{ut}', P(2, 0)[0] + 8, 440, 28, 'red', wt('mohr', 't') - 0.1, wt('mohr', 't') + 0.3);
+    text(2, '−S_{uc}', P(-3.25, 0)[0] - 90, 440, 28, 'red', wt('mohr', 'c') - 0.1, wt('mohr', 'c') + 0.3);
+    text(2, 'asymmetrisk grænse', 700, 260, 34, 'black', wt('mohr', 'asymmetrisk') - 0.2, we('mohr', 'asymmetrisk'));
+    const tv = L('valg').start;
+    const rk = [['stål, aluminium', 'von Mises', 'Konstruktionsstål'], ['duktile metaller', 'Tresca / von Mises', 'Duktile'], ['gråt støbejern', '(modificeret) Mohr', 'støbejern'], ['teknisk keramik', 'Rankine', 'keramik']];
+    rk.forEach(([m, c, w], i) => { const t = wt('valg', w) - 0.2, y = 370 + 58 * i; text(2, m, 700, y, 30, 'black', t, t + 0.4); text(2, '→ ' + c, 940, y, 30, 'blue', t + 0.3, t + 0.7); });
+    text(2, 'aldrig duktile kriterier på sprøde · aldrig Rankine på en aksel', 140, 680, 28, 'red', L('regel').start + 0.2, we('regel', 'aksel'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Beslag i gråt støbejern.', 'Hvilket kriterium?'], ['(modificeret) Mohr', 'sprødt, S_{uc} ≫ S_{ut}'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 6, slide 14–16, 28 og 31–33 · Hamrock, Schmid & Jacobson, kap. 6', '', 'slut');
+  text(4, 'Tresca inden i von Mises → konservativ', 200, 270, 40, 'red', L('slut').start + 0.4, we('slut', 'konservativ'));
+  text(4, 'von Mises: mest præcis for duktile', 200, 350, 40, 'blue', wt('slut', 'von') - 0.1, we('slut', 'metaller'));
+  text(4, 'sprøde: Mohr-kriterier', 200, 430, 40, 'green', wt('slut', 'sprøde') - 0.1, we('slut', 'kriterier'));
+});
+
+</script>
+<script>BP.live({"duration":126.928,"audio":"kriterievalg.mp3","order":["titel","sammenlign","konservativ","rankine","skoer","mohr","valg","regel","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.562,"words":[["Valg",0.64,1.001],["af",1.001,1.156],["brudkriterium",1.156,2.174],["Hvornår",3.052,3.399],["bruger",3.4,3.67],["vi",3.67,3.812],["Tresca",3.812,4.456],["von",4.585,4.804],["Mises",4.804,5.268],["eller",5.268,5.513],["Mohr",5.513,5.964],["og",6.157,6.273],["hvad",6.273,6.415],["med",6.415,6.518],["sprøde",6.518,6.853],["materialer",6.853,7.562]],"text":"Valg af brudkriterium. Hvornår bruger vi Tresca, von Mises eller Mohr, og hvad med sprøde materialer?"},"sammenlign":{"start":8.794,"end":17.351,"words":[["Tegner",8.921,9.231],["vi",9.231,9.347],["de",9.347,9.45],["to",9.45,9.694],["grænser",9.694,10.133],["oven",10.133,10.377],["i",10.377,10.455],["hinanden",10.455,11.035],["ligger",11.176,11.499],["Trescas",11.499,12.001],["sekskant",12.001,12.646],["inden",12.646,12.981],["i",12.981,13.161],["von",13.161,13.367],["Mises",13.367,13.754],["ellipsen",13.754,14.475],["De",15.353,15.469],["rører",15.469,15.714],["hinanden",15.714,16.268],["i",16.268,16.423],["de",16.423,16.513],["seks",16.513,16.848],["hjørner",16.848,17.351]],"text":"Tegner vi de to grænser oven i hinanden, ligger Trescas sekskant inden i von Mises ellipsen. De rører hinanden i de seks hjørner."},"konservativ":{"start":18.576,"end":30.986,"words":[["Tresca",18.703,19.193],["er",19.193,19.322],["derfor",19.322,19.773],["det",19.773,19.94],["konservative",19.94,20.765],["valg",20.765,21.139],["Von",22.042,22.223],["Mises",22.223,22.609],["passer",22.61,23.061],["bedst",23.061,23.434],["med",23.434,23.628],["forsøg",23.628,24.156],["Ved",25.071,25.225],["ren",25.225,25.457],["forskydning",25.457,26.102],["giver",26.102,26.347],["Tresca",26.347,26.785],["nul",26.785,27.042],["komma",27.042,27.39],["fem",27.39,27.648],["S",27.648,27.88],["y",27.88,28.189],["og",28.189,28.305],["von",28.305,28.499],["Mises",28.499,28.872],["nul",28.872,29.066],["komma",29.066,29.426],["fem",29.427,29.736],["syv",29.736,30.032],["syv",30.032,30.354],["S",30.354,30.638],["y",30.638,30.986]],"text":"Tresca er derfor det konservative valg. Von Mises passer bedst med forsøg. Ved ren forskydning giver Tresca nul komma fem S y og von Mises nul komma fem syv syv S y."},"rankine":{"start":32.198,"end":46.103,"words":[["Kriteriet",32.325,32.789],["for",32.789,32.957],["den",32.957,33.124],["største",33.124,33.511],["normalspænding",33.511,34.387],["Rankine",34.516,35.341],["siger",35.483,35.805],["flydning",35.805,36.346],["når",36.488,36.668],["den",36.668,36.81],["største",36.81,37.209],["hovedspænding",37.209,37.918],["når",37.918,38.214],["S",38.214,38.485],["y",38.485,38.807],["Det",39.698,39.801],["ignorerer",39.801,40.265],["forskydningen",40.265,41.064],["og",41.064,41.193],["passer",41.193,41.567],["dårligt",41.567,41.927],["til",41.927,42.082],["duktile",42.082,42.559],["metaller",42.559,43.152],["Det",44.028,44.105],["bruges",44.105,44.427],["kun",44.427,44.737],["til",44.737,44.917],["sprøde",44.917,45.317],["materialer",45.317,46.103]],"text":"Kriteriet for den største normalspænding, Rankine, siger flydning, når den største hovedspænding når S y. Det ignorerer forskydningen og passer dårligt til duktile metaller. Det bruges kun til sprøde materialer."},"skoer":{"start":47.332,"end":60.257,"words":[["Sprøde",47.446,47.846],["materialer",47.846,48.593],["opfører",48.593,49.109],["sig",49.109,49.328],["anderledes",49.328,50.101],["De",50.979,51.056],["deformeres",51.056,51.572],["næsten",51.572,51.984],["ikke",51.984,52.255],["plastisk",52.255,52.938],["de",53.067,53.182],["brister",53.183,53.569],["pludseligt",53.569,54.123],["og",54.265,54.381],["de",54.381,54.536],["er",54.536,54.574],["meget",54.574,54.858],["stærkere",54.858,55.335],["i",55.335,55.425],["tryk",55.425,55.824],["end",55.824,55.992],["i",55.992,56.056],["træk",56.056,56.546],["S",57.448,57.667],["u",57.667,57.809],["c",57.809,58.092],["er",58.092,58.221],["langt",58.221,58.518],["større",58.518,58.969],["end",58.969,59.265],["S",59.265,59.536],["u",59.536,59.729],["t.",59.729,60.257]],"text":"Sprøde materialer opfører sig anderledes. De deformeres næsten ikke plastisk, de brister pludseligt, og de er meget stærkere i tryk end i træk. S u c er langt større end S u t."},"mohr":{"start":61.482,"end":71.25,"words":[["Til",61.609,61.79],["dem",61.79,61.97],["bruger",61.97,62.266],["vi",62.267,62.486],["Coulomb",62.486,62.872],["Mohr",62.872,63.31],["eller",63.31,63.555],["det",63.555,63.684],["modificerede",63.684,64.393],["Mohr",64.393,64.651],["kriterium",64.651,65.411],["Grænsen",66.314,66.83],["er",66.83,67.088],["asymmetrisk",67.088,67.951],["den",68.08,68.26],["når",68.26,68.441],["S",68.441,68.621],["u",68.621,68.763],["t",68.763,69.034],["i",69.034,69.214],["træk",69.214,69.665],["og",69.665,69.871],["S",69.871,70.129],["u",70.129,70.309],["c",70.309,70.606],["i",70.606,70.786],["tryk",70.786,71.25]],"text":"Til dem bruger vi Coulomb Mohr eller det modificerede Mohr kriterium. Grænsen er asymmetrisk: den når S u t i træk og S u c i tryk."},"valg":{"start":72.464,"end":88.25,"words":[["Valget",72.591,73.017],["er",73.017,73.171],["altså",73.171,73.854],["konstruktionsstål",73.996,74.988],["og",74.988,75.22],["aluminium",75.22,76.032],["med",76.032,76.238],["von",76.238,76.444],["Mises",76.444,77.011],["Duktile",77.902,78.315],["metaller",78.315,78.714],["generelt",78.714,79.281],["med",79.281,79.526],["Tresca",79.526,80.144],["eller",80.144,80.415],["von",80.415,80.634],["Mises",80.634,81.227],["Gråt",82.116,82.296],["støbejern",82.296,82.928],["med",82.928,83.173],["Coulomb",83.173,83.546],["Mohr",83.546,83.946],["eller",83.946,84.191],["modificeret",84.191,84.912],["Mohr",84.912,85.325],["Og",86.214,86.278],["teknisk",86.278,86.768],["keramik",86.768,87.322],["med",87.322,87.541],["Rankine",87.541,88.25]],"text":"Valget er altså: konstruktionsstål og aluminium med von Mises. Duktile metaller generelt med Tresca eller von Mises. Gråt støbejern med Coulomb Mohr eller modificeret Mohr. Og teknisk keramik med Rankine."},"regel":{"start":89.494,"end":95.833,"words":[["Brug",89.621,89.866],["aldrig",89.866,90.163],["de",90.163,90.291],["duktile",90.291,90.717],["kriterier",90.717,91.232],["på",91.232,91.374],["sprøde",91.374,91.709],["materialer",91.709,92.482],["og",92.624,92.791],["brug",92.791,93.088],["aldrig",93.088,93.436],["Rankine",93.436,94.003],["på",94.003,94.196],["en",94.196,94.286],["kritisk",94.286,94.724],["duktil",94.724,95.214],["aksel",95.214,95.833]],"text":"Brug aldrig de duktile kriterier på sprøde materialer, og brug aldrig Rankine på en kritisk duktil aksel."},"tjek_q":{"start":97.068,"end":104.219,"words":[["Tjek",97.169,97.491],["dig",97.491,97.671],["selv",97.671,98.097],["Du",98.975,99.053],["skal",99.053,99.233],["dimensionere",99.233,99.877],["et",99.877,99.955],["beslag",99.955,100.483],["i",100.483,100.625],["gråt",100.625,100.87],["støbejern",100.87,101.681],["Hvilket",102.557,102.969],["kriterium",102.969,103.588],["bruger",103.588,103.91],["du",103.91,104.219]],"text":"Tjek dig selv. Du skal dimensionere et beslag i gråt støbejern. Hvilket kriterium bruger du?"},"tjek_a":{"start":108.108,"end":113.905,"words":[["Coulomb",108.248,108.583],["Mohr",108.583,108.918],["eller",108.918,109.202],["modificeret",109.202,109.859],["Mohr",109.859,110.297],["fordi",110.439,110.8],["støbejern",110.8,111.341],["er",111.341,111.405],["sprødt",111.405,111.831],["og",111.831,111.972],["meget",111.972,112.256],["stærkere",112.256,112.733],["i",112.733,112.81],["tryk",112.81,113.197],["end",113.197,113.351],["i",113.351,113.416],["træk",113.416,113.905]],"text":"Coulomb Mohr eller modificeret Mohr, fordi støbejern er sprødt og meget stærkere i tryk end i træk."},"slut":{"start":115.13,"end":124.51,"words":[["Kort",115.257,115.476],["sagt",115.476,115.966],["Tresca",116.095,116.507],["ligger",116.507,116.791],["inden",116.791,117.049],["i",117.049,117.126],["von",117.126,117.332],["Mises",117.332,117.822],["og",117.822,118.002],["er",118.002,118.092],["konservativ",118.092,119.033],["von",119.175,119.381],["Mises",119.381,119.755],["er",119.755,119.845],["mest",119.845,120.141],["præcis",120.141,120.567],["for",120.567,120.695],["duktile",120.695,121.108],["metaller",121.108,121.752],["og",121.894,122.113],["sprøde",122.113,122.448],["materialer",122.448,123.17],["kræver",123.17,123.53],["Mohr",123.53,123.801],["kriterier",123.801,124.51]],"text":"Kort sagt: Tresca ligger inden i von Mises og er konservativ, von Mises er mest præcis for duktile metaller, og sprøde materialer kræver Mohr kriterier."}}}, { audio: 'kriterievalg.mp3', id: 'kriterievalg' });</script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Castiglianos sætning · video</title>
+<meta name="description" content="δ = ∂U/∂P, fiktiv kraft og statisk ubestemte bjælker (R_B = 3wL/8).">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 5: videoer</a><h1>Castiglianos sætning</h1><span class="meta">MEM1 · kapitel 5 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Castiglianos sætning"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>δ = ∂U/∂P, fiktiv kraft og statisk ubestemte bjælker (R_B = 3wL/8).</p><div class="chips"><a href="toejningsenergi.html">Se først: Tøjningsenergi</a><a href="../../Kapitel05_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l05">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Castiglianos sætning (MEM1 kap. 5, slides 21–23 og 27–28). R_B = 3wL/8
+BP.scene({ header: 'MEM1 · kap. 5' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, beam, wall, roller, distLoad, PI } = B;
+
+  B.titel(0, 'Castiglianos sætning', 'MEM1 · kapitel 5 · begreb (slide 21–28)', 'titel');
+  text(0, 'udbøjning = differentiér energien', 640, 520, 40, 'red', wt('titel', 'udbøjningen') - 0.2, we('titel', 'differentiere'), { align: 'center' });
+
+  B.goto('saetning', 1);
+  {
+    const t0 = L('saetning').start;
+    const r = text(1, 'δ_P = ∂U / ∂P', 160, 190, 56, 'red', wt('saetning', 'delta') - 0.1, we('saetning', 'P', 2));
+    box(1, 135, 130, 440, 90, 'red', we('saetning', 'P', 2), we('saetning', 'P', 2) + 0.6);
+    text(1, 'θ_M = ∂U / ∂M', 700, 190, 52, 'blue', wt('moment', 'theta') - 0.1, we('moment', 'M', 2));
+    const tt = L('trick').start;
+    text(1, 'δ = ∫ (M / (E I)) · (∂M/∂P) dx', 160, 330, 46, 'green', wt('trick', 'delta') - 0.1, we('trick', 'P'));
+    text(1, 'differentiér under integralet', 160, 395, 34, 'black', wt('trick', 'differentiér') - 0.1, we('trick', 'integralet'));
+    const tf = L('fiktiv').start;
+    text(1, 'Fiktiv kraft Q, hvor ingen kraft sidder', 160, 500, 38, 'blue', wt('fiktiv', 'fiktiv') - 0.2, we('fiktiv', 'punktet'));
+    text(1, 'indfør Q → M(Q) → U(Q) → ∂U/∂Q → Q = 0', 160, 580, 36, 'red', L('procedure').start + 0.2, we('procedure', 'nul'));
+  }
+
+  B.goto('staerk', 2);
+  {
+    const t0 = L('staerk').start;
+    bubble(2, 'Hvornår?', 150, 140, 52, 'blue', t0, t0 + 0.6);
+    text(2, '· flere dele eller belastningstyper', 170, 220, 34, 'black', wt('staerk', 'flere') - 0.2, we('staerk', 'belastningstyper'));
+    text(2, '· besværligt punkt', 170, 270, 34, 'black', wt('staerk', 'besværligt') - 0.2, we('staerk', 'besværligt'));
+    text(2, '· statisk ubestemt bjælke', 170, 320, 34, 'red', wt('staerk', 'ubestemt') - 0.4, we('staerk', 'ubestemt'));
+    const tu = L('ubestemt').start;
+    text(2, 'overtallig understøtning → ukendt Q,  ∂U/∂Q = 0', 170, 410, 32, 'red', wt('ubestemt', 'fjerner') - 0.2, we('ubestemt', 'Q', 1));
+    const te = L('eks').start, y = 520;
+    wall(2, 160, y - 40, y + 70, te); beam(2, 160, y, 620, 26, 'black', te + 0.2, te + 0.6);
+    distLoad(2, 170, 610, y, 50, 'blue', wt('eks', 'fordelt') - 0.2, wt('eks', 'fordelt') + 0.8, 10);
+    roller(2, 620, y + 26, wt('eks', 'rulle') - 0.1, 'black', 0.8);
+    arrow(2, [[640, y + 130], [640, y + 50]], 'red', 3.6, wt('eks', 'rulle'), wt('eks', 'rulle') + 0.3, 13); text(2, 'Q = R_B', 520, y + 130, 30, 'red', wt('eks', 'rulle') + 0.2, wt('eks', 'rulle') + 0.5);
+    text(2, 'M = Q x − w x² / 2', 720, y - 20, 34, 'blue', wt('eks', 'Momentet') - 0.1, we('eks', 'to'));
+    text(2, '∫ M · x dx = 0  ⇒  Q L³/3 = w L⁴/8', 720, y + 40, 30, 'blue', L('eks2').start, we('eks2', 'otte'));
+    const r = text(2, 'R_B = 3 w L / 8', 720, y + 120, 44, 'red', wt('eks2', 'reaktionen') - 0.1, we('eks2', 'L', 1));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Hvorfor sætter vi', 'den fiktive Q = 0 til sidst?'], ['Q findes ikke i virkeligheden', 'den er kun et hjælpemiddel'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 5, slide 21–28 · Hamrock, Schmid & Jacobson, kap. 5', 'opgave 5.47', 'slut');
+  text(4, 'δ = ∂U / ∂P', 200, 280, 50, 'red', L('slut').start + 0.4, we('slut', 'kraften'));
+  text(4, 'fiktiv Q  ·  understøtning: ∂U/∂Q = 0', 200, 370, 40, 'blue', wt('slut', 'fiktiv') - 0.1, we('slut', 'understøtning'));
+});
+
+</script>
+<script>BP.live({"duration":134.684,"audio":"castigliano.mp3","order":["titel","saetning","moment","trick","fiktiv","procedure","staerk","ubestemt","eks","eks2","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.665,"words":[["Castiglianos",0.601,1.413],["sætning",1.413,2.018],["Med",2.936,3.077],["tøjningsenergien",3.077,4.121],["kan",4.121,4.302],["vi",4.302,4.392],["finde",4.392,4.675],["udbøjningen",4.675,5.332],["i",5.332,5.513],["et",5.513,5.577],["vilkårligt",5.577,6.08],["punkt",6.08,6.415],["ved",6.415,6.686],["at",6.686,6.75],["differentiere",6.75,7.665]],"text":"Castiglianos sætning. Med tøjningsenergien kan vi finde udbøjningen i et vilkårligt punkt ved at differentiere."},"saetning":{"start":8.89,"end":16.917,"words":[["For",9.017,9.159],["en",9.159,9.236],["elastisk",9.236,9.687],["konstruktion",9.687,10.319],["med",10.319,10.461],["kraften",10.461,10.899],["P",10.899,11.26],["er",11.26,11.388],["udbøjningen",11.388,11.968],["i",11.968,12.033],["kraftens",12.033,12.497],["retning",12.497,12.922],["delta",12.922,13.334],["P",13.334,13.669],["lig",13.669,13.927],["den",13.927,14.095],["partielle",14.095,14.533],["afledte",14.533,15.126],["af",15.126,15.358],["U",15.358,15.628],["med",15.628,15.834],["hensyn",15.834,16.363],["til",16.363,16.517],["P",16.517,16.917]],"text":"For en elastisk konstruktion med kraften P er udbøjningen i kraftens retning delta P lig den partielle afledte af U med hensyn til P."},"moment":{"start":18.144,"end":23.645,"words":[["For",18.271,18.465],["et",18.465,18.594],["moment",18.594,18.954],["M",18.954,19.289],["er",19.289,19.431],["drejningen",19.431,19.895],["theta",19.895,20.307],["M",20.307,20.578],["lig",20.578,20.823],["den",20.823,21.016],["partielle",21.016,21.454],["afledte",21.454,22.021],["af",22.021,22.266],["U",22.266,22.537],["med",22.537,22.73],["hensyn",22.73,23.181],["til",23.181,23.323],["M.",23.323,23.645]],"text":"For et moment M er drejningen theta M lig den partielle afledte af U med hensyn til M."},"trick":{"start":24.878,"end":34.826,"words":[["Et",25.005,25.108],["praktisk",25.108,25.637],["trick",25.637,26.062],["differentiér",26.191,26.951],["inde",26.951,27.312],["under",27.312,27.596],["integralet",27.596,28.459],["Så",29.35,29.582],["er",29.582,29.62],["delta",29.62,29.968],["lig",29.968,30.123],["integralet",30.123,30.806],["af",30.806,31.051],["M",31.051,31.295],["over",31.296,31.579],["E",31.579,31.785],["I",31.785,31.966],["gange",31.966,32.417],["den",32.417,32.61],["afledte",32.61,33.164],["af",33.164,33.344],["M",33.344,33.654],["med",33.654,33.821],["hensyn",33.821,34.298],["til",34.298,34.44],["P",34.44,34.826]],"text":"Et praktisk trick: differentiér inde under integralet. Så er delta lig integralet af M over E I gange den afledte af M med hensyn til P."},"fiktiv":{"start":36.052,"end":43.642,"words":[["Hvad",36.192,36.308],["hvis",36.308,36.489],["vi",36.489,36.592],["vil",36.592,36.708],["kende",36.708,37.03],["udbøjningen",37.03,37.661],["et",37.661,37.764],["sted",37.764,38.19],["hvor",38.344,38.525],["der",38.525,38.641],["ikke",38.641,38.898],["sidder",38.898,39.169],["nogen",39.169,39.401],["kraft",39.401,39.904],["Så",40.794,41.013],["indfører",41.013,41.503],["vi",41.503,41.671],["en",41.671,41.787],["fiktiv",41.787,42.238],["kraft",42.238,42.573],["Q",42.573,42.908],["i",42.908,43.075],["punktet",43.075,43.642]],"text":"Hvad hvis vi vil kende udbøjningen et sted, hvor der ikke sidder nogen kraft? Så indfører vi en fiktiv kraft Q i punktet."},"procedure":{"start":44.874,"end":54.318,"words":[["Fremgangsmåden",44.988,45.787],["er",45.787,46.122],["indfør",46.251,46.689],["Q",46.689,47.102],["skriv",47.205,47.54],["de",47.54,47.656],["indre",47.656,47.927],["laster",47.927,48.274],["som",48.275,48.494],["funktion",48.494,48.957],["af",48.957,49.009],["Q",49.009,49.46],["find",49.576,49.834],["U",49.834,50.014],["af",50.014,50.053],["Q",50.053,50.504],["differentiér",50.646,51.29],["med",51.29,51.47],["hensyn",51.47,51.896],["til",51.896,52.024],["Q",52.025,52.424],["og",52.604,52.72],["sæt",52.72,52.939],["til",52.939,53.081],["sidst",53.081,53.429],["Q",53.429,53.726],["lig",53.726,53.945],["nul",53.945,54.318]],"text":"Fremgangsmåden er: indfør Q, skriv de indre laster som funktion af Q, find U af Q, differentiér med hensyn til Q, og sæt til sidst Q lig nul."},"staerk":{"start":55.544,"end":64.344,"words":[["Castigliano",55.684,56.457],["er",56.457,56.689],["især",56.689,57.05],["stærk",57.05,57.514],["når",57.656,57.862],["konstruktionen",57.862,58.545],["har",58.545,58.635],["flere",58.635,58.919],["dele",58.919,59.331],["eller",59.331,59.563],["belastningstyper",59.563,60.62],["når",60.762,60.955],["punktet",60.955,61.38],["er",61.38,61.444],["besværligt",61.445,62.089],["eller",62.231,62.437],["når",62.437,62.553],["bjælken",62.553,63.042],["er",63.042,63.171],["statisk",63.171,63.713],["ubestemt",63.713,64.344]],"text":"Castigliano er især stærk, når konstruktionen har flere dele eller belastningstyper, når punktet er besværligt, eller når bjælken er statisk ubestemt."},"ubestemt":{"start":65.566,"end":78.105,"words":[["Ved",65.706,65.848],["en",65.848,65.938],["statisk",65.938,66.466],["ubestemt",66.466,66.956],["bjælke",66.956,67.265],["fjerner",67.266,67.781],["vi",67.781,68.0],["en",68.0,68.103],["overtallig",68.103,68.696],["understøtning",68.696,69.469],["og",69.469,69.637],["erstatter",69.637,70.036],["den",70.036,70.229],["med",70.229,70.371],["en",70.371,70.487],["ukendt",70.487,70.874],["kraft",70.874,71.209],["Q",71.209,71.634],["Fordi",72.525,72.937],["understøtningen",72.937,73.685],["ikke",73.685,73.955],["flytter",73.955,74.252],["sig",74.252,74.625],["sætter",74.767,75.128],["vi",75.128,75.244],["den",75.244,75.424],["afledte",75.424,75.965],["af",75.965,76.21],["U",76.21,76.468],["lig",76.468,76.661],["nul",76.661,77.048],["og",77.048,77.164],["løser",77.164,77.55],["for",77.551,77.679],["Q",77.679,78.105]],"text":"Ved en statisk ubestemt bjælke fjerner vi en overtallig understøtning og erstatter den med en ukendt kraft Q. Fordi understøtningen ikke flytter sig, sætter vi den afledte af U lig nul og løser for Q."},"eks":{"start":79.332,"end":90.543,"words":[["Eksemplet",79.472,80.001],["fra",80.001,80.155],["slides",80.155,80.722],["en",80.851,81.006],["indspændt",81.006,81.457],["bjælke",81.457,81.805],["med",81.805,81.998],["en",81.998,82.088],["fordelt",82.088,82.488],["last",82.488,82.836],["w",82.836,83.39],["og",83.39,83.57],["en",83.57,83.647],["rulle",83.647,84.021],["i",84.021,84.176],["den",84.176,84.343],["frie",84.343,84.691],["ende",84.691,85.104],["Momentet",86.007,86.445],["fra",86.445,86.626],["den",86.626,86.78],["frie",86.78,87.09],["ende",87.09,87.412],["er",87.412,87.567],["Q",87.567,87.876],["x",87.876,88.095],["minus",88.095,88.43],["w",88.43,88.958],["x",88.958,89.242],["i",89.242,89.422],["anden",89.422,89.835],["over",89.835,90.105],["to.",90.105,90.543]],"text":"Eksemplet fra slides: en indspændt bjælke med en fordelt last w og en rulle i den frie ende. Momentet fra den frie ende er Q x minus w x i anden over to."},"eks2":{"start":91.778,"end":102.796,"words":[["Integralet",91.918,92.588],["af",92.588,92.833],["M",92.833,93.078],["gange",93.078,93.439],["x",93.439,93.903],["skal",93.903,94.122],["være",94.122,94.302],["nul",94.302,94.702],["Det",95.58,95.657],["giver",95.657,96.018],["Q",96.018,96.314],["L",96.314,96.443],["i",96.443,96.572],["tredje",96.572,97.074],["over",97.074,97.345],["tre",97.345,97.616],["lig",97.616,97.796],["w",97.796,98.311],["L",98.312,98.518],["i",98.518,98.698],["fjerde",98.698,99.162],["over",99.162,99.446],["otte",99.446,99.909],["og",100.051,100.232],["reaktionen",100.232,100.799],["bliver",100.799,100.992],["tre",100.992,101.301],["ottendedele",101.301,101.868],["w",101.868,102.358],["L.",102.358,102.796]],"text":"Integralet af M gange x skal være nul. Det giver Q L i tredje over tre lig w L i fjerde over otte, og reaktionen bliver tre ottendedele w L."},"tjek_q":{"start":104.032,"end":109.702,"words":[["Tjek",104.133,104.442],["dig",104.442,104.622],["selv",104.622,105.061],["Hvorfor",105.965,106.223],["sætter",106.223,106.506],["vi",106.506,106.635],["Q",106.635,106.906],["lig",106.906,107.099],["nul",107.099,107.305],["til",107.305,107.447],["sidst",107.447,107.937],["når",108.078,108.246],["vi",108.246,108.349],["bruger",108.349,108.671],["en",108.671,108.8],["fiktiv",108.8,109.225],["kraft",109.225,109.702]],"text":"Tjek dig selv. Hvorfor sætter vi Q lig nul til sidst, når vi bruger en fiktiv kraft?"},"tjek_a":{"start":113.584,"end":120.233,"words":[["Fordi",113.711,114.085],["kraften",114.085,114.678],["ikke",114.678,114.987],["findes",114.987,115.374],["i",115.374,115.528],["virkeligheden",115.528,116.314],["Den",117.218,117.321],["er",117.321,117.373],["kun",117.373,117.63],["et",117.63,117.759],["hjælpemiddel",117.759,118.313],["til",118.313,118.455],["at",118.455,118.494],["finde",118.494,118.803],["udbøjningen",118.803,119.525],["i",119.525,119.654],["punktet",119.654,120.233]],"text":"Fordi kraften ikke findes i virkeligheden. Den er kun et hjælpemiddel til at finde udbøjningen i punktet."},"slut":{"start":121.446,"end":132.271,"words":[["Kort",121.573,121.779],["sagt",121.78,122.269],["udbøjningen",122.398,122.965],["er",122.965,123.068],["den",123.068,123.249],["afledte",123.249,123.777],["af",123.777,123.983],["U",123.983,124.279],["med",124.279,124.473],["hensyn",124.473,124.988],["til",124.988,125.117],["kraften",125.117,125.787],["Brug",126.691,126.897],["en",126.897,127.013],["fiktiv",127.013,127.451],["kraft",127.451,127.954],["hvor",128.095,128.276],["der",128.276,128.392],["ingen",128.392,128.662],["kraft",128.662,128.972],["er",128.972,129.281],["og",129.423,129.565],["sæt",129.565,129.796],["den",129.797,129.977],["afledte",129.977,130.428],["lig",130.428,130.647],["nul",130.647,131.008],["ved",131.008,131.266],["en",131.266,131.407],["understøtning",131.407,132.271]],"text":"Kort sagt: udbøjningen er den afledte af U med hensyn til kraften. Brug en fiktiv kraft, hvor der ingen kraft er, og sæt den afledte lig nul ved en understøtning."}}}, { audio: 'castigliano.mp3', id: 'castigliano' });</script>
+</body>
+</html>

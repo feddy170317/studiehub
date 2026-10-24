@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eksamensspørgsmål 5b: Tresca og von Mises · video</title>
+<meta name="description" content="Eksamensspørgsmål 5b: Tresca giver n = 1,75 og von Mises n = 1,94.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 6: videoer</a><h1>Eksamensspørgsmål 5b: Tresca og von Mises</h1><span class="meta">MEM1 · kapitel 6 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Eksamensspørgsmål 5b: Tresca og von Mises"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Eksamensspørgsmål 5b: Tresca giver n = 1,75 og von Mises n = 1,94.</p><div class="chips"><a href="tresca.html">Se først: Tresca: største forskydning</a><a href="von-mises.html">Se først: Von Mises: formændringsenergi</a><a href="../../../../lab/mem1/flydekriterier.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel06_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l06">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Eksamensspørgsmål 5b: σ1 = 120, σ2 = −40, Sy = 280 → Tresca n = 1,75, von Mises σv = 144,2, n = 1,94 (slide 36)
+BP.scene({ header: 'MEM1 · kap. 6' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under } = B;
+
+  B.titel(0, 'Eksamensspørgsmål 5b', 'MEM1 · kapitel 6 · opgave (slide 36)', 'titel');
+  text(0, 'Tresca og von Mises på en stift', 640, 520, 40, 'red', wt('titel', 'Tresca') - 0.2, we('titel', 'Mises'), { align: 'center' });
+
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start;
+    text(1, 'σ_1 = 120,  σ_2 = −40 MPa,  S_y = 280 MPa', 160, 160, 40, 'black', wt('data', 'Sigma') - 0.1, we('data', 'megapascal', 1));
+    text(1, 'ordnet: 120 ;  0 ;  −40', 160, 240, 38, 'black', L('ordn').start + 0.2, we('ordn', 'fyrre'));
+    bubble(1, 'Tresca', 160, 340, 44, 'red', L('tresca').start, L('tresca').start + 0.6);
+    text(1, 'σ_1 − σ_3 = 120 − (−40) = 160 MPa', 360, 340, 38, 'red', wt('tresca', 'største') - 0.1, we('tresca', 'megapascal'));
+    const r1 = text(1, 'n = 280 / 160 = 1,75', 360, 410, 44, 'red', wt('tresca', 'Sikkerhedsfaktoren') - 0.1, we('tresca', 'fem'));
+    bubble(1, 'von Mises', 160, 510, 44, 'blue', L('vm').start, L('vm').start + 0.6);
+    text(1, 'σ_v = √(120² + 40² − 120·(−40)) = √20 800', 440, 510, 32, 'blue', L('vm').start + 0.4, we('vm2', 'hundrede', 0));
+    text(1, '= 144,2 MPa', 760, 570, 40, 'blue', wt('vm2', 'som') - 0.1, we('vm2', 'megapascal'));
+    const r2 = text(1, 'n = 280 / 144,2 = 1,94', 360, 640, 44, 'blue', L('n').start + 0.2, we('n', 'fire'));
+  }
+
+  B.goto('fortegn', 2);
+  {
+    const t0 = L('fortegn').start;
+    const f = text(2, '− σ_1 σ_2 = − (120)(−40) = + 4 800', 160, 200, 46, 'red', t0 + 0.3, we('fortegn', 'plus'));
+    ring(f, 'red', we('fortegn', 'plus'), we('fortegn', 'plus') + 0.6);
+    text(2, 'Tresca: 1,75  <  von Mises: 1,94', 160, 330, 44, 'black', L('sammenlign').start + 0.2, we('sammenlign', 'sikkerhedsfaktor'));
+    text(2, 'begge > 1  →  stiften flyder ikke', 160, 410, 42, 'green', wt('sammenlign', 'Begge') - 0.1, we('sammenlign', 'ikke'));
+    text(2, 'del a: se videoerne om Tresca og von Mises', 160, 540, 34, 'blue', L('teori').start + 0.4, we('teori', 'Mises', 1));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Hvilket led i von Mises', 'får man nemmest forkert fortegn?'], ['− σ_1 σ_2', 'modsatte fortegn ⇒ plus'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 6, slide 36 (eksamensspm. 5) · Hamrock, Schmid & Jacobson, kap. 6', '', 'slut');
+  text(4, 'Tresca: 160 MPa → n = 1,75', 200, 280, 44, 'red', L('slut').start + 0.4, we('slut', 'fem'));
+  text(4, 'von Mises: 144,2 MPa → n = 1,94', 200, 370, 44, 'blue', wt('slut', 'von') - 0.1, we('slut', 'fire'));
+});
+
+</script>
+<script>BP.live({"duration":126.476,"audio":"eksamen-spm5.mp3","order":["titel","data","ordn","tresca","vm","vm2","n","fortegn","sammenlign","teori","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":10.126,"words":[["Eksamensspørgsmål",0.64,1.736],["fem",1.736,2.096],["b",2.096,2.457],["En",3.361,3.464],["medbringerstift",3.464,4.276],["i",4.276,4.392],["plan",4.392,4.701],["spænding",4.701,5.242],["Vi",6.157,6.26],["finder",6.26,6.531],["sikkerhedsfaktoren",6.531,7.497],["mod",7.497,7.678],["flydning",7.678,8.18],["med",8.18,8.361],["både",8.361,8.644],["Tresca",8.644,9.211],["og",9.211,9.366],["von",9.366,9.572],["Mises",9.572,10.126]],"text":"Eksamensspørgsmål fem b. En medbringerstift i plan spænding. Vi finder sikkerhedsfaktoren mod flydning med både Tresca og von Mises."},"data":{"start":11.338,"end":18.991,"words":[["Sigma",11.452,11.929],["et",11.929,12.187],["er",12.187,12.277],["hundrede",12.277,12.509],["og",12.509,12.535],["tyve",12.535,13.05],["sigma",13.153,13.579],["to",13.579,13.888],["er",13.888,13.978],["minus",13.978,14.326],["fyrre",14.326,14.61],["megapascal",14.61,15.486],["og",15.628,15.847],["flydespændingen",15.847,16.633],["S",16.633,16.916],["y",16.916,17.148],["er",17.148,17.264],["to",17.264,17.522],["hundrede",17.522,17.728],["og",17.728,17.741],["firs",17.741,18.102],["megapascal",18.102,18.991]],"text":"Sigma et er hundrede og tyve, sigma to er minus fyrre megapascal, og flydespændingen S y er to hundrede og firs megapascal."},"ordn":{"start":20.208,"end":26.716,"words":[["Først",20.309,20.786],["ordner",20.786,21.185],["vi",21.185,21.559],["Med",22.45,22.579],["sigma",22.579,22.953],["tre",22.953,23.262],["lig",23.262,23.443],["nul",23.443,23.842],["bliver",23.842,24.1],["rækkefølgen",24.1,24.693],["hundrede",24.693,24.937],["og",24.937,24.963],["tyve",24.963,25.479],["nul",25.595,25.814],["og",25.814,25.852],["minus",25.852,26.213],["fyrre",26.213,26.716]],"text":"Først ordner vi. Med sigma tre lig nul bliver rækkefølgen hundrede og tyve, nul og minus fyrre."},"tresca":{"start":27.95,"end":40.811,"words":[["Tresca",28.064,28.631],["den",28.76,28.915],["største",28.915,29.327],["minus",29.327,29.727],["den",29.727,29.907],["mindste",29.907,30.32],["er",30.32,30.423],["hundrede",30.423,30.706],["og",30.706,30.732],["tyve",30.732,31.028],["minus",31.028,31.35],["minus",31.351,31.673],["fyrre",31.673,32.188],["altså",32.291,32.665],["hundrede",32.665,32.936],["og",32.936,32.961],["tres",32.961,33.258],["megapascal",33.258,34.147],["Sikkerhedsfaktoren",35.025,36.12],["er",36.12,36.288],["to",36.288,36.545],["hundrede",36.545,36.752],["og",36.752,36.764],["firs",36.764,37.074],["divideret",37.074,37.641],["med",37.641,37.86],["hundrede",37.86,38.143],["og",38.143,38.169],["tres",38.169,38.659],["altså",38.801,39.29],["en",39.29,39.522],["komma",39.522,39.857],["syv",39.857,40.166],["fem.",40.166,40.811]],"text":"Tresca: den største minus den mindste er hundrede og tyve minus minus fyrre, altså hundrede og tres megapascal. Sikkerhedsfaktoren er to hundrede og firs divideret med hundrede og tres, altså en komma syv fem."},"vm":{"start":42.028,"end":54.631,"words":[["Von",42.142,42.374],["Mises",42.374,42.954],["kvadratroden",43.083,43.766],["af",43.766,43.882],["hundrede",43.882,44.14],["og",44.14,44.166],["tyve",44.166,44.565],["i",44.565,44.733],["anden",44.733,44.99],["plus",44.99,45.222],["fyrre",45.222,45.699],["i",45.699,45.88],["anden",45.88,46.124],["minus",46.124,46.408],["hundrede",46.408,46.627],["og",46.627,46.653],["tyve",46.653,47.014],["gange",47.014,47.374],["minus",47.374,47.774],["fyrre",47.774,48.276],["Det",49.18,49.296],["er",49.296,49.373],["kvadratroden",49.373,50.043],["af",50.043,50.159],["fjorten",50.159,50.546],["tusind",50.546,51.036],["fire",51.036,51.358],["hundrede",51.358,51.603],["plus",51.603,51.822],["seksten",51.822,52.273],["hundrede",52.273,52.582],["plus",52.582,52.866],["fire",52.866,53.226],["tusind",53.226,53.806],["otte",53.806,54.116],["hundrede",54.116,54.631]],"text":"Von Mises: kvadratroden af hundrede og tyve i anden plus fyrre i anden minus hundrede og tyve gange minus fyrre. Det er kvadratroden af fjorten tusind fire hundrede plus seksten hundrede plus fire tusind otte hundrede."},"vm2":{"start":55.866,"end":61.483,"words":[["Altså",56.006,56.303],["kvadratroden",56.303,57.024],["af",57.024,57.166],["tyve",57.166,57.501],["tusind",57.501,57.875],["otte",57.875,58.158],["hundrede",58.158,58.674],["som",58.79,59.022],["er",59.022,59.06],["hundrede",59.06,59.331],["og",59.331,59.357],["fireogfyrre",59.357,60.04],["komma",60.04,60.31],["to",60.31,60.632],["megapascal",60.632,61.483]],"text":"Altså kvadratroden af tyve tusind otte hundrede, som er hundrede og fireogfyrre komma to megapascal."},"n":{"start":62.696,"end":69.279,"words":[["Sikkerhedsfaktoren",62.81,63.893],["er",63.893,64.06],["to",64.06,64.318],["hundrede",64.318,64.511],["og",64.511,64.524],["firs",64.524,64.834],["divideret",64.834,65.439],["med",65.439,65.684],["hundrede",65.684,65.968],["og",65.968,65.993],["fireogfyrre",65.993,66.548],["komma",66.548,66.857],["to",66.857,67.295],["altså",67.437,67.939],["en",67.939,68.184],["komma",68.184,68.519],["ni",68.519,68.764],["fire",68.764,69.279]],"text":"Sikkerhedsfaktoren er to hundrede og firs divideret med hundrede og fireogfyrre komma to, altså en komma ni fire."},"fortegn":{"start":70.51,"end":78.629,"words":[["Pas",70.611,70.868],["på",70.868,71.036],["fortegnet",71.036,71.783],["i",71.783,71.951],["det",71.951,72.054],["sidste",72.054,72.454],["led",72.454,72.84],["Sigma",73.745,74.196],["et",74.196,74.286],["gange",74.286,74.569],["sigma",74.569,74.956],["to",74.956,75.291],["er",75.291,75.407],["negativ",75.407,76.09],["så",76.232,76.425],["minus",76.425,76.76],["et",76.76,76.889],["negativt",76.889,77.417],["tal",77.417,77.817],["giver",77.817,78.1],["plus",78.1,78.629]],"text":"Pas på fortegnet i det sidste led. Sigma et gange sigma to er negativ, så minus et negativt tal giver plus."},"sammenlign":{"start":79.86,"end":86.819,"words":[["Som",79.987,80.193],["forventet",80.194,80.735],["giver",80.735,81.031],["Tresca",81.031,81.547],["den",81.547,81.753],["mindste",81.753,82.126],["sikkerhedsfaktor",82.127,83.209],["Begge",84.113,84.37],["er",84.37,84.499],["over",84.499,84.783],["en",84.783,85.156],["så",85.298,85.491],["stiften",85.491,85.994],["flyder",85.994,86.368],["ikke",86.368,86.819]],"text":"Som forventet giver Tresca den mindste sikkerhedsfaktor. Begge er over en, så stiften flyder ikke."},"teori":{"start":88.034,"end":97.042,"words":[["Til",88.161,88.38],["del",88.38,88.625],["a",88.625,88.935],["skal",88.934,89.128],["du",89.128,89.205],["kunne",89.205,89.411],["forklare",89.411,89.824],["de",89.824,89.927],["to",89.927,90.159],["kriterier",90.159,90.764],["og",90.764,90.88],["skrive",90.88,91.203],["von",91.203,91.409],["Mises",91.409,91.937],["med",91.937,92.182],["alle",92.182,92.478],["tre",92.478,92.749],["hovedspændinger",92.749,93.587],["Se",94.477,94.761],["videoerne",94.761,95.328],["om",95.328,95.508],["Tresca",95.508,96.088],["og",96.088,96.243],["von",96.243,96.462],["Mises",96.462,97.042]],"text":"Til del a skal du kunne forklare de to kriterier og skrive von Mises med alle tre hovedspændinger. Se videoerne om Tresca og von Mises."},"tjek_q":{"start":98.272,"end":104.213,"words":[["Tjek",98.373,98.695],["dig",98.695,98.875],["selv",98.875,99.301],["Hvilket",100.205,100.514],["led",100.514,100.759],["i",100.759,100.849],["von",100.849,101.055],["Mises",101.056,101.455],["formlen",101.455,102.022],["er",102.022,102.177],["det",102.177,102.28],["nemmeste",102.28,102.692],["at",102.692,102.744],["få",102.744,102.924],["forkert",102.924,103.336],["fortegn",103.336,103.826],["på",103.826,104.213]],"text":"Tjek dig selv. Hvilket led i von Mises formlen er det nemmeste at få forkert fortegn på?"},"tjek_a":{"start":108.088,"end":113.913,"words":[["Leddet",108.202,108.512],["minus",108.512,108.86],["sigma",108.86,109.388],["et",109.388,109.556],["gange",109.556,109.852],["sigma",109.852,110.238],["to.",110.239,110.677],["Med",111.593,111.735],["modsatte",111.735,112.225],["fortegn",112.225,112.895],["bliver",112.895,113.127],["det",113.127,113.294],["et",113.294,113.384],["plus",113.384,113.913]],"text":"Leddet minus sigma et gange sigma to. Med modsatte fortegn bliver det et plus."},"slut":{"start":115.134,"end":124.063,"words":[["Kort",115.261,115.493],["sagt",115.493,115.97],["Tresca",116.099,116.537],["giver",116.537,116.795],["hundrede",116.795,117.053],["og",117.053,117.078],["tres",117.078,117.362],["megapascal",117.362,118.148],["og",118.148,118.315],["n",118.315,118.496],["lig",118.496,118.689],["en",118.689,118.921],["komma",118.921,119.243],["syv",119.243,119.527],["fem",119.527,119.9],["von",120.042,120.248],["Mises",120.248,120.622],["giver",120.622,120.841],["hundrede",120.841,121.086],["og",121.086,121.112],["fireogfyrre",121.112,121.795],["komma",121.795,122.078],["to",122.078,122.349],["og",122.349,122.388],["n",122.388,122.504],["lig",122.504,122.723],["en",122.723,123.019],["komma",123.019,123.341],["ni",123.341,123.56],["fire",123.56,124.063]],"text":"Kort sagt: Tresca giver hundrede og tres megapascal og n lig en komma syv fem, von Mises giver hundrede og fireogfyrre komma to og n lig en komma ni fire."}}}, { audio: 'eksamen-spm5.mp3', id: 'eksamen-spm5' });</script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tresca: to eksempler fra slides · video</title>
+<meta name="description" content="To Tresca-eksempler fra slides: n = 1,39 og n = 1,6.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 6: videoer</a><h1>Tresca: to eksempler fra slides</h1><span class="meta">MEM1 · kapitel 6 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Tresca: to eksempler fra slides"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>To Tresca-eksempler fra slides: n = 1,39 og n = 1,6.</p><div class="chips"><a href="tresca.html">Se først: Tresca: største forskydning</a><a href="../../Kapitel06_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l06">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Tresca-eksempler fra slides 21–24: n = 1,39 og n = 1,60
+BP.scene({ header: 'MEM1 · kap. 6' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under } = B;
+
+  B.titel(0, 'Tresca i praksis', 'MEM1 · kapitel 6 · opgave (slide 21–24)', 'titel');
+  text(0, 'to eksempler fra slides', 640, 520, 42, 'red', wt('titel', 'eksempler') - 0.4, we('titel', 'belastning'), { align: 'center' });
+
+  B.goto('eks1', 1);
+  {
+    const t0 = L('eks1').start;
+    bubble(1, 'Eksempel 1', 150, 140, 52, 'blue', t0, t0 + 0.6);
+    text(1, 'σ_1 = 180,  σ_2 = 60,  σ_3 = 0,  S_y = 250 MPa', 160, 230, 38, 'black', wt('eks1', 'sigma') - 0.1, we('eks1', 'megapascal'));
+    text(1, 'τ_{max} = (σ_1 − σ_3)/2 = 180/2 = 90 MPa', 160, 330, 40, 'red', L('tau').start + 0.2, we('tau', 'megapascal'));
+    text(1, 'τ_{grænse} = S_y/2 = 125 MPa', 160, 410, 40, 'blue', L('graense').start + 0.2, we('graense', 'megapascal'));
+    const r = text(1, '90 < 125 ✓     n = 125/90 = 1,39', 160, 510, 46, 'green', L('n1').start + 0.2, we('n1', 'ni'));
+    box(1, 135, 455, 760, 80, 'green', we('n1', 'ni'), we('n1', 'ni') + 0.6);
+  }
+
+  B.goto('eks2', 2);
+  {
+    const t0 = L('eks2').start;
+    bubble(2, 'Eksempel 2', 150, 140, 52, 'blue', t0, t0 + 0.6);
+    text(2, 'σ_x = 100,  σ_y = 0,  τ_{xy} = 60,  S_y = 250 MPa', 160, 230, 38, 'black', wt('eks2', 'sigma') - 0.1, we('eks2', 'megapascal'));
+    text(2, 'σ_{1,2} = 50 ± √(50² + 60²) = 50 ± 78,1', 160, 320, 40, 'red', L('hoved').start + 0.2, we('hoved', 'anden', 1));
+    text(2, 'σ_1 = 128,1      σ_2 = −28,1 MPa', 160, 390, 40, 'red', wt('hoved', 'giver') - 0.1, we('hoved', 'et', 2));
+    text(2, 'ordnet: 128,1 ;  0 ;  −28,1  →  forskel = 156,2 MPa', 160, 480, 36, 'blue', L('ordn').start + 0.2, we('ordn', 'megapascal'));
+    const r = text(2, '156,2 < 250 ✓     n = 250/156,2 = 1,6', 160, 580, 46, 'green', L('n2').start + 0.2, we('n2', 'seks'));
+    box(2, 135, 525, 820, 80, 'green', we('n2', 'seks'), we('n2', 'seks') + 0.6);
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Hvorfor σ_1 − σ_2 i eks. 2', 'men σ_1 − σ_3 i eks. 1?'], ['σ_2 < 0 i eks. 2', 'begge gange: største − mindste'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 6, slide 21–24 · Hamrock, Schmid & Jacobson, kap. 6', 'von Mises-eksemplet', 'slut');
+  text(4, 'find og ordn hovedspændingerne', 200, 280, 42, 'blue', L('slut').start + 0.4, we('slut', 'hovedspændingerne'));
+  text(4, 'største − mindste ≤ S_y', 200, 370, 46, 'red', wt('slut', 'største') - 0.1, we('slut', 'y'));
+});
+
+</script>
+<script>BP.live({"duration":123.726,"audio":"opg-tresca-eksempler.mp3","order":["titel","eks1","tau","graense","n1","eks2","hoved","ordn","n2","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":8.412,"words":[["To",0.627,0.911],["eksempler",0.911,1.504],["med",1.504,1.761],["Trescas",1.761,2.238],["kriterium",2.238,2.96],["fra",2.96,3.127],["slides",3.127,3.733],["Først",4.611,4.959],["med",4.959,5.139],["hovedspændinger",5.139,6.041],["derefter",6.17,6.763],["med",6.763,6.956],["en",6.956,7.059],["kombineret",7.059,7.652],["belastning",7.652,8.412]],"text":"To eksempler med Trescas kriterium fra slides. Først med hovedspændinger, derefter med en kombineret belastning."},"eks1":{"start":9.634,"end":20.807,"words":[["Eksempel",9.735,10.418],["et",10.418,10.83],["En",11.722,11.825],["ståldel",11.825,12.353],["har",12.353,12.521],["sigma",12.521,12.933],["et",12.933,13.088],["lig",13.088,13.281],["hundrede",13.281,13.526],["og",13.526,13.539],["firs",13.539,14.054],["sigma",14.196,14.673],["to",14.673,14.917],["lig",14.918,15.072],["tres",15.072,15.485],["og",15.485,15.613],["sigma",15.613,16.039],["tre",16.039,16.348],["lig",16.348,16.567],["nul",16.567,16.954],["Flydespændingen",17.83,18.667],["er",18.668,18.848],["to",18.848,19.106],["hundrede",19.106,19.312],["og",19.312,19.338],["halvtreds",19.338,19.789],["megapascal",19.789,20.807]],"text":"Eksempel et. En ståldel har sigma et lig hundrede og firs, sigma to lig tres og sigma tre lig nul. Flydespændingen er to hundrede og halvtreds megapascal."},"tau":{"start":22.032,"end":30.046,"words":[["Den",22.159,22.288],["største",22.288,22.701],["forskydning",22.701,23.332],["er",23.332,23.448],["sigma",23.448,23.873],["et",23.873,24.015],["minus",24.015,24.35],["sigma",24.35,24.672],["tre",24.672,24.943],["divideret",24.943,25.497],["med",25.497,25.677],["to",25.677,26.128],["altså",26.257,26.605],["hundrede",26.605,26.863],["og",26.863,26.876],["firs",26.876,27.146],["divideret",27.146,27.649],["med",27.649,27.791],["to",27.791,28.216],["som",28.358,28.615],["er",28.615,28.68],["halvfems",28.68,29.131],["megapascal",29.131,30.046]],"text":"Den største forskydning er sigma et minus sigma tre divideret med to, altså hundrede og firs divideret med to, som er halvfems megapascal."},"graense":{"start":31.262,"end":36.106,"words":[["Materialets",31.402,31.982],["grænse",31.982,32.536],["er",32.536,32.781],["S",32.781,33.09],["y",33.09,33.271],["halve",33.271,33.773],["altså",33.902,34.302],["hundrede",34.302,34.585],["og",34.585,34.611],["femogtyve",34.611,35.229],["megapascal",35.23,36.106]],"text":"Materialets grænse er S y halve, altså hundrede og femogtyve megapascal."},"n1":{"start":37.324,"end":47.414,"words":[["Halvfems",37.451,37.902],["er",37.902,38.07],["mindre",38.07,38.534],["end",38.534,38.714],["hundrede",38.714,38.998],["og",38.998,39.023],["femogtyve",39.024,39.771],["så",39.913,40.157],["delen",40.157,40.621],["er",40.621,40.737],["sikker",40.737,41.279],["Sikkerhedsfaktoren",42.156,43.239],["er",43.239,43.368],["hundrede",43.368,43.626],["og",43.626,43.651],["femogtyve",43.651,44.193],["divideret",44.193,44.747],["med",44.747,44.94],["halvfems",44.94,45.636],["altså",45.778,46.267],["en",46.267,46.512],["komma",46.512,46.808],["tre",46.809,47.105],["ni",47.105,47.414]],"text":"Halvfems er mindre end hundrede og femogtyve, så delen er sikker. Sikkerhedsfaktoren er hundrede og femogtyve divideret med halvfems, altså en komma tre ni."},"eks2":{"start":48.642,"end":57.508,"words":[["Eksempel",48.743,49.361],["to.",49.361,49.812],["En",50.73,50.846],["aksel",50.846,51.206],["med",51.206,51.387],["bøjning",51.387,51.799],["og",51.799,51.928],["vridning",51.928,52.353],["har",52.353,52.534],["sigma",52.534,52.972],["x",52.972,53.268],["lig",53.268,53.423],["hundrede",53.423,53.925],["sigma",54.041,54.505],["y",54.505,54.699],["lig",54.699,54.866],["nul",54.866,55.021],["og",55.021,55.06],["tau",55.06,55.472],["x",55.472,55.794],["y",55.794,55.974],["lig",55.974,56.232],["tres",56.232,56.554],["megapascal",56.554,57.508]],"text":"Eksempel to. En aksel med bøjning og vridning har sigma x lig hundrede, sigma y lig nul og tau x y lig tres megapascal."},"hoved":{"start":58.736,"end":70.295,"words":[["Hovedspændingerne",58.863,59.636],["er",59.636,59.765],["halvtreds",59.765,60.203],["plus",60.204,60.448],["og",60.448,60.5],["minus",60.5,61.015],["kvadratroden",61.015,61.673],["af",61.673,61.763],["halvtreds",61.763,62.291],["i",62.291,62.523],["anden",62.523,62.819],["plus",62.819,63.064],["tres",63.064,63.49],["i",63.49,63.696],["anden",63.696,64.134],["Det",65.025,65.089],["giver",65.089,65.36],["sigma",65.36,65.785],["et",65.785,65.927],["lig",65.927,66.107],["hundrede",66.107,66.352],["og",66.352,66.391],["otteogtyve",66.391,66.971],["komma",66.971,67.306],["et",67.306,67.525],["og",67.525,67.576],["sigma",67.576,67.976],["to",67.976,68.272],["lig",68.272,68.465],["minus",68.465,68.955],["otteogtyve",68.955,69.638],["komma",69.638,69.96],["et",69.96,70.295]],"text":"Hovedspændingerne er halvtreds plus og minus kvadratroden af halvtreds i anden plus tres i anden. Det giver sigma et lig hundrede og otteogtyve komma et og sigma to lig minus otteogtyve komma et."},"ordn":{"start":71.518,"end":80.964,"words":[["Ordnet",71.658,72.071],["er",72.071,72.238],["det",72.238,72.418],["hundrede",72.418,72.715],["og",72.715,72.792],["otteogtyve",72.792,73.346],["komma",73.346,73.668],["et",73.669,74.004],["nul",74.145,74.377],["og",74.377,74.416],["minus",74.416,74.854],["otteogtyve",74.854,75.511],["komma",75.511,75.859],["et",75.859,76.194],["Den",77.085,77.188],["største",77.188,77.575],["forskel",77.575,78.193],["er",78.193,78.309],["hundrede",78.309,78.58],["og",78.58,78.631],["otteoghalvtreds",78.631,79.379],["komma",79.379,79.688],["to",79.688,80.01],["megapascal",80.01,80.964]],"text":"Ordnet er det hundrede og otteogtyve komma et, nul og minus otteogtyve komma et. Den største forskel er hundrede og otteoghalvtreds komma to megapascal."},"n2":{"start":82.188,"end":93.335,"words":[["Det",82.328,82.431],["er",82.431,82.521],["mindre",82.522,82.934],["end",82.934,83.14],["to",83.14,83.372],["hundrede",83.372,83.578],["og",83.578,83.604],["halvtreds",83.604,84.248],["så",84.39,84.686],["akslen",84.686,85.318],["er",85.318,85.434],["sikker",85.434,86.001],["Sikkerhedsfaktoren",86.892,87.974],["er",87.974,88.154],["to",88.154,88.412],["hundrede",88.412,88.618],["og",88.618,88.644],["halvtreds",88.644,89.031],["divideret",89.031,89.662],["med",89.662,89.907],["hundrede",89.907,90.203],["og",90.203,90.229],["seksoghalvtreds",90.229,90.938],["komma",90.938,91.209],["to",91.209,91.634],["altså",91.776,92.278],["en",92.278,92.536],["komma",92.536,92.832],["seks",92.832,93.335]],"text":"Det er mindre end to hundrede og halvtreds, så akslen er sikker. Sikkerhedsfaktoren er to hundrede og halvtreds divideret med hundrede og seksoghalvtreds komma to, altså en komma seks."},"tjek_q":{"start":94.562,"end":102.307,"words":[["Tjek",94.663,94.972],["dig",94.972,95.152],["selv",95.152,95.591],["Hvorfor",96.508,96.74],["bruger",96.74,96.972],["vi",96.972,97.062],["sigma",97.062,97.462],["et",97.462,97.603],["minus",97.603,97.912],["sigma",97.912,98.273],["to",98.273,98.634],["i",98.634,98.789],["eksempel",98.789,99.175],["to",99.175,99.588],["men",99.73,99.91],["sigma",99.91,100.322],["et",100.322,100.438],["minus",100.438,100.748],["sigma",100.748,101.057],["tre",101.057,101.431],["i",101.431,101.585],["eksempel",101.585,102.023],["et",102.023,102.307]],"text":"Tjek dig selv. Hvorfor bruger vi sigma et minus sigma to i eksempel to, men sigma et minus sigma tre i eksempel et?"},"tjek_a":{"start":106.178,"end":113.457,"words":[["Fordi",106.305,106.627],["sigma",106.628,106.988],["to",106.988,107.336],["er",107.336,107.478],["negativ",107.478,108.084],["i",108.084,108.213],["eksempel",108.213,108.638],["to.",108.638,108.908],["Ordnet",108.908,109.347],["bliver",109.347,109.553],["den",109.553,109.746],["den",109.746,109.914],["mindste",109.914,110.429],["så",110.571,110.751],["det",110.751,110.88],["er",110.88,110.957],["reelt",110.957,111.254],["den",111.254,111.408],["største",111.408,111.782],["minus",111.782,112.182],["den",112.182,112.375],["mindste",112.375,112.723],["begge",112.723,113.006],["gange",113.006,113.457]],"text":"Fordi sigma to er negativ i eksempel to. Ordnet bliver den den mindste, så det er reelt den største minus den mindste begge gange."},"slut":{"start":114.688,"end":121.297,"words":[["Kort",114.815,115.047],["sagt",115.047,115.537],["find",115.653,115.949],["og",115.949,116.04],["ordn",116.04,116.31],["hovedspændingerne",116.31,117.302],["tag",117.431,117.715],["den",117.715,117.869],["største",117.869,118.256],["minus",118.256,118.617],["den",118.617,118.797],["mindste",118.797,119.339],["og",119.493,119.738],["sammenlign",119.738,120.395],["med",120.395,120.653],["S",120.653,120.949],["y",120.949,121.297]],"text":"Kort sagt: find og ordn hovedspændingerne, tag den største minus den mindste, og sammenlign med S y."}}}, { audio: 'opg-tresca-eksempler.mp3', id: 'opg-tresca-eksempler' });</script>
+</body>
+</html>

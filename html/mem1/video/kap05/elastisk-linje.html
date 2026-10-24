@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Den elastiske linje · video</title>
+<meta name="description" content="Krumning, E I y'' = M, randbetingelser, opgave 5.21 og standardudbøjningerne.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 5: videoer</a><h1>Den elastiske linje</h1><span class="meta">MEM1 · kapitel 5 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Den elastiske linje"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Krumning, E I y'' = M, randbetingelser, opgave 5.21 og standardudbøjningerne.</p><div class="chips"><a href="../../../../lab/mem1/bjaelke-brud.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel05_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l05">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Den elastiske linje (MEM1 kap. 5, slides 4–11)
+BP.scene({ header: 'MEM1 · kap. 5' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, beam, pin, roller, wall, moment, plot, dashed, PI } = B;
+
+  B.titel(0, 'Den elastiske linje', 'MEM1 · kapitel 5 · begreb (slide 4–11)', 'titel');
+  text(0, 'stærk nok, men bøjer for meget', 640, 520, 40, 'red', wt('titel', 'stærkt') - 0.2, we('titel', 'meget'), { align: 'center' });
+
+  B.goto('styrke', 1);
+  {
+    const t0 = L('styrke').start;
+    wall(1, 160, 150, 280, t0);
+    const P = []; for (let j = 0; j <= 30; j++) { const u = j / 30; P.push([160 + 520 * u, 215 + 90 * u * u]); }
+    plot(1, [[160, 200], [680, 200]], 'black', t0 + 0.2, t0 + 0.6, 2.4);
+    plot(1, P, 'blue', t0 + 0.5, t0 + 1.1);
+    arrow(1, [[680, 160], [680, 300]], 'red', 4, t0 + 0.8, t0 + 1.1); text(1, 'P', 696, 190, 38, 'red', t0 + 1.0, t0 + 1.2);
+    text(1, 'δ', 720, 280, 40, 'blue', t0 + 1.0, t0 + 1.3);
+    text(1, 'flydning ≠ for stor udbøjning', 160, 400, 40, 'red', wt('styrke', 'Flydning') - 0.1, we('styrke', 'udbøjning'));
+    text(1, 'krav: styrke OG stivhed', 160, 470, 40, 'blue', wt('styrke', 'styrkekrav') - 0.2, we('styrke', 'stivhedskrav'));
+    const tk = L('kurvatur').start;
+    text(1, '1/ρ = M / (E I)', 160, 580, 48, 'red', wt('kurvatur', 'krumningen') - 0.1, we('kurvatur', 'I'));
+    text(1, 'M bestemmer krumningen', 640, 580, 34, 'black', wt('kurvatur', 'Momentet') - 0.1, we('kurvatur', 'krummer'));
+  }
+
+  B.goto('ligning', 2);
+  {
+    const t0 = L('ligning').start;
+    const r = text(2, 'E I · d²y/dx² = M(x)', 160, 170, 52, 'red', t0 + 0.4, we('ligning', 'x'));
+    box(2, 135, 115, 620, 80, 'red', we('ligning', 'x'), we('ligning', 'x') + 0.6);
+    const ti = L('integrer').start;
+    text(2, 'E I · θ = ∫ M dx + C_1', 160, 270, 42, 'blue', wt('integrer', 'theta') - 0.4, we('integrer', 'theta'));
+    text(2, 'E I · y = ∫∫ M dx dx + C_1 x + C_2', 160, 340, 42, 'blue', wt('integrer', 'igen') - 0.1, we('integrer', 'y'));
+    const tr = L('rand').start;
+    text(2, 'Randbetingelser:', 160, 440, 36, 'black', tr, wt('rand', 'indspænding'));
+    text(2, 'indspænding:  y = 0,  θ = 0', 200, 500, 36, 'green', wt('rand', 'indspænding') - 0.1, we('rand', 'nul'));
+    text(2, 'simpel understøtning:  y = 0', 200, 560, 36, 'green', wt('rand', 'simpel') - 0.1, we('rand', 'nul', 1));
+    text(2, 'symmetri:  θ = 0 på midten', 200, 620, 36, 'green', wt('rand', 'symmetrisk') - 0.3, we('rand', 'nul', 2));
+  }
+
+  B.goto('eks', 3);
+  {
+    const t0 = L('eks').start;
+    bubble(3, 'Opgave 5.21', 150, 140, 52, 'blue', t0, t0 + 0.6);
+    wall(3, 160, 200, 320, t0 + 0.4); beam(3, 160, 245, 600, 30, 'black', t0 + 0.6, t0 + 1.0);
+    moment(3, 600, 260, 50, -0.4 * PI, 0.4 * PI, 'red', wt('eks', 'moment') - 0.2, wt('eks', 'moment') + 0.3); text(3, 'M', 660, 250, 38, 'red', wt('eks', 'M') - 0.1, wt('eks', 'M') + 0.3);
+    arrow(3, [[164, 340], [596, 340]], 'black', 2, wt('eks', 'L') - 0.2, wt('eks', 'L') + 0.2, 11); text(3, 'L', 380, 375, 32, 'black', wt('eks', 'L'), wt('eks', 'L') + 0.3);
+    const t2 = L('eks2').start;
+    text(3, 'E I y″ = −M,   y(0) = 0,  θ(0) = 0', 760, 220, 32, 'blue', t2, wt('eks2', 'Med') + 0.6);
+    text(3, 'θ(x) = −M x / (E I)', 760, 300, 40, 'blue', wt('eks2', 'theta') - 0.1, we('eks2', 'I'));
+    text(3, 'y(x) = −M x² / (2 E I)', 760, 370, 40, 'blue', wt('eks2', 'y', 2) - 0.1, we('eks2', 'I', 1));
+    text(3, '|y_L| = M L² / (2 E I)', 760, 450, 42, 'red', L('eks3').start + 0.2, we('eks3', 'I'));
+    const ts = L('standard').start;
+    text(3, 'punktlast midt på:  δ = P L³ / (48 E I)', 160, 560, 38, 'green', wt('standard', 'punktlast') - 0.2, we('standard', 'I'));
+    text(3, 'fordelt last w:  δ = 5 w L⁴ / (384 E I)', 160, 630, 38, 'green', wt('standard', 'fordelt') - 0.2, we('standard', 'I', 1));
+  }
+
+  B.goto('tjek_q', 4);
+  B.tjek(4, ['Punktlast: L fordobles.', 'Hvad sker der med δ?'], ['8 gange større', 'δ ∝ L³'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 5);
+  B.slut(5, 'Abou-Hayt (2026), MEM1 Chapter 5, slide 4–11 · Hamrock, Schmid & Jacobson, kap. 5', 'superposition', 'slut');
+  text(5, 'E I y″ = M  →  integrér to gange', 200, 280, 44, 'red', L('slut').start + 0.4, we('slut', 'gange'));
+  text(5, 'konstanter fra randbetingelser', 200, 360, 42, 'blue', wt('slut', 'konstanterne') - 0.1, we('slut', 'randbetingelserne'));
+});
+
+</script>
+<script>BP.live({"duration":137.012,"audio":"elastisk-linje.mp3","order":["titel","styrke","kurvatur","ligning","integrer","rand","eks","eks2","eks3","standard","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.691,"words":[["Den",0.601,0.82],["elastiske",0.82,1.464],["linje",1.464,1.967],["Et",2.884,3.0],["maskinelement",3.0,3.747],["kan",3.747,3.889],["være",3.889,4.031],["stærkt",4.031,4.366],["nok",4.366,4.714],["og",4.714,4.881],["alligevel",4.881,5.32],["ubrugeligt",5.32,5.951],["fordi",6.08,6.441],["det",6.441,6.518],["bøjer",6.518,6.827],["for",6.827,6.956],["meget",6.956,7.304],["ud",7.304,7.691]],"text":"Den elastiske linje. Et maskinelement kan være stærkt nok og alligevel ubrugeligt, fordi det bøjer for meget ud."},"styrke":{"start":8.914,"end":16.504,"words":[["Flydning",9.041,9.583],["og",9.583,9.724],["for",9.724,9.853],["stor",9.853,10.137],["udbøjning",10.137,10.768],["er",10.768,10.936],["to",10.936,11.219],["forskellige",11.219,11.709],["ting",11.709,12.108],["Et",13.025,13.128],["design",13.128,13.566],["skal",13.566,13.798],["opfylde",13.798,14.262],["både",14.262,14.545],["et",14.545,14.636],["styrkekrav",14.636,15.37],["og",15.37,15.576],["et",15.576,15.654],["stivhedskrav",15.654,16.504]],"text":"Flydning og for stor udbøjning er to forskellige ting. Et design skal opfylde både et styrkekrav og et stivhedskrav."},"kurvatur":{"start":17.736,"end":26.987,"words":[["For",17.863,18.005],["en",18.005,18.082],["slank",18.082,18.379],["bjælke",18.379,18.714],["med",18.714,18.894],["små",18.894,19.216],["elastiske",19.216,19.758],["deformationer",19.758,20.595],["er",20.595,20.698],["krumningen",20.698,21.162],["en",21.162,21.291],["divideret",21.291,21.923],["med",21.923,22.155],["rho",22.155,22.412],["lig",22.412,22.593],["M",22.593,22.799],["divideret",22.799,23.469],["med",23.469,23.817],["E",23.817,24.075],["I",24.075,24.307],["Momentet",24.307,24.809],["bestemmer",24.809,25.454],["hvor",25.595,25.763],["meget",25.763,26.059],["bjælken",26.059,26.472],["krummer",26.472,26.987]],"text":"For en slank bjælke med små elastiske deformationer er krumningen en divideret med rho lig M divideret med E I. Momentet bestemmer, hvor meget bjælken krummer."},"ligning":{"start":28.214,"end":34.926,"words":[["For",28.328,28.457],["små",28.457,28.767],["hældninger",28.767,29.346],["giver",29.346,29.578],["det",29.578,29.694],["den",29.694,29.862],["elastiske",29.862,30.416],["linjes",30.416,30.751],["ligning",30.751,31.202],["E",31.331,31.524],["I",31.524,31.692],["gange",31.692,32.053],["anden",32.053,32.362],["afledte",32.362,32.98],["af",32.98,33.225],["y",33.225,33.496],["er",33.496,33.625],["lig",33.625,33.947],["M",33.947,34.269],["af",34.269,34.437],["x",34.437,34.926]],"text":"For små hældninger giver det den elastiske linjes ligning: E I gange anden afledte af y er lig M af x."},"integrer":{"start":36.148,"end":47.179,"words":[["Vi",36.288,36.443],["integrerer",36.443,36.958],["én",36.958,37.177],["gang",37.177,37.564],["og",37.564,37.693],["får",37.693,37.847],["hældningen",37.848,38.286],["theta",38.286,38.891],["Vi",39.795,39.95],["integrerer",39.95,40.465],["igen",40.465,40.929],["og",40.929,41.096],["får",41.096,41.277],["udbøjningen",41.277,41.883],["y",41.883,42.192],["Hver",43.094,43.352],["gang",43.352,43.635],["kommer",43.635,43.932],["der",43.932,44.086],["en",44.086,44.189],["integrationskonstant",44.189,45.504],["C",45.633,46.071],["et",46.071,46.341],["og",46.341,46.483],["C",46.483,46.767],["to.",46.767,47.179]],"text":"Vi integrerer én gang og får hældningen theta. Vi integrerer igen og får udbøjningen y. Hver gang kommer der en integrationskonstant, C et og C to."},"rand":{"start":48.426,"end":61.802,"words":[["Konstanterne",48.553,49.339],["finder",49.339,49.687],["vi",49.687,49.881],["fra",49.881,50.074],["randbetingelserne",50.074,51.092],["Ved",51.996,52.163],["en",52.163,52.266],["indspænding",52.266,52.885],["er",52.885,53.014],["både",53.014,53.4],["y",53.4,53.658],["og",53.658,53.748],["theta",53.748,54.161],["nul",54.161,54.573],["Ved",55.488,55.63],["en",55.63,55.746],["simpel",55.746,56.158],["understøtning",56.158,56.957],["er",56.957,57.176],["y",57.176,57.395],["nul",57.395,57.782],["Og",58.684,58.748],["midt",58.748,58.954],["på",58.954,59.135],["en",59.135,59.212],["symmetrisk",59.212,59.792],["belastet",59.792,60.307],["bjælke",60.307,60.81],["er",60.81,60.965],["theta",60.965,61.377],["nul",61.377,61.802]],"text":"Konstanterne finder vi fra randbetingelserne. Ved en indspænding er både y og theta nul. Ved en simpel understøtning er y nul. Og midt på en symmetrisk belastet bjælke er theta nul."},"eks":{"start":63.032,"end":71.563,"words":[["Et",63.172,63.275],["eksempel",63.275,63.713],["fra",63.713,63.868],["slides",63.868,64.448],["opgave",64.564,65.105],["fem",65.105,65.376],["komma",65.376,65.801],["enogtyve",65.801,66.639],["En",67.529,67.645],["indspændt",67.645,68.084],["bjælke",68.084,68.406],["med",68.406,68.573],["længden",68.573,68.998],["L",68.998,69.308],["har",69.308,69.527],["et",69.527,69.591],["moment",69.591,70.068],["M",70.068,70.352],["i",70.352,70.571],["den",70.571,70.777],["frie",70.777,71.138],["ende",71.138,71.563]],"text":"Et eksempel fra slides, opgave fem komma enogtyve. En indspændt bjælke med længden L har et moment M i den frie ende."},"eks2":{"start":72.79,"end":85.29,"words":[["Så",72.904,73.252],["er",73.252,73.459],["E",73.459,73.703],["I",73.703,73.948],["y",73.948,74.258],["dobbeltafledt",74.258,74.928],["lig",74.928,75.263],["minus",75.263,75.662],["M.",75.662,76.087],["Med",76.978,77.262],["y",77.262,77.481],["og",77.481,77.571],["theta",77.571,78.164],["lig",78.164,78.421],["nul",78.421,78.769],["ved",78.769,78.976],["indspændingen",78.976,79.517],["bliver",79.517,79.71],["theta",79.71,80.135],["lig",80.135,80.342],["minus",80.342,80.702],["M",80.702,80.909],["x",80.909,81.244],["over",81.244,81.553],["E",81.553,81.772],["I",81.772,82.081],["og",82.249,82.506],["y",82.506,82.7],["lig",82.7,82.88],["minus",82.88,83.241],["M",83.241,83.434],["x",83.434,83.666],["i",83.666,83.834],["anden",83.834,84.208],["over",84.208,84.465],["to",84.465,84.762],["E",84.762,84.968],["I",84.968,85.29]],"text":"Så er E I y dobbeltafledt lig minus M. Med y og theta lig nul ved indspændingen bliver theta lig minus M x over E I, og y lig minus M x i anden over to E I."},"eks3":{"start":86.508,"end":90.604,"words":[["I",86.635,86.713],["den",86.713,86.867],["frie",86.867,87.177],["ende",87.177,87.512],["er",87.512,87.692],["udbøjningen",87.692,88.388],["M",88.388,88.62],["L",88.62,88.8],["i",88.8,89.006],["anden",89.006,89.432],["over",89.432,89.741],["to",89.741,90.063],["E",90.063,90.295],["I",90.295,90.604]],"text":"I den frie ende er udbøjningen M L i anden over to E I."},"standard":{"start":91.826,"end":107.754,"words":[["To",91.953,92.198],["standardresultater",92.198,93.538],["skal",93.538,93.77],["du",93.77,93.873],["kende",93.873,94.376],["En",95.28,95.383],["simpelt",95.383,95.808],["understøttet",95.808,96.349],["bjælke",96.349,96.787],["med",96.787,96.981],["en",96.981,97.084],["punktlast",97.084,97.599],["P",97.599,97.792],["på",97.792,97.934],["midten",97.934,98.347],["bøjer",98.347,98.63],["P",98.63,98.862],["L",98.862,99.004],["i",99.004,99.158],["tredje",99.158,99.7],["over",99.7,100.009],["otteogfyrre",100.009,100.782],["E",100.782,100.988],["I",100.988,101.298],["Med",102.2,102.354],["en",102.354,102.432],["jævnt",102.432,102.689],["fordelt",102.689,103.037],["last",103.037,103.347],["w",103.347,103.901],["er",103.901,104.017],["det",104.017,104.133],["fem",104.133,104.403],["w",104.403,104.867],["L",104.867,105.073],["i",105.073,105.241],["fjerde",105.241,105.744],["over",105.744,106.014],["tre",106.014,106.272],["hundrede",106.272,106.465],["og",106.465,106.478],["fireogfirs",106.478,107.213],["E",107.213,107.432],["I",107.432,107.754]],"text":"To standardresultater skal du kende. En simpelt understøttet bjælke med en punktlast P på midten bøjer P L i tredje over otteogfyrre E I. Med en jævnt fordelt last w er det fem w L i fjerde over tre hundrede og fireogfirs E I."},"tjek_q":{"start":108.976,"end":115.149,"words":[["Tjek",109.077,109.399],["dig",109.399,109.579],["selv",109.579,110.005],["Hvad",110.909,111.025],["sker",111.025,111.296],["der",111.296,111.399],["med",111.399,111.605],["udbøjningen",111.605,112.236],["af",112.236,112.378],["en",112.378,112.481],["bjælke",112.481,112.803],["med",112.803,112.971],["punktlast",112.971,113.718],["hvis",113.86,114.079],["længden",114.079,114.427],["fordobles",114.427,115.149]],"text":"Tjek dig selv. Hvad sker der med udbøjningen af en bjælke med punktlast, hvis længden fordobles?"},"tjek_a":{"start":119.032,"end":123.064,"words":[["Den",119.159,119.288],["bliver",119.288,119.52],["otte",119.52,119.816],["gange",119.817,120.074],["så",120.074,120.203],["stor",120.203,120.667],["fordi",120.796,121.234],["L",121.234,121.427],["indgår",121.427,121.969],["i",121.969,122.097],["tredje",122.097,122.471],["potens",122.471,123.064]],"text":"Den bliver otte gange så stor, fordi L indgår i tredje potens."},"slut":{"start":124.278,"end":134.587,"words":[["Kort",124.405,124.611],["sagt",124.612,125.101],["E",125.23,125.449],["I",125.449,125.642],["y",125.642,125.887],["dobbeltafledt",125.887,126.544],["er",126.545,126.699],["M",126.699,127.086],["integrér",127.228,127.769],["to",127.769,128.014],["gange",128.014,128.439],["og",128.581,128.709],["find",128.709,128.954],["konstanterne",128.954,129.676],["fra",129.676,129.831],["randbetingelserne",129.831,130.771],["Stivhed",131.662,132.242],["er",132.242,132.371],["et",132.371,132.435],["designkrav",132.435,133.144],["på",133.144,133.299],["lige",133.299,133.569],["fod",133.569,133.879],["med",133.879,134.033],["styrke",134.033,134.587]],"text":"Kort sagt: E I y dobbeltafledt er M, integrér to gange, og find konstanterne fra randbetingelserne. Stivhed er et designkrav på lige fod med styrke."}}}, { audio: 'elastisk-linje.mp3', id: 'elastisk-linje' });</script>
+</body>
+</html>

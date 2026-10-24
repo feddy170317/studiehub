@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sprødt støbejern: eksempel fra slides · video</title>
+<meta name="description" content="Sprødt støbejern: træk og tryk hver for sig, n = 1,67.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 6: videoer</a><h1>Sprødt støbejern: eksempel fra slides</h1><span class="meta">MEM1 · kapitel 6 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Sprødt støbejern: eksempel fra slides"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Sprødt støbejern: træk og tryk hver for sig, n = 1,67.</p><div class="chips"><a href="kriterievalg.html">Se først: Tresca, von Mises og sprøde materialer</a><a href="../../Kapitel06_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l06">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Sprødt støbejern fra slides 34–35: nt = 1,67, nc = 20 → n = 1,67
+BP.scene({ header: 'MEM1 · kap. 6' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under } = B;
+
+  B.titel(0, 'Sprødt støbejern', 'MEM1 · kapitel 6 · opgave (slide 34–35)', 'titel');
+  text(0, 'træk og tryk hver for sig', 640, 520, 42, 'red', wt('titel', 'sprødt') - 0.2, we('titel', 'spændingstilstand'), { align: 'center' });
+
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start;
+    text(1, 'σ_1 = 120 MPa,   σ_2 = −40 MPa', 160, 170, 42, 'black', wt('data', 'Sigma') - 0.1, we('data', 'megapascal'));
+    text(1, 'S_{ut} = 200 MPa,   S_{uc} = 800 MPa', 160, 240, 42, 'black', wt('data', 'Trækstyrken') - 0.1, we('data', 'megapascal', 1));
+    text(1, 'træk:  n_t = S_{ut} / σ_1 = 200 / 120 = 1,67', 160, 350, 40, 'red', L('traek').start + 0.2, we('traek', 'syv'));
+    text(1, 'tryk:  n_c = S_{uc} / |σ_2| = 800 / 40 = 20', 160, 430, 40, 'blue', L('tryk').start + 0.2, we('tryk', 'tyve'));
+    const r = text(1, 'n = min(n_t, n_c) = 1,67  ✓', 160, 540, 50, 'green', L('styrende').start + 0.2, we('styrende', 'bestemmer'));
+    box(1, 135, 485, 680, 85, 'green', we('konkl', 'accepteres') - 0.4, we('konkl', 'accepteres') + 0.2);
+    text(1, 'trykket betyder næsten intet', 160, 640, 34, 'black', L('note').start + 0.2, we('note', 'træk'));
+  }
+
+  B.goto('tjek_q', 2);
+  B.tjek(2, ['σ_1 = 240 MPa.', 'Sikkerhed i træk?'], ['n_t = 200/240 = 0,83', '< 1 → brister i træk'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 3);
+  B.slut(3, 'Abou-Hayt (2026), MEM1 Chapter 6, slide 34–35 · Hamrock, Schmid & Jacobson, kap. 6', 'eksamensspørgsmål 5', 'slut');
+  text(3, 'træk mod S_{ut} · tryk mod S_{uc}', 200, 280, 44, 'blue', L('slut').start + 0.4, we('slut', 'sig'));
+  text(3, 'mindste n bestemmer: 1,67', 200, 370, 44, 'red', wt('slut', 'mindste') - 0.1, we('slut', 'syv'));
+});
+
+</script>
+<script>BP.live({"duration":92.042,"audio":"opg-stoebejern.mp3","order":["titel","data","traek","tryk","styrende","konkl","note","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.807,"words":[["Et",0.64,0.743],["eksempel",0.743,1.323],["med",1.323,1.504],["sprødt",1.504,1.813],["materiale",1.813,2.496],["fra",2.496,2.663],["slides",2.663,3.282],["En",4.186,4.314],["del",4.314,4.572],["i",4.572,4.649],["gråt",4.649,4.881],["støbejern",4.881,5.603],["under",5.603,5.899],["en",5.899,6.054],["asymmetrisk",6.054,6.853],["spændingstilstand",6.853,7.807]],"text":"Et eksempel med sprødt materiale fra slides. En del i gråt støbejern under en asymmetrisk spændingstilstand."},"data":{"start":9.034,"end":20.348,"words":[["Sigma",9.148,9.638],["et",9.638,9.896],["er",9.896,9.986],["hundrede",9.986,10.244],["og",10.244,10.27],["tyve",10.27,10.785],["og",10.927,11.107],["sigma",11.107,11.532],["to",11.532,11.893],["er",11.893,12.009],["minus",12.009,12.422],["fyrre",12.422,12.744],["megapascal",12.744,13.659],["Trækstyrken",14.549,15.271],["S",15.271,15.542],["u",15.542,15.709],["t",15.709,16.019],["er",16.019,16.134],["to",16.135,16.392],["hundrede",16.392,16.856],["og",16.998,17.204],["trykstyrken",17.204,17.951],["S",17.952,18.209],["u",18.209,18.364],["c",18.364,18.75],["er",18.75,18.918],["otte",18.918,19.214],["hundrede",19.214,19.498],["megapascal",19.498,20.348]],"text":"Sigma et er hundrede og tyve, og sigma to er minus fyrre megapascal. Trækstyrken S u t er to hundrede, og trykstyrken S u c er otte hundrede megapascal."},"traek":{"start":21.576,"end":31.898,"words":[["Vi",21.716,21.819],["tjekker",21.819,22.167],["træk",22.167,22.593],["og",22.592,22.734],["tryk",22.734,23.018],["hver",23.018,23.25],["for",23.25,23.417],["sig",23.417,23.843],["Sikkerheden",24.746,25.287],["i",25.287,25.352],["træk",25.352,25.79],["er",25.79,25.996],["S",25.996,26.305],["u",26.305,26.447],["t",26.447,26.808],["over",26.808,27.079],["sigma",27.079,27.504],["et",27.504,27.839],["to",27.955,28.225],["hundrede",28.225,28.457],["divideret",28.457,29.037],["med",29.037,29.256],["hundrede",29.256,29.54],["og",29.54,29.566],["tyve",29.566,30.081],["altså",30.21,30.648],["en",30.648,30.88],["komma",30.88,31.189],["seks",31.189,31.512],["syv",31.512,31.898]],"text":"Vi tjekker træk og tryk hver for sig. Sikkerheden i træk er S u t over sigma et, to hundrede divideret med hundrede og tyve, altså en komma seks syv."},"tryk":{"start":33.11,"end":40.338,"words":[["Sikkerheden",33.224,33.779],["i",33.779,33.843],["tryk",33.843,34.281],["er",34.281,34.487],["S",34.487,34.784],["u",34.784,34.938],["c",34.938,35.286],["divideret",35.286,35.802],["med",35.802,35.918],["størrelsen",35.918,36.446],["af",36.446,36.562],["sigma",36.562,36.936],["to",36.936,37.374],["otte",37.503,37.773],["hundrede",37.773,38.031],["divideret",38.031,38.624],["med",38.624,38.791],["fyrre",38.791,39.346],["altså",39.474,39.809],["tyve",39.809,40.338]],"text":"Sikkerheden i tryk er S u c divideret med størrelsen af sigma to, otte hundrede divideret med fyrre, altså tyve."},"styrende":{"start":41.572,"end":48.221,"words":[["Den",41.686,41.815],["styrende",41.815,42.202],["sikkerhedsfaktor",42.202,43.168],["er",43.168,43.31],["den",43.31,43.503],["mindste",43.503,44.058],["en",44.186,44.405],["komma",44.405,44.753],["seks",44.753,45.088],["syv",45.089,45.501],["Det",46.365,46.571],["er",46.571,46.7],["trækket",46.7,47.28],["der",47.422,47.551],["bestemmer",47.551,48.221]],"text":"Den styrende sikkerhedsfaktor er den mindste, en komma seks syv. Det er trækket, der bestemmer."},"konkl":{"start":49.434,"end":54.02,"words":[["Den",49.548,49.69],["er",49.69,49.742],["større",49.742,50.115],["end",50.115,50.283],["en",50.283,50.644],["så",50.786,51.017],["delen",51.017,51.378],["brister",51.378,51.765],["ikke",51.765,52.216],["og",52.358,52.474],["designet",52.474,52.976],["kan",52.976,53.118],["accepteres",53.118,54.02]],"text":"Den er større end en, så delen brister ikke, og designet kan accepteres."},"note":{"start":55.232,"end":62.358,"words":[["Bemærk",55.372,55.888],["at",56.055,56.21],["trykket",56.21,56.571],["næsten",56.571,57.06],["ikke",57.06,57.357],["betyder",57.357,57.769],["noget",57.769,58.233],["Støbejern",59.111,59.833],["er",59.833,59.987],["fire",59.987,60.296],["gange",60.296,60.567],["stærkere",60.567,61.082],["i",61.083,61.173],["tryk",61.173,61.598],["end",61.598,61.765],["i",61.766,61.843],["træk",61.843,62.358]],"text":"Bemærk, at trykket næsten ikke betyder noget. Støbejern er fire gange stærkere i tryk end i træk."},"tjek_q":{"start":63.574,"end":69.914,"words":[["Tjek",63.675,63.997],["dig",63.997,64.177],["selv",64.177,64.603],["Hvad",65.52,65.649],["ville",65.649,65.816],["sikkerheden",65.816,66.358],["i",66.358,66.422],["træk",66.422,66.731],["være",66.731,67.182],["hvis",67.285,67.453],["sigma",67.453,67.865],["et",67.865,68.02],["var",68.02,68.278],["to",68.278,68.535],["hundrede",68.535,68.754],["og",68.754,68.78],["fyrre",68.78,69.089],["megapascal",69.089,69.914]],"text":"Tjek dig selv. Hvad ville sikkerheden i træk være, hvis sigma et var to hundrede og fyrre megapascal?"},"tjek_a":{"start":73.798,"end":78.887,"words":[["Under",73.938,74.17],["en",74.17,74.531],["nul",74.673,74.943],["komma",74.943,75.407],["otte",75.407,75.742],["tre",75.742,76.18],["Delen",77.058,77.496],["ville",77.496,77.728],["briste",77.728,78.192],["i",78.192,78.359],["træk",78.359,78.887]],"text":"Under en, nul komma otte tre. Delen ville briste i træk."},"slut":{"start":80.124,"end":89.608,"words":[["Kort",80.251,80.483],["sagt",80.483,80.96],["tjek",81.089,81.347],["træk",81.347,81.695],["mod",81.695,82.017],["S",82.017,82.274],["u",82.275,82.403],["t",82.403,82.61],["og",82.61,82.635],["tryk",82.635,83.035],["mod",83.035,83.331],["S",83.331,83.602],["u",83.602,83.744],["c",83.744,84.04],["hver",84.04,84.336],["for",84.336,84.504],["sig",84.504,84.865],["og",85.006,85.135],["den",85.135,85.29],["mindste",85.29,85.612],["sikkerhedsfaktor",85.612,86.476],["bestemmer",86.476,87.133],["Her",88.023,88.307],["en",88.307,88.565],["komma",88.565,88.887],["seks",88.887,89.222],["syv",89.222,89.608]],"text":"Kort sagt: tjek træk mod S u t og tryk mod S u c hver for sig, og den mindste sikkerhedsfaktor bestemmer. Her en komma seks syv."}}}, { audio: 'opg-stoebejern.mp3', id: 'opg-stoebejern' });</script>
+</body>
+</html>

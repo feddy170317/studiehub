@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Von Mises: eksempel fra slides · video</title>
+<meta name="description" content="Von Mises-eksemplet fra slides: σv = 158,7 MPa og n = 1,58.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 6: videoer</a><h1>Von Mises: eksempel fra slides</h1><span class="meta">MEM1 · kapitel 6 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Von Mises: eksempel fra slides"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Von Mises-eksemplet fra slides: σv = 158,7 MPa og n = 1,58.</p><div class="chips"><a href="von-mises.html">Se først: Von Mises: formændringsenergi</a><a href="../../Kapitel06_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l06">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Von Mises-eksempel fra slides 29–30: σv = 158,7 MPa, n = 1,58
+BP.scene({ header: 'MEM1 · kap. 6' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under } = B;
+
+  B.titel(0, 'Von Mises i praksis', 'MEM1 · kapitel 6 · opgave (slide 29–30)', 'titel');
+  text(0, 'samme del som Tresca-eksemplet', 640, 520, 40, 'red', wt('titel', 'samme') - 0.2, we('titel', 'sammenligne'), { align: 'center' });
+
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start;
+    text(1, 'σ_1 = 180,  σ_2 = 60,  σ_3 = 0,  S_y = 250 MPa', 160, 170, 38, 'black', t0 + 0.2, we('data', 'megapascal'));
+    text(1, 'σ_v = √(σ_1² + σ_2² − σ_1 σ_2)', 160, 260, 44, 'blue', L('formel').start + 0.3, we('formel', 'to', 1));
+    text(1, '= √(32 400 + 3 600 − 10 800)', 260, 340, 42, 'blue', L('tal').start + 0.2, we('tal', 'hundrede', 2));
+    text(1, '= √25 200 = 158,7 MPa', 260, 420, 46, 'red', L('resultat').start + 0.2, we('resultat', 'megapascal'));
+    const r = text(1, 'n = 250 / 158,7 = 1,58', 160, 530, 52, 'green', L('n').start + 0.2, we('n', 'otte'));
+    box(1, 135, 470, 600, 85, 'green', we('n', 'otte'), we('n', 'otte') + 0.6);
+    text(1, 'Tresca: n = 1,39  (mere konservativ)', 160, 640, 38, 'red', L('sammenlign').start + 0.2, we('sammenlign', 'konservativ'));
+  }
+
+  B.goto('tjek_q', 2);
+  B.tjek(2, ['Kunden kræver en konservativ', 'vurdering. Hvilket n?'], ['Tresca: n = 1,39', 'giver altid den mindste n'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 3);
+  B.slut(3, 'Abou-Hayt (2026), MEM1 Chapter 6, slide 29–30 · Hamrock, Schmid & Jacobson, kap. 6', 'sprødt støbejern', 'slut');
+  text(3, 'σ_v = 158,7 MPa  ·  n = 1,58', 200, 280, 46, 'blue', L('slut').start + 0.4, we('slut', 'otte'));
+  text(3, 'Tresca: n = 1,39', 200, 370, 46, 'red', wt('slut', 'Tresca') - 0.1, we('slut', 'ni'));
+});
+
+</script>
+<script>BP.live({"duration":90.866,"audio":"opg-von-mises.mp3","order":["titel","data","formel","tal","resultat","n","sammenlign","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.497,"words":[["Et",0.64,0.743],["eksempel",0.743,1.31],["med",1.31,1.542],["von",1.542,1.761],["Mises",1.761,2.315],["fra",2.315,2.457],["slides",2.457,3.037],["Samme",3.928,4.302],["ståldel",4.302,4.817],["som",4.817,5.049],["i",5.049,5.113],["Tresca",5.113,5.5],["eksemplet",5.5,6.17],["så",6.312,6.518],["vi",6.518,6.621],["kan",6.621,6.737],["sammenligne",6.737,7.497]],"text":"Et eksempel med von Mises fra slides. Samme ståldel som i Tresca eksemplet, så vi kan sammenligne."},"data":{"start":8.722,"end":16.027,"words":[["Sigma",8.836,9.313],["et",9.313,9.584],["er",9.584,9.674],["hundrede",9.674,9.919],["og",9.919,9.932],["firs",9.932,10.447],["sigma",10.576,11.001],["to",11.001,11.285],["er",11.285,11.324],["tres",11.324,11.839],["sigma",11.981,12.393],["tre",12.393,12.715],["er",12.715,12.78],["nul",12.78,13.218],["og",13.36,13.54],["S",13.54,13.836],["y",13.836,14.055],["er",14.055,14.184],["to",14.184,14.442],["hundrede",14.442,14.648],["og",14.648,14.674],["halvtreds",14.674,15.074],["megapascal",15.074,16.027]],"text":"Sigma et er hundrede og firs, sigma to er tres, sigma tre er nul, og S y er to hundrede og halvtreds megapascal."},"formel":{"start":17.256,"end":24.909,"words":[["Vi",17.383,17.486],["bruger",17.486,17.783],["von",17.783,17.989],["Mises",17.989,18.401],["for",18.401,18.543],["plan",18.543,18.84],["spænding",18.839,19.355],["kvadratroden",19.497,20.141],["af",20.141,20.193],["sigma",20.193,20.618],["et",20.618,20.824],["i",20.824,20.992],["anden",20.992,21.288],["plus",21.288,21.52],["sigma",21.52,21.894],["to",21.894,22.242],["i",22.242,22.409],["anden",22.409,22.628],["minus",22.628,23.144],["sigma",23.144,23.659],["et",23.659,23.814],["gange",23.814,24.123],["sigma",24.123,24.484],["to.",24.484,24.909]],"text":"Vi bruger von Mises for plan spænding: kvadratroden af sigma et i anden plus sigma to i anden minus sigma et gange sigma to."},"tal":{"start":26.15,"end":32.592,"words":[["Det",26.29,26.393],["er",26.393,26.471],["kvadratroden",26.471,27.141],["af",27.141,27.282],["toogtredive",27.282,27.914],["tusind",27.914,28.494],["fire",28.494,28.803],["hundrede",28.803,29.048],["plus",29.048,29.28],["tre",29.28,29.55],["tusind",29.551,29.937],["seks",29.937,30.246],["hundrede",30.246,30.491],["minus",30.491,30.955],["ti",30.955,31.239],["tusind",31.239,31.767],["otte",31.767,32.076],["hundrede",32.076,32.592]],"text":"Det er kvadratroden af toogtredive tusind fire hundrede plus tre tusind seks hundrede minus ti tusind otte hundrede."},"resultat":{"start":33.82,"end":39.836,"words":[["Altså",33.96,34.257],["kvadratroden",34.257,34.978],["af",34.978,35.146],["femogtyve",35.146,35.739],["tusind",35.739,36.074],["to",36.074,36.293],["hundrede",36.293,36.769],["som",36.898,37.13],["er",37.13,37.169],["hundrede",37.169,37.452],["og",37.452,37.517],["otteoghalvtreds",37.517,38.329],["komma",38.329,38.664],["syv",38.664,38.986],["megapascal",38.986,39.836]],"text":"Altså kvadratroden af femogtyve tusind to hundrede, som er hundrede og otteoghalvtreds komma syv megapascal."},"n":{"start":41.058,"end":48.015,"words":[["Sikkerhedsfaktoren",41.185,42.255],["er",42.255,42.435],["to",42.435,42.693],["hundrede",42.693,42.899],["og",42.899,42.925],["halvtreds",42.925,43.299],["divideret",43.299,43.93],["med",43.93,44.188],["hundrede",44.188,44.497],["og",44.497,44.562],["otteoghalvtreds",44.562,45.232],["komma",45.232,45.489],["syv",45.489,45.902],["altså",46.044,46.559],["en",46.559,46.804],["komma",46.804,47.216],["fem",47.216,47.564],["otte",47.564,48.015]],"text":"Sikkerhedsfaktoren er to hundrede og halvtreds divideret med hundrede og otteoghalvtreds komma syv, altså en komma fem otte."},"sammenlign":{"start":49.232,"end":57.065,"words":[["Med",49.372,49.514],["Tresca",49.514,50.094],["fik",50.094,50.352],["vi",50.352,50.532],["en",50.532,50.751],["komma",50.751,51.009],["tre",51.009,51.279],["ni",51.279,51.524],["for",51.524,51.705],["den",51.705,51.859],["samme",51.859,52.194],["del.",52.194,52.413],["Von",52.413,52.594],["Mises",52.594,53.122],["giver",53.122,53.406],["en",53.406,53.483],["større",53.483,53.779],["sikkerhedsfaktor",53.779,54.836],["fordi",54.939,55.287],["Tresca",55.287,55.777],["er",55.777,55.919],["mere",55.919,56.189],["konservativ",56.189,57.065]],"text":"Med Tresca fik vi en komma tre ni for den samme del. Von Mises giver en større sikkerhedsfaktor, fordi Tresca er mere konservativ."},"tjek_q":{"start":58.294,"end":66.039,"words":[["Tjek",58.395,58.717],["dig",58.717,58.897],["selv",58.897,59.323],["Hvilken",60.227,60.562],["af",60.562,60.665],["de",60.665,60.768],["to",60.768,61.013],["sikkerhedsfaktorer",61.013,62.083],["ville",62.083,62.34],["du",62.34,62.443],["skrive",62.443,62.817],["i",62.817,62.907],["en",62.907,63.023],["rapport",63.023,63.59],["hvis",63.732,63.913],["kunden",63.913,64.196],["kræver",64.196,64.531],["en",64.531,64.686],["konservativ",64.686,65.433],["vurdering",65.433,66.039]],"text":"Tjek dig selv. Hvilken af de to sikkerhedsfaktorer ville du skrive i en rapport, hvis kunden kræver en konservativ vurdering?"},"tjek_a":{"start":69.91,"end":77.487,"words":[["Tresca",70.011,70.681],["en",70.823,71.042],["komma",71.042,71.351],["tre",71.351,71.66],["ni",71.66,71.982],["Den",72.887,73.003],["ligger",73.003,73.299],["inden",73.299,73.583],["for",73.583,73.763],["von",73.763,73.982],["Mises",73.982,74.343],["grænsen",74.343,74.923],["og",74.923,75.065],["giver",75.065,75.387],["altid",75.387,75.838],["den",75.838,76.044],["mindste",76.044,76.418],["sikkerhedsfaktor",76.418,77.487]],"text":"Tresca, en komma tre ni. Den ligger inden for von Mises grænsen og giver altid den mindste sikkerhedsfaktor."},"slut":{"start":78.708,"end":88.424,"words":[["Kort",78.835,79.067],["sagt",79.067,79.583],["von",79.712,79.905],["Mises",79.905,80.279],["spændingen",80.279,80.73],["er",80.73,80.858],["hundrede",80.859,81.142],["og",81.142,81.219],["otteoghalvtreds",81.219,81.877],["komma",81.877,82.147],["syv",82.147,82.431],["megapascal",82.431,83.268],["og",83.449,83.629],["n",83.629,83.861],["er",83.861,84.003],["en",84.003,84.351],["komma",84.351,84.737],["fem",84.737,85.06],["otte",85.06,85.511],["Tresca",86.401,86.852],["giver",86.852,87.2],["en",87.2,87.484],["komma",87.484,87.806],["tre",87.806,88.115],["ni",88.115,88.424]],"text":"Kort sagt: von Mises spændingen er hundrede og otteoghalvtreds komma syv megapascal, og n er en komma fem otte. Tresca giver en komma tre ni."}}}, { audio: 'opg-von-mises.mp3', id: 'opg-von-mises' });</script>
+</body>
+</html>

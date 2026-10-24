@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opgave 5.47: trinbjælke med Castigliano · video</title>
+<meta name="description" content="Trinbjælke med I og 2I: δ = 3PL³/(16EI) med Castigliano.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 5: videoer</a><h1>Opgave 5.47: trinbjælke med Castigliano</h1><span class="meta">MEM1 · kapitel 5 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Opgave 5.47: trinbjælke med Castigliano"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Trinbjælke med I og 2I: δ = 3PL³/(16EI) med Castigliano.</p><div class="chips"><a href="castigliano.html">Se først: Castiglianos sætning</a><a href="../../Kapitel05_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l05">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Opgave 5.47: trinbjælke, I ved fri ende, 2I ved indspænding → δ = 3PL³/(16EI) (MEM1 kap. 5, slides 24–25, 34)
+BP.scene({ header: 'MEM1 · kap. 5' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, wall, rect, PI } = B;
+
+  B.titel(0, 'Opgave 5.47', 'MEM1 · kapitel 5 · opgave (slide 24–25)', 'titel');
+  text(0, 'to stivheder · Castigliano', 640, 520, 42, 'red', wt('titel', 'to') - 0.2, we('titel', 'Castigliano'), { align: 'center' });
+
+  B.goto('opgave', 1);
+  {
+    const t0 = L('opgave').start;
+    wall(1, 160, 140, 320, t0);
+    line(1, [[160, 190], [480, 190], [480, 205], [800, 205], [800, 245], [480, 245], [480, 260], [160, 260]], 'black', 3.2, t0 + 0.2, t0 + 0.9);
+    text(1, '2I', 320, 240, 36, 'blue', wt('opgave', 'to') - 0.1, wt('opgave', 'to') + 0.4, { align: 'center' });
+    text(1, 'I', 640, 235, 36, 'blue', wt('opgave', 'I') - 0.1, wt('opgave', 'I') + 0.3, { align: 'center' });
+    arrow(1, [[800, 100], [800, 200]], 'red', 4.2, wt('opgave', 'kraft') - 0.2, wt('opgave', 'kraft') + 0.3); text(1, 'P', 816, 130, 38, 'red', wt('opgave', 'P') - 0.1, wt('opgave', 'P') + 0.3);
+    arrow(1, [[796, 310], [164, 310]], 'black', 2.2, L('moment').start, L('moment').start + 0.5, 12); text(1, 'x', 760, 345, 32, 'black', L('moment').start + 0.3, L('moment').start + 0.6);
+    text(1, 'L/2', 320, 350, 30, 'black', t0 + 0.6, t0 + 0.9, { align: 'center' }); text(1, 'L/2', 640, 350, 30, 'black', t0 + 0.7, t0 + 1.0, { align: 'center' });
+    text(1, 'M = P x', 900, 230, 46, 'green', wt('moment', 'momentet') - 0.1, we('moment', 'vejen'));
+    const te = L('energi').start;
+    text(1, 'U = ∫ (Px)²/(2EI) dx  [0; L/2]  +  ∫ (Px)²/(2E·2I) dx  [L/2; L]', 140, 440, 30, 'blue', te + 0.2, we('energi', 'I', 2));
+    text(1, '= P² L³ / (48 E I)', 160, 520, 38, 'blue', L('integral1').start + 0.2, we('integral1', 'I'));
+    text(1, '+ 7 P² L³ / (96 E I)', 580, 520, 38, 'blue', L('integral2').start + 0.3, we('integral2', 'I'));
+  }
+
+  B.goto('diff', 2);
+  {
+    const t0 = L('diff').start;
+    text(2, 'δ = ∂U / ∂P = 2P L³/48EI + 14P L³/96EI', 160, 200, 38, 'black', t0, we('diff', 'P'));
+    const r = text(2, 'δ = 3 P L³ / (16 E I)', 160, 300, 56, 'red', L('resultat').start + 0.2, we('resultat', 'I'));
+    box(2, 135, 235, 600, 95, 'red', we('resultat', 'I'), we('resultat', 'I') + 0.6);
+    const ts = L('sammenlign').start;
+    text(2, 'kun I hele vejen:  δ = P L³ / (3 E I)', 160, 440, 40, 'blue', wt('sammenlign', 'Til') - 0.1, we('sammenlign', 'I'));
+    text(2, '3/16 ≈ 0,19  mod  1/3 ≈ 0,33  →  ca. 44 % mindre', 160, 520, 36, 'green', wt('sammenlign', 'stive') - 0.2, we('sammenlign', 'procent'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Hvorfor deles integralet', 'ved L/2?'], ['I springer der', 'hvert stykke har sit eget I'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 5, slide 24–25 og 34 · Hamrock, Schmid & Jacobson, opgave 5.47', '', 'slut');
+  text(4, 'M = P x  →  del ved trinnet  →  ∂U/∂P', 200, 280, 42, 'blue', L('slut').start + 0.4, we('slut', 'P', 1));
+  text(4, 'δ = 3 P L³ / (16 E I)', 200, 370, 48, 'red', wt('slut', 'tre') - 0.1, we('slut', 'I'));
+});
+
+</script>
+<script>BP.live({"duration":110.454,"audio":"opg-5-47-trinbjaelke.mp3","order":["titel","opgave","moment","energi","integral1","integral2","diff","resultat","sammenlign","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":10.345,"words":[["Opgave",0.653,1.181],["fem",1.181,1.478],["komma",1.478,1.813],["syvogfyrre",1.813,2.663],["En",3.567,3.683],["indspændt",3.683,4.16],["bjælke",4.16,4.611],["har",4.611,4.843],["to",4.843,5.126],["forskellige",5.126,5.629],["stivheder",5.629,6.325],["Vi",7.227,7.317],["finder",7.317,7.613],["udbøjningen",7.613,8.258],["i",8.258,8.399],["den",8.399,8.567],["frie",8.567,8.928],["ende",8.928,9.302],["med",9.302,9.482],["Castigliano",9.482,10.345]],"text":"Opgave fem komma syvogfyrre. En indspændt bjælke har to forskellige stivheder. Vi finder udbøjningen i den frie ende med Castigliano."},"opgave":{"start":11.578,"end":22.493,"words":[["Bjælken",11.679,12.156],["har",12.156,12.375],["længden",12.375,12.826],["L.",12.826,13.328],["Den",14.233,14.349],["yderste",14.349,14.684],["halvdel",14.684,15.212],["har",15.212,15.457],["inertimomentet",15.457,16.398],["I",16.398,16.72],["og",16.862,17.119],["halvdelen",17.119,17.66],["ved",17.66,17.815],["indspændingen",17.815,18.485],["har",18.485,18.691],["to",18.691,19.039],["I",19.039,19.284],["En",20.173,20.289],["kraft",20.289,20.689],["P",20.689,21.011],["sidder",21.011,21.385],["i",21.385,21.552],["den",21.552,21.745],["frie",21.746,22.093],["ende",22.093,22.493]],"text":"Bjælken har længden L. Den yderste halvdel har inertimomentet I, og halvdelen ved indspændingen har to I. En kraft P sidder i den frie ende."},"moment":{"start":23.712,"end":29.588,"words":[["Vi",23.826,23.955],["måler",23.955,24.329],["x",24.329,24.664],["fra",24.664,24.819],["den",24.819,24.986],["frie",24.986,25.347],["ende",25.347,25.759],["Så",26.637,26.882],["er",26.882,26.895],["momentet",26.895,27.501],["M",27.501,27.733],["lig",27.733,27.9],["P",27.9,28.119],["gange",28.119,28.544],["x",28.544,28.854],["hele",28.854,29.099],["vejen",29.099,29.588]],"text":"Vi måler x fra den frie ende. Så er momentet M lig P gange x hele vejen."},"energi":{"start":30.806,"end":39.401,"words":[["Energien",30.946,31.449],["deles",31.449,31.81],["i",31.81,31.926],["to",31.926,32.196],["stykker",32.196,32.725],["fordi",32.841,33.304],["I",33.304,33.485],["ændrer",33.485,33.756],["sig",33.756,34.181],["Fra",35.071,35.239],["nul",35.239,35.471],["til",35.471,35.716],["L",35.716,35.922],["halve",35.922,36.296],["med",36.296,36.644],["I",36.644,36.953],["og",37.095,37.288],["fra",37.288,37.481],["L",37.481,37.7],["halve",37.7,38.01],["til",38.01,38.293],["L",38.293,38.59],["med",38.59,38.821],["to",38.821,39.144],["I",39.144,39.401]],"text":"Energien deles i to stykker, fordi I ændrer sig. Fra nul til L halve med I, og fra L halve til L med to I."},"integral1":{"start":40.612,"end":49.594,"words":[["Første",40.739,41.177],["stykke",41.177,41.474],["er",41.474,41.538],["integralet",41.538,42.26],["af",42.26,42.492],["P",42.492,42.762],["x",42.763,43.033],["i",43.033,43.214],["anden",43.214,43.626],["over",43.626,43.961],["to",43.961,44.296],["E",44.296,44.528],["I",44.528,44.85],["Det",45.728,45.805],["giver",45.805,46.231],["P",46.231,46.514],["i",46.514,46.759],["anden",46.759,47.055],["L",47.055,47.261],["i",47.261,47.442],["tredje",47.442,47.983],["over",47.983,48.305],["otteogfyrre",48.305,49.066],["E",49.066,49.285],["I",49.285,49.594]],"text":"Første stykke er integralet af P x i anden over to E I. Det giver P i anden L i tredje over otteogfyrre E I."},"integral2":{"start":50.826,"end":61.496,"words":[["Andet",50.966,51.185],["stykke",51.185,51.495],["er",51.495,51.572],["integralet",51.572,52.281],["af",52.281,52.525],["P",52.526,52.809],["x",52.809,53.067],["i",53.067,53.247],["anden",53.247,53.621],["over",53.621,53.917],["fire",53.917,54.278],["E",54.278,54.497],["I",54.497,54.768],["fra",54.768,55.051],["L",55.051,55.27],["halve",55.27,55.644],["til",55.644,55.812],["L.",55.812,56.25],["Det",57.128,57.205],["giver",57.205,57.63],["syv",57.63,57.952],["P",57.952,58.184],["i",58.184,58.455],["anden",58.455,58.79],["L",58.79,59.009],["i",59.009,59.189],["tredje",59.189,59.731],["over",59.731,60.027],["seksoghalvfems",60.027,60.929],["E",60.929,61.174],["I",61.174,61.496]],"text":"Andet stykke er integralet af P x i anden over fire E I fra L halve til L. Det giver syv P i anden L i tredje over seksoghalvfems E I."},"diff":{"start":62.72,"end":66.017,"words":[["Vi",62.86,62.963],["lægger",62.963,63.234],["dem",63.234,63.376],["sammen",63.376,63.865],["og",63.865,64.007],["differentierer",64.007,64.819],["med",64.819,64.986],["hensyn",64.987,65.476],["til",65.476,65.618],["P",65.618,66.017]],"text":"Vi lægger dem sammen og differentierer med hensyn til P."},"resultat":{"start":67.246,"end":71.729,"words":[["Udbøjningen",67.386,67.902],["bliver",67.902,68.185],["tre",68.185,68.507],["P",68.507,68.752],["L",68.752,69.01],["i",69.01,69.203],["tredje",69.203,69.616],["divideret",69.616,70.273],["med",70.273,70.492],["seksten",70.492,71.175],["E",71.175,71.407],["I",71.407,71.729]],"text":"Udbøjningen bliver tre P L i tredje divideret med seksten E I."},"sammenlign":{"start":72.948,"end":83.296,"words":[["Til",73.075,73.23],["sammenligning",73.23,73.823],["ville",73.823,74.003],["en",74.003,74.119],["bjælke",74.119,74.454],["med",74.454,74.673],["I",74.673,74.763],["hele",74.763,75.06],["vejen",75.06,75.459],["bøje",75.459,75.781],["P",75.781,76.052],["L",76.052,76.233],["i",76.233,76.4],["tredje",76.4,76.941],["over",76.941,77.238],["tre",77.238,77.586],["E",77.586,77.818],["I",77.818,78.153],["Den",79.043,79.159],["stive",79.159,79.456],["halvdel",79.456,79.868],["ved",79.868,80.048],["indspændingen",80.049,80.667],["reducerer",80.667,81.234],["udbøjningen",81.234,82.007],["med",82.007,82.149],["godt",82.149,82.407],["fyrre",82.407,82.716],["procent",82.716,83.296]],"text":"Til sammenligning ville en bjælke med I hele vejen bøje P L i tredje over tre E I. Den stive halvdel ved indspændingen reducerer udbøjningen med godt fyrre procent."},"tjek_q":{"start":84.53,"end":88.937,"words":[["Tjek",84.631,84.953],["dig",84.953,85.133],["selv",85.133,85.559],["Hvorfor",86.45,86.734],["skal",86.734,86.927],["integralet",86.927,87.558],["deles",87.558,87.984],["ved",87.984,88.241],["L",88.241,88.447],["halve",88.448,88.937]],"text":"Tjek dig selv. Hvorfor skal integralet deles ved L halve?"},"tjek_a":{"start":92.834,"end":97.962,"words":[["Fordi",92.961,93.399],["inertimomentet",93.399,94.417],["springer",94.417,94.83],["der",94.83,95.191],["Hvert",96.055,96.377],["stykke",96.377,96.725],["skal",96.725,96.905],["have",96.905,97.021],["sit",97.021,97.266],["eget",97.266,97.679],["I",97.679,97.962]],"text":"Fordi inertimomentet springer der. Hvert stykke skal have sit eget I."},"slut":{"start":99.184,"end":108.036,"words":[["Kort",99.311,99.543],["sagt",99.543,100.033],["M",100.149,100.42],["er",100.42,100.6],["P",100.6,100.896],["x",100.896,101.335],["del",101.463,101.708],["integralet",101.708,102.314],["ved",102.314,102.456],["trinnet",102.456,102.984],["differentiér",103.113,103.719],["med",103.719,103.886],["hensyn",103.886,104.286],["til",104.286,104.414],["P",104.414,104.814],["og",104.956,105.072],["du",105.072,105.2],["får",105.2,105.329],["tre",105.329,105.613],["P",105.613,105.806],["L",105.806,105.961],["i",105.961,106.115],["tredje",106.115,106.618],["over",106.618,106.889],["seksten",106.889,107.494],["E",107.494,107.713],["I",107.713,108.036]],"text":"Kort sagt: M er P x, del integralet ved trinnet, differentiér med hensyn til P, og du får tre P L i tredje over seksten E I."}}}, { audio: 'opg-5-47-trinbjaelke.mp3', id: 'opg-5-47-trinbjaelke' });</script>
+</body>
+</html>

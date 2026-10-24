@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tøjningsenergi · video</title>
+<meta name="description" content="U = ½Pδ og energi fra bøjning, træk og vridning.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 5: videoer</a><h1>Tøjningsenergi</h1><span class="meta">MEM1 · kapitel 5 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Tøjningsenergi"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>U = ½Pδ og energi fra bøjning, træk og vridning.</p><div class="chips"><a href="../../Kapitel05_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l05">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Tøjningsenergi (MEM1 kap. 5, slides 17–20)
+BP.scene({ header: 'MEM1 · kap. 5' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, axes, plot, hatch, dashed, PI } = B;
+
+  B.titel(0, 'Tøjningsenergi', 'MEM1 · kapitel 5 · begreb (slide 17–20)', 'titel');
+  text(0, 'arbejdet gemmes i materialet', 640, 520, 42, 'red', wt('titel', 'arbejde') - 0.2, we('titel', 'materialet'), { align: 'center' });
+
+  B.goto('arbejde', 1);
+  {
+    const t0 = L('arbejde').start, ox = 170, oy = 600;
+    axes(1, ox, oy, 640, 150, 'δ', 'P', t0);
+    plot(1, [[ox, oy], [520, 260]], 'blue', t0 + 0.4, t0 + 1.0);
+    hatch(1, [[ox, oy], [520, 260], [520, oy]], 'red', wt('arbejde', 'arealet') - 0.2, we('arbejde', 'kurven'), { gap: 9 });
+    dashed(1, [520, 260], [520, oy], 'black', t0 + 0.9, t0 + 1.2); dashed(1, [ox, 260], [520, 260], 'black', t0 + 1.0, t0 + 1.3);
+    text(1, 'P_1', ox - 14, 270, 32, 'black', t0 + 1.1, t0 + 1.3, { align: 'right' }); text(1, 'δ_1', 510, oy + 40, 32, 'black', t0 + 1.1, t0 + 1.3);
+    text(1, 'U = ½ P δ', 720, 300, 54, 'red', wt('arbejde', 'halv') - 0.1, we('arbejde', 'delta'));
+    text(1, 'kommer tilbage ved aflastning', 720, 380, 32, 'black', L('genvind').start + 0.2, we('genvind', 'område'));
+  }
+
+  B.goto('boejning', 2);
+  {
+    const s = 44;
+    text(2, 'bøjning:', 160, 180, 36, 'black', L('boejning').start, L('boejning').start + 0.5);
+    const r = text(2, 'U_b = ∫ M² / (2 E I) dx', 420, 180, s, 'red', wt('boejning', 'integralet') - 0.1, we('boejning', 'bjælken'));
+    text(2, 'aksial:', 160, 270, 36, 'black', L('aksial').start, L('aksial').start + 0.5);
+    text(2, 'U_a = ∫ N² / (2 E A) dx', 420, 270, s, 'blue', wt('aksial', 'N') - 0.2, we('aksial', 'A'));
+    text(2, 'vridning:', 160, 360, 36, 'black', wt('aksial', 'vridning') - 0.2, wt('aksial', 'vridning') + 0.3);
+    text(2, 'U_t = ∫ T² / (2 G J) dx', 420, 360, s, 'green', wt('aksial', 'T') - 0.2, we('aksial', 'J'));
+    const ts = L('sum').start;
+    text(2, 'U = U_b + U_a + U_t + U_s', 160, 470, 46, 'black', wt('sum', 'samlede') - 0.2, we('sum', 'forskydning'));
+    text(2, 'U_s ofte lille for slanke bjælker', 160, 540, 34, 'blue', L('forskydning').start + 0.2, we('forskydning', 'det'));
+    text(2, 'I ændrer sig ⇒ del integralet op', 160, 620, 36, 'red', L('stykvis').start + 0.2, we('stykvis', 'I'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Lasten fordobles.', 'Hvad sker der med U_b?'], ['4 gange større', 'M indgår i anden'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 5, slide 17–20 · Hamrock, Schmid & Jacobson, kap. 5', 'Castiglianos sætning', 'slut');
+  text(4, 'U = ½ P δ', 200, 280, 46, 'blue', L('slut').start + 0.4, we('slut', 'delta'));
+  text(4, 'U_b = ∫ M² / (2EI) dx', 200, 370, 46, 'red', wt('slut', 'bøjning') - 0.1, we('slut', 'I'));
+});
+
+</script>
+<script>BP.live({"duration":90.688,"audio":"toejningsenergi.mp3","order":["titel","arbejde","genvind","boejning","aksial","sum","forskydning","stykvis","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.961,"words":[["Tøjningsenergi",0.601,1.696],["Når",2.588,2.742],["en",2.742,2.832],["elastisk",2.832,3.322],["bjælke",3.322,3.657],["belastes",3.657,4.186],["langsomt",4.186,4.843],["gemmes",4.985,5.281],["det",5.281,5.448],["ydre",5.448,5.783],["arbejde",5.784,6.273],["som",6.273,6.505],["energi",6.505,7.046],["i",7.046,7.137],["materialet",7.137,7.961]],"text":"Tøjningsenergi. Når en elastisk bjælke belastes langsomt, gemmes det ydre arbejde som energi i materialet."},"arbejde":{"start":9.178,"end":15.542,"words":[["For",9.305,9.46],["en",9.46,9.524],["lineær",9.524,9.872],["sammenhæng",9.872,10.349],["mellem",10.349,10.594],["last",10.594,10.942],["og",10.942,11.097],["udbøjning",11.097,11.702],["er",11.702,11.883],["energien",11.883,12.308],["arealet",12.308,12.926],["under",12.926,13.146],["kurven",13.146,13.661],["en",13.803,13.957],["halv",13.957,14.164],["gange",14.164,14.447],["P",14.447,14.666],["gange",14.666,14.988],["delta",14.988,15.542]],"text":"For en lineær sammenhæng mellem last og udbøjning er energien arealet under kurven: en halv gange P gange delta."},"genvind":{"start":16.776,"end":22.161,"words":[["Energien",16.916,17.393],["kommer",17.393,17.638],["tilbage",17.638,18.282],["når",18.424,18.63],["vi",18.63,18.785],["aflaster",18.785,19.532],["så",19.674,19.841],["længe",19.841,20.099],["vi",20.099,20.189],["holder",20.189,20.421],["os",20.421,20.602],["i",20.602,20.756],["det",20.756,20.885],["elastiske",20.885,21.53],["område",21.53,22.161]],"text":"Energien kommer tilbage, når vi aflaster, så længe vi holder os i det elastiske område."},"boejning":{"start":23.39,"end":28.943,"words":[["For",23.517,23.646],["bøjning",23.646,24.046],["er",24.046,24.239],["energien",24.239,24.69],["integralet",24.69,25.373],["af",25.373,25.592],["M",25.592,25.824],["i",25.824,26.03],["anden",26.03,26.43],["divideret",26.43,27.035],["med",27.035,27.293],["to",27.293,27.628],["E",27.628,27.821],["I",27.821,28.002],["langs",28.002,28.35],["bjælken",28.35,28.943]],"text":"For bøjning er energien integralet af M i anden divideret med to E I langs bjælken."},"aksial":{"start":30.172,"end":39.386,"words":[["For",30.286,30.428],["træk",30.428,30.737],["og",30.737,30.815],["tryk",30.815,31.214],["er",31.214,31.343],["det",31.343,31.459],["integralet",31.459,32.142],["af",32.142,32.387],["N",32.387,32.645],["i",32.645,32.851],["anden",32.851,33.263],["over",33.263,33.56],["to",33.56,33.882],["E",33.882,34.101],["A.",34.101,34.578],["Og",35.468,35.533],["for",35.533,35.675],["vridning",35.675,36.087],["er",36.087,36.229],["det",36.229,36.345],["integralet",36.345,37.041],["af",37.041,37.234],["T",37.234,37.53],["i",37.53,37.736],["anden",37.736,38.162],["over",38.162,38.445],["to",38.445,38.729],["G",38.729,38.961],["J",38.961,39.386]],"text":"For træk og tryk er det integralet af N i anden over to E A. Og for vridning er det integralet af T i anden over to G J."},"sum":{"start":40.626,"end":49.234,"words":[["Har",40.753,40.856],["bjælken",40.856,41.23],["flere",41.23,41.527],["slags",41.526,41.823],["belastning",41.823,42.519],["lægger",42.661,43.047],["vi",43.047,43.202],["bidragene",43.202,43.743],["sammen",43.743,44.297],["Den",45.188,45.304],["samlede",45.304,45.69],["energi",45.69,46.206],["er",46.206,46.309],["bøjning",46.309,46.734],["plus",46.734,47.005],["aksial",47.005,47.456],["plus",47.456,47.739],["vridning",47.739,48.229],["plus",48.229,48.538],["forskydning",48.538,49.234]],"text":"Har bjælken flere slags belastning, lægger vi bidragene sammen. Den samlede energi er bøjning plus aksial plus vridning plus forskydning."},"forskydning":{"start":50.456,"end":57.684,"words":[["For",50.583,50.699],["slanke",50.699,51.086],["bjælker",51.086,51.614],["er",51.614,51.795],["energien",51.795,52.297],["fra",52.297,52.452],["forskydning",52.452,52.98],["lille",52.98,53.277],["i",53.277,53.406],["forhold",53.406,53.792],["til",53.792,53.895],["bøjningen",53.895,54.501],["og",54.694,54.81],["den",54.81,54.991],["kan",54.991,55.132],["ofte",55.132,55.519],["udelades",55.519,56.189],["når",56.331,56.563],["opgaven",56.563,57.104],["siger",57.104,57.362],["det",57.362,57.684]],"text":"For slanke bjælker er energien fra forskydning lille i forhold til bøjningen, og den kan ofte udelades, når opgaven siger det."},"stykvis":{"start":58.918,"end":64.187,"words":[["Ændrer",59.058,59.355],["tværsnittet",59.355,59.947],["sig",59.947,60.128],["langs",60.128,60.411],["bjælken",60.411,60.927],["skal",61.069,61.313],["integralet",61.313,61.88],["deles",61.88,62.241],["op",62.241,62.538],["i",62.538,62.628],["stykker",62.628,63.169],["med",63.169,63.362],["hvert",63.362,63.607],["sit",63.607,63.891],["I",63.891,64.187]],"text":"Ændrer tværsnittet sig langs bjælken, skal integralet deles op i stykker med hvert sit I."},"tjek_q":{"start":65.412,"end":70.786,"words":[["Tjek",65.513,65.835],["dig",65.835,66.015],["selv",66.015,66.441],["Hvad",67.345,67.461],["sker",67.461,67.744],["der",67.744,67.86],["med",67.86,68.067],["bøjningsenergien",68.067,69.265],["hvis",69.407,69.639],["lasten",69.639,70.038],["fordobles",70.038,70.786]],"text":"Tjek dig selv. Hvad sker der med bøjningsenergien, hvis lasten fordobles?"},"tjek_a":{"start":74.652,"end":78.22,"words":[["Den",74.779,74.895],["bliver",74.895,75.089],["fire",75.089,75.385],["gange",75.385,75.668],["så",75.668,75.797],["stor",75.797,76.261],["fordi",76.39,76.841],["M",76.841,77.086],["indgår",77.086,77.601],["i",77.602,77.795],["anden",77.795,78.22]],"text":"Den bliver fire gange så stor, fordi M indgår i anden."},"slut":{"start":79.442,"end":88.255,"words":[["Kort",79.569,79.775],["sagt",79.776,80.239],["U",80.368,80.6],["er",80.6,80.716],["en",80.716,80.806],["halv",80.806,81.025],["P",81.025,81.232],["delta",81.232,81.773],["og",81.902,82.172],["for",82.172,82.288],["bøjning",82.288,82.662],["er",82.662,82.765],["U",82.765,82.933],["integralet",82.933,83.603],["af",83.603,83.835],["M",83.835,84.092],["i",84.093,84.299],["anden",84.299,84.711],["over",84.711,84.995],["to",84.995,85.317],["E",85.317,85.51],["I",85.51,85.716],["Læg",85.716,86.0],["bidragene",86.0,86.515],["fra",86.515,86.67],["de",86.67,86.747],["forskellige",86.747,87.211],["belastninger",87.211,87.752],["sammen",87.752,88.255]],"text":"Kort sagt: U er en halv P delta, og for bøjning er U integralet af M i anden over to E I. Læg bidragene fra de forskellige belastninger sammen."}}}, { audio: 'toejningsenergi.mp3', id: 'toejningsenergi' });</script>
+</body>
+</html>
