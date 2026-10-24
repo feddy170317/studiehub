@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eulers knæklast · video</title>
+<meta name="description" content="Eulers formel, effektiv længde K·L, slankhed λ og udledningen med sin kx.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 9: videoer</a><h1>Eulers knæklast</h1><span class="meta">MEM1 · kapitel 9 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Eulers knæklast"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Eulers formel, effektiv længde K·L, slankhed λ og udledningen med sin kx.</p><div class="chips"><a href="knaekning-stabilitet.html">Se først: Knækning og stabilitet</a><a href="../../../../lab/mem1/soejleknaekning.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel09_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l09">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Eulers knæklast (MEM1 kap. 9, slides 7–11)
+BP.scene({ header: 'MEM1 · kap. 9' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, plot, hatch, rect, dashed, PI } = B;
+
+  B.titel(0, 'Eulers knæklast', 'MEM1 · kapitel 9 · begreb (slide 7–11)', 'titel');
+  text(0, 'P_{cr} = π² E I / L_e²', 640, 520, 46, 'red', wt('titel', 'trykkraft') - 0.3, we('titel', 'knækker'), { align: 'center' });
+
+  B.goto('formel', 1);
+  {
+    const t0 = L('formel').start;
+    const r = text(1, 'P_{cr} = π² E I / (K L)²', 140, 170, 52, 'red', t0 + 0.2, we('formel', 'længde'));
+    box(1, 115, 110, 600, 90, 'red', we('formel', 'længde'), we('formel', 'længde') + 0.6);
+    text(1, 'L_e = K · L  (mellem vendepunkter)', 140, 270, 36, 'blue', L('effektiv').start + 0.2, we('effektiv', 'søjle'));
+    // fire understøtningstilfælde
+    const tk = L('k').start;
+    const cases = [['charnier–charnier', 'K = 1', 'charnier', (x, t) => { const P = []; for (let j = 0; j <= 20; j++) { const u = j / 20; P.push([x + 40 * Math.sin(u * PI), 620 - 260 * u]); } plot(1, P, 'blue', t, t + 0.5); }],
+      ['indspændt–indspændt', 'K = 0,5', 'Indspændt', (x, t) => { const P = []; for (let j = 0; j <= 20; j++) { const u = j / 20; P.push([x + 20 * (1 - Math.cos(u * 2 * PI)), 620 - 260 * u]); } plot(1, P, 'blue', t, t + 0.5); }],
+      ['indspændt–charnier', 'K ≈ 0,7', 'charnier', (x, t) => { const P = []; for (let j = 0; j <= 20; j++) { const u = j / 20; P.push([x + 36 * Math.sin(u * 1.4 * PI) * (1 - u * 0.3), 620 - 260 * u]); } plot(1, P, 'blue', t, t + 0.5); }],
+      ['indspændt–fri', 'K = 2', 'fri', (x, t) => { const P = []; for (let j = 0; j <= 20; j++) { const u = j / 20; P.push([x + 50 * (1 - Math.cos(u * PI / 2)), 620 - 260 * u]); } plot(1, P, 'blue', t, t + 0.5); }]];
+    cases.forEach(([n, k, w, f], i) => {
+      const x = 200 + 260 * i, t = tk + 0.8 * i + 0.3;
+      dashed(1, [x, 620], [x, 360], 'black', t - 0.2, t + 0.2);
+      f(x, t);
+      arrow(1, [[x, 310], [x, 354]], 'red', 3, t, t + 0.2, 11);
+      text(1, k, x, 670, 32, 'red', t + 0.3, t + 0.6, { align: 'center' });
+      text(1, n, x, 710, 22, 'black', t + 0.3, t + 0.6, { align: 'center' });
+    });
+  }
+
+  B.goto('sigma', 2);
+  {
+    const t0 = L('sigma').start;
+    text(2, 'r = √(I / A)', 140, 170, 44, 'blue', wt('sigma', 'inertiradius') - 0.2, we('sigma', 'A'));
+    text(2, 'σ_{cr} = π² E / (L_e / r)²', 520, 170, 48, 'red', wt('sigma', 'sigma') - 0.1, we('sigma', 'anden', 1));
+    text(2, 'λ = L_e / r  (slankhed)', 140, 270, 44, 'green', L('slank').start + 0.2, we('slank', 'lambda'));
+    text(2, 'større λ ⇒ mindre bæreevne', 140, 340, 36, 'black', wt('slank', 'Jo') - 0.1, we('slank', 'bære'));
+    // udledning
+    const tu = L('udled').start, x0 = 1000;
+    line(2, [[x0, 650], [x0, 380]], 'black', 2, tu, tu + 0.3, { alpha: 0.4 });
+    const P = []; for (let j = 0; j <= 20; j++) { const u = j / 20; P.push([x0 + 50 * Math.sin(u * PI), 650 - 270 * u]); } plot(2, P, 'blue', tu + 0.2, tu + 0.8);
+    text(2, 'y', x0 + 60, 520, 30, 'blue', tu + 0.6, tu + 0.9);
+    text(2, 'M = −P y', 140, 440, 40, 'black', wt('udled', 'momentet') - 0.1, we('udled', 'y', 1));
+    text(2, 'E I y″ + P y = 0,   k² = P / (E I)', 140, 500, 38, 'blue', L('ode').start + 0.2, wt('ode', 'løsningen'));
+    text(2, 'y = A sin kx + B cos kx', 140, 560, 38, 'blue', wt('ode', 'løsningen') - 0.1, we('ode', 'x', 1));
+    text(2, 'y(0) = 0 ⇒ B = 0;   y(L) = 0 ⇒ sin kL = 0', 140, 620, 34, 'green', L('rand').start + 0.2, we('rand', 'nul', 3));
+    const r = text(2, 'kL = π  ⇒  P_{cr} = π² E I / L²', 140, 690, 40, 'red', L('loes').start + 0.4, we('loes', 'anden', 1));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Fra charnier–charnier til', 'indspændt–fri. Og P_{cr}?'], ['K: 1 → 2, L_e fordobles', 'P_{cr} bliver 1/4'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 9, slide 7–11 · Hamrock, Schmid & Jacobson, kap. 9', 'Johnson', 'slut');
+  text(4, 'P_{cr} = π² E I / (K L)²', 200, 280, 48, 'red', L('slut').start + 0.4, we('slut', 'anden'));
+  text(4, 'λ = L_e / r  ·  kL = π', 200, 370, 44, 'blue', wt('slut', 'lambda') - 0.1, we('slut', 'pi', 1));
+});
+
+</script>
+<script>BP.live({"duration":141.548,"audio":"euler.mp3","order":["titel","formel","effektiv","k","sigma","slank","udled","ode","rand","loes","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":6.273,"words":[["Eulers",0.601,1.013],["knæklast",1.013,1.722],["Hvor",2.626,2.794],["stor",2.794,3.103],["en",3.103,3.18],["trykkraft",3.18,3.825],["kan",3.825,4.005],["en",4.005,4.095],["slank",4.095,4.418],["søjle",4.418,4.74],["bære",4.74,5.229],["før",5.345,5.59],["den",5.59,5.758],["knækker",5.758,6.273]],"text":"Eulers knæklast. Hvor stor en trykkraft kan en slank søjle bære, før den knækker?"},"formel":{"start":7.498,"end":15.254,"words":[["Eulers",7.625,7.896],["formel",7.896,8.295],["er",8.295,8.489],["P",8.489,8.734],["c",8.734,8.966],["r",8.966,9.172],["lig",9.172,9.391],["pi",9.391,9.7],["i",9.7,9.88],["anden",9.88,10.151],["gange",10.151,10.525],["E",10.525,10.77],["I",10.77,10.911],["divideret",10.911,11.556],["med",11.556,11.839],["L",11.839,12.097],["e",12.097,12.303],["i",12.303,12.509],["anden",12.509,12.947],["hvor",13.089,13.502],["L",13.502,13.734],["e",13.734,14.004],["er",14.004,14.133],["den",14.133,14.301],["effektive",14.301,14.816],["længde",14.816,15.254]],"text":"Eulers formel er P c r lig pi i anden gange E I divideret med L e i anden, hvor L e er den effektive længde."},"effektiv":{"start":16.488,"end":24.425,"words":[["Den",16.615,16.744],["effektive",16.744,17.298],["længde",17.298,17.724],["er",17.724,17.878],["K",17.878,18.136],["gange",18.136,18.432],["L.",18.432,18.651],["K",18.651,18.974],["afhænger",18.974,19.541],["af",19.541,19.708],["understøtningerne",19.708,20.713],["og",20.855,21.01],["L",21.01,21.229],["e",21.229,21.435],["er",21.435,21.577],["afstanden",21.577,22.157],["mellem",22.157,22.401],["vendepunkterne",22.401,23.149],["på",23.149,23.291],["den",23.291,23.458],["udbøjede",23.458,23.922],["søjle",23.922,24.425]],"text":"Den effektive længde er K gange L. K afhænger af understøtningerne, og L e er afstanden mellem vendepunkterne på den udbøjede søjle."},"k":{"start":25.646,"end":41.819,"words":[["Med",25.786,25.915],["charnier",25.915,26.392],["i",26.392,26.495],["begge",26.495,26.778],["ender",26.778,27.242],["er",27.242,27.41],["K",27.41,27.745],["en",27.745,28.119],["Indspændt",29.022,29.486],["i",29.486,29.564],["begge",29.564,29.86],["ender",29.86,30.324],["er",30.324,30.491],["K",30.491,30.814],["en",30.814,30.942],["halv",30.942,31.303],["Indspændt",32.218,32.708],["og",32.708,32.837],["charnier",32.837,33.481],["giver",33.481,33.765],["nul",33.765,34.048],["komma",34.048,34.332],["syv",34.332,34.77],["Og",35.659,35.762],["indspændt",35.762,36.368],["med",36.368,36.587],["fri",36.587,36.922],["ende",36.922,37.192],["giver",37.192,37.45],["to.",37.45,37.875],["Til",38.777,38.958],["design",38.958,39.422],["anbefaler",39.422,40.208],["bogen",40.208,40.646],["lidt",40.646,40.904],["større",40.904,41.226],["værdier",41.226,41.819]],"text":"Med charnier i begge ender er K en. Indspændt i begge ender er K en halv. Indspændt og charnier giver nul komma syv. Og indspændt med fri ende giver to. Til design anbefaler bogen lidt større værdier."},"sigma":{"start":43.036,"end":54.724,"words":[["Dividerer",43.15,43.601],["vi",43.601,43.73],["med",43.73,43.924],["arealet",43.924,44.723],["får",44.864,45.019],["vi",45.019,45.135],["den",45.135,45.315],["kritiske",45.315,45.792],["spænding",45.792,46.32],["Med",47.224,47.379],["inertiradius",47.379,48.242],["r",48.242,48.423],["lig",48.423,48.577],["kvadratroden",48.577,49.247],["af",49.247,49.389],["I",49.389,49.505],["over",49.505,49.814],["A",49.814,50.098],["er",50.098,50.149],["sigma",50.149,50.588],["c",50.588,50.884],["r",50.884,51.013],["lig",51.013,51.232],["pi",51.232,51.58],["i",51.58,51.76],["anden",51.76,52.005],["E",52.005,52.16],["divideret",52.16,52.804],["med",52.804,53.075],["L",53.075,53.294],["e",53.294,53.526],["over",53.526,53.809],["r",53.809,54.08],["i",54.08,54.286],["anden",54.286,54.724]],"text":"Dividerer vi med arealet, får vi den kritiske spænding. Med inertiradius r lig kvadratroden af I over A er sigma c r lig pi i anden E divideret med L e over r i anden."},"slank":{"start":55.938,"end":62.678,"words":[["L",56.078,56.246],["e",56.246,56.542],["over",56.542,56.851],["r",56.851,57.096],["kaldes",57.096,57.457],["slankhedsforholdet",57.457,58.411],["lambda",58.411,59.003],["Jo",59.894,60.023],["større",60.023,60.371],["lambda",60.371,60.977],["jo",61.118,61.26],["mindre",61.26,61.66],["kan",61.66,61.801],["søjlen",61.801,62.201],["bære",62.201,62.678]],"text":"L e over r kaldes slankhedsforholdet lambda. Jo større lambda, jo mindre kan søjlen bære."},"udled":{"start":63.896,"end":71.525,"words":[["Formlen",64.023,64.577],["udledes",64.577,65.028],["for",65.028,65.17],["en",65.17,65.248],["søjle",65.248,65.647],["med",65.647,65.866],["charnier",65.866,66.51],["i",66.51,66.665],["begge",66.665,67.013],["ender",67.013,67.528],["Udbøjningen",68.432,68.986],["y",68.986,69.257],["giver",69.257,69.489],["momentet",69.489,70.069],["M",70.069,70.326],["lig",70.326,70.545],["minus",70.545,70.984],["P",70.984,71.241],["y",71.241,71.525]],"text":"Formlen udledes for en søjle med charnier i begge ender. Udbøjningen y giver momentet M lig minus P y."},"ode":{"start":72.742,"end":83.644,"words":[["Den",72.882,72.998],["elastiske",72.998,73.526],["linje",73.527,73.823],["giver",73.823,74.197],["E",74.197,74.416],["I",74.416,74.648],["y",74.648,74.931],["dobbeltafledt",74.931,75.601],["plus",75.601,75.911],["P",75.911,76.207],["y",76.207,76.452],["lig",76.452,76.735],["nul",76.735,77.135],["Med",78.038,78.245],["k",78.245,78.502],["i",78.502,78.696],["anden",78.696,78.953],["lig",78.953,79.134],["P",79.134,79.469],["over",79.469,79.791],["E",79.791,80.023],["I",80.023,80.268],["er",80.268,80.371],["løsningen",80.371,80.848],["A",80.848,80.886],["sinus",80.886,81.273],["k",81.273,81.569],["x",81.569,81.827],["plus",81.827,82.085],["B",82.085,82.291],["cosinus",82.291,82.845],["k",82.845,83.167],["x",83.167,83.644]],"text":"Den elastiske linje giver E I y dobbeltafledt plus P y lig nul. Med k i anden lig P over E I er løsningen A sinus k x plus B cosinus k x."},"rand":{"start":84.876,"end":93.394,"words":[["Ved",85.016,85.222],["x",85.222,85.519],["lig",85.519,85.699],["nul",85.699,86.086],["er",86.086,86.331],["y",86.331,86.524],["nul",86.524,86.911],["så",87.052,87.323],["B",87.323,87.568],["er",87.568,87.645],["nul",87.645,88.045],["Ved",88.948,89.167],["x",89.167,89.489],["lig",89.489,89.721],["L",89.721,90.069],["er",90.069,90.301],["y",90.301,90.546],["også",90.546,90.868],["nul",90.868,91.268],["så",91.41,91.693],["A",91.693,91.706],["sinus",91.706,92.08],["k",92.08,92.324],["L",92.324,92.634],["skal",92.634,92.853],["være",92.853,93.007],["nul",93.007,93.394]],"text":"Ved x lig nul er y nul, så B er nul. Ved x lig L er y også nul, så A sinus k L skal være nul."},"loes":{"start":94.61,"end":107.716,"words":[["A",94.75,94.866],["må",94.866,95.008],["ikke",95.008,95.291],["være",95.291,95.472],["nul",95.472,95.91],["ellers",96.039,96.4],["er",96.4,96.58],["der",96.58,96.722],["ingen",96.722,97.096],["udbøjning",97.096,97.817],["Derfor",98.708,99.095],["er",99.095,99.159],["sinus",99.159,99.533],["k",99.533,99.79],["L",99.79,99.945],["nul",99.945,100.357],["og",100.499,100.654],["k",100.654,100.937],["L",100.937,101.234],["er",101.234,101.363],["pi",101.363,101.646],["for",101.646,101.814],["den",101.814,101.994],["laveste",101.994,102.381],["mode",102.381,102.857],["Det",103.734,103.811],["giver",103.811,104.133],["P",104.133,104.352],["c",104.352,104.623],["r",104.623,104.855],["lig",104.855,105.087],["pi",105.087,105.422],["i",105.422,105.615],["anden",105.615,105.95],["E",105.95,106.182],["I",106.182,106.453],["over",106.453,106.801],["L",106.801,107.097],["i",107.097,107.316],["anden",107.316,107.716]],"text":"A må ikke være nul, ellers er der ingen udbøjning. Derfor er sinus k L nul, og k L er pi for den laveste mode. Det giver P c r lig pi i anden E I over L i anden."},"tjek_q":{"start":108.928,"end":117.343,"words":[["Tjek",109.029,109.351],["dig",109.351,109.531],["selv",109.531,109.957],["En",110.861,110.964],["søjle",110.964,111.351],["ændres",111.351,111.711],["fra",111.712,111.84],["charnier",111.84,112.382],["i",112.382,112.498],["begge",112.498,112.781],["ender",112.781,113.077],["til",113.077,113.297],["indspændt",113.297,113.876],["med",113.876,114.044],["fri",114.044,114.34],["ende",114.34,114.74],["Hvad",115.616,115.771],["sker",115.771,116.093],["der",116.093,116.248],["med",116.248,116.518],["P",116.518,116.763],["c",116.763,117.034],["r",117.034,117.343]],"text":"Tjek dig selv. En søjle ændres fra charnier i begge ender til indspændt med fri ende. Hvad sker der med P c r?"},"tjek_a":{"start":121.216,"end":127.26,"words":[["K",121.343,121.549],["går",121.55,121.756],["fra",121.756,121.988],["en",121.988,122.22],["til",122.22,122.361],["to",122.361,122.812],["så",122.954,123.302],["L",123.302,123.56],["e",123.56,123.779],["fordobles",123.779,124.526],["P",125.404,125.61],["c",125.61,125.842],["r",125.842,126.164],["bliver",126.164,126.422],["en",126.422,126.538],["fjerdedel",126.538,127.26]],"text":"K går fra en til to, så L e fordobles. P c r bliver en fjerdedel."},"slut":{"start":128.502,"end":139.132,"words":[["Kort",128.629,128.848],["sagt",128.848,129.351],["P",129.48,129.712],["c",129.712,129.931],["r",129.931,130.227],["er",130.227,130.343],["pi",130.343,130.665],["i",130.665,130.846],["anden",130.846,131.155],["E",131.155,131.387],["I",131.387,131.671],["over",131.671,131.967],["K",131.967,132.263],["L",132.263,132.457],["i",132.457,132.676],["anden",132.676,133.165],["lambda",133.307,133.887],["er",133.887,134.093],["L",134.093,134.364],["e",134.364,134.609],["over",134.609,134.854],["r",134.854,135.176],["og",135.317,135.459],["formlen",135.459,135.872],["kommer",135.872,136.116],["fra",136.116,136.258],["løsningen",136.258,136.735],["sinus",136.735,137.083],["k",137.083,137.341],["x",137.341,137.676],["med",137.676,137.908],["k",137.908,138.23],["L",138.23,138.462],["lig",138.462,138.758],["pi",138.758,139.132]],"text":"Kort sagt: P c r er pi i anden E I over K L i anden, lambda er L e over r, og formlen kommer fra løsningen sinus k x med k L lig pi."}}}, { audio: 'euler.mp3', id: 'euler' });</script>
+</body>
+</html>

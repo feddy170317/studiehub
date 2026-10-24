@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eksamensspørgsmål 7b: Euler eller flydning · video</title>
+<meta name="description" content="Eksamensspørgsmål 7b: Pcr = 15,5 kN, σcr = 49,3 MPa, og stiveren knækker før den flyder.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 9: videoer</a><h1>Eksamensspørgsmål 7b: Euler eller flydning</h1><span class="meta">MEM1 · kapitel 9 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Eksamensspørgsmål 7b: Euler eller flydning"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Eksamensspørgsmål 7b: Pcr = 15,5 kN, σcr = 49,3 MPa, og stiveren knækker før den flyder.</p><div class="chips"><a href="euler.html">Se først: Eulers knæklast</a><a href="johnson.html">Se først: Johnson: korte og mellemlange søjler</a><a href="../../../../lab/mem1/soejleknaekning.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel09_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l09">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Eksamensspørgsmål 7b: E = 200 GPa, Sy = 400 MPa, d = 20, I = 2500π, Le = 1 m → Pcr = 15,5 kN, σ = 49,3 MPa, λ = 200 (slide 18)
+BP.scene({ header: 'MEM1 · kap. 9' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under } = B;
+
+  B.titel(0, 'Eksamensspørgsmål 7b', 'MEM1 · kapitel 9 · opgave (slide 18)', 'titel');
+  text(0, 'knækker stiveren før den flyder?', 640, 520, 40, 'red', wt('titel', 'Knækker') - 0.2, we('titel', 'flyder'), { align: 'center' });
+
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start;
+    text(1, 'E = 200 GPa,  S_y = 400 MPa', 140, 160, 40, 'black', wt('data', 'E') - 0.1, we('data', 'megapascal'));
+    text(1, 'd = 20 mm,  I = 2500 π mm⁴,  L_e = 1000 mm', 140, 220, 38, 'black', wt('data', 'diameteren') - 0.1, we('data', 'meter'));
+    text(1, 'P_{cr} = π² · 200 000 · 2500π / 1000²', 140, 320, 42, 'blue', L('pcr').start + 0.2, we('pcr', 'anden'));
+    const r = text(1, 'P_{cr} = 15,5 kN', 140, 410, 56, 'red', L('pcr2').start + 0.2, we('pcr2', 'kilonewton'));
+    box(1, 115, 350, 520, 90, 'red', we('pcr2', 'kilonewton'), we('pcr2', 'kilonewton') + 0.6);
+    text(1, 'σ_{cr} = 15 500 / (100π) = 49,3 MPa', 140, 520, 42, 'blue', L('sigma').start + 0.2, we('sigma', 'megapascal'));
+    text(1, '49,3 ≪ 400  ⇒  knækker før flydning', 140, 610, 42, 'green', L('sammenlign').start + 0.2, we('sammenlign', 'flyder'));
+  }
+
+  B.goto('lambda', 2);
+  {
+    const t0 = L('lambda').start;
+    text(2, 'r = d/4 = 5 mm  ⇒  λ = 1000/5 = 200', 140, 180, 42, 'blue', t0 + 0.3, we('lambda', 'hundrede'));
+    text(2, 'λ_{cr} = √(π² · 200 000 / 400) = 70,2', 140, 260, 42, 'blue', wt('lambda', 'Overgangen') - 0.1, we('lambda', 'to', 2));
+    text(2, '200 > 70,2  ⇒  slank, Euler gælder', 140, 360, 46, 'green', L('konkl').start + 0.2, we('konkl', 'gælder'));
+    text(2, 'del a: se videoerne om Euler og Johnson', 140, 480, 34, 'red', L('teori').start + 0.4, we('teori', 'Johnson'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Hvor kort skulle stiveren', 'være, for at λ = 70?'], ['L_e = 70 · 5 = 350 mm'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 9, slide 18 (eksamensspm. 7) · Hamrock, Schmid & Jacobson, kap. 9', '', 'slut');
+  text(4, 'P_{cr} = 15,5 kN · σ_{cr} = 49,3 MPa', 200, 280, 44, 'red', L('slut').start + 0.4, we('slut', 'megapascal'));
+  text(4, 'λ = 200 → knækker før flydning', 200, 370, 44, 'blue', wt('slut', 'lambda') - 0.1, we('slut', 'flyder'));
+});
+
+</script>
+<script>BP.live({"duration":112.614,"audio":"eksamen-spm7.mp3","order":["titel","data","pcr","pcr2","sigma","sammenlign","lambda","konkl","teori","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":8.463,"words":[["Eksamensspørgsmål",0.64,1.748],["syv",1.748,2.109],["b",2.109,2.47],["En",3.361,3.464],["stiver",3.464,3.863],["med",3.863,4.057],["charnier",4.057,4.688],["i",4.688,4.843],["begge",4.843,5.204],["ender",5.204,5.719],["Knækker",6.582,6.981],["den",6.981,7.342],["før",7.484,7.754],["den",7.754,7.935],["flyder",7.935,8.463]],"text":"Eksamensspørgsmål syv b. En stiver med charnier i begge ender. Knækker den, før den flyder?"},"data":{"start":9.682,"end":23.78,"words":[["Stiveren",9.796,10.338],["er",10.338,10.492],["af",10.492,10.518],["stål",10.518,10.93],["med",10.93,11.265],["E",11.265,11.472],["lig",11.472,11.626],["to",11.626,11.871],["hundrede",11.871,12.116],["gigapascal",12.116,12.941],["og",12.941,13.121],["S",13.121,13.418],["y",13.418,13.585],["lig",13.585,13.869],["fire",13.869,14.178],["hundrede",14.178,14.448],["megapascal",14.448,15.299],["Den",16.19,16.306],["har",16.306,16.435],["diameteren",16.435,17.04],["tyve",17.04,17.337],["millimeter",17.337,18.071],["inertimomentet",18.2,19.076],["to",19.076,19.334],["tusind",19.334,19.669],["fem",19.669,19.901],["hundrede",19.901,20.133],["pi",20.133,20.326],["millimeter",20.326,20.842],["i",20.842,20.932],["fjerde",20.932,21.473],["og",21.654,21.795],["den",21.795,21.976],["effektive",21.976,22.543],["længde",22.543,23.007],["er",23.007,23.187],["en",23.187,23.29],["meter",23.29,23.78]],"text":"Stiveren er af stål med E lig to hundrede gigapascal og S y lig fire hundrede megapascal. Den har diameteren tyve millimeter, inertimomentet to tusind fem hundrede pi millimeter i fjerde, og den effektive længde er en meter."},"pcr":{"start":25.008,"end":31.965,"words":[["Eulers",25.148,25.432],["knæklast",25.432,25.986],["er",25.986,26.128],["pi",26.128,26.424],["i",26.424,26.591],["anden",26.591,26.849],["gange",26.849,27.21],["to",27.21,27.442],["hundrede",27.442,27.661],["tusind",27.661,28.009],["gange",28.009,28.344],["to",28.344,28.589],["tusind",28.589,28.924],["fem",28.924,29.143],["hundrede",29.143,29.388],["pi",29.388,29.8],["divideret",29.942,30.561],["med",30.561,30.767],["tusind",30.767,31.308],["i",31.308,31.514],["anden",31.514,31.965]],"text":"Eulers knæklast er pi i anden gange to hundrede tusind gange to tusind fem hundrede pi, divideret med tusind i anden."},"pcr2":{"start":33.182,"end":35.59,"words":[["Det",33.309,33.387],["giver",33.387,33.722],["femten",33.722,34.16],["komma",34.16,34.482],["fem",34.482,34.765],["kilonewton",34.765,35.59]],"text":"Det giver femten komma fem kilonewton."},"sigma":{"start":36.82,"end":44.473,"words":[["Den",36.947,37.076],["kritiske",37.076,37.54],["spænding",37.54,38.017],["er",38.017,38.159],["femten",38.159,38.558],["tusind",38.558,38.893],["fem",38.893,39.112],["hundrede",39.112,39.344],["divideret",39.344,39.898],["med",39.898,40.13],["arealet",40.13,40.942],["hundrede",41.084,41.483],["pi",41.483,41.87],["altså",42.012,42.36],["niogfyrre",42.36,43.004],["komma",43.004,43.313],["tre",43.313,43.61],["megapascal",43.61,44.473]],"text":"Den kritiske spænding er femten tusind fem hundrede divideret med arealet, hundrede pi, altså niogfyrre komma tre megapascal."},"sammenlign":{"start":45.69,"end":52.61,"words":[["Det",45.83,45.946],["er",45.946,46.023],["langt",46.024,46.359],["under",46.359,46.565],["flydespændingen",46.565,47.428],["på",47.428,47.57],["fire",47.57,47.892],["hundrede",47.892,48.176],["megapascal",48.176,49.078],["Stiveren",49.955,50.535],["knækker",50.535,50.909],["altså",50.909,51.489],["før",51.618,51.914],["den",51.914,52.095],["flyder",52.095,52.61]],"text":"Det er langt under flydespændingen på fire hundrede megapascal. Stiveren knækker altså, før den flyder."},"lambda":{"start":53.84,"end":69.562,"words":[["Vi",53.98,54.083],["kan",54.083,54.238],["også",54.238,54.599],["se",54.599,54.844],["det",54.844,55.05],["på",55.05,55.217],["slankheden",55.217,55.991],["Lambda",56.881,57.371],["er",57.371,57.526],["tusind",57.526,57.912],["divideret",57.912,58.466],["med",58.466,58.672],["fem",58.672,59.111],["altså",59.252,59.665],["to",59.665,59.948],["hundrede",59.948,60.438],["Overgangen",61.34,61.843],["med",61.843,61.971],["slidernes",61.971,62.41],["definition",62.41,63.093],["er",63.093,63.209],["kvadratroden",63.209,63.853],["af",63.853,63.982],["pi",63.982,64.304],["i",64.304,64.484],["anden",64.484,64.768],["gange",64.768,65.18],["to",65.18,65.438],["hundrede",65.438,65.644],["tusind",65.644,66.108],["divideret",66.108,66.765],["med",66.765,67.023],["fire",67.023,67.345],["hundrede",67.345,67.873],["altså",67.977,68.363],["halvfjerds",68.363,68.866],["komma",68.866,69.149],["to.",69.149,69.562]],"text":"Vi kan også se det på slankheden. Lambda er tusind divideret med fem, altså to hundrede. Overgangen med slidernes definition er kvadratroden af pi i anden gange to hundrede tusind divideret med fire hundrede, altså halvfjerds komma to."},"konkl":{"start":70.798,"end":75.564,"words":[["To",70.912,71.157],["hundrede",71.157,71.505],["er",71.505,71.621],["meget",71.621,71.905],["større",71.905,72.266],["end",72.266,72.356],["halvfjerds",72.356,73.026],["så",73.168,73.361],["stiveren",73.361,73.812],["er",73.812,73.889],["slank",73.889,74.392],["og",74.572,74.778],["Euler",74.778,75.049],["gælder",75.049,75.564]],"text":"To hundrede er meget større end halvfjerds, så stiveren er slank, og Euler gælder."},"teori":{"start":76.788,"end":84.636,"words":[["Til",76.915,77.121],["del",77.122,77.379],["a",77.379,77.676],["skal",77.676,77.856],["du",77.856,77.972],["udlede",77.972,78.371],["Eulers",78.371,78.642],["formel",78.642,79.17],["og",79.17,79.312],["definere",79.312,79.802],["det",79.802,79.931],["kritiske",79.931,80.459],["slankhedsforhold",80.459,81.4],["Se",82.291,82.587],["videoerne",82.587,83.205],["om",83.206,83.463],["Euler",83.463,83.824],["og",83.824,83.94],["Johnson",83.94,84.636]],"text":"Til del a skal du udlede Eulers formel og definere det kritiske slankhedsforhold. Se videoerne om Euler og Johnson."},"tjek_q":{"start":85.874,"end":91.338,"words":[["Tjek",85.975,86.297],["dig",86.297,86.477],["selv",86.477,86.903],["Hvor",87.794,88.0],["kort",88.0,88.258],["skulle",88.258,88.477],["stiveren",88.477,88.98],["være",88.98,89.456],["for",89.585,89.804],["at",89.804,89.843],["lambda",89.843,90.243],["blev",90.243,90.436],["lig",90.436,90.668],["halvfjerds",90.668,91.338]],"text":"Tjek dig selv. Hvor kort skulle stiveren være, for at lambda blev lig halvfjerds?"},"tjek_a":{"start":95.21,"end":99.706,"words":[["L",95.35,95.531],["e",95.531,95.801],["skulle",95.801,96.033],["være",96.033,96.252],["halvfjerds",96.252,96.742],["gange",96.742,97.025],["fem",97.025,97.425],["altså",97.554,98.069],["tre",98.069,98.353],["hundrede",98.353,98.559],["og",98.559,98.585],["halvtreds",98.585,98.984],["millimeter",98.984,99.706]],"text":"L e skulle være halvfjerds gange fem, altså tre hundrede og halvtreds millimeter."},"slut":{"start":100.936,"end":110.187,"words":[["Kort",101.063,101.269],["sagt",101.27,101.746],["P",101.875,102.081],["c",102.081,102.262],["r",102.262,102.545],["er",102.545,102.661],["femten",102.661,103.099],["komma",103.099,103.37],["fem",103.37,103.615],["kilonewton",103.615,104.337],["sigma",104.465,104.903],["c",104.904,105.135],["r",105.135,105.329],["niogfyrre",105.329,105.831],["megapascal",105.831,106.695],["lambda",106.824,107.288],["to",107.288,107.545],["hundrede",107.545,107.996],["og",108.138,108.28],["stiveren",108.28,108.744],["knækker",108.744,109.208],["før",109.208,109.491],["den",109.491,109.684],["flyder",109.684,110.187]],"text":"Kort sagt: P c r er femten komma fem kilonewton, sigma c r niogfyrre megapascal, lambda to hundrede, og stiveren knækker før den flyder."}}}, { audio: 'eksamen-spm7.mp3', id: 'eksamen-spm7' });</script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Søjle: eksempel fra slides · video</title>
+<meta name="description" content="Søjleeksemplet fra slides: λ = 240 &gt; 88,9, så Euler gælder, og Pcr = 10,76 kN.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 9: videoer</a><h1>Søjle: eksempel fra slides</h1><span class="meta">MEM1 · kapitel 9 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Søjle: eksempel fra slides"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Søjleeksemplet fra slides: λ = 240 &gt; 88,9, så Euler gælder, og Pcr = 10,76 kN.</p><div class="chips"><a href="euler.html">Se først: Eulers knæklast</a><a href="../../../../lab/mem1/soejleknaekning.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel09_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l09">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Søjleeksempel fra slides 14–15: d = 20, L = 1,2 m, K = 1 → λ = 240 > 88,9 → Euler, Pcr = 10,76 kN
+BP.scene({ header: 'MEM1 · kap. 9' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, plot, PI, TAU } = B;
+
+  B.titel(0, 'Søjleeksempel', 'MEM1 · kapitel 9 · opgave (slide 14–15)', 'titel');
+  text(0, 'klassificér og beregn P_{cr}', 640, 520, 42, 'red', wt('titel', 'klassificerer') - 0.2, we('titel', 'knæklasten'), { align: 'center' });
+
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start;
+    line(1, ell(1050, 240, 60, 60, 0, TAU), 'black', 3, wt('data', 'cirkulært') - 0.2, wt('data', 'cirkulært') + 0.4); text(1, 'd = 20', 1050, 340, 30, 'black', wt('data', 'tyve') - 0.1, wt('data', 'tyve') + 0.4, { align: 'center' });
+    text(1, 'K = 1,  L = 1200 mm,  d = 20 mm', 140, 160, 38, 'black', t0 + 0.3, we('data', 'millimeter'));
+    text(1, 'E = 200 GPa,  S_y = 250 MPa', 140, 220, 38, 'black', wt('data', 'E') - 0.1, we('data', 'megapascal'));
+    text(1, 'A = π/4 · 20² = 314,2 mm²', 140, 320, 40, 'blue', L('areal').start + 0.2, we('areal', 'kvadratmillimeter'));
+    text(1, 'I = π/64 · 20⁴ = 7854 mm⁴', 140, 390, 40, 'blue', L('inerti').start + 0.2, we('inerti', 'fjerde'));
+    text(1, 'r = √(I/A) = d/4 = 5 mm', 140, 460, 40, 'blue', L('r').start + 0.2, we('r', 'millimeter'));
+    text(1, 'λ = K L / r = 1200 / 5 = 240', 140, 550, 42, 'red', L('lambda').start + 0.2, we('lambda', 'fyrre'));
+    text(1, 'λ_{cr} = √(π² · 200 000 / 250) = 88,9', 140, 630, 40, 'green', L('lambdacr').start + 0.2, we('lambdacr', 'ni'));
+  }
+
+  B.goto('klasse', 2);
+  {
+    const t0 = L('klasse').start;
+    text(2, '240 > 88,9  ⇒  slank  ⇒  Euler', 140, 170, 48, 'green', t0 + 0.2, we('klasse', 'gælder'));
+    text(2, 'P_{cr} = π² · 200 000 · 7854 / 1200²', 140, 280, 42, 'blue', L('pcr').start + 0.2, we('pcr', 'anden'));
+    const r = text(2, 'P_{cr} = 10,76 kN', 140, 380, 56, 'red', wt('pcr', 'giver') - 0.1, we('pcr', 'kilonewton'));
+    box(2, 115, 320, 520, 90, 'red', we('pcr', 'kilonewton'), we('pcr', 'kilonewton') + 0.6);
+    text(2, 'σ_{cr} = 10 760 / 314 ≈ 34 MPa  ≪  S_y', 140, 500, 40, 'black', L('spaending').start + 0.2, we('spaending', 'y'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Søjlen er halvt så lang.', 'Hvad sker der med P_{cr}?'], ['4 gange større ≈ 43 kN', 'λ = 120: Euler gælder stadig'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 9, slide 14–15 · Hamrock, Schmid & Jacobson, kap. 9', 'eksamensspørgsmål 7', 'slut');
+  text(4, 'r = d/4 · λ = 240 → Euler', 200, 280, 44, 'blue', L('slut').start + 0.4, we('slut', 'gælder'));
+  text(4, 'P_{cr} = 10,76 kN', 200, 370, 48, 'red', wt('slut', 'P') - 0.1, we('slut', 'kilonewton'));
+});
+
+</script>
+<script>BP.live({"duration":124.844,"audio":"opg-soejle-eks1.mp3","order":["titel","data","areal","inerti","r","lambda","lambdacr","klasse","pcr","spaending","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":6.338,"words":[["Et",0.64,0.73],["søjleeksempel",0.73,1.736],["fra",1.736,1.903],["slides",1.903,2.483],["Vi",3.387,3.503],["klassificerer",3.503,4.237],["søjlen",4.237,4.817],["og",4.817,4.959],["beregner",4.959,5.474],["knæklasten",5.474,6.338]],"text":"Et søjleeksempel fra slides. Vi klassificerer søjlen og beregner knæklasten."},"data":{"start":7.57,"end":20.792,"words":[["En",7.697,7.8],["stålsøjle",7.8,8.406],["med",8.406,8.625],["charnier",8.625,9.102],["i",9.102,9.179],["begge",9.179,9.476],["ender",9.476,9.927],["er",9.927,10.12],["en",10.12,10.352],["komma",10.352,10.61],["to",10.61,10.842],["meter",10.842,11.061],["lang",11.061,11.473],["og",11.473,11.576],["har",11.576,11.718],["et",11.718,11.782],["massivt",11.782,12.143],["cirkulært",12.143,12.659],["tværsnit",12.659,13.213],["med",13.213,13.445],["diameteren",13.445,14.128],["tyve",14.128,14.45],["millimeter",14.45,15.159],["E",16.062,16.268],["er",16.268,16.436],["to",16.436,16.707],["hundrede",16.707,16.939],["gigapascal",16.939,17.841],["og",17.982,18.201],["S",18.201,18.511],["y",18.511,18.743],["er",18.743,18.884],["to",18.884,19.142],["hundrede",19.142,19.348],["og",19.348,19.374],["halvtreds",19.374,19.799],["megapascal",19.799,20.792]],"text":"En stålsøjle med charnier i begge ender er en komma to meter lang og har et massivt cirkulært tværsnit med diameteren tyve millimeter. E er to hundrede gigapascal, og S y er to hundrede og halvtreds megapascal."},"areal":{"start":22.008,"end":28.192,"words":[["Arealet",22.148,22.741],["er",22.741,22.908],["pi",22.908,23.166],["over",23.166,23.385],["fire",23.385,23.682],["gange",23.682,23.978],["tyve",23.978,24.352],["i",24.352,24.584],["anden",24.584,25.022],["altså",25.151,25.576],["tre",25.576,25.847],["hundrede",25.847,26.04],["og",26.04,26.053],["fjorten",26.053,26.568],["komma",26.568,26.865],["to",26.865,27.122],["kvadratmillimeter",27.122,28.192]],"text":"Arealet er pi over fire gange tyve i anden, altså tre hundrede og fjorten komma to kvadratmillimeter."},"inerti":{"start":29.414,"end":36.706,"words":[["Inertimomentet",29.554,30.456],["er",30.456,30.624],["pi",30.624,30.907],["over",30.907,31.139],["fireogtres",31.139,31.68],["gange",31.681,31.977],["tyve",31.977,32.338],["i",32.338,32.428],["fjerde",32.428,32.956],["altså",33.085,33.536],["syv",33.536,33.82],["tusind",33.82,34.219],["otte",34.219,34.516],["hundrede",34.516,34.735],["og",34.735,34.747],["fireoghalvtreds",34.747,35.353],["millimeter",35.353,36.036],["i",36.036,36.191],["fjerde",36.191,36.706]],"text":"Inertimomentet er pi over fireogtres gange tyve i fjerde, altså syv tusind otte hundrede og fireoghalvtreds millimeter i fjerde."},"r":{"start":37.924,"end":46.133,"words":[["Inertiradius",38.064,38.876],["er",38.876,39.044],["kvadratroden",39.044,39.817],["af",39.817,40.023],["I",40.023,40.165],["over",40.165,40.551],["A.",40.551,41.286],["For",42.164,42.331],["en",42.331,42.409],["massiv",42.409,42.731],["cirkel",42.731,43.195],["er",43.195,43.349],["det",43.349,43.452],["d",43.452,43.736],["over",43.736,43.994],["fire",43.994,44.548],["altså",44.677,45.128],["fem",45.128,45.411],["millimeter",45.411,46.133]],"text":"Inertiradius er kvadratroden af I over A. For en massiv cirkel er det d over fire, altså fem millimeter."},"lambda":{"start":47.346,"end":53.582,"words":[["Slankhedsforholdet",47.46,48.453],["er",48.453,48.685],["K",48.685,49.02],["L",49.02,49.303],["over",49.303,49.638],["r",49.638,49.973],["tolv",50.115,50.386],["hundrede",50.386,50.631],["divideret",50.631,51.249],["med",51.249,51.455],["fem",51.455,51.868],["altså",52.009,52.525],["to",52.525,52.795],["hundrede",52.795,53.04],["og",53.04,53.066],["fyrre",53.066,53.582]],"text":"Slankhedsforholdet er K L over r: tolv hundrede divideret med fem, altså to hundrede og fyrre."},"lambdacr":{"start":54.8,"end":63.833,"words":[["Overgangen",54.94,55.43],["på",55.43,55.533],["slides",55.533,56.01],["er",56.01,56.164],["kvadratroden",56.164,56.809],["af",56.809,56.925],["pi",56.925,57.26],["i",57.26,57.453],["anden",57.453,57.749],["gange",57.75,58.123],["to",58.123,58.381],["hundrede",58.381,58.6],["tusind",58.6,58.999],["divideret",58.999,59.721],["med",59.721,59.94],["to",59.94,60.198],["hundrede",60.198,60.43],["og",60.43,60.469],["halvtreds",60.469,61.087],["Det",61.951,62.08],["giver",62.08,62.48],["otteogfirs",62.48,63.175],["komma",63.176,63.511],["ni",63.511,63.833]],"text":"Overgangen på slides er kvadratroden af pi i anden gange to hundrede tusind divideret med to hundrede og halvtreds. Det giver otteogfirs komma ni."},"klasse":{"start":65.062,"end":70.743,"words":[["To",65.176,65.408],["hundrede",65.408,65.615],["og",65.615,65.627],["fyrre",65.627,66.066],["er",66.066,66.194],["langt",66.194,66.452],["større",66.452,66.774],["end",66.774,67.019],["otteogfirs",67.019,67.599],["komma",67.599,67.857],["ni",67.857,68.256],["så",68.398,68.617],["søjlen",68.617,69.004],["er",69.004,69.081],["slank",69.081,69.584],["og",69.764,69.97],["Euler",69.97,70.241],["gælder",70.241,70.743]],"text":"To hundrede og fyrre er langt større end otteogfirs komma ni, så søjlen er slank, og Euler gælder."},"pcr":{"start":71.964,"end":83.24,"words":[["Knæklasten",72.104,72.787],["er",72.787,72.955],["pi",72.955,73.264],["i",73.264,73.47],["anden",73.47,73.754],["gange",73.754,74.179],["to",74.179,74.437],["hundrede",74.437,74.656],["tusind",74.656,75.004],["gange",75.004,75.339],["syv",75.339,75.622],["tusind",75.622,76.112],["otte",76.112,76.408],["hundrede",76.408,76.64],["og",76.64,76.653],["fireoghalvtreds",76.653,77.504],["divideret",77.697,78.277],["med",78.277,78.496],["tolv",78.496,78.779],["hundrede",78.779,79.166],["i",79.166,79.372],["anden",79.372,79.823],["Det",80.701,80.791],["giver",80.791,81.126],["ti",81.126,81.384],["komma",81.384,81.771],["syv",81.771,82.106],["seks",82.106,82.441],["kilonewton",82.441,83.24]],"text":"Knæklasten er pi i anden gange to hundrede tusind gange syv tusind otte hundrede og fireoghalvtreds, divideret med tolv hundrede i anden. Det giver ti komma syv seks kilonewton."},"spaending":{"start":84.482,"end":94.03,"words":[["Den",84.609,84.738],["kritiske",84.738,85.215],["spænding",85.215,85.705],["er",85.705,85.872],["ti",85.872,86.13],["tusind",86.13,86.478],["syv",86.478,86.723],["hundrede",86.723,86.929],["og",86.929,86.942],["tres",86.942,87.251],["divideret",87.251,87.921],["med",87.921,88.192],["tre",88.192,88.475],["hundrede",88.475,88.681],["og",88.681,88.694],["fjorten",88.694,89.261],["cirka",89.403,89.906],["fireogtredive",89.906,90.614],["megapascal",90.614,91.529],["Det",92.394,92.587],["er",92.587,92.716],["langt",92.716,93.102],["under",93.102,93.386],["S",93.386,93.695],["y",93.695,94.03]],"text":"Den kritiske spænding er ti tusind syv hundrede og tres divideret med tre hundrede og fjorten, cirka fireogtredive megapascal. Det er langt under S y."},"tjek_q":{"start":95.248,"end":100.377,"words":[["Tjek",95.349,95.671],["dig",95.671,95.851],["selv",95.851,96.277],["Hvad",97.194,97.297],["sker",97.297,97.58],["der",97.58,97.696],["med",97.696,97.941],["P",97.941,98.186],["c",98.186,98.444],["r",98.444,98.805],["hvis",98.946,99.14],["søjlen",99.14,99.526],["er",99.526,99.617],["halvt",99.617,99.848],["så",99.849,99.977],["lang",99.977,100.377]],"text":"Tjek dig selv. Hvad sker der med P c r, hvis søjlen er halvt så lang?"},"tjek_a":{"start":104.272,"end":113.061,"words":[["Den",104.399,104.515],["bliver",104.515,104.721],["fire",104.722,105.018],["gange",105.018,105.288],["så",105.288,105.417],["stor",105.417,105.881],["cirka",106.01,106.487],["treogfyrre",106.487,107.105],["kilonewton",107.105,107.904],["Men",108.821,108.988],["tjek",108.988,109.246],["lambda",109.246,109.633],["igen",109.633,110.123],["den",110.251,110.432],["bliver",110.432,110.651],["hundrede",110.651,110.947],["og",110.947,110.973],["tyve",110.973,111.488],["så",111.63,111.901],["Euler",111.901,112.21],["gælder",112.21,112.507],["stadig",112.507,113.061]],"text":"Den bliver fire gange så stor, cirka treogfyrre kilonewton. Men tjek lambda igen: den bliver hundrede og tyve, så Euler gælder stadig."},"slut":{"start":114.294,"end":122.398,"words":[["Kort",114.421,114.627],["sagt",114.628,115.13],["r",115.246,115.465],["er",115.465,115.542],["d",115.542,115.762],["over",115.762,115.968],["fire",115.968,116.496],["lambda",116.625,117.179],["er",117.179,117.347],["to",117.347,117.591],["hundrede",117.591,117.798],["og",117.798,117.811],["fyrre",117.811,118.339],["Euler",118.442,118.7],["gælder",118.7,119.228],["og",119.37,119.537],["P",119.537,119.769],["c",119.769,120.014],["r",120.014,120.336],["er",120.336,120.426],["ti",120.426,120.697],["komma",120.697,121.019],["syv",121.019,121.341],["seks",121.341,121.664],["kilonewton",121.664,122.398]],"text":"Kort sagt: r er d over fire, lambda er to hundrede og fyrre, Euler gælder, og P c r er ti komma syv seks kilonewton."}}}, { audio: 'opg-soejle-eks1.mp3', id: 'opg-soejle-eks1' });</script>
+</body>
+</html>

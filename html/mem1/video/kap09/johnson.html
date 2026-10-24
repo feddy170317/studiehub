@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Johnson: korte og mellemlange søjler · video</title>
+<meta name="description" content="Johnsons parabel, overgangsslankheden λcr, AISC og excentrisk last.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 9: videoer</a><h1>Johnson: korte og mellemlange søjler</h1><span class="meta">MEM1 · kapitel 9 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Johnson: korte og mellemlange søjler"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Johnsons parabel, overgangsslankheden λcr, AISC og excentrisk last.</p><div class="chips"><a href="euler.html">Se først: Eulers knæklast</a><a href="../../../../lab/mem1/soejleknaekning.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel09_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l09">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Johnson (MEM1 kap. 9, slides 12–13, 16–17)
+BP.scene({ header: 'MEM1 · kap. 9' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, axes, plot, dashed, PI } = B;
+
+  B.titel(0, 'Johnsons kriterium', 'MEM1 · kapitel 9 · begreb (slide 12–17)', 'titel');
+  text(0, 'korte og mellemlange søjler', 640, 520, 42, 'red', wt('titel', 'korte') - 0.2, we('titel', 'så'), { align: 'center' });
+
+  B.goto('graense', 1);
+  {
+    const t0 = L('graense').start;
+    text(1, 'Euler kun når σ_{cr} < S_y', 140, 160, 40, 'black', t0 + 0.3, we('graense', 'flydespændingen'));
+    text(1, 'λ_{cr} = √(2 π² E / S_y)', 140, 240, 44, 'blue', L('lambdacr').start + 0.2, we('lambdacr', 'y'));
+    const r = text(1, 'σ_{cr} = S_y − (S_y²/(4π²E)) λ²', 140, 330, 38, 'red', L('johnson').start + 0.2, we('johnson', 'anden', 2));
+    text(1, 'mødes tangentielt ved ½ S_y', 140, 410, 36, 'green', L('tangent').start + 0.2, we('tangent', 'y'));
+    // graf
+    const tg = L('graf').start, ox = 760, oy = 650, X = (l) => ox + l * 2.0, Y = (s) => oy - s * 1.4;
+    const Sy = 250, E = 200000, lc = Math.sqrt(2 * PI * PI * E / Sy);
+    axes(1, ox, oy, X(230), Y(300), 'λ', 'σ_{cr}', tg);
+    const J = []; for (let j = 0; j <= 20; j++) { const l = lc * j / 20; J.push([X(l), Y(Sy - Sy * Sy / (4 * PI * PI * E) * l * l)]); }
+    plot(1, J, 'red', wt('graf', 'Johnson') - 0.1, wt('graf', 'parabel') + 0.3);
+    const Eu = []; for (let j = 0; j <= 30; j++) { const l = lc + (210 - lc) * j / 30; Eu.push([X(l), Y(PI * PI * E / (l * l))]); }
+    plot(1, Eu, 'blue', wt('graf', 'Euler') - 0.1, we('graf', 'hyperbel'));
+    dashed(1, [X(lc), oy], [X(lc), Y(Sy / 2)], 'black', wt('graf', 'Efter') - 0.2, wt('graf', 'Efter') + 0.3);
+    text(1, 'λ_{cr}', X(lc) - 20, oy + 40, 28, 'black', wt('graf', 'Efter'), wt('graf', 'Efter') + 0.3);
+    text(1, 'S_y', ox - 10, Y(Sy) + 10, 28, 'red', tg + 0.3, tg + 0.6, { align: 'right' });
+    text(1, 'Johnson', X(20), Y(Sy) - 20, 28, 'red', wt('graf', 'Johnson'), wt('graf', 'Johnson') + 0.4);
+    text(1, 'Euler', X(150), Y(70) - 10, 28, 'blue', wt('graf', 'Euler'), wt('graf', 'Euler') + 0.4);
+    text(1, 'λ < λ_{cr}: Johnson · λ > λ_{cr}: Euler', 140, 520, 34, 'black', L('regel').start + 0.3, we('regel', 'mellemlange'));
+  }
+
+  B.goto('note', 2);
+  {
+    const t0 = L('note').start;
+    bubble(2, 'Pas på definitionen', 150, 140, 50, 'red', t0, t0 + 0.7);
+    text(2, 'slides:  λ_{cr} = √(π² E / S_y)  (Euler = S_y)', 160, 230, 36, 'black', wt('note', 'Slides') - 0.1, wt('note', 'Bogen') - 0.2);
+    text(2, 'bog/AISC:  √(2 π² E / S_y)  (Euler = ½ S_y)', 160, 300, 36, 'blue', wt('note', 'Bogen') - 0.1, we('note', 'y', 1));
+    text(2, 'brug underviserens definition til eksamen', 160, 370, 34, 'red', wt('note', 'Brug') - 0.1, we('note', 'eksamen'));
+    text(2, 'AISC:  C_c = √(2π²E/S_y),  F.S. 1,67 … 1,92', 160, 470, 36, 'green', L('aisc').start + 0.2, we('aisc', 'to', 1));
+    text(2, 'excentrisk last: M = P e → sekantformlen (iteration)', 160, 560, 34, 'black', L('excentrisk').start + 0.2, we('excentrisk', 'iteration'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Hvad er σ_{cr} for en meget', 'kort søjle ifølge Johnson?'], ['σ_{cr} → S_y, når λ → 0', 'svigt ved flydning'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 9, slide 12–17 · Hamrock, Schmid & Jacobson, kap. 9', 'søjleeksemplet', 'slut');
+  text(4, 'λ mod λ_{cr} → vælg formel', 200, 280, 44, 'blue', L('slut').start + 0.4, we('slut', 'lambda', 1));
+  text(4, 'Euler slank · Johnson kort · sekant excentrisk', 200, 360, 38, 'red', wt('slut', 'Euler') - 0.1, we('slut', 'last'));
+});
+
+</script>
+<script>BP.live({"duration":134.18,"audio":"johnson.mp3","order":["titel","graense","lambdacr","johnson","tangent","graf","regel","note","aisc","excentrisk","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.355,"words":[["Johnsons",0.601,1.168],["kriterium",1.168,1.98],["Eulers",2.884,3.193],["formel",3.193,3.696],["holder",3.696,4.07],["ikke",4.07,4.405],["for",4.405,4.572],["korte",4.572,4.946],["søjler",4.946,5.487],["Hvad",6.35,6.582],["gør",6.582,6.839],["vi",6.839,6.955],["så",6.955,7.355]],"text":"Johnsons kriterium. Eulers formel holder ikke for korte søjler. Hvad gør vi så?"},"graense":{"start":8.602,"end":16.656,"words":[["Eulers",8.742,9.026],["formel",9.026,9.412],["gælder",9.412,9.657],["kun",9.657,10.108],["når",10.25,10.443],["den",10.443,10.598],["kritiske",10.598,11.088],["spænding",11.088,11.603],["er",11.603,11.783],["under",11.783,12.041],["flydespændingen",12.041,12.943],["Ellers",13.847,14.13],["ville",14.13,14.311],["en",14.311,14.414],["kort",14.414,14.684],["søjle",14.684,15.161],["kunne",15.161,15.38],["bære",15.38,15.715],["uendeligt",15.715,16.192],["meget",16.192,16.656]],"text":"Eulers formel gælder kun, når den kritiske spænding er under flydespændingen. Ellers ville en kort søjle kunne bære uendeligt meget."},"lambdacr":{"start":17.88,"end":25.443,"words":[["Overgangen",18.02,18.587],["ligger",18.587,18.909],["ved",18.909,19.051],["det",19.051,19.141],["kritiske",19.141,19.657],["slankhedsforhold",19.657,20.623],["lambda",20.765,21.268],["c",21.268,21.538],["r",21.538,21.706],["lig",21.706,21.899],["kvadratroden",21.899,22.556],["af",22.556,22.672],["to",22.672,22.943],["pi",22.943,23.252],["i",23.252,23.433],["anden",23.433,23.716],["E",23.716,23.871],["divideret",23.871,24.567],["med",24.567,24.824],["S",24.824,25.121],["y",25.121,25.443]],"text":"Overgangen ligger ved det kritiske slankhedsforhold, lambda c r lig kvadratroden af to pi i anden E divideret med S y."},"johnson":{"start":26.678,"end":36.238,"words":[["Under",26.818,26.999],["lambda",26.999,27.385],["c",27.385,27.63],["r",27.63,27.849],["bruger",27.849,28.133],["vi",28.133,28.262],["Johnsons",28.261,28.725],["parabel",28.725,29.383],["sigma",29.499,29.963],["c",29.963,30.207],["r",30.207,30.517],["er",30.517,30.671],["S",30.671,30.968],["y",30.968,31.122],["minus",31.122,31.56],["S",31.56,31.844],["y",31.844,31.999],["i",31.999,32.205],["anden",32.205,32.617],["divideret",32.617,33.133],["med",33.133,33.326],["fire",33.326,33.609],["pi",33.609,33.854],["i",33.854,34.022],["anden",34.022,34.331],["E",34.331,34.64],["gange",34.821,35.091],["lambda",35.091,35.594],["i",35.594,35.8],["anden",35.8,36.238]],"text":"Under lambda c r bruger vi Johnsons parabel: sigma c r er S y minus S y i anden divideret med fire pi i anden E, gange lambda i anden."},"tangent":{"start":37.468,"end":43.704,"words":[["Ved",37.608,37.686],["lambda",37.686,38.149],["c",38.149,38.42],["r",38.42,38.613],["mødes",38.613,38.897],["Johnsons",38.897,39.374],["parabel",39.374,39.992],["og",39.992,40.147],["Eulers",40.147,40.418],["hyperbel",40.418,40.933],["med",40.933,41.1],["samme",41.1,41.423],["hældning",41.423,41.938],["ved",42.08,42.376],["en",42.376,42.479],["halv",42.479,42.698],["gange",42.698,43.085],["S",43.085,43.381],["y",43.381,43.704]],"text":"Ved lambda c r mødes Johnsons parabel og Eulers hyperbel med samme hældning, ved en halv gange S y."},"graf":{"start":44.922,"end":56.533,"words":[["I",45.062,45.127],["grafen",45.127,45.552],["med",45.552,45.668],["lambda",45.668,46.029],["hen",46.029,46.274],["ad",46.274,46.467],["og",46.467,46.505],["sigma",46.505,46.931],["c",46.931,47.201],["r",47.201,47.304],["op",47.304,47.627],["ad",47.627,47.743],["starter",47.743,48.091],["Johnson",48.091,48.632],["ved",48.632,48.877],["S",48.877,49.16],["y",49.16,49.328],["for",49.328,49.457],["lambda",49.457,49.843],["lig",49.843,50.036],["nul",50.036,50.384],["og",50.384,50.5],["falder",50.5,50.81],["som",50.81,51.003],["en",51.003,51.093],["parabel",51.093,51.725],["Efter",52.628,52.899],["lambda",52.899,53.311],["c",53.311,53.569],["r",53.569,53.878],["overtager",53.878,54.445],["Euler",54.445,54.922],["som",55.064,55.321],["falder",55.321,55.605],["som",55.605,55.798],["en",55.798,55.876],["hyperbel",55.876,56.533]],"text":"I grafen med lambda hen ad og sigma c r op ad starter Johnson ved S y for lambda lig nul og falder som en parabel. Efter lambda c r overtager Euler, som falder som en hyperbel."},"regel":{"start":57.752,"end":67.636,"words":[["Reglen",57.879,58.317],["er",58.317,58.472],["altså",58.472,59.142],["beregn",59.271,59.671],["lambda",59.671,60.263],["sammenlign",60.392,60.998],["med",60.998,61.127],["lambda",61.127,61.513],["c",61.513,61.784],["r",61.784,62.08],["og",62.287,62.402],["vælg",62.403,62.647],["formel",62.647,63.163],["Euler",64.041,64.285],["for",64.286,64.427],["lange",64.427,64.711],["søjler",64.711,65.304],["Johnson",65.445,66.141],["for",66.141,66.309],["korte",66.309,66.773],["og",66.773,66.914],["mellemlange",66.914,67.636]],"text":"Reglen er altså: beregn lambda, sammenlign med lambda c r, og vælg formel. Euler for lange søjler, Johnson for korte og mellemlange."},"note":{"start":68.854,"end":84.395,"words":[["Slides",68.968,69.355],["skriver",69.355,69.6],["lambda",69.6,70.025],["c",70.025,70.309],["r",70.309,70.579],["med",70.579,70.811],["pi",70.811,71.146],["i",71.146,71.352],["anden",71.352,71.649],["E",71.649,71.907],["over",71.907,72.242],["S",72.242,72.564],["y",72.564,72.912],["Det",73.802,73.944],["er",73.944,74.086],["overgangen",74.086,74.756],["hvor",74.885,75.181],["Euler",75.181,75.439],["giver",75.439,75.748],["S",75.748,76.045],["y",76.045,76.238],["Bogen",76.238,76.547],["og",76.547,76.728],["AISC",76.728,77.488],["bruger",77.488,77.746],["to",77.746,78.003],["pi",78.003,78.21],["i",78.21,78.39],["anden",78.39,78.648],["E",78.648,78.893],["over",78.893,79.163],["S",79.163,79.473],["y",79.473,79.795],["hvor",79.936,80.168],["Euler",80.168,80.426],["giver",80.426,80.671],["en",80.671,80.761],["halv",80.761,80.993],["S",80.993,81.238],["y",81.238,81.418],["Brug",81.418,81.637],["den",81.638,81.805],["definition",81.805,82.54],["din",82.694,82.875],["underviser",82.875,83.364],["bruger",83.364,83.648],["til",83.648,83.79],["eksamen",83.79,84.395]],"text":"Slides skriver lambda c r med pi i anden E over S y. Det er overgangen, hvor Euler giver S y. Bogen og AISC bruger to pi i anden E over S y, hvor Euler giver en halv S y. Brug den definition, din underviser bruger til eksamen."},"aisc":{"start":85.62,"end":94.91,"words":[["AISC",85.747,86.366],["standarden",86.366,86.997],["bruger",86.997,87.319],["C",87.32,87.616],["c",87.616,88.002],["kvadratroden",88.144,88.763],["af",88.763,88.879],["to",88.879,89.149],["pi",89.149,89.381],["i",89.381,89.575],["anden",89.575,89.845],["E",89.845,90.09],["over",90.09,90.386],["S",90.386,90.696],["y",90.696,90.992],["med",91.134,91.276],["sikkerhedsfaktorer",91.276,92.126],["mellem",92.126,92.461],["en",92.461,92.693],["komma",92.693,93.028],["seks",93.028,93.402],["syv",93.402,93.634],["og",93.634,93.66],["en",93.66,93.969],["komma",93.969,94.304],["ni",94.304,94.51],["to.",94.51,94.91]],"text":"AISC standarden bruger C c, kvadratroden af to pi i anden E over S y, med sikkerhedsfaktorer mellem en komma seks syv og en komma ni to."},"excentrisk":{"start":96.146,"end":105.217,"words":[["Sidder",96.26,96.595],["lasten",96.596,96.995],["skævt",96.995,97.304],["med",97.304,97.498],["en",97.498,97.601],["excentricitet",97.601,98.528],["e",98.528,98.851],["giver",98.979,99.224],["den",99.224,99.392],["straks",99.392,99.74],["et",99.74,99.894],["moment",99.894,100.255],["P",100.255,100.474],["e.",100.474,100.719],["Så",100.719,100.874],["bruger",100.874,101.196],["vi",101.196,101.325],["sekantformlen",101.325,102.278],["og",102.433,102.562],["den",102.562,102.729],["tilladte",102.729,103.116],["last",103.116,103.554],["skal",103.554,103.748],["findes",103.748,104.108],["ved",104.108,104.276],["iteration",104.276,105.217]],"text":"Sidder lasten skævt med en excentricitet e, giver den straks et moment P e. Så bruger vi sekantformlen, og den tilladte last skal findes ved iteration."},"tjek_q":{"start":106.432,"end":111.767,"words":[["Tjek",106.533,106.855],["dig",106.855,107.035],["selv",107.035,107.461],["Hvad",108.378,108.533],["er",108.532,108.558],["sigma",108.558,108.971],["c",108.971,109.228],["r",109.228,109.512],["for",109.512,109.731],["en",109.731,109.821],["meget",109.821,110.092],["kort",110.092,110.375],["søjle",110.375,110.788],["ifølge",110.788,111.148],["Johnson",111.148,111.767]],"text":"Tjek dig selv. Hvad er sigma c r for en meget kort søjle ifølge Johnson?"},"tjek_a":{"start":115.648,"end":122.233,"words":[["Den",115.775,115.904],["går",115.904,116.136],["mod",116.136,116.42],["S",116.42,116.729],["y",116.729,117.025],["når",117.167,117.347],["lambda",117.348,117.76],["går",117.76,117.992],["mod",117.992,118.198],["nul",118.198,118.61],["Så",119.488,119.72],["svigter",119.72,120.068],["søjlen",120.068,120.48],["ved",120.48,120.584],["flydning",120.584,121.189],["ikke",121.305,121.563],["knækning",121.563,122.233]],"text":"Den går mod S y, når lambda går mod nul. Så svigter søjlen ved flydning, ikke knækning."},"slut":{"start":123.462,"end":131.747,"words":[["Kort",123.589,123.808],["sagt",123.808,124.298],["tjek",124.427,124.698],["lambda",124.698,125.084],["mod",125.084,125.303],["lambda",125.303,125.677],["c",125.677,126.012],["r.",126.012,126.167],["Euler",126.167,126.45],["for",126.45,126.592],["slanke",126.592,126.953],["søjler",126.953,127.533],["Johnsons",127.661,128.138],["parabel",128.138,128.576],["for",128.576,128.692],["korte",128.692,129.234],["og",129.414,129.569],["sekantformlen",129.569,130.471],["ved",130.471,130.664],["excentrisk",130.664,131.27],["last",131.27,131.747]],"text":"Kort sagt: tjek lambda mod lambda c r. Euler for slanke søjler, Johnsons parabel for korte, og sekantformlen ved excentrisk last."}}}, { audio: 'johnson.mp3', id: 'johnson' });</script>
+</body>
+</html>

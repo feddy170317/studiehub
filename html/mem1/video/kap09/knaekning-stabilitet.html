@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Knækning og stabilitet · video</title>
+<meta name="description" content="Knækning som instabilitet, stabil, neutral og ustabil ligevægt og den ideelle søjle.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 9: videoer</a><h1>Knækning og stabilitet</h1><span class="meta">MEM1 · kapitel 9 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Knækning og stabilitet"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Knækning som instabilitet, stabil, neutral og ustabil ligevægt og den ideelle søjle.</p><div class="chips"><a href="../../../../lab/mem1/soejleknaekning.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel09_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l09">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Knækning og stabilitet (MEM1 kap. 9, slides 3–6)
+BP.scene({ header: 'MEM1 · kap. 9' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, plot, hatch, rect, PI, TAU } = B;
+
+  B.titel(0, 'Knækning', 'MEM1 · kapitel 9 · begreb (slide 3–6)', 'titel');
+  text(0, 'slanke søjler bøjer pludselig ud', 640, 520, 42, 'red', wt('titel', 'bøjer') - 0.3, we('titel', 'siden'), { align: 'center' });
+
+  B.goto('soejle', 1);
+  {
+    const t0 = L('soejle').start;
+    hatch(1, rect(200, 580, 120, 16), 'black', t0, t0 + 0.3, { gap: 6 });
+    line(1, rect(225, 470, 70, 110).concat([[225, 472]]), 'black', 3, wt('soejle', 'kort') - 0.2, wt('soejle', 'kort') + 0.3);
+    arrow(1, [[260, 390], [260, 466]], 'red', 4, wt('soejle', 'kort'), wt('soejle', 'kort') + 0.3);
+    text(1, 'kort: flydning', 260, 640, 30, 'black', wt('soejle', 'flydegrænsen') - 0.4, we('soejle', 'flydegrænsen'), { align: 'center' });
+    hatch(1, rect(560, 580, 120, 16), 'black', wt('soejle', 'slank') - 0.3, wt('soejle', 'slank'), { gap: 6 });
+    line(1, [[620, 580], [620, 160]], 'black', 3, wt('soejle', 'slank') - 0.2, wt('soejle', 'slank') + 0.3, { alpha: 0.4 });
+    const P = []; for (let j = 0; j <= 30; j++) { const u = j / 30; P.push([620 + 70 * Math.sin(u * PI), 580 - 420 * u]); }
+    plot(1, P, 'blue', wt('soejle', 'knækning') - 0.2, wt('soejle', 'knækning') + 0.5, 3.4);
+    arrow(1, [[620, 80], [620, 156]], 'red', 4, wt('soejle', 'slank'), wt('soejle', 'slank') + 0.3);
+    text(1, 'slank: knækning', 620, 640, 30, 'blue', wt('soejle', 'knækning') - 0.2, we('soejle', 'knækning'), { align: 'center' });
+    const tu = L('ustabil').start;
+    text(1, 'instabilitet, ikke styrke', 800, 260, 38, 'red', tu + 0.2, we('ustabil', 'styrkeproblem'));
+    text(1, 'σ_{cr} ≪ S_y', 800, 340, 44, 'red', wt('ustabil', 'langt') - 0.2, we('ustabil', 'flydespændingen'));
+    text(1, 'afhænger af tværsnit, L og', 800, 420, 28, 'black', wt('ustabil', 'tværsnit') - 0.2, we('ustabil', 'længde'));
+    text(1, 'understøtninger', 800, 460, 28, 'black', wt('ustabil', 'understøtninger') - 0.3, we('ustabil', 'understøtninger'));
+  }
+
+  B.goto('ligevaegt', 2);
+  {
+    const t0 = L('ligevaegt').start;
+    line(2, ell(250, 300, 120, 80, 0.15 * PI, 0.85 * PI), 'black', 3, t0, t0 + 0.6); dot(2, 250, 365, 16, 'blue', t0 + 0.5);
+    text(2, 'stabil', 250, 460, 36, 'green', t0 + 0.4, wt('ligevaegt', 'tilbage'), { align: 'center' });
+    const tn = L('neutral').start;
+    line(2, [[520, 380], [760, 380]], 'black', 3, tn, tn + 0.4); dot(2, 640, 364, 16, 'blue', tn + 0.3);
+    text(2, 'neutral', 640, 460, 36, 'blue', tn + 0.2, we('neutral', 'den'), { align: 'center' });
+    const tu = L('ustabil2').start;
+    line(2, ell(1030, 460, 120, 80, -0.85 * PI, -0.15 * PI), 'black', 3, tu, tu + 0.6); dot(2, 1030, 364, 16, 'red', tu + 0.5);
+    arrow(2, [[1060, 350], [1140, 380]], 'red', 2.6, wt('ustabil2', 'rulle') - 0.2, wt('ustabil2', 'rulle') + 0.2, 11);
+    text(2, 'ustabil', 1030, 460, 36, 'red', tu + 0.2, we('ustabil2', 'væk'), { align: 'center' });
+    const tp = L('pcr').start;
+    text(2, 'P < P_{cr}', 250, 560, 40, 'green', wt('pcr', 'Under') - 0.1, we('pcr', 'stabil'), { align: 'center' });
+    text(2, 'P = P_{cr}', 640, 560, 40, 'blue', wt('pcr', 'Ved') - 0.1, we('pcr', 'neutral'), { align: 'center' });
+    text(2, 'P > P_{cr}', 1030, 560, 40, 'red', wt('pcr', 'Over') - 0.1, we('pcr', 'kollapser'), { align: 'center' });
+    text(2, 'ideal søjle: lige · homogen · last gennem tyngdepunktet', 160, 660, 30, 'black', L('ideal').start + 0.3, we('ideal', 'tyngdepunktet'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Hvorfor kan en søjle knække,', 'selv om σ ≪ S_y?'], ['knækning er instabilitet', 'udbøjningen vokser af sig selv'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 9, slide 3–6 · Hamrock, Schmid & Jacobson, kap. 9', 'Eulers knæklast', 'slut');
+  text(4, 'knækning = instabilitet under S_y', 200, 280, 42, 'blue', L('slut').start + 0.4, we('slut', 'flydespændingen'));
+  text(4, 'P < P_{cr} stabil · P > P_{cr} kollaps', 200, 360, 42, 'red', wt('slut', 'Under') - 0.1, we('slut', 'den'));
+});
+
+</script>
+<script>BP.live({"duration":115.504,"audio":"knaekning-stabilitet.mp3","order":["titel","soejle","ustabil","ligevaegt","neutral","ustabil2","pcr","ideal","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":8.593,"words":[["Knækning",0.601,1.219],["og",1.219,1.348],["stabilitet",1.348,2.16],["En",3.064,3.167],["lang",3.168,3.593],["slank",3.722,4.095],["søjle",4.095,4.508],["i",4.508,4.649],["tryk",4.649,4.946],["knuses",4.946,5.448],["ikke",5.448,5.887],["Den",6.789,6.93],["bøjer",6.93,7.227],["pludselig",7.227,7.691],["ud",7.691,7.897],["til",7.897,8.026],["siden",8.026,8.593]],"text":"Knækning og stabilitet. En lang, slank søjle i tryk knuses ikke. Den bøjer pludselig ud til siden."},"soejle":{"start":9.826,"end":20.728,"words":[["En",9.953,10.069],["søjle",10.069,10.533],["er",10.533,10.688],["et",10.688,10.791],["langt",10.791,11.255],["slankt",11.384,11.809],["element",11.809,12.337],["med",12.337,12.543],["en",12.544,12.647],["aksial",12.647,13.085],["trykkraft",13.085,13.794],["En",14.684,14.813],["kort",14.813,15.097],["klods",15.097,15.419],["svigter",15.419,15.947],["når",16.089,16.244],["trykket",16.244,16.669],["når",16.669,16.798],["flydegrænsen",16.798,17.7],["En",18.589,18.705],["slank",18.705,19.053],["søjle",19.053,19.388],["svigter",19.388,19.916],["ved",19.916,20.045],["knækning",20.045,20.728]],"text":"En søjle er et langt, slankt element med en aksial trykkraft. En kort klods svigter, når trykket når flydegrænsen. En slank søjle svigter ved knækning."},"ustabil":{"start":21.96,"end":32.398,"words":[["Knækning",22.1,22.629],["er",22.629,22.796],["en",22.796,22.912],["instabilitet",22.912,23.853],["ikke",23.982,24.291],["et",24.291,24.407],["styrkeproblem",24.407,25.361],["Det",26.264,26.329],["sker",26.329,26.638],["ved",26.638,26.702],["spændinger",26.702,27.359],["der",27.501,27.656],["er",27.656,27.669],["langt",27.669,27.965],["under",27.965,28.133],["flydespændingen",28.133,28.957],["og",29.151,29.292],["det",29.292,29.408],["afhænger",29.408,29.885],["af",29.885,29.911],["tværsnit",29.911,30.594],["længde",30.723,31.303],["og",31.303,31.496],["understøtninger",31.496,32.398]],"text":"Knækning er en instabilitet, ikke et styrkeproblem. Det sker ved spændinger, der er langt under flydespændingen, og det afhænger af tværsnit, længde og understøtninger."},"ligevaegt":{"start":33.614,"end":40.908,"words":[["Tænk",33.714,34.049],["på",34.049,34.217],["en",34.217,34.359],["kugle",34.359,34.874],["Ligger",35.83,36.14],["den",36.14,36.346],["i",36.346,36.436],["en",36.436,36.526],["skål",36.526,37.029],["er",37.171,37.287],["den",37.287,37.454],["i",37.454,37.519],["stabil",37.519,37.97],["ligevægt",37.97,38.627],["skubber",38.756,39.194],["du",39.194,39.31],["den",39.31,39.645],["ruller",39.787,40.096],["den",40.096,40.263],["tilbage",40.263,40.908]],"text":"Tænk på en kugle. Ligger den i en skål, er den i stabil ligevægt: skubber du den, ruller den tilbage."},"neutral":{"start":42.124,"end":46.414,"words":[["På",42.251,42.38],["et",42.38,42.457],["plant",42.458,42.715],["bord",42.715,43.063],["er",43.063,43.205],["den",43.205,43.385],["i",43.385,43.45],["neutral",43.45,43.927],["ligevægt",43.927,44.545],["den",44.674,44.88],["bliver",44.88,45.267],["hvor",45.409,45.602],["du",45.602,45.718],["lægger",45.718,46.014],["den",46.014,46.414]],"text":"På et plant bord er den i neutral ligevægt: den bliver, hvor du lægger den."},"ustabil2":{"start":47.634,"end":52.71,"words":[["Og",47.774,47.839],["på",47.839,47.955],["toppen",47.955,48.315],["af",48.315,48.406],["en",48.406,48.496],["bakke",48.496,48.921],["er",48.921,49.089],["den",49.089,49.23],["i",49.23,49.385],["ustabil",49.385,49.939],["ligevægt",49.939,50.571],["det",50.699,50.803],["mindste",50.803,51.15],["skub",51.151,51.486],["får",51.486,51.666],["den",51.666,51.833],["til",51.833,51.975],["at",51.975,52.014],["rulle",52.014,52.323],["væk",52.323,52.71]],"text":"Og på toppen af en bakke er den i ustabil ligevægt: det mindste skub får den til at rulle væk."},"pcr":{"start":53.936,"end":67.918,"words":[["En",54.063,54.166],["søjle",54.166,54.605],["opfører",54.605,55.12],["sig",55.12,55.416],["på",55.416,55.545],["samme",55.545,55.893],["måde",55.893,56.344],["Under",57.261,57.454],["den",57.454,57.647],["kritiske",57.647,58.189],["last",58.189,58.562],["P",58.562,58.768],["c",58.768,59.013],["r",59.013,59.31],["er",59.31,59.451],["den",59.451,59.619],["stabil",59.619,60.238],["Ved",61.152,61.281],["P",61.281,61.5],["c",61.5,61.745],["r",61.745,62.067],["er",62.067,62.209],["den",62.209,62.39],["neutral",62.39,62.957],["Over",63.872,64.078],["P",64.078,64.284],["c",64.284,64.516],["r",64.516,64.838],["vokser",64.838,65.276],["enhver",65.276,65.624],["lille",65.624,65.856],["udbøjning",65.856,66.5],["og",66.642,66.758],["søjlen",66.758,67.183],["kollapser",67.183,67.918]],"text":"En søjle opfører sig på samme måde. Under den kritiske last P c r er den stabil. Ved P c r er den neutral. Over P c r vokser enhver lille udbøjning, og søjlen kollapser."},"ideal":{"start":69.142,"end":82.737,"words":[["De",69.256,69.334],["klassiske",69.334,69.862],["formler",69.862,70.352],["bygger",70.352,70.661],["på",70.661,70.829],["en",70.829,70.906],["ideel",70.906,71.28],["søjle",71.28,71.808],["helt",71.937,72.207],["lige",72.207,72.581],["homogent",72.723,73.187],["materiale",73.187,73.934],["der",74.076,74.192],["følger",74.192,74.475],["Hookes",74.475,74.759],["lov",74.759,75.12],["og",75.313,75.429],["en",75.429,75.519],["last",75.519,75.829],["præcis",75.829,76.292],["gennem",76.293,76.602],["tyngdepunktet",76.602,77.414],["Rigtige",78.291,78.743],["søjler",78.743,79.168],["har",79.168,79.374],["små",79.374,79.67],["skævheder",79.67,80.392],["og",80.534,80.663],["derfor",80.663,81.036],["findes",81.036,81.371],["der",81.371,81.513],["empiriske",81.513,82.029],["kriterier",82.029,82.737]],"text":"De klassiske formler bygger på en ideel søjle: helt lige, homogent materiale, der følger Hookes lov, og en last præcis gennem tyngdepunktet. Rigtige søjler har små skævheder, og derfor findes der empiriske kriterier."},"tjek_q":{"start":83.964,"end":89.853,"words":[["Tjek",84.065,84.387],["dig",84.387,84.567],["selv",84.567,84.993],["Hvorfor",85.897,86.18],["kan",86.18,86.361],["en",86.361,86.438],["søjle",86.438,86.773],["knække",86.773,87.263],["selv",87.353,87.675],["om",87.675,87.791],["trykspændingen",87.791,88.461],["er",88.461,88.59],["langt",88.59,88.951],["under",88.951,89.196],["S",89.196,89.531],["y",89.531,89.853]],"text":"Tjek dig selv. Hvorfor kan en søjle knække, selv om trykspændingen er langt under S y?"},"tjek_a":{"start":93.732,"end":102.25,"words":[["Fordi",93.859,94.246],["knækning",94.246,94.826],["er",94.826,95.019],["en",95.019,95.174],["instabilitet",95.174,96.089],["Over",97.005,97.211],["den",97.211,97.392],["kritiske",97.392,97.894],["last",97.894,98.358],["vokser",98.358,98.796],["en",98.796,98.887],["lille",98.887,99.157],["udbøjning",99.157,99.698],["af",99.698,99.827],["sig",99.827,99.982],["selv",99.982,100.394],["uanset",100.536,101.064],["materialets",101.064,101.722],["styrke",101.722,102.25]],"text":"Fordi knækning er en instabilitet. Over den kritiske last vokser en lille udbøjning af sig selv, uanset materialets styrke."},"slut":{"start":103.466,"end":113.079,"words":[["Kort",103.606,103.825],["sagt",103.825,104.315],["slanke",104.444,104.908],["søjler",104.908,105.256],["knækker",105.256,105.758],["ved",105.758,106.003],["instabilitet",106.003,106.879],["under",106.879,107.137],["flydespændingen",107.137,108.039],["Under",108.943,109.149],["P",109.149,109.355],["c",109.355,109.574],["r",109.574,109.884],["er",109.884,109.999],["søjlen",110.0,110.399],["stabil",110.399,110.979],["over",111.121,111.378],["P",111.378,111.61],["c",111.61,111.842],["r",111.842,112.152],["kollapser",112.152,112.693],["den",112.693,113.079]],"text":"Kort sagt: slanke søjler knækker ved instabilitet under flydespændingen. Under P c r er søjlen stabil, over P c r kollapser den."}}}, { audio: 'knaekning-stabilitet.mp3', id: 'knaekning-stabilitet' });</script>
+</body>
+</html>
