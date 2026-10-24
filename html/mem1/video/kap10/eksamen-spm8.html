@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eksamensspørgsmål 8b: tykvægget hydraulikcylinder · video</title>
+<meta name="description" content="Eksamensspørgsmål 8b: tykvægget cylinder, σθ = 130 MPa og σr = −50 MPa ved den indre radius.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 10: videoer</a><h1>Eksamensspørgsmål 8b: tykvægget hydraulikcylinder</h1><span class="meta">MEM1 · kapitel 10 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Eksamensspørgsmål 8b: tykvægget hydraulikcylinder"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Eksamensspørgsmål 8b: tykvægget cylinder, σθ = 130 MPa og σr = −50 MPa ved den indre radius.</p><div class="chips"><a href="tykvaeggede-lame.html">Se først: Tykvæggede cylindre: Lamé</a><a href="../../../../lab/mem1/trykbeholder.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel10_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l10">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Eksamensspørgsmål 8b: ri = 40, ro = 60, pi = 50 MPa → σθ = 130 MPa, σr = −50 MPa (slide 19)
+BP.scene({ header: 'MEM1 · kap. 10' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, PI, TAU } = B;
+
+  B.titel(0, 'Eksamensspørgsmål 8b', 'MEM1 · kapitel 10 · opgave (slide 19)', 'titel');
+  text(0, 'tykvægget hydraulikcylinder', 640, 520, 42, 'red', wt('titel', 'tykvægget') - 0.2, we('titel', 'overflade'), { align: 'center' });
+
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start, cx = 1110, cy = 220;
+    line(1, ell(cx, cy, 105, 105, 0, TAU), 'black', 3, t0, t0 + 0.5); line(1, ell(cx, cy, 70, 70, 0, TAU), 'black', 3, t0 + 0.3, t0 + 0.7);
+    for (let i = 0; i < 10; i++) { const a = i * TAU / 10; arrow(1, [[cx + 25 * Math.cos(a), cy + 25 * Math.sin(a)], [cx + 64 * Math.cos(a), cy + 64 * Math.sin(a)]], 'blue', 2, wt('data', 'tryk') - 0.2 + 0.03 * i, wt('data', 'tryk') + 0.2 + 0.03 * i, 8); }
+    text(1, 'r_i = 40,  r_o = 60 mm,  p_i = 50 MPa', 140, 160, 38, 'black', t0 + 0.2, we('data', 'megapascal'));
+    text(1, 't = 20 mm = 0,5 r_i  ≫ 0,1 r_i  →  Lamé', 140, 240, 36, 'green', L('tjek_tyk').start + 0.2, we('tjek_tyk', 'Lamé'));
+    text(1, 'σ_θ(r_i) = p (r_o² + r_i²)/(r_o² − r_i²)', 140, 340, 40, 'red', L('sigma').start + 0.2, we('sigma', 'anden', 3));
+    text(1, '= 50 · (3600 + 1600)/(3600 − 1600) = 50 · 5200/2000', 140, 410, 32, 'red', L('tal').start + 0.2, we('tal', 'tusind', 2));
+    const r = text(1, 'σ_θ = 130 MPa   ·   σ_r = −50 MPa', 140, 510, 46, 'red', L('resultat').start + 0.2, we('radial', 'megapascal'));
+    box(1, 115, 455, 820, 85, 'red', we('radial', 'megapascal'), we('radial', 'megapascal') + 0.6);
+    text(1, 'tynd formel: p r/t = 100 MPa (for lavt)', 140, 620, 36, 'black', L('tynd').start + 0.2, we('tynd', 'fjerdedel'));
+    text(1, 'del a: se videoen om Lamé', 140, 690, 32, 'blue', L('teori').start + 0.4, we('teori', 'cylindre'));
+  }
+
+  B.goto('tjek_q', 2);
+  B.tjek(2, ['Hvad er σ_r ved', 'den ydre overflade?'], ['σ_r = 0', 'intet udvendigt tryk'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 3);
+  B.slut(3, 'Abou-Hayt (2026), MEM1 Chapter 10, slide 19 (eksamensspm. 8) · Hamrock, Schmid & Jacobson, kap. 10', '', 'slut');
+  text(3, 'ved r_i:  σ_θ = 130 MPa', 200, 280, 46, 'red', L('slut').start + 0.4, we('slut', 'megapascal'));
+  text(3, 'σ_r = −50 MPa', 200, 370, 46, 'blue', wt('slut', 'sigma', 1) - 0.1, we('slut', 'megapascal', 1));
+});
+
+</script>
+<script>BP.live({"duration":110.718,"audio":"eksamen-spm8.mp3","order":["titel","data","tjek_tyk","sigma","tal","resultat","radial","tynd","teori","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":9.688,"words":[["Eksamensspørgsmål",0.64,1.761],["otte",1.761,2.083],["b",2.083,2.457],["En",3.361,3.49],["tykvægget",3.49,4.044],["hydraulikcylinder",4.044,5.088],["med",5.088,5.345],["indre",5.345,5.693],["tryk",5.693,6.157],["Vi",7.059,7.175],["finder",7.175,7.446],["spændingerne",7.446,8.168],["ved",8.168,8.348],["den",8.348,8.606],["indre",8.606,8.979],["overflade",8.979,9.688]],"text":"Eksamensspørgsmål otte b. En tykvægget hydraulikcylinder med indre tryk. Vi finder spændingerne ved den indre overflade."},"data":{"start":10.906,"end":17.928,"words":[["Den",11.02,11.175],["indre",11.175,11.497],["radius",11.497,12.0],["er",12.0,12.18],["fyrre",12.18,12.464],["millimeter",12.464,13.211],["den",13.301,13.495],["ydre",13.495,13.752],["radius",13.752,14.19],["er",14.191,14.332],["tres",14.332,14.629],["millimeter",14.629,15.325],["og",15.466,15.634],["det",15.634,15.763],["indre",15.763,16.111],["tryk",16.111,16.51],["er",16.51,16.626],["halvtreds",16.626,17.051],["megapascal",17.051,17.928]],"text":"Den indre radius er fyrre millimeter, den ydre radius er tres millimeter, og det indre tryk er halvtreds megapascal."},"tjek_tyk":{"start":19.152,"end":29.397,"words":[["Først",19.266,19.717],["tjekker",19.717,20.156],["vi",20.156,20.284],["tykkelsen",20.284,21.071],["Den",21.974,22.116],["er",22.116,22.206],["tyve",22.206,22.502],["millimeter",22.502,23.237],["altså",23.366,23.791],["en",23.791,23.946],["halv",23.946,24.165],["gange",24.165,24.474],["den",24.474,24.771],["indre",24.771,25.106],["radius",25.106,25.75],["Det",26.652,26.768],["er",26.768,26.832],["langt",26.832,27.116],["over",27.116,27.322],["en",27.322,27.451],["tiendedel",27.451,28.173],["så",28.314,28.521],["vi",28.521,28.624],["bruger",28.624,28.972],["Lamé",28.972,29.397]],"text":"Først tjekker vi tykkelsen. Den er tyve millimeter, altså en halv gange den indre radius. Det er langt over en tiendedel, så vi bruger Lamé."},"sigma":{"start":30.614,"end":39.131,"words":[["Ringspændingen",30.741,31.347],["ved",31.347,31.424],["den",31.424,31.618],["indre",31.618,31.888],["radius",31.888,32.365],["er",32.365,32.494],["p",32.494,32.713],["gange",32.713,33.1],["r",33.1,33.344],["o",33.344,33.576],["i",33.576,33.808],["anden",33.808,34.143],["plus",34.143,34.414],["r",34.414,34.697],["i",34.697,34.929],["i",34.929,35.149],["anden",35.149,35.638],["divideret",35.78,36.283],["med",36.283,36.527],["r",36.527,36.759],["o",36.759,37.004],["i",37.004,37.21],["anden",37.21,37.494],["minus",37.494,38.048],["r",38.048,38.306],["i",38.306,38.525],["i",38.525,38.705],["anden",38.705,39.131]],"text":"Ringspændingen ved den indre radius er p gange r o i anden plus r i i anden, divideret med r o i anden minus r i i anden."},"tal":{"start":40.348,"end":52.397,"words":[["Det",40.488,40.604],["er",40.604,40.72],["halvtreds",40.72,41.12],["gange",41.12,41.429],["tre",41.429,41.712],["tusind",41.712,42.112],["seks",42.112,42.421],["hundrede",42.421,42.653],["plus",42.653,42.885],["seksten",42.885,43.259],["hundrede",43.259,43.8],["divideret",43.942,44.457],["med",44.457,44.676],["tre",44.676,44.973],["tusind",44.973,45.372],["seks",45.372,45.694],["hundrede",45.694,45.926],["minus",45.926,46.416],["seksten",46.416,46.88],["hundrede",46.88,47.383],["Altså",48.286,48.595],["halvtreds",48.595,49.021],["gange",49.021,49.472],["fem",49.472,49.755],["tusind",49.755,50.09],["to",50.09,50.322],["hundrede",50.322,50.567],["divideret",50.567,51.302],["med",51.302,51.508],["to",51.508,51.778],["tusind",51.778,52.397]],"text":"Det er halvtreds gange tre tusind seks hundrede plus seksten hundrede, divideret med tre tusind seks hundrede minus seksten hundrede. Altså halvtreds gange fem tusind to hundrede divideret med to tusind."},"resultat":{"start":53.634,"end":56.429,"words":[["Det",53.761,53.839],["giver",53.839,54.161],["hundrede",54.161,54.47],["og",54.47,54.509],["tredive",54.509,54.882],["megapascal",54.882,55.759],["i",55.759,55.913],["træk",55.913,56.429]],"text":"Det giver hundrede og tredive megapascal i træk."},"radial":{"start":57.656,"end":63.093,"words":[["Radialspændingen",57.783,58.621],["ved",58.621,58.724],["den",58.724,58.956],["indre",58.956,59.291],["overflade",59.291,59.91],["er",59.91,60.026],["minus",60.026,60.412],["p",60.412,60.825],["altså",60.953,61.392],["minus",61.392,61.791],["halvtreds",61.791,62.178],["megapascal",62.178,63.093]],"text":"Radialspændingen ved den indre overflade er minus p, altså minus halvtreds megapascal."},"tynd":{"start":64.318,"end":76.083,"words":[["Til",64.445,64.6],["sammenligning",64.6,65.244],["ville",65.244,65.489],["den",65.489,65.682],["tyndvæggede",65.682,66.198],["formel",66.198,66.623],["give",66.623,66.842],["p",66.842,67.087],["r",67.087,67.371],["over",67.371,67.654],["t",67.654,68.092],["halvtreds",68.234,68.737],["gange",68.737,69.033],["fyrre",69.033,69.304],["divideret",69.304,69.871],["med",69.871,70.025],["tyve",70.025,70.566],["altså",70.695,71.043],["hundrede",71.043,71.365],["megapascal",71.365,72.216],["Den",73.107,73.261],["undervurderer",73.261,73.854],["spændingen",73.854,74.486],["med",74.486,74.653],["næsten",74.653,75.194],["en",75.194,75.375],["fjerdedel",75.375,76.083]],"text":"Til sammenligning ville den tyndvæggede formel give p r over t, halvtreds gange fyrre divideret med tyve, altså hundrede megapascal. Den undervurderer spændingen med næsten en fjerdedel."},"teori":{"start":77.316,"end":87.432,"words":[["Til",77.443,77.662],["del",77.662,77.92],["a",77.92,78.204],["skal",78.204,78.384],["du",78.384,78.474],["kunne",78.474,78.668],["vise",78.668,78.977],["Lamés",78.977,79.325],["ligninger",79.325,79.802],["og",79.802,79.93],["forklare",79.93,80.6],["hvorfor",80.742,81.284],["den",81.284,81.464],["største",81.464,81.863],["ringspænding",81.863,82.482],["sidder",82.482,82.856],["ved",82.856,82.972],["den",82.972,83.216],["indre",83.217,83.539],["radius",83.539,84.17],["Se",85.061,85.357],["videoen",85.357,85.924],["om",85.924,86.118],["tykvæggede",86.118,86.71],["cylindre",86.71,87.432]],"text":"Til del a skal du kunne vise Lamés ligninger og forklare, hvorfor den største ringspænding sidder ved den indre radius. Se videoen om tykvæggede cylindre."},"tjek_q":{"start":88.658,"end":93.426,"words":[["Tjek",88.759,89.081],["dig",89.081,89.261],["selv",89.261,89.687],["Hvad",90.591,90.849],["er",90.849,90.99],["radialspændingen",90.99,91.918],["ved",91.918,92.06],["den",92.06,92.318],["ydre",92.318,92.679],["overflade",92.679,93.426]],"text":"Tjek dig selv. Hvad er radialspændingen ved den ydre overflade?"},"tjek_a":{"start":97.298,"end":100.131,"words":[["Nul",97.412,97.812],["fordi",97.941,98.314],["der",98.314,98.443],["ikke",98.443,98.791],["er",98.791,98.869],["noget",98.869,99.178],["udvendigt",99.178,99.655],["tryk",99.655,100.131]],"text":"Nul, fordi der ikke er noget udvendigt tryk."},"slut":{"start":101.344,"end":108.301,"words":[["Kort",101.484,101.69],["sagt",101.69,102.167],["ved",102.296,102.464],["den",102.464,102.67],["indre",102.67,102.94],["radius",102.94,103.404],["er",103.404,103.533],["sigma",103.533,103.984],["theta",103.984,104.332],["hundrede",104.332,104.577],["og",104.577,104.603],["tredive",104.603,104.951],["megapascal",104.951,105.801],["og",105.801,105.891],["sigma",105.891,106.368],["r",106.368,106.574],["minus",106.574,106.922],["halvtreds",106.922,107.335],["megapascal",107.335,108.301]],"text":"Kort sagt: ved den indre radius er sigma theta hundrede og tredive megapascal og sigma r minus halvtreds megapascal."}}}, { audio: 'eksamen-spm8.mp3', id: 'eksamen-spm8' });</script>
+</body>
+</html>

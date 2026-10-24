@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tolerancer og presningspasninger · video</title>
+<meta name="description" content="Tolerancer, spil- og presningspasning, kontakttryk, krympning og det radiale overlap.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 10: videoer</a><h1>Tolerancer og presningspasninger</h1><span class="meta">MEM1 · kapitel 10 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Tolerancer og presningspasninger"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Tolerancer, spil- og presningspasning, kontakttryk, krympning og det radiale overlap.</p><div class="chips"><a href="tykvaeggede-lame.html">Se først: Tykvæggede cylindre: Lamé</a><a href="../../Kapitel10_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l10">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Tolerancer og presningspasninger (MEM1 kap. 10, slides 3–4 og 14–17)
+BP.scene({ header: 'MEM1 · kap. 10' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, hatch, rect, PI, TAU } = B;
+
+  B.titel(0, 'Presningspasning', 'MEM1 · kapitel 10 · begreb (slide 3–4, 14–17)', 'titel');
+  text(0, 'moment uden kile', 640, 520, 42, 'red', wt('titel', 'moment') - 0.2, we('titel', 'kile'), { align: 'center' });
+
+  B.goto('tolerance', 1);
+  {
+    const t0 = L('tolerance').start;
+    text(1, 'tolerance = største mål − mindste mål', 140, 160, 38, 'black', wt('tolerance', 'Tolerancen') - 0.1, we('tolerance', 'mål', 1));
+    const tp = L('pasning').start;
+    line(1, rect(200, 260, 220, 140).concat([[200, 262]]), 'black', 3, wt('pasning', 'spillepasning') - 0.3, wt('pasning', 'spillepasning') + 0.3);
+    line(1, rect(230, 290, 160, 80).concat([[230, 292]]), 'blue', 3, wt('pasning', 'spillepasning'), wt('pasning', 'spillepasning') + 0.4);
+    text(1, 'spil: hul > aksel', 310, 450, 32, 'blue', wt('pasning', 'spillepasning') - 0.1, we('pasning', 'glide'), { align: 'center' });
+    const tr = L('presning').start;
+    line(1, rect(700, 260, 220, 140).concat([[700, 262]]), 'black', 3, tr, tr + 0.4);
+    line(1, rect(690, 250, 240, 160).concat([[690, 252]]), 'red', 3, wt('presning', 'større') - 0.2, wt('presning', 'større') + 0.4);
+    text(1, 'presning: aksel > hul', 810, 450, 32, 'red', wt('presning', 'presningspasning') - 0.1, we('presning', 'dem'), { align: 'center' });
+  }
+
+  B.goto('tryk', 2);
+  {
+    const t0 = L('tryk').start, cx = 340, cy = 380;
+    line(2, ell(cx, cy, 200, 200, 0, TAU), 'black', 3, t0, t0 + 0.5); line(2, ell(cx, cy, 120, 120, 0, TAU), 'red', 3.4, t0 + 0.3, t0 + 0.8);
+    hatch(2, rect(cx - 120, cy - 8, 240, 16), 'blue', t0 + 0.6, t0 + 0.9, { gap: 6 });
+    for (let i = 0; i < 12; i++) { const a = i * TAU / 12; arrow(2, [[cx + 100 * Math.cos(a), cy + 100 * Math.sin(a)], [cx + 60 * Math.cos(a), cy + 60 * Math.sin(a)]], 'red', 2, wt('tryk', 'udvendigt') - 0.3 + 0.03 * i, wt('tryk', 'udvendigt') + 0.03 * i, 8); }
+    for (let i = 0; i < 12; i++) { const a = i * TAU / 12 + 0.26; arrow(2, [[cx + 140 * Math.cos(a), cy + 140 * Math.sin(a)], [cx + 180 * Math.cos(a), cy + 180 * Math.sin(a)]], 'blue', 2, wt('tryk', 'indvendigt') - 0.3 + 0.03 * i, wt('tryk', 'indvendigt') + 0.03 * i, 8); }
+    text(2, 'kontakttryk p', 640, 200, 40, 'red', wt('tryk', 'kontakttryk') - 0.2, we('tryk', 'fladen'));
+    text(2, 'aksel: ydre tryk · nav: indre tryk', 640, 260, 32, 'black', wt('tryk', 'Akslen') - 0.1, we('tryk', 'tryk', 1));
+    text(2, 'friktion → aksialkraft og moment', 640, 360, 34, 'blue', L('friktion').start + 0.2, we('friktion', 'moment'));
+    text(2, 'ingen kilespor → ingen K_t', 640, 420, 34, 'green', wt('friktion', 'kilespor') - 0.3, we('friktion', 'spændingskoncentrationer'));
+    text(2, 'krympning:  Δr = α R ΔT', 640, 530, 40, 'red', L('krymp').start + 0.4, we('krymp', 'T'));
+  }
+
+  B.goto('overlap', 3);
+  {
+    const t0 = L('overlap').start;
+    text(3, 'δ = |δ_{nav}| + |δ_{aksel}|', 140, 170, 46, 'red', t0 + 0.2, we('overlap', 'sammentrykning'));
+    text(3, 'δ = (pR/E_n)·[(r_o² + R²)/(r_o² − R²) + ν_n]', 140, 290, 36, 'blue', L('formel').start + 0.3, we('formel', 'n', 1));
+    text(3, '+ (pR/E_s)·[(R² + r_i²)/(R² − r_i²) − ν_s]', 180, 360, 36, 'blue', wt('formel', 'Plus') - 0.1, we('formel', 's', 1));
+    text(3, 'samme stål → forenkles', 140, 470, 38, 'green', L('ens').start + 0.2, we('ens', 'forenkles'));
+  }
+
+  B.goto('tjek_q', 4);
+  B.tjek(4, ['Hvad sker der, hvis', 'overlappet er for stort?'], ['p bliver for stort', 'navet flyder ved den indre radius'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 5);
+  B.slut(5, 'Abou-Hayt (2026), MEM1 Chapter 10, slide 3–4 og 14–17 · Hamrock, Schmid & Jacobson, kap. 10', 'presningseksemplet', 'slut');
+  text(5, 'kontakttryk p → moment ved friktion', 200, 280, 42, 'blue', L('slut').start + 0.4, we('slut', 'friktion'));
+  text(5, 'δ = navets + akslens deformation', 200, 360, 42, 'red', wt('slut', 'overlappet') - 0.1, we('slut', 'deformation'));
+});
+
+</script>
+<script>BP.live({"duration":129.62,"audio":"presningspasning.mp3","order":["titel","tolerance","pasning","presning","tryk","friktion","krymp","overlap","formel","ens","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.188,"words":[["Tolerancer",0.627,1.439],["og",1.439,1.568],["presningspasninger",1.568,2.741],["Hvordan",3.619,3.928],["kan",3.928,4.057],["en",4.057,4.186],["aksel",4.186,4.714],["og",4.714,4.881],["et",4.881,4.985],["nav",4.985,5.268],["overføre",5.268,5.899],["moment",5.899,6.376],["uden",6.376,6.595],["en",6.595,6.711],["kile",6.711,7.188]],"text":"Tolerancer og presningspasninger. Hvordan kan en aksel og et nav overføre moment uden en kile?"},"tolerance":{"start":8.41,"end":16.09,"words":[["Ingen",8.55,8.782],["fremstilling",8.782,9.465],["er",9.465,9.594],["helt",9.594,9.877],["præcis",9.878,10.522],["Tolerancen",11.413,12.134],["er",12.134,12.289],["den",12.289,12.482],["tilladte",12.482,12.882],["variation",12.882,13.578],["altså",13.719,14.067],["største",14.067,14.441],["mål",14.441,14.815],["minus",14.815,15.304],["mindste",15.304,15.691],["mål",15.691,16.09]],"text":"Ingen fremstilling er helt præcis. Tolerancen er den tilladte variation, altså største mål minus mindste mål."},"pasning":{"start":17.328,"end":26.168,"words":[["En",17.468,17.584],["pasning",17.584,18.138],["beskriver",18.138,18.576],["forholdet",18.576,19.053],["mellem",19.053,19.401],["to",19.401,19.685],["dele",19.685,19.994],["før",19.994,20.239],["samling",20.239,20.844],["Ved",21.761,21.916],["en",21.916,21.993],["spillepasning",21.993,22.805],["er",22.805,22.934],["hullet",22.934,23.23],["større",23.23,23.578],["end",23.578,23.72],["akslen",23.72,24.325],["så",24.467,24.66],["de",24.66,24.764],["kan",24.764,24.918],["dreje",24.918,25.382],["eller",25.382,25.627],["glide",25.627,26.168]],"text":"En pasning beskriver forholdet mellem to dele før samling. Ved en spillepasning er hullet større end akslen, så de kan dreje eller glide."},"presning":{"start":27.398,"end":33.841,"words":[["Ved",27.538,27.706],["en",27.706,27.809],["presningspasning",27.809,28.711],["er",28.711,28.878],["akslen",28.878,29.433],["større",29.433,29.922],["end",29.922,30.09],["hullet",30.09,30.554],["Så",31.444,31.599],["skal",31.599,31.767],["der",31.767,31.844],["kraft",31.844,32.23],["eller",32.23,32.488],["varme",32.488,32.862],["til",32.862,33.042],["at",33.042,33.068],["samle",33.068,33.442],["dem",33.442,33.841]],"text":"Ved en presningspasning er akslen større end hullet. Så skal der kraft eller varme til at samle dem."},"tryk":{"start":35.068,"end":46.743,"words":[["Efter",35.208,35.453],["samlingen",35.453,35.981],["er",35.981,36.046],["navet",36.046,36.342],["strakt",36.342,36.755],["og",36.755,36.935],["akslen",36.935,37.541],["trykket",37.541,37.927],["sammen",37.927,38.494],["Der",39.385,39.488],["opstår",39.488,39.978],["et",39.978,40.042],["kontakttryk",40.042,40.764],["p",40.764,41.034],["i",41.034,41.189],["fladen",41.189,41.73],["Akslen",42.62,43.096],["ser",43.096,43.341],["det",43.341,43.418],["som",43.419,43.625],["et",43.625,43.766],["udvendigt",43.766,44.243],["tryk",44.243,44.656],["og",44.875,45.081],["navet",45.081,45.442],["som",45.442,45.661],["et",45.661,45.764],["indvendigt",45.764,46.279],["tryk",46.279,46.743]],"text":"Efter samlingen er navet strakt og akslen trykket sammen. Der opstår et kontakttryk p i fladen. Akslen ser det som et udvendigt tryk, og navet som et indvendigt tryk."},"friktion":{"start":47.97,"end":57.042,"words":[["Kontakttrykket",48.097,48.909],["giver",48.909,49.18],["friktion",49.18,49.824],["der",49.966,50.082],["kan",50.082,50.198],["overføre",50.198,50.739],["både",50.739,51.035],["aksialkraft",51.035,51.86],["og",51.86,52.002],["moment",52.002,52.543],["Så",53.421,53.627],["slipper",53.627,53.949],["vi",53.949,54.104],["for",54.104,54.233],["kilespor",54.233,54.967],["der",55.135,55.251],["giver",55.251,55.56],["spændingskoncentrationer",55.56,57.042]],"text":"Kontakttrykket giver friktion, der kan overføre både aksialkraft og moment. Så slipper vi for kilespor, der giver spændingskoncentrationer."},"krymp":{"start":58.256,"end":71.774,"words":[["Ved",58.396,58.538],["en",58.538,58.641],["krympepasning",58.641,59.504],["varmer",59.504,59.917],["man",59.917,60.097],["navet",60.097,60.432],["op",60.432,60.78],["eller",60.78,60.999],["køler",60.999,61.321],["akslen",61.321,61.798],["ned",61.798,62.185],["for",62.327,62.507],["eksempel",62.507,63.048],["i",63.048,63.19],["flydende",63.19,63.577],["kvælstof",63.577,64.298],["Radiusændringen",65.189,66.027],["er",66.027,66.233],["alfa",66.233,66.658],["gange",66.658,67.109],["R",67.109,67.315],["gange",67.315,67.702],["delta",67.702,68.101],["T.",68.101,68.681],["Når",68.681,68.849],["delene",68.849,69.222],["får",69.222,69.351],["samme",69.351,69.674],["temperatur",69.674,70.241],["igen",70.241,70.666],["griber",70.872,71.168],["de",71.168,71.284],["fast",71.284,71.774]],"text":"Ved en krympepasning varmer man navet op eller køler akslen ned, for eksempel i flydende kvælstof. Radiusændringen er alfa gange R gange delta T. Når delene får samme temperatur igen, griber de fast."},"overlap":{"start":73.006,"end":77.927,"words":[["Det",73.133,73.224],["radiale",73.224,73.687],["overlap",73.687,74.177],["delta",74.177,74.68],["er",74.68,74.783],["summen",74.783,75.208],["af",75.208,75.285],["navets",75.285,75.646],["udvidelse",75.646,76.342],["og",76.342,76.497],["akslens",76.497,77.038],["sammentrykning",77.038,77.927]],"text":"Det radiale overlap delta er summen af navets udvidelse og akslens sammentrykning."},"formel":{"start":79.14,"end":96.896,"words":[["Med",79.267,79.383],["Lamé",79.383,79.641],["for",79.641,79.783],["begge",79.783,80.066],["dele",80.066,80.376],["bliver",80.376,80.595],["delta",80.595,80.994],["lig",80.994,81.252],["p",81.252,81.458],["R",81.458,81.754],["over",81.754,82.089],["E",82.09,82.283],["n",82.283,82.437],["gange",82.437,82.798],["r",82.798,83.056],["o",83.056,83.288],["i",83.288,83.507],["anden",83.507,83.829],["plus",83.829,84.087],["R",84.087,84.319],["i",84.319,84.538],["anden",84.538,84.989],["over",85.131,85.453],["r",85.453,85.672],["o",85.672,85.891],["i",85.891,86.084],["anden",86.084,86.368],["minus",86.368,86.819],["R",86.819,87.038],["i",87.038,87.244],["anden",87.244,87.695],["plus",87.824,88.133],["ny",88.133,88.288],["n.",88.288,88.739],["Plus",88.739,89.01],["p",89.01,89.229],["R",89.229,89.538],["over",89.538,89.912],["E",89.912,90.105],["s",90.105,90.26],["gange",90.26,90.646],["R",90.646,90.904],["i",90.904,91.123],["anden",91.123,91.471],["plus",91.471,91.729],["r",91.729,91.961],["i",91.961,92.18],["i",92.18,92.373],["anden",92.373,92.824],["over",92.966,93.301],["R",93.301,93.546],["i",93.546,93.752],["anden",93.752,94.048],["minus",94.048,94.564],["r",94.564,94.809],["i",94.809,95.002],["i",95.002,95.208],["anden",95.208,95.685],["minus",95.827,96.265],["ny",96.265,96.471],["s",96.471,96.896]],"text":"Med Lamé for begge dele bliver delta lig p R over E n gange r o i anden plus R i anden, over r o i anden minus R i anden, plus ny n. Plus p R over E s gange R i anden plus r i i anden, over R i anden minus r i i anden, minus ny s."},"ens":{"start":98.114,"end":101.553,"words":[["Er",98.241,98.332],["begge",98.332,98.628],["dele",98.628,98.989],["af",98.989,99.079],["samme",99.079,99.401],["stål",99.401,99.891],["kan",100.045,100.252],["udtrykket",100.252,100.819],["forenkles",100.819,101.553]],"text":"Er begge dele af samme stål, kan udtrykket forenkles."},"tjek_q":{"start":102.784,"end":107.346,"words":[["Tjek",102.884,103.219],["dig",103.219,103.4],["selv",103.4,103.838],["Hvad",104.756,104.884],["sker",104.884,105.194],["der",105.194,105.477],["hvis",105.606,105.877],["overlappet",105.877,106.547],["er",106.547,106.714],["for",106.714,106.856],["stort",106.856,107.346]],"text":"Tjek dig selv. Hvad sker der, hvis overlappet er for stort?"},"tjek_a":{"start":111.208,"end":117.366,"words":[["Så",111.322,111.529],["bliver",111.529,111.735],["kontakttrykket",111.735,112.521],["for",112.521,112.65],["stort",112.65,113.114],["og",113.281,113.5],["navet",113.5,113.81],["kan",113.81,113.938],["flyde",113.938,114.235],["ved",114.235,114.351],["den",114.351,114.596],["indre",114.596,114.931],["radius",114.931,115.588],["hvor",115.73,115.974],["ringspændingen",115.974,116.735],["er",116.735,116.851],["størst",116.851,117.366]],"text":"Så bliver kontakttrykket for stort, og navet kan flyde ved den indre radius, hvor ringspændingen er størst."},"slut":{"start":118.59,"end":127.197,"words":[["Kort",118.73,118.949],["sagt",118.949,119.426],["presningspasningen",119.555,120.509],["giver",120.509,120.779],["et",120.779,120.844],["kontakttryk",120.844,121.501],["p",121.501,121.913],["der",122.055,122.171],["overfører",122.171,122.712],["moment",122.712,123.047],["ved",123.047,123.15],["friktion",123.15,123.795],["og",124.001,124.143],["overlappet",124.143,124.735],["er",124.735,124.761],["summen",124.761,125.161],["af",125.161,125.251],["navets",125.251,125.702],["og",125.702,125.895],["akslens",125.895,126.423],["deformation",126.423,127.197]],"text":"Kort sagt: presningspasningen giver et kontakttryk p, der overfører moment ved friktion, og overlappet er summen af navets og akslens deformation."}}}, { audio: 'presningspasning.mp3', id: 'presningspasning' });</script>
+</body>
+</html>

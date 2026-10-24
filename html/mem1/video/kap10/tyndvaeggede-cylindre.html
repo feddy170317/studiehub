@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tyndvæggede trykbeholdere · video</title>
+<meta name="description" content="Tynd eller tyk væg, σθ = pr/t og σz = pr/(2t) med udledning, radius- og volumenændring.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 10: videoer</a><h1>Tyndvæggede trykbeholdere</h1><span class="meta">MEM1 · kapitel 10 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Tyndvæggede trykbeholdere"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Tynd eller tyk væg, σθ = pr/t og σz = pr/(2t) med udledning, radius- og volumenændring.</p><div class="chips"><a href="../../../../lab/mem1/trykbeholder.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel10_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l10">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Tyndvæggede trykbeholdere (MEM1 kap. 10, slides 2 og 5–9)
+BP.scene({ header: 'MEM1 · kap. 10' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, hatch, rect, dashed, PI, TAU } = B;
+
+  B.titel(0, 'Tyndvæggede cylindre', 'MEM1 · kapitel 10 · begreb (slide 2, 5–9)', 'titel');
+  text(0, 'σ_θ og σ_z fra indre tryk', 640, 520, 42, 'red', wt('titel', 'spændinger') - 0.3, we('titel', 'retninger'), { align: 'center' });
+
+  B.goto('klasse', 1);
+  {
+    const t0 = L('klasse').start;
+    line(1, ell(300, 330, 150, 150, 0, TAU), 'black', 3, t0, t0 + 0.6); line(1, ell(300, 330, 135, 135, 0, TAU), 'black', 3, t0 + 0.4, t0 + 0.9);
+    text(1, 'tynd: t ≤ 0,1 r_i', 300, 540, 36, 'blue', wt('klasse', 'tiendedel') - 0.6, we('klasse', 'radius'), { align: 'center' });
+    text(1, 'σ jævn gennem væggen', 300, 590, 30, 'black', wt('klasse', 'jævn') - 0.2, we('klasse', 'væggen'), { align: 'center' });
+    const tt = L('tyk').start;
+    line(1, ell(900, 330, 150, 150, 0, TAU), 'black', 3, tt, tt + 0.5); line(1, ell(900, 330, 85, 85, 0, TAU), 'black', 3, tt + 0.4, tt + 0.8);
+    text(1, 'tyk: σ varierer → Lamé', 900, 540, 36, 'red', tt + 0.2, we('tyk', 'ligninger'), { align: 'center' });
+  }
+
+  B.goto('ring', 2);
+  {
+    const t0 = L('ring').start;
+    const r = text(2, 'σ_θ = p r / t', 140, 170, 56, 'red', t0 + 0.4, we('ring', 't', 1));
+    // snit på langs: halvring med tryk
+    const tb = L('ring_bevis').start, cx = 330, cy = 470;
+    line(2, ell(cx, cy, 160, 160, PI, TAU), 'black', 3, tb, tb + 0.6); line(2, ell(cx, cy, 145, 145, PI, TAU), 'black', 3, tb + 0.2, tb + 0.8);
+    for (let i = 1; i < 8; i++) { const a = PI + i * PI / 8; arrow(2, [[cx + 60 * Math.cos(a), cy + 60 * Math.sin(a)], [cx + 135 * Math.cos(a), cy + 135 * Math.sin(a)]], 'blue', 2.2, wt('ring_bevis', 'Trykket') - 0.2 + i * 0.05, wt('ring_bevis', 'Trykket') + 0.2 + i * 0.05, 9); }
+    arrow(2, [[cx - 152, cy + 10], [cx - 152, cy + 90]], 'red', 3.6, wt('ring_bevis', 'holdes') - 0.1, wt('ring_bevis', 'holdes') + 0.3, 13); arrow(2, [[cx + 152, cy + 10], [cx + 152, cy + 90]], 'red', 3.6, wt('ring_bevis', 'holdes'), wt('ring_bevis', 'holdes') + 0.4, 13);
+    text(2, 'σ_θ', cx - 200, cy + 70, 32, 'red', wt('ring_bevis', 'holdes') + 0.2, wt('ring_bevis', 'holdes') + 0.5);
+    text(2, 'p · 2r L = σ_θ · 2t L', 600, 400, 42, 'black', wt('ring_bevis', 'Altså') - 0.1, we('ring_bevis', 'L', 2));
+    text(2, 'σ_z = p r / (2t)', 600, 520, 50, 'blue', L('laengde').start + 0.2, wt('laengde', 'Det') - 0.1);
+    text(2, 'p · π r² = σ_z · 2π r t', 600, 600, 38, 'black', wt('laengde', 'Trykket') - 0.1, we('laengde', 't'));
+  }
+
+  B.goto('forhold', 3);
+  {
+    const t0 = L('forhold').start;
+    text(3, 'σ_θ = 2 σ_z', 140, 170, 54, 'red', t0 + 0.2, we('forhold', 'længdespændingen'));
+    line(3, rect(700, 120, 400, 140).concat([[700, 122]]), 'black', 3, wt('forhold', 'revner') - 0.4, wt('forhold', 'revner'));
+    line(3, [[720, 190], [760, 186], [800, 194], [840, 188], [880, 192], [920, 186], [960, 192], [1000, 188], [1040, 192], [1080, 190]], 'red', 3, wt('forhold', 'langs') - 0.4, we('forhold', 'langs'));
+    text(3, 'revner på langs', 900, 300, 34, 'red', wt('forhold', 'langs') - 0.2, we('forhold', 'langs'), { align: 'center' });
+    text(3, 'Δr = p r² (2 − ν) / (2 · t · E)', 140, 420, 46, 'blue', L('radius').start + 0.3, we('radius', 'ny'));
+    text(3, 'ΔV = p r V (5 − 4ν) / (2 · t · E)', 140, 520, 46, 'green', L('volumen').start + 0.3, we('volumen', 'ny'));
+  }
+
+  B.goto('tjek_q', 4);
+  B.tjek(4, ['r = 500 mm, t = 10 mm, p = 2 MPa.', 'Ringspænding?'], ['σ_θ = 2 · 500 / 10 = 100 MPa', 'σ_z = 50 MPa'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 5);
+  B.slut(5, 'Abou-Hayt (2026), MEM1 Chapter 10, slide 2 og 5–9 · Hamrock, Schmid & Jacobson, kap. 10', 'tykvæggede cylindre', 'slut');
+  text(5, 'tynd: t ≤ 0,1 r', 200, 270, 42, 'blue', L('slut').start + 0.4, we('slut', 'r'));
+  text(5, 'σ_θ = p r / t     σ_z = p r / (2t)', 200, 350, 44, 'red', wt('slut', 'sigma') - 0.1, we('slut', 't', 1));
+});
+
+</script>
+<script>BP.live({"duration":125.214,"audio":"tyndvaeggede-cylindre.mp3","order":["titel","klasse","tyk","ring","ring_bevis","laengde","forhold","radius","volumen","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":6.905,"words":[["Tyndvæggede",0.601,1.271],["trykbeholdere",1.271,2.186],["Et",3.155,3.271],["rør",3.271,3.606],["eller",3.606,3.876],["en",3.876,3.979],["tank",3.979,4.276],["med",4.276,4.521],["indre",4.521,4.869],["tryk",4.869,5.139],["får",5.139,5.268],["spændinger",5.268,5.874],["i",5.874,6.028],["to",6.028,6.312],["retninger",6.312,6.905]],"text":"Tyndvæggede trykbeholdere. Et rør eller en tank med indre tryk får spændinger i to retninger."},"klasse":{"start":8.122,"end":18.934,"words":[["Først",8.236,8.546],["skal",8.546,8.7],["vi",8.7,8.803],["vide",8.803,9.216],["om",9.358,9.551],["væggen",9.551,9.976],["er",9.976,10.105],["tynd",10.105,10.479],["eller",10.479,10.736],["tyk",10.736,11.187],["Er",12.078,12.168],["tykkelsen",12.168,12.71],["t",12.71,12.942],["højst",12.942,13.199],["en",13.199,13.315],["tiendedel",13.315,13.882],["af",13.882,13.998],["den",13.998,14.204],["indre",14.204,14.514],["radius",14.514,15.171],["er",15.326,15.467],["cylinderen",15.467,16.021],["tyndvægget",16.021,16.704],["og",16.846,17.039],["spændingen",17.04,17.607],["er",17.607,17.722],["jævn",17.723,18.07],["gennem",18.07,18.393],["væggen",18.393,18.934]],"text":"Først skal vi vide, om væggen er tynd eller tyk. Er tykkelsen t højst en tiendedel af den indre radius, er cylinderen tyndvægget, og spændingen er jævn gennem væggen."},"tyk":{"start":20.16,"end":25.352,"words":[["Er",20.287,20.378],["væggen",20.378,20.713],["tykkere",20.713,21.318],["varierer",21.408,21.834],["spændingen",21.834,22.298],["meget",22.298,22.581],["gennem",22.581,22.865],["væggen",22.865,23.354],["og",23.496,23.689],["så",23.689,23.87],["skal",23.87,24.037],["vi",24.037,24.14],["bruge",24.14,24.398],["Lamés",24.398,24.746],["ligninger",24.746,25.352]],"text":"Er væggen tykkere, varierer spændingen meget gennem væggen, og så skal vi bruge Lamés ligninger."},"ring":{"start":26.582,"end":33.9,"words":[["I",26.709,26.787],["en",26.787,26.903],["tyndvægget",26.903,27.418],["cylinder",27.418,27.998],["med",27.998,28.217],["trykket",28.217,28.578],["p",28.578,28.99],["radius",29.132,29.699],["r",29.699,29.931],["og",29.931,29.995],["tykkelse",29.995,30.434],["t",30.434,30.756],["er",30.756,30.872],["ringspændingen",30.872,31.49],["sigma",31.49,31.864],["theta",31.864,32.315],["lig",32.315,32.521],["p",32.521,32.74],["r",32.74,33.05],["over",33.05,33.333],["t.",33.333,33.9]],"text":"I en tyndvægget cylinder med trykket p, radius r og tykkelse t er ringspændingen sigma theta lig p r over t."},"ring_bevis":{"start":35.116,"end":50.528,"words":[["Det",35.243,35.321],["ses",35.321,35.669],["ved",35.669,35.836],["at",35.836,35.862],["skære",35.862,36.171],["cylinderen",36.171,36.854],["over",36.854,37.138],["på",37.138,37.266],["langs",37.267,37.795],["Trykket",38.673,39.046],["virker",39.046,39.343],["på",39.343,39.51],["det",39.51,39.639],["projicerede",39.639,40.309],["areal",40.309,40.979],["to",41.121,41.456],["r",41.456,41.637],["gange",41.637,41.959],["L.",41.959,42.461],["Det",43.351,43.428],["holdes",43.428,43.724],["af",43.724,43.802],["væggen",43.802,44.188],["i",44.188,44.291],["begge",44.291,44.575],["sider",44.575,45.077],["to",45.18,45.451],["t",45.451,45.631],["gange",45.631,45.876],["L.",45.876,46.224],["Altså",46.224,46.688],["er",46.688,46.791],["p",46.791,47.01],["gange",47.01,47.32],["to",47.32,47.603],["r",47.603,47.822],["L",47.822,47.99],["lig",47.99,48.273],["sigma",48.273,48.737],["theta",48.737,49.162],["gange",49.162,49.613],["to",49.613,49.897],["t",49.897,50.116],["L.",50.116,50.528]],"text":"Det ses ved at skære cylinderen over på langs. Trykket virker på det projicerede areal, to r gange L. Det holdes af væggen i begge sider, to t gange L. Altså er p gange to r L lig sigma theta gange to t L."},"laengde":{"start":51.762,"end":66.736,"words":[["Længdespændingen",51.889,52.65],["sigma",52.65,53.204],["z",53.204,53.397],["finder",53.397,53.693],["vi",53.693,53.822],["ved",53.822,53.964],["at",53.964,53.99],["skære",53.99,54.364],["på",54.364,54.492],["tværs",54.492,55.072],["Trykket",55.963,56.337],["på",56.337,56.543],["endebunden",56.543,57.149],["er",57.149,57.29],["p",57.29,57.522],["gange",57.522,57.819],["pi",57.819,58.154],["r",58.154,58.463],["i",58.463,58.695],["anden",58.695,59.12],["Det",60.009,60.1],["holdes",60.1,60.448],["af",60.448,60.564],["væggens",60.564,60.989],["ring",60.989,61.324],["to",61.453,61.749],["pi",61.749,62.02],["r",62.02,62.226],["gange",62.226,62.561],["t.",62.561,63.115],["Det",63.991,64.082],["giver",64.082,64.352],["sigma",64.352,64.752],["z",64.752,64.945],["lig",64.945,65.151],["p",65.151,65.37],["r",65.37,65.68],["over",65.68,65.976],["to",65.976,66.259],["t.",66.259,66.736]],"text":"Længdespændingen sigma z finder vi ved at skære på tværs. Trykket på endebunden er p gange pi r i anden. Det holdes af væggens ring, to pi r gange t. Det giver sigma z lig p r over to t."},"forhold":{"start":67.952,"end":75.516,"words":[["Ringspændingen",68.079,68.827],["er",68.827,69.02],["altså",69.02,69.368],["dobbelt",69.368,69.755],["så",69.755,69.896],["stor",69.896,70.244],["som",70.244,70.489],["længdespændingen",70.489,71.391],["Derfor",72.282,72.591],["revner",72.591,72.939],["et",72.939,73.068],["rør",73.068,73.377],["med",73.377,73.622],["for",73.622,73.764],["stort",73.764,74.073],["tryk",74.073,74.434],["altid",74.434,74.859],["på",74.859,75.014],["langs",75.014,75.516]],"text":"Ringspændingen er altså dobbelt så stor som længdespændingen. Derfor revner et rør med for stort tryk altid på langs."},"radius":{"start":76.75,"end":83.643,"words":[["Med",76.89,77.045],["Hookes",77.045,77.303],["lov",77.303,77.496],["for",77.496,77.65],["plan",77.65,77.921],["spænding",77.921,78.372],["bliver",78.372,78.604],["radiusændringen",78.604,79.326],["delta",79.326,79.867],["r",79.867,80.06],["lig",80.06,80.254],["p",80.254,80.46],["r",80.46,80.73],["i",80.73,80.962],["anden",80.962,81.362],["over",81.362,81.632],["to",81.632,81.903],["t",81.903,82.096],["E",82.096,82.251],["gange",82.251,82.599],["to",82.599,82.895],["minus",82.895,83.295],["ny",83.295,83.643]],"text":"Med Hookes lov for plan spænding bliver radiusændringen delta r lig p r i anden over to t E gange to minus ny."},"volumen":{"start":84.876,"end":89.642,"words":[["Og",85.016,85.081],["volumenændringen",85.081,85.828],["er",85.828,85.983],["p",85.983,86.24],["r",86.24,86.408],["V",86.408,86.743],["over",86.743,87.027],["to",87.027,87.297],["t",87.297,87.503],["E",87.503,87.684],["gange",87.684,88.109],["fem",88.109,88.393],["minus",88.393,88.882],["fire",88.882,89.282],["ny",89.282,89.642]],"text":"Og volumenændringen er p r V over to t E gange fem minus fire ny."},"tjek_q":{"start":90.866,"end":100.595,"words":[["Tjek",90.967,91.289],["dig",91.289,91.469],["selv",91.469,91.895],["Et",92.812,92.928],["rør",92.928,93.25],["har",93.25,93.469],["radius",93.469,93.946],["fem",93.946,94.152],["hundrede",94.152,94.384],["millimeter",94.384,95.106],["tykkelse",95.222,95.75],["ti",95.75,95.969],["millimeter",95.969,96.626],["og",96.626,96.742],["trykket",96.742,97.168],["to",97.168,97.477],["megapascal",97.477,98.353],["Hvad",99.229,99.564],["er",99.564,99.758],["ringspændingen",99.758,100.595]],"text":"Tjek dig selv. Et rør har radius fem hundrede millimeter, tykkelse ti millimeter og trykket to megapascal. Hvad er ringspændingen?"},"tjek_a":{"start":104.474,"end":112.27,"words":[["Sigma",104.588,105.027],["theta",105.027,105.542],["er",105.542,105.697],["to",105.697,105.967],["gange",105.967,106.251],["fem",106.251,106.47],["hundrede",106.47,106.715],["divideret",106.715,107.295],["med",107.295,107.475],["ti",107.475,107.913],["altså",108.042,108.416],["hundrede",108.416,108.725],["megapascal",108.725,109.588],["Længdespændingen",110.466,111.433],["er",111.433,111.587],["halvtreds",111.587,112.27]],"text":"Sigma theta er to gange fem hundrede divideret med ti, altså hundrede megapascal. Længdespændingen er halvtreds."},"slut":{"start":113.488,"end":122.791,"words":[["Kort",113.615,113.821],["sagt",113.822,114.311],["tynd",114.44,114.698],["væg",114.698,114.917],["når",114.917,115.084],["t",115.084,115.381],["er",115.381,115.471],["højst",115.471,115.767],["en",115.767,115.883],["tiendedel",115.883,116.425],["af",116.425,116.476],["r",116.476,116.785],["sigma",116.927,117.378],["theta",117.378,117.791],["er",117.791,117.881],["p",117.881,118.113],["r",118.113,118.358],["over",118.358,118.641],["t",118.641,119.053],["sigma",119.182,119.595],["z",119.595,119.801],["er",119.801,119.84],["p",119.84,120.059],["r",120.059,120.316],["over",120.316,120.561],["to",120.561,120.832],["t",120.832,121.193],["og",121.386,121.502],["røret",121.502,121.811],["revner",121.811,122.159],["på",122.159,122.301],["langs",122.301,122.791]],"text":"Kort sagt: tynd væg når t er højst en tiendedel af r, sigma theta er p r over t, sigma z er p r over to t, og røret revner på langs."}}}, { audio: 'tyndvaeggede-cylindre.mp3', id: 'tyndvaeggede-cylindre' });</script>
+</body>
+</html>

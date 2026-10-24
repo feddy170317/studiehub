@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Presningspasning: eksempel fra slides · video</title>
+<meta name="description" content="Overlap for p = 40 MPa med massiv aksel og stålnav: δ = 32,8 µm.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 10: videoer</a><h1>Presningspasning: eksempel fra slides</h1><span class="meta">MEM1 · kapitel 10 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Presningspasning: eksempel fra slides"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Overlap for p = 40 MPa med massiv aksel og stålnav: δ = 32,8 µm.</p><div class="chips"><a href="presningspasning.html">Se først: Tolerancer og presningspasninger</a><a href="../../Kapitel10_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l10">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Presningseksempel fra slide 18: p = 40 MPa, R = 50, ro = 80, ri = 0 → δ = 32,8 µm
+BP.scene({ header: 'MEM1 · kap. 10' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, PI, TAU } = B;
+
+  B.titel(0, 'Presning i praksis', 'MEM1 · kapitel 10 · opgave (slide 18)', 'titel');
+  text(0, 'overlap for p = 40 MPa', 640, 520, 42, 'red', wt('titel', 'overlap') - 0.2, we('titel', 'megapascal'), { align: 'center' });
+
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start, cx = 1100, cy = 380;
+    line(1, ell(cx, cy, 128, 128, 0, TAU), 'black', 3, t0, t0 + 0.5); line(1, ell(cx, cy, 80, 80, 0, TAU), 'red', 3, t0 + 0.3, t0 + 0.7);
+    text(1, 'R = 50', cx, cy + 10, 30, 'red', wt('data', 'halvtreds') - 0.1, wt('data', 'halvtreds') + 0.3, { align: 'center' });
+    text(1, 'r_o = 80', cx, cy + 165, 30, 'black', wt('data', 'firs') - 0.1, wt('data', 'firs') + 0.3, { align: 'center' });
+    text(1, 'massiv stålaksel i tykt stålnav', 140, 160, 36, 'black', t0 + 0.2, we('data', 'stålnav'));
+    text(1, 'R = 50 mm,  r_o = 80 mm,  r_i = 0,  E = 200 GPa', 140, 220, 32, 'black', wt('data', 'Fladen') - 0.1, we('data', 'gigapascal'));
+    text(1, 'δ = (pR/E)·[(r_o² + R²)/(r_o² − R²) + 1]', 140, 330, 38, 'blue', L('forenkl').start + 0.4, we('forenkl', 'en'));
+    text(1, 'pR/E = 40 · 50 / 200 000 = 0,01 mm', 140, 420, 38, 'black', L('tal1').start + 0.2, we('tal1', 'millimeter'));
+    text(1, '(6400 + 2500)/(6400 − 2500) = 8900/3900 = 2,28', 140, 490, 30, 'black', L('tal2').start + 0.2, we('tal2', 'otte'));
+    const r = text(1, 'δ = 0,01 · 3,28 = 0,0328 mm = 32,8 µm', 140, 590, 42, 'red', L('resultat').start + 0.2, we('resultat', 'mikrometer'));
+    box(1, 115, 535, 820, 85, 'red', we('resultat', 'mikrometer'), we('resultat', 'mikrometer') + 0.6);
+    text(1, 'på diameteren: 65,6 µm', 140, 680, 36, 'green', L('diameter').start + 0.2, we('diameter', 'mikrometer'));
+  }
+
+  B.goto('tjek_q', 2);
+  B.tjek(2, ['Kontakttrykket skal fordobles.', 'Hvad bliver δ?'], ['65,6 µm radialt', 'δ ∝ p'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 3);
+  B.slut(3, 'Abou-Hayt (2026), MEM1 Chapter 10, slide 18 · Hamrock, Schmid & Jacobson, kap. 10', 'eksamensspørgsmål 8', 'slut');
+  text(3, 'δ = (pR/E)·[brøk + 1]', 200, 280, 44, 'blue', L('slut').start + 0.4, we('slut', 'en'));
+  text(3, 'δ = 32,8 µm', 200, 370, 48, 'red', wt('slut', 'Her') - 0.1, we('slut', 'mikrometer'));
+});
+
+</script>
+<script>BP.live({"duration":105.962,"audio":"opg-presning.mp3","order":["titel","data","forenkl","tal1","tal2","resultat","diameter","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":8.399,"words":[["Et",0.64,0.743],["eksempel",0.743,1.272],["med",1.272,1.478],["presningspasning",1.478,2.535],["fra",2.535,2.702],["slides",2.702,3.295],["Hvor",4.198,4.34],["stort",4.34,4.637],["et",4.637,4.74],["overlap",4.74,5.358],["skal",5.358,5.552],["der",5.552,5.616],["til",5.616,5.796],["for",5.796,6.003],["at",6.003,6.028],["få",6.028,6.209],["et",6.209,6.26],["kontakttryk",6.26,6.969],["på",6.969,7.201],["fyrre",7.201,7.536],["megapascal",7.536,8.399]],"text":"Et eksempel med presningspasning fra slides. Hvor stort et overlap skal der til for at få et kontakttryk på fyrre megapascal?"},"data":{"start":9.634,"end":20.098,"words":[["En",9.774,9.864],["massiv",9.864,10.238],["stålaksel",10.238,11.037],["sidder",11.037,11.449],["i",11.449,11.591],["et",11.591,11.669],["tykt",11.669,11.939],["stålnav",11.939,12.583],["Fladen",13.474,13.874],["har",13.874,14.015],["radius",14.015,14.441],["halvtreds",14.441,14.814],["millimeter",14.814,15.549],["navets",15.639,16.077],["ydre",16.077,16.412],["radius",16.412,16.863],["er",16.863,17.005],["firs",17.005,17.302],["millimeter",17.302,17.985],["og",18.126,18.371],["E",18.371,18.59],["er",18.59,18.706],["to",18.706,18.977],["hundrede",18.977,19.234],["gigapascal",19.235,20.098]],"text":"En massiv stålaksel sidder i et tykt stålnav. Fladen har radius halvtreds millimeter, navets ydre radius er firs millimeter, og E er to hundrede gigapascal."},"forenkl":{"start":21.312,"end":35.565,"words":[["Akslen",21.426,21.929],["er",21.929,22.071],["massiv",22.071,22.612],["så",22.754,23.102],["r",23.102,23.398],["i",23.398,23.643],["er",23.643,23.72],["nul",23.72,24.158],["Begge",25.062,25.294],["dele",25.294,25.629],["er",25.629,25.784],["af",25.784,25.809],["stål",25.809,26.286],["så",26.428,26.634],["ny",26.634,26.789],["går",26.789,27.034],["ud",27.034,27.33],["og",27.472,27.601],["formlen",27.601,28.013],["bliver",28.013,28.168],["delta",28.168,28.49],["lig",28.49,28.696],["p",28.696,28.902],["R",28.902,29.199],["over",29.199,29.495],["E",29.495,29.701],["gange",29.701,30.062],["r",30.062,30.307],["o",30.307,30.565],["i",30.565,30.784],["anden",30.784,31.067],["plus",31.067,31.338],["R",31.338,31.57],["i",31.57,31.776],["anden",31.776,32.15],["over",32.15,32.459],["r",32.459,32.691],["o",32.691,32.923],["i",32.923,33.116],["anden",33.116,33.374],["minus",33.374,33.825],["R",33.825,34.057],["i",34.057,34.276],["anden",34.276,34.74],["plus",34.882,35.204],["en",35.204,35.565]],"text":"Akslen er massiv, så r i er nul. Begge dele er af stål, så ny går ud, og formlen bliver delta lig p R over E gange r o i anden plus R i anden over r o i anden minus R i anden, plus en."},"tal1":{"start":36.782,"end":43.945,"words":[["P",36.922,37.115],["R",37.116,37.438],["over",37.438,37.786],["E",37.786,38.043],["er",38.043,38.198],["fyrre",38.198,38.533],["gange",38.533,38.842],["halvtreds",38.842,39.293],["divideret",39.293,39.925],["med",39.925,40.221],["to",40.221,40.479],["hundrede",40.479,40.724],["tusind",40.724,41.329],["altså",41.471,41.935],["nul",41.935,42.193],["komma",42.193,42.528],["nul",42.528,42.927],["en",42.927,43.185],["millimeter",43.185,43.945]],"text":"P R over E er fyrre gange halvtreds divideret med to hundrede tusind, altså nul komma nul en millimeter."},"tal2":{"start":45.172,"end":57.285,"words":[["Brøken",45.312,45.673],["er",45.673,45.776],["firs",45.776,46.124],["i",46.124,46.33],["anden",46.33,46.627],["plus",46.627,46.859],["halvtreds",46.859,47.322],["i",47.323,47.554],["anden",47.554,47.993],["altså",48.134,48.534],["otte",48.534,48.83],["tusind",48.83,49.165],["ni",49.165,49.346],["hundrede",49.346,49.887],["divideret",50.016,50.48],["med",50.48,50.634],["firs",50.634,50.957],["i",50.957,51.111],["anden",51.111,51.369],["minus",51.369,51.652],["halvtreds",51.652,52.078],["i",52.078,52.31],["anden",52.31,52.735],["altså",52.877,53.212],["tre",53.212,53.469],["tusind",53.469,53.856],["ni",53.856,54.075],["hundrede",54.075,54.539],["Det",55.403,55.532],["giver",55.532,55.816],["to",55.816,56.163],["komma",56.164,56.486],["to",56.486,56.821],["otte",56.821,57.285]],"text":"Brøken er firs i anden plus halvtreds i anden, altså otte tusind ni hundrede, divideret med firs i anden minus halvtreds i anden, altså tre tusind ni hundrede. Det giver to komma to otte."},"resultat":{"start":58.53,"end":68.582,"words":[["Så",58.657,58.902],["er",58.902,58.979],["delta",58.98,59.418],["nul",59.418,59.662],["komma",59.662,59.997],["nul",59.998,60.268],["en",60.268,60.449],["gange",60.449,60.745],["tre",60.745,61.041],["komma",61.041,61.338],["to",61.338,61.634],["otte",61.634,62.059],["altså",62.188,62.588],["nul",62.588,62.833],["komma",62.833,63.168],["nul",63.168,63.374],["tre",63.374,63.722],["to",63.722,64.07],["otte",64.07,64.353],["millimeter",64.353,65.049],["Det",65.953,66.094],["er",66.094,66.185],["toogtredive",66.185,67.022],["komma",67.022,67.448],["otte",67.448,67.795],["mikrometer",67.795,68.582]],"text":"Så er delta nul komma nul en gange tre komma to otte, altså nul komma nul tre to otte millimeter. Det er toogtredive komma otte mikrometer."},"diameter":{"start":69.8,"end":76.578,"words":[["Det",69.901,70.107],["er",70.107,70.262],["det",70.262,70.429],["radiale",70.429,71.086],["overlap",71.086,71.769],["På",72.661,72.738],["diameteren",72.738,73.382],["er",73.382,73.524],["det",73.524,73.666],["det",73.666,73.756],["dobbelte",73.756,74.413],["femogtres",74.516,75.161],["komma",75.161,75.444],["seks",75.444,75.779],["mikrometer",75.779,76.578]],"text":"Det er det radiale overlap. På diameteren er det det dobbelte, femogtres komma seks mikrometer."},"tjek_q":{"start":77.806,"end":83.141,"words":[["Tjek",77.907,78.229],["dig",78.229,78.409],["selv",78.409,78.835],["Hvad",79.739,79.881],["bliver",79.881,80.164],["overlappet",80.164,80.989],["hvis",81.105,81.285],["kontakttrykket",81.285,82.11],["skal",82.11,82.291],["være",82.291,82.458],["det",82.458,82.561],["dobbelte",82.561,83.141]],"text":"Tjek dig selv. Hvad bliver overlappet, hvis kontakttrykket skal være det dobbelte?"},"tjek_a":{"start":87.022,"end":92.871,"words":[["Det",87.136,87.227],["dobbelte",87.227,87.858],["femogtres",87.935,88.567],["komma",88.567,88.85],["seks",88.85,89.172],["mikrometer",89.173,89.714],["radialt",89.714,90.41],["fordi",90.551,90.964],["delta",90.964,91.389],["er",91.389,91.492],["proportional",91.492,92.265],["med",92.265,92.471],["p",92.471,92.871]],"text":"Det dobbelte, femogtres komma seks mikrometer radialt, fordi delta er proportional med p."},"slut":{"start":94.116,"end":103.536,"words":[["Kort",94.256,94.475],["sagt",94.475,94.978],["med",95.107,95.261],["massiv",95.261,95.648],["aksel",95.648,96.022],["og",96.022,96.086],["samme",96.086,96.408],["materiale",96.408,97.014],["er",97.014,97.117],["delta",97.117,97.516],["p",97.517,97.748],["R",97.748,98.045],["over",98.045,98.38],["E",98.38,98.599],["gange",98.599,98.895],["brøken",98.895,99.359],["plus",99.359,99.681],["en",99.681,100.094],["Her",101.01,101.216],["toogtredive",101.217,102.003],["komma",102.003,102.415],["otte",102.415,102.763],["mikrometer",102.763,103.536]],"text":"Kort sagt: med massiv aksel og samme materiale er delta p R over E gange brøken plus en. Her toogtredive komma otte mikrometer."}}}, { audio: 'opg-presning.mp3', id: 'opg-presning' });</script>
+</body>
+</html>

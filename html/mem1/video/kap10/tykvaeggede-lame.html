@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tykvæggede cylindre: Lamé · video</title>
+<meta name="description" content="Lamés ligninger, fordelingen gennem væggen ved indre tryk og roterende skiver.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 10: videoer</a><h1>Tykvæggede cylindre: Lamé</h1><span class="meta">MEM1 · kapitel 10 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Tykvæggede cylindre: Lamé"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Lamés ligninger, fordelingen gennem væggen ved indre tryk og roterende skiver.</p><div class="chips"><a href="tyndvaeggede-cylindre.html">Se først: Tyndvæggede trykbeholdere</a><a href="../../../../lab/mem1/trykbeholder.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel10_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l10">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Tykvæggede cylindre, Lamé (MEM1 kap. 10, slides 10–13)
+BP.scene({ header: 'MEM1 · kap. 10' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, axes, plot, dashed, ell, PI, TAU } = B;
+
+  B.titel(0, 'Lamés ligninger', 'MEM1 · kapitel 10 · begreb (slide 10–13)', 'titel');
+  text(0, 'spændingen varierer gennem væggen', 640, 520, 40, 'red', wt('titel', 'varierer') - 0.2, we('titel', 'væggen'), { align: 'center' });
+
+  B.goto('lame', 1);
+  {
+    const t0 = L('lame').start;
+    text(1, 'σ_θ = A / r² + B', 140, 160, 46, 'red', wt('lame', 'ringspændingen') - 0.1, we('lame', 'B'));
+    text(1, 'σ_r = −A / r² + B', 640, 160, 46, 'blue', wt('lame', 'radialspændingen') - 0.1, we('lame', 'B', 1));
+    text(1, 'A, B fra p_i, p_o, r_i, r_o', 140, 240, 36, 'black', L('konstanter').start + 0.2, we('konstanter', 'o', 1));
+    text(1, 'p_o = 0:', 140, 340, 36, 'black', L('indre').start, wt('indre', 'ringspændingen'));
+    text(1, 'σ_θ = p r_i² / (r_o² − r_i²) · (1 + r_o²/r²)', 300, 340, 34, 'red', wt('indre', 'ringspændingen') - 0.1, we('indre', 'anden', 4));
+    text(1, 'σ_r = p r_i² / (r_o² − r_i²) · (1 − r_o²/r²)', 300, 400, 34, 'blue', L('radial').start + 0.2, we('radial', 'anden', 1));
+    // fordeling
+    const tm = L('max').start, ox = 160, oy = 600, ri = 40, ro = 60, p = 50, X = (r) => ox + (r - ri) * 22, Y = (s) => oy - s * 1.2;
+    line(1, [[X(ri), oy], [X(ro), oy]], 'black', 2.4, tm, tm + 0.3);
+    const St = [], Sr = [];
+    for (let j = 0; j <= 30; j++) { const r = ri + (ro - ri) * j / 30, k = p * ri * ri / (ro * ro - ri * ri); St.push([X(r), Y(k * (1 + ro * ro / r / r))]); Sr.push([X(r), Y(k * (1 - ro * ro / r / r))]); }
+    plot(1, St, 'red', tm + 0.2, we('max', 'anden', 3));
+    text(1, 'σ_{θ,max} ved r_i', X(ri) + 10, Y(130) - 10, 30, 'red', wt('max', 'indre') - 0.1, we('max', 'radius'));
+    plot(1, Sr, 'blue', L('radial2').start + 0.2, we('radial2', 'ydre'));
+    text(1, '−p', X(ri) - 50, Y(-50) + 10, 30, 'blue', wt('radial2', 'minus') - 0.1, we('radial2', 'p'));
+    text(1, '0', X(ro) + 10, oy + 10, 30, 'blue', wt('radial2', 'nul') - 0.1, wt('radial2', 'nul') + 0.3);
+    text(1, 'r_i', X(ri) - 10, oy + 40, 28, 'black', tm + 0.2, tm + 0.4); text(1, 'r_o', X(ro) - 10, oy + 40, 28, 'black', tm + 0.2, tm + 0.4);
+    text(1, 'rotation: σ_θ størst ved r_i, ∝ ρ ω²', 700, 560, 30, 'green', L('rotation').start + 0.3, we('rotation', 'anden'));
+  }
+
+  B.goto('tjek_q', 2);
+  B.tjek(2, ['Hvor skal du tjekke flydning', 'ved indre tryk?'], ['ved r_i', 'σ_θ størst, σ_r = −p'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 3);
+  B.slut(3, 'Abou-Hayt (2026), MEM1 Chapter 10, slide 10–13 · Hamrock, Schmid & Jacobson, kap. 10', 'presningspasninger', 'slut');
+  text(3, 'σ_θ = A/r² + B · σ_r = −A/r² + B', 200, 280, 42, 'blue', L('slut').start + 0.4, we('slut', 'B'));
+  text(3, 'indre tryk: σ_{θ,max} ved r_i', 200, 360, 42, 'red', wt('slut', 'indre') - 0.1, we('slut', 'i', 1));
+});
+
+</script>
+<script>BP.live({"duration":102.76,"audio":"tykvaeggede-lame.mp3","order":["titel","lame","konstanter","indre","radial","max","radial2","rotation","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":6.892,"words":[["Tykvæggede",0.614,1.194],["cylindre",1.194,1.839],["og",1.839,1.98],["Lamés",1.98,2.367],["ligninger",2.367,2.986],["Når",3.889,4.044],["væggen",4.044,4.379],["er",4.379,4.43],["tyk",4.43,4.856],["varierer",4.972,5.436],["spændingen",5.436,6.003],["gennem",6.003,6.35],["væggen",6.351,6.892]],"text":"Tykvæggede cylindre og Lamés ligninger. Når væggen er tyk, varierer spændingen gennem væggen."},"lame":{"start":8.122,"end":15.633,"words":[["Lamé",8.236,8.533],["fandt",8.533,8.945],["at",9.1,9.254],["ringspændingen",9.254,9.834],["er",9.834,10.002],["A",10.002,10.26],["over",10.26,10.569],["r",10.569,10.84],["i",10.84,11.071],["anden",11.072,11.342],["plus",11.342,11.6],["B",11.6,11.974],["og",12.115,12.257],["radialspændingen",12.257,12.992],["er",12.992,13.056],["minus",13.056,13.507],["A",13.507,13.765],["over",13.765,14.087],["r",14.087,14.37],["i",14.37,14.615],["anden",14.615,14.976],["plus",14.976,15.26],["B",15.26,15.633]],"text":"Lamé fandt, at ringspændingen er A over r i anden plus B, og radialspændingen er minus A over r i anden plus B."},"konstanter":{"start":16.872,"end":24.551,"words":[["Konstanterne",16.986,17.669],["A",17.669,17.837],["og",17.837,17.863],["B",17.863,18.108],["bestemmes",18.108,18.597],["af",18.597,18.752],["trykket",18.752,19.151],["indvendigt",19.151,19.821],["p",19.95,20.182],["i",20.182,20.492],["og",20.698,20.84],["udvendigt",20.84,21.535],["p",21.677,21.935],["o",21.935,22.257],["og",22.476,22.618],["af",22.618,22.669],["radierne",22.669,23.352],["r",23.352,23.649],["i",23.649,23.907],["og",23.907,23.984],["r",23.984,24.216],["o.",24.216,24.551]],"text":"Konstanterne A og B bestemmes af trykket indvendigt, p i, og udvendigt, p o, og af radierne r i og r o."},"indre":{"start":25.766,"end":36.499,"words":[["For",25.893,26.048],["kun",26.048,26.28],["indre",26.28,26.525],["tryk",26.525,26.937],["hvor",27.079,27.285],["p",27.285,27.504],["o",27.504,27.672],["er",27.672,27.697],["nul",27.697,28.11],["bliver",28.252,28.432],["ringspændingen",28.432,29.012],["p",29.012,29.231],["r",29.231,29.45],["i",29.45,29.63],["i",29.63,29.837],["anden",29.837,30.146],["divideret",30.146,30.752],["med",30.752,31.035],["r",31.035,31.254],["o",31.254,31.486],["i",31.486,31.692],["anden",31.692,31.937],["minus",31.937,32.401],["r",32.401,32.633],["i",32.633,32.813],["i",32.813,33.02],["anden",33.02,33.484],["gange",33.625,33.947],["en",33.947,34.128],["plus",34.128,34.398],["r",34.398,34.566],["o",34.566,34.811],["i",34.811,34.953],["anden",34.953,35.339],["over",35.339,35.623],["r",35.623,35.868],["i",35.868,36.074],["anden",36.074,36.499]],"text":"For kun indre tryk, hvor p o er nul, bliver ringspændingen p r i i anden divideret med r o i anden minus r i i anden, gange en plus r o i anden over r i anden."},"radial":{"start":37.732,"end":42.718,"words":[["Og",37.872,37.937],["radialspændingen",37.937,38.748],["bliver",38.748,38.929],["det",38.929,38.993],["samme",38.993,39.496],["bare",39.638,39.831],["med",39.831,39.986],["en",39.986,40.089],["minus",40.089,40.462],["r",40.462,40.694],["o",40.694,40.952],["i",40.952,41.094],["anden",41.094,41.519],["over",41.519,41.828],["r",41.828,42.073],["i",42.073,42.292],["anden",42.292,42.718]],"text":"Og radialspændingen bliver det samme, bare med en minus r o i anden over r i anden."},"max":{"start":43.938,"end":54.479,"words":[["Den",44.065,44.194],["største",44.194,44.645],["ringspænding",44.645,45.354],["sidder",45.354,45.753],["ved",45.753,45.869],["den",45.869,46.127],["indre",46.127,46.462],["radius",46.462,47.094],["Den",47.984,48.087],["er",48.087,48.165],["p",48.165,48.371],["gange",48.371,48.693],["r",48.693,48.938],["o",48.938,49.17],["i",49.17,49.389],["anden",49.389,49.698],["plus",49.698,49.969],["r",49.969,50.24],["i",50.24,50.459],["i",50.459,50.678],["anden",50.678,51.154],["divideret",51.296,51.76],["med",51.76,51.992],["r",51.992,52.224],["o",52.224,52.482],["i",52.482,52.688],["anden",52.688,52.946],["minus",52.946,53.435],["r",53.435,53.68],["i",53.68,53.886],["i",53.886,54.054],["anden",54.054,54.479]],"text":"Den største ringspænding sidder ved den indre radius. Den er p gange r o i anden plus r i i anden, divideret med r o i anden minus r i i anden."},"radial2":{"start":55.712,"end":62.439,"words":[["Radialspændingen",55.839,56.767],["er",56.767,56.896],["tryk",56.896,57.192],["hele",57.192,57.489],["vejen",57.489,58.004],["Den",58.908,59.037],["er",59.037,59.101],["minus",59.101,59.436],["p",59.436,59.707],["ved",59.707,59.874],["den",59.874,60.093],["indre",60.093,60.416],["radius",60.416,61.008],["og",61.008,61.189],["nul",61.189,61.524],["ved",61.524,61.704],["den",61.704,61.949],["ydre",61.949,62.439]],"text":"Radialspændingen er tryk hele vejen. Den er minus p ved den indre radius og nul ved den ydre."},"rotation":{"start":63.67,"end":73.425,"words":[["Roterende",63.797,64.313],["skiver",64.313,64.815],["og",64.815,64.918],["svinghjul",64.918,65.498],["får",65.498,65.64],["spændinger",65.64,66.259],["fra",66.259,66.439],["centrifugalkraften",66.439,67.753],["Ringspændingen",68.644,69.289],["er",69.289,69.34],["størst",69.34,69.714],["ved",69.714,69.83],["den",69.83,70.023],["indre",70.023,70.319],["radius",70.319,70.912],["og",70.912,71.08],["vokser",71.08,71.479],["med",71.479,71.685],["rho",71.685,71.93],["gange",71.93,72.227],["omega",72.227,72.781],["i",72.781,72.987],["anden",72.987,73.425]],"text":"Roterende skiver og svinghjul får spændinger fra centrifugalkraften. Ringspændingen er størst ved den indre radius og vokser med rho gange omega i anden."},"tjek_q":{"start":74.652,"end":80.167,"words":[["Tjek",74.753,75.075],["dig",75.075,75.255],["selv",75.255,75.681],["Hvor",76.572,76.765],["i",76.765,76.843],["en",76.843,76.959],["tykvægget",76.959,77.5],["cylinder",77.5,78.015],["med",78.015,78.273],["indre",78.273,78.621],["tryk",78.621,79.033],["skal",79.033,79.24],["du",79.24,79.33],["tjekke",79.33,79.639],["flydning",79.639,80.167]],"text":"Tjek dig selv. Hvor i en tykvægget cylinder med indre tryk skal du tjekke flydning?"},"tjek_a":{"start":84.06,"end":89.82,"words":[["Ved",84.161,84.341],["den",84.341,84.638],["indre",84.638,84.973],["radius",84.973,85.63],["Der",86.534,86.663],["er",86.663,86.74],["ringspændingen",86.74,87.359],["størst",87.359,87.797],["og",87.797,87.965],["radialspændingen",87.965,88.983],["minus",88.983,89.421],["p",89.421,89.82]],"text":"Ved den indre radius. Der er ringspændingen størst og radialspændingen minus p."},"slut":{"start":91.058,"end":100.335,"words":[["Kort",91.185,91.417],["sagt",91.417,91.894],["sigma",92.01,92.5],["theta",92.5,93.015],["er",93.015,93.234],["A",93.234,93.518],["over",93.518,93.84],["r",93.84,94.111],["i",94.111,94.355],["anden",94.355,94.665],["plus",94.665,94.948],["B",94.948,95.322],["og",95.464,95.593],["ved",95.593,95.683],["kun",95.683,95.94],["indre",95.94,96.185],["tryk",96.185,96.559],["er",96.559,96.688],["den",96.688,96.843],["størst",96.843,97.203],["ved",97.203,97.5],["r",97.5,97.732],["i",97.732,97.989],["Radialspændingen",97.989,98.776],["går",98.776,99.007],["fra",99.007,99.162],["minus",99.162,99.562],["p",99.562,99.781],["til",99.781,99.922],["nul",99.922,100.335]],"text":"Kort sagt: sigma theta er A over r i anden plus B, og ved kun indre tryk er den størst ved r i. Radialspændingen går fra minus p til nul."}}}, { audio: 'tykvaeggede-lame.mp3', id: 'tykvaeggede-lame' });</script>
+</body>
+</html>
