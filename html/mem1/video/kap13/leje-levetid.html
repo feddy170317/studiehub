@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lejers levetid L10 · video</title>
+<meta name="description" content="Dynamisk bæreevne C, L10 = (C/P)^p, levetid i timer, ækvivalent last og eksemplet fra slide 12.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 13: videoer</a><h1>Lejers levetid L10</h1><span class="meta">MEM1 · kapitel 13 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Lejers levetid L10"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Dynamisk bæreevne C, L10 = (C/P)^p, levetid i timer, ækvivalent last og eksemplet fra slide 12.</p><div class="chips"><a href="leje-typer.html">Se først: Rullelejer: typer og opbygning</a><a href="../../../../lab/mem1/rulleleje.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel13_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l13">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Lejers levetid L10 (MEM1 kap. 13, slides 10–13). Eksempel: C = 27, P = 3 kN, n = 1500 → 729 Mrev, 8100 h
+BP.scene({ header: 'MEM1 · kap. 13' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, PI, TAU } = B;
+
+  B.titel(0, 'Lejers levetid', 'MEM1 · kapitel 13 · begreb (slide 10–13)', 'titel');
+  text(0, 'L_{10} = (C/P)^p', 640, 520, 46, 'red', wt('titel', 'længe') - 0.2, we('titel', 'udmattelsesskader'), { align: 'center' });
+
+  B.goto('udmattelse', 1);
+  {
+    const t0 = L('udmattelse').start;
+    text(1, 'cykliske kontaktspændinger → afskalning', 140, 160, 38, 'black', t0 + 0.3, we('udmattelse', 'afskalning'));
+    text(1, 'C: 90 % klarer 10⁶ omdrejninger', 140, 240, 40, 'blue', L('c').start + 0.3, we('c', 'afskalning'));
+    const r = text(1, 'L_{10} = (C / P)^p   [10⁶ omdr.]', 140, 350, 50, 'red', L('l10').start + 0.3, we('l10', 'omdrejninger'));
+    box(1, 115, 290, 720, 90, 'red', we('l10', 'omdrejninger'), we('l10', 'omdrejninger') + 0.6);
+    text(1, 'p = 3 (kugle) · p = 10/3 (rulle)', 140, 450, 40, 'green', L('p').start + 0.2, we('p', 'rullelejer'));
+    text(1, 'L_{10h} = 10⁶ / (60 n) · (C/P)^p', 140, 540, 42, 'blue', L('timer').start + 0.3, we('timer', 'p'));
+    text(1, 'P = X V F_r + Y F_a   (V = 1 inderring roterer)', 140, 640, 32, 'black', L('p_ekv').start + 0.4, we('p_ekv', 'kataloget'));
+  }
+
+  B.goto('eks', 2);
+  {
+    const t0 = L('eks').start;
+    bubble(2, 'Eksempel (slide 12)', 150, 140, 50, 'blue', t0, t0 + 0.7);
+    text(2, 'C = 27 kN,  P = 3 kN,  n = 1500 omdr./min,  p = 3', 140, 230, 36, 'black', wt('eks', 'C') - 0.1, we('eks', 'minuttet'));
+    text(2, 'L_{10} = (27/3)³ = 9³ = 729 · 10⁶ omdr.', 140, 330, 42, 'blue', L('eks2').start + 0.2, we('eks2', 'omdrejninger'));
+    const r = text(2, 'L_{10h} = 10⁶ · 729 / (60 · 1500) = 8100 h', 140, 430, 44, 'red', L('eks3').start + 0.2, we('eks3', 'timer'));
+    box(2, 115, 375, 900, 85, 'red', we('eks3', 'timer'), we('eks3', 'timer') + 0.6);
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Kugleleje: lasten halveres.', 'Hvad sker der med L_{10}?'], ['8 gange længere', 'L_{10} ∝ (C/P)³'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 13, slide 10–13 · Hamrock, Schmid & Jacobson, kap. 13', 'eksamensspørgsmål 10', 'slut');
+  text(4, 'L_{10} = (C/P)^p · p = 3 eller 10/3', 200, 280, 42, 'red', L('slut').start + 0.4, we('slut', 'tredjedele'));
+  text(4, 'L_{10h} = 10⁶ / (60 n) · L_{10}', 200, 360, 42, 'blue', wt('slut', 'L', 1) - 0.1, we('slut', 'ti', 4));
+});
+
+</script>
+<script>BP.live({"duration":128.204,"audio":"leje-levetid.mp3","order":["titel","udmattelse","c","l10","p","timer","p_ekv","eks","eks2","eks3","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":5.99,"words":[["Lejers",0.601,1.129],["levetid",1.129,1.799],["Hvor",2.742,2.923],["længe",2.923,3.206],["holder",3.206,3.477],["et",3.477,3.554],["rulleleje",3.554,4.211],["før",4.327,4.572],["det",4.572,4.675],["får",4.675,4.92],["udmattelsesskader",4.92,5.99]],"text":"Lejers levetid. Hvor længe holder et rulleleje, før det får udmattelsesskader?"},"udmattelse":{"start":7.21,"end":18.343,"words":[["Et",7.35,7.44],["roterende",7.44,7.93],["leje",7.93,8.278],["udsættes",8.278,8.845],["hele",8.845,9.103],["tiden",9.103,9.438],["for",9.438,9.567],["cykliske",9.567,10.121],["kontaktspændinger",10.121,11.139],["under",11.139,11.461],["overfladen",11.461,12.26],["Til",13.151,13.318],["sidst",13.318,13.731],["slår",13.731,14.027],["der",14.027,14.104],["små",14.104,14.426],["stykker",14.426,14.852],["ud",14.852,15.161],["af",15.161,15.251],["løbebanen",15.251,16.115],["Det",16.977,17.106],["kaldes",17.106,17.531],["afskalning",17.531,18.343]],"text":"Et roterende leje udsættes hele tiden for cykliske kontaktspændinger under overfladen. Til sidst slår der små stykker ud af løbebanen. Det kaldes afskalning."},"c":{"start":19.56,"end":30.359,"words":[["Kataloget",19.7,20.254],["angiver",20.254,20.744],["den",20.744,20.963],["dynamiske",20.963,21.569],["bæreevne",21.569,22.187],["C.",22.187,22.587],["Det",23.503,23.632],["er",23.632,23.735],["den",23.735,23.916],["radiale",23.916,24.354],["last",24.354,24.895],["som",25.024,25.256],["halvfems",25.256,25.642],["procent",25.642,26.029],["af",26.029,26.184],["ens",26.184,26.519],["lejer",26.519,26.88],["kan",26.88,27.034],["køre",27.034,27.331],["en",27.331,27.421],["million",27.421,27.846],["omdrejninger",27.846,28.452],["med",28.452,28.813],["før",28.954,29.225],["der",29.225,29.302],["kommer",29.302,29.637],["afskalning",29.637,30.359]],"text":"Kataloget angiver den dynamiske bæreevne C. Det er den radiale last, som halvfems procent af ens lejer kan køre en million omdrejninger med, før der kommer afskalning."},"l10":{"start":31.574,"end":41.69,"words":[["Levetiden",31.701,32.333],["L",32.333,32.539],["ti",32.539,32.887],["er",32.887,33.003],["den",33.003,33.222],["levetid",33.222,33.828],["halvfems",33.969,34.42],["procent",34.42,34.833],["af",34.833,34.936],["lejerne",34.936,35.4],["mindst",35.4,35.748],["opnår",35.748,36.328],["Den",37.231,37.36],["er",37.36,37.412],["C",37.412,37.656],["divideret",37.656,38.185],["med",38.185,38.391],["P",38.391,38.662],["opløftet",38.662,39.203],["til",39.203,39.345],["p",39.345,39.744],["målt",39.886,40.272],["i",40.272,40.363],["millioner",40.363,40.917],["omdrejninger",40.917,41.69]],"text":"Levetiden L ti er den levetid, halvfems procent af lejerne mindst opnår. Den er C divideret med P opløftet til p, målt i millioner omdrejninger."},"p":{"start":42.916,"end":47.141,"words":[["Eksponenten",43.069,43.713],["p",43.713,43.997],["er",43.997,44.1],["tre",44.1,44.371],["for",44.371,44.487],["kuglelejer",44.487,45.221],["og",45.221,45.363],["ti",45.363,45.621],["tredjedele",45.621,46.304],["for",46.304,46.445],["rullelejer",46.445,47.141]],"text":"Eksponenten p er tre for kuglelejer og ti tredjedele for rullelejer."},"timer":{"start":48.378,"end":55.425,"words":[["I",48.505,48.596],["timer",48.596,49.072],["er",49.072,49.278],["L",49.278,49.51],["ti",49.51,49.73],["h",49.73,49.936],["lig",49.936,50.116],["ti",50.116,50.4],["i",50.4,50.49],["sjette",50.49,50.864],["divideret",50.864,51.482],["med",51.482,51.714],["tres",51.714,52.01],["gange",52.01,52.32],["omdrejningstallet",52.32,53.209],["n",53.209,53.557],["gange",53.699,53.995],["C",53.995,54.304],["over",54.304,54.588],["P",54.588,54.846],["i",54.846,55.039],["p",55.039,55.425]],"text":"I timer er L ti h lig ti i sjette divideret med tres gange omdrejningstallet n, gange C over P i p."},"p_ekv":{"start":56.648,"end":71.803,"words":[["Har",56.775,56.866],["lejet",56.866,57.11],["både",57.11,57.355],["radial",57.355,57.806],["og",57.806,57.922],["aksial",57.922,58.36],["last",58.36,58.889],["regner",59.03,59.456],["vi",59.456,59.61],["en",59.61,59.713],["ækvivalent",59.713,60.332],["last",60.332,60.68],["P",60.68,60.86],["lig",60.86,61.067],["X",61.067,61.26],["gange",61.26,61.582],["V",61.582,61.75],["gange",61.75,62.162],["F",62.162,62.445],["r",62.445,62.587],["plus",62.587,62.871],["Y",62.871,63.0],["gange",63.0,63.399],["F",63.399,63.721],["a.",63.721,64.172],["V",64.172,64.404],["er",64.404,64.52],["en",64.52,64.881],["når",65.023,65.28],["inderringen",65.28,65.757],["roterer",65.757,66.414],["og",66.556,66.711],["en",66.711,66.93],["komma",66.93,67.188],["to",67.188,67.613],["når",67.755,67.948],["yderringen",67.948,68.412],["roterer",68.412,68.992],["X",69.895,70.127],["og",70.127,70.218],["Y",70.218,70.488],["findes",70.488,70.913],["i",70.913,71.055],["kataloget",71.055,71.803]],"text":"Har lejet både radial og aksial last, regner vi en ækvivalent last P lig X gange V gange F r plus Y gange F a. V er en, når inderringen roterer, og en komma to, når yderringen roterer. X og Y findes i kataloget."},"eks":{"start":73.03,"end":83.056,"words":[["Et",73.17,73.273],["eksempel",73.273,73.918],["fra",73.918,74.085],["slides",74.085,74.691],["Et",75.582,75.685],["kugleleje",75.685,76.239],["har",76.239,76.419],["C",76.419,76.651],["lig",76.651,76.844],["syvogtyve",76.844,77.373],["kilonewton",77.373,78.133],["lasten",78.262,78.79],["er",78.79,78.932],["tre",78.932,79.177],["kilonewton",79.177,79.911],["og",80.079,80.221],["akslen",80.221,80.749],["kører",80.749,81.02],["femten",81.02,81.406],["hundrede",81.406,81.651],["omdrejninger",81.651,82.347],["i",82.347,82.463],["minuttet",82.463,83.056]],"text":"Et eksempel fra slides. Et kugleleje har C lig syvogtyve kilonewton, lasten er tre kilonewton, og akslen kører femten hundrede omdrejninger i minuttet."},"eks2":{"start":84.276,"end":90.191,"words":[["C",84.377,84.789],["over",84.789,84.995],["P",84.995,85.305],["er",85.305,85.421],["ni",85.421,85.756],["Ni",86.673,86.892],["i",86.892,86.956],["tredje",86.956,87.511],["er",87.511,87.678],["syv",87.678,87.949],["hundrede",87.949,88.181],["og",88.181,88.206],["niogtyve",88.206,88.748],["millioner",88.748,89.366],["omdrejninger",89.366,90.191]],"text":"C over P er ni. Ni i tredje er syv hundrede og niogtyve millioner omdrejninger."},"eks3":{"start":91.418,"end":100.09,"words":[["I",91.545,91.623],["timer",91.623,92.112],["er",92.112,92.254],["det",92.254,92.383],["ti",92.383,92.692],["i",92.692,92.77],["sjette",92.77,93.105],["gange",93.105,93.517],["syv",93.517,93.813],["hundrede",93.813,94.032],["og",94.032,94.058],["niogtyve",94.058,94.612],["divideret",94.612,95.295],["med",95.295,95.501],["tres",95.501,95.798],["gange",95.798,96.133],["femten",96.133,96.532],["hundrede",96.532,97.048],["Det",97.912,98.041],["giver",98.041,98.505],["otte",98.505,98.827],["tusind",98.827,99.175],["og",99.175,99.214],["hundrede",99.214,99.536],["timer",99.536,100.09]],"text":"I timer er det ti i sjette gange syv hundrede og niogtyve divideret med tres gange femten hundrede. Det giver otte tusind og hundrede timer."},"tjek_q":{"start":101.32,"end":106.823,"words":[["Tjek",101.421,101.743],["dig",101.743,101.923],["selv",101.923,102.349],["Hvad",103.266,103.369],["sker",103.369,103.64],["der",103.64,103.743],["med",103.743,103.897],["levetiden",103.897,104.451],["for",104.451,104.619],["et",104.619,104.683],["kugleleje",104.683,105.379],["hvis",105.508,105.727],["lasten",105.727,106.14],["halveres",106.14,106.823]],"text":"Tjek dig selv. Hvad sker der med levetiden for et kugleleje, hvis lasten halveres?"},"tjek_a":{"start":110.704,"end":115.329,"words":[["Den",110.831,110.947],["bliver",110.947,111.179],["otte",111.179,111.476],["gange",111.476,111.746],["længere",111.746,112.287],["fordi",112.391,112.777],["levetiden",112.777,113.28],["går",113.28,113.486],["med",113.486,113.615],["C",113.615,114.001],["over",114.001,114.298],["P",114.298,114.581],["i",114.581,114.762],["tredje",114.762,115.329]],"text":"Den bliver otte gange længere, fordi levetiden går med C over P i tredje."},"slut":{"start":116.55,"end":125.788,"words":[["Kort",116.677,116.896],["sagt",116.896,117.386],["L",117.502,117.734],["ti",117.734,118.005],["er",118.005,118.108],["C",118.108,118.456],["over",118.456,118.7],["P",118.701,118.932],["i",118.932,119.126],["p",119.126,119.525],["p",119.654,119.886],["er",119.886,119.963],["tre",119.963,120.247],["for",120.247,120.389],["kugler",120.389,120.711],["og",120.711,120.749],["ti",120.749,120.981],["tredjedele",120.981,121.51],["for",121.51,121.639],["ruller",121.639,122.115],["og",122.257,122.425],["L",122.425,122.644],["ti",122.644,122.876],["h",122.876,123.133],["er",123.133,123.211],["ti",123.211,123.481],["i",123.481,123.52],["sjette",123.52,123.997],["over",123.997,124.293],["tres",124.293,124.628],["n",124.628,124.77],["gange",124.77,125.131],["L",125.131,125.35],["ti.",125.35,125.788]],"text":"Kort sagt: L ti er C over P i p, p er tre for kugler og ti tredjedele for ruller, og L ti h er ti i sjette over tres n gange L ti."}}}, { audio: 'leje-levetid.mp3', id: 'leje-levetid' });</script>
+</body>
+</html>

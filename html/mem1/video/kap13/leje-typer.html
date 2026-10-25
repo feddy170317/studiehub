@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rullelejer: typer og opbygning · video</title>
+<meta name="description" content="Kugle- og rullelejer, valg af lejetype, lejets dele og lastfordelingen P0 ≈ 5Fr/Z.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 13: videoer</a><h1>Rullelejer: typer og opbygning</h1><span class="meta">MEM1 · kapitel 13 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Rullelejer: typer og opbygning"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Kugle- og rullelejer, valg af lejetype, lejets dele og lastfordelingen P0 ≈ 5Fr/Z.</p><div class="chips"><a href="../../../../lab/mem1/rulleleje.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel13_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l13">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Rullelejer: typer og opbygning (MEM1 kap. 13, slides 2–9)
+BP.scene({ header: 'MEM1 · kap. 13' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, rect, hatch, PI, TAU } = B;
+
+  B.titel(0, 'Rullelejer', 'MEM1 · kapitel 13 · begreb (slide 2–9)', 'titel');
+  text(0, 'kraft fra aksel til hus med lidt friktion', 640, 520, 38, 'red', wt('titel', 'holder') - 0.2, we('titel', 'friktion'), { align: 'center' });
+
+  B.goto('funktion', 1);
+  {
+    const t0 = L('funktion').start;
+    text(1, 'glidefriktion → rullemodstand', 140, 160, 40, 'blue', t0 + 0.2, we('funktion', 'rullemodstand'));
+    text(1, 'holder akslen præcist · fører lasten ud i huset', 140, 220, 32, 'black', wt('funktion', 'holder') - 0.1, we('funktion', 'huset'));
+    const tk = L('kugle').start;
+    line(1, ell(300, 400, 70, 70, 0, TAU), 'blue', 3, tk, tk + 0.5); dot(1, 300, 470, 7, 'red', tk + 0.5);
+    text(1, 'kugle: punktkontakt', 300, 520, 32, 'blue', tk + 0.2, we('kugle', 'omdrejningstal'), { align: 'center' });
+    text(1, 'lav friktion, høj hastighed', 300, 565, 28, 'black', wt('kugle', 'lav') - 0.1, we('kugle', 'spændinger'), { align: 'center' });
+    const tr = L('rulle').start;
+    line(1, rect(780, 330, 160, 140).concat([[780, 332]]), 'blue', 3, tr, tr + 0.5); line(1, [[780, 472], [940, 472]], 'red', 5, tr + 0.5, tr + 0.8);
+    text(1, 'rulle: linjekontakt', 860, 520, 32, 'blue', tr + 0.2, we('rulle', 'mere'), { align: 'center' });
+    text(1, 'bærer mere', 860, 565, 28, 'black', wt('rulle', 'bære') - 0.3, we('rulle', 'mere'), { align: 'center' });
+  }
+
+  B.goto('valg', 2);
+  {
+    const t0 = L('valg').start;
+    bubble(2, 'Valg', 150, 140, 50, 'blue', t0, t0 + 0.5);
+    text(2, 'rillekugleleje: standard, billigt, hurtigt', 170, 220, 34, 'black', wt('valg', 'rillekugleleje') - 0.2, we('valg', 'hastigheder'));
+    text(2, 'konisk rulleleje: radial + aksial', 170, 275, 34, 'red', wt('valg', 'Koniske') - 0.1, we('valg', 'last'));
+    text(2, 'cylindrisk rulleleje: meget radialt, ikke aksialt', 170, 330, 34, 'black', wt('valg', 'Cylindriske') - 0.1, we('valg', 'aksialt'));
+    const td = L('dele').start, cx = 340, cy = 540;
+    line(2, ell(cx, cy, 130, 130, 0, TAU), 'black', 3, td, td + 0.4); line(2, ell(cx, cy, 70, 70, 0, TAU), 'black', 3, td + 0.2, td + 0.6);
+    for (let i = 0; i < 10; i++) { const a = i * TAU / 10; line(2, ell(cx + 100 * Math.cos(a), cy + 100 * Math.sin(a), 22, 22, 0, TAU), 'blue', 2.4, wt('dele', 'kuglerne') - 0.2 + 0.03 * i, wt('dele', 'kuglerne') + 0.1 + 0.03 * i); }
+    text(2, 'inderring · yderring · kugler · bur', 560, 500, 32, 'blue', wt('dele', 'inderringen') - 0.2, we('dele', 'adskilt'));
+    text(2, 'katalog: d · D · B', 560, 560, 34, 'black', L('maal').start + 0.2, we('maal', 'B'));
+    text(2, 'buret: ≈ ½ akselhastighed', 560, 620, 32, 'green', wt('bur', 'halvdelen') - 0.4, we('bur', 'vibrationsovervågning'));
+  }
+
+  B.goto('stribeck', 3);
+  {
+    const t0 = L('stribeck').start, cx = 360, cy = 380;
+    line(3, ell(cx, cy, 170, 170, 0, TAU), 'black', 3, t0, t0 + 0.4);
+    for (let i = 0; i < 12; i++) { const a = i * TAU / 12 + PI / 2; const ld = Math.max(0, Math.cos(a - PI / 2)); line(3, ell(cx + 140 * Math.cos(a), cy + 140 * Math.sin(a), 20, 20, 0, TAU), ld > 0.2 ? 'red' : 'blue', 2.4, t0 + 0.3, t0 + 0.7); if (ld > 0.2) arrow(3, [[cx + 140 * Math.cos(a), cy + 140 * Math.sin(a)], [cx + (140 + 60 * ld) * Math.cos(a), cy + (140 + 60 * ld) * Math.sin(a)]], 'red', 2.4, wt('stribeck', 'mest') - 0.2, wt('stribeck', 'mest') + 0.3, 10); }
+    arrow(3, [[cx, cy - 80], [cx, cy + 40]], 'black', 4, wt('stribeck', 'radial') - 0.2, wt('stribeck', 'radial') + 0.3); text(3, 'F_r', cx + 14, cy - 40, 32, 'black', wt('stribeck', 'radial'), wt('stribeck', 'radial') + 0.3);
+    text(3, 'P_0 ≈ 5 F_r / Z', 680, 300, 50, 'red', wt('stribeck', 'fem') - 0.2, we('stribeck', 'Z'));
+    text(3, 'P_0 < C_0  (ellers mærker)', 680, 400, 38, 'blue', wt('stribeck', 'statiske') - 0.4, we('stribeck', 'mærker'));
+  }
+
+  B.goto('tjek_q', 4);
+  B.tjek(4, ['Skrå tandhjul: radial + aksial last.', 'Hvilken lejetype?'], ['konisk rulleleje'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 5);
+  B.slut(5, 'Abou-Hayt (2026), MEM1 Chapter 13, slide 2–9 · Hamrock, Schmid & Jacobson, kap. 13', 'lejers levetid', 'slut');
+  text(5, 'kugle: punkt, hurtig · rulle: linje, stærk', 200, 280, 40, 'blue', L('slut').start + 0.4, we('slut', 'bæreevne'));
+  text(5, 'P_0 ≈ 5 F_r / Z', 200, 360, 46, 'red', wt('slut', 'mest') - 0.1, we('slut', 'Z'));
+});
+
+</script>
+<script>BP.live({"duration":127.758,"audio":"leje-typer.mp3","order":["titel","funktion","kugle","rulle","valg","dele","maal","bur","stribeck","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.356,"words":[["Rullelejer",0.6,1.425],["De",2.42,2.497],["holder",2.497,2.768],["en",2.768,2.858],["roterende",2.858,3.348],["aksel",3.348,3.735],["på",3.735,3.863],["plads",3.863,4.314],["og",4.314,4.482],["fører",4.482,4.753],["kræfterne",4.753,5.268],["ud",5.268,5.474],["i",5.474,5.513],["huset",5.513,6.067],["med",6.067,6.247],["meget",6.247,6.57],["lidt",6.57,6.75],["friktion",6.75,7.356]],"text":"Rullelejer. De holder en roterende aksel på plads og fører kræfterne ud i huset med meget lidt friktion."},"funktion":{"start":8.578,"end":17.934,"words":[["Et",8.718,8.821],["leje",8.821,9.143],["erstatter",9.143,9.594],["glidefriktion",9.594,10.484],["med",10.484,10.651],["rullemodstand",10.651,11.502],["Det",12.405,12.483],["holder",12.483,12.74],["akslen",12.74,13.217],["præcist",13.217,13.642],["på",13.642,13.745],["plads",13.746,14.197],["og",14.197,14.351],["fører",14.351,14.622],["lasten",14.622,14.996],["fra",14.996,15.163],["akslen",15.163,15.756],["gennem",15.756,16.039],["rulleelementerne",16.039,16.967],["ud",16.967,17.225],["i",17.225,17.341],["huset",17.341,17.934]],"text":"Et leje erstatter glidefriktion med rullemodstand. Det holder akslen præcist på plads og fører lasten fra akslen gennem rulleelementerne ud i huset."},"kugle":{"start":19.152,"end":26.227,"words":[["Kuglelejer",19.292,19.937],["har",19.937,20.13],["punktkontakt",20.13,21.058],["Det",21.948,22.013],["giver",22.013,22.296],["lav",22.296,22.528],["friktion",22.528,23.018],["og",23.018,23.147],["høje",23.147,23.469],["omdrejningstal",23.469,24.448],["men",24.59,24.783],["store",24.783,25.144],["lokale",25.144,25.582],["spændinger",25.582,26.227]],"text":"Kuglelejer har punktkontakt. Det giver lav friktion og høje omdrejningstal, men store lokale spændinger."},"rulle":{"start":27.446,"end":35.887,"words":[["Rullelejer",27.573,28.115],["har",28.115,28.295],["linjekontakt",28.295,29.068],["med",29.068,29.249],["cylindriske",29.249,30.151],["koniske",30.279,31.014],["eller",31.014,31.272],["tøndeformede",31.272,31.903],["ruller",31.903,32.354],["Linjen",33.232,33.632],["spreder",33.632,33.979],["lasten",33.98,34.534],["så",34.688,34.882],["de",34.882,34.972],["kan",34.972,35.114],["bære",35.114,35.41],["mere",35.41,35.887]],"text":"Rullelejer har linjekontakt med cylindriske, koniske eller tøndeformede ruller. Linjen spreder lasten, så de kan bære mere."},"valg":{"start":37.108,"end":52.469,"words":[["Det",37.235,37.338],["almindelige",37.338,37.802],["rillekugleleje",37.802,38.653],["er",38.653,38.769],["standardvalget",38.769,39.735],["billigt",39.851,40.225],["og",40.225,40.367],["godt",40.367,40.599],["til",40.599,40.74],["høje",40.74,41.037],["hastigheder",41.037,41.771],["Koniske",42.675,43.152],["rullelejer",43.152,43.654],["bruges",43.654,44.196],["hvor",44.337,44.505],["tandhjul",44.505,44.969],["giver",44.969,45.188],["både",45.188,45.458],["radial",45.459,46.064],["og",46.064,46.245],["aksial",46.245,46.696],["last",46.696,47.198],["Cylindriske",48.074,48.757],["rullelejer",48.757,49.337],["bærer",49.337,49.608],["meget",49.608,49.943],["radialt",49.943,50.6],["men",50.742,50.961],["næsten",50.961,51.438],["intet",51.438,51.837],["aksialt",51.837,52.469]],"text":"Det almindelige rillekugleleje er standardvalget: billigt og godt til høje hastigheder. Koniske rullelejer bruges, hvor tandhjul giver både radial og aksial last. Cylindriske rullelejer bærer meget radialt, men næsten intet aksialt."},"dele":{"start":53.682,"end":61.18,"words":[["Et",53.809,53.912],["rillekugleleje",53.912,54.686],["har",54.686,54.866],["fire",54.866,55.188],["dele",55.188,55.678],["inderringen",55.807,56.271],["på",56.271,56.412],["akslen",56.412,57.07],["yderringen",57.199,57.701],["i",57.701,57.778],["huset",57.778,58.358],["kuglerne",58.487,59.015],["og",59.015,59.106],["buret",59.106,59.608],["der",59.75,59.866],["holder",59.866,60.098],["kuglerne",60.098,60.601],["adskilt",60.601,61.18]],"text":"Et rillekugleleje har fire dele: inderringen på akslen, yderringen i huset, kuglerne og buret, der holder kuglerne adskilt."},"maal":{"start":62.408,"end":68.747,"words":[["I",62.535,62.6],["kataloget",62.6,63.18],["er",63.18,63.283],["lejet",63.283,63.605],["beskrevet",63.605,64.069],["ved",64.069,64.172],["boringen",64.172,64.597],["d",64.597,64.997],["der",65.138,65.254],["passer",65.254,65.589],["til",65.589,65.77],["akslen",65.77,66.414],["ydre",66.543,66.827],["diameter",66.827,67.432],["D",67.432,67.741],["og",67.741,67.961],["bredden",67.961,68.412],["B",68.412,68.747]],"text":"I kataloget er lejet beskrevet ved boringen d, der passer til akslen, ydre diameter D og bredden B."},"bur":{"start":69.982,"end":80.278,"words":[["Buret",70.122,70.444],["holder",70.444,70.651],["kuglerne",70.651,71.102],["jævnt",71.102,71.372],["fordelt",71.372,71.836],["og",71.836,71.965],["forhindrer",71.965,72.661],["at",72.815,72.944],["de",72.944,73.047],["gnider",73.047,73.357],["mod",73.357,73.537],["hinanden",73.537,74.156],["Buret",75.046,75.317],["roterer",75.317,75.742],["med",75.742,75.884],["cirka",75.884,76.258],["halvdelen",76.258,76.812],["af",76.812,77.005],["akslens",77.005,77.534],["hastighed",77.534,78.101],["og",78.281,78.397],["det",78.397,78.487],["bruges",78.487,78.835],["i",78.835,79.015],["vibrationsovervågning",79.016,80.278]],"text":"Buret holder kuglerne jævnt fordelt og forhindrer, at de gnider mod hinanden. Buret roterer med cirka halvdelen af akslens hastighed, og det bruges i vibrationsovervågning."},"stribeck":{"start":81.492,"end":97.239,"words":[["Under",81.632,81.851],["en",81.851,81.967],["radial",81.967,82.367],["last",82.367,82.818],["bærer",82.818,83.088],["kuglerne",83.088,83.655],["ikke",83.655,83.926],["lige",83.926,84.132],["meget",84.132,84.596],["Den",85.487,85.616],["mest",85.616,85.861],["belastede",85.861,86.324],["kugle",86.324,86.634],["i",86.634,86.698],["bunden",86.698,87.046],["bærer",87.046,87.446],["cirka",87.446,87.819],["fem",87.819,88.09],["gange",88.09,88.399],["F",88.399,88.592],["r",88.593,88.721],["divideret",88.721,89.417],["med",89.417,89.649],["antallet",89.649,90.255],["af",90.255,90.371],["kugler",90.371,90.719],["Z",90.719,91.131],["Den",92.033,92.136],["last",92.136,92.471],["skal",92.471,92.613],["være",92.613,92.794],["under",92.794,93.064],["den",93.064,93.245],["statiske",93.245,93.812],["bæreevne",93.812,94.366],["C",94.366,94.623],["nul",94.623,95.023],["ellers",95.165,95.513],["får",95.513,95.616],["løbebanerne",95.616,96.324],["blivende",96.324,96.711],["mærker",96.711,97.239]],"text":"Under en radial last bærer kuglerne ikke lige meget. Den mest belastede kugle i bunden bærer cirka fem gange F r divideret med antallet af kugler Z. Den last skal være under den statiske bæreevne C nul, ellers får løbebanerne blivende mærker."},"tjek_q":{"start":98.474,"end":106.051,"words":[["Tjek",98.575,98.897],["dig",98.897,99.077],["selv",99.077,99.503],["Hvilken",100.42,100.755],["lejetype",100.755,101.451],["vil",101.451,101.631],["du",101.631,101.721],["vælge",101.721,102.005],["til",102.005,102.147],["en",102.147,102.25],["aksel",102.25,102.662],["med",102.662,102.778],["skrå",102.778,103.062],["tandhjul",103.062,103.654],["der",103.796,103.899],["giver",103.899,104.144],["både",104.144,104.415],["radial",104.415,104.93],["og",104.93,105.098],["aksial",105.098,105.523],["last",105.523,106.051]],"text":"Tjek dig selv. Hvilken lejetype vil du vælge til en aksel med skrå tandhjul, der giver både radial og aksial last?"},"tjek_a":{"start":109.922,"end":114.703,"words":[["Et",110.023,110.203],["konisk",110.203,110.719],["rulleleje",110.719,111.415],["Det",112.37,112.448],["bærer",112.448,112.705],["meget",112.706,112.989],["både",112.989,113.285],["radialt",113.285,113.904],["og",113.904,114.071],["aksialt",114.071,114.703]],"text":"Et konisk rulleleje. Det bærer meget både radialt og aksialt."},"slut":{"start":115.936,"end":125.316,"words":[["Kort",116.063,116.295],["sagt",116.295,116.785],["kugler",116.914,117.249],["giver",117.249,117.468],["punktkontakt",117.468,118.19],["og",118.19,118.331],["høj",118.331,118.55],["hastighed",118.55,119.169],["ruller",119.311,119.723],["giver",119.723,119.942],["linjekontakt",119.942,120.69],["og",120.69,120.818],["stor",120.818,121.115],["bæreevne",121.115,121.824],["og",121.965,122.081],["den",122.081,122.223],["mest",122.223,122.468],["belastede",122.468,122.919],["kugle",122.919,123.241],["bærer",123.241,123.46],["cirka",123.46,123.885],["fem",123.885,124.208],["F",124.208,124.375],["r",124.375,124.646],["over",124.646,124.929],["Z",124.929,125.316]],"text":"Kort sagt: kugler giver punktkontakt og høj hastighed, ruller giver linjekontakt og stor bæreevne, og den mest belastede kugle bærer cirka fem F r over Z."}}}, { audio: 'leje-typer.mp3', id: 'leje-typer' });</script>
+</body>
+</html>

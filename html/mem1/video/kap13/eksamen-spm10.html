@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eksamensspørgsmål 10b: lejelevetid · video</title>
+<meta name="description" content="Eksamensspørgsmål 10b: L10 = 1000 millioner omdrejninger, svarende til cirka 11 100 timer.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 13: videoer</a><h1>Eksamensspørgsmål 10b: lejelevetid</h1><span class="meta">MEM1 · kapitel 13 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Eksamensspørgsmål 10b: lejelevetid"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Eksamensspørgsmål 10b: L10 = 1000 millioner omdrejninger, svarende til cirka 11 100 timer.</p><div class="chips"><a href="leje-levetid.html">Se først: Lejers levetid L10</a><a href="../../../../lab/mem1/rulleleje.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel13_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l13">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Eksamensspørgsmål 10b: p = 3, P = 5, C = 50 kN, n = 1500 → L10 = 1000 Mrev, 11 111 h (slide 14)
+BP.scene({ header: 'MEM1 · kap. 13' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under } = B;
+
+  B.titel(0, 'Eksamensspørgsmål 10b', 'MEM1 · kapitel 13 · opgave (slide 14)', 'titel');
+  text(0, 'levetid for et kugleleje', 640, 520, 42, 'red', wt('titel', 'levetiden') - 0.2, we('titel', 'timer'), { align: 'center' });
+
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start;
+    text(1, 'p = 3,  P = 5 kN,  C = 50 kN,  n = 1500 omdr./min', 140, 160, 36, 'black', t0 + 0.2, we('data', 'minuttet'));
+    text(1, 'C / P = 50 / 5 = 10', 140, 260, 46, 'blue', L('forhold').start + 0.2, we('forhold', 'ti'));
+    const r = text(1, 'L_{10} = 10³ = 1000 · 10⁶ omdr.', 140, 360, 46, 'red', L('l10').start + 0.2, we('l10', 'omdrejninger'));
+    text(1, '60 · 1500 = 90 000 omdr./time', 140, 460, 38, 'black', wt('timer', 'Tres') - 0.1, we('timer', 'timen'));
+    const r2 = text(1, 'L_{10h} = 10⁹ / 90 000 ≈ 11 100 h', 140, 560, 46, 'red', L('resultat').start + 0.2, we('resultat', 'timer', 1));
+    box(1, 115, 505, 760, 85, 'red', we('resultat', 'timer', 1), we('resultat', 'timer', 1) + 0.6);
+    text(1, '8 h/dag → knap 4 år', 140, 660, 36, 'green', L('fortolk').start + 0.2, we('fortolk', 'år'));
+  }
+
+  B.goto('tjek_q', 2);
+  B.tjek(2, ['Rulleleje med samme C og P?'], ['L_{10} = 10^{10/3} ≈ 2155 · 10⁶ omdr.'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 3);
+  B.slut(3, 'Abou-Hayt (2026), MEM1 Chapter 13, slide 14 (eksamensspm. 10) · Hamrock, Schmid & Jacobson, kap. 13', '', 'slut');
+  text(3, 'C/P = 10 → L_{10} = 1000 · 10⁶ omdr.', 200, 280, 42, 'blue', L('slut').start + 0.4, we('slut', 'omdrejninger'));
+  text(3, 'L_{10h} ≈ 11 000 h', 200, 370, 48, 'red', wt('slut', 'ved') - 0.1, we('slut', 'timer'));
+});
+
+</script>
+<script>BP.live({"duration":92.656,"audio":"eksamen-spm10.mp3","order":["titel","data","forhold","l10","timer","resultat","fortolk","teori","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.691,"words":[["Eksamensspørgsmål",0.64,1.723],["ti",1.723,2.019],["b",2.019,2.38],["Vi",3.296,3.387],["beregner",3.387,3.799],["levetiden",3.799,4.366],["for",4.366,4.508],["et",4.508,4.559],["rillekugleleje",4.559,5.41],["i",5.41,5.539],["millioner",5.539,6.054],["omdrejninger",6.054,6.892],["og",6.892,7.046],["i",7.046,7.124],["timer",7.124,7.691]],"text":"Eksamensspørgsmål ti b. Vi beregner levetiden for et rillekugleleje i millioner omdrejninger og i timer."},"data":{"start":8.914,"end":21.466,"words":[["Lejet",9.028,9.454],["er",9.454,9.595],["et",9.595,9.673],["kugleleje",9.673,10.394],["så",10.51,10.742],["p",10.742,11.0],["er",11.0,11.077],["tre",11.077,11.528],["Den",12.419,12.535],["radiale",12.535,12.96],["last",12.96,13.347],["er",13.347,13.489],["fem",13.489,13.759],["kilonewton",13.759,14.494],["og",14.636,14.752],["den",14.752,14.932],["dynamiske",14.932,15.473],["bæreevne",15.473,16.169],["er",16.169,16.311],["halvtreds",16.311,16.723],["kilonewton",16.723,17.509],["Akslen",18.411,18.978],["kører",18.978,19.275],["femten",19.275,19.674],["hundrede",19.674,19.958],["omdrejninger",19.958,20.718],["i",20.718,20.847],["minuttet",20.847,21.466]],"text":"Lejet er et kugleleje, så p er tre. Den radiale last er fem kilonewton, og den dynamiske bæreevne er halvtreds kilonewton. Akslen kører femten hundrede omdrejninger i minuttet."},"forhold":{"start":22.68,"end":26.532,"words":[["C",22.794,23.117],["over",23.117,23.31],["P",23.31,23.645],["er",23.645,23.761],["halvtreds",23.761,24.212],["divideret",24.212,24.818],["med",24.818,25.024],["fem",25.024,25.449],["altså",25.591,25.952],["ti.",25.952,26.532]],"text":"C over P er halvtreds divideret med fem, altså ti."},"l10":{"start":27.758,"end":31.622,"words":[["L",27.898,28.053],["ti",28.053,28.375],["er",28.375,28.504],["ti",28.504,28.762],["i",28.762,28.813],["tredje",28.813,29.393],["altså",29.522,29.896],["tusind",29.896,30.269],["millioner",30.269,30.798],["omdrejninger",30.798,31.622]],"text":"L ti er ti i tredje, altså tusind millioner omdrejninger."},"timer":{"start":32.836,"end":42.346,"words":[["I",32.963,33.041],["timer",33.041,33.517],["er",33.517,33.659],["det",33.659,33.775],["tusind",33.775,34.123],["gange",34.123,34.394],["ti",34.394,34.651],["i",34.651,34.716],["sjette",34.716,35.077],["divideret",35.077,35.798],["med",35.798,36.03],["tres",36.03,36.327],["gange",36.327,36.649],["femten",36.649,37.048],["hundrede",37.048,37.564],["Tres",38.455,38.738],["gange",38.738,39.022],["femten",39.022,39.369],["hundrede",39.37,39.872],["er",39.872,40.027],["halvfems",40.027,40.465],["tusind",40.465,40.813],["omdrejninger",40.813,41.586],["i",41.586,41.741],["timen",41.741,42.346]],"text":"I timer er det tusind gange ti i sjette divideret med tres gange femten hundrede. Tres gange femten hundrede er halvfems tusind omdrejninger i timen."},"resultat":{"start":43.578,"end":47.764,"words":[["Det",43.679,43.808],["giver",43.808,44.156],["elleve",44.156,44.478],["tusind",44.478,44.787],["hundrede",44.787,44.993],["og",44.993,45.032],["elleve",45.032,45.341],["timer",45.341,45.869],["cirka",46.011,46.54],["elleve",46.54,46.875],["tusind",46.875,47.248],["timer",47.248,47.764]],"text":"Det giver elleve tusind hundrede og elleve timer, cirka elleve tusind timer."},"fortolk":{"start":48.992,"end":53.204,"words":[["Kører",49.132,49.377],["maskinen",49.377,49.957],["otte",49.957,50.279],["timer",50.279,50.601],["om",50.601,50.717],["dagen",50.717,51.155],["holder",51.297,51.619],["lejet",51.619,51.967],["i",51.967,52.109],["knap",52.109,52.444],["fire",52.444,52.882],["år",52.882,53.204]],"text":"Kører maskinen otte timer om dagen, holder lejet i knap fire år."},"teori":{"start":54.43,"end":63.747,"words":[["Til",54.544,54.763],["del",54.764,55.008],["a",55.008,55.279],["skal",55.279,55.446],["du",55.446,55.524],["forklare",55.524,56.013],["L",56.013,56.258],["ti",56.258,56.684],["forskellen",56.812,57.405],["på",57.405,57.521],["p",57.521,57.74],["for",57.74,57.856],["kugle",57.856,58.372],["og",58.513,58.668],["rullelejer",58.668,59.403],["og",59.596,59.712],["hvad",59.712,59.854],["C",59.854,60.124],["betyder",60.124,60.73],["Se",61.621,61.917],["videoen",61.917,62.497],["om",62.497,62.716],["lejers",62.716,63.077],["levetid",63.077,63.747]],"text":"Til del a skal du forklare L ti, forskellen på p for kugle- og rullelejer, og hvad C betyder. Se videoen om lejers levetid."},"tjek_q":{"start":64.98,"end":70.676,"words":[["Tjek",65.081,65.39],["dig",65.39,65.57],["selv",65.57,65.983],["Hvad",66.9,67.029],["ville",67.029,67.274],["L",67.274,67.493],["ti",67.493,67.751],["være",67.751,68.24],["hvis",68.369,68.537],["det",68.537,68.64],["var",68.64,68.807],["et",68.807,68.872],["rulleleje",68.872,69.374],["med",69.374,69.568],["samme",69.568,69.928],["C",69.928,70.212],["og",70.212,70.251],["P",70.251,70.676]],"text":"Tjek dig selv. Hvad ville L ti være, hvis det var et rulleleje med samme C og P?"},"tjek_a":{"start":74.556,"end":80.263,"words":[["Ti",74.67,74.993],["opløftet",74.993,75.547],["til",75.547,75.83],["ti",75.83,76.101],["tredjedele",76.101,76.874],["cirka",77.003,77.48],["to",77.48,77.737],["tusind",77.737,77.995],["hundrede",77.995,78.201],["og",78.201,78.214],["femoghalvtreds",78.214,78.871],["millioner",78.871,79.477],["omdrejninger",79.477,80.263]],"text":"Ti opløftet til ti tredjedele, cirka to tusind hundrede og femoghalvtreds millioner omdrejninger."},"slut":{"start":81.482,"end":90.23,"words":[["Kort",81.609,81.828],["sagt",81.828,82.331],["C",82.46,82.821],["over",82.821,83.001],["P",83.001,83.272],["er",83.272,83.336],["ti",83.336,83.813],["L",83.955,84.187],["ti",84.187,84.522],["er",84.522,84.638],["tusind",84.638,84.973],["millioner",84.973,85.411],["omdrejninger",85.411,86.223],["og",86.364,86.519],["ved",86.519,86.635],["femten",86.635,86.983],["hundrede",86.983,87.215],["omdrejninger",87.215,87.795],["i",87.795,87.846],["minuttet",87.846,88.323],["er",88.323,88.452],["det",88.452,88.529],["cirka",88.529,88.993],["elleve",88.993,89.341],["tusind",89.341,89.702],["timer",89.702,90.23]],"text":"Kort sagt: C over P er ti, L ti er tusind millioner omdrejninger, og ved femten hundrede omdrejninger i minuttet er det cirka elleve tusind timer."}}}, { audio: 'eksamen-spm10.mp3', id: 'eksamen-spm10' });</script>
+</body>
+</html>
