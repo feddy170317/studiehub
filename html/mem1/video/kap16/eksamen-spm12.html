@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eksamensspørgsmål 12b: moment på en bevægelsesskrue · video</title>
+<meta name="description" content="Eksamensspørgsmål 12b: T ≈ 18,1 Nm for at hæve 10 kN, selvlåsende og η ≈ 44 %.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 16: videoer</a><h1>Eksamensspørgsmål 12b: moment på en bevægelsesskrue</h1><span class="meta">MEM1 · kapitel 16 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Eksamensspørgsmål 12b: moment på en bevægelsesskrue"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Eksamensspørgsmål 12b: T ≈ 18,1 Nm for at hæve 10 kN, selvlåsende og η ≈ 44 %.</p><div class="chips"><a href="kraftskrue.html">Se først: Bevægelsesskruer</a><a href="../../../../lab/mem1/kraftskrue.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel16_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l16">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Eksamensspørgsmål 12b: dm = 20, l = 5, μ = 0,1, W = 10 kN → T = 18,1 Nm, TL ≈ 2,0 Nm, η ≈ 44 % (slide 15)
+BP.scene({ header: 'MEM1 · kap. 16' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under } = B;
+
+  B.titel(0, 'Eksamensspørgsmål 12b', 'MEM1 · kapitel 16 · opgave (slide 15)', 'titel');
+  text(0, 'moment til at hæve 10 kN', 640, 520, 42, 'red', wt('titel', 'moment') - 0.2, we('titel', 'bevægelsesskrue'), { align: 'center' });
+
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start;
+    text(1, 'd_m = 20 mm,  l = p = 5 mm,  μ = 0,1,  W = 10 kN', 140, 160, 36, 'black', t0 + 0.3, we('data', 'kilonewton'));
+    text(1, 'T = (W d_m/2) · (l + π μ d_m)/(π d_m − μ l)', 140, 240, 38, 'blue', L('formel').start + 0.2, we('formel', 'l', 1));
+    text(1, 'π d_m = 62,83 mm', 140, 320, 38, 'black', L('pidm').start + 0.2, we('pidm', 'millimeter'));
+    text(1, 'tæller: 5 + 0,1 · 62,83 = 11,28', 140, 390, 38, 'black', L('taeller').start + 0.2, we('taeller', 'tre', 1));
+    text(1, 'nævner: 62,83 − 0,1 · 5 = 62,33', 140, 460, 38, 'black', L('naevner').start + 0.2, we('naevner', 'tre', 1));
+    text(1, 'W d_m/2 = 10 000 · 10 = 100 000 N·mm', 140, 530, 38, 'black', L('faktor').start + 0.2, we('faktor', 'newtonmillimeter'));
+    const r = text(1, 'T = 100 000 · 11,28 / 62,33 ≈ 18,1 N·m', 140, 630, 46, 'red', L('resultat').start + 0.2, we('resultat', 'newtonmeter'));
+    box(1, 115, 575, 850, 85, 'red', we('resultat', 'newtonmeter'), we('resultat', 'newtonmeter') + 0.6);
+  }
+
+  B.goto('selvlaas', 2);
+  {
+    const t0 = L('selvlaas').start;
+    text(2, 'tan λ = 5 / 62,83 = 0,080 < μ = 0,1  →  selvlåsende ✓', 140, 200, 36, 'green', t0 + 0.3, we('selvlaas', 'ja'));
+    text(2, 'η = W l / (2π T) = 10 000 · 5 / (2π · 18 100) ≈ 44 %', 140, 300, 36, 'blue', L('virkning').start + 0.2, we('virkning', 'procent'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Hvad er sænkemomentet', 'for samme skrue og last?'], ['T_L ≈ 2,0 N·m > 0', 'skruen holder selv lasten'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 16, slide 15 (eksamensspm. 12) · Hamrock, Schmid & Jacobson, kap. 16', '', 'slut');
+  text(4, 'T_R ≈ 18,1 N·m', 200, 280, 46, 'red', L('slut').start + 0.4, we('slut', 'newtonmeter'));
+  text(4, 'selvlåsende · η ≈ 44 %', 200, 370, 46, 'blue', wt('slut', 'selvlåsende') - 0.1, we('slut', 'procent'));
+});
+
+</script>
+<script>BP.live({"duration":118.796,"audio":"eksamen-spm12.mp3","order":["titel","data","formel","pidm","taeller","naevner","faktor","resultat","selvlaas","virkning","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.459,"words":[["Eksamensspørgsmål",0.64,1.71],["tolv",1.71,2.045],["b",2.045,2.406],["Hvor",3.322,3.477],["stort",3.477,3.786],["et",3.786,3.889],["moment",3.889,4.237],["skal",4.237,4.379],["der",4.379,4.456],["til",4.456,4.675],["for",4.675,4.894],["at",4.894,4.907],["hæve",4.907,5.216],["ti",5.216,5.461],["kilonewton",5.461,6.209],["med",6.209,6.415],["en",6.415,6.518],["bevægelsesskrue",6.518,7.459]],"text":"Eksamensspørgsmål tolv b. Hvor stort et moment skal der til for at hæve ti kilonewton med en bevægelsesskrue?"},"data":{"start":8.674,"end":21.857,"words":[["Skruen",8.788,9.188],["har",9.188,9.343],["firkantgevind",9.343,10.167],["med",10.167,10.425],["middeldiameter",10.425,11.147],["tyve",11.147,11.443],["millimeter",11.443,12.152],["stigning",12.294,12.77],["fem",12.77,12.989],["millimeter",12.989,13.608],["og",13.608,13.737],["én",13.737,13.969],["gevindgang",13.969,14.626],["så",14.781,14.974],["ledet",14.974,15.309],["er",15.309,15.451],["fem",15.451,15.721],["millimeter",15.721,16.417],["Friktionskoefficienten",17.295,18.545],["er",18.545,18.726],["nul",18.726,18.996],["komma",18.996,19.357],["et",19.357,19.692],["og",19.834,20.092],["lasten",20.092,20.659],["er",20.659,20.813],["ti",20.813,21.084],["kilonewton",21.084,21.857]],"text":"Skruen har firkantgevind med middeldiameter tyve millimeter, stigning fem millimeter og én gevindgang, så ledet er fem millimeter. Friktionskoefficienten er nul komma et, og lasten er ti kilonewton."},"formel":{"start":23.088,"end":31.192,"words":[["Vi",23.228,23.331],["bruger",23.331,23.628],["hævemomentet",23.628,24.465],["T",24.581,24.903],["er",24.903,25.045],["W",25.045,25.548],["d",25.548,25.741],["m",25.741,26.063],["over",26.063,26.308],["to",26.308,26.579],["gange",26.579,26.94],["l",26.94,27.12],["plus",27.12,27.391],["pi",27.391,27.623],["mu",27.623,27.906],["d",27.906,28.138],["m",28.138,28.473],["divideret",28.615,29.117],["med",29.117,29.336],["pi",29.336,29.581],["d",29.581,29.787],["m",29.787,30.045],["minus",30.045,30.496],["mu",30.496,30.741],["l.",30.741,31.192]],"text":"Vi bruger hævemomentet: T er W d m over to gange l plus pi mu d m, divideret med pi d m minus mu l."},"pidm":{"start":32.414,"end":36.24,"words":[["Pi",32.554,32.735],["gange",32.735,33.057],["d",33.057,33.276],["m",33.276,33.611],["er",33.611,33.753],["treogtres",33.753,34.449],["komma",34.449,34.874],["otte",34.874,35.209],["tre",35.209,35.492],["millimeter",35.492,36.24]],"text":"Pi gange d m er treogtres komma otte tre millimeter."},"taeller":{"start":37.468,"end":43.497,"words":[["Tælleren",37.595,38.072],["er",38.072,38.253],["fem",38.253,38.536],["plus",38.536,38.768],["nul",38.768,38.948],["komma",38.948,39.387],["et",39.387,39.541],["gange",39.541,39.863],["treogtres",39.863,40.443],["komma",40.443,40.765],["otte",40.765,41.049],["tre",41.049,41.448],["altså",41.59,41.99],["elleve",41.99,42.363],["komma",42.363,42.75],["otte",42.75,43.085],["tre",43.085,43.497]],"text":"Tælleren er fem plus nul komma et gange treogtres komma otte tre, altså elleve komma otte tre."},"naevner":{"start":44.73,"end":51.056,"words":[["Nævneren",44.857,45.321],["er",45.321,45.489],["treogtres",45.489,46.082],["komma",46.082,46.404],["otte",46.404,46.726],["tre",46.726,47.035],["minus",47.035,47.383],["nul",47.383,47.563],["komma",47.563,47.989],["et",47.989,48.143],["gange",48.143,48.427],["fem",48.427,48.813],["altså",48.955,49.342],["treogtres",49.342,50.012],["komma",50.012,50.36],["tre",50.36,50.643],["tre",50.643,51.056]],"text":"Nævneren er treogtres komma otte tre minus nul komma et gange fem, altså treogtres komma tre tre."},"faktor":{"start":52.28,"end":57.742,"words":[["W",52.407,52.807],["d",52.807,53.0],["m",53.0,53.322],["over",53.322,53.58],["to",53.58,53.98],["er",53.98,54.121],["ti",54.121,54.405],["tusind",54.405,54.701],["gange",54.701,54.972],["ti",54.972,55.371],["altså",55.5,55.887],["hundrede",55.887,56.183],["tusind",56.183,56.647],["newtonmillimeter",56.647,57.742]],"text":"W d m over to er ti tusind gange ti, altså hundrede tusind newtonmillimeter."},"resultat":{"start":58.966,"end":70.422,"words":[["Momentet",59.093,59.647],["er",59.647,59.789],["hundrede",59.789,60.098],["tusind",60.098,60.408],["gange",60.408,60.73],["elleve",60.73,61.026],["komma",61.026,61.361],["otte",61.361,61.645],["tre",61.645,62.019],["divideret",62.019,62.65],["med",62.65,62.921],["treogtres",62.921,63.565],["komma",63.565,63.861],["tre",63.861,64.145],["tre",64.145,64.557],["Det",65.435,65.525],["giver",65.525,65.886],["atten",65.886,66.26],["tusind",66.26,66.556],["og",66.556,66.582],["hundrede",66.582,66.84],["newtonmillimeter",66.84,67.935],["altså",68.077,68.528],["atten",68.528,68.927],["komma",68.927,69.353],["et",69.353,69.533],["newtonmeter",69.533,70.422]],"text":"Momentet er hundrede tusind gange elleve komma otte tre divideret med treogtres komma tre tre. Det giver atten tusind og hundrede newtonmillimeter, altså atten komma et newtonmeter."},"selvlaas":{"start":71.652,"end":83.585,"words":[["Er",71.753,71.933],["skruen",71.933,72.333],["selvlåsende",72.333,73.145],["Tangens",74.049,74.539],["lambda",74.539,75.041],["er",75.041,75.209],["fem",75.209,75.466],["divideret",75.466,75.982],["med",75.982,76.227],["treogtres",76.227,76.845],["komma",76.845,77.167],["otte",77.167,77.477],["tre",77.477,77.889],["altså",78.031,78.482],["nul",78.482,78.74],["komma",78.74,79.062],["nul",79.062,79.32],["otte",79.32,79.771],["Det",80.647,80.763],["er",80.763,80.84],["mindre",80.84,81.253],["end",81.253,81.42],["mu",81.42,81.678],["lig",81.678,81.91],["nul",81.91,82.142],["komma",82.142,82.515],["et",82.515,82.838],["så",82.954,83.224],["ja",83.224,83.585]],"text":"Er skruen selvlåsende? Tangens lambda er fem divideret med treogtres komma otte tre, altså nul komma nul otte. Det er mindre end mu lig nul komma et, så ja."},"virkning":{"start":84.818,"end":91.88,"words":[["Virkningsgraden",84.958,85.706],["er",85.706,85.873],["W",85.873,86.337],["gange",86.337,86.659],["l",86.659,86.917],["divideret",86.917,87.677],["med",87.677,87.935],["to",87.935,88.206],["pi",88.206,88.412],["T.",88.412,88.914],["Det",89.792,89.882],["giver",89.882,90.166],["cirka",90.166,90.656],["fireogfyrre",90.656,91.287],["procent",91.287,91.88]],"text":"Virkningsgraden er W gange l divideret med to pi T. Det giver cirka fireogfyrre procent."},"tjek_q":{"start":93.112,"end":97.97,"words":[["Tjek",93.213,93.535],["dig",93.535,93.715],["selv",93.715,94.153],["Hvad",95.071,95.277],["er",95.277,95.328],["sænkemomentet",95.328,96.153],["for",96.153,96.347],["den",96.347,96.514],["samme",96.514,96.849],["skrue",96.849,97.287],["og",97.287,97.403],["last",97.403,97.97]],"text":"Tjek dig selv. Hvad er sænkemomentet for den samme skrue og last?"},"tjek_a":{"start":101.848,"end":107.312,"words":[["Cirka",101.962,102.401],["to",102.401,102.736],["newtonmeter",102.736,103.586],["Det",104.477,104.619],["er",104.619,104.709],["positivt",104.709,105.482],["så",105.611,105.804],["skruen",105.804,106.152],["holder",106.152,106.397],["selv",106.397,106.719],["lasten",106.719,107.312]],"text":"Cirka to newtonmeter. Det er positivt, så skruen holder selv lasten."},"slut":{"start":108.534,"end":116.38,"words":[["Kort",108.674,108.88],["sagt",108.88,109.37],["hævemomentet",109.499,110.246],["er",110.246,110.478],["atten",110.478,110.852],["komma",110.852,111.213],["et",111.213,111.355],["newtonmeter",111.355,112.218],["skruen",112.347,112.785],["er",112.785,112.888],["selvlåsende",112.888,113.674],["og",113.842,113.958],["virkningsgraden",113.958,114.731],["er",114.731,114.821],["cirka",114.821,115.233],["fireogfyrre",115.233,115.826],["procent",115.826,116.38]],"text":"Kort sagt: hævemomentet er atten komma et newtonmeter, skruen er selvlåsende, og virkningsgraden er cirka fireogfyrre procent."}}}, { audio: 'eksamen-spm12.mp3', id: 'eksamen-spm12' });</script>
+</body>
+</html>

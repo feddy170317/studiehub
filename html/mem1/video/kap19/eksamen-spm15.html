@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eksamensspørgsmål 15b: fladremstræk · video</title>
+<meta name="description" content="Eksamensspørgsmål 15b: F2 = 1000 N og T = 400 Nm.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 19: videoer</a><h1>Eksamensspørgsmål 15b: fladremstræk</h1><span class="meta">MEM1 · kapitel 19 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Eksamensspørgsmål 15b: fladremstræk"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Eksamensspørgsmål 15b: F2 = 1000 N og T = 400 Nm.</p><div class="chips"><a href="remtraek.html">Se først: Fladremme og remfriktion</a><a href="../../../../lab/mem1/remtraek.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel19_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l19">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Eksamensspørgsmål 15b: Fc ≈ 0, φ = π, μ = 0,35 (e^{μφ} ≈ 3), F1 = 3000 N, r = 0,2 m → F2 = 1000 N, T = 400 Nm
+BP.scene({ header: 'MEM1 · kap. 19' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under } = B;
+
+  B.titel(0, 'Eksamensspørgsmål 15b', 'MEM1 · kapitel 19 · opgave (eksamensspm. 15)', 'titel');
+  text(0, 'fladrem ved lav hastighed', 640, 520, 42, 'red', wt('titel', 'lav') - 0.2, we('titel', 'moment'), { align: 'center' });
+
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start;
+    text(1, 'F_c ≈ 0,  φ = π,  μ = 0,35  →  e^{μφ} ≈ 3', 140, 160, 38, 'black', t0 + 0.3, we('data', 'tre'));
+    text(1, 'F_1 = 3000 N,  r = 0,2 m', 140, 230, 38, 'black', wt('data', 'tilladte') - 0.2, we('data', 'meter'));
+    text(1, 'F_1 / F_2 = e^{μφ} = 3', 140, 330, 46, 'blue', L('ligning').start + 0.2, we('ligning', 'tre'));
+    text(1, 'F_2 = 3000 / 3 = 1000 N', 140, 420, 46, 'blue', L('f2').start + 0.2, we('f2', 'newton'));
+    text(1, 'T = (F_1 − F_2) · r = 2000 · 0,2', 140, 510, 42, 'red', L('moment').start + 0.2, we('moment', 'meter'));
+    const r = text(1, 'T = 400 N·m', 140, 600, 56, 'red', L('resultat').start + 0.2, we('resultat', 'newtonmeter'));
+    box(1, 115, 540, 420, 90, 'red', we('resultat', 'newtonmeter'), we('resultat', 'newtonmeter') + 0.6);
+    text(1, 'høj hastighed: F_c trækker fra', 640, 600, 32, 'green', L('hastighed').start + 0.2, we('hastighed', 'mindre'));
+  }
+
+  B.goto('tjek_q', 2);
+  B.tjek(2, ['Hvis e^{μφ} kun er 2?'], ['F_2 = 1500 N', 'T = 1500 · 0,2 = 300 N·m'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 3);
+  B.slut(3, 'Abou-Hayt (2026), MEM1 mundtligt eksamensspm. 15 · Hamrock, Schmid & Jacobson, kap. 19', '', 'slut');
+  text(3, 'F_2 = 1000 N', 200, 280, 46, 'blue', L('slut').start + 0.4, we('slut', 'newton'));
+  text(3, 'T = 2000 · 0,2 = 400 N·m', 200, 370, 46, 'red', wt('slut', 'momentet') - 0.1, we('slut', 'newtonmeter'));
+});
+
+</script>
+<script>BP.live({"duration":105.232,"audio":"eksamen-spm15.mp3","order":["titel","data","ligning","f2","moment","resultat","hastighed","teori","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":10.1,"words":[["Eksamensspørgsmål",0.64,1.723],["femten",1.723,2.212],["b",2.212,2.56],["En",3.477,3.593],["fladremstransmission",3.593,4.869],["ved",4.869,5.075],["lav",5.075,5.358],["hastighed",5.358,6.003],["Vi",6.918,7.021],["finder",7.021,7.304],["kraften",7.304,7.807],["i",7.807,7.961],["den",7.961,8.129],["slappe",8.129,8.451],["part",8.451,8.876],["og",8.876,9.044],["det",9.044,9.134],["største",9.134,9.572],["moment",9.572,10.1]],"text":"Eksamensspørgsmål femten b. En fladremstransmission ved lav hastighed. Vi finder kraften i den slappe part og det største moment."},"data":{"start":11.338,"end":28.967,"words":[["Hastigheden",11.465,12.032],["er",12.032,12.11],["lav",12.11,12.509],["så",12.651,12.96],["F",12.96,13.153],["c",13.153,13.488],["er",13.489,13.63],["nul",13.63,14.056],["Omslutningsvinklen",14.972,15.951],["er",15.951,16.106],["pi",16.106,16.338],["radianer",16.338,17.098],["friktionskoefficienten",17.214,18.542],["er",18.542,18.696],["nul",18.696,18.941],["komma",18.941,19.25],["tre",19.25,19.534],["fem",19.534,19.895],["og",20.088,20.281],["e",20.281,20.487],["i",20.487,20.616],["nul",20.616,20.797],["komma",20.797,21.067],["tre",21.067,21.364],["fem",21.364,21.621],["pi",21.622,21.957],["er",21.957,22.06],["cirka",22.06,22.433],["tre",22.433,22.859],["Den",23.748,23.864],["tilladte",23.864,24.225],["remkraft",24.225,24.83],["er",24.83,24.985],["tre",24.985,25.268],["tusind",25.268,25.591],["newton",25.591,26.158],["og",26.299,26.441],["remskiven",26.441,27.034],["har",27.034,27.201],["radius",27.201,27.665],["nul",27.665,27.871],["komma",27.872,28.181],["to",28.181,28.464],["meter",28.464,28.967]],"text":"Hastigheden er lav, så F c er nul. Omslutningsvinklen er pi radianer, friktionskoefficienten er nul komma tre fem, og e i nul komma tre fem pi er cirka tre. Den tilladte remkraft er tre tusind newton, og remskiven har radius nul komma to meter."},"ligning":{"start":30.192,"end":36.002,"words":[["Eulers",30.332,30.629],["remligning",30.629,31.131],["med",31.131,31.428],["F",31.428,31.634],["c",31.634,31.866],["lig",31.866,32.059],["nul",32.059,32.459],["F",32.6,32.845],["et",32.845,33.025],["over",33.025,33.257],["F",33.257,33.502],["to",33.502,33.837],["er",33.837,34.031],["e",34.031,34.25],["i",34.25,34.443],["mu",34.443,34.701],["phi",34.701,35.1],["altså",35.242,35.59],["tre",35.59,36.002]],"text":"Eulers remligning med F c lig nul: F et over F to er e i mu phi, altså tre."},"f2":{"start":37.238,"end":46.181,"words":[["Så",37.352,37.636],["er",37.636,37.778],["F",37.778,38.01],["to",38.01,38.254],["lig",38.254,38.461],["F",38.461,38.757],["et",38.757,38.912],["divideret",38.912,39.427],["med",39.427,39.569],["tre",39.569,40.02],["altså",40.162,40.497],["tusind",40.497,40.883],["newton",40.883,41.476],["Det",42.393,42.483],["er",42.483,42.586],["den",42.586,42.766],["mindste",42.766,43.088],["kraft",43.089,43.411],["i",43.411,43.527],["den",43.527,43.707],["slappe",43.707,44.029],["part",44.029,44.467],["der",44.609,44.725],["skal",44.725,44.893],["til",44.893,45.047],["for",45.047,45.253],["at",45.253,45.331],["undgå",45.331,45.782],["glid",45.782,46.181]],"text":"Så er F to lig F et divideret med tre, altså tusind newton. Det er den mindste kraft i den slappe part, der skal til for at undgå glid."},"moment":{"start":47.428,"end":55.352,"words":[["Momentet",47.555,48.084],["er",48.084,48.341],["F",48.341,48.599],["et",48.599,48.754],["minus",48.754,49.179],["F",49.179,49.385],["to",49.385,49.617],["gange",49.617,49.939],["r",49.939,50.274],["tre",50.416,50.751],["tusind",50.751,51.06],["minus",51.06,51.331],["tusind",51.331,51.898],["altså",52.027,52.465],["to",52.465,52.723],["tusind",52.723,53.032],["newton",53.032,53.586],["gange",53.78,54.063],["nul",54.063,54.256],["komma",54.256,54.566],["to",54.566,54.849],["meter",54.849,55.352]],"text":"Momentet er F et minus F to gange r: tre tusind minus tusind, altså to tusind newton, gange nul komma to meter."},"resultat":{"start":56.586,"end":58.684,"words":[["Det",56.687,56.816],["giver",56.816,57.202],["fire",57.202,57.524],["hundrede",57.524,57.821],["newtonmeter",57.821,58.684]],"text":"Det giver fire hundrede newtonmeter."},"hastighed":{"start":59.912,"end":65.258,"words":[["Hvis",60.052,60.194],["remmen",60.194,60.49],["kørte",60.49,60.761],["hurtigt",60.761,61.264],["ville",61.38,61.702],["F",61.702,61.869],["c",61.869,62.114],["trække",62.114,62.501],["fra",62.501,62.668],["i",62.668,62.72],["begge",62.72,62.99],["parter",62.99,63.519],["og",63.699,63.841],["momentet",63.841,64.343],["ville",64.343,64.537],["blive",64.537,64.691],["mindre",64.691,65.258]],"text":"Hvis remmen kørte hurtigt, ville F c trække fra i begge parter, og momentet ville blive mindre."},"teori":{"start":66.478,"end":75.202,"words":[["Til",66.605,66.799],["del",66.799,67.043],["a",67.043,67.353],["skal",67.353,67.546],["du",67.546,67.623],["forklare",67.623,68.036],["leddene",68.036,68.371],["i",68.371,68.461],["remligningen",68.461,69.157],["og",69.157,69.299],["hvordan",69.299,69.647],["centrifugalkraften",69.647,70.897],["påvirker",70.897,71.451],["kapaciteten",71.451,72.469],["Se",73.359,73.656],["videoen",73.656,74.236],["om",74.236,74.442],["remfriktion",74.442,75.202]],"text":"Til del a skal du forklare leddene i remligningen og hvordan centrifugalkraften påvirker kapaciteten. Se videoen om remfriktion."},"tjek_q":{"start":76.428,"end":83.245,"words":[["Tjek",76.529,76.851],["dig",76.851,77.031],["selv",77.031,77.457],["Hvad",78.374,78.529],["bliver",78.528,78.722],["momentet",78.722,79.34],["hvis",79.418,79.611],["friktionskoefficienten",79.611,80.797],["falder",80.797,81.325],["så",81.467,81.737],["e",81.737,81.905],["i",81.905,82.021],["mu",82.021,82.291],["phi",82.291,82.536],["kun",82.536,82.755],["er",82.755,82.807],["to",82.807,83.245]],"text":"Tjek dig selv. Hvad bliver momentet, hvis friktionskoefficienten falder, så e i mu phi kun er to?"},"tjek_a":{"start":87.132,"end":94.231,"words":[["F",87.272,87.44],["to",87.44,87.788],["bliver",87.788,88.032],["femten",88.032,88.406],["hundrede",88.406,88.638],["newton",88.638,89.244],["og",89.386,89.618],["momentet",89.618,90.081],["bliver",90.082,90.339],["femten",90.339,90.726],["hundrede",90.726,90.945],["gange",90.945,91.254],["nul",91.254,91.46],["komma",91.46,91.757],["to",91.757,92.195],["altså",92.337,92.813],["tre",92.813,93.11],["hundrede",93.11,93.38],["newtonmeter",93.38,94.231]],"text":"F to bliver femten hundrede newton, og momentet bliver femten hundrede gange nul komma to, altså tre hundrede newtonmeter."},"slut":{"start":95.45,"end":102.82,"words":[["Kort",95.577,95.796],["sagt",95.796,96.286],["F",96.402,96.608],["to",96.608,96.892],["er",96.892,96.995],["tusind",96.995,97.369],["newton",97.369,97.923],["og",98.064,98.258],["momentet",98.258,98.786],["er",98.786,98.954],["to",98.954,99.211],["tusind",99.211,99.495],["gange",99.495,99.804],["nul",99.804,100.023],["komma",100.023,100.332],["to",100.332,100.758],["altså",100.899,101.402],["fire",101.402,101.698],["hundrede",101.698,101.982],["newtonmeter",101.982,102.82]],"text":"Kort sagt: F to er tusind newton, og momentet er to tusind gange nul komma to, altså fire hundrede newtonmeter."}}}, { audio: 'eksamen-spm15.mp3', id: 'eksamen-spm15' });</script>
+</body>
+</html>

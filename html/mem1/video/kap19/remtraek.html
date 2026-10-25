@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fladremme og remfriktion · video</title>
+<meta name="description" content="Eulers remligning, omslutningsvinkel og centrifugalkraftens effekt.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 19: videoer</a><h1>Fladremme og remfriktion</h1><span class="meta">MEM1 · kapitel 19 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Fladremme og remfriktion"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Eulers remligning, omslutningsvinkel og centrifugalkraftens effekt.</p><div class="chips"><a href="../../../../lab/mem1/remtraek.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel19_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l19">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Fladremme og remfriktion (MEM1 kap. 19, eksamensspm. 15 + Hamrock kap. 19)
+BP.scene({ header: 'MEM1 · kap. 19' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, PI, TAU } = B;
+
+  B.titel(0, 'Remfriktion', 'MEM1 · kapitel 19 · begreb (eksamensspm. 15)', 'titel');
+  text(0, 'hvor meget kan remmen trække?', 640, 520, 40, 'red', wt('titel', 'moment') - 0.2, we('titel', 'glider'), { align: 'center' });
+
+  B.goto('rem', 1);
+  {
+    const t0 = L('rem').start, c1 = [260, 380], c2 = [760, 380], r1 = 90, r2 = 150;
+    line(1, ell(c1[0], c1[1], r1, r1, 0, TAU), 'black', 3, t0, t0 + 0.5); line(1, ell(c2[0], c2[1], r2, r2, 0, TAU), 'black', 3, t0 + 0.2, t0 + 0.7);
+    line(1, [[c1[0], c1[1] - r1], [c2[0], c2[1] - r2]], 'red', 4, wt('rem', 'stramme') - 0.2, wt('rem', 'stramme') + 0.3);
+    line(1, [[c1[0], c1[1] + r1], [c2[0], c2[1] + r2]], 'blue', 3, wt('rem', 'slappe') - 0.2, wt('rem', 'slappe') + 0.3);
+    text(1, 'F_1 (stram)', 460, 270, 32, 'red', wt('rem', 'F'), wt('rem', 'et') + 0.3);
+    text(1, 'F_2 (slap)', 460, 520, 32, 'blue', wt('rem', 'F', 1), wt('rem', 'to') + 0.3);
+    text(1, 'T = (F_1 − F_2) · r', 960, 200, 40, 'black', wt('rem', 'Forskellen') - 0.1, we('rem', 'r'));
+    const te = L('euler').start;
+    const r = text(1, 'F_1 / F_2 = e^{μφ}', 960, 600, 46, 'red', te + 0.4, we('euler', 'radianer'));
+    text(1, 'φ', c1[0] - 120, c1[1] + 10, 34, 'green', wt('euler', 'omslutningsvinklen') - 0.1, we('euler', 'omslutningsvinklen'));
+    line(1, ell(c1[0], c1[1], r1 + 14, r1 + 14, 0.5 * PI, 1.5 * PI), 'green', 3, wt('euler', 'omslutningsvinklen') - 0.2, we('euler', 'radianer'));
+    text(1, 'lille skive: kritisk φ', 160, 620, 30, 'green', L('vinkel').start + 0.4, we('vinkel', 'kritiske'));
+  }
+
+  B.goto('centrifugal', 2);
+  {
+    const t0 = L('centrifugal').start;
+    text(2, 'høj hastighed:  F_c = m′ v²', 140, 180, 44, 'blue', t0 + 0.3, we('centrifugal', 'parter'));
+    const r = text(2, '(F_1 − F_c) / (F_2 − F_c) = e^{μφ}', 140, 300, 50, 'red', L('med_fc').start + 0.2, we('med_fc', 'phi'));
+    box(2, 115, 240, 820, 90, 'red', we('med_fc', 'phi'), we('med_fc', 'phi') + 0.6);
+    text(2, 'F_c bruger af den tilladte remkraft', 140, 430, 36, 'black', L('kapacitet').start + 0.2, we('kapacitet', 'remkraft'));
+    text(2, '⇒ kapaciteten falder ved høj v', 140, 500, 40, 'red', wt('kapacitet', 'høj') - 0.3, we('kapacitet', 'noget'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['φ fordobles.', 'Hvad sker der med F_1/F_2?'], ['forholdet kvadreres', 'e^{μ·2φ} = (e^{μφ})²'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Hamrock, Schmid & Jacobson, kap. 19 · Abou-Hayt (2026), MEM1 mundtligt eksamensspm. 15', 'eksamensspørgsmål 15', 'slut');
+  text(4, '(F_1 − F_c)/(F_2 − F_c) = e^{μφ}', 200, 280, 44, 'red', L('slut').start + 0.4, we('slut', 'phi'));
+  text(4, 'T = (F_1 − F_2) r · F_c sænker kapaciteten', 200, 370, 38, 'blue', wt('slut', 'momentet') - 0.1, we('slut', 'hastighed'));
+});
+
+</script>
+<script>BP.live({"duration":108.554,"audio":"remtraek.mp3","order":["titel","rem","euler","vinkel","centrifugal","med_fc","kapacitet","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":6.389,"words":[["Fladremme",0.627,1.297],["og",1.297,1.439],["remfriktion",1.439,2.212],["Hvor",3.129,3.271],["stort",3.271,3.58],["et",3.58,3.683],["moment",3.683,4.044],["kan",4.044,4.186],["en",4.186,4.276],["rem",4.276,4.559],["overføre",4.559,5.358],["før",5.487,5.732],["den",5.732,5.899],["glider",5.899,6.389]],"text":"Fladremme og remfriktion. Hvor stort et moment kan en rem overføre, før den glider?"},"rem":{"start":7.618,"end":19.512,"words":[["En",7.745,7.861],["rem",7.861,8.171],["løber",8.171,8.673],["om",8.673,8.866],["to",8.866,9.15],["remskiver",9.15,9.884],["Den",10.775,10.891],["stramme",10.891,11.252],["part",11.252,11.548],["har",11.548,11.755],["kraften",11.755,12.218],["F",12.219,12.463],["et",12.463,12.773],["og",12.914,13.082],["den",13.082,13.314],["slappe",13.314,13.623],["part",13.623,13.92],["har",13.92,14.01],["kraften",14.01,14.525],["F",14.525,14.731],["to.",14.731,14.963],["Forskellen",14.963,15.505],["giver",15.505,15.698],["momentet",15.698,16.136],["på",16.136,16.291],["remskiven",16.291,17.012],["T",17.128,17.45],["er",17.45,17.554],["F",17.554,17.798],["et",17.798,17.927],["minus",17.927,18.417],["F",18.417,18.636],["to",18.636,18.868],["gange",18.868,19.216],["r.",19.216,19.512]],"text":"En rem løber om to remskiver. Den stramme part har kraften F et, og den slappe part har kraften F to. Forskellen giver momentet på remskiven: T er F et minus F to gange r."},"euler":{"start":20.736,"end":32.514,"words":[["Ved",20.863,20.954],["glidegrænsen",20.954,21.74],["gælder",21.74,22.036],["Eulers",22.036,22.307],["remligning",22.307,22.938],["F",23.054,23.286],["et",23.286,23.402],["divideret",23.402,23.982],["med",23.982,24.201],["F",24.201,24.407],["to",24.407,24.742],["er",24.742,24.935],["e",24.935,25.167],["opløftet",25.167,25.773],["til",25.773,25.928],["mu",25.928,26.211],["gange",26.211,26.533],["phi",26.533,26.894],["Mu",27.785,28.12],["er",28.12,28.262],["friktionskoefficienten",28.262,29.679],["og",29.847,29.976],["phi",29.976,30.259],["er",30.259,30.427],["omslutningsvinklen",30.427,31.625],["i",31.625,31.78],["radianer",31.78,32.514]],"text":"Ved glidegrænsen gælder Eulers remligning: F et divideret med F to er e opløftet til mu gange phi. Mu er friktionskoefficienten, og phi er omslutningsvinklen i radianer."},"vinkel":{"start":33.734,"end":43.554,"words":[["Jo",33.861,33.964],["større",33.964,34.338],["omslutningsvinkel",34.338,35.343],["og",35.343,35.498],["jo",35.498,35.588],["større",35.588,35.923],["friktion",35.923,36.555],["jo",36.696,36.825],["større",36.825,37.147],["forhold",37.147,37.508],["mellem",37.508,37.843],["de",37.843,37.972],["to",37.972,38.243],["kræfter",38.243,38.797],["Derfor",39.688,40.061],["er",40.061,40.19],["omslutningsvinklen",40.19,41.221],["på",41.221,41.35],["den",41.35,41.582],["lille",41.582,41.827],["skive",41.827,42.316],["ofte",42.316,42.664],["den",42.664,42.845],["kritiske",42.845,43.554]],"text":"Jo større omslutningsvinkel og jo større friktion, jo større forhold mellem de to kræfter. Derfor er omslutningsvinklen på den lille skive ofte den kritiske."},"centrifugal":{"start":44.788,"end":54.492,"words":[["Ved",44.928,45.07],["høj",45.07,45.315],["hastighed",45.315,45.946],["slynger",45.946,46.423],["remmen",46.423,46.784],["udad",46.784,47.286],["Centrifugalkraften",48.164,49.376],["F",49.376,49.569],["c",49.569,49.917],["er",49.917,50.046],["masse",50.046,50.419],["pr.",50.419,50.754],["meter",50.754,51.09],["gange",51.09,51.412],["v",51.412,51.605],["i",51.605,51.785],["anden",51.785,52.185],["og",52.417,52.533],["den",52.533,52.675],["trækker",52.675,52.997],["lige",52.997,53.177],["meget",53.177,53.538],["i",53.538,53.667],["begge",53.667,53.963],["parter",53.963,54.492]],"text":"Ved høj hastighed slynger remmen udad. Centrifugalkraften F c er masse pr. meter gange v i anden, og den trækker lige meget i begge parter."},"med_fc":{"start":55.722,"end":61.61,"words":[["Så",55.836,55.991],["bliver",55.991,56.146],["ligningen",56.146,56.584],["F",56.584,56.816],["et",56.816,56.958],["minus",56.958,57.318],["F",57.318,57.525],["c",57.525,57.885],["divideret",57.885,58.478],["med",58.478,58.736],["F",58.736,58.955],["to",58.955,59.174],["minus",59.174,59.651],["F",59.651,59.857],["c",59.857,60.128],["lig",60.128,60.424],["e",60.424,60.708],["i",60.708,60.901],["mu",60.901,61.184],["phi",61.184,61.61]],"text":"Så bliver ligningen F et minus F c divideret med F to minus F c lig e i mu phi."},"kapacitet":{"start":62.84,"end":76.796,"words":[["Centrifugalkraften",62.967,64.32],["hjælper",64.32,64.759],["ikke",64.759,65.055],["med",65.055,65.235],["at",65.235,65.351],["overføre",65.351,65.996],["moment",65.996,66.537],["Den",67.428,67.544],["bruger",67.544,67.788],["bare",67.788,68.046],["noget",68.046,68.459],["af",68.459,68.613],["den",68.613,68.794],["tilladte",68.794,69.219],["remkraft",69.219,69.889],["Ved",70.791,70.946],["høj",70.946,71.165],["hastighed",71.165,71.745],["falder",71.745,72.028],["kapaciteten",72.028,72.776],["derfor",72.776,73.343],["og",73.484,73.639],["over",73.639,73.871],["en",73.871,73.974],["vis",73.974,74.18],["hastighed",74.18,74.696],["kan",74.696,74.837],["remmen",74.837,75.185],["slet",75.185,75.469],["ikke",75.469,75.778],["overføre",75.778,76.332],["noget",76.332,76.796]],"text":"Centrifugalkraften hjælper ikke med at overføre moment. Den bruger bare noget af den tilladte remkraft. Ved høj hastighed falder kapaciteten derfor, og over en vis hastighed kan remmen slet ikke overføre noget."},"tjek_q":{"start":78.022,"end":84.762,"words":[["Tjek",78.123,78.445],["dig",78.445,78.625],["selv",78.625,79.051],["Hvad",79.968,80.058],["sker",80.058,80.329],["der",80.329,80.432],["med",80.432,80.599],["forholdet",80.599,81.192],["F",81.192,81.45],["et",81.45,81.617],["over",81.617,81.914],["F",81.914,82.159],["to",82.159,82.597],["hvis",82.738,83.009],["omslutningsvinklen",83.009,84.053],["fordobles",84.053,84.762]],"text":"Tjek dig selv. Hvad sker der med forholdet F et over F to, hvis omslutningsvinklen fordobles?"},"tjek_a":{"start":88.63,"end":93.435,"words":[["Det",88.744,88.835],["kvadreres",88.835,89.531],["fordi",89.646,90.059],["e",90.059,90.226],["i",90.226,90.355],["mu",90.355,90.587],["gange",90.587,90.909],["to",90.909,91.167],["phi",91.167,91.502],["er",91.502,91.695],["e",91.695,91.927],["i",91.927,92.108],["mu",92.108,92.43],["phi",92.43,92.804],["i",92.804,93.01],["anden",93.01,93.435]],"text":"Det kvadreres, fordi e i mu gange to phi er e i mu phi i anden."},"slut":{"start":94.668,"end":106.135,"words":[["Kort",94.795,95.001],["sagt",95.002,95.478],["F",95.607,95.813],["et",95.813,95.929],["minus",95.929,96.316],["F",96.316,96.509],["c",96.509,96.857],["over",96.857,97.128],["F",97.128,97.36],["to",97.36,97.579],["minus",97.579,98.017],["F",98.017,98.21],["c",98.21,98.532],["er",98.532,98.751],["e",98.751,98.971],["i",98.971,99.151],["mu",99.151,99.396],["phi",99.396,99.821],["momentet",99.95,100.491],["er",100.491,100.684],["F",100.684,100.916],["et",100.916,101.058],["minus",101.058,101.471],["F",101.471,101.664],["to",101.664,101.896],["gange",101.896,102.166],["r",102.166,102.501],["og",102.643,102.837],["centrifugalkraften",102.837,103.919],["sænker",103.919,104.254],["kapaciteten",104.254,105.13],["ved",105.13,105.285],["høj",105.285,105.517],["hastighed",105.517,106.135]],"text":"Kort sagt: F et minus F c over F to minus F c er e i mu phi, momentet er F et minus F to gange r, og centrifugalkraften sænker kapaciteten ved høj hastighed."}}}, { audio: 'remtraek.mp3', id: 'remtraek' });</script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lamelkoblinger: konstant tryk og konstant slid · video</title>
+<meta name="description" content="Lamelkoblinger: konstant tryk mod konstant slid og T = NμF(ro + ri)/2.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 18: videoer</a><h1>Lamelkoblinger: konstant tryk og konstant slid</h1><span class="meta">MEM1 · kapitel 18 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Lamelkoblinger: konstant tryk og konstant slid"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Lamelkoblinger: konstant tryk mod konstant slid og T = NμF(ro + ri)/2.</p><div class="chips"><a href="../../../../lab/mem1/lamelkobling.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel18_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l18">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Lamelkoblinger: konstant tryk og konstant slid (MEM1 kap. 18, eksamensspm. 14 + Hamrock kap. 18)
+BP.scene({ header: 'MEM1 · kap. 18' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, hatch, rect, PI, TAU } = B;
+
+  B.titel(0, 'Lamelkoblinger', 'MEM1 · kapitel 18 · begreb (eksamensspm. 14)', 'titel');
+  text(0, 'konstant tryk eller konstant slid?', 640, 520, 40, 'red', wt('titel', 'konstant') - 0.2, we('titel', 'slid'), { align: 'center' });
+
+  B.goto('kobling', 1);
+  {
+    const t0 = L('kobling').start, cx = 320, cy = 380;
+    line(1, ell(cx, cy, 200, 200, 0, TAU), 'black', 3, t0, t0 + 0.6); line(1, ell(cx, cy, 100, 100, 0, TAU), 'black', 3, t0 + 0.3, t0 + 0.8);
+    arrow(1, [[cx, cy], [cx + 100, cy]], 'blue', 2.4, wt('kobling', 'indre') - 0.1, wt('kobling', 'radius') + 0.2, 11); text(1, 'r_i', cx + 30, cy - 12, 30, 'blue', wt('kobling', 'r'), wt('kobling', 'i') + 0.3);
+    arrow(1, [[cx, cy], [cx - 141, cy + 141]], 'blue', 2.4, wt('kobling', 'ydre') - 0.1, wt('kobling', 'ydre') + 0.4, 11); text(1, 'r_o', cx - 110, cy + 90, 30, 'blue', wt('kobling', 'o') - 0.1, wt('kobling', 'o') + 0.3);
+    text(1, 'aksial kraft F trykker fladerne sammen', 600, 230, 32, 'black', wt('kobling', 'aksial') - 0.1, we('kobling', 'momentet'));
+    const tr = L('ring').start;
+    line(1, ell(cx, cy, 150, 150, 0, TAU), 'red', 2.4, tr, tr + 0.5); line(1, ell(cx, cy, 165, 165, 0, TAU), 'red', 2.4, tr + 0.2, tr + 0.6);
+    text(1, 'dT = μ p · 2π r dr · r', 600, 320, 40, 'red', tr + 0.4, we('ring', 'r', 3));
+  }
+
+  B.goto('tryk', 2);
+  {
+    const t0 = L('tryk').start;
+    text(2, 'konstant tryk (ny kobling):', 140, 160, 36, 'blue', t0 + 0.2, wt('tryk', 'momentet'));
+    text(2, 'T = (2/3) μ F (r_o³ − r_i³) / (r_o² − r_i²)', 160, 230, 40, 'blue', wt('tryk', 'momentet') - 0.1, we('tryk', 'anden', 1));
+    const ts = L('slid').start;
+    text(2, 'konstant slid (tilkørt): p · r = konstant', 140, 340, 36, 'red', ts + 0.3, we('slid', 'konstant'));
+    const r = text(2, 'T = N μ F (r_o + r_i) / 2', 160, 450, 52, 'red', L('slid_t').start + 0.3, we('n', 'to'));
+    box(2, 135, 390, 640, 90, 'red', we('n', 'to'), we('n', 'to') + 0.6);
+    text(2, 'konstant slid giver mindst T → sikker', 140, 570, 36, 'green', L('valg').start + 0.2, we('valg', 'dimensionering'));
+    text(2, 'antagelser: stive skiver, konstant μ, ens kraft', 140, 640, 30, 'black', L('antag').start + 0.2, we('antag', 'ligeligt'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Hvorfor er p · r konstant', 'ved konstant slid?'], ['slid ∝ p · v og v ∝ r', '⇒ ens slid kræver p r konstant'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Hamrock, Schmid & Jacobson, kap. 18 · Abou-Hayt (2026), MEM1 mundtligt eksamensspm. 14', 'eksamensspørgsmål 14', 'slut');
+  text(4, 'konstant slid: T = N μ F (r_o + r_i)/2', 200, 280, 42, 'red', L('slut').start + 0.4, we('slut', 'to'));
+  text(4, 'konstant tryk giver lidt mere', 200, 360, 42, 'blue', wt('slut', 'Konstant') - 0.1, we('slut', 'antagelse'));
+});
+
+</script>
+<script>BP.live({"duration":127.11,"audio":"lamelkobling.mp3","order":["titel","kobling","ring","tryk","slid","slid_t","n","valg","antag","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":8.438,"words":[["Lamelkoblinger",0.601,1.761],["Hvor",2.678,2.845],["stort",2.845,3.155],["et",3.155,3.258],["moment",3.258,3.606],["kan",3.606,3.747],["en",3.747,3.838],["friktionskobling",3.838,4.701],["overføre",4.701,5.513],["og",5.655,5.822],["hvad",5.822,5.99],["er",5.99,6.015],["forskellen",6.015,6.531],["på",6.531,6.673],["konstant",6.673,7.124],["tryk",7.124,7.459],["og",7.459,7.588],["konstant",7.588,8.039],["slid",8.039,8.438]],"text":"Lamelkoblinger. Hvor stort et moment kan en friktionskobling overføre, og hvad er forskellen på konstant tryk og konstant slid?"},"kobling":{"start":9.658,"end":21.746,"words":[["En",9.798,9.876],["lamelkobling",9.876,10.61],["har",10.61,10.842],["en",10.842,11.074],["eller",11.074,11.229],["flere",11.229,11.551],["ringformede",11.551,12.066],["friktionsflader",12.066,12.943],["med",12.943,13.174],["indre",13.175,13.522],["radius",13.522,14.064],["r",14.064,14.321],["i",14.321,14.566],["og",14.566,14.669],["ydre",14.669,15.017],["radius",15.017,15.597],["r",15.597,15.816],["o.",15.816,16.151],["En",17.055,17.145],["aksial",17.145,17.532],["kraft",17.532,17.97],["F",17.97,18.15],["trykker",18.15,18.472],["fladerne",18.472,18.872],["sammen",18.872,19.387],["og",19.568,19.735],["friktionen",19.735,20.418],["overfører",20.418,21.063],["momentet",21.063,21.746]],"text":"En lamelkobling har en eller flere ringformede friktionsflader med indre radius r i og ydre radius r o. En aksial kraft F trykker fladerne sammen, og friktionen overfører momentet."},"ring":{"start":22.968,"end":32.543,"words":[["Se",23.095,23.366],["på",23.366,23.533],["en",23.533,23.624],["tynd",23.624,23.856],["ring",23.856,24.178],["med",24.178,24.423],["radius",24.423,25.003],["r",25.003,25.273],["og",25.273,25.428],["bredde",25.428,25.789],["d",25.789,26.033],["r.",26.033,26.343],["Den",27.259,27.375],["giver",27.375,27.646],["friktionskraften",27.646,28.599],["mu",28.599,28.844],["gange",28.844,29.128],["p",29.128,29.321],["gange",29.321,29.63],["to",29.63,29.888],["pi",29.888,30.094],["r",30.094,30.288],["d",30.288,30.52],["r",30.52,30.829],["og",30.829,30.945],["momentet",30.945,31.422],["det",31.422,31.525],["samme",31.525,31.873],["gange",31.873,32.221],["r.",32.221,32.543]],"text":"Se på en tynd ring med radius r og bredde d r. Den giver friktionskraften mu gange p gange to pi r d r og momentet det samme gange r."},"tryk":{"start":33.758,"end":48.835,"words":[["Ved",33.898,33.988],["konstant",33.988,34.439],["tryk",34.439,34.787],["antager",34.787,35.213],["vi",35.213,35.509],["at",35.651,35.805],["trykket",35.805,36.166],["p",36.166,36.463],["er",36.463,36.591],["det",36.591,36.669],["samme",36.669,37.068],["overalt",37.068,37.738],["Det",38.629,38.694],["passer",38.694,39.17],["for",39.17,39.377],["en",39.377,39.467],["ny",39.467,39.621],["kobling",39.621,40.266],["Så",41.168,41.322],["bliver",41.322,41.49],["momentet",41.49,41.928],["to",41.928,42.173],["tredjedele",42.173,42.727],["mu",42.727,43.036],["F",43.036,43.204],["gange",43.204,43.59],["r",43.59,43.822],["o",43.822,44.093],["i",44.093,44.235],["tredje",44.235,44.544],["minus",44.544,44.905],["r",44.905,45.15],["i",45.15,45.343],["i",45.343,45.498],["tredje",45.498,45.974],["over",45.974,46.284],["r",46.284,46.529],["o",46.529,46.786],["i",46.786,46.992],["anden",46.993,47.263],["minus",47.263,47.74],["r",47.74,47.998],["i",47.998,48.204],["i",48.204,48.384],["anden",48.384,48.835]],"text":"Ved konstant tryk antager vi, at trykket p er det samme overalt. Det passer for en ny kobling. Så bliver momentet to tredjedele mu F gange r o i tredje minus r i i tredje over r o i anden minus r i i anden."},"slid":{"start":50.068,"end":63.934,"words":[["Efter",50.208,50.466],["tilkøring",50.466,51.059],["slides",51.059,51.432],["belægningen",51.432,52.012],["mest",52.012,52.296],["yderst",52.296,52.837],["fordi",52.979,53.365],["den",53.365,53.533],["glider",53.533,53.842],["hurtigst",53.842,54.242],["der",54.242,54.577],["Så",55.455,55.712],["indstiller",55.712,56.189],["trykket",56.189,56.55],["sig",56.55,56.937],["så",57.078,57.297],["slidet",57.297,57.71],["er",57.71,57.903],["ens",57.903,58.393],["Slid",59.269,59.63],["er",59.63,59.746],["proportionalt",59.746,60.48],["med",60.48,60.699],["tryk",60.699,60.97],["gange",60.97,61.266],["hastighed",61.266,61.885],["så",62.027,62.233],["p",62.233,62.452],["gange",62.452,62.8],["r",62.8,63.109],["er",63.109,63.238],["konstant",63.238,63.934]],"text":"Efter tilkøring slides belægningen mest yderst, fordi den glider hurtigst der. Så indstiller trykket sig, så slidet er ens. Slid er proportionalt med tryk gange hastighed, så p gange r er konstant."},"slid_t":{"start":65.154,"end":71.944,"words":[["Det",65.268,65.346],["giver",65.346,65.629],["et",65.629,65.745],["enklere",65.745,66.171],["udtryk",66.17,66.802],["momentet",66.918,67.459],["er",67.459,67.627],["mu",67.627,67.949],["F",67.949,68.116],["gange",68.116,68.4],["middelradius",68.4,69.289],["r",69.431,69.676],["o",69.676,69.882],["plus",69.882,70.165],["r",70.165,70.513],["i",70.513,70.694],["divideret",70.694,71.351],["med",71.351,71.518],["to.",71.518,71.944]],"text":"Det giver et enklere udtryk: momentet er mu F gange middelradius, r o plus r i divideret med to."},"n":{"start":73.184,"end":81.533,"words":[["Har",73.311,73.414],["koblingen",73.414,73.969],["N",73.969,74.175],["aktive",74.175,74.6],["friktionsflader",74.6,75.566],["ganges",75.708,76.017],["momentet",76.017,76.481],["med",76.481,76.675],["N.",76.675,77.19],["Altså",77.19,77.706],["T",77.706,78.002],["lig",78.002,78.195],["N",78.195,78.427],["mu",78.427,78.788],["F",78.788,79.033],["gange",79.033,79.497],["r",79.497,79.78],["o",79.78,79.999],["plus",79.999,80.283],["r",80.283,80.605],["i",80.605,80.863],["over",80.863,81.121],["to.",81.121,81.533]],"text":"Har koblingen N aktive friktionsflader, ganges momentet med N. Altså T lig N mu F gange r o plus r i over to."},"valg":{"start":82.774,"end":88.339,"words":[["Konstant",82.901,83.352],["slid",83.352,83.636],["giver",83.636,83.919],["det",83.919,84.035],["mindste",84.035,84.396],["moment",84.396,84.757],["af",84.757,84.847],["de",84.847,84.95],["to",84.95,85.363],["så",85.556,85.762],["det",85.762,85.917],["er",85.917,86.007],["den",86.007,86.2],["sikre",86.2,86.626],["antagelse",86.626,87.296],["til",87.296,87.463],["dimensionering",87.463,88.339]],"text":"Konstant slid giver det mindste moment af de to, så det er den sikre antagelse til dimensionering."},"antag":{"start":89.556,"end":96.062,"words":[["Antagelserne",89.696,90.418],["er",90.418,90.753],["stive",90.895,91.32],["skiver",91.32,91.887],["konstant",92.029,92.518],["friktionskoefficient",92.518,93.691],["og",93.691,93.884],["at",93.884,93.949],["alle",93.949,94.245],["flader",94.245,94.567],["deler",94.567,94.851],["kraften",94.851,95.431],["F",95.431,95.65],["ligeligt",95.65,96.062]],"text":"Antagelserne er: stive skiver, konstant friktionskoefficient og at alle flader deler kraften F ligeligt."},"tjek_q":{"start":97.298,"end":102.427,"words":[["Tjek",97.399,97.708],["dig",97.708,97.888],["selv",97.888,98.327],["Hvorfor",99.244,99.527],["er",99.527,99.592],["produktet",99.592,100.12],["p",100.12,100.326],["gange",100.326,100.661],["r",100.661,100.855],["konstant",100.855,101.37],["ved",101.37,101.563],["konstant",101.563,102.04],["slid",102.04,102.427]],"text":"Tjek dig selv. Hvorfor er produktet p gange r konstant ved konstant slid?"},"tjek_a":{"start":106.298,"end":114.131,"words":[["Fordi",106.425,106.773],["slidet",106.773,107.057],["er",107.057,107.147],["proportionalt",107.147,107.907],["med",107.907,108.126],["tryk",108.126,108.384],["gange",108.384,108.693],["glidehastighed",108.693,109.57],["og",109.711,109.918],["hastigheden",109.918,110.459],["er",110.459,110.523],["proportional",110.523,111.296],["med",111.296,111.554],["r.",111.554,111.696],["Ens",111.696,112.005],["slid",112.005,112.327],["kræver",112.327,112.675],["p",112.675,112.92],["gange",112.92,113.294],["r",113.294,113.487],["konstant",113.487,114.131]],"text":"Fordi slidet er proportionalt med tryk gange glidehastighed, og hastigheden er proportional med r. Ens slid kræver p gange r konstant."},"slut":{"start":115.36,"end":124.675,"words":[["Kort",115.487,115.693],["sagt",115.694,116.157],["konstant",116.286,116.763],["slid",116.763,117.034],["giver",117.034,117.304],["T",117.304,117.562],["lig",117.562,117.717],["N",117.717,117.871],["mu",117.871,118.206],["F",118.206,118.425],["gange",118.425,118.838],["r",118.838,119.083],["o",119.083,119.276],["plus",119.276,119.547],["r",119.547,119.895],["i",119.895,120.165],["over",120.165,120.41],["to.",120.41,120.668],["Konstant",120.668,121.08],["tryk",121.08,121.351],["giver",121.351,121.557],["lidt",121.557,121.763],["mere",121.763,122.201],["så",122.33,122.536],["konstant",122.536,122.987],["slid",122.987,123.309],["er",123.309,123.425],["den",123.425,123.58],["sikre",123.58,123.98],["antagelse",123.98,124.675]],"text":"Kort sagt: konstant slid giver T lig N mu F gange r o plus r i over to. Konstant tryk giver lidt mere, så konstant slid er den sikre antagelse."}}}, { audio: 'lamelkobling.mp3', id: 'lamelkobling' });</script>
+</body>
+</html>

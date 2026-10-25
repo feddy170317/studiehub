@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eksamensspørgsmål 14b: lamelkobling · video</title>
+<meta name="description" content="Eksamensspørgsmål 14b: T = 180 Nm for fire flader med konstant slid.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 18: videoer</a><h1>Eksamensspørgsmål 14b: lamelkobling</h1><span class="meta">MEM1 · kapitel 18 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Eksamensspørgsmål 14b: lamelkobling"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Eksamensspørgsmål 14b: T = 180 Nm for fire flader med konstant slid.</p><div class="chips"><a href="lamelkobling.html">Se først: Lamelkoblinger: konstant tryk og konstant slid</a><a href="../../../../lab/mem1/lamelkobling.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel18_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l18">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Eksamensspørgsmål 14b: N = 4, ri = 50, ro = 100 mm, μ = 0,3, F = 2000 N → T = 180 Nm (konstant tryk: 186,7 Nm)
+BP.scene({ header: 'MEM1 · kap. 18' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under } = B;
+
+  B.titel(0, 'Eksamensspørgsmål 14b', 'MEM1 · kapitel 18 · opgave (eksamensspm. 14)', 'titel');
+  text(0, 'moment i en flerskivekobling', 640, 520, 42, 'red', wt('titel', 'flerskivekobling') - 0.4, we('titel', 'slid'), { align: 'center' });
+
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start;
+    text(1, 'N = 4,  r_i = 50 mm,  r_o = 100 mm,  μ = 0,3,  F = 2000 N', 140, 160, 34, 'black', t0 + 0.3, we('data', 'newton'));
+    text(1, 'T = N μ F (r_o + r_i) / 2', 140, 260, 46, 'blue', L('formel').start + 0.2, we('formel', 'to'));
+    text(1, '(r_o + r_i)/2 = 75 mm = 0,075 m', 140, 350, 40, 'black', L('middel').start + 0.2, we('middel', 'meter'));
+    text(1, 'T = 4 · 0,3 · 2000 · 0,075', 140, 440, 42, 'red', L('tal').start + 0.2, we('tal', 'fem'));
+    const r = text(1, 'T = 180 N·m', 140, 540, 56, 'red', L('resultat').start + 0.2, we('resultat', 'newtonmeter'));
+    box(1, 115, 480, 420, 90, 'red', we('resultat', 'newtonmeter'), we('resultat', 'newtonmeter') + 0.6);
+    text(1, 'konstant tryk: ≈ 186,7 N·m', 640, 540, 36, 'blue', L('sammenlign').start + 0.2, we('sammenlign', 'værdi'));
+    text(1, 'del a: se videoen om lamelkoblinger', 140, 660, 32, 'green', L('teori').start + 0.4, we('teori', 'lamelkoblinger'));
+  }
+
+  B.goto('tjek_q', 2);
+  B.tjek(2, ['Hvilken F giver T = 360 N·m?'], ['F = 4000 N', 'T ∝ F'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 3);
+  B.slut(3, 'Abou-Hayt (2026), MEM1 mundtligt eksamensspm. 14 · Hamrock, Schmid & Jacobson, kap. 18', '', 'slut');
+  text(3, 'r_m = 75 mm', 200, 280, 46, 'blue', L('slut').start + 0.4, we('slut', 'millimeter'));
+  text(3, 'T = 4 · 0,3 · 2000 · 0,075 = 180 N·m', 200, 370, 42, 'red', wt('slut', 'T') - 0.1, we('slut', 'newtonmeter'));
+});
+
+</script>
+<script>BP.live({"duration":97.144,"audio":"eksamen-spm14.mp3","order":["titel","data","formel","middel","tal","resultat","sammenlign","teori","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":9.572,"words":[["Eksamensspørgsmål",0.64,1.723],["fjorten",1.723,2.199],["b",2.2,2.535],["En",3.412,3.567],["flerskivekobling",3.567,4.74],["Vi",5.642,5.745],["beregner",5.745,6.157],["det",6.157,6.338],["overførte",6.338,6.918],["moment",6.918,7.317],["med",7.317,7.549],["antagelsen",7.549,8.412],["om",8.412,8.606],["konstant",8.606,9.108],["slid",9.108,9.572]],"text":"Eksamensspørgsmål fjorten b. En flerskivekobling. Vi beregner det overførte moment med antagelsen om konstant slid."},"data":{"start":10.786,"end":23.363,"words":[["Koblingen",10.926,11.467],["har",11.467,11.674],["fire",11.674,12.06],["aktive",12.06,12.537],["friktionsflader",12.537,13.491],["Den",14.381,14.523],["indre",14.523,14.845],["radius",14.845,15.335],["er",15.335,15.502],["halvtreds",15.502,15.915],["millimeter",15.915,16.649],["den",16.74,16.933],["ydre",16.933,17.281],["er",17.281,17.371],["hundrede",17.371,17.667],["millimeter",17.667,18.389],["friktionskoefficienten",18.492,19.781],["er",19.781,19.935],["nul",19.935,20.167],["komma",20.167,20.451],["tre",20.451,20.889],["og",21.095,21.25],["klemkraften",21.25,22.049],["er",22.049,22.203],["to",22.204,22.461],["tusind",22.461,22.796],["newton",22.796,23.363]],"text":"Koblingen har fire aktive friktionsflader. Den indre radius er halvtreds millimeter, den ydre er hundrede millimeter, friktionskoefficienten er nul komma tre, og klemkraften er to tusind newton."},"formel":{"start":24.576,"end":29.574,"words":[["Ved",24.716,24.819],["konstant",24.819,25.283],["slid",25.283,25.618],["er",25.618,25.773],["T",25.773,26.044],["lig",26.044,26.224],["N",26.224,26.469],["mu",26.469,26.83],["F",26.83,27.074],["gange",27.074,27.525],["r",27.526,27.809],["o",27.809,28.054],["plus",28.054,28.35],["r",28.35,28.672],["i",28.672,28.917],["over",28.917,29.162],["to.",29.162,29.574]],"text":"Ved konstant slid er T lig N mu F gange r o plus r i over to."},"middel":{"start":30.806,"end":38.343,"words":[["Middelradius",30.946,31.681],["er",31.681,31.822],["hundrede",31.822,32.145],["plus",32.145,32.389],["halvtreds",32.389,32.905],["divideret",32.905,33.485],["med",33.485,33.652],["to",33.652,34.09],["altså",34.219,34.645],["femoghalvfjerds",34.645,35.302],["millimeter",35.302,36.036],["eller",36.036,36.346],["nul",36.346,36.603],["komma",36.603,36.938],["nul",36.938,37.158],["syv",37.158,37.493],["fem",37.493,37.815],["meter",37.815,38.343]],"text":"Middelradius er hundrede plus halvtreds divideret med to, altså femoghalvfjerds millimeter eller nul komma nul syv fem meter."},"tal":{"start":39.556,"end":45.186,"words":[["T",39.683,39.98],["er",39.98,40.109],["fire",40.109,40.418],["gange",40.418,40.792],["nul",40.792,41.088],["komma",41.088,41.462],["tre",41.462,41.745],["gange",41.745,42.183],["to",42.183,42.428],["tusind",42.428,42.776],["gange",42.776,43.227],["nul",43.227,43.511],["komma",43.511,43.923],["nul",43.923,44.181],["syv",44.181,44.451],["fem.",44.451,45.186]],"text":"T er fire gange nul komma tre gange to tusind gange nul komma nul syv fem."},"resultat":{"start":46.41,"end":48.547,"words":[["Det",46.511,46.64],["giver",46.64,46.988],["hundrede",46.988,47.271],["og",47.271,47.297],["firs",47.297,47.658],["newtonmeter",47.658,48.547]],"text":"Det giver hundrede og firs newtonmeter."},"sammenlign":{"start":49.76,"end":58.033,"words":[["Med",49.9,50.042],["konstant",50.042,50.493],["tryk",50.493,50.905],["ville",50.905,51.137],["man",51.137,51.292],["få",51.292,51.408],["cirka",51.408,51.795],["hundrede",51.795,52.117],["og",52.117,52.142],["seksogfirs",52.142,52.877],["newtonmeter",52.877,53.792],["Konstant",54.683,55.121],["slid",55.121,55.43],["giver",55.43,55.739],["altså",55.739,56.01],["lidt",56.01,56.229],["mindre",56.229,56.745],["og",56.745,56.912],["er",56.912,57.015],["den",57.015,57.17],["sikre",57.17,57.556],["værdi",57.556,58.033]],"text":"Med konstant tryk ville man få cirka hundrede og seksogfirs newtonmeter. Konstant slid giver altså lidt mindre og er den sikre værdi."},"teori":{"start":59.254,"end":67.141,"words":[["Til",59.381,59.562],["del",59.562,59.819],["a",59.819,60.116],["skal",60.116,60.309],["du",60.309,60.386],["sammenligne",60.386,60.915],["de",60.915,61.031],["to",61.031,61.263],["teorier",61.263,61.959],["og",61.959,62.113],["forklare",62.113,62.59],["antagelserne",62.59,63.299],["bag",63.299,63.518],["formlen",63.518,64.136],["Se",65.027,65.324],["videoen",65.324,65.916],["om",65.916,66.123],["lamelkoblinger",66.123,67.141]],"text":"Til del a skal du sammenligne de to teorier og forklare antagelserne bag formlen. Se videoen om lamelkoblinger."},"tjek_q":{"start":68.364,"end":74.472,"words":[["Tjek",68.465,68.787],["dig",68.787,68.967],["selv",68.967,69.393],["Hvor",70.31,70.452],["stor",70.452,70.735],["skal",70.735,70.903],["klemkraften",70.903,71.599],["være",71.599,71.83],["for",71.83,72.062],["at",72.062,72.153],["overføre",72.153,72.81],["tre",72.81,73.093],["hundrede",73.093,73.325],["og",73.325,73.351],["tres",73.351,73.648],["newtonmeter",73.648,74.472]],"text":"Tjek dig selv. Hvor stor skal klemkraften være for at overføre tre hundrede og tres newtonmeter?"},"tjek_a":{"start":78.348,"end":83.424,"words":[["Det",78.462,78.553],["dobbelte",78.553,79.197],["fire",79.287,79.609],["tusind",79.609,79.957],["newton",79.957,80.511],["fordi",80.653,81.014],["momentet",81.014,81.529],["er",81.529,81.684],["proportionalt",81.684,82.47],["med",82.47,82.702],["F.",82.702,83.424]],"text":"Det dobbelte, fire tusind newton, fordi momentet er proportionalt med F."},"slut":{"start":84.65,"end":94.713,"words":[["Kort",84.79,85.009],["sagt",85.009,85.499],["middelradius",85.628,86.362],["femoghalvfjerds",86.362,86.994],["millimeter",86.994,87.715],["og",87.857,88.076],["T",88.076,88.36],["er",88.36,88.45],["fire",88.45,88.733],["gange",88.733,89.081],["nul",89.081,89.313],["komma",89.313,89.623],["tre",89.623,89.906],["gange",89.906,90.319],["to",90.319,90.563],["tusind",90.563,90.86],["gange",90.86,91.298],["nul",91.298,91.543],["komma",91.543,91.878],["nul",91.878,92.071],["syv",92.071,92.342],["fem",92.342,92.69],["altså",92.831,93.192],["hundrede",93.192,93.463],["og",93.463,93.476],["firs",93.476,93.837],["newtonmeter",93.837,94.713]],"text":"Kort sagt: middelradius femoghalvfjerds millimeter, og T er fire gange nul komma tre gange to tusind gange nul komma nul syv fem, altså hundrede og firs newtonmeter."}}}, { audio: 'eksamen-spm14.mp3', id: 'eksamen-spm14' });</script>
+</body>
+</html>

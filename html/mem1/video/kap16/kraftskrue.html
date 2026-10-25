@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bevægelsesskruer · video</title>
+<meta name="description" content="Gevind, hæve- og sænkemoment for bevægelsesskruer, selvlåsning og virkningsgrad.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 16: videoer</a><h1>Bevægelsesskruer</h1><span class="meta">MEM1 · kapitel 16 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Bevægelsesskruer"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Gevind, hæve- og sænkemoment for bevægelsesskruer, selvlåsning og virkningsgrad.</p><div class="chips"><a href="../../../../lab/mem1/kraftskrue.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel16_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l16">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Bevægelsesskruer (MEM1 kap. 16, slides 2–6)
+BP.scene({ header: 'MEM1 · kap. 16' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, dashed, PI } = B;
+
+  B.titel(0, 'Bevægelsesskruer', 'MEM1 · kapitel 16 · begreb (slide 2–6)', 'titel');
+  text(0, 'moment → stor aksialkraft', 640, 520, 42, 'red', wt('titel', 'moment') - 0.2, we('titel', 'aksialkraft'), { align: 'center' });
+
+  B.goto('samlinger', 1);
+  {
+    const t0 = L('samlinger').start;
+    text(1, 'adskillelige: bolte, skruer', 140, 150, 36, 'blue', wt('samlinger', 'adskillelige') - 0.2, we('samlinger', 'skruer'));
+    text(1, 'permanente: nitter, svejsning, lim', 640, 150, 32, 'red', wt('samlinger', 'permanente') - 0.2, we('samlinger', 'limninger'));
+    const tg = L('gevind').start, x0 = 160, y0 = 300;
+    const P = []; for (let i = 0; i <= 8; i++) P.push([x0 + 60 * i, i % 2 ? y0 + 50 : y0]);
+    line(1, P, 'black', 3, tg, tg + 0.8);
+    arrow(1, [[x0, y0 + 90], [x0 + 120, y0 + 90]], 'red', 2.2, wt('gevind', 'stigningen') - 0.2, wt('gevind', 'stigningen') + 0.2, 10); text(1, 'p', x0 + 60, y0 + 125, 30, 'red', wt('gevind', 'stigningen'), wt('gevind', 'stigningen') + 0.3);
+    text(1, 'd, d_1, p  ·  ledet l = n · p', 700, 320, 36, 'black', wt('gevind', 'Ledet') - 0.2, we('gevind', 'p', 1));
+    text(1, 'M12 × 1,75: d = 12, p = 1,75 mm', 700, 380, 32, 'blue', wt('gevind', 'M') - 0.1, we('gevind', 'millimeter'));
+    text(1, 'firkantgevind: højest η · trapezgevind: lettere at lave', 140, 520, 30, 'green', L('profiler').start + 0.3, we('profiler', 'fremstille'));
+  }
+
+  B.goto('hæve', 2);
+  {
+    const t0 = L('hæve').start;
+    const r = text(2, 'T_R = (F d_m / 2) · (l + π μ d_m) / (π d_m − μ l)', 140, 180, 40, 'red', t0 + 0.4, we('hæve', 'l', 1));
+    box(2, 115, 125, 980, 85, 'red', we('hæve', 'l', 1), we('hæve', 'l', 1) + 0.6);
+    text(2, 'T_L = (F d_m / 2) · (π μ d_m − l) / (π d_m + μ l)', 140, 290, 38, 'blue', L('saenke').start + 0.3, we('saenke', 'l', 1));
+    text(2, 'trapez: μ′ = μ / cos α', 140, 380, 38, 'black', L('trapez').start + 0.2, we('trapez', 'flankevinklen'));
+    const ts = L('selvlaas').start;
+    text(2, 'selvlåsende:  μ > tan λ = l / (π d_m)', 140, 490, 42, 'green', ts + 0.3, we('selvlaas', 'm'));
+    text(2, 'η = T_0 / T_R   ·   selvlåsende ⇒ η < 50 %', 140, 590, 38, 'red', L('virkning').start + 0.2, we('virkning', 'procent'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Hvorfor er en kugleomløbsskrue', 'ikke selvlåsende?'], ['μ < tan λ', 'lasten kan dreje skruen baglæns'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 16, slide 2–6 · Hamrock, Schmid & Jacobson, kap. 16', 'boltsamlinger', 'slut');
+  text(4, 'T_R = (F d_m/2)(l + πμd_m)/(πd_m − μl)', 200, 280, 40, 'red', L('slut').start + 0.4, we('slut', 'l', 1));
+  text(4, 'selvlåsende: μ > l/(π d_m)', 200, 370, 42, 'green', wt('slut', 'selvlåsende') - 0.1, we('slut', 'm'));
+});
+
+</script>
+<script>BP.live({"duration":125.958,"audio":"kraftskrue.mp3","order":["titel","samlinger","gevind","profiler","hæve","saenke","trapez","selvlaas","virkning","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":5.99,"words":[["Bevægelsesskruer",0.601,1.761],["Hvordan",2.755,3.052],["omsætter",3.052,3.554],["en",3.554,3.67],["skrue",3.67,4.121],["et",4.121,4.237],["moment",4.237,4.624],["til",4.624,4.765],["en",4.765,4.856],["stor",4.856,5.139],["aksialkraft",5.139,5.99]],"text":"Bevægelsesskruer. Hvordan omsætter en skrue et moment til en stor aksialkraft?"},"samlinger":{"start":7.21,"end":14.322,"words":[["Samlinger",7.324,7.917],["er",7.917,8.046],["enten",8.046,8.433],["adskillelige",8.433,9.18],["som",9.296,9.554],["bolte",9.554,9.902],["og",9.902,9.966],["skruer",9.966,10.572],["eller",10.714,10.933],["permanente",10.933,11.706],["som",11.848,12.105],["nitter",12.105,12.582],["svejsninger",12.724,13.549],["og",13.549,13.652],["limninger",13.652,14.322]],"text":"Samlinger er enten adskillelige, som bolte og skruer, eller permanente, som nitter, svejsninger og limninger."},"gevind":{"start":15.552,"end":31.246,"words":[["Et",15.692,15.808],["gevind",15.808,16.13],["beskrives",16.13,16.581],["ved",16.581,16.723],["den",16.723,16.891],["største",16.891,17.29],["diameter",17.29,17.728],["d",17.728,18.141],["kernediameteren",18.27,19.172],["d",19.172,19.404],["et",19.404,19.674],["og",19.674,19.777],["stigningen",19.777,20.241],["p",20.241,20.525],["Ledet",20.525,20.821],["l",20.821,21.014],["er",21.014,21.349],["hvor",21.491,21.646],["langt",21.646,21.916],["møtrikken",21.916,22.445],["flytter",22.445,22.728],["sig",22.728,22.909],["på",22.909,23.05],["én",23.05,23.244],["omgang",23.244,23.746],["og",23.927,24.03],["det",24.03,24.197],["er",24.197,24.275],["antallet",24.275,24.751],["af",24.752,24.803],["gevindgange",24.803,25.357],["gange",25.357,25.679],["p",25.679,26.027],["M",26.027,26.246],["tolv",26.246,26.491],["gange",26.491,26.788],["en",26.788,27.02],["komma",27.02,27.29],["syv",27.29,27.548],["fem",27.548,27.87],["betyder",27.87,28.231],["diameter",28.231,28.643],["tolv",28.643,28.978],["og",28.978,29.056],["stigning",29.056,29.507],["en",29.507,29.764],["komma",29.764,30.061],["syv",30.061,30.331],["fem",30.331,30.563],["millimeter",30.563,31.246]],"text":"Et gevind beskrives ved den største diameter d, kernediameteren d et og stigningen p. Ledet l er, hvor langt møtrikken flytter sig på én omgang, og det er antallet af gevindgange gange p. M tolv gange en komma syv fem betyder diameter tolv og stigning en komma syv fem millimeter."},"profiler":{"start":32.462,"end":43.996,"words":[["Bevægelsesskruer",32.602,33.504],["har",33.504,33.723],["flade",33.723,34.045],["profiler",34.045,34.703],["for",34.703,34.935],["at",34.935,34.96],["mindske",34.96,35.386],["friktionen",35.386,36.172],["Firkantgevind",37.063,38.068],["har",38.068,38.351],["den",38.351,38.506],["højeste",38.506,38.931],["virkningsgrad",38.931,39.794],["Trapezgevind",40.697,41.444],["har",41.444,41.624],["en",41.624,41.715],["flankevinkel",41.715,42.514],["og",42.514,42.72],["er",42.72,42.784],["lettere",42.784,43.235],["at",43.235,43.312],["fremstille",43.313,43.996]],"text":"Bevægelsesskruer har flade profiler for at mindske friktionen. Firkantgevind har den højeste virkningsgrad. Trapezgevind har en flankevinkel og er lettere at fremstille."},"hæve":{"start":45.22,"end":56.676,"words":[["Vi",45.36,45.463],["ser",45.463,45.721],["gevindet",45.721,46.146],["som",46.146,46.352],["et",46.352,46.43],["skråplan",46.43,47.126],["der",47.267,47.448],["er",47.448,47.499],["rullet",47.499,47.899],["op",47.899,48.298],["Momentet",49.202,49.64],["til",49.64,49.795],["at",49.795,49.821],["hæve",49.821,50.052],["lasten",50.052,50.516],["F",50.516,50.8],["er",50.8,50.967],["F",50.967,51.225],["d",51.225,51.431],["m",51.431,51.753],["over",51.754,52.011],["to",52.011,52.269],["gange",52.269,52.591],["l",52.591,52.772],["plus",52.772,53.029],["pi",53.029,53.248],["mu",53.248,53.493],["d",53.493,53.712],["m",53.712,54.034],["divideret",54.176,54.666],["med",54.666,54.872],["pi",54.872,55.104],["d",55.104,55.323],["m",55.323,55.555],["minus",55.555,55.955],["mu",55.955,56.174],["l.",56.174,56.676]],"text":"Vi ser gevindet som et skråplan, der er rullet op. Momentet til at hæve lasten F er F d m over to gange l plus pi mu d m, divideret med pi d m minus mu l."},"saenke":{"start":57.906,"end":65.172,"words":[["Momentet",58.033,58.471],["til",58.471,58.626],["at",58.626,58.665],["sænke",58.665,59.064],["er",59.064,59.27],["F",59.27,59.515],["d",59.515,59.709],["m",59.709,60.031],["over",60.031,60.276],["to",60.276,60.533],["gange",60.533,60.83],["pi",60.83,61.036],["mu",61.036,61.268],["d",61.268,61.526],["m",61.526,61.809],["minus",61.809,62.17],["l",62.17,62.531],["divideret",62.672,63.175],["med",63.175,63.407],["pi",63.407,63.652],["d",63.652,63.884],["m",63.884,64.167],["plus",64.167,64.477],["mu",64.477,64.709],["l.",64.709,65.172]],"text":"Momentet til at sænke er F d m over to gange pi mu d m minus l, divideret med pi d m plus mu l."},"trapez":{"start":66.392,"end":71.545,"words":[["For",66.519,66.687],["trapezgevind",66.687,67.46],["bruger",67.46,67.705],["man",67.705,67.872],["mu",67.872,68.079],["mærke",68.079,68.388],["lig",68.388,68.555],["mu",68.555,68.852],["divideret",68.852,69.535],["med",69.535,69.754],["cosinus",69.754,70.475],["til",70.475,70.63],["flankevinklen",70.63,71.545]],"text":"For trapezgevind bruger man mu mærke lig mu divideret med cosinus til flankevinklen."},"selvlaas":{"start":72.766,"end":83.294,"words":[["Skruen",72.88,73.331],["er",73.331,73.46],["selvlåsende",73.46,74.285],["hvis",74.427,74.607],["sænkemomentet",74.607,75.484],["er",75.484,75.599],["positivt",75.599,76.424],["Det",77.315,77.379],["kræver",77.379,77.921],["at",78.062,78.23],["mu",78.23,78.526],["er",78.526,78.591],["større",78.591,78.952],["end",78.952,79.055],["tangens",79.055,79.557],["til",79.557,79.66],["stigningsvinklen",79.66,80.601],["og",80.769,80.897],["tangens",80.897,81.4],["lambda",81.4,81.903],["er",81.903,82.083],["l",82.083,82.289],["over",82.289,82.547],["pi",82.547,82.792],["d",82.792,82.985],["m.",82.985,83.294]],"text":"Skruen er selvlåsende, hvis sænkemomentet er positivt. Det kræver, at mu er større end tangens til stigningsvinklen, og tangens lambda er l over pi d m."},"virkning":{"start":84.516,"end":93.665,"words":[["Virkningsgraden",84.656,85.532],["er",85.532,85.687],["det",85.687,85.79],["friktionsfrie",85.79,86.486],["moment",86.486,86.847],["divideret",86.847,87.569],["med",87.569,87.775],["hævemomentet",87.775,88.741],["En",89.632,89.748],["selvlåsende",89.748,90.341],["skrue",90.341,90.856],["kan",90.856,91.049],["ikke",91.05,91.346],["have",91.346,91.488],["en",91.488,91.591],["virkningsgrad",91.591,92.351],["over",92.351,92.647],["halvtreds",92.647,93.086],["procent",93.086,93.665]],"text":"Virkningsgraden er det friktionsfrie moment divideret med hævemomentet. En selvlåsende skrue kan ikke have en virkningsgrad over halvtreds procent."},"tjek_q":{"start":94.898,"end":100.877,"words":[["Tjek",94.999,95.321],["dig",95.321,95.501],["selv",95.501,95.927],["Hvorfor",96.831,97.089],["kan",97.089,97.269],["en",97.269,97.359],["kugleomløbsskrue",97.359,98.313],["med",98.313,98.532],["meget",98.532,98.841],["lav",98.841,99.073],["friktion",99.073,99.653],["ikke",99.653,99.924],["være",99.924,100.104],["selvlåsende",100.104,100.877]],"text":"Tjek dig selv. Hvorfor kan en kugleomløbsskrue med meget lav friktion ikke være selvlåsende?"},"tjek_a":{"start":104.762,"end":111.785,"words":[["Fordi",104.889,105.224],["mu",105.224,105.508],["så",105.508,105.766],["er",105.766,105.804],["mindre",105.804,106.307],["end",106.307,106.474],["tangens",106.474,107.003],["lambda",107.003,107.557],["Lasten",108.435,108.86],["kan",108.86,108.989],["dreje",108.989,109.285],["skruen",109.285,109.594],["baglæns",109.594,110.277],["så",110.419,110.625],["der",110.625,110.703],["skal",110.703,110.87],["være",110.87,111.051],["en",111.051,111.154],["bremse",111.154,111.785]],"text":"Fordi mu så er mindre end tangens lambda. Lasten kan dreje skruen baglæns, så der skal være en bremse."},"slut":{"start":113.008,"end":123.522,"words":[["Kort",113.135,113.341],["sagt",113.342,113.805],["hævemomentet",113.934,114.63],["er",114.63,114.862],["F",114.862,115.094],["d",115.094,115.287],["m",115.287,115.597],["over",115.597,115.829],["to",115.829,116.086],["gange",116.086,116.408],["l",116.409,116.589],["plus",116.589,116.847],["pi",116.847,117.053],["mu",117.053,117.272],["d",117.272,117.491],["m",117.491,117.826],["over",117.826,118.071],["pi",118.071,118.303],["d",118.303,118.496],["m",118.496,118.715],["minus",118.715,119.076],["mu",119.076,119.334],["l",119.334,119.656],["og",119.798,119.965],["skruen",119.965,120.287],["er",120.287,120.365],["selvlåsende",120.365,121.138],["når",121.28,121.434],["mu",121.434,121.705],["er",121.705,121.769],["større",121.769,122.117],["end",122.117,122.311],["l",122.311,122.581],["over",122.581,122.826],["pi",122.826,123.058],["d",123.058,123.238],["m.",123.238,123.522]],"text":"Kort sagt: hævemomentet er F d m over to gange l plus pi mu d m over pi d m minus mu l, og skruen er selvlåsende, når mu er større end l over pi d m."}}}, { audio: 'kraftskrue.mp3', id: 'kraftskrue' });</script>
+</body>
+</html>

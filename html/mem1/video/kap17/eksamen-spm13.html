@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eksamensspørgsmål 13b: trykfjeder · video</title>
+<meta name="description" content="Eksamensspørgsmål 13b: τmax ≈ 300 MPa, δ = 25,6 mm og k = 7,8 N/mm.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 17: videoer</a><h1>Eksamensspørgsmål 13b: trykfjeder</h1><span class="meta">MEM1 · kapitel 17 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Eksamensspørgsmål 13b: trykfjeder"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Eksamensspørgsmål 13b: τmax ≈ 300 MPa, δ = 25,6 mm og k = 7,8 N/mm.</p><div class="chips"><a href="fjeder-skrue.html">Se først: Skruetrykfjedre</a><a href="../../../../lab/mem1/trykfjeder.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel17_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l17">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Eksamensspørgsmål 13b: d = 4, D = 32, C = 8, Na = 10, G = 80 GPa, F = 200 N, Kw = 1,18 → τ ≈ 300 MPa, δ = 25,6 mm (slide 15)
+BP.scene({ header: 'MEM1 · kap. 17' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under } = B;
+
+  B.titel(0, 'Eksamensspørgsmål 13b', 'MEM1 · kapitel 17 · opgave (slide 15)', 'titel');
+  text(0, 'trykfjeder: τ og δ', 640, 520, 42, 'red', wt('titel', 'forskydningsspænding') - 0.2, we('titel', 'skruetrykfjeder'), { align: 'center' });
+
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start;
+    text(1, 'd = 4,  D = 32 mm,  C = 8,  N_a = 10,  G = 80 GPa,  F = 200 N', 140, 150, 32, 'black', t0 + 0.3, we('data', 'otte', 1));
+    text(1, 'K_w = 31/28 + 0,615/8 = 1,18 ✓', 140, 220, 38, 'green', L('wahl').start + 0.2, we('wahl', 'passer'));
+    text(1, 'τ = 1,18 · 8 · 200 · 32 / (π · 64)', 140, 310, 40, 'red', L('tau').start + 0.2, we('tau', 'fireogtres'));
+    const r = text(1, 'τ_{max} ≈ 300 MPa', 140, 390, 48, 'red', L('tau2').start + 0.1, we('tau2', 'megapascal'));
+    text(1, 'δ = 8 · 200 · 32³ · 10 / (80 000 · 4⁴)', 140, 480, 40, 'blue', L('delta').start + 0.2, we('delta', 'fjerde', 1));
+    const r2 = text(1, 'δ = 25,6 mm', 140, 560, 48, 'blue', L('delta2').start + 0.1, we('delta2', 'millimeter'));
+    box(1, 115, 340, 720, 250, 'red', we('delta2', 'millimeter'), we('delta2', 'millimeter') + 0.6);
+    text(1, 'k = 200 / 25,6 = 7,8 N/mm', 140, 660, 40, 'green', L('k').start + 0.2, we('k', 'millimeter'));
+  }
+
+  B.goto('tjek_q', 2);
+  B.tjek(2, ['N_a = 5 i stedet for 10.', 'Hvad bliver δ?'], ['12,8 mm', 'δ ∝ N_a'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 3);
+  B.slut(3, 'Abou-Hayt (2026), MEM1 Chapter 17, slide 15 (eksamensspm. 13) · Hamrock, Schmid & Jacobson, kap. 17', '', 'slut');
+  text(3, 'τ_{max} ≈ 300 MPa · δ = 25,6 mm', 200, 280, 44, 'red', L('slut').start + 0.4, we('slut', 'millimeter'));
+  text(3, 'k = 7,8 N/mm', 200, 370, 46, 'blue', wt('slut', 'k') - 0.1, we('slut', 'millimeter', 1));
+});
+
+</script>
+<script>BP.live({"duration":118.11,"audio":"eksamen-spm13.mp3","order":["titel","data","wahl","tau","tau2","delta","delta2","k","teori","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.82,"words":[["Eksamensspørgsmål",0.64,1.723],["tretten",1.723,2.187],["b",2.187,2.535],["Vi",3.438,3.528],["beregner",3.528,4.018],["den",4.018,4.211],["største",4.211,4.624],["forskydningsspænding",4.624,5.539],["og",5.539,5.732],["udbøjningen",5.732,6.505],["af",6.505,6.673],["en",6.673,6.776],["skruetrykfjeder",6.776,7.82]],"text":"Eksamensspørgsmål tretten b. Vi beregner den største forskydningsspænding og udbøjningen af en skruetrykfjeder."},"data":{"start":9.034,"end":24.459,"words":[["Tråden",9.161,9.599],["er",9.599,9.767],["fire",9.767,10.05],["millimeter",10.05,10.476],["tyk",10.476,10.888],["middeldiameteren",11.03,11.996],["er",11.996,12.151],["toogtredive",12.151,12.757],["millimeter",12.757,13.478],["så",13.62,13.878],["C",13.878,14.187],["er",14.187,14.393],["otte",14.393,14.806],["Der",15.696,15.825],["er",15.825,15.877],["ti",15.877,16.16],["aktive",16.16,16.534],["vindinger",16.534,17.217],["G",17.346,17.591],["er",17.591,17.681],["firs",17.681,17.99],["gigapascal",17.99,18.879],["og",19.021,19.253],["kraften",19.253,19.833],["er",19.833,19.988],["to",19.988,20.245],["hundrede",20.245,20.516],["newton",20.516,21.122],["Wahls",22.037,22.359],["faktor",22.359,22.9],["er",22.9,23.08],["en",23.08,23.338],["komma",23.338,23.725],["en",23.725,23.995],["otte",23.995,24.459]],"text":"Tråden er fire millimeter tyk, middeldiameteren er toogtredive millimeter, så C er otte. Der er ti aktive vindinger, G er firs gigapascal, og kraften er to hundrede newton. Wahls faktor er en komma en otte."},"wahl":{"start":25.68,"end":38.617,"words":[["Kontrol",25.807,26.245],["af",26.245,26.349],["Wahl",26.349,26.748],["fire",26.877,27.212],["C",27.212,27.431],["minus",27.431,27.779],["en",27.779,28.14],["over",28.14,28.423],["fire",28.423,28.694],["C",28.694,28.913],["minus",28.913,29.274],["fire",29.274,29.699],["er",29.699,29.841],["enogtredive",29.841,30.524],["over",30.524,30.782],["otteogtyve",30.782,31.568],["plus",31.696,31.98],["nul",31.98,32.148],["komma",32.148,32.508],["seks",32.508,32.882],["en",32.882,33.075],["fem",33.075,33.372],["over",33.372,33.668],["otte",33.668,34.132],["Det",34.996,35.125],["giver",35.125,35.512],["en",35.512,35.795],["komma",35.795,36.22],["en",36.22,36.504],["otte",36.504,36.981],["Det",37.856,38.024],["passer",38.024,38.617]],"text":"Kontrol af Wahl: fire C minus en over fire C minus fire er enogtredive over otteogtyve, plus nul komma seks en fem over otte. Det giver en komma en otte. Det passer."},"tau":{"start":39.854,"end":50.394,"words":[["Spændingen",39.968,40.484],["er",40.484,40.703],["K",40.703,40.948],["w",40.948,41.347],["gange",41.347,41.747],["otte",41.747,42.082],["F",42.082,42.275],["D",42.275,42.584],["over",42.584,42.855],["pi",42.855,43.1],["d",43.1,43.267],["i",43.267,43.435],["tredje",43.435,44.028],["en",44.157,44.376],["komma",44.376,44.736],["en",44.736,45.033],["otte",45.033,45.355],["gange",45.355,45.742],["otte",45.742,46.064],["gange",46.064,46.386],["to",46.386,46.618],["hundrede",46.618,46.85],["gange",46.85,47.146],["toogtredive",47.146,48.023],["divideret",48.164,48.757],["med",48.757,49.015],["pi",49.015,49.273],["gange",49.273,49.582],["fireogtres",49.582,50.394]],"text":"Spændingen er K w gange otte F D over pi d i tredje: en komma en otte gange otte gange to hundrede gange toogtredive, divideret med pi gange fireogtres."},"tau2":{"start":51.628,"end":54.088,"words":[["Det",51.755,51.833],["giver",51.833,52.103],["cirka",52.103,52.541],["tre",52.541,52.851],["hundrede",52.851,53.134],["megapascal",53.134,54.088]],"text":"Det giver cirka tre hundrede megapascal."},"delta":{"start":55.314,"end":65.828,"words":[["Udbøjningen",55.441,56.008],["er",56.008,56.266],["otte",56.266,56.562],["F",56.562,56.769],["D",56.769,56.949],["i",56.949,57.104],["tredje",57.104,57.555],["N",57.555,57.825],["a",57.825,58.096],["over",58.096,58.392],["G",58.392,58.624],["d",58.624,58.818],["i",58.818,59.011],["fjerde",59.011,59.526],["otte",59.655,59.952],["gange",59.952,60.261],["to",60.261,60.48],["hundrede",60.48,60.699],["gange",60.699,60.995],["toogtredive",60.995,61.678],["i",61.678,61.82],["tredje",61.82,62.168],["gange",62.168,62.465],["ti",62.465,62.864],["divideret",63.006,63.573],["med",63.573,63.779],["firs",63.779,64.088],["tusind",64.088,64.423],["gange",64.423,64.72],["fire",64.72,65.145],["i",65.145,65.3],["fjerde",65.3,65.828]],"text":"Udbøjningen er otte F D i tredje N a over G d i fjerde: otte gange to hundrede gange toogtredive i tredje gange ti, divideret med firs tusind gange fire i fjerde."},"delta2":{"start":67.064,"end":69.485,"words":[["Det",67.204,67.333],["er",67.333,67.449],["femogtyve",67.449,68.08],["komma",68.08,68.416],["seks",68.416,68.776],["millimeter",68.776,69.485]],"text":"Det er femogtyve komma seks millimeter."},"k":{"start":70.702,"end":78.02,"words":[["Fjederkonstanten",70.829,71.822],["er",71.822,72.028],["to",72.028,72.285],["hundrede",72.285,72.517],["divideret",72.517,73.175],["med",73.175,73.458],["femogtyve",73.458,74.09],["komma",74.09,74.36],["seks",74.36,74.889],["altså",75.03,75.443],["syv",75.443,75.726],["komma",75.726,76.061],["otte",76.061,76.396],["newton",76.396,76.873],["pr.",76.873,77.247],["millimeter",77.247,78.02]],"text":"Fjederkonstanten er to hundrede divideret med femogtyve komma seks, altså syv komma otte newton pr. millimeter."},"teori":{"start":79.236,"end":88.553,"words":[["Til",79.363,79.582],["del",79.582,79.84],["a",79.84,80.137],["skal",80.136,80.317],["du",80.317,80.433],["udlede",80.433,80.794],["spændingen",80.794,81.219],["fra",81.219,81.374],["vridning",81.374,81.747],["af",81.747,81.786],["tråden",81.786,82.237],["og",82.237,82.366],["forklare",82.366,82.817],["Wahls",82.817,83.113],["faktor",83.113,83.693],["og",83.835,83.977],["udlede",83.977,84.389],["fjederkonstanten",84.389,85.484],["Se",86.362,86.672],["videoen",86.672,87.251],["om",87.251,87.445],["skruetrykfjedre",87.445,88.553]],"text":"Til del a skal du udlede spændingen fra vridning af tråden og forklare Wahls faktor, og udlede fjederkonstanten. Se videoen om skruetrykfjedre."},"tjek_q":{"start":89.786,"end":96.01,"words":[["Tjek",89.887,90.209],["dig",90.209,90.389],["selv",90.389,90.815],["Hvad",91.719,91.874],["bliver",91.874,92.118],["udbøjningen",92.118,92.879],["hvis",93.021,93.291],["fjederen",93.291,93.613],["har",93.613,93.807],["fem",93.807,94.103],["aktive",94.103,94.528],["vindinger",94.528,95.057],["i",95.057,95.173],["stedet",95.173,95.482],["for",95.482,95.598],["ti",95.598,96.01]],"text":"Tjek dig selv. Hvad bliver udbøjningen, hvis fjederen har fem aktive vindinger i stedet for ti?"},"tjek_a":{"start":99.89,"end":105.43,"words":[["Halvdelen",100.017,100.713],["tolv",100.842,101.113],["komma",101.113,101.448],["otte",101.448,101.77],["millimeter",101.77,102.504],["fordi",102.633,103.046],["delta",103.046,103.419],["er",103.419,103.522],["proportional",103.522,104.309],["med",104.309,104.605],["N",104.605,104.927],["a.",104.927,105.43]],"text":"Halvdelen, tolv komma otte millimeter, fordi delta er proportional med N a."},"slut":{"start":106.648,"end":115.693,"words":[["Kort",106.775,106.981],["sagt",106.982,107.458],["tau",107.587,107.819],["max",107.819,108.167],["er",108.167,108.296],["cirka",108.296,108.683],["tre",108.683,108.966],["hundrede",108.966,109.172],["megapascal",109.172,110.023],["delta",110.152,110.551],["er",110.551,110.667],["femogtyve",110.667,111.247],["komma",111.247,111.543],["seks",111.543,111.866],["millimeter",111.866,112.561],["og",112.703,112.871],["k",112.871,113.154],["er",113.154,113.206],["syv",113.206,113.502],["komma",113.502,113.811],["otte",113.811,114.134],["newton",114.134,114.585],["pr.",114.585,114.92],["millimeter",114.92,115.693]],"text":"Kort sagt: tau max er cirka tre hundrede megapascal, delta er femogtyve komma seks millimeter, og k er syv komma otte newton pr. millimeter."}}}, { audio: 'eksamen-spm13.mp3', id: 'eksamen-spm13' });</script>
+</body>
+</html>

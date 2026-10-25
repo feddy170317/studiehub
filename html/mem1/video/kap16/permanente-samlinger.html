@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nitter, svejsninger og limninger · video</title>
+<meta name="description" content="Nitter, kantsvejsninger (t = 0,707 h), limninger og snaplåse.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 16: videoer</a><h1>Nitter, svejsninger og limninger</h1><span class="meta">MEM1 · kapitel 16 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Nitter, svejsninger og limninger"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Nitter, kantsvejsninger (t = 0,707 h), limninger og snaplåse.</p><div class="chips"><a href="../../Kapitel16_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l16">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Nitter, svejsninger og limninger (MEM1 kap. 16, slides 11–14)
+BP.scene({ header: 'MEM1 · kap. 16' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, hatch, rect, PI } = B;
+
+  B.titel(0, 'Permanente samlinger', 'MEM1 · kapitel 16 · begreb (slide 11–14)', 'titel');
+  text(0, 'nitter · svejsninger · limninger', 640, 520, 40, 'red', wt('titel', 'Nitter') - 0.2, we('titel', 'limninger'), { align: 'center' });
+
+  B.goto('nitter', 1);
+  {
+    const t0 = L('nitter').start, cx = 300;
+    line(1, rect(140, 260, 320, 40).concat([[140, 262]]), 'black', 3, t0, t0 + 0.4); line(1, rect(140, 300, 320, 40).concat([[140, 302]]), 'black', 3, t0 + 0.2, t0 + 0.6);
+    line(1, rect(cx - 14, 240, 28, 120).concat([[cx - 14, 242]]), 'red', 3, wt('nitter', 'stuke') - 0.3, wt('nitter', 'stuke') + 0.3);
+    line(1, B.ell(cx, 240, 32, 16, PI, 2 * PI), 'red', 3, wt('nitter', 'hoved') - 0.3, wt('nitter', 'hoved')); line(1, B.ell(cx, 360, 32, 16, 0, PI), 'red', 3, wt('nitter', 'hoved'), wt('nitter', 'hoved') + 0.3);
+    arrow(1, [[140, 280], [60, 280]], 'blue', 3.4, t0 + 0.6, t0 + 0.9, 12); arrow(1, [[460, 320], [540, 320]], 'blue', 3.4, t0 + 0.7, t0 + 1.0, 12);
+    text(1, 'forskydning: τ = 4F / (n π d²)', 620, 230, 36, 'red', L('nitte_tau').start + 0.2, we('nitte_tau', 'anden'));
+    text(1, 'hultryk: σ_b = F / (n d t)', 620, 300, 36, 'blue', L('nitte_tryk').start + 0.2, we('nitte_tryk', 't'));
+    text(1, 'trækbrud i nettotværsnit', 620, 370, 36, 'black', L('nitte_traek').start + 0.2, we('nitte_traek', 'hullerne'));
+    const ts = L('svejs').start;
+    line(1, [[140, 600], [400, 600]], 'black', 3, ts, ts + 0.3); line(1, [[140, 600], [140, 480]], 'black', 3, ts + 0.1, ts + 0.4);
+    hatch(1, [[140, 600], [140, 540], [200, 600]], 'red', ts + 0.3, ts + 0.6, { gap: 5 });
+    line(1, [[140, 600], [170, 570]], 'blue', 2.4, wt('svejs', 'Halstykkelsen') - 0.2, wt('svejs', 'Halstykkelsen') + 0.3);
+    text(1, 't = 0,707 h', 240, 560, 34, 'blue', wt('svejs', 'Halstykkelsen'), we('svejs', 'h'));
+    text(1, 'τ = F / (0,707 h L)', 620, 540, 40, 'red', L('svejs_tau').start + 0.2, we('svejs_tau', 'L'));
+  }
+
+  B.goto('lim', 2);
+  {
+    const t0 = L('lim').start;
+    text(2, 'lim: τ = F / (W L), godt i forskydning', 140, 180, 38, 'green', t0 + 0.4, we('lim', 'overlapslængde'));
+    text(2, 'tåler dårligt afskalning → sikr kanterne', 140, 260, 36, 'red', wt('lim', 'afskalning') - 0.6, we('lim', 'sikres'));
+    text(2, 'snaplås: krog = indspændt bjælke, ε < ε_y', 140, 380, 36, 'blue', L('snap').start + 0.3, we('snap', 'flydegrænsen'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Kantsvejsning med h = 8 mm.', 'Halstykkelse?'], ['t = 0,707 · 8 ≈ 5,7 mm'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 16, slide 11–14 · Hamrock, Schmid & Jacobson, kap. 16', 'eksamensspørgsmål 12', 'slut');
+  text(4, 'nitter: forskydning · hultryk · trækbrud', 200, 280, 40, 'blue', L('slut').start + 0.4, we('slut', 'trækbrud'));
+  text(4, 'svejsning: τ = F / (0,707 h L)', 200, 360, 42, 'red', wt('slut', 'svejsninger') - 0.1, we('slut', 'h'));
+});
+
+</script>
+<script>BP.live({"duration":98.07,"audio":"permanente-samlinger.mp3","order":["titel","nitter","nitte_tau","nitte_tryk","nitte_traek","svejs","svejs_tau","lim","snap","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":5.19,"words":[["Permanente",0.601,1.181],["samlinger",1.181,1.941],["Nitter",2.819,3.373],["svejsninger",3.515,4.378],["og",4.378,4.481],["limninger",4.481,5.19]],"text":"Permanente samlinger. Nitter, svejsninger og limninger."},"nitter":{"start":6.418,"end":13.673,"words":[["En",6.545,6.661],["nitte",6.661,6.945],["sættes",6.945,7.331],["ved",7.331,7.473],["at",7.473,7.499],["stuke",7.499,7.86],["skaftet",7.86,8.298],["plastisk",8.298,8.942],["så",9.123,9.342],["der",9.342,9.419],["dannes",9.419,9.715],["et",9.715,9.857],["hoved",9.857,10.334],["En",11.238,11.341],["nittesamling",11.341,12.088],["tjekkes",12.088,12.513],["for",12.513,12.629],["tre",12.629,12.926],["brudformer",12.926,13.673]],"text":"En nitte sættes ved at stuke skaftet plastisk, så der dannes et hoved. En nittesamling tjekkes for tre brudformer."},"nitte_tau":{"start":14.904,"end":19.632,"words":[["Forskydning",15.018,15.547],["af",15.547,15.598],["skaftet",15.598,16.217],["tau",16.346,16.668],["er",16.668,16.823],["fire",16.823,17.158],["F",17.158,17.299],["divideret",17.299,17.969],["med",17.969,18.279],["n",18.279,18.511],["pi",18.511,18.756],["d",18.756,19.026],["i",19.026,19.219],["anden",19.219,19.632]],"text":"Forskydning af skaftet: tau er fire F divideret med n pi d i anden."},"nitte_tryk":{"start":20.846,"end":25.097,"words":[["Hultryk",20.96,21.373],["i",21.373,21.437],["pladen",21.437,21.914],["sigma",22.043,22.584],["b",22.584,22.868],["er",22.868,22.996],["F",22.997,23.216],["divideret",23.216,23.911],["med",23.911,24.208],["n",24.208,24.44],["d",24.44,24.633],["t.",24.633,25.097]],"text":"Hultryk i pladen: sigma b er F divideret med n d t."},"nitte_traek":{"start":26.332,"end":29.449,"words":[["Og",26.472,26.537],["trækbrud",26.537,27.091],["i",27.091,27.194],["pladens",27.194,27.593],["nettotværsnit",27.593,28.521],["mellem",28.521,28.908],["hullerne",28.908,29.449]],"text":"Og trækbrud i pladens nettotværsnit mellem hullerne."},"svejs":{"start":30.666,"end":38.926,"words":[["En",30.806,30.922],["kantsvejsning",30.922,31.76],["antages",31.76,32.262],["at",32.262,32.34],["svigte",32.34,32.739],["ved",32.739,32.907],["forskydning",32.907,33.564],["i",33.564,33.719],["halsen",33.719,34.363],["Halstykkelsen",35.254,36.065],["er",36.065,36.233],["nul",36.233,36.478],["komma",36.478,36.877],["syv",36.877,37.212],["nul",37.212,37.393],["syv",37.393,37.676],["gange",37.676,37.998],["benlængden",37.998,38.565],["h.",38.565,38.926]],"text":"En kantsvejsning antages at svigte ved forskydning i halsen. Halstykkelsen er nul komma syv nul syv gange benlængden h."},"svejs_tau":{"start":40.16,"end":45.21,"words":[["Så",40.287,40.545],["er",40.545,40.674],["tau",40.674,40.957],["lig",40.957,41.164],["F",41.164,41.331],["divideret",41.331,42.014],["med",42.014,42.323],["nul",42.323,42.568],["komma",42.568,42.955],["syv",42.955,43.264],["nul",43.264,43.445],["syv",43.445,43.715],["gange",43.715,44.153],["h",44.153,44.45],["gange",44.45,44.759],["L.",44.759,45.21]],"text":"Så er tau lig F divideret med nul komma syv nul syv gange h gange L."},"lim":{"start":46.438,"end":57.92,"words":[["En",46.565,46.681],["limning",46.681,47.171],["bærer",47.171,47.429],["bedst",47.429,47.777],["i",47.777,47.931],["ren",47.931,48.189],["forskydning",48.189,48.924],["Middelspændingen",49.827,50.562],["er",50.562,50.768],["F",50.768,50.948],["divideret",50.948,51.67],["med",51.67,51.863],["bredde",51.863,52.173],["gange",52.173,52.546],["overlapslængde",52.546,53.526],["Men",54.428,54.569],["lim",54.569,54.827],["tåler",54.827,55.188],["dårligt",55.188,55.575],["afskalning",55.575,56.322],["så",56.464,56.67],["kanterne",56.67,57.134],["skal",57.134,57.288],["sikres",57.289,57.92]],"text":"En limning bærer bedst i ren forskydning. Middelspændingen er F divideret med bredde gange overlapslængde. Men lim tåler dårligt afskalning, så kanterne skal sikres."},"snap":{"start":59.148,"end":67.602,"words":[["En",59.275,59.391],["snaplås",59.391,60.074],["bruger",60.074,60.422],["materialets",60.422,61.195],["elasticitet",61.195,62.149],["Krogen",63.066,63.452],["er",63.452,63.633],["en",63.633,63.723],["lille",63.723,64.032],["indspændt",64.032,64.522],["bjælke",64.522,65.037],["og",65.179,65.346],["tøjningen",65.346,65.888],["skal",65.888,66.055],["holdes",66.055,66.416],["under",66.416,66.674],["flydegrænsen",66.674,67.602]],"text":"En snaplås bruger materialets elasticitet. Krogen er en lille indspændt bjælke, og tøjningen skal holdes under flydegrænsen."},"tjek_q":{"start":68.834,"end":75.959,"words":[["Tjek",68.935,69.257],["dig",69.257,69.437],["selv",69.437,69.863],["En",70.767,70.896],["kantsvejsning",70.896,71.695],["har",71.695,71.862],["benlængden",71.862,72.571],["otte",72.571,72.893],["millimeter",72.893,73.641],["Hvad",74.503,74.877],["er",74.877,75.032],["halstykkelsen",75.032,75.959]],"text":"Tjek dig selv. En kantsvejsning har benlængden otte millimeter. Hvad er halstykkelsen?"},"tjek_a":{"start":79.826,"end":84.399,"words":[["Nul",79.966,80.172],["komma",80.172,80.546],["syv",80.546,80.868],["nul",80.868,81.049],["syv",81.049,81.293],["gange",81.294,81.629],["otte",81.629,82.08],["cirka",82.208,82.763],["fem",82.763,83.046],["komma",83.046,83.317],["syv",83.317,83.652],["millimeter",83.652,84.399]],"text":"Nul komma syv nul syv gange otte, cirka fem komma syv millimeter."},"slut":{"start":85.624,"end":95.648,"words":[["Kort",85.764,85.97],["sagt",85.97,86.447],["nitter",86.576,86.885],["tjekkes",86.885,87.272],["for",87.272,87.401],["forskydning",87.401,88.084],["hultryk",88.2,88.844],["og",88.844,88.947],["trækbrud",88.947,89.553],["svejsninger",89.695,90.3],["for",90.3,90.455],["forskydning",90.455,90.996],["i",90.996,91.138],["halsen",91.138,91.499],["nul",91.499,91.692],["komma",91.692,92.079],["syv",92.079,92.388],["nul",92.388,92.53],["syv",92.53,92.787],["h",92.787,93.084],["og",93.277,93.38],["limninger",93.38,93.896],["i",93.896,93.986],["forskydning",93.986,94.643],["uden",94.643,94.939],["afskalning",94.939,95.648]],"text":"Kort sagt: nitter tjekkes for forskydning, hultryk og trækbrud, svejsninger for forskydning i halsen nul komma syv nul syv h, og limninger i forskydning uden afskalning."}}}, { audio: 'permanente-samlinger.mp3', id: 'permanente-samlinger' });</script>
+</body>
+</html>

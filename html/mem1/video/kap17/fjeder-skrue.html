@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skruetrykfjedre · video</title>
+<meta name="description" content="Fjederindeks, Wahls faktor, τmax = Kw 8FD/(πd³), udbøjning og fjederkonstant.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 17: videoer</a><h1>Skruetrykfjedre</h1><span class="meta">MEM1 · kapitel 17 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Skruetrykfjedre"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Fjederindeks, Wahls faktor, τmax = Kw 8FD/(πd³), udbøjning og fjederkonstant.</p><div class="chips"><a href="../../../../lab/mem1/trykfjeder.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel17_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l17">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Skruetrykfjedre (MEM1 kap. 17, slides 2–8 og 17)
+BP.scene({ header: 'MEM1 · kap. 17' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, dashed, PI, TAU } = B;
+
+  B.titel(0, 'Skruetrykfjedre', 'MEM1 · kapitel 17 · begreb (slide 2–8)', 'titel');
+  text(0, 'spænding i tråden og udbøjning', 640, 520, 40, 'red', wt('titel', 'spændingen') - 0.2, we('titel', 'efter'), { align: 'center' });
+
+  B.goto('funktion', 1);
+  {
+    const t0 = L('funktion').start, cx = 280;
+    const P = []; for (let j = 0; j <= 160; j++) { const u = j / 160; P.push([cx + 80 * Math.cos(u * 8 * TAU), 180 + 380 * u + 14 * Math.sin(u * 8 * TAU)]); }
+    line(1, P, 'blue', 3, t0, t0 + 1.2);
+    arrow(1, [[cx, 110], [cx, 170]], 'red', 4, wt('materiale', 'Fjedermaterialer') - 0.6, wt('materiale', 'Fjedermaterialer') - 0.2); text(1, 'F', cx + 14, 130, 36, 'red', wt('materiale', 'Fjedermaterialer') - 0.4, wt('materiale', 'Fjedermaterialer'));
+    text(1, 'energi · stød · kontakttryk · måling', 520, 200, 32, 'black', wt('funktion', 'lagrer') - 0.1, we('funktion', 'kraft'));
+    text(1, 'S_{ut} = A / d^m', 520, 300, 44, 'blue', wt('materiale', 'Trækstyrken') - 0.1, we('materiale', 'm'));
+    text(1, 'tyndere tråd ⇒ stærkere', 520, 360, 32, 'black', wt('materiale', 'tyndere') - 0.2, we('materiale', 'er', 1));
+    text(1, 'tråden er mest vredet', 520, 460, 36, 'red', L('vridning').start + 0.2, we('vridning', 'forskydning'));
+    text(1, 'C = D / d   (4 ≤ C ≤ 12)', 520, 550, 42, 'green', L('index').start + 0.2, we('index', 'tolv'));
+  }
+
+  B.goto('wahl', 2);
+  {
+    const t0 = L('wahl').start;
+    text(2, 'K_w = (4C − 1)/(4C − 4) + 0,615 / C', 140, 180, 44, 'blue', t0 + 0.3, we('wahl', 'C', 2));
+    const r = text(2, 'τ_{max} = K_w · 8 F D / (π d³)', 140, 290, 50, 'red', L('tau').start + 0.3, we('tau', 'tredje'));
+    box(2, 115, 230, 760, 90, 'red', we('tau', 'tredje'), we('tau', 'tredje') + 0.6);
+    text(2, 'δ = 8 F D³ N_a / (G d⁴)', 140, 410, 46, 'blue', L('delta').start + 0.3, we('delta', 'forskydningsmodulet'));
+    text(2, 'k = G d⁴ / (8 D³ N_a)', 140, 500, 46, 'green', L('k').start + 0.2, wt('k', 'Den'));
+    text(2, 'meget følsom over for d', 700, 500, 32, 'green', wt('k', 'følsom') - 0.2, we('k', 'tråddiameteren'));
+    text(2, 'knæk: tjek hvis L_0 / D > 4', 140, 610, 38, 'red', L('knaek').start + 0.2, we('knaek', 'D'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Tråden 10 % tykkere.', 'Hvad sker der med k?'], ['1,1⁴ ≈ 1,46', '≈ 46 % stivere'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 17, slide 2–8 · Hamrock, Schmid & Jacobson, kap. 17', 'andre fjedretyper', 'slut');
+  text(4, 'C = D/d · τ_{max} = K_w 8FD/(πd³)', 200, 280, 40, 'red', L('slut').start + 0.4, we('slut', 'tredje'));
+  text(4, 'k = G d⁴ / (8 D³ N_a)', 200, 360, 44, 'blue', wt('slut', 'k') - 0.1, we('slut', 'a'));
+});
+
+</script>
+<script>BP.live({"duration":126.116,"audio":"fjeder-skrue.mp3","order":["titel","funktion","materiale","vridning","index","wahl","tau","delta","k","knaek","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":6.299,"words":[["Skruetrykfjedre",0.6,1.825],["Hvor",2.82,3.013],["stor",3.013,3.322],["er",3.322,3.361],["spændingen",3.361,3.812],["i",3.812,3.876],["tråden",3.876,4.379],["og",4.521,4.649],["hvor",4.649,4.791],["meget",4.791,5.088],["giver",5.088,5.358],["fjederen",5.358,5.758],["efter",5.758,6.299]],"text":"Skruetrykfjedre. Hvor stor er spændingen i tråden, og hvor meget giver fjederen efter?"},"funktion":{"start":7.522,"end":17.78,"words":[["En",7.649,7.765],["fjeder",7.765,8.165],["er",8.165,8.358],["et",8.358,8.461],["elastisk",8.461,9.015],["element",9.015,9.621],["der",9.763,9.879],["deformeres",9.879,10.446],["meget",10.446,10.884],["og",10.884,11.026],["vender",11.026,11.296],["tilbage",11.296,11.953],["Fjedre",12.831,13.179],["lagrer",13.179,13.488],["energi",13.488,14.184],["optager",14.275,14.738],["stød",14.738,15.19],["holder",15.331,15.718],["et",15.718,15.795],["kontakttryk",15.795,16.62],["eller",16.62,16.839],["måler",16.839,17.174],["en",17.174,17.29],["kraft",17.29,17.78]],"text":"En fjeder er et elastisk element, der deformeres meget og vender tilbage. Fjedre lagrer energi, optager stød, holder et kontakttryk eller måler en kraft."},"materiale":{"start":19.008,"end":32.397,"words":[["Fjedermaterialer",19.135,20.218],["skal",20.218,20.411],["have",20.411,20.501],["høj",20.501,20.733],["flydespænding",20.733,21.506],["og",21.506,21.713],["udmattelsesstyrke",21.713,22.808],["Trækstyrken",23.686,24.304],["stiger",24.304,24.871],["jo",24.974,25.142],["tyndere",25.142,25.464],["tråden",25.464,25.761],["er",25.761,26.07],["S",26.199,26.456],["u",26.456,26.585],["t",26.585,26.869],["er",26.869,27.011],["A",27.011,27.049],["divideret",27.049,27.616],["med",27.616,27.797],["d",27.797,28.067],["i",28.067,28.209],["m.",28.209,28.338],["Typiske",28.338,28.815],["materialer",28.815,29.459],["er",29.459,29.562],["pianotråd",29.562,30.271],["oliehærdet",30.413,30.967],["tråd",30.967,31.366],["og",31.366,31.495],["rustfrit",31.495,31.959],["stål",31.959,32.397]],"text":"Fjedermaterialer skal have høj flydespænding og udmattelsesstyrke. Trækstyrken stiger, jo tyndere tråden er: S u t er A divideret med d i m. Typiske materialer er pianotråd, oliehærdet tråd og rustfrit stål."},"vridning":{"start":33.614,"end":40.199,"words":[["Når",33.754,33.909],["en",33.909,33.986],["skruefjeder",33.986,34.605],["trykkes",34.605,34.953],["sammen",34.953,35.442],["bliver",35.584,35.739],["tråden",35.739,36.164],["mest",36.164,36.486],["vredet",36.486,36.963],["Der",37.854,37.931],["kommer",37.931,38.253],["også",38.253,38.653],["en",38.653,38.872],["direkte",38.872,39.413],["forskydning",39.413,40.199]],"text":"Når en skruefjeder trykkes sammen, bliver tråden mest vredet. Der kommer også en direkte forskydning."},"index":{"start":41.428,"end":48.709,"words":[["Fjederindekset",41.555,42.367],["C",42.367,42.767],["er",42.767,42.908],["middeldiameteren",42.908,43.759],["D",43.759,43.939],["divideret",43.939,44.648],["med",44.648,44.854],["trådtykkelsen",44.854,45.64],["d.",45.64,46.053],["Det",46.956,47.034],["bør",47.034,47.188],["ligge",47.188,47.433],["mellem",47.433,47.871],["fire",47.871,48.219],["og",48.219,48.258],["tolv",48.258,48.709]],"text":"Fjederindekset C er middeldiameteren D divideret med trådtykkelsen d. Det bør ligge mellem fire og tolv."},"wahl":{"start":49.938,"end":59.537,"words":[["Krumningen",50.065,50.529],["og",50.529,50.658],["den",50.658,50.813],["direkte",50.813,51.251],["forskydning",51.251,51.753],["samles",51.753,52.192],["i",52.192,52.333],["Wahls",52.333,52.656],["faktor",52.656,53.223],["K",53.351,53.622],["w",53.622,54.137],["er",54.137,54.228],["fire",54.228,54.511],["C",54.511,54.743],["minus",54.743,55.078],["en",55.078,55.426],["over",55.426,55.697],["fire",55.697,55.98],["C",55.98,56.212],["minus",56.212,56.534],["fire",56.534,56.985],["plus",57.114,57.398],["nul",57.398,57.578],["komma",57.578,57.978],["seks",57.978,58.39],["en",58.39,58.583],["fem",58.583,58.893],["over",58.893,59.137],["C.",59.138,59.537]],"text":"Krumningen og den direkte forskydning samles i Wahls faktor: K w er fire C minus en over fire C minus fire, plus nul komma seks en fem over C."},"tau":{"start":60.752,"end":69.077,"words":[["Den",60.879,60.995],["største",60.995,61.433],["forskydningsspænding",61.433,62.387],["sidder",62.387,62.787],["på",62.787,62.98],["indersiden",62.98,63.637],["af",63.637,63.766],["vindingen",63.766,64.449],["Den",65.34,65.468],["er",65.468,65.546],["K",65.546,65.816],["w",65.816,66.267],["gange",66.267,66.654],["otte",66.654,66.976],["F",66.976,67.182],["D",67.182,67.492],["over",67.492,67.775],["pi",67.775,68.059],["d",68.059,68.304],["i",68.304,68.51],["tredje",68.51,69.077]],"text":"Den største forskydningsspænding sidder på indersiden af vindingen. Den er K w gange otte F D over pi d i tredje."},"delta":{"start":70.294,"end":79.055,"words":[["Udbøjningen",70.421,70.975],["er",70.975,71.207],["otte",71.207,71.491],["F",71.491,71.646],["D",71.646,71.813],["i",71.813,71.942],["tredje",71.942,72.367],["N",72.367,72.56],["a",72.561,72.625],["divideret",72.625,73.243],["med",73.244,73.501],["G",73.501,73.72],["d",73.72,73.901],["i",73.901,74.055],["fjerde",74.055,74.558],["hvor",74.7,75.189],["N",75.189,75.383],["a",75.383,75.653],["er",75.653,75.782],["antallet",75.782,76.323],["af",76.323,76.401],["aktive",76.401,76.877],["vindinger",76.877,77.419],["og",77.419,77.522],["G",77.522,77.792],["er",77.792,77.87],["forskydningsmodulet",77.87,79.055]],"text":"Udbøjningen er otte F D i tredje N a divideret med G d i fjerde, hvor N a er antallet af aktive vindinger og G er forskydningsmodulet."},"k":{"start":80.268,"end":88.683,"words":[["Fjederkonstanten",80.395,81.388],["er",81.388,81.568],["k",81.568,81.826],["lig",81.826,81.98],["G",81.98,82.187],["d",82.187,82.38],["i",82.38,82.56],["fjerde",82.56,83.063],["over",83.063,83.385],["otte",83.385,83.694],["D",83.694,83.875],["i",83.875,84.029],["tredje",84.029,84.48],["N",84.48,84.79],["a.",84.79,85.292],["Den",86.196,86.312],["er",86.312,86.376],["meget",86.376,86.66],["følsom",86.66,87.227],["over",87.227,87.523],["for",87.523,87.678],["tråddiameteren",87.678,88.683]],"text":"Fjederkonstanten er k lig G d i fjerde over otte D i tredje N a. Den er meget følsom over for tråddiameteren."},"knaek":{"start":89.906,"end":97.483,"words":[["En",90.046,90.149],["slank",90.149,90.523],["trykfjeder",90.523,91.129],["kan",91.129,91.283],["knække",91.283,91.644],["ud",91.644,91.85],["til",91.85,91.966],["siden",91.966,92.533],["Tjek",93.411,93.656],["stabiliteten",93.656,94.519],["hvis",94.648,94.893],["den",94.893,95.048],["frie",95.048,95.305],["længde",95.305,95.692],["er",95.692,95.834],["mere",95.834,96.233],["end",96.233,96.414],["fire",96.414,96.749],["gange",96.749,97.084],["D.",97.084,97.483]],"text":"En slank trykfjeder kan knække ud til siden. Tjek stabiliteten, hvis den frie længde er mere end fire gange D."},"tjek_q":{"start":98.704,"end":104.516,"words":[["Tjek",98.805,99.127],["dig",99.127,99.307],["selv",99.307,99.733],["Hvad",100.65,100.753],["sker",100.753,101.036],["der",101.036,101.152],["med",101.152,101.346],["fjederkonstanten",101.346,102.428],["hvis",102.557,102.75],["tråden",102.75,103.085],["gøres",103.085,103.356],["ti",103.356,103.575],["procent",103.575,103.949],["tykkere",103.949,104.516]],"text":"Tjek dig selv. Hvad sker der med fjederkonstanten, hvis tråden gøres ti procent tykkere?"},"tjek_a":{"start":108.4,"end":112.522,"words":[["Den",108.527,108.656],["stiger",108.656,108.978],["med",108.978,109.21],["en",109.21,109.442],["komma",109.442,109.777],["en",109.777,109.893],["i",109.893,109.945],["fjerde",109.945,110.447],["altså",110.576,110.911],["cirka",110.911,111.298],["seksogfyrre",111.298,111.955],["procent",111.955,112.522]],"text":"Den stiger med en komma en i fjerde, altså cirka seksogfyrre procent."},"slut":{"start":113.742,"end":123.702,"words":[["Kort",113.869,114.075],["sagt",114.076,114.565],["C",114.694,115.055],["er",115.055,115.158],["D",115.158,115.416],["over",115.416,115.609],["d",115.609,116.021],["tau",116.15,116.421],["max",116.421,116.795],["er",116.795,116.988],["K",116.988,117.246],["w",117.246,117.735],["otte",117.735,118.006],["F",118.006,118.186],["D",118.186,118.47],["over",118.47,118.753],["pi",118.753,118.985],["d",118.985,119.153],["i",119.153,119.307],["tredje",119.307,119.823],["og",119.965,120.132],["k",120.132,120.416],["er",120.416,120.506],["G",120.506,120.738],["d",120.738,120.905],["i",120.905,121.073],["fjerde",121.073,121.575],["over",121.575,121.885],["otte",121.885,122.22],["D",122.22,122.4],["i",122.4,122.555],["tredje",122.555,122.954],["N",122.954,123.264],["a.",123.264,123.702]],"text":"Kort sagt: C er D over d, tau max er K w otte F D over pi d i tredje, og k er G d i fjerde over otte D i tredje N a."}}}, { audio: 'fjeder-skrue.mp3', id: 'fjeder-skrue' });</script>
+</body>
+</html>

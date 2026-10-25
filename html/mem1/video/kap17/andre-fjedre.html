@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trækfjedre, torsionsfjedre og andre fjedre · video</title>
+<meta name="description" content="Trækfjedre, torsionsfjedre, bladfjedre, gasfjedre, tallerkenfjedre og bølgefjedre.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 17: videoer</a><h1>Trækfjedre, torsionsfjedre og andre fjedre</h1><span class="meta">MEM1 · kapitel 17 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Trækfjedre, torsionsfjedre og andre fjedre"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Trækfjedre, torsionsfjedre, bladfjedre, gasfjedre, tallerkenfjedre og bølgefjedre.</p><div class="chips"><a href="fjeder-skrue.html">Se først: Skruetrykfjedre</a><a href="../../Kapitel17_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l17">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Andre fjedretyper (MEM1 kap. 17, slides 9–14)
+BP.scene({ header: 'MEM1 · kap. 17' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, rect, PI, TAU } = B;
+
+  B.titel(0, 'Andre fjedretyper', 'MEM1 · kapitel 17 · begreb (slide 9–14)', 'titel');
+  text(0, 'træk · torsion · blad · tallerken', 640, 520, 40, 'red', wt('titel', 'Trækfjedre') - 0.2, we('titel', 'tallerkenfjedre'), { align: 'center' });
+
+  B.goto('traek', 1);
+  {
+    const t0 = L('traek').start, cx = 260;
+    const P = []; for (let j = 0; j <= 120; j++) { const u = j / 120; P.push([cx + 60 * Math.cos(u * 10 * TAU), 260 + 200 * u + 8 * Math.sin(u * 10 * TAU)]); }
+    line(1, P, 'blue', 3, t0, t0 + 1.0);
+    line(1, ell(cx, 220, 40, 40, 0.5 * PI, 2.5 * PI), 'red', 3, wt('kroge', 'Krogene') - 0.2, wt('kroge', 'Krogene') + 0.4);
+    line(1, ell(cx, 500, 40, 40, -0.5 * PI, 1.5 * PI), 'red', 3, wt('kroge', 'Krogene'), wt('kroge', 'Krogene') + 0.5);
+    text(1, 'trækfjeder: forspænding F_i', 480, 220, 36, 'blue', t0 + 0.2, we('traek', 'i', 1));
+    text(1, 'knækker ved krogen (bøjning + vridning)', 480, 290, 30, 'red', L('kroge').start + 0.3, we('kroge', 'krogen'));
+    const tt = L('torsion').start;
+    text(1, 'torsionsfjeder: tråden i bøjning', 480, 400, 36, 'green', tt + 0.2, wt('torsion', 'sigma'));
+    text(1, 'σ_{max} = K_i · 32 T / (π d³)', 480, 460, 38, 'green', wt('torsion', 'sigma') - 0.1, we('torsion', 'tredje'));
+    text(1, 'belast så vindingerne strammes', 480, 530, 30, 'black', L('retning').start + 0.2, we('retning', 'åbnes'));
+  }
+
+  B.goto('blad', 2);
+  {
+    const t0 = L('blad').start;
+    for (let i = 0; i < 4; i++) { const w = 500 - 100 * i; line(2, [[640 - w / 2, 220 + 18 * i], [640 + w / 2, 220 + 18 * i]], 'black', 6, t0 + 0.1 * i, t0 + 0.3 + 0.1 * i); }
+    text(2, 'σ = 6 F L / (n b h²)', 140, 360, 44, 'red', wt('blad', 'Spændingen') - 0.1, we('blad', 'anden'));
+    text(2, 'δ = 6 F L³ / (n E b h³)', 700, 360, 40, 'blue', wt('blad', 'udbøjningen') - 0.1, we('blad', 'tredje', 1));
+    text(2, 'gasfjeder: næsten konstant kraft (bagklap)', 140, 460, 32, 'black', L('gas').start + 0.2, we('gas', 'bagklapper'));
+    text(2, 'tallerkenfjedre: parallelt = mere kraft, modsat = mere vandring', 140, 530, 28, 'green', L('belleville').start + 0.3, we('belleville', 'vandring'));
+    text(2, 'bølgefjedre: op til halv højde', 140, 600, 32, 'blue', L('boelge').start + 0.2, we('boelge', 'lejer'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Hvorfor knækker trækfjedre', 'typisk ved krogen?'], ['skarp overgang', 'bøjning + vridning + K_t'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 17, slide 9–14 · Hamrock, Schmid & Jacobson, kap. 17', 'eksamensspørgsmål 13', 'slut');
+  text(4, 'træk: F_i, svigt ved krogen', 200, 270, 40, 'blue', L('slut').start + 0.4, we('slut', 'krogen'));
+  text(4, 'torsion: bøjning · blad: σ = 6FL/(nbh²)', 200, 350, 40, 'red', wt('slut', 'torsionsfjedre') - 0.1, we('slut', 'anden'));
+});
+
+</script>
+<script>BP.live({"duration":109.614,"audio":"andre-fjedre.mp3","order":["titel","traek","kroge","torsion","retning","blad","gas","belleville","boelge","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":6.647,"words":[["Andre",0.601,1.0],["fjedretyper",1.0,1.877],["Trækfjedre",2.768,3.541],["torsionsfjedre",3.657,4.649],["bladfjedre",4.778,5.5],["og",5.5,5.616],["tallerkenfjedre",5.616,6.647]],"text":"Andre fjedretyper. Trækfjedre, torsionsfjedre, bladfjedre og tallerkenfjedre."},"traek":{"start":7.858,"end":15.332,"words":[["En",7.998,8.101],["trækfjeder",8.101,8.655],["er",8.655,8.733],["viklet",8.733,9.055],["tæt",9.055,9.441],["med",9.441,9.661],["en",9.661,9.764],["forspænding",9.764,10.395],["F",10.395,10.653],["i",10.653,10.949],["Den",11.827,11.969],["giver",11.969,12.252],["ikke",12.252,12.562],["efter",12.562,13.09],["før",13.193,13.477],["kraften",13.477,13.953],["er",13.953,14.056],["større",14.056,14.52],["end",14.52,14.739],["F",14.739,14.997],["i",14.997,15.332]],"text":"En trækfjeder er viklet tæt med en forspænding F i. Den giver ikke efter, før kraften er større end F i."},"kroge":{"start":16.56,"end":24.563,"words":[["Krogene",16.7,17.087],["i",17.087,17.267],["enderne",17.267,17.796],["giver",17.796,18.053],["både",18.053,18.324],["bøjning",18.324,18.775],["og",18.775,18.917],["vridning",18.917,19.432],["med",19.432,19.613],["spændingskoncentrationer",19.613,21.043],["Trækfjedre",21.934,22.591],["knækker",22.591,22.965],["næsten",22.965,23.441],["altid",23.441,23.88],["ved",23.88,23.957],["krogen",23.957,24.563]],"text":"Krogene i enderne giver både bøjning og vridning med spændingskoncentrationer. Trækfjedre knækker næsten altid ved krogen."},"torsion":{"start":25.79,"end":36.215,"words":[["En",25.917,26.02],["torsionsfjeder",26.02,26.703],["belastes",26.703,27.309],["med",27.309,27.515],["et",27.515,27.593],["moment",27.593,28.031],["om",28.031,28.211],["sin",28.211,28.43],["akse",28.43,28.984],["Paradoksalt",29.888,30.468],["nok",30.468,30.764],["er",30.764,30.867],["tråden",30.867,31.241],["i",31.241,31.344],["ren",31.344,31.589],["bøjning",31.589,32.079],["sigma",32.195,32.646],["max",32.646,32.955],["er",32.955,33.058],["K",33.058,33.354],["i",33.354,33.47],["gange",33.47,33.767],["toogtredive",33.767,34.36],["T",34.36,34.733],["over",34.733,34.978],["pi",34.978,35.236],["d",35.236,35.481],["i",35.481,35.661],["tredje",35.661,36.215]],"text":"En torsionsfjeder belastes med et moment om sin akse. Paradoksalt nok er tråden i ren bøjning: sigma max er K i gange toogtredive T over pi d i tredje."},"retning":{"start":37.444,"end":41.682,"words":[["Den",37.571,37.687],["skal",37.687,37.893],["altid",37.894,38.293],["belastes",38.293,39.066],["så",39.208,39.44],["vindingerne",39.44,39.955],["strammes",39.955,40.6],["ikke",40.729,41.038],["åbnes",41.038,41.682]],"text":"Den skal altid belastes, så vindingerne strammes, ikke åbnes."},"blad":{"start":42.906,"end":53.782,"words":[["En",43.046,43.175],["bladfjeder",43.175,43.858],["er",43.858,44.013],["en",44.013,44.103],["stabel",44.103,44.657],["af",44.657,44.799],["flade",44.799,45.16],["blade",45.16,45.675],["Spændingen",46.553,47.055],["er",47.055,47.249],["seks",47.249,47.571],["F",47.571,47.738],["L",47.738,48.009],["over",48.009,48.344],["n",48.344,48.589],["b",48.589,48.769],["h",48.769,49.014],["i",49.014,49.22],["anden",49.22,49.646],["og",49.8,49.942],["udbøjningen",49.942,50.483],["er",50.483,50.599],["seks",50.599,50.934],["F",50.934,51.115],["L",51.115,51.244],["i",51.244,51.398],["tredje",51.398,51.888],["over",51.888,52.197],["n",52.197,52.429],["E",52.429,52.597],["b",52.597,52.79],["h",52.79,53.061],["i",53.061,53.254],["tredje",53.254,53.782]],"text":"En bladfjeder er en stabel af flade blade. Spændingen er seks F L over n b h i anden, og udbøjningen er seks F L i tredje over n E b h i tredje."},"gas":{"start":55.016,"end":62.374,"words":[["En",55.156,55.285],["gasfjeder",55.285,55.788],["bruger",55.788,56.071],["tryk",56.071,56.368],["i",56.368,56.471],["kvælstof",56.471,57.192],["og",57.192,57.308],["giver",57.308,57.592],["en",57.592,57.695],["næsten",57.695,58.043],["konstant",58.043,58.507],["kraft",58.507,58.919],["over",58.919,59.177],["slaglængden",59.177,60.014],["Den",60.892,61.06],["bruges",61.06,61.434],["i",61.434,61.588],["bagklapper",61.588,62.374]],"text":"En gasfjeder bruger tryk i kvælstof og giver en næsten konstant kraft over slaglængden. Den bruges i bagklapper."},"belleville":{"start":63.598,"end":74.204,"words":[["Tallerkenfjedre",63.725,64.55],["er",64.55,64.692],["kegleformede",64.692,65.388],["skiver",65.388,65.968],["der",66.109,66.225],["kan",66.225,66.328],["bære",66.328,66.573],["meget",66.573,66.895],["på",66.895,67.037],["lidt",67.037,67.256],["plads",67.256,67.759],["Stablet",68.637,69.152],["parallelt",69.152,69.706],["giver",69.706,69.964],["de",69.964,70.08],["mere",70.08,70.363],["kraft",70.363,70.892],["Stablet",71.781,72.309],["modsat",72.309,72.902],["giver",72.902,73.147],["de",73.147,73.263],["mere",73.263,73.572],["vandring",73.572,74.204]],"text":"Tallerkenfjedre er kegleformede skiver, der kan bære meget på lidt plads. Stablet parallelt giver de mere kraft. Stablet modsat giver de mere vandring."},"boelge":{"start":75.444,"end":81.203,"words":[["Bølgefjedre",75.571,76.177],["er",76.177,76.319],["lavere",76.319,76.731],["end",76.731,76.834],["skruefjedre",76.834,77.685],["op",77.775,77.981],["til",77.981,78.136],["halvdelen",78.136,78.638],["af",78.638,78.677],["højden",78.677,79.18],["og",79.36,79.54],["bruges",79.54,79.85],["til",79.85,79.991],["forspænding",79.991,80.584],["af",80.584,80.713],["lejer",80.713,81.203]],"text":"Bølgefjedre er lavere end skruefjedre, op til halvdelen af højden, og bruges til forspænding af lejer."},"tjek_q":{"start":82.418,"end":87.856,"words":[["Tjek",82.519,82.841],["dig",82.841,83.021],["selv",83.021,83.447],["Hvorfor",84.351,84.634],["knækker",84.634,85.008],["trækfjedre",85.008,85.537],["typisk",85.537,86.0],["ved",86.0,86.116],["krogen",86.116,86.632],["og",86.632,86.799],["ikke",86.799,87.07],["i",87.07,87.186],["vindingerne",87.186,87.856]],"text":"Tjek dig selv. Hvorfor knækker trækfjedre typisk ved krogen og ikke i vindingerne?"},"tjek_a":{"start":91.73,"end":97.063,"words":[["Fordi",91.857,92.205],["krogen",92.205,92.527],["har",92.527,92.734],["en",92.734,92.798],["skarp",92.798,93.133],["overgang",93.133,93.687],["med",93.687,93.829],["både",93.829,94.1],["bøjning",94.1,94.499],["og",94.499,94.628],["vridning",94.628,95.182],["og",95.182,95.324],["store",95.324,95.659],["spændingskoncentrationer",95.659,97.063]],"text":"Fordi krogen har en skarp overgang med både bøjning og vridning og store spændingskoncentrationer."},"slut":{"start":98.296,"end":107.186,"words":[["Kort",98.423,98.655],["sagt",98.655,99.145],["trækfjedre",99.274,99.815],["har",99.815,99.957],["forspænding",99.957,100.511],["og",100.511,100.627],["svigter",100.627,101.026],["ved",101.026,101.117],["krogen",101.117,101.632],["torsionsfjedre",101.761,102.547],["er",102.547,102.676],["i",102.676,102.74],["bøjning",102.74,103.269],["og",103.41,103.565],["bladfjedre",103.565,104.068],["har",104.068,104.145],["sigma",104.145,104.519],["lig",104.519,104.763],["seks",104.764,105.073],["F",105.073,105.266],["L",105.266,105.562],["over",105.562,105.872],["n",105.872,106.104],["b",106.104,106.297],["h",106.297,106.568],["i",106.568,106.748],["anden",106.748,107.186]],"text":"Kort sagt: trækfjedre har forspænding og svigter ved krogen, torsionsfjedre er i bøjning, og bladfjedre har sigma lig seks F L over n b h i anden."}}}, { audio: 'andre-fjedre.mp3', id: 'andre-fjedre' });</script>
+</body>
+</html>

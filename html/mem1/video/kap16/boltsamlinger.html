@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boltsamlinger og forspænding · video</title>
+<meta name="description" content="Forspænding, T = K Fi d, samlingskonstanten C og lastdeling mellem bolt og plader.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 16: videoer</a><h1>Boltsamlinger og forspænding</h1><span class="meta">MEM1 · kapitel 16 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Boltsamlinger og forspænding"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Forspænding, T = K Fi d, samlingskonstanten C og lastdeling mellem bolt og plader.</p><div class="chips"><a href="../../Kapitel16_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l16">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Boltsamlinger og forspænding (MEM1 kap. 16, slides 7–10)
+BP.scene({ header: 'MEM1 · kap. 16' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, hatch, rect, PI } = B;
+
+  B.titel(0, 'Boltsamlinger', 'MEM1 · kapitel 16 · begreb (slide 7–10)', 'titel');
+  text(0, 'forspænding og lastdeling', 640, 520, 42, 'red', wt('titel', 'forspænding') - 0.2, we('titel', 'last'), { align: 'center' });
+
+  B.goto('forspaend', 1);
+  {
+    const t0 = L('forspaend').start, cx = 300;
+    hatch(1, rect(cx - 160, 260, 320, 60), 'blue', t0, t0 + 0.4, { gap: 8 }); hatch(1, rect(cx - 160, 320, 320, 60), 'green', t0 + 0.2, t0 + 0.6, { gap: 8, ang: -PI / 4 });
+    line(1, rect(cx - 20, 210, 40, 220).concat([[cx - 20, 212]]), 'black', 3, t0 + 0.4, t0 + 0.8);
+    line(1, rect(cx - 50, 190, 100, 20).concat([[cx - 50, 192]]), 'black', 3, t0 + 0.6, t0 + 0.9); line(1, rect(cx - 50, 430, 100, 20).concat([[cx - 50, 432]]), 'black', 3, t0 + 0.7, t0 + 1.0);
+    arrow(1, [[cx + 80, 260], [cx + 80, 300]], 'red', 3, wt('forspaend', 'forspænding') - 0.2, wt('forspaend', 'forspænding') + 0.2, 11); arrow(1, [[cx + 80, 380], [cx + 80, 340]], 'red', 3, wt('forspaend', 'forspænding') - 0.1, wt('forspaend', 'forspænding') + 0.3, 11);
+    text(1, 'F_i', cx + 100, 330, 34, 'red', wt('forspaend', 'F'), wt('forspaend', 'i') + 0.3);
+    text(1, 'holder tæt · modstår vibration', 620, 220, 32, 'black', wt('formaal', 'holder') - 0.1, we('formaal', 'vibrationer'));
+    text(1, 'F_i = 0,75 A_t S_p', 620, 290, 42, 'blue', wt('formaal', 'nul') - 0.2, we('formaal', 'p'));
+    text(1, 'T = K F_i d', 620, 390, 48, 'red', L('moment').start + 0.2, we('moment', 'd'));
+    text(1, 'K ≈ 0,20 tør · 0,15 smurt', 620, 450, 32, 'black', wt('moment', 'nul') - 0.1, we('moment', 'smurte'));
+    text(1, 'op til 90 % af T går til friktion', 620, 540, 32, 'red', L('friktion').start + 0.2, we('friktion', 'meget'));
+  }
+
+  B.goto('fjedre', 2);
+  {
+    const t0 = L('fjedre').start;
+    text(2, 'bolt: k_b (træk) · plader: k_m (tryk)', 140, 160, 38, 'black', t0 + 0.3, we('fjedre', 'm'));
+    const r = text(2, 'C = k_b / (k_b + k_m) ≈ 0,2 … 0,3', 140, 250, 44, 'blue', L('c').start + 0.2, we('c', 'tre'));
+    text(2, 'F_b = F_i + C P', 140, 370, 46, 'red', wt('deling', 'bolteraften') - 0.2, we('deling', 'P'));
+    text(2, 'F_m = F_i − (1 − C) P', 640, 370, 46, 'green', wt('deling', 'klemkraften') - 0.2, we('deling', 'P', 1));
+    const ta = L('adskil').start;
+    box(2, 115, 450, 900, 90, 'red', ta, ta + 0.6);
+    text(2, 'tæt så længe F_m > 0', 140, 510, 44, 'red', ta + 0.2, we('adskil', 'hinanden'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['C = 0,2, P = 10 kN.', 'Hvor meget stiger F_b?'], ['C P = 2 kN', 'pladerne tager 8 kN'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 16, slide 7–10 · Hamrock, Schmid & Jacobson, kap. 16', 'permanente samlinger', 'slut');
+  text(4, 'T = K F_i d · C = k_b/(k_b + k_m)', 200, 280, 40, 'blue', L('slut').start + 0.4, we('slut', 'm'));
+  text(4, 'F_b = F_i + CP · F_m = F_i − (1−C)P > 0', 200, 360, 38, 'red', wt('slut', 'bolten') - 0.1, we('slut', 'positiv'));
+});
+
+</script>
+<script>BP.live({"duration":119.574,"audio":"boltsamlinger.mp3","order":["titel","forspaend","formaal","moment","friktion","fjedre","c","deling","adskil","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.24,"words":[["Boltsamlinger",0.627,1.452],["og",1.452,1.594],["forspænding",1.594,2.29],["Hvorfor",3.193,3.464],["strammer",3.464,3.838],["vi",3.838,3.954],["bolte",3.954,4.495],["og",4.637,4.778],["hvordan",4.778,5.139],["deler",5.139,5.41],["bolt",5.41,5.693],["og",5.693,5.745],["plader",5.745,6.183],["en",6.183,6.402],["ydre",6.402,6.686],["last",6.686,7.24]],"text":"Boltsamlinger og forspænding. Hvorfor strammer vi bolte, og hvordan deler bolt og plader en ydre last?"},"forspaend":{"start":8.458,"end":15.365,"words":[["Når",8.585,8.791],["en",8.792,8.92],["bolt",8.92,9.165],["strammes",9.165,9.822],["strækkes",9.964,10.454],["den",10.454,10.634],["elastisk",10.634,11.343],["Det",12.234,12.298],["giver",12.298,12.595],["en",12.595,12.698],["forspænding",12.698,13.278],["F",13.278,13.548],["i",13.548,13.857],["der",13.999,14.115],["klemmer",14.115,14.463],["delene",14.463,14.85],["sammen",14.85,15.365]],"text":"Når en bolt strammes, strækkes den elastisk. Det giver en forspænding F i, der klemmer delene sammen."},"formaal":{"start":16.584,"end":29.947,"words":[["Forspændingen",16.711,17.304],["holder",17.304,17.549],["samlingen",17.549,18.039],["tæt",18.039,18.438],["når",18.58,18.773],["der",18.773,18.85],["kommer",18.851,19.134],["en",19.134,19.25],["ydre",19.25,19.521],["trækkraft",19.521,20.255],["og",20.423,20.526],["den",20.526,20.693],["forhindrer",20.693,21.338],["at",21.492,21.66],["bolten",21.66,22.098],["løsner",22.098,22.433],["sig",22.433,22.652],["ved",22.652,22.768],["vibrationer",22.768,23.58],["Til",24.471,24.677],["adskillelige",24.677,25.205],["samlinger",25.205,25.721],["bruger",25.721,26.03],["man",26.03,26.326],["F",26.326,26.584],["i",26.584,26.7],["lig",26.7,26.906],["nul",26.906,27.099],["komma",27.099,27.447],["syv",27.447,27.77],["fem",27.77,28.014],["gange",28.014,28.44],["A",28.44,28.659],["t",28.659,28.891],["gange",28.891,29.29],["S",29.29,29.548],["p",29.548,29.947]],"text":"Forspændingen holder samlingen tæt, når der kommer en ydre trækkraft, og den forhindrer, at bolten løsner sig ved vibrationer. Til adskillelige samlinger bruger man F i lig nul komma syv fem gange A t gange S p."},"moment":{"start":31.19,"end":39.99,"words":[["Forspændingen",31.317,31.833],["styres",31.833,32.219],["med",32.219,32.4],["tilspændingsmomentet",32.4,33.585],["T",33.701,34.036],["er",34.036,34.178],["K",34.178,34.436],["gange",34.436,34.771],["F",34.771,35.042],["i",35.042,35.183],["gange",35.183,35.493],["d.",35.493,35.673],["K",35.673,35.995],["er",35.995,36.047],["cirka",36.047,36.511],["nul",36.511,36.781],["komma",36.781,37.078],["to",37.078,37.374],["for",37.374,37.516],["tørre",37.516,37.799],["gevind",37.799,38.186],["og",38.186,38.25],["nul",38.25,38.469],["komma",38.469,38.843],["et",38.843,39.011],["fem",39.011,39.294],["for",39.294,39.436],["smurte",39.436,39.99]],"text":"Forspændingen styres med tilspændingsmomentet: T er K gange F i gange d. K er cirka nul komma to for tørre gevind og nul komma et fem for smurte."},"friktion":{"start":41.212,"end":49.318,"words":[["Pas",41.352,41.558],["på",41.558,41.971],["friktionen",42.087,42.68],["i",42.68,42.795],["gevindet",42.795,43.272],["tager",43.272,43.569],["op",43.569,43.788],["til",43.788,43.942],["halvfems",43.942,44.393],["procent",44.393,44.844],["af",44.844,44.973],["momentet",44.973,45.682],["Ændrer",46.586,46.869],["smøringen",46.869,47.32],["sig",47.32,47.72],["ændres",47.849,48.287],["forspændingen",48.287,48.854],["meget",48.854,49.318]],"text":"Pas på: friktionen i gevindet tager op til halvfems procent af momentet. Ændrer smøringen sig, ændres forspændingen meget."},"fjedre":{"start":50.538,"end":58.515,"words":[["En",50.678,50.768],["samling",50.768,51.258],["virker",51.258,51.683],["som",51.683,51.928],["to",51.928,52.212],["fjedre",52.212,52.766],["Bolten",53.657,54.03],["strækkes",54.03,54.481],["med",54.481,54.623],["stivheden",54.623,55.113],["k",55.113,55.358],["b",55.358,55.706],["og",55.886,56.053],["pladerne",56.053,56.479],["trykkes",56.479,56.827],["sammen",56.827,57.265],["med",57.265,57.381],["stivheden",57.381,57.896],["k",57.896,58.18],["m.",58.18,58.515]],"text":"En samling virker som to fjedre. Bolten strækkes med stivheden k b, og pladerne trykkes sammen med stivheden k m."},"c":{"start":59.744,"end":68.931,"words":[["Samlingskonstanten",59.871,60.838],["C",60.838,61.16],["er",61.16,61.289],["k",61.289,61.559],["b",61.559,61.843],["divideret",61.843,62.423],["med",62.423,62.668],["k",62.668,62.925],["b",62.925,63.093],["plus",63.093,63.338],["k",63.338,63.712],["m.",63.712,63.879],["Pladerne",63.879,64.343],["er",64.343,64.433],["typisk",64.433,64.858],["meget",64.858,65.142],["stivere",65.142,65.554],["end",65.554,65.657],["bolten",65.657,66.147],["så",66.289,66.469],["C",66.469,66.688],["ligger",66.688,66.869],["mellem",66.869,67.152],["nul",67.152,67.358],["komma",67.358,67.681],["to",67.681,67.964],["og",67.964,67.99],["nul",67.99,68.235],["komma",68.235,68.505],["tre",68.505,68.931]],"text":"Samlingskonstanten C er k b divideret med k b plus k m. Pladerne er typisk meget stivere end bolten, så C ligger mellem nul komma to og nul komma tre."},"deling":{"start":70.15,"end":78.499,"words":[["Kommer",70.29,70.522],["der",70.522,70.651],["en",70.651,70.767],["ydre",70.767,71.038],["trækkraft",71.038,71.566],["P",71.566,71.914],["stiger",72.056,72.442],["bolteraften",72.442,73.074],["til",73.074,73.344],["F",73.344,73.602],["i",73.602,73.757],["plus",73.757,74.002],["C",74.002,74.221],["P",74.221,74.569],["og",74.723,74.891],["klemkraften",74.891,75.612],["falder",75.612,75.857],["til",75.857,76.089],["F",76.089,76.308],["i",76.308,76.437],["minus",76.437,76.914],["en",76.914,77.094],["minus",77.094,77.545],["C",77.545,77.829],["gange",77.829,78.125],["P",78.125,78.499]],"text":"Kommer der en ydre trækkraft P, stiger bolteraften til F i plus C P, og klemkraften falder til F i minus en minus C gange P."},"adskil":{"start":79.74,"end":86.711,"words":[["Samlingen",79.867,80.409],["holder",80.409,80.628],["tæt",80.628,81.027],["så",81.182,81.375],["længe",81.375,81.659],["klemkraften",81.659,82.457],["er",82.458,82.573],["positiv",82.573,83.347],["Bliver",84.211,84.417],["den",84.417,84.649],["nul",84.649,85.048],["glider",85.19,85.525],["delene",85.525,85.938],["fra",85.938,86.067],["hinanden",86.067,86.711]],"text":"Samlingen holder tæt, så længe klemkraften er positiv. Bliver den nul, glider delene fra hinanden."},"tjek_q":{"start":87.938,"end":94.884,"words":[["Tjek",88.039,88.361],["dig",88.361,88.541],["selv",88.541,88.967],["Med",89.884,90.026],["C",90.026,90.27],["lig",90.27,90.425],["nul",90.425,90.606],["komma",90.606,90.928],["to",90.928,91.276],["og",91.276,91.404],["en",91.404,91.52],["ydre",91.52,91.791],["last",91.791,92.152],["på",92.152,92.307],["ti",92.307,92.551],["kilonewton",92.551,93.273],["hvor",93.415,93.569],["meget",93.569,93.853],["stiger",93.853,94.162],["bolteraften",94.162,94.884]],"text":"Tjek dig selv. Med C lig nul komma to og en ydre last på ti kilonewton, hvor meget stiger bolteraften?"},"tjek_a":{"start":98.762,"end":104.612,"words":[["Kun",98.889,99.108],["to",99.108,99.405],["kilonewton",99.405,100.281],["Pladerne",101.185,101.61],["tager",101.61,101.868],["de",101.868,101.997],["otte",101.997,102.293],["kilonewton",102.293,103.079],["ved",103.079,103.311],["at",103.311,103.35],["få",103.35,103.491],["mindre",103.491,103.878],["klemkraft",103.878,104.612]],"text":"Kun to kilonewton. Pladerne tager de otte kilonewton ved at få mindre klemkraft."},"slut":{"start":105.832,"end":117.158,"words":[["Kort",105.959,106.165],["sagt",106.166,106.655],["T",106.784,107.093],["er",107.093,107.248],["K",107.248,107.519],["F",107.519,107.763],["i",107.763,107.918],["d",107.918,108.279],["C",108.408,108.769],["er",108.769,108.885],["k",108.885,109.142],["b",109.142,109.426],["over",109.426,109.671],["k",109.671,109.941],["b",109.941,110.109],["plus",110.109,110.354],["k",110.354,110.598],["m",110.598,110.934],["bolten",111.075,111.462],["får",111.462,111.668],["F",111.668,111.913],["i",111.913,112.068],["plus",112.068,112.312],["C",112.312,112.544],["P",112.544,112.892],["og",113.034,113.176],["klemkraften",113.176,113.923],["F",113.923,114.155],["i",114.155,114.284],["minus",114.284,114.671],["en",114.671,114.877],["minus",114.877,115.238],["C",115.238,115.431],["gange",115.431,115.689],["P",115.689,116.05],["skal",116.05,116.243],["være",116.243,116.397],["positiv",116.397,117.158]],"text":"Kort sagt: T er K F i d, C er k b over k b plus k m, bolten får F i plus C P, og klemkraften F i minus en minus C gange P skal være positiv."}}}, { audio: 'boltsamlinger.mp3', id: 'boltsamlinger' });</script>
+</body>
+</html>
