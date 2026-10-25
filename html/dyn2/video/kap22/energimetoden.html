@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Energimetoden til svingninger · video</title>
+<meta name="description" content="Bevægelsesligningen fra dE/dt = 0.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 22: videoer</a><h1>Energimetoden til svingninger</h1><span class="meta">DYN2 · kapitel 22 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Energimetoden til svingninger"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Bevægelsesligningen fra dE/dt = 0.</p><div class="chips"><a href="fri-svingning.html">Se først: Frie udæmpede svingninger</a><a href="../../../../lab/dyn2/vibrationer.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel22_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/dyn2/l11">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Energimetoden (DYN2 Vibrationer II, HI 22.2)
+BP.scene({ header: 'DYN2 · kap. 22' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, strike, PI } = B;
+
+  B.titel(0, 'Energimetoden', 'DYN2 · Hibbeler kap. 22 · begreb (Vibrationer II)', 'titel');
+  text(0, 'dE/dt = 0', 640, 520, 46, 'red', wt('titel', 'bevægelsesligningen') - 0.3, we('titel', 'energien'), { align: 'center' });
+
+  B.goto('ide', 1);
+  {
+    const t0 = L('ide').start;
+    text(1, 'uden friktion: E = T + V konstant  ⇒  dE/dt = 0', 140, 160, 36, 'blue', t0 + 0.2, we('ide', 'nul'));
+    text(1, 'E = ½ m ẋ² + ½ k x²', 140, 250, 44, 'black', L('masse').start + 0.2, wt('masse', 'Differentierer'));
+    text(1, 'dE/dt = ẋ (m ẍ + k x) = 0', 140, 320, 44, 'black', wt('masse', 'Differentierer') - 0.1, we('masse', 'x', 3));
+    const r = text(1, 'm ẍ + k x = 0', 140, 410, 52, 'red', L('xprik').start + 0.3, we('xprik', 'før'));
+    box(1, 115, 350, 460, 90, 'red', we('xprik', 'før'), we('xprik', 'før') + 0.6);
+    text(1, 'pendul: E = ½ m l² θ̇² − m g l cos θ', 140, 520, 38, 'blue', L('pendul').start + 0.2, wt('pendul', 'Differentierer'));
+    text(1, '⇒ m l² θ̈ + m g l sin θ = 0', 140, 590, 38, 'blue', wt('pendul', 'Differentierer') - 0.1, we('pendul', 'nul'));
+    const s = text(1, 'cos θ ≈ 1 før d/dt', 760, 590, 34, 'red', wt('lille', 'Pas') - 0.1, wt('lille', 'erstatte') + 0.4);
+    strike(s, wt('lille', 'erstatte'), wt('lille', 'erstatte') + 0.5);
+    text(1, 'smart ved flere legemer (ingen leddkræfter)', 140, 670, 30, 'green', L('fordel').start + 0.2, we('fordel', 'leddene'));
+  }
+
+  B.goto('tjek_q', 2);
+  B.tjek(2, ['Hvorfor ikke cos θ = 1', 'før man differentierer?'], ['så forsvinder tyngdeleddet', 'tilnærm efter d/dt'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 3);
+  B.slut(3, 'DYN2 slides Vibrationer II · Hibbeler (2023), kap. 22.2', 'dæmpede svingninger', 'slut');
+  text(3, 'T + V → d/dt = 0 → del med ẋ', 200, 300, 44, 'blue', L('slut').start + 0.4, we('slut', 'bevægelsesligningen'));
+});
+
+</script>
+<script>BP.live({"duration":105.424,"audio":"energimetoden.mp3","order":["titel","ide","masse","xprik","pendul","lille","lodret","fordel","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":5.874,"words":[["Energimetoden",0.601,1.696],["Bevægelsesligningen",2.613,3.477],["for",3.477,3.644],["en",3.644,3.722],["svingning",3.722,4.224],["direkte",4.224,4.881],["fra",4.881,5.088],["energien",5.088,5.874]],"text":"Energimetoden. Bevægelsesligningen for en svingning direkte fra energien."},"ide":{"start":7.09,"end":12.786,"words":[["Uden",7.217,7.411],["friktion",7.411,7.991],["er",7.99,8.119],["den",8.119,8.274],["mekaniske",8.274,8.905],["energi",8.905,9.356],["konstant",9.357,10.014],["Derfor",10.892,11.33],["er",11.33,11.484],["den",11.484,11.703],["tidsafledte",11.703,12.361],["nul",12.361,12.786]],"text":"Uden friktion er den mekaniske energi konstant. Derfor er den tidsafledte nul."},"masse":{"start":14.016,"end":24.145,"words":[["For",14.143,14.259],["masse",14.259,14.569],["og",14.569,14.633],["fjeder",14.633,15.084],["er",15.084,15.329],["E",15.329,15.522],["lig",15.522,15.677],["en",15.677,15.754],["halv",15.754,15.973],["m",15.973,16.179],["v",16.179,16.476],["i",16.476,16.695],["anden",16.695,17.004],["plus",17.004,17.313],["en",17.313,17.468],["halv",17.468,17.674],["k",17.674,17.984],["x",17.984,18.28],["i",18.28,18.447],["anden",18.447,18.886],["Differentierer",19.763,20.382],["vi",20.382,20.704],["får",20.833,21.001],["vi",21.001,21.155],["x",21.155,21.4],["prik",21.4,21.619],["gange",21.619,21.993],["m",21.993,22.238],["x",22.238,22.482],["dobbeltprik",22.482,23.114],["plus",23.114,23.41],["k",23.41,23.694],["x",23.694,24.145]],"text":"For masse og fjeder er E lig en halv m v i anden plus en halv k x i anden. Differentierer vi, får vi x prik gange m x dobbeltprik plus k x."},"xprik":{"start":25.358,"end":34.585,"words":[["X",25.498,25.717],["prik",25.717,26.117],["er",26.117,26.297],["ikke",26.297,26.671],["altid",26.671,27.032],["nul",27.032,27.444],["så",27.573,27.779],["parentesen",27.779,28.565],["må",28.565,28.746],["være",28.746,28.913],["nul",28.913,29.338],["Det",30.229,30.306],["giver",30.306,30.667],["m",30.667,30.886],["x",30.886,31.105],["dobbeltprik",31.105,31.634],["plus",31.634,31.891],["k",31.892,32.188],["x",32.188,32.446],["lig",32.446,32.613],["nul",32.613,33.0],["den",33.142,33.296],["samme",33.296,33.605],["ligning",33.605,33.94],["som",33.94,34.16],["før",34.16,34.585]],"text":"X prik er ikke altid nul, så parentesen må være nul. Det giver m x dobbeltprik plus k x lig nul, den samme ligning som før."},"pendul":{"start":35.812,"end":48.48,"words":[["For",35.939,36.12],["et",36.12,36.197],["pendul",36.197,36.7],["er",36.7,36.932],["E",36.932,37.138],["en",37.138,37.241],["halv",37.241,37.46],["m",37.46,37.64],["l",37.64,37.769],["i",37.769,37.988],["anden",37.988,38.272],["theta",38.272,38.749],["prik",38.749,39.097],["i",39.097,39.264],["anden",39.264,39.509],["minus",39.509,39.921],["m",39.921,40.14],["g",40.14,40.385],["l",40.385,40.566],["cosinus",40.566,41.081],["theta",41.081,41.661],["Differentierer",42.565,43.132],["vi",43.132,43.454],["får",43.57,43.737],["vi",43.737,43.892],["m",43.892,44.098],["l",44.098,44.227],["i",44.227,44.42],["anden",44.42,44.717],["theta",44.717,45.271],["dobbeltprik",45.271,45.876],["plus",45.876,46.147],["m",46.147,46.327],["g",46.327,46.559],["l",46.559,46.753],["sinus",46.753,47.268],["theta",47.268,47.822],["lig",47.822,48.106],["nul",48.106,48.48]],"text":"For et pendul er E en halv m l i anden theta prik i anden minus m g l cosinus theta. Differentierer vi, får vi m l i anden theta dobbeltprik plus m g l sinus theta lig nul."},"lille":{"start":49.698,"end":59.671,"words":[["For",49.825,49.941],["små",49.941,50.238],["vinkler",50.238,50.689],["bliver",50.689,50.921],["sinus",50.921,51.294],["theta",51.294,51.758],["til",51.758,51.964],["theta",51.965,52.583],["og",52.725,53.021],["omega",53.021,53.434],["n",53.434,53.64],["er",53.64,53.73],["kvadratroden",53.73,54.361],["af",54.361,54.439],["g",54.439,54.748],["over",54.748,54.98],["l.",54.98,55.263],["Pas",55.263,55.547],["på",55.547,55.934],["man",56.062,56.243],["må",56.243,56.346],["ikke",56.346,56.591],["erstatte",56.591,56.964],["cosinus",56.964,57.467],["theta",57.467,58.021],["med",58.021,58.227],["en",58.227,58.318],["før",58.318,58.601],["man",58.601,58.833],["differentierer",58.833,59.671]],"text":"For små vinkler bliver sinus theta til theta, og omega n er kvadratroden af g over l. Pas på: man må ikke erstatte cosinus theta med en før man differentierer."},"lodret":{"start":60.896,"end":65.946,"words":[["For",61.023,61.165],["en",61.165,61.229],["lodret",61.23,61.603],["fjeder",61.603,61.912],["med",61.912,62.093],["tyngde",62.093,62.441],["går",62.441,62.711],["m",62.711,62.918],["g",62.918,63.15],["og",63.15,63.188],["fjederens",63.188,63.601],["forspænding",63.601,64.052],["ud",64.052,64.348],["når",64.49,64.657],["vi",64.657,64.748],["måler",64.748,65.07],["fra",65.07,65.199],["ligevægten",65.199,65.946]],"text":"For en lodret fjeder med tyngde går m g og fjederens forspænding ud, når vi måler fra ligevægten."},"fordel":{"start":67.174,"end":72.43,"words":[["Metoden",67.314,67.752],["er",67.752,67.83],["smart",67.83,68.332],["når",68.474,68.667],["systemet",68.667,69.209],["har",69.209,69.312],["flere",69.312,69.595],["dele",69.595,70.085],["fordi",70.214,70.6],["man",70.6,70.755],["slipper",70.755,71.09],["for",71.09,71.219],["kræfterne",71.219,71.812],["i",71.812,71.953],["leddene",71.953,72.43]],"text":"Metoden er smart, når systemet har flere dele, fordi man slipper for kræfterne i leddene."},"tjek_q":{"start":73.644,"end":80.77,"words":[["Tjek",73.745,74.067],["dig",74.067,74.247],["selv",74.247,74.673],["Hvorfor",75.577,75.796],["må",75.796,75.899],["man",75.899,76.041],["ikke",76.041,76.208],["sætte",76.208,76.479],["cosinus",76.479,76.994],["theta",76.994,77.523],["lig",77.523,77.858],["en",77.858,78.0],["i",78.0,78.232],["energiudtrykket",78.232,79.327],["før",79.43,79.688],["man",79.688,79.868],["differentierer",79.868,80.77]],"text":"Tjek dig selv. Hvorfor må man ikke sætte cosinus theta lig en i energiudtrykket, før man differentierer?"},"tjek_a":{"start":84.636,"end":92.664,"words":[["Fordi",84.763,85.137],["så",85.137,85.317],["forsvinder",85.317,85.781],["tyngdeleddet",85.781,86.336],["helt",86.336,86.735],["og",86.877,87.006],["man",87.006,87.199],["får",87.199,87.354],["ingen",87.354,87.637],["tilbageførende",87.637,88.449],["kraft",88.449,88.939],["Tilnærmelsen",89.829,90.667],["skal",90.667,90.847],["laves",90.847,91.298],["efter",91.298,91.621],["differentieringen",91.621,92.664]],"text":"Fordi så forsvinder tyngdeleddet helt, og man får ingen tilbageførende kraft. Tilnærmelsen skal laves efter differentieringen."},"slut":{"start":93.89,"end":102.988,"words":[["Kort",94.017,94.236],["sagt",94.236,94.7],["skriv",94.829,95.216],["T",95.216,95.435],["plus",95.435,95.693],["V",95.693,96.066],["differentiér",96.195,96.801],["med",96.801,96.968],["hensyn",96.968,97.406],["til",97.407,97.535],["tiden",97.535,98.012],["sæt",98.141,98.412],["lig",98.412,98.605],["nul",98.605,98.979],["og",99.133,99.262],["del",99.262,99.533],["med",99.533,99.662],["hastigheden",99.662,100.358],["Så",101.235,101.467],["får",101.467,101.596],["du",101.596,101.789],["bevægelsesligningen",101.789,102.988]],"text":"Kort sagt: skriv T plus V, differentiér med hensyn til tiden, sæt lig nul, og del med hastigheden. Så får du bevægelsesligningen."}}}, { audio: 'energimetoden.mp3', id: 'energimetoden' });</script>
+</body>
+</html>

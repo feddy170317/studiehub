@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Absolut bevægelse med bindinger · video</title>
+<meta name="description" content="Find ω og α ved at differentiere en geometrisk binding, med stangen fra slides.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 16: videoer</a><h1>Absolut bevægelse med bindinger</h1><span class="meta">DYN2 · kapitel 16 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Absolut bevægelse med bindinger"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Find ω og α ved at differentiere en geometrisk binding, med stangen fra slides.</p><div class="chips"><a href="rotation-fast-akse.html">Se først: Rotation om fast akse</a><a href="../../../../lab/dyn2/plan-bevaegelse.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel16_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/dyn2/l05">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Absolut bevægelse med bindinger (DYN2 Kinematik II, HI 16.4)
+BP.scene({ header: 'DYN2 · kap. 16' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, hatch, rect, PI } = B;
+
+  B.titel(0, 'Absolut bevægelse', 'DYN2 · Hibbeler kap. 16 · begreb (Kinematik II)', 'titel');
+  text(0, 'binding → differentiér', 640, 520, 44, 'red', wt('titel', 'binding') - 0.3, we('titel', 'binding'), { align: 'center' });
+
+  B.goto('ide', 1);
+  {
+    const t0 = L('ide').start;
+    text(1, 'én frihedsgrad: geometrien binder alt sammen', 140, 160, 36, 'blue', t0 + 0.2, we('ide', 'hastighederne'));
+    text(1, 'cos φ = a/c,  sin φ = b/c,  sinus- og cosinusrelation', 140, 230, 32, 'black', L('trig').start + 0.3, we('trig', 'cosinusrelationen'));
+    const te = L('eks').start, A = [300, 300], th = PI / 6, l = 280, Bp = [A[0] + l * Math.cos(th), A[1] + l * Math.sin(th)];
+    hatch(1, rect(200, Bp[1] + 6, 520, 14), 'black', te, te + 0.3, { gap: 6 });
+    dot(1, A[0], A[1], 8, 'black', te + 0.1); text(1, 'A', A[0] - 30, A[1] - 6, 32, 'black', te + 0.1, te + 0.4);
+    line(1, [A, Bp], 'blue', 5, te + 0.2, te + 0.6); dot(1, Bp[0], Bp[1], 8, 'blue', te + 0.5); text(1, 'B', Bp[0] + 12, Bp[1] - 10, 32, 'blue', te + 0.5, te + 0.8);
+    line(1, ell(A[0], A[1], 70, 70, 0, th), 'red', 2.4, wt('eks', 'cosinus') - 0.2, wt('eks', 'theta')); text(1, 'θ', A[0] + 80, A[1] + 30, 32, 'red', wt('eks', 'theta'), wt('eks', 'theta') + 0.3);
+    text(1, 'l', (A[0] + Bp[0]) / 2 - 10, (A[1] + Bp[1]) / 2 - 16, 32, 'blue', wt('eks', 'l') - 0.1, wt('eks', 'l') + 0.3);
+    arrow(1, [[Bp[0] + 10, Bp[1] + 50], [Bp[0] - 80, Bp[1] + 50]], 'red', 3, wt('eks', 'v') - 0.2, wt('eks', 'v') + 0.3, 12); text(1, 'v', Bp[0] - 40, Bp[1] + 90, 32, 'red', wt('eks', 'v'), wt('eks', 'v') + 0.3);
+    text(1, 'cos θ = x / l', 760, 340, 44, 'black', wt('eks', 'Bindingen') - 0.1, we('eks', 'l', 1));
+  }
+
+  B.goto('diff', 2);
+  {
+    const t0 = L('diff').start;
+    text(2, '−sin θ · ω = v_x / l = −v / l', 140, 180, 44, 'blue', t0 + 0.2, we('diff', 'v', 1));
+    const r = text(2, 'ω = v / (l sin θ)', 140, 280, 52, 'red', L('omega').start + 0.2, we('omega', 'theta'));
+    box(2, 115, 220, 520, 85, 'red', we('omega', 'theta'), we('omega', 'theta') + 0.6);
+    text(2, 'cos θ ω² + sin θ α = a / l', 140, 390, 42, 'blue', L('alfa').start + 0.2, wt('alfa', 'Så'));
+    text(2, 'α = a/(l sin θ) − ω²/tan θ', 140, 460, 44, 'red', wt('alfa', 'Så') - 0.1, we('alfa', 'theta', 2));
+    text(2, 'l = 2 m, v = 1 m/s, θ = 30°:  ω = 1 rad/s', 140, 570, 36, 'green', L('tal').start + 0.2, we('tal', 'sekund', 1));
+    text(2, 'a = 0:  α = −1/tan30° = −1,73 rad/s²', 140, 630, 36, 'green', L('tal2').start + 0.2, we('tal2', 'anden'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Hvad sker der med ω,', 'når θ → 0?'], ['ω → ∞', 'sin θ → 0'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'DYN2 slides Kinematik II · Hibbeler (2023), kap. 16.4', 'relativ hastighed', 'slut');
+  text(4, 'binding → d/dt → isolér', 200, 280, 44, 'blue', L('slut').start + 0.4, we('slut', 'alfa'));
+  text(4, 'ω = v / (l sin θ)', 200, 370, 46, 'red', wt('slut', 'Her') - 0.1, we('slut', 'theta'));
+});
+
+</script>
+<script>BP.live({"duration":125.166,"audio":"absolut-bevaegelse.mp3","order":["titel","ide","trig","eks","diff","omega","alfa","tal","tal2","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.948,"words":[["Absolut",0.601,1.155],["bevægelse",1.155,1.928],["Vi",2.884,2.987],["finder",2.987,3.296],["vinkelhastighed",3.296,4.108],["og",4.108,4.224],["vinkelacceleration",4.224,5.436],["ved",5.436,5.745],["at",5.745,5.822],["differentiere",5.822,6.647],["en",6.647,6.814],["geometrisk",6.814,7.459],["binding",7.459,7.948]],"text":"Absolut bevægelse. Vi finder vinkelhastighed og vinkelacceleration ved at differentiere en geometrisk binding."},"ide":{"start":9.178,"end":18.431,"words":[["I",9.318,9.408],["et",9.408,9.511],["system",9.512,9.975],["med",9.975,10.143],["én",10.143,10.349],["frihedsgrad",10.349,11.084],["hænger",11.084,11.47],["positionerne",11.47,12.218],["sammen",12.218,12.63],["gennem",12.63,12.965],["geometrien",12.965,13.816],["Skriver",14.693,15.106],["vi",15.106,15.222],["sammenhængen",15.222,15.776],["op",15.776,16.047],["og",16.047,16.175],["differentierer",16.175,17.155],["får",17.297,17.477],["vi",17.477,17.606],["hastighederne",17.606,18.431]],"text":"I et system med én frihedsgrad hænger positionerne sammen gennem geometrien. Skriver vi sammenhængen op og differentierer, får vi hastighederne."},"trig":{"start":19.656,"end":29.822,"words":[["Vi",19.783,19.886],["bruger",19.886,20.209],["trigonometri",20.209,21.124],["cosinus",21.252,21.832],["er",21.832,21.961],["hosliggende",21.961,22.58],["over",22.58,22.825],["hypotenusen",22.825,23.739],["sinus",23.881,24.332],["er",24.332,24.435],["modstående",24.435,25.028],["over",25.028,25.26],["hypotenusen",25.26,26.149],["og",26.355,26.497],["i",26.497,26.6],["en",26.6,26.691],["vilkårlig",26.691,27.193],["trekant",27.193,27.631],["sinus",27.631,28.237],["og",28.417,28.546],["cosinusrelationen",28.546,29.822]],"text":"Vi bruger trigonometri: cosinus er hosliggende over hypotenusen, sinus er modstående over hypotenusen, og i en vilkårlig trekant sinus- og cosinusrelationen."},"eks":{"start":31.046,"end":39.485,"words":[["Eksemplet",31.186,31.689],["fra",31.689,31.843],["slides",31.843,32.307],["er",32.307,32.488],["en",32.488,32.578],["stang",32.578,32.913],["med",32.913,33.081],["længden",33.081,33.48],["l",33.48,33.828],["hvor",33.97,34.15],["den",34.15,34.279],["nederste",34.279,34.653],["ende",34.653,34.898],["glider",34.898,35.155],["vandret",35.155,35.568],["med",35.568,35.787],["hastigheden",35.787,36.341],["v.",36.341,36.521],["Bindingen",36.521,36.947],["er",36.947,37.062],["cosinus",37.062,37.565],["theta",37.565,38.081],["lig",38.081,38.39],["x",38.39,38.764],["over",38.764,39.008],["l.",39.008,39.485]],"text":"Eksemplet fra slides er en stang med længden l, hvor den nederste ende glider vandret med hastigheden v. Bindingen er cosinus theta lig x over l."},"diff":{"start":40.708,"end":53.698,"words":[["Vi",40.848,40.951],["differentierer",40.951,41.724],["med",41.724,41.905],["hensyn",41.905,42.382],["til",42.382,42.511],["tiden",42.511,43.026],["med",43.026,43.181],["kædereglen",43.181,44.031],["Minus",44.935,45.27],["sinus",45.27,45.644],["theta",45.644,46.056],["gange",46.056,46.417],["omega",46.417,46.958],["er",46.958,47.126],["lig",47.126,47.383],["v",47.383,47.589],["x",47.589,47.937],["over",47.937,48.195],["l.",48.195,48.698],["Fordi",49.574,49.999],["enden",49.999,50.283],["bevæger",50.283,50.618],["sig",50.618,50.785],["mod",50.785,50.966],["mindre",50.966,51.391],["x",51.391,51.868],["er",52.01,52.138],["v",52.138,52.396],["x",52.396,52.68],["lig",52.68,52.95],["minus",52.95,53.363],["v.",53.363,53.698]],"text":"Vi differentierer med hensyn til tiden med kædereglen. Minus sinus theta gange omega er lig v x over l. Fordi enden bevæger sig mod mindre x, er v x lig minus v."},"omega":{"start":54.93,"end":58.266,"words":[["Det",55.044,55.122],["giver",55.122,55.38],["omega",55.38,55.74],["lig",55.74,55.972],["v",55.972,56.127],["divideret",56.127,56.81],["med",56.81,57.08],["l",57.081,57.274],["sinus",57.274,57.699],["theta",57.699,58.266]],"text":"Det giver omega lig v divideret med l sinus theta."},"alfa":{"start":59.48,"end":70.574,"words":[["Differentierer",59.607,60.136],["vi",60.136,60.252],["igen",60.252,60.703],["får",60.832,60.999],["vi",60.999,61.102],["cosinus",61.102,61.605],["theta",61.605,61.991],["omega",61.991,62.507],["i",62.507,62.713],["anden",62.713,62.997],["plus",62.997,63.203],["sinus",63.203,63.499],["theta",63.499,64.079],["alfa",64.079,64.453],["lig",64.453,64.672],["a",64.672,64.878],["over",64.878,65.097],["l.",65.097,65.496],["Så",65.496,65.78],["er",65.78,65.806],["alfa",65.806,66.205],["lig",66.205,66.45],["a",66.45,66.656],["over",66.656,66.901],["l",66.901,67.082],["sinus",67.082,67.455],["theta",67.455,67.79],["minus",67.79,68.267],["omega",68.267,68.744],["i",68.744,68.937],["anden",68.937,69.311],["over",69.311,69.556],["tangens",69.556,70.033],["theta",70.033,70.574]],"text":"Differentierer vi igen, får vi cosinus theta omega i anden plus sinus theta alfa lig a over l. Så er alfa lig a over l sinus theta minus omega i anden over tangens theta."},"tal":{"start":71.806,"end":83.662,"words":[["Et",71.946,72.049],["taleksempel",72.049,72.835],["l",72.951,73.17],["er",73.17,73.325],["to",73.325,73.583],["meter",73.583,74.085],["v",74.201,74.549],["er",74.549,74.652],["en",74.652,74.743],["meter",74.743,75.039],["pr.",75.039,75.245],["sekund",75.245,75.812],["og",75.993,76.147],["theta",76.147,76.676],["er",76.676,76.804],["tredive",76.804,77.204],["grader",77.204,77.719],["Så",78.61,78.894],["er",78.894,78.997],["omega",78.997,79.486],["en",79.486,79.654],["divideret",79.654,80.272],["med",80.272,80.543],["to",80.543,80.801],["gange",80.801,81.071],["en",81.071,81.175],["halv",81.175,81.548],["altså",81.69,82.154],["en",82.154,82.309],["radian",82.309,82.798],["pr.",82.798,83.069],["sekund",83.069,83.662]],"text":"Et taleksempel: l er to meter, v er en meter pr. sekund, og theta er tredive grader. Så er omega en divideret med to gange en halv, altså en radian pr. sekund."},"tal2":{"start":84.876,"end":93.689,"words":[["Med",85.003,85.158],["konstant",85.158,85.635],["v",85.635,85.918],["er",85.918,86.047],["a",86.047,86.073],["nul",86.073,86.524],["så",86.666,86.975],["alfa",86.975,87.349],["er",87.349,87.439],["minus",87.439,87.838],["en",87.838,87.98],["divideret",87.98,88.521],["med",88.521,88.74],["tangens",88.74,89.243],["tredive",89.243,89.81],["altså",89.926,90.261],["minus",90.261,90.673],["en",90.673,90.88],["komma",90.88,91.202],["syv",91.202,91.472],["tre",91.472,91.704],["radianer",91.704,92.271],["pr.",92.271,92.529],["sekund",92.529,93.07],["i",93.07,93.251],["anden",93.251,93.689]],"text":"Med konstant v er a nul, så alfa er minus en divideret med tangens tredive, altså minus en komma syv tre radianer pr. sekund i anden."},"tjek_q":{"start":94.922,"end":100.85,"words":[["Tjek",95.023,95.345],["dig",95.345,95.525],["selv",95.525,95.963],["Hvad",96.881,96.984],["sker",96.984,97.254],["der",97.254,97.358],["med",97.358,97.551],["omega",97.551,98.182],["når",98.324,98.543],["theta",98.543,98.943],["går",98.943,99.162],["mod",99.162,99.381],["nul",99.381,99.78],["og",99.78,99.909],["stangen",99.909,100.283],["ligger",100.283,100.502],["ned",100.502,100.85]],"text":"Tjek dig selv. Hvad sker der med omega, når theta går mod nul og stangen ligger ned?"},"tjek_a":{"start":104.738,"end":112.367,"words":[["Omega",104.865,105.187],["går",105.188,105.394],["mod",105.394,105.664],["uendelig",105.664,106.231],["fordi",106.347,106.747],["sinus",106.747,107.12],["theta",107.12,107.687],["går",107.688,107.919],["mod",107.919,108.151],["nul",108.151,108.577],["I",109.467,109.545],["praksis",109.545,110.047],["kan",110.047,110.202],["v",110.202,110.46],["ikke",110.46,110.704],["holdes",110.704,110.962],["konstant",110.962,111.452],["helt",111.452,111.774],["derned",111.774,112.367]],"text":"Omega går mod uendelig, fordi sinus theta går mod nul. I praksis kan v ikke holdes konstant helt derned."},"slut":{"start":113.608,"end":122.745,"words":[["Kort",113.735,113.954],["sagt",113.954,114.392],["skriv",114.521,114.908],["bindingen",114.908,115.269],["op",115.269,115.668],["differentiér",115.797,116.429],["med",116.429,116.596],["kædereglen",116.596,117.305],["og",117.46,117.601],["isolér",117.601,118.078],["omega",118.078,118.632],["og",118.632,118.838],["alfa",118.838,119.354],["Her",120.245,120.438],["er",120.438,120.489],["omega",120.489,120.863],["v",120.863,121.198],["over",121.198,121.507],["l",121.507,121.714],["sinus",121.714,122.165],["theta",122.165,122.745]],"text":"Kort sagt: skriv bindingen op, differentiér med kædereglen, og isolér omega og alfa. Her er omega v over l sinus theta."}}}, { audio: 'absolut-bevaegelse.mp3', id: 'absolut-bevaegelse' });</script>
+</body>
+</html>

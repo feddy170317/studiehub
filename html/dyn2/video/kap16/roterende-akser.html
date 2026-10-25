@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roterende koordinatsystem og Coriolis · video</title>
+<meta name="description" content="Roterende koordinatsystem og Coriolisaccelerationen.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 16: videoer</a><h1>Roterende koordinatsystem og Coriolis</h1><span class="meta">DYN2 · kapitel 16 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Roterende koordinatsystem og Coriolis"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Roterende koordinatsystem og Coriolisaccelerationen.</p><div class="chips"><a href="relativ-acceleration.html">Se først: Relativ acceleration</a><a href="../../../../lab/dyn2/roterende-system.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel16_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/dyn2/l05">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Roterende koordinatsystem og Coriolis (DYN2 Kinematik VI, HI 16.8)
+BP.scene({ header: 'DYN2 · kap. 16' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, moment, PI, TAU } = B;
+
+  B.titel(0, 'Roterende akser', 'DYN2 · Hibbeler kap. 16 · begreb (Kinematik VI)', 'titel');
+  text(0, 'Coriolisaccelerationen', 640, 520, 44, 'red', wt('titel', 'bevæger') - 0.3, we('titel', 'drejer'), { align: 'center' });
+
+  B.goto('system', 1);
+  {
+    const t0 = L('system').start, O = [260, 460];
+    arrow(1, [O, [O[0] + 220, O[1]]], 'black', 2.6, t0, t0 + 0.3, 12); arrow(1, [O, [O[0], O[1] - 220]], 'black', 2.6, t0 + 0.1, t0 + 0.4, 12);
+    text(1, 'I', O[0] + 230, O[1] + 10, 30, 'black', t0 + 0.3, t0 + 0.5); text(1, 'J', O[0] - 30, O[1] - 220, 30, 'black', t0 + 0.3, t0 + 0.5);
+    const a = PI / 7;
+    arrow(1, [O, [O[0] + 200 * Math.cos(a), O[1] - 200 * Math.sin(a)]], 'blue', 3, t0 + 0.5, t0 + 0.8, 12); arrow(1, [O, [O[0] - 200 * Math.sin(a), O[1] - 200 * Math.cos(a)]], 'blue', 3, t0 + 0.6, t0 + 0.9, 12);
+    text(1, 'i', O[0] + 205, O[1] - 90, 30, 'blue', t0 + 0.8, t0 + 1.0); text(1, 'j', O[0] - 110, O[1] - 190, 30, 'blue', t0 + 0.8, t0 + 1.0);
+    moment(1, O[0], O[1], 60, -0.05 * PI, -0.45 * PI, 'red', wt('system', 'omega') - 0.3, wt('system', 'omega') + 0.2); text(1, 'Ω', O[0] + 60, O[1] - 60, 32, 'red', wt('system', 'omega'), wt('system', 'omega') + 0.3);
+    text(1, 'v_B = v_A + Ω × r_{B/A} + (v_{B/A})_{xy}', 600, 220, 34, 'blue', L('hast').start + 0.3, we('hast', 'system'));
+    text(1, 'translation · stiv rotation · relativ', 600, 290, 30, 'black', L('led_v').start + 0.2, we('led_v', 'stang'));
+    text(1, 'a_B = a_A + Ω̇ × r + Ω × (Ω × r)', 600, 390, 32, 'red', L('acc').start + 0.3, we('acc', 'acceleration'));
+    const c = text(1, '+ 2 Ω × (v_{B/A})_{xy} + (a_{B/A})_{xy}', 640, 440, 32, 'red', wt('acc', 'to') - 0.1, we('acc', 'acceleration'));
+    text(1, '2 Ω × v_{rel} = Coriolis', 600, 560, 40, 'green', L('coriolis').start + 0.2, we('coriolis', 'system'));
+  }
+
+  B.goto('eks', 2);
+  {
+    const t0 = L('eks').start, O = [400, 400];
+    dot(2, O[0], O[1], 7, 'black', t0); line(2, [O, [O[0] + 320, O[1] - 120]], 'black', 4, t0, t0 + 0.4);
+    dot(2, O[0] + 180, O[1] - 68, 12, 'blue', t0 + 0.3);
+    arrow(2, [[O[0] + 190, O[1] - 72], [O[0] + 280, O[1] - 106]], 'blue', 3, wt('eks', 'udad') - 0.2, wt('eks', 'udad') + 0.3, 11);
+    arrow(2, [[O[0] + 180, O[1] - 68], [O[0] + 150, O[1] - 150]], 'green', 3.4, wt('eks', 'sidelæns') - 0.2, wt('eks', 'sidelæns') + 0.3, 11);
+    moment(2, O[0], O[1], 60, 0.2 * PI, -0.6 * PI, 'red', t0 + 0.2, t0 + 0.6);
+    text(2, 'perle glider udad på roterende stang', 140, 560, 34, 'black', t0 + 0.2, we('eks', 'roterende'));
+    text(2, '→ skal skubbes sidelæns (Coriolis)', 140, 620, 34, 'green', wt('eks', 'sidelæns') - 0.2, we('eks', 'Coriolis'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Hvornår er Coriolis nul?'], ['Ω = 0, v_{rel} = 0', 'eller v_{rel} ∥ aksen'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'DYN2 slides Kinematik VI · Hibbeler (2023), kap. 16.8', '', 'slut');
+  text(4, 'v_B = v_A + Ω × r + v_{rel}', 200, 280, 44, 'blue', L('slut').start + 0.4, we('slut', 'relativ'));
+  text(4, 'ekstra led: 2 Ω × v_{rel}', 200, 370, 44, 'red', wt('slut', 'accelerationen') - 0.1, we('slut', 'relativ', 1));
+});
+
+</script>
+<script>BP.live({"duration":97.874,"audio":"roterende-akser.mp3","order":["titel","system","hast","led_v","acc","coriolis","eks","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":6.763,"words":[["Roterende",0.627,1.259],["koordinatsystemer",1.259,2.56],["Når",3.464,3.657],["et",3.657,3.747],["punkt",3.747,4.044],["bevæger",4.044,4.353],["sig",4.353,4.559],["i",4.559,4.598],["forhold",4.598,4.997],["til",4.997,5.139],["et",5.139,5.216],["legeme",5.216,5.693],["der",5.835,5.951],["selv",5.951,6.247],["drejer",6.247,6.763]],"text":"Roterende koordinatsystemer. Når et punkt bevæger sig i forhold til et legeme, der selv drejer."},"system":{"start":7.978,"end":16.288,"words":[["Vi",8.118,8.247],["har",8.247,8.389],["et",8.389,8.44],["fast",8.44,8.737],["system",8.737,9.201],["med",9.201,9.445],["enhedsvektorerne",9.446,10.425],["I",10.425,10.631],["og",10.631,10.67],["J",10.67,11.121],["og",11.263,11.404],["et",11.404,11.494],["system",11.495,11.984],["x",11.984,12.293],["y",12.293,12.603],["der",12.744,12.848],["følger",12.848,13.118],["med",13.118,13.234],["legemet",13.234,13.737],["og",13.737,13.866],["drejer",13.866,14.201],["med",14.201,14.394],["vinkelhastigheden",14.394,15.18],["store",15.18,15.657],["omega",15.657,16.288]],"text":"Vi har et fast system med enhedsvektorerne I og J, og et system x y, der følger med legemet og drejer med vinkelhastigheden store omega."},"hast":{"start":17.52,"end":24.091,"words":[["Hastigheden",17.647,18.137],["af",18.137,18.214],["B",18.214,18.562],["er",18.562,18.704],["v",18.704,18.962],["A",18.962,19.078],["plus",19.078,19.31],["store",19.31,19.761],["omega",19.761,20.186],["kryds",20.186,20.495],["r",20.495,20.663],["B",20.663,21.036],["over",21.037,21.294],["A",21.294,21.307],["plus",21.307,21.578],["hastigheden",21.578,22.093],["af",22.093,22.222],["B",22.222,22.441],["målt",22.441,22.828],["i",22.828,22.944],["det",22.944,23.034],["roterende",23.034,23.511],["system",23.511,24.091]],"text":"Hastigheden af B er v A plus store omega kryds r B over A plus hastigheden af B målt i det roterende system."},"led_v":{"start":25.31,"end":34.058,"words":[["Det",25.437,25.528],["første",25.528,25.888],["led",25.888,26.198],["er",26.198,26.339],["translationen",26.339,27.319],["det",27.448,27.576],["andet",27.577,27.886],["er",27.886,28.002],["den",28.002,28.169],["stive",28.169,28.453],["rotation",28.453,29.213],["og",29.393,29.509],["det",29.509,29.613],["tredje",29.613,30.012],["er",30.012,30.102],["den",30.102,30.283],["relative",30.283,30.785],["bevægelse",30.785,31.494],["for",31.636,31.778],["eksempel",31.778,32.216],["en",32.216,32.345],["krave",32.345,32.692],["der",32.692,32.796],["glider",32.796,33.066],["langs",33.066,33.44],["en",33.44,33.62],["stang",33.62,34.058]],"text":"Det første led er translationen, det andet er den stive rotation, og det tredje er den relative bevægelse, for eksempel en krave der glider langs en stang."},"acc":{"start":35.284,"end":46.326,"words":[["Accelerationen",35.411,36.21],["får",36.21,36.365],["fem",36.365,36.648],["led",36.648,36.983],["a",37.125,37.293],["A",37.293,37.641],["store",37.77,38.208],["omega",38.208,38.62],["prik",38.62,38.865],["kryds",38.865,39.148],["r",39.148,39.471],["store",39.612,40.025],["omega",40.025,40.398],["kryds",40.398,40.669],["store",40.669,41.004],["omega",41.004,41.365],["kryds",41.365,41.674],["r",41.674,42.022],["to",42.164,42.422],["store",42.422,42.705],["omega",42.705,43.066],["kryds",43.066,43.324],["den",43.324,43.504],["relative",43.504,43.981],["hastighed",43.981,44.561],["og",44.715,44.844],["den",44.844,45.012],["relative",45.012,45.502],["acceleration",45.502,46.326]],"text":"Accelerationen får fem led: a A, store omega prik kryds r, store omega kryds store omega kryds r, to store omega kryds den relative hastighed, og den relative acceleration."},"coriolis":{"start":47.538,"end":56.571,"words":[["Leddet",47.665,47.962],["to",47.962,48.194],["omega",48.194,48.619],["kryds",48.619,48.941],["v",48.941,49.134],["relativ",49.134,49.753],["kaldes",49.753,50.114],["Coriolisaccelerationen",50.114,51.544],["Den",52.435,52.577],["opstår",52.577,53.028],["kun",53.028,53.44],["når",53.582,53.775],["punktet",53.775,54.175],["bevæger",54.175,54.523],["sig",54.523,54.742],["i",54.742,54.78],["forhold",54.78,55.193],["til",55.193,55.36],["et",55.36,55.45],["roterende",55.45,55.953],["system",55.953,56.571]],"text":"Leddet to omega kryds v relativ kaldes Coriolisaccelerationen. Den opstår kun, når punktet bevæger sig i forhold til et roterende system."},"eks":{"start":57.8,"end":68.495,"words":[["Tænk",57.927,58.172],["på",58.172,58.327],["en",58.327,58.43],["perle",58.43,58.907],["der",59.048,59.164],["glider",59.164,59.487],["udad",59.487,59.809],["på",59.809,59.989],["en",59.989,60.079],["roterende",60.079,60.595],["stang",60.595,61.02],["Den",61.924,62.04],["skal",62.04,62.194],["skubbes",62.194,62.594],["sidelæns",62.594,63.277],["fordi",63.406,63.805],["den",63.805,63.947],["kommer",63.947,64.192],["ud",64.192,64.553],["hvor",64.694,64.862],["stangen",64.862,65.287],["bevæger",65.287,65.622],["sig",65.622,65.79],["hurtigere",65.79,66.498],["Det",67.361,67.58],["er",67.58,67.657],["Coriolis",67.657,68.495]],"text":"Tænk på en perle, der glider udad på en roterende stang. Den skal skubbes sidelæns, fordi den kommer ud, hvor stangen bevæger sig hurtigere. Det er Coriolis."},"tjek_q":{"start":69.718,"end":74.035,"words":[["Tjek",69.819,70.141],["dig",70.141,70.321],["selv",70.321,70.747],["Hvornår",71.651,72.115],["er",72.115,72.295],["Coriolisaccelerationen",72.295,73.648],["nul",73.648,74.035]],"text":"Tjek dig selv. Hvornår er Coriolisaccelerationen nul?"},"tjek_a":{"start":77.902,"end":85.388,"words":[["Når",78.042,78.171],["systemet",78.171,78.738],["ikke",78.738,79.022],["drejer",79.022,79.55],["eller",79.653,79.859],["når",79.859,79.975],["punktet",79.975,80.323],["står",80.323,80.555],["stille",80.555,80.826],["i",80.826,80.916],["forhold",80.916,81.302],["til",81.303,81.444],["det",81.444,81.728],["eller",81.87,82.089],["når",82.089,82.217],["den",82.217,82.372],["relative",82.372,82.875],["hastighed",82.875,83.442],["er",83.442,83.519],["parallel",83.519,84.086],["med",84.086,84.266],["rotationsaksen",84.266,85.388]],"text":"Når systemet ikke drejer, eller når punktet står stille i forhold til det, eller når den relative hastighed er parallel med rotationsaksen."},"slut":{"start":86.604,"end":95.456,"words":[["Kort",86.731,86.937],["sagt",86.938,87.376],["v",87.504,87.814],["B",87.814,88.084],["er",88.084,88.239],["v",88.239,88.497],["A",88.497,88.651],["plus",88.651,88.935],["omega",88.935,89.45],["kryds",89.45,89.785],["r",89.785,89.953],["plus",89.953,90.224],["v",90.224,90.404],["relativ",90.404,91.023],["og",91.164,91.306],["accelerationen",91.306,92.066],["har",92.066,92.195],["et",92.195,92.337],["ekstra",92.337,92.685],["Coriolisled",92.685,93.458],["to",93.587,93.896],["omega",93.896,94.309],["kryds",94.309,94.631],["v",94.631,94.798],["relativ",94.798,95.456]],"text":"Kort sagt: v B er v A plus omega kryds r plus v relativ, og accelerationen har et ekstra Coriolisled, to omega kryds v relativ."}}}, { audio: 'roterende-akser.mp3', id: 'roterende-akser' });</script>
+</body>
+</html>

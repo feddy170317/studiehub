@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rotation med vektorer: eksempel fra slides · video</title>
+<meta name="description" content="Eksemplet fra slides: v = 2,5i + 4,3j m/s og a = −44i + 24j m/s².">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 16: videoer</a><h1>Rotation med vektorer: eksempel fra slides</h1><span class="meta">DYN2 · kapitel 16 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Rotation med vektorer: eksempel fra slides"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Eksemplet fra slides: v = 2,5i + 4,3j m/s og a = −44i + 24j m/s².</p><div class="chips"><a href="rotation-fast-akse.html">Se først: Rotation om fast akse</a><a href="../../../../lab/dyn2/rotation-fast-akse.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel16_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/dyn2/l05">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Rotation med vektorer (DYN2 Kinematik I, slide 9–10): ω = 10, α = −2, r = 0,5 @ −30° → v = 2,5i + 4,3j, a = −44i + 24j
+BP.scene({ header: 'DYN2 · kap. 16' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, PI, TAU } = B;
+
+  B.titel(0, 'Rotation med vektorer', 'DYN2 · Hibbeler kap. 16 · opgave (Kinematik I, slide 9–10)', 'titel');
+  text(0, 'v = ω × r  og  a = α × r − ω² r', 640, 520, 40, 'red', wt('titel', 'hastighed') - 0.2, we('titel', 'krydsprodukter'), { align: 'center' });
+
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start, cx = 1000, cy = 300, a = PI / 6;
+    line(1, ell(cx, cy, 130, 130, 0, TAU), 'black', 2.4, t0, t0 + 0.6, { alpha: 0.6 }); dot(1, cx, cy, 6, 'black', t0);
+    const P = [cx + 130 * Math.cos(a), cy + 130 * Math.sin(a)];
+    line(1, [[cx, cy], P], 'black', 3, t0 + 0.4, t0 + 0.7); dot(1, P[0], P[1], 8, 'blue', t0 + 0.6); text(1, 'P', P[0] + 10, P[1] + 30, 32, 'blue', t0 + 0.6, t0 + 0.9);
+    text(1, '30°', cx + 70, cy + 40, 28, 'black', wt('data', 'tredive') - 0.1, we('data', 'grader'));
+    text(1, 'ω = 10 rad/s,  α = −2 rad/s²,  r = 0,5 m', 120, 160, 36, 'black', t0 + 0.3, we('data', 'vandret'));
+    text(1, 'r = 0,5 (cos30° i − sin30° j)', 120, 240, 40, 'blue', L('r').start + 0.2, we('r', 'j'));
+    text(1, 'k × i = j,   k × j = −i', 120, 320, 38, 'green', L('regler').start + 0.2, we('regler', 'i', 1));
+    const r = text(1, 'v = ω k × r = 2,5 i + 4,3 j  m/s', 120, 420, 42, 'blue', L('v').start + 0.2, we('v', 'sekund'));
+  }
+
+  B.goto('at', 2);
+  {
+    const t0 = L('at').start;
+    text(2, 'a_t = −2 k × r = −1 (sin30° i + cos30° j)', 120, 180, 38, 'red', t0 + 0.2, we('at', 'j'));
+    text(2, 'a_n = −ω² r = −50 (cos30° i − sin30° j)', 120, 260, 38, 'green', L('an').start + 0.2, we('an', 'j'));
+    const r = text(2, 'a = −44 i + 24 j  m/s²', 120, 370, 50, 'red', L('a').start + 0.2, we('a', 'anden'));
+    box(2, 95, 310, 620, 90, 'red', we('a', 'anden'), we('a', 'anden') + 0.6);
+    text(2, 'kontrol: |v| = √(2,5² + 4,3²) = 5 = ω r  ✓', 120, 500, 36, 'black', L('tjek').start + 0.2, we('tjek', 'passer'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Hvilken del af a er størst', 'og hvorfor?'], ['a_n = ω² r = 50 m/s²', 'ω er stor'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'DYN2 slides Kinematik I, slide 9–10 · Hibbeler (2023), kap. 16.3', '', 'slut');
+  text(4, 'v = 2,5 i + 4,3 j m/s', 200, 280, 46, 'blue', L('slut').start + 0.4, we('slut', 'j'));
+  text(4, 'a = −44 i + 24 j m/s²', 200, 370, 46, 'red', wt('slut', 'a', 1) - 0.1, we('slut', 'j', 1));
+});
+
+</script>
+<script>BP.live({"duration":118.11,"audio":"opg-rotation-vektor.mp3","order":["titel","data","r","regler","v","at","an","a","tjek","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.794,"words":[["Et",0.64,0.743],["eksempel",0.743,1.375],["fra",1.375,1.542],["slides",1.542,2.148],["Vi",3.052,3.155],["finder",3.155,3.425],["hastighed",3.425,3.966],["og",3.966,4.095],["acceleration",4.095,4.959],["af",4.959,5.126],["et",5.126,5.204],["punkt",5.204,5.513],["på",5.513,5.68],["et",5.68,5.745],["roterende",5.745,6.209],["legeme",6.209,6.737],["med",6.737,6.905],["krydsprodukter",6.905,7.794]],"text":"Et eksempel fra slides. Vi finder hastighed og acceleration af et punkt på et roterende legeme med krydsprodukter."},"data":{"start":9.01,"end":20.711,"words":[["Legemet",9.137,9.537],["drejer",9.537,9.885],["med",9.885,10.104],["omega",10.104,10.568],["lig",10.568,10.8],["ti",10.8,11.006],["radianer",11.006,11.444],["pr.",11.444,11.663],["sekund",11.663,12.153],["og",12.153,12.243],["bremses",12.243,12.746],["med",12.746,12.952],["alfa",12.952,13.3],["lig",13.3,13.506],["to",13.506,13.725],["radianer",13.725,14.202],["pr.",14.202,14.421],["sekund",14.421,14.923],["i",14.923,15.104],["anden",15.104,15.568],["Punktet",16.458,16.793],["P",16.794,17.116],["sidder",17.116,17.464],["en",17.464,17.567],["halv",17.567,17.786],["meter",17.786,18.031],["fra",18.031,18.224],["aksen",18.224,18.83],["tredive",18.971,19.384],["grader",19.384,19.886],["under",19.886,20.144],["vandret",20.144,20.711]],"text":"Legemet drejer med omega lig ti radianer pr. sekund og bremses med alfa lig to radianer pr. sekund i anden. Punktet P sidder en halv meter fra aksen, tredive grader under vandret."},"r":{"start":21.936,"end":27.772,"words":[["Positionsvektoren",22.063,23.12],["er",23.12,23.313],["r",23.313,23.507],["lig",23.507,23.713],["nul",23.713,23.919],["komma",23.919,24.28],["fem",24.28,24.55],["gange",24.55,24.821],["cosinus",24.821,25.336],["tredive",25.337,25.839],["i",25.839,25.981],["minus",25.981,26.406],["sinus",26.406,26.96],["tredive",26.96,27.36],["j",27.36,27.772]],"text":"Positionsvektoren er r lig nul komma fem gange cosinus tredive i minus sinus tredive j."},"regler":{"start":29.006,"end":32.922,"words":[["Vi",29.133,29.236],["bruger",29.236,29.52],["k",29.52,29.765],["kryds",29.765,30.087],["i",30.087,30.229],["lig",30.229,30.448],["j",30.448,30.783],["og",30.783,30.886],["k",30.886,31.131],["kryds",31.131,31.517],["j",31.517,31.865],["lig",31.865,32.162],["minus",32.162,32.587],["i",32.587,32.922]],"text":"Vi bruger k kryds i lig j og k kryds j lig minus i."},"v":{"start":34.156,"end":45.509,"words":[["Hastigheden",34.283,34.876],["er",34.876,35.044],["omega",35.044,35.495],["k",35.495,35.791],["kryds",35.791,36.191],["r.",36.191,36.526],["Det",37.429,37.494],["giver",37.494,37.79],["fem",37.79,38.035],["gange",38.035,38.305],["cosinus",38.305,38.808],["tredive",38.808,39.298],["j",39.298,39.607],["plus",39.607,39.878],["sinus",39.878,40.329],["tredive",40.329,40.805],["i",40.805,41.141],["altså",41.269,41.643],["to",41.643,41.914],["komma",41.914,42.197],["fem",42.197,42.442],["i",42.442,42.506],["plus",42.507,42.803],["fire",42.803,43.202],["komma",43.202,43.486],["tre",43.486,43.808],["j",43.808,44.143],["meter",44.143,44.633],["pr.",44.633,44.903],["sekund",44.903,45.509]],"text":"Hastigheden er omega k kryds r. Det giver fem gange cosinus tredive j plus sinus tredive i, altså to komma fem i plus fire komma tre j meter pr. sekund."},"at":{"start":46.746,"end":54.476,"words":[["Den",46.873,46.989],["tangentielle",46.989,47.556],["del",47.556,47.801],["af",47.801,47.917],["accelerationen",47.917,48.819],["er",48.819,49.012],["minus",49.013,49.438],["to",49.438,49.683],["k",49.683,49.902],["kryds",49.902,50.185],["r",50.185,50.507],["altså",50.649,50.971],["minus",50.971,51.345],["en",51.345,51.512],["gange",51.512,51.796],["sinus",51.796,52.118],["tredive",52.118,52.608],["i",52.608,52.75],["plus",52.75,52.994],["cosinus",52.994,53.639],["tredive",53.639,54.064],["j",54.064,54.476]],"text":"Den tangentielle del af accelerationen er minus to k kryds r, altså minus en gange sinus tredive i plus cosinus tredive j."},"an":{"start":55.712,"end":62.863,"words":[["Den",55.839,55.93],["normale",55.93,56.29],["del",56.29,56.587],["er",56.587,56.728],["minus",56.728,57.115],["omega",57.115,57.631],["i",57.631,57.862],["anden",57.863,58.21],["r",58.21,58.533],["altså",58.674,59.035],["minus",59.035,59.37],["halvtreds",59.37,59.731],["gange",59.731,60.027],["cosinus",60.027,60.517],["tredive",60.517,61.007],["i",61.007,61.149],["minus",61.149,61.587],["sinus",61.587,62.064],["tredive",62.064,62.45],["j",62.45,62.863]],"text":"Den normale del er minus omega i anden r, altså minus halvtreds gange cosinus tredive i minus sinus tredive j."},"a":{"start":64.078,"end":69.811,"words":[["Lægger",64.192,64.515],["vi",64.515,64.605],["sammen",64.605,65.094],["får",65.223,65.378],["vi",65.378,65.533],["a",65.533,65.649],["lig",65.649,65.816],["minus",65.816,66.138],["fireogfyrre",66.138,66.795],["i",66.796,66.937],["plus",66.937,67.221],["fireogtyve",67.221,67.749],["j",67.749,68.058],["meter",68.058,68.393],["pr.",68.393,68.651],["sekund",68.651,69.192],["i",69.192,69.373],["anden",69.373,69.811]],"text":"Lægger vi sammen, får vi a lig minus fireogfyrre i plus fireogtyve j meter pr. sekund i anden."},"tjek":{"start":71.028,"end":84.557,"words":[["Kontrol",71.155,71.709],["farten",71.825,72.405],["er",72.405,72.56],["omega",72.56,72.934],["r",72.934,73.294],["ti",73.436,73.72],["gange",73.72,74.042],["nul",74.042,74.261],["komma",74.261,74.545],["fem",74.545,74.931],["altså",75.073,75.55],["fem",75.55,75.807],["meter",75.807,76.246],["pr.",76.246,76.542],["sekund",76.542,77.135],["Og",78.051,78.128],["kvadratroden",78.129,78.786],["af",78.786,78.94],["to",78.94,79.198],["komma",79.198,79.469],["fem",79.469,79.791],["i",79.791,79.971],["anden",79.971,80.242],["plus",80.242,80.487],["fire",80.487,80.912],["komma",80.912,81.196],["tre",81.196,81.505],["i",81.505,81.698],["anden",81.698,82.098],["er",82.098,82.226],["fem.",82.226,82.935],["Det",83.797,83.965],["passer",83.965,84.557]],"text":"Kontrol: farten er omega r, ti gange nul komma fem, altså fem meter pr. sekund. Og kvadratroden af to komma fem i anden plus fire komma tre i anden er fem. Det passer."},"tjek_q":{"start":85.802,"end":90.957,"words":[["Tjek",85.902,86.237],["dig",86.237,86.418],["selv",86.418,86.856],["Hvilken",87.774,88.122],["del",88.122,88.328],["af",88.328,88.431],["accelerationen",88.431,89.359],["er",89.359,89.436],["størst",89.436,89.797],["her",89.797,90.132],["og",90.274,90.428],["hvorfor",90.428,90.957]],"text":"Tjek dig selv. Hvilken del af accelerationen er størst her, og hvorfor?"},"tjek_a":{"start":94.826,"end":101.693,"words":[["Den",94.94,95.056],["normale",95.056,95.636],["halvtreds",95.752,96.229],["meter",96.229,96.487],["pr.",96.487,96.693],["sekund",96.693,97.118],["i",97.118,97.312],["anden",97.312,97.775],["fordi",97.904,98.291],["omega",98.291,98.729],["i",98.729,98.935],["anden",98.935,99.232],["r",99.232,99.515],["er",99.515,99.618],["stor",99.618,100.069],["når",100.211,100.443],["omega",100.443,100.984],["er",100.984,101.087],["ti.",101.087,101.693]],"text":"Den normale, halvtreds meter pr. sekund i anden, fordi omega i anden r er stor, når omega er ti."},"slut":{"start":102.928,"end":115.686,"words":[["Kort",103.055,103.261],["sagt",103.262,103.713],["v",103.828,104.138],["er",104.138,104.228],["omega",104.228,104.628],["kryds",104.628,104.963],["r",104.963,105.31],["a",105.452,105.684],["er",105.684,105.839],["alfa",105.839,106.29],["kryds",106.29,106.612],["r",106.612,106.78],["minus",106.78,107.179],["omega",107.179,107.785],["i",107.785,108.004],["anden",108.004,108.313],["r.",108.313,108.622],["Her",109.513,109.693],["er",109.693,109.758],["v",109.758,109.925],["lig",109.925,110.067],["to",110.067,110.364],["komma",110.364,110.647],["fem",110.647,110.892],["i",110.892,110.956],["plus",110.956,111.253],["fire",111.253,111.652],["komma",111.652,111.923],["tre",111.923,112.219],["j",112.219,112.619],["og",112.619,112.773],["a",112.773,112.786],["lig",112.786,113.018],["minus",113.018,113.521],["fireogfyrre",113.521,114.255],["i",114.255,114.384],["plus",114.384,114.693],["fireogtyve",114.693,115.286],["j",115.286,115.686]],"text":"Kort sagt: v er omega kryds r, a er alfa kryds r minus omega i anden r. Her er v lig to komma fem i plus fire komma tre j og a lig minus fireogfyrre i plus fireogtyve j."}}}, { audio: 'opg-rotation-vektor.mp3', id: 'opg-rotation-vektor' });</script>
+</body>
+</html>

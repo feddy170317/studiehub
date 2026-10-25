@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Newtons love for stive legemer · video</title>
+<meta name="description" content="ΣF = maG, ΣMG = IGα og moment om et vilkårligt punkt.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 17: videoer</a><h1>Newtons love for stive legemer</h1><span class="meta">DYN2 · kapitel 17 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Newtons love for stive legemer"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>ΣF = maG, ΣMG = IGα og moment om et vilkårligt punkt.</p><div class="chips"><a href="inertimoment.html">Se først: Masse-inertimoment</a><a href="../../../../lab/dyn2/bil-kinetik.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel17_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/dyn2/l06">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Newtons love for stift legeme (DYN2 Kinetik II–III, HI 17.2–17.5)
+BP.scene({ header: 'DYN2 · kap. 17' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, moment, PI, TAU } = B;
+
+  B.titel(0, 'Newton for stive legemer', 'DYN2 · Hibbeler kap. 17 · begreb (Kinetik II–III)', 'titel');
+  text(0, 'sum i FLD = sum i KD', 640, 520, 44, 'red', wt('titel', 'Summen') - 0.2, we('titel', 'diagram'), { align: 'center' });
+
+  B.goto('partikel', 1);
+  {
+    const t0 = L('partikel').start;
+    line(1, ell(260, 300, 90, 60, 0, TAU), 'black', 3, t0, t0 + 0.5);
+    arrow(1, [[260, 300], [400, 260]], 'red', 3, t0 + 0.3, t0 + 0.6, 12); arrow(1, [[260, 300], [180, 420]], 'red', 3, t0 + 0.4, t0 + 0.7, 12);
+    text(1, 'FLD', 220, 450, 32, 'red', t0 + 0.5, t0 + 0.8);
+    text(1, '=', 470, 310, 50, 'black', t0 + 0.7, t0 + 0.9);
+    line(1, ell(620, 300, 90, 60, 0, TAU), 'black', 3, t0 + 0.6, t0 + 1.1); arrow(1, [[620, 300], [760, 300]], 'blue', 3.4, t0 + 1.0, t0 + 1.3, 12);
+    text(1, 'm a', 680, 280, 32, 'blue', t0 + 1.1, t0 + 1.4); text(1, 'KD', 580, 450, 32, 'blue', t0 + 1.0, t0 + 1.3);
+    text(1, 'indre kræfter går ud ⇒ ΣF = m_{tot} a_G', 140, 560, 34, 'black', L('system').start + 0.3, we('system', 'tyngdepunktet'));
+  }
+
+  B.goto('stift', 2);
+  {
+    const t0 = L('stift').start;
+    const r = text(2, 'ΣF = m a_G', 140, 170, 48, 'red', t0 + 0.4, we('stift', 'G'));
+    text(2, 'ΣM_P = I_G α + r_{G/P} × m a_G', 520, 170, 42, 'red', wt('stift', 'momentet') - 0.1, we('stift', 'G', 2));
+    text(2, 'om G:  ΣM_G = I_G α', 140, 270, 42, 'blue', L('g').start + 0.2, we('g', 'alfa'));
+    text(2, 'translation: α = 0, ΣM_G = 0', 140, 350, 38, 'green', L('trans').start + 0.2, we('trans', 'nul', 1));
+    text(2, 'fast akse O:  ΣM_O = I_O α', 140, 430, 42, 'blue', L('fast').start + 0.2, we('fast', 'alfa'));
+    text(2, 'plan: ΣF_x = m a_{Gx},  ΣF_y = m a_{Gy},  ΣM', 140, 530, 36, 'black', L('komp').start + 0.2, we('komp', 'momentligning'));
+    text(2, 'vælg P smart, men husk r × m a_G', 140, 620, 36, 'red', L('valg').start + 0.2, we('valg', 'G'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Hvorfor ikke bare ΣM_P = I α', 'om et vilkårligt punkt?'], ['m a_G giver også moment om P', 'kun om G eller fast akse: I α'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'DYN2 slides Kinetik II–III · Hibbeler (2023), kap. 17.2–17.5', 'bil i translation', 'slut');
+  text(4, 'ΣF = m a_G  ·  ΣM_G = I_G α', 200, 280, 44, 'red', L('slut').start + 0.4, we('slut', 'alfa'));
+  text(4, 'ΣM_O = I_O α (fast akse)', 200, 370, 44, 'blue', wt('slut', 'Om') - 0.1, we('slut', 'alfa', 1));
+});
+
+</script>
+<script>BP.live({"duration":108.87,"audio":"newton-stift-legeme.mp3","order":["titel","partikel","system","stift","g","trans","fast","komp","valg","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":8.464,"words":[["Newtons",0.64,1.156],["love",1.156,1.491],["for",1.491,1.697],["et",1.697,1.761],["stift",1.761,2.122],["legeme",2.122,2.65],["Summen",3.554,3.915],["af",3.915,4.018],["kræfterne",4.018,4.598],["i",4.598,4.74],["det",4.74,4.843],["frie",4.843,5.113],["legeme-diagram",5.113,6.119],["er",6.119,6.247],["lig",6.247,6.454],["summen",6.454,6.93],["i",6.93,7.072],["det",7.072,7.188],["kinetiske",7.188,7.858],["diagram",7.858,8.464]],"text":"Newtons love for et stift legeme. Summen af kræfterne i det frie legeme-diagram er lig summen i det kinetiske diagram."},"partikel":{"start":9.706,"end":17.179,"words":[["For",9.833,10.001],["en",10.001,10.078],["partikel",10.078,10.606],["er",10.606,10.71],["summen",10.71,11.045],["af",11.045,11.135],["kræfterne",11.135,11.663],["m",11.663,11.882],["a.",11.882,12.501],["Tegn",12.501,12.823],["et",12.823,12.913],["frit",12.913,13.132],["legeme-diagram",13.132,13.931],["med",13.931,14.06],["kræfterne",14.06,14.704],["og",14.704,14.872],["et",14.872,14.949],["kinetisk",14.949,15.491],["diagram",15.491,16.096],["med",16.096,16.328],["m",16.328,16.586],["a.",16.586,17.179]],"text":"For en partikel er summen af kræfterne m a. Tegn et frit legeme-diagram med kræfterne og et kinetisk diagram med m a."},"system":{"start":18.408,"end":26.254,"words":[["For",18.535,18.716],["et",18.716,18.78],["system",18.78,19.205],["af",19.205,19.296],["partikler",19.296,19.953],["går",19.953,20.172],["de",20.172,20.314],["indre",20.314,20.662],["kræfter",20.662,21.048],["ud",21.048,21.37],["og",21.512,21.641],["summen",21.641,22.002],["af",22.002,22.118],["ydre",22.118,22.401],["kræfter",22.401,22.904],["bliver",22.904,23.097],["den",23.097,23.252],["samlede",23.252,23.651],["masse",23.651,23.986],["gange",23.986,24.27],["accelerationen",24.27,25.275],["af",25.275,25.404],["tyngdepunktet",25.404,26.254]],"text":"For et system af partikler går de indre kræfter ud, og summen af ydre kræfter bliver den samlede masse gange accelerationen af tyngdepunktet."},"stift":{"start":27.47,"end":37.573,"words":[["For",27.597,27.765],["et",27.765,27.829],["stift",27.829,28.164],["legeme",28.164,28.641],["har",28.641,28.822],["vi",28.822,28.925],["derfor",28.925,29.285],["sum",29.285,29.646],["F",29.646,29.891],["lig",29.891,30.149],["m",30.149,30.471],["a",30.471,30.703],["G.",30.703,31.141],["Og",32.045,32.096],["momentet",32.096,32.599],["om",32.599,32.766],["et",32.766,32.857],["vilkårligt",32.857,33.346],["punkt",33.346,33.565],["P",33.565,33.9],["er",33.9,34.068],["I",34.068,34.3],["G",34.3,34.57],["alfa",34.571,34.957],["plus",34.957,35.266],["r",35.266,35.46],["G",35.46,35.833],["over",35.833,36.104],["P",36.104,36.336],["kryds",36.336,36.748],["m",36.748,37.019],["a",37.019,37.148],["G.",37.148,37.573]],"text":"For et stift legeme har vi derfor sum F lig m a G. Og momentet om et vilkårligt punkt P er I G alfa plus r G over P kryds m a G."},"g":{"start":38.812,"end":44.442,"words":[["Tager",38.926,39.158],["vi",39.158,39.261],["momentet",39.262,39.79],["om",39.79,39.996],["tyngdepunktet",39.996,40.821],["forsvinder",40.911,41.414],["det",41.414,41.504],["sidste",41.504,41.852],["led",41.852,42.2],["sum",42.329,42.754],["M",42.754,42.973],["G",42.973,43.282],["er",43.282,43.475],["I",43.475,43.694],["G",43.694,43.952],["alfa",43.952,44.442]],"text":"Tager vi momentet om tyngdepunktet, forsvinder det sidste led: sum M G er I G alfa."},"trans":{"start":45.666,"end":53.23,"words":[["Ved",45.806,45.948],["ren",45.948,46.193],["translation",46.193,46.992],["er",46.992,47.198],["alfa",47.198,47.572],["nul",47.572,48.01],["Så",48.901,49.158],["er",49.158,49.184],["sum",49.184,49.532],["M",49.532,49.751],["G",49.751,49.957],["lig",49.957,50.138],["nul",50.138,50.537],["men",50.679,50.872],["momentet",50.872,51.388],["om",51.388,51.594],["et",51.594,51.723],["andet",51.723,51.993],["punkt",51.993,52.354],["er",52.354,52.509],["ikke",52.509,52.844],["nul",52.844,53.23]],"text":"Ved ren translation er alfa nul. Så er sum M G lig nul, men momentet om et andet punkt er ikke nul."},"fast":{"start":54.464,"end":59.127,"words":[["Ved",54.604,54.694],["rotation",54.694,55.21],["om",55.21,55.339],["en",55.339,55.442],["fast",55.442,55.841],["akse",55.841,56.305],["O",56.305,56.537],["kan",56.537,56.679],["vi",56.679,56.756],["skrive",56.756,57.04],["sum",57.04,57.413],["M",57.414,57.71],["O",57.71,57.968],["lig",57.968,58.264],["I",58.264,58.496],["O",58.496,58.741],["alfa",58.741,59.127]],"text":"Ved rotation om en fast akse O kan vi skrive sum M O lig I O alfa."},"komp":{"start":60.358,"end":67.805,"words":[["I",60.472,60.563],["planen",60.563,61.027],["giver",61.027,61.271],["det",61.271,61.362],["tre",61.362,61.632],["ligninger",61.632,62.238],["sum",62.367,62.74],["F",62.74,62.998],["x",62.998,63.256],["lig",63.256,63.488],["m",63.488,63.707],["a",63.707,63.887],["G",63.887,64.106],["x",64.106,64.519],["sum",64.661,65.034],["F",65.034,65.266],["y",65.266,65.434],["lig",65.434,65.691],["m",65.691,65.936],["a",65.936,66.13],["G",66.13,66.362],["y",66.362,66.645],["og",66.851,66.98],["en",66.98,67.096],["momentligning",67.096,67.805]],"text":"I planen giver det tre ligninger: sum F x lig m a G x, sum F y lig m a G y, og en momentligning."},"valg":{"start":69.036,"end":75.685,"words":[["Vælg",69.176,69.434],["momentpunktet",69.434,70.104],["klogt",70.104,70.568],["så",70.71,70.955],["ukendte",70.955,71.431],["kræfter",71.431,71.869],["forsvinder",71.869,72.54],["Men",73.443,73.598],["husk",73.598,73.881],["så",73.881,74.023],["leddet",74.023,74.307],["r",74.307,74.487],["kryds",74.487,74.925],["m",74.925,75.157],["a",75.157,75.222],["G.",75.222,75.685]],"text":"Vælg momentpunktet klogt, så ukendte kræfter forsvinder. Men husk så leddet r kryds m a G."},"tjek_q":{"start":76.898,"end":82.594,"words":[["Tjek",76.999,77.308],["dig",77.308,77.488],["selv",77.488,77.927],["Hvorfor",78.831,79.037],["kan",79.037,79.166],["man",79.166,79.295],["ikke",79.295,79.475],["bare",79.475,79.681],["sætte",79.682,79.965],["momentet",79.965,80.545],["om",80.545,80.751],["et",80.751,80.841],["vilkårligt",80.841,81.305],["punkt",81.305,81.563],["lig",81.563,81.821],["I",81.821,82.027],["alfa",82.027,82.594]],"text":"Tjek dig selv. Hvorfor kan man ikke bare sætte momentet om et vilkårligt punkt lig I alfa?"},"tjek_a":{"start":86.474,"end":93.961,"words":[["Fordi",86.601,87.001],["m",87.001,87.168],["a",87.168,87.22],["G",87.22,87.465],["også",87.465,87.916],["giver",87.916,88.199],["et",88.199,88.289],["moment",88.289,88.676],["om",88.676,88.869],["punktet",88.869,89.436],["Kun",90.327,90.495],["om",90.495,90.623],["tyngdepunktet",90.623,91.332],["eller",91.332,91.667],["en",91.667,91.783],["fast",91.783,92.131],["akse",92.131,92.647],["er",92.647,92.814],["det",92.814,92.904],["bare",92.904,93.239],["I",93.239,93.446],["alfa",93.446,93.961]],"text":"Fordi m a G også giver et moment om punktet. Kun om tyngdepunktet eller en fast akse er det bare I alfa."},"slut":{"start":95.176,"end":106.452,"words":[["Kort",95.303,95.509],["sagt",95.51,95.999],["sum",96.128,96.528],["F",96.528,96.798],["er",96.798,96.953],["m",96.953,97.172],["a",97.172,97.236],["G",97.236,97.623],["sum",97.752,98.125],["M",98.126,98.332],["G",98.332,98.615],["er",98.615,98.718],["I",98.718,98.924],["G",98.924,99.169],["alfa",99.169,99.633],["og",99.775,99.904],["om",99.904,100.058],["andre",100.058,100.368],["punkter",100.368,100.664],["skal",100.664,100.922],["r",100.922,101.102],["kryds",101.102,101.502],["m",101.502,101.734],["a",101.734,101.798],["G",101.798,102.004],["med.",102.004,102.339],["Om",103.243,103.372],["en",103.372,103.462],["fast",103.462,103.797],["akse",103.797,104.171],["er",104.171,104.287],["sum",104.287,104.648],["M",104.648,104.97],["O",104.97,105.24],["lig",105.24,105.575],["I",105.575,105.82],["O",105.82,106.065],["alfa",106.065,106.452]],"text":"Kort sagt: sum F er m a G, sum M G er I G alfa, og om andre punkter skal r kryds m a G med. Om en fast akse er sum M O lig I O alfa."}}}, { audio: 'newton-stift-legeme.mp3', id: 'newton-stift-legeme' });</script>
+</body>
+</html>

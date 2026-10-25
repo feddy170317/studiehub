@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rotation om fast akse · video</title>
+<meta name="description" content="θ, ω og α, formler for konstant α, v = ωr, at = αr, an = ω²r og tandhjul/remme uden glid.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 16: videoer</a><h1>Rotation om fast akse</h1><span class="meta">DYN2 · kapitel 16 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Rotation om fast akse"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>θ, ω og α, formler for konstant α, v = ωr, at = αr, an = ω²r og tandhjul/remme uden glid.</p><div class="chips"><a href="../../../../lab/dyn2/rotation-fast-akse.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel16_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/dyn2/l05">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Rotation om fast akse (DYN2 Lektion 5, Intro + Kinematik I, HI 16.3)
+BP.scene({ header: 'DYN2 · kap. 16' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, dashed, PI, TAU } = B;
+
+  B.titel(0, 'Rotation om fast akse', 'DYN2 · Hibbeler kap. 16 · begreb (Kinematik I)', 'titel');
+  text(0, 'θ, ω, α og v = ω r', 640, 520, 44, 'red', wt('titel', 'Vinkel') - 0.2, we('titel', 'punkt'), { align: 'center' });
+
+  B.goto('analogi', 1);
+  {
+    const t0 = L('analogi').start;
+    text(1, 's  ↔  θ', 160, 180, 44, 'black', wt('analogi', 'theta') - 0.3, we('analogi', 'positionen'));
+    text(1, 'v = ds/dt  ↔  ω = dθ/dt', 160, 250, 44, 'blue', wt('analogi', 'omega') - 0.1, we('analogi', 'hastigheden'));
+    text(1, 'a = dv/dt  ↔  α = dω/dt', 160, 320, 44, 'red', wt('analogi', 'alfa') - 0.1, we('analogi', 'accelerationen'));
+    text(1, '1 omdr. = 2π rad · 1 rpm = 2π/60 rad/s', 160, 420, 34, 'green', L('enheder').start + 0.3, we('enheder', 'sekund'));
+    const tk = L('konstant').start;
+    text(1, 'ω = ω_0 + α t', 160, 520, 38, 'black', wt('konstant', 'omega') - 0.1, we('konstant', 't'));
+    text(1, 'θ = θ_0 + ω_0 t + ½ α t²', 480, 520, 38, 'black', wt('konstant', 'theta') - 0.1, we('konstant', 'anden'));
+    text(1, 'ω² = ω_0² + 2 α (θ − θ_0)', 160, 590, 38, 'black', wt('konstant', 'omega', 2) - 0.1, we('konstant', 'vinkelændringen'));
+  }
+
+  B.goto('punkt', 2);
+  {
+    const t0 = L('punkt').start, cx = 320, cy = 400, R = 180, a = -PI / 5;
+    line(2, ell(cx, cy, R, R, 0, TAU), 'black', 2.6, t0, t0 + 0.6, { alpha: 0.6 }); dot(2, cx, cy, 7, 'black', t0);
+    const P = [cx + R * Math.cos(a), cy + R * Math.sin(a)];
+    line(2, [[cx, cy], P], 'black', 3, t0 + 0.3, t0 + 0.6); dot(2, P[0], P[1], 8, 'blue', t0 + 0.5); text(2, 'r', cx + 90, cy - 70, 32, 'black', t0 + 0.5, t0 + 0.8);
+    const tg = [-Math.sin(a), Math.cos(a)];
+    arrow(2, [P, [P[0] - 120 * tg[0], P[1] - 120 * tg[1]]], 'blue', 3.6, wt('punkt', 'farten') - 0.2, wt('punkt', 'farten') + 0.3, 13);
+    arrow(2, [P, [P[0] - 80 * Math.cos(a), P[1] - 80 * Math.sin(a)]], 'green', 3.6, wt('punkt', 'normale') - 0.2, wt('punkt', 'normale') + 0.3, 13);
+    text(2, 'v = ω r', 640, 200, 46, 'blue', wt('punkt', 'v') - 0.1, we('punkt', 'r'));
+    text(2, 'a_t = α r', 640, 270, 46, 'red', wt('punkt', 'tangentielle') - 0.1, we('punkt', 'r', 1));
+    text(2, 'a_n = ω² r', 640, 340, 46, 'green', wt('punkt', 'normale') - 0.1, we('punkt', 'r', 2));
+    text(2, 'v = ω × r ·  a = α × r − ω² r', 640, 440, 36, 'black', L('vektor').start + 0.2, we('vektor', 'r', 2));
+    text(2, 'ω og α fælles, r varierer', 640, 520, 34, 'red', L('faelles').start + 0.2, we('faelles', 'punkt', 1));
+    text(2, 'uden glid: ω_1 R_1 = ω_2 R_2', 640, 620, 40, 'blue', L('tandhjul').start + 0.3, we('tandhjul', 'to', 1));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['R_1 = 5 cm, R_2 = 15 cm,', 'ω_1 = 60 rad/s. Og ω_2?'], ['ω_2 = (5/15) · 60 = 20 rad/s'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'DYN2 slides Intro til rotation + Kinematik I · Hibbeler (2023), kap. 16.3', 'relativ hastighed', 'slut');
+  text(4, 'v = ω r · a_t = α r · a_n = ω² r', 200, 280, 42, 'blue', L('slut').start + 0.4, we('slut', 'r', 2));
+  text(4, 'ω_1 R_1 = ω_2 R_2', 200, 370, 44, 'red', wt('slut', 'uden') - 0.1, we('slut', 'to', 1));
+});
+
+</script>
+<script>BP.live({"duration":124.12,"audio":"rotation-fast-akse.mp3","order":["titel","analogi","enheder","konstant","punkt","vektor","faelles","tandhjul","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":8.67,"words":[["Rotation",0.627,1.31],["om",1.31,1.529],["en",1.529,1.658],["fast",1.658,2.019],["akse",2.019,2.573],["Vinkel",3.49,4.005],["vinkelhastighed",4.082,4.997],["og",4.997,5.126],["vinkelacceleration",5.126,6.338],["og",6.531,6.66],["hvordan",6.66,7.008],["de",7.008,7.085],["giver",7.085,7.343],["hastigheden",7.343,7.974],["af",7.974,8.142],["et",8.142,8.232],["punkt",8.232,8.67]],"text":"Rotation om en fast akse. Vinkel, vinkelhastighed og vinkelacceleration, og hvordan de giver hastigheden af et punkt."},"analogi":{"start":9.898,"end":21.715,"words":[["Det",10.025,10.09],["svarer",10.09,10.399],["til",10.399,10.567],["bevægelse",10.567,11.25],["på",11.25,11.443],["en",11.443,11.559],["ret",11.559,11.791],["linje",11.791,12.293],["Vinklen",13.197,13.7],["theta",13.7,14.215],["svarer",14.215,14.576],["til",14.576,14.743],["positionen",14.743,15.555],["omega",15.697,16.071],["lig",16.071,16.238],["d",16.238,16.393],["theta",16.393,16.805],["d",16.805,16.986],["t",16.986,17.205],["svarer",17.205,17.514],["til",17.514,17.669],["hastigheden",17.669,18.364],["og",18.545,18.687],["alfa",18.687,19.022],["lig",19.022,19.176],["d",19.176,19.357],["omega",19.357,19.756],["d",19.756,19.962],["t",19.962,20.169],["svarer",20.169,20.594],["til",20.594,20.761],["accelerationen",20.761,21.715]],"text":"Det svarer til bevægelse på en ret linje. Vinklen theta svarer til positionen, omega lig d theta d t svarer til hastigheden, og alfa lig d omega d t svarer til accelerationen."},"enheder":{"start":22.944,"end":32.39,"words":[["Vinklen",23.084,23.69],["måles",23.69,24.231],["i",24.231,24.424],["radianer",24.424,25.172],["En",26.063,26.179],["omdrejning",26.179,26.733],["er",26.733,26.874],["to",26.874,27.119],["pi",27.119,27.274],["radianer",27.274,28.021],["og",28.163,28.472],["en",28.472,28.575],["omdrejning",28.575,29.104],["i",29.104,29.155],["minuttet",29.155,29.619],["er",29.619,29.774],["to",29.774,30.032],["pi",30.032,30.367],["over",30.367,30.65],["tres",30.65,30.947],["radianer",30.947,31.552],["pr.",31.552,31.81],["sekund",31.81,32.39]],"text":"Vinklen måles i radianer. En omdrejning er to pi radianer, og en omdrejning i minuttet er to pi over tres radianer pr. sekund."},"konstant":{"start":33.614,"end":49.141,"words":[["Ved",33.754,33.844],["konstant",33.844,34.295],["vinkelacceleration",34.295,35.417],["gælder",35.417,35.674],["de",35.674,35.752],["samme",35.752,36.074],["formler",36.074,36.525],["som",36.525,36.718],["for",36.718,36.847],["konstant",36.847,37.285],["acceleration",37.285,38.11],["omega",38.252,38.69],["er",38.69,38.832],["omega",38.832,39.27],["nul",39.27,39.54],["plus",39.54,39.824],["alfa",39.824,40.133],["t",40.133,40.545],["theta",40.661,41.125],["er",41.125,41.241],["theta",41.241,41.602],["nul",41.602,41.77],["plus",41.77,42.053],["omega",42.053,42.543],["nul",42.543,42.826],["t",42.826,43.045],["plus",43.045,43.303],["en",43.303,43.393],["halv",43.393,43.677],["alfa",43.677,44.051],["t",44.051,44.295],["i",44.295,44.463],["anden",44.463,44.85],["og",45.056,45.223],["omega",45.223,45.584],["i",45.584,45.726],["anden",45.726,46.022],["er",46.022,46.151],["omega",46.151,46.499],["nul",46.499,46.77],["i",46.77,46.899],["anden",46.899,47.143],["plus",47.143,47.375],["to",47.375,47.672],["alfa",47.672,47.994],["gange",47.994,48.329],["vinkelændringen",48.329,49.141]],"text":"Ved konstant vinkelacceleration gælder de samme formler som for konstant acceleration: omega er omega nul plus alfa t, theta er theta nul plus omega nul t plus en halv alfa t i anden, og omega i anden er omega nul i anden plus to alfa gange vinkelændringen."},"punkt":{"start":50.356,"end":61.567,"words":[["Et",50.496,50.599],["punkt",50.599,50.844],["i",50.844,50.96],["afstanden",50.96,51.463],["r",51.463,51.656],["fra",51.656,51.824],["aksen",51.824,52.416],["har",52.416,52.584],["farten",52.584,53.035],["v",53.035,53.254],["lig",53.254,53.486],["omega",53.486,54.001],["r.",54.001,54.311],["Den",55.201,55.33],["tangentielle",55.33,55.897],["acceleration",55.897,56.722],["er",56.722,56.941],["alfa",56.941,57.405],["r",57.405,57.727],["og",57.869,57.985],["den",57.985,58.14],["normale",58.14,58.487],["acceleration",58.487,59.209],["mod",59.209,59.454],["aksen",59.454,59.995],["er",59.995,60.15],["omega",60.15,60.678],["i",60.678,60.897],["anden",60.897,61.232],["r.",61.232,61.567]],"text":"Et punkt i afstanden r fra aksen har farten v lig omega r. Den tangentielle acceleration er alfa r, og den normale acceleration mod aksen er omega i anden r."},"vektor":{"start":62.802,"end":68.78,"words":[["På",62.916,63.007],["vektorform",63.007,63.587],["er",63.587,63.741],["v",63.741,63.947],["lig",63.947,64.115],["omega",64.115,64.514],["kryds",64.514,64.837],["r",64.837,65.184],["og",65.326,65.545],["a",65.545,65.751],["er",65.752,65.893],["alfa",65.893,66.344],["kryds",66.344,66.679],["r",66.679,66.873],["minus",66.873,67.311],["omega",67.311,67.916],["i",67.916,68.135],["anden",68.135,68.471],["r.",68.471,68.78]],"text":"På vektorform er v lig omega kryds r, og a er alfa kryds r minus omega i anden r."},"faelles":{"start":70.016,"end":76.343,"words":[["Omega",70.143,70.62],["og",70.62,70.839],["alfa",70.839,71.368],["er",71.368,71.522],["de",71.522,71.612],["samme",71.612,71.973],["for",71.973,72.102],["hele",72.102,72.424],["legemet",72.424,72.965],["Det",73.843,73.998],["er",73.998,74.127],["kun",74.127,74.397],["r",74.397,74.732],["der",74.874,74.99],["varierer",74.99,75.377],["fra",75.377,75.531],["punkt",75.531,75.802],["til",75.802,75.918],["punkt",75.918,76.343]],"text":"Omega og alfa er de samme for hele legemet. Det er kun r, der varierer fra punkt til punkt."},"tandhjul":{"start":77.566,"end":86.625,"words":[["To",77.693,77.925],["tandhjul",77.925,78.505],["eller",78.505,78.802],["en",78.802,78.943],["rem",78.943,79.265],["uden",79.266,79.536],["glid",79.536,79.858],["har",79.858,80.026],["samme",80.026,80.374],["tangentielle",80.374,80.967],["hastighed",80.967,81.598],["i",81.598,81.714],["kontaktpunktet",81.714,82.693],["Derfor",83.571,83.919],["er",83.919,83.996],["omega",83.996,84.396],["et",84.396,84.563],["R",84.563,84.821],["et",84.821,85.002],["lig",85.002,85.234],["omega",85.234,85.749],["to",85.749,86.071],["R",86.071,86.187],["to.",86.187,86.625]],"text":"To tandhjul eller en rem uden glid har samme tangentielle hastighed i kontaktpunktet. Derfor er omega et R et lig omega to R to."},"tjek_q":{"start":87.852,"end":100.209,"words":[["Tjek",87.953,88.275],["dig",88.275,88.455],["selv",88.455,88.881],["Et",89.798,89.901],["tandhjul",89.901,90.378],["med",90.378,90.571],["radius",90.571,90.996],["fem",90.996,91.215],["centimeter",91.215,91.989],["driver",91.989,92.298],["et",92.298,92.453],["med",92.453,92.646],["radius",92.646,93.148],["femten",93.148,93.548],["centimeter",93.548,94.386],["Det",95.275,95.339],["lille",95.339,95.61],["drejer",95.61,95.996],["tres",95.996,96.318],["radianer",96.318,96.886],["pr.",96.886,97.143],["sekund",97.143,97.762],["Hvor",98.624,98.895],["hurtigt",98.895,99.23],["drejer",99.23,99.552],["det",99.552,99.655],["store",99.655,100.209]],"text":"Tjek dig selv. Et tandhjul med radius fem centimeter driver et med radius femten centimeter. Det lille drejer tres radianer pr. sekund. Hvor hurtigt drejer det store?"},"tjek_a":{"start":104.076,"end":111.587,"words":[["Tyve",104.203,104.513],["radianer",104.513,105.002],["pr.",105.002,105.221],["sekund",105.221,105.788],["fordi",105.917,106.291],["omega",106.291,106.69],["to",106.69,107.013],["er",107.013,107.09],["R",107.09,107.373],["et",107.373,107.657],["over",107.657,107.979],["R",107.979,108.172],["to",108.172,108.417],["gange",108.417,108.752],["omega",108.752,109.165],["et",109.165,109.525],["altså",109.654,110.092],["en",110.092,110.26],["tredjedel",110.26,110.879],["af",110.879,111.046],["tres",111.046,111.587]],"text":"Tyve radianer pr. sekund, fordi omega to er R et over R to gange omega et, altså en tredjedel af tres."},"slut":{"start":112.802,"end":121.692,"words":[["Kort",112.916,113.135],["sagt",113.136,113.599],["v",113.715,114.038],["er",114.038,114.115],["omega",114.115,114.501],["r",114.502,114.888],["a",115.03,115.172],["t",115.172,115.494],["er",115.494,115.7],["alfa",115.7,116.138],["r",116.138,116.46],["a",116.602,116.731],["n",116.731,116.976],["er",116.976,117.092],["omega",117.092,117.543],["i",117.543,117.749],["anden",117.749,118.007],["r",118.007,118.316],["og",118.458,118.574],["uden",118.574,118.831],["glid",118.831,119.025],["er",119.025,119.089],["omega",119.089,119.489],["et",119.489,119.733],["R",119.733,119.94],["et",119.94,120.12],["lig",120.12,120.352],["omega",120.352,120.829],["to",120.829,121.125],["R",121.125,121.267],["to.",121.267,121.692]],"text":"Kort sagt: v er omega r, a t er alfa r, a n er omega i anden r, og uden glid er omega et R et lig omega to R to."}}}, { audio: 'rotation-fast-akse.mp3', id: 'rotation-fast-akse' });</script>
+</body>
+</html>

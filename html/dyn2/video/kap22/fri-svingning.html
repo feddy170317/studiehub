@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Frie udæmpede svingninger · video</title>
+<meta name="description" content="mẍ + kx = 0, ωn, periode, matematisk og fysisk pendul og lodret fjeder.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 22: videoer</a><h1>Frie udæmpede svingninger</h1><span class="meta">DYN2 · kapitel 22 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Frie udæmpede svingninger"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>mẍ + kx = 0, ωn, periode, matematisk og fysisk pendul og lodret fjeder.</p><div class="chips"><a href="../../../../lab/dyn2/vibrationer.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel22_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/dyn2/l11">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Frie udæmpede svingninger (DYN2 Vibrationer I, HI 22.1). Tjek: slank stang 1 m → ωn = 3,84 rad/s, τ = 1,64 s
+BP.scene({ header: 'DYN2 · kap. 22' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, rect, hatch, plot, axes, dashed, PI, TAU } = B;
+
+  B.titel(0, 'Frie svingninger', 'DYN2 · Hibbeler kap. 22 · begreb (Vibrationer I)', 'titel');
+  text(0, 'ẍ + ω_n² x = 0', 640, 520, 46, 'red', wt('titel', 'Masse') - 0.3, we('titel', 'pendul', 1), { align: 'center' });
+
+  B.goto('ligning', 1);
+  {
+    const t0 = L('ligning').start;
+    hatch(1, rect(100, 200, 20, 160), 'black', t0, t0 + 0.3, { gap: 6 });
+    const P = [[120, 280]]; for (let i = 0; i < 9; i++) P.push([150 + 25 * i, i % 2 ? 300 : 260]); P.push([380, 280]); line(1, P, 'black', 2.6, t0 + 0.2, t0 + 0.6);
+    line(1, rect(380, 240, 90, 80).concat([[380, 242]]), 'blue', 3, t0 + 0.5, t0 + 0.8); text(1, 'm', 415, 292, 34, 'blue', t0 + 0.6, t0 + 0.9);
+    text(1, 'k', 250, 240, 30, 'black', t0 + 0.4, t0 + 0.7);
+    text(1, '−k x = m ẍ', 560, 230, 44, 'black', t0 + 0.4, wt('ligning', 'Det'));
+    const r = text(1, 'ẍ + ω_n² x = 0,  ω_n = √(k/m)', 560, 310, 42, 'red', wt('ligning', 'Det') - 0.1, we('ligning', 'm', 1));
+    text(1, 'x = A sin ω_n t + B cos ω_n t', 140, 440, 40, 'blue', L('loesning').start + 0.2, wt('loesning', 'Med'));
+    text(1, 'A = v_1/ω_n,  B = x_1', 760, 440, 34, 'blue', wt('loesning', 'Med') - 0.1, we('loesning', 'et', 1));
+    text(1, 'τ = 2π/ω_n,   f = ω_n/(2π)', 140, 530, 42, 'green', L('periode').start + 0.2, we('periode', 'pi', 1));
+    const ta = L('amplitude').start, ox = 760, oy = 590;
+    line(1, [[ox, oy], [ox + 400, oy]], 'black', 2, ta, ta + 0.3);
+    const S = []; for (let j = 0; j <= 60; j++) { const u = j / 60; S.push([ox + 400 * u, oy - 50 * Math.sin(u * 4 * PI + 0.6)]); } plot(1, S, 'blue', ta + 0.2, ta + 1.2);
+  }
+
+  B.goto('pendul', 2);
+  {
+    const t0 = L('pendul').start, O = [260, 140];
+    dot(2, O[0], O[1], 7, 'black', t0); dashed(2, O, [O[0], O[1] + 300], 'black', t0, t0 + 0.3);
+    line(2, [O, [O[0] + 120, O[1] + 280]], 'black', 2.6, t0 + 0.2, t0 + 0.5); dot(2, O[0] + 120, O[1] + 280, 16, 'blue', t0 + 0.5);
+    text(2, 'θ', O[0] + 20, O[1] + 120, 32, 'red', t0 + 0.4, t0 + 0.7);
+    text(2, 'pendul:  ω_n = √(g/l)', 500, 200, 42, 'blue', wt('pendul', 'sinus', 1) - 0.4, we('pendul', 'l', 1));
+    text(2, 'fysisk pendul:  ω_n = √(m g d / I_O)', 500, 290, 40, 'red', L('fysisk').start + 0.3, wt('fysisk', 'For'));
+    text(2, 'slank stang om enden:  ω_n = √(3g/(2l))', 500, 360, 38, 'red', wt('fysisk', 'For') - 0.1, we('fysisk', 'l'));
+    text(2, 'lodret fjeder: y fra ligevægt → ω_n = √(k/m)', 500, 460, 30, 'green', L('lodret').start + 0.3, we('lodret', 'm'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Slank stang, l = 1 m,', 'svinger om enden. Periode?'], ['ω_n = √(3 · 9,81 / 2) = 3,84 rad/s', 'τ = 2π/3,84 = 1,64 s'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'DYN2 slides Vibrationer I · Hibbeler (2023), kap. 22.1', 'energimetoden', 'slut');
+  text(4, 'ẍ + ω_n² x = 0 · ω_n = √(k/m)', 200, 280, 44, 'red', L('slut').start + 0.4, we('slut', 'm'));
+  text(4, 'τ = 2π / ω_n', 200, 370, 46, 'blue', wt('slut', 'perioden') - 0.1, we('slut', 'n', 2));
+});
+
+</script>
+<script>BP.live({"duration":127.662,"audio":"fri-svingning.mp3","order":["titel","ligning","omega","loesning","amplitude","periode","pendul","fysisk","lodret","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":6.325,"words":[["Frie",0.614,0.949],["svingninger",0.95,1.529],["uden",1.529,1.852],["dæmpning",1.852,2.457],["Masse",3.361,3.735],["og",3.735,3.825],["fjeder",3.825,4.392],["pendul",4.521,5.126],["og",5.126,5.281],["fysisk",5.281,5.771],["pendul",5.771,6.325]],"text":"Frie svingninger uden dæmpning. Masse og fjeder, pendul og fysisk pendul."},"ligning":{"start":7.57,"end":18.652,"words":[["En",7.697,7.8],["masse",7.8,8.123],["på",8.123,8.303],["en",8.303,8.38],["fjeder",8.38,8.883],["minus",9.012,9.398],["k",9.398,9.669],["x",9.669,10.068],["er",10.068,10.262],["m",10.262,10.545],["x",10.545,10.829],["dobbeltprik",10.829,11.525],["Det",12.415,12.493],["giver",12.493,12.828],["x",12.828,13.085],["dobbeltprik",13.085,13.588],["plus",13.588,13.859],["omega",13.859,14.374],["n",14.374,14.606],["i",14.606,14.812],["anden",14.812,15.122],["x",15.122,15.405],["lig",15.405,15.573],["nul",15.573,15.959],["hvor",16.101,16.294],["omega",16.294,16.668],["n",16.668,16.861],["er",16.861,16.939],["kvadratroden",16.939,17.66],["af",17.66,17.802],["k",17.802,18.111],["over",18.111,18.343],["m.",18.343,18.652]],"text":"En masse på en fjeder: minus k x er m x dobbeltprik. Det giver x dobbeltprik plus omega n i anden x lig nul, hvor omega n er kvadratroden af k over m."},"omega":{"start":19.872,"end":27.514,"words":[["Omega",20.012,20.437],["n",20.437,20.76],["er",20.76,20.888],["den",20.888,21.082],["naturlige",21.082,21.636],["vinkelfrekvens",21.636,22.615],["Den",23.519,23.674],["er",23.674,23.802],["den",23.802,24.047],["eneste",24.047,24.447],["kombination",24.447,25.117],["af",25.117,25.233],["parametrene",25.233,26.058],["der",26.225,26.341],["styrer",26.341,26.728],["bevægelsen",26.728,27.514]],"text":"Omega n er den naturlige vinkelfrekvens. Den er den eneste kombination af parametrene, der styrer bevægelsen."},"loesning":{"start":28.742,"end":39.605,"words":[["Løsningen",28.869,29.333],["er",29.333,29.527],["x",29.527,29.823],["lig",29.823,29.978],["A",29.978,29.99],["sinus",29.99,30.583],["omega",30.583,31.099],["n",31.099,31.318],["t",31.318,31.55],["plus",31.55,31.795],["B",31.795,31.975],["cosinus",31.975,32.606],["omega",32.606,33.161],["n",33.161,33.354],["t.",33.354,33.882],["Med",34.773,34.902],["begyndelsesbetingelserne",34.902,36.152],["er",36.152,36.448],["A",36.448,36.641],["lig",36.641,36.848],["v",36.848,37.208],["et",37.208,37.376],["over",37.376,37.582],["omega",37.582,38.072],["n",38.072,38.291],["og",38.291,38.355],["B",38.355,38.613],["lig",38.613,38.897],["x",38.897,39.232],["et",39.232,39.605]],"text":"Løsningen er x lig A sinus omega n t plus B cosinus omega n t. Med begyndelsesbetingelserne er A lig v et over omega n og B lig x et."},"amplitude":{"start":40.828,"end":48.082,"words":[["Det",40.968,41.033],["kan",41.033,41.136],["også",41.136,41.381],["skrives",41.381,41.638],["som",41.638,41.819],["C",41.819,42.064],["sinus",42.064,42.54],["omega",42.54,43.082],["n",43.082,43.326],["t",43.326,43.571],["plus",43.571,43.855],["phi",43.855,44.241],["hvor",44.383,44.615],["C",44.615,44.899],["er",44.899,45.002],["kvadratroden",45.002,45.685],["af",45.685,45.955],["A",45.955,46.213],["i",46.213,46.471],["anden",46.471,46.844],["plus",46.844,47.192],["B",47.192,47.463],["i",47.463,47.656],["anden",47.656,48.082]],"text":"Det kan også skrives som C sinus omega n t plus phi, hvor C er kvadratroden af A i anden plus B i anden."},"periode":{"start":49.314,"end":54.235,"words":[["Perioden",49.441,49.815],["er",49.815,49.944],["to",49.944,50.202],["pi",50.202,50.524],["over",50.524,50.794],["omega",50.794,51.181],["n",51.181,51.555],["og",51.696,51.941],["frekvensen",51.941,52.573],["er",52.573,52.715],["omega",52.715,53.153],["n",53.153,53.372],["over",53.372,53.617],["to",53.617,53.874],["pi",53.874,54.235]],"text":"Perioden er to pi over omega n, og frekvensen er omega n over to pi."},"pendul":{"start":55.472,"end":66.851,"words":[["Et",55.612,55.702],["matematisk",55.702,56.269],["pendul",56.269,56.849],["minus",56.978,57.416],["m",57.416,57.61],["g",57.61,57.79],["sinus",57.79,58.138],["theta",58.138,58.666],["er",58.666,58.847],["m",58.847,59.079],["l",59.079,59.285],["theta",59.285,59.736],["dobbeltprik",59.736,60.483],["For",61.361,61.49],["små",61.49,61.774],["vinkler",61.774,62.25],["er",62.25,62.353],["sinus",62.353,62.727],["theta",62.727,63.165],["lig",63.165,63.371],["theta",63.371,63.938],["så",64.08,64.325],["omega",64.325,64.699],["n",64.699,64.905],["er",64.905,64.969],["kvadratroden",64.969,65.691],["af",65.691,65.82],["g",65.82,66.116],["over",66.116,66.348],["l.",66.348,66.851]],"text":"Et matematisk pendul: minus m g sinus theta er m l theta dobbeltprik. For små vinkler er sinus theta lig theta, så omega n er kvadratroden af g over l."},"fysisk":{"start":68.086,"end":82.416,"words":[["Et",68.226,68.342],["fysisk",68.342,68.755],["pendul",68.755,69.193],["om",69.193,69.386],["O",69.386,69.721],["I",69.85,70.069],["O",70.069,70.288],["theta",70.288,70.803],["dobbeltprik",70.804,71.422],["plus",71.422,71.718],["m",71.718,71.912],["g",71.912,72.131],["d",72.131,72.324],["theta",72.324,72.84],["er",72.84,72.994],["nul",72.994,73.419],["Omega",74.323,74.748],["n",74.748,74.955],["er",74.955,75.032],["kvadratroden",75.032,75.715],["af",75.715,75.921],["m",75.921,76.179],["g",76.179,76.398],["d",76.398,76.707],["over",76.707,77.016],["I",77.016,77.197],["O.",77.197,77.493],["For",78.382,78.524],["en",78.524,78.601],["slank",78.601,78.911],["stang",78.911,79.194],["om",79.194,79.31],["enden",79.31,79.735],["er",79.735,79.877],["det",79.877,79.98],["kvadratroden",79.98,80.65],["af",80.65,80.779],["tre",80.779,81.089],["g",81.089,81.398],["over",81.398,81.656],["to",81.656,81.965],["l.",81.965,82.416]],"text":"Et fysisk pendul om O: I O theta dobbeltprik plus m g d theta er nul. Omega n er kvadratroden af m g d over I O. For en slank stang om enden er det kvadratroden af tre g over to l."},"lodret":{"start":83.628,"end":92.028,"words":[["En",83.755,83.858],["lodret",83.858,84.232],["masse-fjeder",84.232,85.07],["måler",85.199,85.585],["vi",85.585,85.753],["y",85.753,85.946],["fra",85.946,86.101],["ligevægten",86.101,86.797],["går",86.938,87.144],["tyngden",87.145,87.596],["ud",87.596,87.776],["mod",87.776,87.943],["fjederens",87.943,88.33],["forspænding",88.33,88.936],["og",89.09,89.245],["omega",89.245,89.644],["n",89.644,89.876],["er",89.876,89.941],["stadig",89.941,90.263],["kvadratroden",90.263,91.01],["af",91.01,91.152],["k",91.152,91.461],["over",91.461,91.706],["m.",91.706,92.028]],"text":"En lodret masse-fjeder: måler vi y fra ligevægten, går tyngden ud mod fjederens forspænding, og omega n er stadig kvadratroden af k over m."},"tjek_q":{"start":93.242,"end":100.11,"words":[["Tjek",93.343,93.665],["dig",93.665,93.845],["selv",93.845,94.271],["En",95.175,95.278],["slank",95.278,95.626],["stang",95.626,95.961],["på",95.961,96.116],["en",96.116,96.193],["meter",96.193,96.683],["svinger",96.683,97.198],["om",97.198,97.379],["sin",97.379,97.585],["ende",97.585,98.01],["Hvad",98.873,99.259],["er",99.259,99.401],["perioden",99.401,100.11]],"text":"Tjek dig selv. En slank stang på en meter svinger om sin ende. Hvad er perioden?"},"tjek_a":{"start":103.994,"end":114.883,"words":[["Omega",104.134,104.585],["n",104.585,104.817],["er",104.817,104.959],["kvadratroden",104.959,105.629],["af",105.629,105.771],["tre",105.771,106.054],["gange",106.054,106.299],["ni",106.299,106.492],["komma",106.492,106.815],["otte",106.815,107.111],["en",107.111,107.382],["over",107.382,107.652],["to",107.652,108.103],["altså",108.245,108.567],["tre",108.567,108.915],["komma",108.915,109.315],["otte",109.315,109.663],["fire",109.663,110.165],["Perioden",111.056,111.455],["er",111.455,111.623],["to",111.623,111.893],["pi",111.893,112.19],["over",112.19,112.473],["det",112.473,112.821],["en",112.95,113.182],["komma",113.182,113.53],["seks",113.53,113.891],["fire",113.891,114.187],["sekunder",114.187,114.883]],"text":"Omega n er kvadratroden af tre gange ni komma otte en over to, altså tre komma otte fire. Perioden er to pi over det, en komma seks fire sekunder."},"slut":{"start":116.104,"end":125.239,"words":[["Kort",116.231,116.437],["sagt",116.438,116.927],["x",117.043,117.314],["dobbeltprik",117.314,117.842],["plus",117.842,118.113],["omega",118.113,118.602],["n",118.602,118.847],["i",118.847,119.053],["anden",119.054,119.363],["x",119.363,119.659],["er",119.659,119.749],["nul",119.749,120.162],["omega",120.303,120.742],["n",120.742,120.935],["er",120.935,121.012],["kvadratroden",121.012,121.644],["af",121.644,121.734],["k",121.734,122.03],["over",122.03,122.262],["m",122.262,122.623],["og",122.765,122.919],["perioden",122.919,123.345],["er",123.345,123.448],["to",123.448,123.693],["pi",123.693,124.015],["over",124.015,124.26],["omega",124.26,124.633],["n.",124.633,125.239]],"text":"Kort sagt: x dobbeltprik plus omega n i anden x er nul, omega n er kvadratroden af k over m, og perioden er to pi over omega n."}}}, { audio: 'fri-svingning.mp3', id: 'fri-svingning' });</script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kinetisk energi og arbejde · video</title>
+<meta name="description" content="Kinetisk energi for stift legeme, arbejde fra kræfter, vægt, fjedre og kraftpar, og arbejdssætningen.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 18: videoer</a><h1>Kinetisk energi og arbejde</h1><span class="meta">DYN2 · kapitel 18 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Kinetisk energi og arbejde"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Kinetisk energi for stift legeme, arbejde fra kræfter, vægt, fjedre og kraftpar, og arbejdssætningen.</p><div class="chips"><a href="../../../../lab/dyn2/energi.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel18_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/dyn2/l07">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Kinetisk energi og arbejde (DYN2 Energi I, HI 18.1–18.4)
+BP.scene({ header: 'DYN2 · kap. 18' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, PI, TAU } = B;
+
+  B.titel(0, 'Energi og arbejde', 'DYN2 · Hibbeler kap. 18 · begreb (Energi I)', 'titel');
+  text(0, 'T_1 + ΣU = T_2', 640, 520, 46, 'red', wt('titel', 'Arbejdssætningen') - 0.2, we('titel', 'accelerationer'), { align: 'center' });
+
+  B.goto('t', 1);
+  {
+    const t0 = L('t').start;
+    const r = text(1, 'T = ½ m v_G² + ½ I_G ω²', 140, 180, 48, 'red', t0 + 0.3, we('t', 'rotation'));
+    text(1, 'fast akse / IC:  T = ½ I_O ω²', 140, 260, 40, 'blue', L('t0').start + 0.3, we('t0', 'anden'));
+    text(1, 'U = ∫ F · dr  ·  konstant: F s cos θ', 140, 350, 38, 'black', L('u').start + 0.3, we('u', 'vinklen'));
+    text(1, 'vægt:  U = −m g Δy', 140, 420, 38, 'black', L('vaegt').start + 0.2, we('vaegt', 'løftes'));
+    text(1, 'fjeder:  U = −½ k (s_2² − s_1²)', 640, 420, 38, 'black', L('fjeder').start + 0.2, we('fjeder', 'længde'));
+    text(1, 'kraftpar:  U = M Δθ', 140, 490, 38, 'black', L('moment').start + 0.2, we('moment', 'konstant'));
+    text(1, 'intet arbejde: N, statisk friktion, faste lejer, rulning', 140, 580, 30, 'green', L('nul').start + 0.3, we('nul', 'glid'));
+    text(1, 'T_1 + ΣU_{1−2} = T_2', 140, 660, 44, 'red', L('saetning').start + 0.3, we('saetning', 'to', 1));
+  }
+
+  B.goto('tjek_q', 2);
+  B.tjek(2, ['Kugle ruller uden glid ned.', 'Laver friktionen arbejde?'], ['nej: kontaktpunktet står stille', 'men den giver rotationen'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 3);
+  B.slut(3, 'DYN2 slides Energi I · Hibbeler (2023), kap. 18.1–18.4', 'energibevarelse', 'slut');
+  text(3, 'T = ½ m v_G² + ½ I_G ω²', 200, 280, 44, 'red', L('slut').start + 0.4, we('slut', 'anden', 1));
+  text(3, 'T_1 + U = T_2', 200, 370, 46, 'blue', wt('slut', 'T') - 0.1, we('slut', 'to'));
+});
+
+</script>
+<script>BP.live({"duration":117.75,"audio":"arbejde-energi.mp3","order":["titel","t","t0","u","vaegt","fjeder","moment","nul","saetning","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":8.58,"words":[["Kinetisk",0.601,1.245],["energi",1.245,1.838],["og",1.838,2.044],["arbejde",2.044,2.714],["Arbejdssætningen",3.619,4.508],["forbinder",4.508,4.959],["to",4.959,5.229],["tilstande",5.229,5.706],["direkte",5.706,6.428],["uden",6.557,6.776],["at",6.776,6.827],["vi",6.827,6.918],["skal",6.918,7.098],["regne",7.098,7.51],["accelerationer",7.51,8.58]],"text":"Kinetisk energi og arbejde. Arbejdssætningen forbinder to tilstande direkte, uden at vi skal regne accelerationer."},"t":{"start":9.802,"end":17.855,"words":[["Et",9.929,10.032],["stift",10.032,10.432],["legemes",10.432,10.818],["kinetiske",10.818,11.424],["energi",11.424,11.991],["er",11.991,12.133],["en",12.133,12.249],["halv",12.249,12.468],["m",12.468,12.713],["v",12.713,12.893],["G",12.893,13.177],["i",13.177,13.447],["anden",13.447,13.757],["plus",13.757,14.027],["en",14.027,14.156],["halv",14.156,14.401],["I",14.401,14.568],["G",14.568,14.826],["omega",14.826,15.303],["i",15.303,15.509],["anden",15.509,15.96],["translation",16.102,16.862],["plus",16.862,17.159],["rotation",17.159,17.855]],"text":"Et stift legemes kinetiske energi er en halv m v G i anden plus en halv I G omega i anden: translation plus rotation."},"t0":{"start":19.104,"end":25.584,"words":[["Drejer",19.244,19.476],["legemet",19.476,19.85],["om",19.85,20.043],["en",20.043,20.146],["fast",20.146,20.456],["akse",20.456,20.971],["eller",20.971,21.229],["om",21.229,21.409],["I",21.409,21.59],["C",21.59,21.847],["i",21.847,21.989],["punktet",21.989,22.389],["O",22.389,22.711],["er",22.878,23.007],["T",23.007,23.265],["bare",23.265,23.51],["en",23.51,23.664],["halv",23.664,23.909],["I",23.909,24.102],["O",24.102,24.399],["omega",24.399,24.927],["i",24.927,25.146],["anden",25.146,25.584]],"text":"Drejer legemet om en fast akse eller om I C i punktet O, er T bare en halv I O omega i anden."},"u":{"start":26.798,"end":35.96,"words":[["En",26.925,27.041],["krafts",27.041,27.402],["arbejde",27.402,28.034],["er",28.034,28.162],["integralet",28.162,28.897],["af",28.897,29.103],["F",29.103,29.348],["prik",29.348,29.619],["d",29.619,29.863],["r.",29.863,30.16],["For",31.063,31.205],["en",31.205,31.283],["konstant",31.283,31.708],["kraft",31.708,32.017],["langs",32.017,32.313],["en",32.313,32.442],["ret",32.442,32.661],["linje",32.661,33.112],["er",33.112,33.28],["det",33.28,33.435],["F",33.435,33.654],["gange",33.654,34.027],["s",34.027,34.246],["gange",34.246,34.53],["cosinus",34.53,35.213],["til",35.213,35.368],["vinklen",35.368,35.96]],"text":"En krafts arbejde er integralet af F prik d r. For en konstant kraft langs en ret linje er det F gange s gange cosinus til vinklen."},"vaegt":{"start":37.18,"end":45.608,"words":[["Vægtens",37.32,37.733],["arbejde",37.733,38.351],["er",38.351,38.467],["minus",38.467,38.918],["m",38.918,39.15],["g",39.15,39.33],["gange",39.331,39.653],["ændringen",39.653,40.194],["i",40.194,40.336],["højde",40.336,40.838],["Med",41.742,41.961],["y",41.961,42.18],["opad",42.18,42.657],["giver",42.657,42.927],["det",42.927,43.043],["negativt",43.043,43.662],["arbejde",43.662,44.293],["når",44.435,44.603],["legemet",44.603,45.015],["løftes",45.015,45.608]],"text":"Vægtens arbejde er minus m g gange ændringen i højde. Med y opad giver det negativt arbejde, når legemet løftes."},"fjeder":{"start":46.842,"end":53.915,"words":[["En",46.969,47.072],["fjeders",47.072,47.382],["arbejde",47.382,47.987],["er",47.987,48.103],["minus",48.103,48.477],["en",48.477,48.58],["halv",48.58,48.773],["k",48.773,48.98],["gange",48.98,49.302],["s",49.302,49.521],["to",49.521,49.83],["i",49.83,50.011],["anden",50.011,50.268],["minus",50.268,50.668],["s",50.668,50.925],["et",50.925,51.132],["i",51.132,51.364],["anden",51.364,51.776],["hvor",51.918,52.098],["s",52.098,52.266],["måles",52.266,52.601],["fra",52.601,52.73],["den",52.73,52.897],["afslappede",52.897,53.425],["længde",53.425,53.915]],"text":"En fjeders arbejde er minus en halv k gange s to i anden minus s et i anden, hvor s måles fra den afslappede længde."},"moment":{"start":55.136,"end":59.567,"words":[["Et",55.263,55.366],["kraftpars",55.366,55.998],["arbejde",55.998,56.629],["er",56.629,56.848],["M",56.848,57.093],["gange",57.093,57.39],["vinkelændringen",57.39,58.214],["når",58.356,58.575],["M",58.575,58.781],["er",58.781,58.884],["konstant",58.884,59.567]],"text":"Et kraftpars arbejde er M gange vinkelændringen, når M er konstant."},"nul":{"start":60.79,"end":75.429,"words":[["Nogle",60.917,61.201],["kræfter",61.201,61.742],["laver",61.742,62.116],["intet",62.116,62.515],["arbejde",62.515,63.211],["normalkraft",63.34,64.036],["og",64.036,64.165],["statisk",64.165,64.654],["friktion",64.654,65.118],["fra",65.118,65.273],["en",65.273,65.35],["stillestående",65.35,65.93],["flade",65.93,66.42],["reaktioner",66.562,67.283],["i",67.283,67.373],["faste",67.373,67.734],["lejer",67.734,68.237],["og",68.417,68.559],["vægten",68.559,69.113],["når",69.255,69.448],["tyngdepunktet",69.448,70.17],["bevæger",70.17,70.518],["sig",70.518,70.685],["vandret",70.685,71.24],["Det",72.13,72.195],["gælder",72.195,72.491],["også",72.491,72.839],["friktionen",72.839,73.432],["ved",73.432,73.574],["et",73.574,73.651],["hjul",73.651,74.063],["der",74.218,74.334],["ruller",74.334,74.72],["uden",74.72,75.004],["glid",75.004,75.429]],"text":"Nogle kræfter laver intet arbejde: normalkraft og statisk friktion fra en stillestående flade, reaktioner i faste lejer, og vægten, når tyngdepunktet bevæger sig vandret. Det gælder også friktionen ved et hjul, der ruller uden glid."},"saetning":{"start":76.644,"end":81.784,"words":[["Arbejdssætningen",76.771,77.532],["siger",77.532,78.008],["T",78.15,78.459],["et",78.459,78.55],["plus",78.55,78.794],["summen",78.795,79.207],["af",79.207,79.387],["arbejdet",79.387,79.851],["fra",79.851,80.07],["et",80.07,80.238],["til",80.238,80.367],["to",80.367,80.753],["er",80.753,80.908],["lig",80.908,81.166],["T",81.166,81.385],["to.",81.385,81.784]],"text":"Arbejdssætningen siger: T et plus summen af arbejdet fra et til to er lig T to."},"tjek_q":{"start":83.018,"end":90.415,"words":[["Tjek",83.118,83.453],["dig",83.453,83.621],["selv",83.621,84.046],["En",84.938,85.054],["kugle",85.054,85.376],["ruller",85.376,85.763],["uden",85.763,86.059],["glid",86.059,86.265],["ned",86.265,86.613],["ad",86.613,86.82],["en",86.82,86.91],["skråning",86.91,87.541],["Laver",88.43,88.753],["friktionen",88.753,89.41],["noget",89.41,89.745],["arbejde",89.745,90.415]],"text":"Tjek dig selv. En kugle ruller uden glid ned ad en skråning. Laver friktionen noget arbejde?"},"tjek_a":{"start":94.298,"end":103.473,"words":[["Nej",94.398,94.926],["Kontaktpunktet",95.832,96.592],["står",96.592,96.862],["stille",96.862,97.339],["så",97.468,97.687],["friktionskraften",97.687,98.718],["flytter",98.718,99.053],["sig",99.053,99.259],["ikke",99.259,99.697],["Men",100.6,100.741],["den",100.741,100.883],["sørger",100.883,101.231],["for",101.231,101.605],["at",101.746,101.914],["kuglen",101.914,102.288],["begynder",102.288,102.739],["at",102.739,102.842],["rotere",102.842,103.473]],"text":"Nej. Kontaktpunktet står stille, så friktionskraften flytter sig ikke. Men den sørger for, at kuglen begynder at rotere."},"slut":{"start":104.704,"end":115.321,"words":[["Kort",104.831,105.05],["sagt",105.05,105.527],["T",105.656,105.965],["er",105.965,106.081],["en",106.081,106.172],["halv",106.172,106.391],["m",106.391,106.597],["v",106.597,106.764],["G",106.764,106.983],["i",106.983,107.241],["anden",107.241,107.55],["plus",107.55,107.808],["en",107.808,107.924],["halv",107.924,108.143],["I",108.143,108.311],["G",108.311,108.646],["omega",108.646,109.071],["i",109.071,109.329],["anden",109.329,109.767],["arbejdet",109.909,110.385],["kommer",110.385,110.617],["fra",110.617,110.746],["kræfter",110.746,111.352],["vægt",111.468,111.983],["fjedre",112.099,112.525],["og",112.525,112.653],["kraftpar",112.653,113.298],["og",113.44,113.607],["T",113.607,113.891],["et",113.891,114.007],["plus",114.007,114.303],["U",114.303,114.561],["er",114.561,114.677],["T",114.677,114.934],["to.",114.934,115.321]],"text":"Kort sagt: T er en halv m v G i anden plus en halv I G omega i anden, arbejdet kommer fra kræfter, vægt, fjedre og kraftpar, og T et plus U er T to."}}}, { audio: 'arbejde-energi.mp3', id: 'arbejde-energi' });</script>
+</body>
+</html>

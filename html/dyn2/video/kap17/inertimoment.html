@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Masse-inertimoment · video</title>
+<meta name="description" content="I = ∫r²dm, inertiradius og parallelakseteoremet, med den slanke stang.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 17: videoer</a><h1>Masse-inertimoment</h1><span class="meta">DYN2 · kapitel 17 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Masse-inertimoment"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>I = ∫r²dm, inertiradius og parallelakseteoremet, med den slanke stang.</p><div class="chips"><a href="../../../../lab/dyn2/inertimoment.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel17_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/dyn2/l06">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Masse-inertimoment (DYN2 Kinetik I, HI 17.1)
+BP.scene({ header: 'DYN2 · kap. 17' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, dashed, PI, TAU } = B;
+
+  B.titel(0, 'Masse-inertimoment', 'DYN2 · Hibbeler kap. 17 · begreb (Kinetik I)', 'titel');
+  text(0, 'hvor svært er det at dreje?', 640, 520, 42, 'red', wt('titel', 'svært') - 0.2, we('titel', 'rotere'), { align: 'center' });
+
+  B.goto('def', 1);
+  {
+    const t0 = L('def').start;
+    line(1, ell(300, 380, 180, 120, 0, TAU), 'black', 3, t0, t0 + 0.6); dot(1, 300, 380, 7, 'black', t0 + 0.2);
+    dot(1, 420, 330, 9, 'blue', t0 + 0.5); line(1, [[300, 380], [420, 330]], 'blue', 2.4, t0 + 0.5, t0 + 0.8); text(1, 'r', 350, 340, 30, 'blue', t0 + 0.7, t0 + 0.9); text(1, 'dm', 430, 320, 28, 'blue', t0 + 0.6, t0 + 0.9);
+    const r = text(1, 'I = ∫ r² dm', 600, 260, 52, 'red', wt('def', 'I') - 0.1, we('def', 'anden', 1));
+    text(1, 'additivt · kun afstand · kg·m²', 600, 340, 32, 'black', L('noter').start + 0.3, we('noter', 'kvadratmeter'));
+    text(1, 'I = m k²   (k = inertiradius)', 600, 430, 40, 'blue', L('k').start + 0.2, we('k', 'I', 1));
+    text(1, 'I = I_G + m d²', 600, 530, 48, 'green', L('steiner').start + 0.3, we('steiner', 'tyngdepunktet'));
+    text(1, 'I_G er mindst', 600, 590, 32, 'green', L('min').start + 0.2, we('min', 'akseretning'));
+  }
+
+  B.goto('stang', 2);
+  {
+    const t0 = L('stang').start;
+    line(2, [[200, 300], [700, 300]], 'black', 7, t0, t0 + 0.5); dot(2, 450, 300, 7, 'red', t0 + 0.3); text(2, 'G', 440, 280, 30, 'red', t0 + 0.3, t0 + 0.6);
+    dashed(2, [450, 220], [450, 380], 'red', t0 + 0.4, t0 + 0.7); dashed(2, [200, 220], [200, 380], 'blue', wt('stang', 'enden') - 0.2, wt('stang', 'enden') + 0.3);
+    text(2, 'I_G = m l² / 12', 760, 260, 42, 'red', wt('stang', 'I') - 0.1, we('stang', 'tolv'));
+    text(2, 'I_{ende} = m l²/12 + m (l/2)² = m l² / 3', 160, 470, 42, 'blue', wt('stang', 'Om') - 0.1, we('stang', 'tre'));
+    text(2, 'tabeller + additivitet + parallelakse', 160, 590, 36, 'green', L('praksis').start + 0.2, we('praksis', 'parallelakseteoremet'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['m = 20 kg, k = 0,2 m.', 'Hvad er I?'], ['I = 20 · 0,2² = 0,8 kg·m²'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'DYN2 slides Kinetik I · Hibbeler (2023), kap. 17.1', "Newtons love for stive legemer", 'slut');
+  text(4, 'I = ∫ r² dm = m k²', 200, 280, 46, 'red', L('slut').start + 0.4, we('slut', 'anden', 2));
+  text(4, 'I = I_G + m d²', 200, 370, 46, 'blue', wt('slut', 'I', 3) - 0.1, we('slut', 'anden', 2));
+});
+
+</script>
+<script>BP.live({"duration":104.128,"audio":"inertimoment.mp3","order":["titel","def","noter","k","steiner","min","stang","praksis","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":5.964,"words":[["Masse-inertimoment",0.601,1.993],["Det",2.871,2.961],["fortæller",2.961,3.606],["hvor",3.735,3.902],["svært",3.902,4.211],["det",4.211,4.353],["er",4.353,4.443],["at",4.443,4.469],["få",4.469,4.675],["et",4.675,4.753],["legeme",4.753,5.1],["til",5.101,5.281],["at",5.281,5.32],["rotere",5.32,5.964]],"text":"Masse-inertimoment. Det fortæller, hvor svært det er at få et legeme til at rotere."},"def":{"start":7.186,"end":15.459,"words":[["Masse-inertimomentet",7.326,8.563],["er",8.563,8.744],["I",8.744,8.808],["lig",8.808,9.04],["integralet",9.04,9.788],["af",9.788,9.994],["r",9.994,10.239],["i",10.239,10.483],["anden",10.483,10.857],["d",10.857,11.089],["m.",11.089,11.398],["Det",12.289,12.392],["er",12.392,12.418],["summen",12.418,12.766],["af",12.766,12.856],["massen",12.856,13.268],["gange",13.268,13.565],["afstanden",13.565,14.067],["til",14.067,14.222],["aksen",14.222,14.815],["i",14.815,15.008],["anden",15.008,15.459]],"text":"Masse-inertimomentet er I lig integralet af r i anden d m. Det er summen af massen gange afstanden til aksen i anden."},"noter":{"start":16.68,"end":29.038,"words":[["Det",16.794,16.872],["ligner",16.872,17.168],["det",17.168,17.31],["polære",17.31,17.8],["inertimoment",17.8,18.521],["for",18.521,18.637],["tværsnit",18.637,19.294],["men",19.436,19.694],["nu",19.694,19.874],["er",19.874,19.965],["det",19.965,20.055],["massen",20.055,20.609],["der",20.763,20.879],["tæller",20.879,21.434],["Det",22.324,22.492],["er",22.492,22.711],["additivt",22.711,23.394],["og",23.536,23.652],["kun",23.652,23.909],["afstanden",23.909,24.412],["til",24.412,24.554],["aksen",24.554,25.082],["betyder",25.082,25.52],["noget",25.52,25.971],["Enheden",26.873,27.415],["er",27.415,27.569],["kilogram",27.569,28.123],["kvadratmeter",28.123,29.038]],"text":"Det ligner det polære inertimoment for tværsnit, men nu er det massen, der tæller. Det er additivt, og kun afstanden til aksen betyder noget. Enheden er kilogram kvadratmeter."},"k":{"start":30.254,"end":38.385,"words":[["Inertiradius",30.394,31.193],["k",31.193,31.425],["defineres",31.425,31.992],["ved",31.992,32.173],["I",32.173,32.224],["lig",32.224,32.559],["m",32.559,32.778],["k",32.778,33.1],["i",33.1,33.281],["anden",33.281,33.706],["Det",34.584,34.751],["er",34.751,34.867],["den",34.867,35.112],["afstand",35.112,35.705],["hvor",35.847,36.027],["hele",36.027,36.298],["massen",36.298,36.684],["skulle",36.684,36.891],["sidde",36.891,37.2],["for",37.2,37.38],["at",37.38,37.406],["give",37.406,37.638],["samme",37.638,38.089],["I",38.089,38.385]],"text":"Inertiradius k defineres ved I lig m k i anden. Det er den afstand, hvor hele massen skulle sidde for at give samme I."},"steiner":{"start":39.604,"end":48.29,"words":[["Parallelakseteoremet",39.744,41.007],["I",41.136,41.368],["er",41.368,41.6],["I",41.6,41.832],["G",41.832,42.038],["plus",42.038,42.36],["m",42.36,42.618],["d",42.618,42.914],["i",42.914,43.108],["anden",43.108,43.546],["Det",44.436,44.501],["gælder",44.501,44.772],["kun",44.772,45.042],["for",45.042,45.274],["parallelle",45.274,45.751],["akser",45.751,46.331],["og",46.473,46.589],["man",46.589,46.756],["skal",46.756,46.924],["flytte",46.924,47.284],["fra",47.284,47.439],["tyngdepunktet",47.439,48.29]],"text":"Parallelakseteoremet: I er I G plus m d i anden. Det gælder kun for parallelle akser, og man skal flytte fra tyngdepunktet."},"min":{"start":49.506,"end":53.358,"words":[["Derfor",49.633,50.007],["er",50.007,50.084],["I",50.084,50.239],["G",50.239,50.458],["det",50.458,50.561],["mindste",50.561,50.948],["inertimoment",50.948,51.76],["for",51.76,51.966],["en",51.966,52.069],["given",52.069,52.43],["akseretning",52.43,53.358]],"text":"Derfor er I G det mindste inertimoment for en given akseretning."},"stang":{"start":54.584,"end":67.548,"words":[["Et",54.724,54.814],["eksempel",54.814,55.42],["en",55.523,55.665],["slank",55.665,55.987],["stang",55.987,56.309],["har",56.309,56.49],["I",56.49,56.644],["G",56.644,56.85],["lig",56.851,57.134],["m",57.134,57.405],["l",57.405,57.662],["i",57.662,57.894],["anden",57.894,58.307],["over",58.307,58.551],["tolv",58.552,58.99],["Om",59.906,60.035],["enden",60.035,60.344],["er",60.344,60.486],["d",60.486,60.679],["lig",60.679,60.86],["l",60.86,61.014],["halve",61.014,61.53],["så",61.646,61.904],["I",61.904,62.071],["er",62.071,62.187],["m",62.187,62.393],["l",62.393,62.509],["i",62.509,62.69],["anden",62.69,63.063],["over",63.063,63.308],["tolv",63.308,63.566],["plus",63.566,63.824],["m",63.824,63.965],["l",63.965,64.107],["i",64.107,64.262],["anden",64.262,64.61],["over",64.61,64.842],["fire",64.842,65.344],["altså",65.473,65.911],["m",65.911,66.13],["l",66.13,66.272],["i",66.272,66.465],["anden",66.465,66.852],["over",66.852,67.11],["tre",67.11,67.548]],"text":"Et eksempel: en slank stang har I G lig m l i anden over tolv. Om enden er d lig l halve, så I er m l i anden over tolv plus m l i anden over fire, altså m l i anden over tre."},"praksis":{"start":68.782,"end":73.884,"words":[["I",68.909,68.974],["praksis",68.974,69.463],["bruger",69.463,69.786],["vi",69.786,69.914],["tabeller",69.914,70.597],["lægger",70.726,71.061],["dele",71.061,71.332],["sammen",71.332,71.809],["og",71.809,71.925],["flytter",71.925,72.247],["med",72.247,72.453],["parallelakseteoremet",72.453,73.884]],"text":"I praksis bruger vi tabeller, lægger dele sammen og flytter med parallelakseteoremet."},"tjek_q":{"start":75.108,"end":82.761,"words":[["Tjek",75.209,75.531],["dig",75.531,75.711],["selv",75.711,76.149],["Et",77.054,77.17],["hjul",77.17,77.453],["vejer",77.453,77.763],["tyve",77.763,78.085],["kilo",78.085,78.562],["og",78.562,78.755],["har",78.755,78.935],["inertiradius",78.935,79.708],["tyve",79.709,80.031],["centimeter",80.031,80.868],["Hvad",81.73,82.155],["er",82.155,82.49],["I",82.49,82.761]],"text":"Tjek dig selv. Et hjul vejer tyve kilo og har inertiradius tyve centimeter. Hvad er I?"},"tjek_a":{"start":86.628,"end":93.199,"words":[["I",86.755,86.923],["er",86.923,87.116],["m",87.116,87.348],["k",87.348,87.606],["i",87.606,87.825],["anden",87.825,88.289],["tyve",88.418,88.753],["gange",88.753,89.049],["nul",89.049,89.23],["komma",89.23,89.526],["to",89.526,89.809],["i",89.809,89.951],["anden",89.951,90.376],["altså",90.518,90.892],["nul",90.892,91.124],["komma",91.124,91.51],["otte",91.51,91.833],["kilogram",91.833,92.335],["kvadratmeter",92.335,93.199]],"text":"I er m k i anden, tyve gange nul komma to i anden, altså nul komma otte kilogram kvadratmeter."},"slut":{"start":94.418,"end":101.697,"words":[["Kort",94.545,94.751],["sagt",94.752,95.203],["I",95.331,95.499],["er",95.499,95.563],["integralet",95.563,96.195],["af",96.195,96.414],["r",96.414,96.672],["i",96.672,96.904],["anden",96.904,97.213],["d",97.213,97.419],["m",97.419,97.754],["I",97.896,98.089],["er",98.089,98.192],["m",98.192,98.424],["k",98.424,98.682],["i",98.682,98.862],["anden",98.862,99.262],["og",99.404,99.623],["I",99.623,99.829],["er",99.829,99.958],["I",99.958,100.138],["G",100.138,100.331],["plus",100.331,100.615],["m",100.615,100.86],["d",100.86,101.117],["i",101.117,101.298],["anden",101.298,101.697]],"text":"Kort sagt: I er integralet af r i anden d m, I er m k i anden, og I er I G plus m d i anden."}}}, { audio: 'inertimoment.mp3', id: 'inertimoment' });</script>
+</body>
+</html>

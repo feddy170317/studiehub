@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Potentiel energi og energibevarelse · video</title>
+<meta name="description" content="Potentiel energi, bevarelse af mekanisk energi og en faldende stang.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 18: videoer</a><h1>Potentiel energi og energibevarelse</h1><span class="meta">DYN2 · kapitel 18 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Potentiel energi og energibevarelse"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Potentiel energi, bevarelse af mekanisk energi og en faldende stang.</p><div class="chips"><a href="arbejde-energi.html">Se først: Kinetisk energi og arbejde</a><a href="../../../../lab/dyn2/energi.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel18_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/dyn2/l07">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Potentiel energi og energibevarelse (DYN2 Energi II, HI 18.5). Eget eksempel: stang 1 m slippes vandret → ω = √(3g/l) = 5,42 rad/s
+BP.scene({ header: 'DYN2 · kap. 18' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, dashed, PI } = B;
+
+  B.titel(0, 'Energibevarelse', 'DYN2 · Hibbeler kap. 18 · begreb (Energi II)', 'titel');
+  text(0, 'T + V = konstant', 640, 520, 46, 'red', wt('titel', 'konstant') - 0.4, we('titel', 'konstant'), { align: 'center' });
+
+  B.goto('konservativ', 1);
+  {
+    const t0 = L('konservativ').start;
+    text(1, 'konservativ: U = −ΔV', 140, 170, 44, 'blue', t0 + 0.3, we('konservativ', 'energi'));
+    text(1, 'V_g = m g y_G  (y op)', 140, 260, 42, 'black', L('vg').start + 0.2, we('vg', 'opad'));
+    text(1, 'V_e = ½ k s²  (s = 0 afslappet)', 140, 330, 42, 'black', L('ve').start + 0.2, we('ve', 'længde'));
+    const r = text(1, 'T_1 + V_1 + ΣU_{andre} = T_2 + V_2', 140, 440, 46, 'red', L('saetning').start + 0.3, we('saetning', 'to', 1));
+    box(1, 115, 385, 860, 85, 'red', we('saetning', 'to', 1), we('saetning', 'to', 1) + 0.6);
+    text(1, 'ingen friktion ⇒ E_{mek} = T + V konstant', 140, 550, 38, 'green', L('bevar').start + 0.2, we('bevar', 'energi'));
+    text(1, 'snore flytter energi, laver intet nettoarbejde', 140, 620, 32, 'black', L('snor').start + 0.2, we('snor', 'delene'));
+  }
+
+  B.goto('eks', 2);
+  {
+    const t0 = L('eks').start, O = [300, 220];
+    dot(2, O[0], O[1], 9, 'black', t0); line(2, [O, [O[0] + 300, O[1]]], 'black', 6, t0 + 0.2, t0 + 0.6, { alpha: 0.5 });
+    line(2, [O, [O[0], O[1] + 300]], 'blue', 6, wt('eks', 'drejer') - 0.2, wt('eks', 'drejer') + 0.4);
+    line(2, ell(O[0], O[1], 120, 120, 0, PI / 2), 'red', 2.6, wt('eks', 'drejer'), wt('eks', 'ende'));
+    dashed(2, [O[0] + 150, O[1]], [O[0] + 150, O[1] + 150], 'green', wt('eks', 'falder') - 0.2, wt('eks', 'falder') + 0.4); text(2, 'l/2', O[0] + 160, O[1] + 90, 30, 'green', wt('eks', 'falder'), we('eks', 'meter', 1));
+    text(2, 'm g (l/2) = ½ (m l²/3) ω²', 640, 260, 44, 'blue', L('eks2').start + 0.3, we('eks2', 'anden', 1));
+    const r = text(2, 'ω = √(3g/l) = 5,42 rad/s', 640, 360, 46, 'red', wt('eks2', 'omega', 1) - 0.1, we('eks2', 'sekund'));
+    box(2, 615, 305, 600, 85, 'red', we('eks2', 'sekund'), we('eks2', 'sekund') + 0.6);
+    text(2, '(eget eksempel, l = 1 m)', 640, 440, 30, 'black', L('eks').start + 0.3, we('eks', 'ende'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Afhænger ω af', 'stangens masse?'], ['nej, m går ud'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'DYN2 slides Energi II · Hibbeler (2023), kap. 18.5', '', 'slut');
+  text(4, 'V_g = m g y · V_e = ½ k s²', 200, 280, 44, 'blue', L('slut').start + 0.4, we('slut', 'anden'));
+  text(4, 'T_1 + V_1 + U = T_2 + V_2', 200, 370, 44, 'red', wt('slut', 'T') - 0.1, we('slut', 'to', 1));
+});
+
+</script>
+<script>BP.live({"duration":110.958,"audio":"energibevarelse.mp3","order":["titel","konservativ","vg","ve","saetning","bevar","snor","eks","eks2","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":8.992,"words":[["Potentiel",0.627,1.156],["energi",1.156,1.723],["og",1.723,1.839],["bevarelse",1.839,2.586],["af",2.586,2.741],["mekanisk",2.741,3.333],["energi",3.333,3.978],["Når",4.894,5.036],["kun",5.036,5.281],["konservative",5.281,6.028],["kræfter",6.028,6.441],["laver",6.441,6.75],["arbejde",6.75,7.459],["er",7.601,7.755],["energien",7.755,8.322],["konstant",8.322,8.992]],"text":"Potentiel energi og bevarelse af mekanisk energi. Når kun konservative kræfter laver arbejde, er energien konstant."},"konservativ":{"start":10.21,"end":20.146,"words":[["En",10.337,10.453],["kraft",10.453,10.788],["er",10.788,10.93],["konservativ",10.93,11.845],["hvis",11.987,12.206],["arbejdet",12.206,12.683],["kun",12.683,12.94],["afhænger",12.94,13.456],["af",13.456,13.482],["start",13.482,13.958],["og",14.139,14.268],["slutpositionen",14.268,15.337],["Så",16.228,16.396],["kan",16.396,16.499],["vi",16.499,16.589],["skrive",16.589,16.924],["arbejdet",16.924,17.452],["som",17.452,17.671],["minus",17.671,18.032],["ændringen",18.032,18.651],["i",18.651,18.805],["en",18.805,18.908],["potentiel",18.908,19.514],["energi",19.514,20.146]],"text":"En kraft er konservativ, hvis arbejdet kun afhænger af start- og slutpositionen. Så kan vi skrive arbejdet som minus ændringen i en potentiel energi."},"vg":{"start":21.384,"end":26.241,"words":[["Tyngdens",21.498,21.898],["potentielle",21.898,22.478],["energi",22.478,23.083],["er",23.084,23.199],["V",23.199,23.47],["g",23.47,23.676],["lig",23.676,23.947],["m",23.947,24.23],["g",24.23,24.462],["y",24.462,24.668],["G",24.669,25.004],["med",25.145,25.442],["y",25.442,25.674],["opad",25.674,26.241]],"text":"Tyngdens potentielle energi er V g lig m g y G, med y opad."},"ve":{"start":27.47,"end":33.873,"words":[["En",27.597,27.7],["fjeders",27.7,27.997],["potentielle",27.997,28.551],["energi",28.551,29.105],["er",29.105,29.208],["V",29.208,29.479],["e",29.479,29.633],["lig",29.633,29.891],["en",29.891,30.007],["halv",30.007,30.226],["k",30.226,30.51],["s",30.51,30.767],["i",30.767,30.999],["anden",30.999,31.399],["med",31.541,31.734],["s",31.734,31.992],["lig",31.992,32.146],["nul",32.146,32.481],["i",32.481,32.649],["den",32.649,32.855],["afslappede",32.855,33.396],["længde",33.396,33.873]],"text":"En fjeders potentielle energi er V e lig en halv k s i anden, med s lig nul i den afslappede længde."},"saetning":{"start":35.092,"end":40.902,"words":[["Så",35.219,35.374],["bliver",35.374,35.58],["arbejdssætningen",35.58,36.366],["T",36.366,36.65],["et",36.65,36.766],["plus",36.766,37.036],["V",37.036,37.294],["et",37.294,37.423],["plus",37.423,37.681],["arbejdet",37.681,38.145],["fra",38.145,38.325],["andre",38.325,38.712],["kræfter",38.712,39.227],["lig",39.227,39.536],["T",39.536,39.768],["to",39.768,40.039],["plus",40.039,40.335],["V",40.335,40.503],["to.",40.503,40.902]],"text":"Så bliver arbejdssætningen T et plus V et plus arbejdet fra andre kræfter lig T to plus V to."},"bevar":{"start":42.138,"end":49.806,"words":[["Er",42.265,42.368],["der",42.368,42.471],["ingen",42.472,42.716],["friktion",42.716,43.245],["og",43.245,43.399],["ingen",43.399,43.709],["påført",43.709,44.147],["arbejde",44.147,44.791],["er",44.933,45.075],["T",45.075,45.358],["plus",45.358,45.629],["V",45.629,45.809],["konstant",45.809,46.466],["Det",47.344,47.499],["er",47.499,47.641],["bevarelse",47.641,48.401],["af",48.401,48.568],["mekanisk",48.568,49.174],["energi",49.174,49.806]],"text":"Er der ingen friktion og ingen påført arbejde, er T plus V konstant. Det er bevarelse af mekanisk energi."},"snor":{"start":51.032,"end":57.074,"words":[["Uudstrækkelige",51.159,52.126],["masseløse",52.255,52.989],["snore",52.989,53.363],["laver",53.363,53.737],["intet",53.737,54.072],["nettoarbejde",54.072,55.0],["men",55.141,55.296],["de",55.296,55.386],["flytter",55.386,55.708],["energi",55.708,56.172],["mellem",56.172,56.533],["delene",56.533,57.074]],"text":"Uudstrækkelige, masseløse snore laver intet nettoarbejde, men de flytter energi mellem delene."},"eks":{"start":58.294,"end":66.4,"words":[["Et",58.434,58.589],["eget",58.589,58.847],["eksempel",58.847,59.504],["en",59.633,59.774],["slank",59.774,60.097],["stang",60.097,60.38],["på",60.38,60.535],["en",60.535,60.612],["meter",60.612,61.076],["slippes",61.076,61.475],["vandret",61.475,61.991],["og",61.991,62.146],["drejer",62.146,62.545],["om",62.545,62.751],["en",62.751,62.867],["ende",62.867,63.305],["Tyngdepunktet",64.196,64.982],["falder",64.982,65.485],["en",65.485,65.678],["halv",65.678,65.897],["meter",65.897,66.4]],"text":"Et eget eksempel: en slank stang på en meter slippes vandret og drejer om en ende. Tyngdepunktet falder en halv meter."},"eks2":{"start":67.62,"end":81.911,"words":[["Energibevarelse",67.76,68.984],["m",69.1,69.319],["g",69.32,69.5],["gange",69.5,69.783],["en",69.783,69.899],["halv",69.899,70.222],["er",70.222,70.35],["en",70.35,70.453],["halv",70.453,70.66],["gange",70.66,70.982],["m",70.982,71.188],["l",71.188,71.33],["i",71.33,71.523],["anden",71.523,71.961],["over",71.961,72.232],["tre",72.232,72.502],["gange",72.502,72.825],["omega",72.825,73.366],["i",73.366,73.572],["anden",73.572,74.01],["Massen",74.914,75.3],["går",75.3,75.571],["ud",75.571,75.88],["og",76.022,76.177],["omega",76.177,76.589],["er",76.589,76.718],["kvadratroden",76.718,77.362],["af",77.362,77.465],["tre",77.465,77.762],["g",77.762,77.994],["over",77.994,78.251],["l",78.251,78.625],["altså",78.767,79.257],["fem",79.257,79.501],["komma",79.501,79.836],["fire",79.836,80.12],["to",80.12,80.391],["radianer",80.391,81.035],["pr.",81.035,81.306],["sekund",81.306,81.911]],"text":"Energibevarelse: m g gange en halv er en halv gange m l i anden over tre gange omega i anden. Massen går ud, og omega er kvadratroden af tre g over l, altså fem komma fire to radianer pr. sekund."},"tjek_q":{"start":83.138,"end":88.808,"words":[["Tjek",83.239,83.561],["dig",83.561,83.741],["selv",83.741,84.167],["Afhænger",85.058,85.458],["stangens",85.458,85.87],["vinkelhastighed",85.87,86.759],["i",86.759,86.875],["den",86.875,87.03],["lodrette",87.03,87.481],["stilling",87.481,87.932],["af",87.932,88.061],["dens",88.061,88.331],["masse",88.331,88.808]],"text":"Tjek dig selv. Afhænger stangens vinkelhastighed i den lodrette stilling af dens masse?"},"tjek_a":{"start":92.69,"end":98.528,"words":[["Nej",92.79,93.318],["Massen",94.236,94.649],["indgår",94.649,95.022],["både",95.022,95.306],["i",95.306,95.396],["den",95.396,95.589],["potentielle",95.59,96.311],["og",96.311,96.44],["den",96.44,96.62],["kinetiske",96.62,97.226],["energi",97.226,97.806],["og",97.806,97.935],["går",97.935,98.231],["ud",98.231,98.528]],"text":"Nej. Massen indgår både i den potentielle og den kinetiske energi og går ud."},"slut":{"start":99.76,"end":108.521,"words":[["Kort",99.887,100.093],["sagt",100.094,100.557],["V",100.686,100.983],["g",100.983,101.189],["er",101.189,101.369],["m",101.369,101.64],["g",101.64,101.872],["y",101.872,102.207],["V",102.336,102.658],["e",102.658,102.903],["er",102.903,103.032],["en",103.032,103.16],["halv",103.161,103.38],["k",103.38,103.663],["s",103.663,103.947],["i",103.947,104.179],["anden",104.179,104.591],["og",104.733,104.913],["T",104.913,105.171],["et",105.171,105.274],["plus",105.274,105.532],["V",105.532,105.751],["et",105.751,105.88],["plus",105.88,106.15],["andet",106.15,106.459],["arbejde",106.459,107.001],["er",107.001,107.207],["T",107.207,107.478],["to",107.478,107.709],["plus",107.709,107.967],["V",107.967,108.135],["to.",108.135,108.521]],"text":"Kort sagt: V g er m g y, V e er en halv k s i anden, og T et plus V et plus andet arbejde er T to plus V to."}}}, { audio: 'energibevarelse.mp3', id: 'energibevarelse' });</script>
+</body>
+</html>

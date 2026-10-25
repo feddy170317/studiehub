@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fast akse: stang med kraft i enden · video</title>
+<meta name="description" content="En stang om en fast akse med kraft i enden: α = 3P/(ml).">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 17: videoer</a><h1>Fast akse: stang med kraft i enden</h1><span class="meta">DYN2 · kapitel 17 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Fast akse: stang med kraft i enden"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>En stang om en fast akse med kraft i enden: α = 3P/(ml).</p><div class="chips"><a href="newton-stift-legeme.html">Se først: Newtons love for stive legemer</a><a href="../../../../lab/dyn2/inertimoment.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel17_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/dyn2/l06">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Fast akse: stang med kraft i enden (DYN2 Kinetik III, slide 4): α = 3P/(ml), O_t = P/2
+BP.scene({ header: 'DYN2 · kap. 17' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, moment, PI } = B;
+
+  B.titel(0, 'Stang om fast akse', 'DYN2 · Hibbeler kap. 17 · opgave (Kinetik III, slide 4)', 'titel');
+  text(0, 'α = 3P / (m l)', 640, 520, 46, 'red', wt('titel', 'vinkelaccelerationen') - 0.3, we('titel', 'vinkelaccelerationen'), { align: 'center' });
+
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start, O = [200, 360], E = [680, 360];
+    dot(1, O[0], O[1], 9, 'black', t0); text(1, 'O', O[0] - 40, O[1] + 10, 32, 'black', t0, t0 + 0.3);
+    line(1, [O, E], 'black', 7, t0 + 0.2, t0 + 0.6); dot(1, 440, 360, 7, 'red', t0 + 0.5); text(1, 'G', 430, 340, 30, 'red', t0 + 0.5, t0 + 0.8);
+    arrow(1, [[E[0], E[1] + 120], [E[0], E[1] + 6]], 'blue', 4, wt('data', 'kraft') - 0.2, wt('data', 'kraft') + 0.3); text(1, 'P', E[0] + 14, E[1] + 90, 34, 'blue', wt('data', 'P') - 0.1, wt('data', 'P') + 0.3);
+    text(1, 'l', 440, 420, 32, 'black', wt('data', 'længden') - 0.1, wt('data', 'længden') + 0.3);
+    const tk = L('kd').start;
+    arrow(1, [[440, 360], [440, 280]], 'red', 3, tk + 0.2, tk + 0.5, 11); text(1, 'm α l/2', 452, 260, 28, 'red', tk + 0.3, tk + 0.6);
+    arrow(1, [[440, 360], [360, 360]], 'green', 3, wt('kd', 'omega') - 0.2, wt('kd', 'omega') + 0.2, 11); text(1, 'm ω² l/2', 300, 330, 28, 'green', wt('kd', 'omega'), wt('kd', 'omega') + 0.3);
+    moment(1, 440, 360, 50, -0.2 * PI, -0.8 * PI, 'blue', wt('kd', 'I') - 0.2, wt('kd', 'I') + 0.2);
+    text(1, 'l P = (l/2) m α (l/2) + I_G α', 760, 220, 34, 'black', L('moment').start + 0.2, we('moment', 'alfa', 1));
+    text(1, '= (m l²/4 + I_G) α = I_O α', 760, 280, 34, 'blue', L('io').start + 0.2, we('io', 'forventet'));
+    const r = text(1, 'I_O = m l²/3 ⇒ α = 3P/(m l)', 760, 370, 36, 'red', L('tal').start + 0.2, we('tal', 'l', 3));
+    text(1, 'O_t + P = m α l/2 ⇒ O_t = P/2', 760, 470, 34, 'green', L('reaktion').start + 0.3, we('ot', 'P', 2));
+  }
+
+  B.goto('tjek_q', 2);
+  B.tjek(2, ['m = 2 kg, l = 1 m, P = 12 N.', 'Hvad er α?'], ['α = 3 · 12 / (2 · 1) = 18 rad/s²'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 3);
+  B.slut(3, 'DYN2 slides Kinetik III, slide 4 · Hibbeler (2023), kap. 17.4', '', 'slut');
+  text(3, 'ΣM_O = I_O α', 200, 280, 46, 'blue', L('slut').start + 0.4, we('slut', 'alfa'));
+  text(3, 'slank stang: α = 3P/(m l)', 200, 370, 46, 'red', wt('slut', 'slank') - 0.1, we('slut', 'l'));
+});
+
+</script>
+<script>BP.live({"duration":106.336,"audio":"opg-fast-akse-stang.mp3","order":["titel","data","kd","moment","io","tal","reaktion","ot","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":8.219,"words":[["Et",0.64,0.743],["eksempel",0.743,1.375],["fra",1.375,1.542],["slides",1.542,2.148],["En",3.039,3.142],["stang",3.142,3.49],["drejer",3.49,3.928],["om",3.928,4.108],["en",4.108,4.211],["fast",4.211,4.559],["akse",4.559,5.126],["Hvor",6.041,6.222],["stor",6.222,6.557],["bliver",6.557,6.827],["vinkelaccelerationen",6.827,8.219]],"text":"Et eksempel fra slides. En stang drejer om en fast akse. Hvor stor bliver vinkelaccelerationen?"},"data":{"start":9.442,"end":18.179,"words":[["En",9.569,9.672],["slank",9.672,10.007],["stang",10.007,10.33],["med",10.33,10.51],["massen",10.51,10.91],["m",10.91,11.103],["og",11.103,11.154],["længden",11.154,11.631],["l",11.631,11.863],["drejer",11.863,12.314],["om",12.314,12.495],["en",12.495,12.585],["akse",12.585,13.049],["O",13.049,13.332],["i",13.332,13.474],["den",13.474,13.654],["ene",13.654,13.977],["ende",13.977,14.376],["En",15.267,15.383],["kraft",15.383,15.782],["P",15.782,16.104],["virker",16.104,16.465],["vinkelret",16.465,17.11],["i",17.11,17.225],["den",17.226,17.419],["anden",17.419,17.78],["ende",17.78,18.179]],"text":"En slank stang med massen m og længden l drejer om en akse O i den ene ende. En kraft P virker vinkelret i den anden ende."},"kd":{"start":19.392,"end":26.916,"words":[["Det",19.506,19.584],["kinetiske",19.584,20.202],["diagram",20.202,20.769],["har",20.769,21.091],["m",21.092,21.298],["alfa",21.298,21.646],["l",21.646,21.839],["halve",21.839,22.135],["tangentielt",22.135,22.934],["m",23.076,23.282],["omega",23.282,23.823],["i",23.823,24.017],["anden",24.017,24.287],["l",24.287,24.442],["halve",24.442,24.751],["mod",24.751,25.009],["aksen",25.009,25.589],["og",25.808,25.963],["I",25.963,26.169],["G",26.169,26.427],["alfa",26.427,26.916]],"text":"Det kinetiske diagram har m alfa l halve tangentielt, m omega i anden l halve mod aksen, og I G alfa."},"moment":{"start":28.142,"end":34.21,"words":[["Moment",28.256,28.617],["om",28.617,28.927],["O",28.927,29.287],["l",29.403,29.622],["gange",29.622,29.932],["P",29.932,30.267],["er",30.267,30.37],["lig",30.37,30.653],["l",30.653,30.795],["halve",30.795,31.117],["gange",31.117,31.53],["m",31.53,31.826],["alfa",31.826,32.264],["l",32.264,32.496],["halve",32.496,32.921],["plus",32.921,33.308],["I",33.308,33.514],["G",33.514,33.772],["alfa",33.772,34.21]],"text":"Moment om O: l gange P er lig l halve gange m alfa l halve plus I G alfa."},"io":{"start":35.428,"end":43.377,"words":[["Parentesen",35.568,36.174],["er",36.174,36.393],["m",36.393,36.612],["l",36.612,36.754],["i",36.754,36.947],["anden",36.947,37.347],["over",37.347,37.63],["fire",37.63,37.914],["plus",37.914,38.197],["I",38.197,38.365],["G",38.365,38.7],["og",38.841,38.957],["det",38.957,39.112],["er",39.112,39.151],["netop",39.151,39.563],["I",39.563,39.808],["O.",39.808,40.014],["Så",40.014,40.182],["sum",40.182,40.478],["M",40.478,40.8],["O",40.8,41.109],["er",41.109,41.303],["I",41.303,41.586],["O",41.586,41.831],["alfa",41.831,42.321],["som",42.45,42.707],["forventet",42.707,43.377]],"text":"Parentesen er m l i anden over fire plus I G, og det er netop I O. Så sum M O er I O alfa, som forventet."},"tal":{"start":44.61,"end":55.28,"words":[["For",44.724,44.879],["en",44.879,44.956],["slank",44.956,45.266],["stang",45.266,45.665],["er",45.665,45.846],["I",45.846,46.103],["O",46.103,46.335],["lig",46.335,46.58],["m",46.58,46.825],["l",46.825,47.018],["i",47.018,47.25],["anden",47.25,47.663],["over",47.663,47.92],["tre",47.92,48.358],["Så",49.236,49.558],["er",49.558,49.674],["alfa",49.674,50.061],["lig",50.061,50.254],["P",50.254,50.473],["l",50.473,50.808],["divideret",50.808,51.375],["med",51.375,51.633],["m",51.633,51.852],["l",51.852,51.981],["i",51.981,52.187],["anden",52.187,52.548],["over",52.548,52.806],["tre",52.806,53.257],["altså",53.399,53.747],["tre",53.747,54.017],["P",54.017,54.314],["over",54.314,54.61],["m",54.61,54.868],["l.",54.868,55.28]],"text":"For en slank stang er I O lig m l i anden over tre. Så er alfa lig P l divideret med m l i anden over tre, altså tre P over m l."},"reaktion":{"start":56.504,"end":64.133,"words":[["Lejekræfterne",56.618,57.559],["findes",57.559,57.881],["bagefter",57.881,58.551],["fra",58.551,58.719],["kraftligningerne",58.719,59.621],["Tangentielt",60.512,61.169],["er",61.169,61.336],["O",61.336,61.556],["t",61.556,61.762],["plus",61.762,61.994],["P",61.994,62.264],["lig",62.264,62.625],["m",62.625,62.909],["alfa",62.909,63.398],["l",63.398,63.617],["halve",63.617,64.133]],"text":"Lejekræfterne findes bagefter fra kraftligningerne. Tangentielt er O t plus P lig m alfa l halve."},"ot":{"start":65.35,"end":74.074,"words":[["Det",65.477,65.555],["giver",65.555,65.98],["O",65.98,66.199],["t",66.199,66.392],["lig",66.392,66.598],["m",66.598,66.779],["gange",66.779,67.101],["tre",67.101,67.397],["P",67.397,67.745],["over",67.745,68.08],["m",68.08,68.312],["l",68.312,68.467],["gange",68.467,68.892],["l",68.892,69.111],["halve",69.111,69.408],["minus",69.408,69.717],["P",69.717,70.091],["altså",70.232,70.683],["en",70.683,70.838],["halv",70.838,71.057],["P",71.057,71.431],["Den",72.347,72.489],["peger",72.489,72.824],["samme",72.824,73.198],["vej",73.198,73.469],["som",73.469,73.7],["P",73.701,74.074]],"text":"Det giver O t lig m gange tre P over m l gange l halve minus P, altså en halv P. Den peger samme vej som P."},"tjek_q":{"start":75.3,"end":83.301,"words":[["Tjek",75.4,75.735],["dig",75.735,75.916],["selv",75.916,76.354],["En",77.259,77.362],["stang",77.362,77.658],["på",77.658,77.8],["to",77.8,78.058],["kilo",78.058,78.341],["og",78.341,78.419],["en",78.419,78.496],["meter",78.496,78.934],["får",78.934,79.114],["en",79.114,79.205],["kraft",79.205,79.578],["på",79.578,79.72],["tolv",79.72,80.004],["newton",80.004,80.558],["i",80.558,80.751],["enden",80.751,81.189],["Hvad",82.051,82.476],["er",82.476,82.695],["alfa",82.695,83.301]],"text":"Tjek dig selv. En stang på to kilo og en meter får en kraft på tolv newton i enden. Hvad er alfa?"},"tjek_a":{"start":87.18,"end":93.3,"words":[["Alfa",87.32,87.681],["er",87.681,87.797],["tre",87.797,88.068],["gange",88.068,88.3],["tolv",88.3,88.57],["divideret",88.57,89.176],["med",89.176,89.434],["to",89.434,89.691],["gange",89.691,90.001],["en",90.001,90.361],["altså",90.503,90.928],["atten",90.928,91.302],["radianer",91.302,91.895],["pr.",91.895,92.14],["sekund",92.14,92.681],["i",92.681,92.861],["anden",92.861,93.3]],"text":"Alfa er tre gange tolv divideret med to gange en, altså atten radianer pr. sekund i anden."},"slut":{"start":94.514,"end":103.908,"words":[["Kort",94.628,94.847],["sagt",94.848,95.299],["om",95.44,95.608],["en",95.608,95.685],["fast",95.685,96.007],["akse",96.007,96.355],["er",96.355,96.458],["sum",96.458,96.832],["M",96.832,97.128],["O",97.128,97.386],["lig",97.386,97.683],["I",97.683,97.927],["O",97.927,98.172],["alfa",98.172,98.585],["For",99.475,99.617],["en",99.617,99.694],["slank",99.694,99.991],["stang",99.991,100.3],["med",100.3,100.468],["kraften",100.468,100.97],["P",100.97,101.176],["i",101.176,101.357],["enden",101.357,101.73],["er",101.73,101.898],["alfa",101.898,102.323],["tre",102.323,102.607],["P",102.607,102.929],["over",102.929,103.212],["m",103.212,103.457],["l.",103.457,103.908]],"text":"Kort sagt: om en fast akse er sum M O lig I O alfa. For en slank stang med kraften P i enden er alfa tre P over m l."}}}, { audio: 'opg-fast-akse-stang.mp3', id: 'opg-fast-akse-stang' });</script>
+</body>
+</html>

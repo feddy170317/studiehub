@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dæmpede svingninger · video</title>
+<meta name="description" content="Viskøs dæmpning, cc = 2mωn, og under-, kritisk og overdæmpet bevægelse.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 22: videoer</a><h1>Dæmpede svingninger</h1><span class="meta">DYN2 · kapitel 22 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Dæmpede svingninger"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Viskøs dæmpning, cc = 2mωn, og under-, kritisk og overdæmpet bevægelse.</p><div class="chips"><a href="fri-svingning.html">Se først: Frie udæmpede svingninger</a><a href="../../../../lab/dyn2/vibrationer.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel22_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/dyn2/l11">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Dæmpede svingninger (DYN2 Vibrations III, HI 22.4)
+BP.scene({ header: 'DYN2 · kap. 22' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, axes, plot, PI } = B;
+
+  B.titel(0, 'Dæmpede svingninger', 'DYN2 · Hibbeler kap. 22 · begreb (Vibrations III)', 'titel');
+  text(0, 'under · kritisk · over', 640, 520, 44, 'red', wt('titel', 'viskøs') - 0.2, we('titel', 'systemet'), { align: 'center' });
+
+  B.goto('ligning', 1);
+  {
+    const t0 = L('ligning').start;
+    const r = text(1, 'm ẍ + c ẋ + k x = 0', 140, 170, 50, 'red', t0 + 0.3, we('ligning', 'nul'));
+    text(1, 'm λ² + c λ + k = 0', 140, 260, 42, 'blue', L('karakt').start + 0.3, we('karakt', 'nul'));
+    text(1, 'c_c = 2 m ω_n', 700, 260, 46, 'green', L('cc').start + 0.2, we('cc', 'n'));
+    const ox = 160, oy = 470, X = (t) => ox + t * 90, Y = (x) => oy - x * 90;
+    const tu = L('under').start;
+    line(1, [[ox, oy], [ox + 980, oy]], 'black', 2, tu, tu + 0.3); line(1, [[ox, oy - 110], [ox, oy + 110]], 'black', 2, tu, tu + 0.3);
+    const U = []; for (let j = 0; j <= 120; j++) { const t = 10.5 * j / 120; U.push([X(t), Y(Math.exp(-0.3 * t) * Math.cos(3 * t))]); } plot(1, U, 'blue', tu + 0.2, tu + 1.6);
+    text(1, 'c < c_c: svinger, ω_d = √(ω_n² − (c/2m)²)', 140, 650, 32, 'blue', tu + 0.3, we('under', 'anden', 1));
+    const tk = L('kritisk').start;
+    const K = []; for (let j = 0; j <= 80; j++) { const t = 10.5 * j / 80; K.push([X(t), Y((1 + 3 * t) * Math.exp(-3 * t))]); } plot(1, K, 'red', tk + 0.2, tk + 1.0);
+    text(1, 'c = c_c: hurtigst til ro', 760, 380, 30, 'red', tk + 0.3, we('kritisk', 'ligevægten'));
+    const to = L('over').start;
+    const O = []; for (let j = 0; j <= 80; j++) { const t = 10.5 * j / 80; O.push([X(t), Y(1.17 * Math.exp(-0.6 * t) - 0.17 * Math.exp(-15 * t))]); } plot(1, O, 'green', to + 0.2, to + 1.0);
+    text(1, 'c > c_c: kryber', 760, 330, 30, 'green', to + 0.3, we('over', 'dæmpning'));
+    text(1, 'τ_d = 2π/ω_d', 760, 170, 38, 'blue', L('periode').start + 0.2, we('periode', 'd'));
+  }
+
+  B.goto('rotation', 2);
+  {
+    const t0 = L('rotation').start;
+    text(2, 'drejende stang:', 140, 200, 40, 'black', t0, t0 + 0.6);
+    text(2, 'I θ̈ + c d² θ̇ + k a² θ = 0', 140, 290, 50, 'red', t0 + 0.4, we('rotation', 'arme'));
+    text(2, 'd: dæmperens arm · a: fjederens arm', 140, 380, 34, 'blue', wt('rotation', 'd', 1) - 0.2, we('rotation', 'arme'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Hvorfor næsten kritisk dæmpning', 'i en støddæmper?'], ['bilen falder hurtigt til ro', 'uden at blive ved med at gynge'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'DYN2 slides Vibrations III · Hibbeler (2023), kap. 22.4', 'eksamensopgaven med stang og dæmper', 'slut');
+  text(4, 'c_c = 2 m ω_n', 200, 280, 46, 'red', L('slut').start + 0.4, we('slut', 'n'));
+  text(4, 'c < c_c svinger med ω_d', 200, 370, 44, 'blue', wt('slut', 'under') - 0.1, we('slut', 'd'));
+});
+
+</script>
+<script>BP.live({"duration":107.598,"audio":"daempet-svingning.mp3","order":["titel","ligning","karakt","cc","under","periode","kritisk","over","rotation","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":6.389,"words":[["Dæmpede",0.601,1.039],["svingninger",1.039,1.748],["Hvad",2.729,2.845],["sker",2.845,3.168],["der",3.168,3.451],["når",3.593,3.812],["en",3.812,3.915],["viskøs",3.915,4.392],["dæmper",4.392,4.727],["tager",4.727,4.972],["energi",4.972,5.461],["ud",5.461,5.667],["af",5.668,5.706],["systemet",5.706,6.389]],"text":"Dæmpede svingninger. Hvad sker der, når en viskøs dæmper tager energi ud af systemet?"},"ligning":{"start":7.618,"end":16.561,"words":[["Med",7.758,7.926],["en",7.926,8.029],["dæmper",8.029,8.351],["får",8.351,8.531],["vi",8.531,8.686],["m",8.686,8.892],["x",8.892,9.111],["dobbeltprik",9.111,9.627],["plus",9.627,9.872],["c",9.872,10.155],["x",10.155,10.413],["prik",10.413,10.645],["plus",10.645,10.89],["k",10.89,11.212],["x",11.212,11.47],["lig",11.47,11.663],["nul",11.663,12.049],["Dæmperen",12.94,13.391],["ændrer",13.391,13.804],["ikke",13.804,14.074],["ligevægten",14.074,14.796],["men",14.925,15.157],["den",15.157,15.376],["bremser",15.376,15.762],["bevægelsen",15.762,16.561]],"text":"Med en dæmper får vi m x dobbeltprik plus c x prik plus k x lig nul. Dæmperen ændrer ikke ligevægten, men den bremser bevægelsen."},"karakt":{"start":17.784,"end":24.857,"words":[["Vi",17.924,18.014],["gætter",18.014,18.362],["x",18.362,18.646],["lig",18.646,18.826],["e",18.826,18.994],["i",18.994,19.136],["lambda",19.136,19.548],["t",19.548,19.909],["og",19.909,20.025],["får",20.025,20.166],["den",20.166,20.321],["karakteristiske",20.321,21.146],["ligning",21.146,21.532],["m",21.532,21.752],["lambda",21.752,22.19],["i",22.19,22.383],["anden",22.383,22.641],["plus",22.641,22.873],["c",22.873,23.13],["lambda",23.13,23.685],["plus",23.685,23.994],["k",23.994,24.252],["lig",24.252,24.471],["nul",24.471,24.857]],"text":"Vi gætter x lig e i lambda t og får den karakteristiske ligning m lambda i anden plus c lambda plus k lig nul."},"cc":{"start":26.078,"end":32.391,"words":[["Den",26.218,26.334],["kritiske",26.334,26.824],["dæmpning",26.824,27.339],["er",27.339,27.481],["c",27.481,27.765],["c",27.765,27.958],["lig",27.958,28.138],["to",28.138,28.499],["m",28.499,28.795],["omega",28.796,29.195],["n.",29.195,29.607],["Forholdet",29.607,30.071],["mellem",30.071,30.355],["c",30.355,30.625],["og",30.625,30.651],["c",30.651,30.909],["c",30.909,31.192],["afgør",31.192,31.592],["bevægelsen",31.592,32.391]],"text":"Den kritiske dæmpning er c c lig to m omega n. Forholdet mellem c og c c afgør bevægelsen."},"under":{"start":33.604,"end":45.949,"words":[["Underdæmpet",33.744,34.427],["c",34.517,34.814],["mindre",34.814,35.239],["end",35.239,35.407],["c",35.407,35.677],["c",35.677,36.09],["systemet",36.218,36.811],["svinger",36.811,37.172],["med",37.172,37.404],["aftagende",37.404,37.971],["amplitude",37.971,38.757],["Den",39.648,39.777],["dæmpede",39.777,40.137],["vinkelfrekvens",40.138,40.949],["er",40.949,41.143],["omega",41.143,41.503],["d",41.503,41.697],["lig",41.697,41.864],["kvadratroden",41.864,42.534],["af",42.534,42.676],["omega",42.676,43.114],["n",43.114,43.359],["i",43.359,43.552],["anden",43.552,43.772],["minus",43.772,44.068],["c",44.068,44.442],["over",44.442,44.686],["to",44.686,44.983],["m",44.983,45.292],["i",45.292,45.498],["anden",45.498,45.949]],"text":"Underdæmpet, c mindre end c c: systemet svinger med aftagende amplitude. Den dæmpede vinkelfrekvens er omega d lig kvadratroden af omega n i anden minus c over to m i anden."},"periode":{"start":47.178,"end":54.432,"words":[["Perioden",47.305,47.718],["er",47.718,47.872],["tau",47.872,48.182],["d",48.182,48.388],["lig",48.388,48.555],["to",48.555,48.8],["pi",48.8,49.135],["over",49.135,49.406],["omega",49.406,49.767],["d",49.767,50.166],["og",50.308,50.45],["amplituden",50.45,51.004],["aftager",51.004,51.519],["med",51.519,51.816],["e",51.816,52.022],["i",52.022,52.202],["minus",52.202,52.511],["c",52.511,52.872],["over",52.872,53.13],["to",53.13,53.426],["m",53.426,53.607],["gange",53.607,53.916],["t.",53.916,54.432]],"text":"Perioden er tau d lig to pi over omega d, og amplituden aftager med e i minus c over to m gange t."},"kritisk":{"start":55.664,"end":61.951,"words":[["Kritisk",55.804,56.217],["dæmpet",56.217,56.706],["c",56.809,57.144],["lig",57.144,57.312],["c",57.312,57.557],["c",57.557,57.982],["ingen",58.098,58.343],["svingning",58.343,58.884],["og",59.026,59.18],["systemet",59.181,59.709],["vender",59.709,59.928],["hurtigst",59.928,60.327],["muligt",60.327,60.624],["tilbage",60.624,61.075],["til",61.075,61.217],["ligevægten",61.217,61.951]],"text":"Kritisk dæmpet, c lig c c: ingen svingning, og systemet vender hurtigst muligt tilbage til ligevægten."},"over":{"start":63.166,"end":69.518,"words":[["Overdæmpet",63.306,64.015],["c",64.105,64.414],["større",64.414,64.801],["end",64.801,64.969],["c",64.969,65.239],["c",65.239,65.664],["ingen",65.793,66.038],["svingning",66.038,66.579],["og",66.721,66.85],["bevægelsen",66.85,67.43],["er",67.43,67.533],["langsommere",67.533,68.19],["end",68.19,68.371],["ved",68.371,68.461],["kritisk",68.461,68.951],["dæmpning",68.951,69.518]],"text":"Overdæmpet, c større end c c: ingen svingning, og bevægelsen er langsommere end ved kritisk dæmpning."},"rotation":{"start":70.74,"end":79.965,"words":[["For",70.867,71.022],["en",71.022,71.099],["drejende",71.099,71.421],["stang",71.421,71.821],["bliver",71.821,72.027],["det",72.027,72.156],["I",72.156,72.233],["theta",72.233,72.671],["dobbeltprik",72.671,73.226],["plus",73.226,73.496],["c",73.496,73.702],["d",73.702,73.973],["i",73.973,74.179],["anden",74.179,74.424],["theta",74.424,74.888],["prik",74.888,75.171],["plus",75.171,75.416],["k",75.416,75.674],["a",75.674,76.009],["i",76.009,76.215],["anden",76.215,76.473],["theta",76.473,76.86],["lig",76.86,77.079],["nul",77.079,77.465],["hvor",77.607,77.762],["d",77.762,77.968],["og",77.968,78.135],["a",78.135,78.329],["er",78.329,78.406],["dæmperens",78.406,78.96],["og",78.96,79.102],["fjederens",79.102,79.527],["arme",79.527,79.965]],"text":"For en drejende stang bliver det I theta dobbeltprik plus c d i anden theta prik plus k a i anden theta lig nul, hvor d og a er dæmperens og fjederens arme."},"tjek_q":{"start":81.194,"end":86.387,"words":[["Tjek",81.295,81.617],["dig",81.617,81.797],["selv",81.797,82.223],["Hvorfor",83.127,83.398],["bruger",83.398,83.668],["man",83.668,83.874],["næsten",83.874,84.248],["kritisk",84.248,84.673],["dæmpning",84.673,85.176],["i",85.176,85.343],["en",85.343,85.459],["bils",85.459,85.704],["støddæmper",85.704,86.387]],"text":"Tjek dig selv. Hvorfor bruger man næsten kritisk dæmpning i en bils støddæmper?"},"tjek_a":{"start":90.266,"end":94.324,"words":[["Fordi",90.393,90.741],["bilen",90.741,91.128],["så",91.128,91.282],["falder",91.282,91.527],["hurtigt",91.527,91.811],["til",91.811,91.94],["ro",91.94,92.275],["efter",92.275,92.533],["et",92.533,92.597],["bump",92.597,92.983],["uden",92.984,93.203],["at",93.203,93.254],["blive",93.254,93.422],["ved",93.422,93.576],["med",93.576,93.757],["at",93.757,93.795],["gynge",93.795,94.324]],"text":"Fordi bilen så falder hurtigt til ro efter et bump uden at blive ved med at gynge."},"slut":{"start":95.536,"end":105.174,"words":[["Kort",95.663,95.869],["sagt",95.87,96.333],["c",96.449,96.772],["c",96.772,97.055],["er",97.055,97.197],["to",97.197,97.493],["m",97.493,97.751],["omega",97.751,98.099],["n",98.099,98.473],["under",98.614,98.859],["c",98.859,99.104],["c",99.104,99.362],["svinger",99.362,99.697],["systemet",99.697,100.264],["med",100.264,100.47],["omega",100.47,100.805],["d",100.805,101.217],["ved",101.359,101.54],["c",101.54,101.784],["c",101.784,102.055],["går",102.055,102.235],["det",102.235,102.3],["hurtigst",102.3,102.686],["til",102.687,102.802],["ro",102.802,103.176],["og",103.331,103.447],["over",103.447,103.666],["c",103.666,103.911],["c",103.911,104.143],["kryber",104.143,104.465],["det",104.465,104.581],["tilbage",104.581,105.174]],"text":"Kort sagt: c c er to m omega n, under c c svinger systemet med omega d, ved c c går det hurtigst til ro, og over c c kryber det tilbage."}}}, { audio: 'daempet-svingning.mp3', id: 'daempet-svingning' });</script>
+</body>
+</html>
