@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tandhjul: geometri og udveksling · video</title>
+<meta name="description" content="Tandhjulstyper, delecirkel, modul og deling, udveksling, indgrebsgrad og tandhjulstog.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 14: videoer</a><h1>Tandhjul: geometri og udveksling</h1><span class="meta">MEM1 · kapitel 14 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Tandhjul: geometri og udveksling"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Tandhjulstyper, delecirkel, modul og deling, udveksling, indgrebsgrad og tandhjulstog.</p><div class="chips"><a href="../../../../lab/mem1/tandhjul-lewis.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel14_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l14">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Tandhjul: geometri og udveksling (MEM1 kap. 14, slides 2–11)
+BP.scene({ header: 'MEM1 · kap. 14' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, dashed, PI, TAU } = B;
+  const gear = (k, cx, cy, r, z, col, a, b) => { const P = []; const n = z * 8; for (let j = 0; j <= n; j++) { const an = j / n * TAU, ph = (j % 8) / 8, rr = ph < 0.25 || ph >= 0.75 ? r + 10 : r - 10; P.push([cx + rr * Math.cos(an), cy + rr * Math.sin(an)]); } line(k, P, col, 2.6, a, b); };
+
+  B.titel(0, 'Tandhjul', 'MEM1 · kapitel 14 · begreb (slide 2–11)', 'titel');
+  text(0, 'geometri og udveksling', 640, 520, 42, 'red', wt('titel', 'beskriver') - 0.2, we('titel', 'udvekslingen'), { align: 'center' });
+
+  B.goto('fordele', 1);
+  {
+    const t0 = L('fordele').start;
+    gear(1, 320, 360, 120, 18, 'blue', t0, t0 + 1.0); gear(1, 520, 360, 70, 10, 'red', t0 + 0.4, t0 + 1.2);
+    text(1, 'ingen slip · stort moment · lang levetid', 660, 240, 28, 'black', wt('fordele', 'ingen') - 0.1, we('fordele', 'smøring'));
+    const tt = L('typer').start;
+    text(1, 'parallelle: lige eller skrå tænder', 700, 330, 32, 'blue', wt('typer', 'parallelle') - 0.2, we('typer', 'indgreb'));
+    text(1, 'skærende: koniske tandhjul', 700, 385, 32, 'blue', wt('typer', 'skærer') - 0.3, we('typer', 'tandhjul', 1));
+    text(1, 'forbigående: snekkegear', 700, 440, 32, 'blue', wt('typer', 'forbi') - 0.3, we('typer', 'snekkegear'));
+  }
+
+  B.goto('delecirkel', 2);
+  {
+    const t0 = L('delecirkel').start, cx = 320, cy = 400;
+    gear(2, cx, cy, 200, 24, 'black', t0 - 0.5, t0 + 0.4);
+    dashed(2, [cx - 200, cy], [cx + 200, cy], 'black', t0, t0 + 0.3);
+    line(2, ell(cx, cy, 200, 200, 0, TAU), 'blue', 2.4, t0 + 0.2, we('delecirkel', 'slip'), { alpha: 0.8 });
+    text(2, 'delecirkel', cx + 40, cy - 214, 28, 'blue', t0 + 0.4, we('delecirkel', 'slip'));
+    text(2, 'm = d / Z  [mm]', 640, 200, 46, 'red', L('modul').start + 0.2, we('modul', 'millimeter'));
+    text(2, 'p = π m', 640, 280, 46, 'blue', L('deling').start + 0.2, we('deling', 'm'));
+    text(2, 'tandhoved: 1 · m', 640, 370, 36, 'black', wt('tand', 'tandhovedet') - 0.2, we('tand', 'modul'));
+    text(2, 'tandfod: 1,25 · m', 640, 420, 36, 'black', wt('tand', 'tandfoden') - 0.2, we('tand', 'modul', 1));
+    const tu = L('udveksling').start;
+    const r = text(2, 'i = ω_1/ω_2 = Z_2/Z_1 = d_2/d_1', 640, 530, 40, 'red', tu + 0.3, we('udveksling', 'et', 2));
+    box(2, 615, 475, 600, 80, 'red', we('udveksling', 'et', 2), we('udveksling', 'et', 2) + 0.6);
+  }
+
+  B.goto('indgreb', 3);
+  {
+    const t0 = L('indgreb').start;
+    text(3, 'indgrebsgrad ε ≥ 1,2', 140, 170, 46, 'red', t0 + 0.2, we('indgreb', 'slipper'));
+    text(3, 'tilbageslag: varme · tolerancer · oliefilm', 140, 270, 36, 'blue', L('tilbageslag').start + 0.2, we('tilbageslag', 'oliefilm'));
+    const tg = L('tog').start;
+    gear(3, 240, 480, 70, 10, 'blue', tg, tg + 0.6); gear(3, 400, 480, 90, 14, 'black', tg + 0.3, tg + 0.9); gear(3, 580, 480, 70, 10, 'blue', tg + 0.5, tg + 1.1);
+    text(3, 'simpelt: mellemhjul vender kun retningen', 140, 620, 30, 'black', tg + 0.3, we('tog', 'omdrejningsretningen'));
+    text(3, 'sammensat: i = Π Z_{drevne} / Π Z_{drivende}', 140, 670, 30, 'red', wt('tog', 'sammensat') - 0.2, we('tog', 'trin'));
+  }
+
+  B.goto('tjek_q', 4);
+  B.tjek(4, ['Z_1 = 20, Z_2 = 60, n_1 = 1500 omdr./min.', 'Udveksling og n_2?'], ['i = 60/20 = 3', 'n_2 = 500 omdr./min'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 5);
+  B.slut(5, 'Abou-Hayt (2026), MEM1 Chapter 14, slide 2–11 · Hamrock, Schmid & Jacobson, kap. 14', "Lewis' formel", 'slut');
+  text(5, 'm = d/Z · p = π m', 200, 280, 44, 'blue', L('slut').start + 0.4, we('slut', 'm', 1));
+  text(5, 'i = Z_2/Z_1 · ε ≥ 1,2', 200, 360, 44, 'red', wt('slut', 'udvekslingen') - 0.1, we('slut', 'tolv'));
+});
+
+</script>
+<script>BP.live({"duration":151.618,"audio":"tandhjul-geometri.mp3","order":["titel","fordele","typer","delecirkel","modul","deling","tand","udveksling","indgreb","tilbageslag","tog","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":5.861,"words":[["Tandhjul",0.6,1.309],["Hvordan",2.265,2.588],["beskriver",2.588,3.026],["vi",3.026,3.18],["et",3.18,3.258],["tandhjul",3.258,3.915],["og",4.057,4.186],["hvordan",4.186,4.521],["regner",4.521,4.869],["vi",4.869,5.062],["udvekslingen",5.062,5.861]],"text":"Tandhjul. Hvordan beskriver vi et tandhjul, og hvordan regner vi udvekslingen?"},"fordele":{"start":7.09,"end":17.863,"words":[["Tandhjul",7.217,7.668],["overfører",7.668,8.274],["effekt",8.274,8.622],["og",8.622,8.751],["moment",8.751,9.125],["ved",9.125,9.395],["at",9.55,9.704],["tænderne",9.704,10.117],["griber",10.117,10.387],["direkte",10.387,10.993],["ind",10.993,11.199],["i",11.199,11.277],["hinanden",11.277,11.908],["Der",12.812,12.953],["er",12.953,13.069],["ingen",13.069,13.353],["slip",13.353,13.765],["de",13.894,13.997],["kan",13.997,14.1],["bære",14.1,14.306],["store",14.306,14.629],["momenter",14.629,15.093],["på",15.093,15.234],["lidt",15.234,15.44],["plads",15.441,15.917],["og",16.111,16.227],["de",16.227,16.343],["holder",16.343,16.587],["længe",16.587,16.897],["med",16.897,17.064],["god",17.064,17.335],["smøring",17.335,17.863]],"text":"Tandhjul overfører effekt og moment ved, at tænderne griber direkte ind i hinanden. Der er ingen slip, de kan bære store momenter på lidt plads, og de holder længe med god smøring."},"typer":{"start":19.08,"end":36.181,"words":[["Til",19.207,19.413],["parallelle",19.414,19.865],["aksler",19.865,20.483],["bruger",20.483,20.779],["vi",20.78,20.895],["cylindriske",20.895,21.553],["tandhjul",21.553,22.133],["med",22.133,22.326],["lige",22.326,22.725],["eller",22.725,22.957],["skrå",22.957,23.279],["tænder",23.279,23.782],["Skrå",24.66,25.034],["tænder",25.034,25.382],["går",25.382,25.613],["mere",25.614,25.897],["blødt",25.897,26.284],["i",26.284,26.477],["indgreb",26.477,27.07],["Til",27.946,28.217],["aksler",28.217,28.835],["der",28.977,29.08],["skærer",29.08,29.389],["hinanden",29.389,30.008],["bruger",30.15,30.485],["vi",30.485,30.626],["koniske",30.626,31.142],["tandhjul",31.142,31.735],["Og",32.624,32.701],["til",32.701,32.894],["aksler",32.894,33.5],["der",33.642,33.745],["går",33.745,33.964],["forbi",33.964,34.312],["hinanden",34.312,34.892],["bruger",35.034,35.33],["vi",35.33,35.407],["snekkegear",35.407,36.181]],"text":"Til parallelle aksler bruger vi cylindriske tandhjul med lige eller skrå tænder. Skrå tænder går mere blødt i indgreb. Til aksler, der skærer hinanden, bruger vi koniske tandhjul. Og til aksler, der går forbi hinanden, bruger vi snekkegear."},"delecirkel":{"start":37.406,"end":44.391,"words":[["Alt",37.546,37.727],["måles",37.727,38.087],["i",38.087,38.242],["forhold",38.242,38.719],["til",38.719,38.886],["delecirklen",38.886,39.827],["Det",40.731,40.847],["er",40.847,40.963],["den",40.963,41.143],["tænkte",41.143,41.452],["cirkel",41.452,41.981],["som",42.097,42.354],["to",42.354,42.612],["tandhjul",42.612,43.037],["ruller",43.037,43.45],["på",43.45,43.643],["uden",43.643,43.94],["slip",43.94,44.391]],"text":"Alt måles i forhold til delecirklen. Det er den tænkte cirkel, som to tandhjul ruller på uden slip."},"modul":{"start":45.604,"end":53.8,"words":[["Tandstørrelsen",45.731,46.504],["angives",46.504,47.11],["med",47.11,47.316],["modulet",47.316,47.832],["m.",47.832,48.167],["Det",49.07,49.199],["er",49.199,49.315],["delediameteren",49.315,50.179],["d",50.179,50.359],["divideret",50.359,50.875],["med",50.875,51.107],["antallet",51.107,51.648],["af",51.648,51.686],["tænder",51.686,51.983],["Z",51.983,52.395],["målt",52.537,52.975],["i",52.975,53.078],["millimeter",53.078,53.8]],"text":"Tandstørrelsen angives med modulet m. Det er delediameteren d divideret med antallet af tænder Z, målt i millimeter."},"deling":{"start":55.026,"end":61.224,"words":[["Delingen",55.153,55.501],["p",55.501,55.811],["er",55.811,55.965],["afstanden",55.965,56.532],["langs",56.532,56.841],["delecirklen",56.841,57.679],["fra",57.679,57.872],["en",57.872,57.963],["tand",57.963,58.246],["til",58.246,58.414],["den",58.414,58.594],["næste",58.594,59.097],["Den",59.961,60.167],["er",60.167,60.296],["pi",60.296,60.566],["gange",60.566,60.889],["m.",60.889,61.224]],"text":"Delingen p er afstanden langs delecirklen fra en tand til den næste. Den er pi gange m."},"tand":{"start":62.456,"end":73.113,"words":[["Over",62.596,62.854],["delecirklen",62.854,63.614],["er",63.614,63.73],["tandhovedet",63.73,64.387],["med",64.529,64.697],["højden",64.697,65.199],["et",65.199,65.367],["modul",65.367,65.908],["Under",66.825,67.069],["er",67.069,67.172],["tandfoden",67.172,67.83],["med",67.971,68.152],["højden",68.152,68.564],["en",68.564,68.835],["komma",68.835,69.144],["to",69.144,69.441],["fem",69.441,69.685],["modul",69.685,70.201],["Ekstra",71.103,71.464],["dybde",71.464,71.812],["giver",71.812,72.069],["plads",72.069,72.392],["til",72.392,72.52],["frigang",72.52,73.113]],"text":"Over delecirklen er tandhovedet, med højden et modul. Under er tandfoden, med højden en komma to fem modul. Ekstra dybde giver plads til frigang."},"udveksling":{"start":74.35,"end":85.097,"words":[["Udvekslingen",74.477,75.122],["i",75.122,75.302],["er",75.302,75.431],["omega",75.431,75.921],["et",75.921,76.075],["divideret",76.075,76.771],["med",76.771,77.016],["omega",77.016,77.454],["to.",77.454,77.892],["Fordi",78.796,79.131],["begge",79.131,79.376],["hjul",79.376,79.685],["har",79.685,79.84],["samme",79.84,80.162],["hastighed",80.162,80.677],["i",80.677,80.742],["delecirklen",80.742,81.592],["er",81.734,81.85],["det",81.85,81.966],["også",81.966,82.262],["Z",82.262,82.456],["to",82.456,82.765],["over",82.765,82.997],["Z",82.997,83.293],["et",83.293,83.538],["og",83.538,83.667],["d",83.667,83.899],["to",83.899,84.221],["over",84.221,84.492],["d",84.492,84.762],["et",84.762,85.097]],"text":"Udvekslingen i er omega et divideret med omega to. Fordi begge hjul har samme hastighed i delecirklen, er det også Z to over Z et og d to over d et."},"indgreb":{"start":86.316,"end":96.02,"words":[["Indgrebsgraden",86.456,87.191],["fortæller",87.191,87.861],["hvor",88.003,88.209],["mange",88.209,88.518],["tandpar",88.518,88.905],["der",88.905,89.111],["er",89.111,89.175],["i",89.175,89.33],["indgreb",89.33,89.807],["i",89.807,89.923],["gennemsnit",89.923,90.619],["Den",91.509,91.612],["skal",91.612,91.754],["være",91.754,91.922],["mindst",91.922,92.257],["en",92.257,92.437],["komma",92.437,92.721],["to",92.721,93.159],["så",93.301,93.545],["et",93.545,93.623],["nyt",93.623,93.816],["tandpar",93.816,94.177],["griber",94.177,94.718],["før",94.834,95.092],["det",95.092,95.169],["forrige",95.169,95.491],["slipper",95.491,96.02]],"text":"Indgrebsgraden fortæller, hvor mange tandpar der er i indgreb i gennemsnit. Den skal være mindst en komma to, så et nyt tandpar griber, før det forrige slipper."},"tilbageslag":{"start":97.25,"end":104.505,"words":[["Der",97.377,97.455],["skal",97.455,97.609],["være",97.609,97.79],["et",97.79,97.854],["lille",97.854,98.099],["tilbageslag",98.099,98.911],["mellem",98.911,99.31],["tænderne",99.31,99.89],["Det",100.768,100.845],["giver",100.845,101.116],["plads",101.116,101.412],["til",101.412,101.567],["varmeudvidelse",101.567,102.624],["tolerancer",102.753,103.603],["og",103.603,103.783],["oliefilm",103.784,104.505]],"text":"Der skal være et lille tilbageslag mellem tænderne. Det giver plads til varmeudvidelse, tolerancer og oliefilm."},"tog":{"start":105.736,"end":116.896,"words":[["I",105.876,105.954],["et",105.954,106.057],["simpelt",106.057,106.43],["tandhjulstog",106.43,107.216],["ændrer",107.216,107.539],["mellemhjul",107.539,108.118],["kun",108.118,108.466],["omdrejningsretningen",108.466,109.691],["I",110.594,110.684],["et",110.684,110.775],["sammensat",110.775,111.303],["tog",111.303,111.664],["sidder",111.664,111.96],["to",111.96,112.231],["hjul",112.231,112.463],["på",112.463,112.579],["samme",112.579,112.901],["aksel",112.901,113.442],["og",113.597,113.777],["så",113.777,113.971],["er",113.971,113.996],["den",113.996,114.164],["samlede",114.164,114.589],["udveksling",114.589,115.143],["produktet",115.143,115.775],["af",115.775,115.904],["de",115.904,116.071],["enkelte",116.071,116.432],["trin",116.432,116.896]],"text":"I et simpelt tandhjulstog ændrer mellemhjul kun omdrejningsretningen. I et sammensat tog sidder to hjul på samme aksel, og så er den samlede udveksling produktet af de enkelte trin."},"tjek_q":{"start":118.11,"end":129.012,"words":[["Tjek",118.211,118.533],["dig",118.533,118.713],["selv",118.713,119.139],["Et",120.056,120.185],["drev",120.185,120.442],["har",120.442,120.558],["tyve",120.558,120.842],["tænder",120.842,121.357],["og",121.357,121.551],["et",121.551,121.641],["hjul",121.641,121.899],["har",121.899,122.015],["tres",122.015,122.543],["Hvad",123.445,123.69],["er",123.69,123.845],["udvekslingen",123.845,124.695],["og",124.837,124.966],["hvor",124.966,125.133],["hurtigt",125.133,125.442],["drejer",125.442,125.726],["hjulet",125.726,126.241],["når",126.383,126.551],["drevet",126.551,126.847],["drejer",126.847,127.182],["femten",127.182,127.569],["hundrede",127.569,127.814],["omdrejninger",127.814,128.432],["i",128.432,128.484],["minuttet",128.484,129.012]],"text":"Tjek dig selv. Et drev har tyve tænder og et hjul har tres. Hvad er udvekslingen, og hvor hurtigt drejer hjulet, når drevet drejer femten hundrede omdrejninger i minuttet?"},"tjek_a":{"start":132.894,"end":139.685,"words":[["Udvekslingen",133.021,133.653],["er",133.653,133.756],["tres",133.756,134.104],["over",134.104,134.4],["tyve",134.4,134.941],["altså",135.083,135.444],["tre",135.444,135.869],["Hjulet",136.786,137.134],["drejer",137.134,137.572],["fem",137.572,137.868],["hundrede",137.868,138.165],["omdrejninger",138.165,138.925],["i",138.925,139.054],["minuttet",139.054,139.685]],"text":"Udvekslingen er tres over tyve, altså tre. Hjulet drejer fem hundrede omdrejninger i minuttet."},"slut":{"start":140.9,"end":149.172,"words":[["Kort",141.027,141.233],["sagt",141.234,141.736],["m",141.852,142.058],["er",142.058,142.187],["d",142.187,142.471],["over",142.471,142.715],["Z",142.715,143.166],["p",143.295,143.566],["er",143.566,143.695],["pi",143.695,143.965],["m",143.965,144.313],["udvekslingen",144.442,145.074],["er",145.074,145.164],["Z",145.164,145.357],["to",145.357,145.641],["over",145.641,145.847],["Z",145.847,146.13],["et",146.13,146.465],["og",146.659,146.801],["indgrebsgraden",146.801,147.587],["skal",147.587,147.741],["være",147.741,147.909],["mindst",147.909,148.282],["en",148.282,148.489],["komma",148.489,148.759],["to.",148.759,149.172]],"text":"Kort sagt: m er d over Z, p er pi m, udvekslingen er Z to over Z et, og indgrebsgraden skal være mindst en komma to."}}}, { audio: 'tandhjul-geometri.mp3', id: 'tandhjul-geometri' });</script>
+</body>
+</html>

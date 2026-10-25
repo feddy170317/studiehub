@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tandkræfter og Lewis' formel · video</title>
+<meta name="description" content="Ft = 2T/d, Fr = Ft tan φ, Lewis' formel σ = Ft/(bmY) og grubetæring.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 14: videoer</a><h1>Tandkræfter og Lewis' formel</h1><span class="meta">MEM1 · kapitel 14 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Tandkræfter og Lewis' formel"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Ft = 2T/d, Fr = Ft tan φ, Lewis' formel σ = Ft/(bmY) og grubetæring.</p><div class="chips"><a href="tandhjul-geometri.html">Se først: Tandhjul: geometri og udveksling</a><a href="../../../../lab/mem1/tandhjul-lewis.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel14_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l14">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Tandkræfter og Lewis (MEM1 kap. 14, slides 12–14)
+BP.scene({ header: 'MEM1 · kap. 14' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, hatch, rect, dashed, ell, PI } = B;
+
+  B.titel(0, "Lewis' formel", 'MEM1 · kapitel 14 · begreb (slide 12–14)', 'titel');
+  text(0, 'bøjning i tandfoden', 640, 520, 42, 'red', wt('titel', 'bøjningsspændingen') - 0.2, we('titel', 'tand'), { align: 'center' });
+
+  B.goto('kraefter', 1);
+  {
+    const t0 = L('kraefter').start, x0 = 340, y0 = 560;
+    line(1, [[x0 - 120, y0], [x0 - 60, y0 - 300], [x0 + 60, y0 - 300], [x0 + 120, y0]], 'black', 3.2, t0, t0 + 0.7);
+    const a = 20 * PI / 180, px = x0 + 60, py = y0 - 280;
+    arrow(1, [[px + 220 * Math.cos(a), py + 220 * Math.sin(a) - 150], [px + 4, py]], 'red', 4, t0 + 0.6, wt('kraefter', 'komposanter'));
+    text(1, 'F_n', px + 200, py - 70, 34, 'red', t0 + 0.8, t0 + 1.1);
+    text(1, 'φ ≈ 20°', px + 120, py + 60, 30, 'red', wt('kraefter', 'trykvinklen') - 0.1, we('kraefter', 'grader'));
+    text(1, 'F_t = 2T / d', 760, 230, 46, 'blue', L('ft').start + 0.2, we('ft', 'd'));
+    text(1, 'overfører effekt, bøjer tanden', 760, 285, 28, 'black', wt('ft', 'overfører') - 0.1, we('ft', 'tanden'));
+    text(1, 'F_r = F_t · tan φ', 760, 380, 46, 'green', L('fr').start + 0.2, we('fr', 'phi'));
+    text(1, 'skubber hjulene fra hinanden', 760, 435, 28, 'black', wt('fr', 'skubber') - 0.1, we('fr', 'lejer'));
+  }
+
+  B.goto('lewis', 2);
+  {
+    const t0 = L('lewis').start, x0 = 300, y0 = 600;
+    line(2, [[x0 - 110, y0], [x0 - 60, y0 - 320], [x0 + 60, y0 - 320], [x0 + 110, y0]], 'black', 3.2, t0, t0 + 0.6);
+    hatch(2, rect(x0 - 160, y0, 320, 20), 'black', t0 + 0.4, t0 + 0.7, { gap: 6 });
+    arrow(2, [[x0 + 180, y0 - 310], [x0 + 64, y0 - 310]], 'red', 4.2, wt('lewis', 'kraften') - 0.2, wt('lewis', 'spidsen'));
+    text(2, 'F_t', x0 + 190, y0 - 300, 36, 'red', wt('lewis', 'F'), wt('lewis', 'spidsen'));
+    line(2, ell(x0 - 110, y0 - 8, 26, 26, 0, 2 * PI), 'red', 2.6, wt('lewis', 'hulkehlen') - 0.2, we('lewis', 'tandfoden'));
+    text(2, 'kritisk', x0 - 230, y0 - 40, 30, 'red', wt('lewis', 'kritiske') - 0.1, we('lewis', 'tandfoden'));
+    const tf = L('formel').start;
+    const r = text(2, 'σ = F_t / (b · m · Y)', 640, 260, 52, 'red', tf + 0.3, wt('formel', 'b') + 0.2);
+    box(2, 615, 200, 560, 90, 'red', wt('formel', 'b') + 0.2, wt('formel', 'b') + 0.8);
+    text(2, 'b: tandbredde · m: modul · Y: formfaktor', 640, 340, 26, 'black', wt('formel', 'b') - 0.1, we('formel', 'formfaktor'));
+    text(2, 'flere tænder ⇒ større Y', 640, 410, 34, 'blue', L('y').start + 0.3, we('y', 'Y'));
+    text(2, 'grubetæring: σ_c = C_p √(F_t / (b d_1 I)),  λ ≥ 3', 640, 510, 26, 'green', L('kontakt').start + 0.3, we('kontakt', 'tre'));
+    text(2, 'dynamisk faktor K_v', 640, 580, 32, 'black', L('dynamisk').start + 0.2, we('dynamisk', 'lasten'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Modulet fordobles.', 'Hvad sker der med σ?'], ['σ halveres', '(m i nævneren)'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 14, slide 12–14 · Hamrock, Schmid & Jacobson, kap. 14', 'eksamensspørgsmål 11', 'slut');
+  text(4, 'F_t = 2T/d · F_r = F_t tan φ', 200, 280, 44, 'blue', L('slut').start + 0.4, we('slut', 'phi'));
+  text(4, 'σ = F_t / (b m Y)', 200, 370, 48, 'red', wt('slut', 'Lewis') - 0.1, we('slut', 'Y'));
+});
+
+</script>
+<script>BP.live({"duration":115.926,"audio":"lewis.mp3","order":["titel","kraefter","ft","fr","lewis","formel","y","kontakt","dynamisk","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":6.35,"words":[["Tandkræfter",0.614,1.375],["og",1.375,1.491],["Lewis",1.491,2.071],["formel",2.212,2.818],["Hvor",3.722,3.889],["stor",3.889,4.211],["er",4.211,4.34],["bøjningsspændingen",4.34,5.191],["i",5.191,5.32],["foden",5.32,5.693],["af",5.693,5.874],["en",5.874,5.964],["tand",5.964,6.35]],"text":"Tandkræfter og Lewis' formel. Hvor stor er bøjningsspændingen i foden af en tand?"},"kraefter":{"start":7.594,"end":16.718,"words":[["Momentet",7.734,8.224],["giver",8.224,8.533],["en",8.533,8.623],["normalkraft",8.623,9.268],["langs",9.268,9.603],["indgrebslinjen",9.603,10.569],["som",10.711,10.943],["hælder",10.943,11.188],["med",11.188,11.368],["trykvinklen",11.368,12.013],["phi",12.013,12.438],["typisk",12.567,13.056],["tyve",13.056,13.366],["grader",13.366,13.894],["Den",14.798,14.965],["deles",14.965,15.403],["i",15.403,15.597],["to",15.597,15.867],["komposanter",15.867,16.718]],"text":"Momentet giver en normalkraft langs indgrebslinjen, som hælder med trykvinklen phi, typisk tyve grader. Den deles i to komposanter."},"ft":{"start":17.952,"end":27.591,"words":[["Den",18.079,18.221],["tangentielle",18.221,18.827],["kraft",18.827,19.213],["F",19.213,19.407],["t",19.407,19.793],["er",19.793,19.909],["momentet",19.909,20.386],["divideret",20.386,20.94],["med",20.94,21.133],["delecirklens",21.133,21.894],["radius",21.894,22.538],["altså",22.68,23.054],["to",23.054,23.337],["T",23.337,23.608],["over",23.608,23.891],["d.",23.891,24.304],["Den",25.207,25.336],["overfører",25.336,25.916],["effekten",25.916,26.625],["og",26.625,26.766],["bøjer",26.766,27.063],["tanden",27.063,27.591]],"text":"Den tangentielle kraft F t er momentet divideret med delecirklens radius, altså to T over d. Den overfører effekten og bøjer tanden."},"fr":{"start":28.814,"end":36.507,"words":[["Den",28.941,29.057],["radiale",29.057,29.47],["kraft",29.47,29.805],["F",29.805,30.011],["r",30.011,30.32],["er",30.32,30.501],["F",30.501,30.72],["t",30.72,30.939],["gange",30.939,31.248],["tangens",31.248,31.789],["phi",31.789,32.15],["Den",33.041,33.157],["skubber",33.157,33.492],["hjulene",33.492,33.853],["fra",33.853,33.994],["hinanden",33.994,34.587],["og",34.587,34.729],["belaster",34.729,35.27],["aksler",35.27,35.863],["og",35.863,35.992],["lejer",35.992,36.507]],"text":"Den radiale kraft F r er F t gange tangens phi. Den skubber hjulene fra hinanden og belaster aksler og lejer."},"lewis":{"start":37.732,"end":46.534,"words":[["Wilfred",37.872,38.31],["Lewis",38.31,38.62],["betragtede",38.62,39.148],["tanden",39.148,39.599],["som",39.599,39.818],["en",39.818,39.934],["indspændt",39.934,40.437],["bjælke",40.437,40.759],["med",40.759,40.926],["kraften",40.926,41.545],["F",41.545,41.777],["t",41.777,42.06],["i",42.06,42.228],["spidsen",42.228,42.859],["Det",43.75,43.814],["kritiske",43.814,44.356],["sted",44.356,44.755],["er",44.755,44.871],["hulkehlen",44.871,45.58],["ved",45.58,45.76],["tandfoden",45.76,46.534]],"text":"Wilfred Lewis betragtede tanden som en indspændt bjælke med kraften F t i spidsen. Det kritiske sted er hulkehlen ved tandfoden."},"formel":{"start":47.754,"end":56.966,"words":[["Lewis",47.868,48.384],["formel",48.526,48.964],["er",48.964,49.054],["sigma",49.054,49.479],["lig",49.479,49.724],["F",49.724,49.879],["t",49.879,50.136],["divideret",50.136,50.781],["med",50.781,51.039],["b",51.039,51.27],["gange",51.271,51.606],["m",51.606,51.825],["gange",51.825,52.185],["Y",52.185,52.404],["b",52.405,52.688],["er",52.688,52.778],["tandbredden",52.778,53.526],["m",53.667,53.886],["er",53.886,54.002],["modulet",54.002,54.685],["og",54.827,55.085],["Y",55.085,55.33],["er",55.33,55.433],["Lewis",55.433,55.987],["formfaktor",56.129,56.966]],"text":"Lewis' formel er sigma lig F t divideret med b gange m gange Y. b er tandbredden, m er modulet, og Y er Lewis' formfaktor."},"y":{"start":58.184,"end":65.027,"words":[["Formfaktoren",58.311,59.097],["Y",59.097,59.329],["afhænger",59.329,59.974],["af",59.974,60.128],["antallet",60.128,60.721],["af",60.721,60.811],["tænder",60.811,61.353],["Flere",62.243,62.656],["tænder",62.656,62.939],["giver",62.939,63.184],["en",63.184,63.287],["bredere",63.287,63.648],["fod",63.648,64.034],["og",64.035,64.202],["et",64.202,64.279],["større",64.279,64.718],["Y",64.718,65.027]],"text":"Formfaktoren Y afhænger af antallet af tænder. Flere tænder giver en bredere fod og et større Y."},"kontakt":{"start":66.238,"end":78.97,"words":[["Tandhjul",66.365,66.881],["kan",66.881,67.061],["også",67.061,67.409],["svigte",67.409,67.77],["ved",67.77,67.963],["grubetæring",67.963,68.762],["i",68.762,68.943],["overfladen",68.943,69.703],["Hertz",70.594,71.045],["kontaktspænding",71.199,72.127],["er",72.127,72.269],["C",72.269,72.552],["p",72.552,72.733],["gange",72.733,73.003],["kvadratroden",73.003,73.686],["af",73.686,73.906],["F",73.906,74.137],["t",74.137,74.447],["over",74.447,74.704],["b",74.704,74.924],["d",74.924,75.117],["et",75.117,75.362],["I",75.362,75.658],["og",75.839,76.019],["oliefilmen",76.019,76.625],["skal",76.625,76.792],["være",76.792,76.947],["tyk",76.947,77.192],["nok",77.192,77.565],["med",77.72,77.862],["lambda",77.862,78.261],["mindst",78.261,78.57],["tre",78.57,78.97]],"text":"Tandhjul kan også svigte ved grubetæring i overfladen. Hertz' kontaktspænding er C p gange kvadratroden af F t over b d et I, og oliefilmen skal være tyk nok, med lambda mindst tre."},"dynamisk":{"start":80.196,"end":85.233,"words":[["Husk",80.323,80.581],["også",80.581,80.865],["den",80.865,81.045],["dynamiske",81.045,81.599],["faktor",81.599,82.05],["K",82.05,82.321],["v.",82.321,82.475],["Fejl",82.475,82.836],["i",82.836,82.952],["delingen",82.952,83.403],["giver",83.403,83.635],["stød",83.635,84.06],["der",84.202,84.37],["øger",84.37,84.627],["lasten",84.627,85.233]],"text":"Husk også den dynamiske faktor K v. Fejl i delingen giver stød, der øger lasten."},"tjek_q":{"start":86.45,"end":93.074,"words":[["Tjek",86.551,86.873],["dig",86.873,87.053],["selv",87.053,87.479],["Hvad",88.383,88.486],["sker",88.486,88.757],["der",88.757,88.86],["med",88.86,89.027],["bøjningsspændingen",89.027,90.02],["hvis",90.161,90.355],["modulet",90.355,90.793],["fordobles",90.793,91.489],["og",91.489,91.695],["alt",91.695,91.965],["andet",91.965,92.3],["er",92.301,92.468],["uændret",92.468,93.074]],"text":"Tjek dig selv. Hvad sker der med bøjningsspændingen, hvis modulet fordobles og alt andet er uændret?"},"tjek_a":{"start":96.938,"end":104.541,"words":[["Den",97.078,97.22],["halveres",97.22,97.942],["fordi",98.058,98.509],["m",98.509,98.689],["står",98.689,99.037],["i",99.037,99.127],["nævneren",99.127,99.733],["I",100.624,100.688],["praksis",100.688,101.191],["bliver",101.191,101.487],["Y",101.487,101.745],["også",101.745,102.028],["lidt",102.028,102.234],["anderledes",102.234,103.02],["men",103.149,103.355],["det",103.356,103.536],["er",103.536,103.575],["hovedeffekten",103.575,104.541]],"text":"Den halveres, fordi m står i nævneren. I praksis bliver Y også lidt anderledes, men det er hovedeffekten."},"slut":{"start":105.76,"end":113.49,"words":[["Kort",105.874,106.093],["sagt",106.094,106.583],["F",106.699,106.905],["t",106.905,107.15],["er",107.15,107.279],["to",107.279,107.537],["T",107.537,107.769],["over",107.769,107.975],["d",107.975,108.4],["F",108.529,108.825],["r",108.825,109.096],["er",109.096,109.251],["F",109.251,109.47],["t",109.47,109.676],["tangens",109.676,110.179],["phi",110.179,110.552],["og",110.694,110.81],["Lewis",110.81,111.106],["giver",111.106,111.313],["sigma",111.313,111.673],["lig",111.673,111.931],["F",111.931,112.086],["t",112.086,112.382],["over",112.382,112.666],["b",112.666,112.936],["m",112.936,113.181],["Y",113.181,113.49]],"text":"Kort sagt: F t er to T over d, F r er F t tangens phi, og Lewis giver sigma lig F t over b m Y."}}}, { audio: 'lewis.mp3', id: 'lewis' });</script>
+</body>
+</html>
