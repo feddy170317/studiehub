@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kiler og akseldele · video</title>
+<meta name="description" content="Kiler (forskydning og fladetryk), noter, låseringe, svinghjul og koblinger.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 11: videoer</a><h1>Kiler og akseldele</h1><span class="meta">MEM1 · kapitel 11 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Kiler og akseldele"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Kiler (forskydning og fladetryk), noter, låseringe, svinghjul og koblinger.</p><div class="chips"><a href="../../Kapitel11_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l11">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Kiler og akseldele (MEM1 kap. 11, slides 12–16)
+BP.scene({ header: 'MEM1 · kap. 11' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, hatch, rect, PI, TAU } = B;
+
+  B.titel(0, 'Kiler og akseldele', 'MEM1 · kapitel 11 · begreb (slide 12–16)', 'titel');
+  text(0, 'fastgør tandhjulet på akslen', 640, 520, 42, 'red', wt('titel', 'fastgøres') - 0.2, we('titel', 'aksel'), { align: 'center' });
+
+  B.goto('kile', 1);
+  {
+    const t0 = L('kile').start, cx = 320, cy = 380;
+    line(1, ell(cx, cy, 200, 200, 0, TAU), 'black', 3, t0, t0 + 0.5);
+    line(1, ell(cx, cy, 120, 120, 0, TAU), 'black', 3, t0 + 0.3, t0 + 0.8);
+    line(1, rect(cx - 20, cy - 145, 40, 50).concat([[cx - 20, cy - 143]]), 'red', 3.4, t0 + 0.6, t0 + 1.0);
+    hatch(1, rect(cx - 20, cy - 145, 40, 50), 'red', t0 + 0.8, t0 + 1.2, { gap: 5 });
+    text(1, 'nav', cx + 150, cy - 150, 30, 'black', t0 + 0.4, t0 + 0.7); text(1, 'aksel', cx - 30, cy + 20, 30, 'black', t0 + 0.5, t0 + 0.8);
+    text(1, 'F = 2T / d', 660, 200, 46, 'blue', L('kraft').start + 0.2, we('kraft', 'd'));
+    text(1, 'forskydning:  τ = 2T / (d w L)', 660, 310, 36, 'red', L('forskydning').start + 0.2, we('forskydning', 'L', 1));
+    text(1, 'fladetryk:  σ_b = 4T / (d h L)', 660, 400, 36, 'green', L('fladetryk').start + 0.2, we('fladetryk', 'L', 1));
+    text(1, 'w', cx, cy - 165, 28, 'red', wt('forskydning', 'w') - 0.1, wt('forskydning', 'w') + 0.3, { align: 'center' });
+    text(1, 'h', cx + 34, cy - 110, 28, 'green', wt('fladetryk', 'h') - 0.1, wt('fladetryk', 'h') + 0.3);
+  }
+
+  B.goto('andre', 2);
+  {
+    const t0 = L('andre').start;
+    bubble(2, 'Andre løsninger', 150, 140, 50, 'blue', t0, t0 + 0.6);
+    text(2, 'noter: stort moment, aksial bevægelse', 170, 230, 34, 'black', wt('andre', 'Noter') - 0.1, we('andre', 'bevægelse'));
+    text(2, 'spændstifter: billige, små momenter', 170, 285, 34, 'black', wt('andre', 'Spændstifter') - 0.1, we('andre', 'momenter'));
+    text(2, 'pinolskruer: friktion, små momenter', 170, 340, 34, 'black', wt('andre', 'pinolskruer') - 0.1, we('andre', 'momenter', 1));
+    text(2, 'aksialt: låseringe · skuldre · splitter', 170, 430, 34, 'blue', L('aksialt').start + 0.2, we('aksialt', 'skiver'));
+    text(2, 'noter og skuldre giver K_t → væk fra M_{max}', 170, 510, 34, 'red', L('kt').start + 0.2, we('kt', 'moment'));
+  }
+
+  B.goto('svinghjul', 3);
+  {
+    const t0 = L('svinghjul').start;
+    line(3, ell(300, 330, 150, 150, 0, TAU), 'black', 3.4, t0, t0 + 0.6); line(3, ell(300, 330, 30, 30, 0, TAU), 'black', 3, t0 + 0.4, t0 + 0.7);
+    text(3, 'E_k = ½ I ω²', 560, 260, 44, 'blue', wt('svinghjul', 'halv') - 0.2, we('svinghjul', 'anden'));
+    text(3, 'ΔE = I ω_m² C_s', 560, 340, 44, 'red', wt('svinghjul', 'Energiændringen') - 0.1, we('svinghjul', 's'));
+    text(3, 'C_s = udsvingskoefficient', 560, 400, 30, 'black', wt('svinghjul', 'udsvingskoefficienten') - 0.3, we('svinghjul', 'udsvingskoefficienten'));
+    const tk = L('kobling').start;
+    text(3, 'koblinger:', 140, 540, 34, 'black', tk, tk + 0.6);
+    text(3, 'stiv · fleksibel · kardanled', 330, 540, 34, 'green', wt('kobling', 'Stive') - 0.1, we('kobling', 'vinkel'));
+  }
+
+  B.goto('tjek_q', 4);
+  B.tjek(4, ['Kilen gøres dobbelt så lang.', 'Hvad sker der med τ?'], ['τ halveres', 'τ = 2T/(d w L)'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 5);
+  B.slut(5, 'Abou-Hayt (2026), MEM1 Chapter 11, slide 12–16 · Hamrock, Schmid & Jacobson, kap. 11', 'DE-Goodman-eksemplet', 'slut');
+  text(5, 'τ = 2T/(d w L)  ·  σ_b = 4T/(d h L)', 200, 280, 42, 'blue', L('slut').start + 0.4, we('slut', 'L', 1));
+  text(5, 'noter og skuldre væk fra M_{max}', 200, 360, 42, 'red', wt('slut', 'Placér') - 0.1, we('slut', 'moment'));
+});
+
+</script>
+<script>BP.live({"duration":127.772,"audio":"kiler-dele.mp3","order":["titel","kile","kraft","forskydning","fladetryk","andre","aksialt","kt","svinghjul","kobling","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":6.595,"words":[["Kiler",0.614,1.143],["noter",1.285,1.864],["og",1.864,2.019],["andre",2.019,2.457],["akseldele",2.457,3.321],["Hvordan",4.224,4.546],["fastgøres",4.546,5.165],["et",5.165,5.332],["tandhjul",5.332,5.783],["på",5.784,5.951],["en",5.951,6.054],["aksel",6.054,6.595]],"text":"Kiler, noter og andre akseldele. Hvordan fastgøres et tandhjul på en aksel?"},"kile":{"start":7.81,"end":11.842,"words":[["En",7.937,8.053],["kile",8.053,8.35],["sidder",8.35,8.62],["mellem",8.62,8.891],["aksel",8.891,9.393],["og",9.393,9.484],["nav",9.484,9.909],["og",9.909,10.051],["overfører",10.051,10.669],["momentet",10.669,11.146],["direkte",11.146,11.842]],"text":"En kile sidder mellem aksel og nav og overfører momentet direkte."},"kraft":{"start":13.056,"end":18.634,"words":[["Kraften",13.196,13.57],["på",13.57,13.686],["kilen",13.686,14.201],["er",14.201,14.33],["momentet",14.33,14.807],["divideret",14.807,15.374],["med",15.374,15.606],["akslens",15.606,16.16],["radius",16.16,16.817],["altså",16.959,17.371],["to",17.371,17.655],["T",17.655,17.938],["over",17.938,18.222],["d.",18.222,18.634]],"text":"Kraften på kilen er momentet divideret med akslens radius, altså to T over d."},"forskydning":{"start":19.862,"end":28.87,"words":[["Kilen",20.002,20.311],["kan",20.312,20.44],["svigte",20.44,20.801],["ved",20.801,20.969],["forskydning",20.969,21.574],["i",21.574,21.742],["fladen",21.742,22.077],["mellem",22.077,22.322],["aksel",22.322,22.915],["og",22.915,23.069],["nav",23.069,23.482],["Arealet",24.385,24.875],["er",24.875,25.004],["w",25.004,25.481],["gange",25.481,25.764],["L",25.764,26.125],["så",26.254,26.473],["tau",26.473,26.756],["er",26.756,26.898],["to",26.898,27.156],["T",27.156,27.491],["over",27.491,27.761],["d",27.761,27.981],["w",27.981,28.432],["L.",28.432,28.87]],"text":"Kilen kan svigte ved forskydning i fladen mellem aksel og nav. Arealet er w gange L, så tau er to T over d w L."},"fladetryk":{"start":30.1,"end":38.425,"words":[["Eller",30.24,30.446],["ved",30.446,30.588],["fladetryk",30.588,31.245],["mod",31.245,31.58],["den",31.58,31.787],["halve",31.787,32.122],["højde",32.122,32.637],["Arealet",33.541,34.133],["er",34.134,34.301],["h",34.301,34.546],["halve",34.546,34.816],["gange",34.816,35.126],["L",35.126,35.487],["så",35.628,35.847],["sigma",35.847,36.247],["b",36.247,36.543],["er",36.543,36.633],["fire",36.634,36.93],["T",36.93,37.304],["over",37.304,37.548],["d",37.548,37.768],["h",37.768,37.961],["L.",37.961,38.425]],"text":"Eller ved fladetryk mod den halve højde. Arealet er h halve gange L, så sigma b er fire T over d h L."},"andre":{"start":39.642,"end":53.559,"words":[["Noter",39.782,40.207],["er",40.207,40.336],["tænder",40.336,40.684],["fræset",40.684,41.109],["direkte",41.11,41.728],["i",41.728,41.908],["akslen",41.909,42.527],["De",43.418,43.495],["kan",43.495,43.598],["bære",43.598,43.817],["meget",43.817,44.088],["moment",44.088,44.59],["og",44.59,44.719],["tillader",44.719,45.196],["aksial",45.196,45.647],["bevægelse",45.647,46.395],["Spændstifter",47.284,48.083],["er",48.083,48.186],["billige",48.186,48.56],["til",48.56,48.701],["små",48.701,48.998],["momenter",48.998,49.629],["og",49.771,49.977],["pinolskruer",49.977,50.699],["holder",50.699,50.944],["ved",50.944,51.06],["friktion",51.06,51.665],["og",51.665,51.794],["bruges",51.794,52.103],["kun",52.103,52.425],["til",52.426,52.58],["små",52.58,52.902],["momenter",52.902,53.559]],"text":"Noter er tænder fræset direkte i akslen. De kan bære meget moment og tillader aksial bevægelse. Spændstifter er billige til små momenter, og pinolskruer holder ved friktion og bruges kun til små momenter."},"aksialt":{"start":54.776,"end":60.586,"words":[["Aksialt",54.903,55.341],["fastholdes",55.341,55.87],["delene",55.87,56.244],["med",56.244,56.398],["låseringe",56.398,57.004],["i",57.004,57.081],["noter",57.081,57.609],["med",57.751,58.073],["akselskuldre",58.073,58.963],["eller",58.963,59.207],["med",59.207,59.323],["splitter",59.323,59.839],["og",59.839,59.968],["skiver",59.968,60.586]],"text":"Aksialt fastholdes delene med låseringe i noter, med akselskuldre eller med splitter og skiver."},"kt":{"start":61.822,"end":69.696,"words":[["Pas",61.962,62.181],["på",62.181,62.594],["noter",62.722,63.083],["til",63.083,63.238],["låseringe",63.238,63.908],["og",63.908,63.998],["skarpe",63.998,64.372],["skuldre",64.372,64.939],["giver",64.939,65.197],["spændingskoncentrationer",65.197,66.64],["Placér",67.531,67.956],["dem",67.956,68.124],["væk",68.124,68.459],["fra",68.459,68.665],["det",68.665,68.742],["største",68.742,69.154],["moment",69.154,69.696]],"text":"Pas på: noter til låseringe og skarpe skuldre giver spændingskoncentrationer. Placér dem væk fra det største moment."},"svinghjul":{"start":70.932,"end":82.285,"words":[["Et",71.072,71.175],["svinghjul",71.175,71.794],["lagrer",71.794,72.155],["energien",72.155,72.606],["en",72.606,72.709],["halv",72.709,72.941],["I",72.941,73.083],["omega",73.083,73.572],["i",73.572,73.778],["anden",73.778,74.126],["og",74.126,74.281],["udjævner",74.281,74.784],["hastigheden",74.784,75.557],["Energiændringen",76.447,77.208],["er",77.208,77.35],["I",77.35,77.491],["omega",77.491,77.852],["middel",77.852,78.2],["i",78.2,78.393],["anden",78.393,78.69],["gange",78.69,78.96],["C",78.96,79.244],["s",79.244,79.643],["hvor",79.785,80.069],["C",80.069,80.352],["s",80.352,80.7],["er",80.7,80.868],["udsvingskoefficienten",80.868,82.285]],"text":"Et svinghjul lagrer energien en halv I omega i anden og udjævner hastigheden. Energiændringen er I omega middel i anden gange C s, hvor C s er udsvingskoefficienten."},"kobling":{"start":83.498,"end":98.086,"words":[["Koblinger",83.638,84.231],["forbinder",84.231,84.721],["to",84.721,85.069],["aksler",85.069,85.661],["Stive",86.539,86.926],["koblinger",86.926,87.557],["kræver",87.557,87.918],["præcis",87.918,88.459],["opretning",88.459,89.233],["Fleksible",90.135,90.727],["koblinger",90.727,91.397],["tåler",91.397,91.745],["lidt",91.745,91.939],["skævhed",91.939,92.467],["og",92.467,92.596],["dæmper",92.596,92.944],["stød",92.944,93.421],["Og",94.323,94.387],["kardanled",94.387,94.993],["overfører",94.993,95.637],["moment",95.637,96.037],["mellem",96.037,96.307],["aksler",96.307,96.952],["med",96.952,97.171],["en",97.171,97.261],["stor",97.261,97.583],["vinkel",97.583,98.086]],"text":"Koblinger forbinder to aksler. Stive koblinger kræver præcis opretning. Fleksible koblinger tåler lidt skævhed og dæmper stød. Og kardanled overfører moment mellem aksler med en stor vinkel."},"tjek_q":{"start":99.304,"end":105.064,"words":[["Tjek",99.405,99.727],["dig",99.727,99.907],["selv",99.907,100.333],["Hvad",101.237,101.34],["sker",101.34,101.624],["der",101.624,101.727],["med",101.727,101.881],["kilens",101.881,102.268],["forskydningsspænding",102.268,103.299],["hvis",103.441,103.621],["kilen",103.621,103.969],["gøres",103.969,104.227],["dobbelt",104.227,104.536],["så",104.536,104.665],["lang",104.665,105.064]],"text":"Tjek dig selv. Hvad sker der med kilens forskydningsspænding, hvis kilen gøres dobbelt så lang?"},"tjek_a":{"start":108.952,"end":114.286,"words":[["Den",109.079,109.195],["halveres",109.195,109.852],["fordi",109.968,110.316],["tau",110.316,110.626],["er",110.626,110.819],["to",110.819,111.09],["T",111.09,111.399],["over",111.399,111.657],["d",111.657,111.863],["w",111.863,112.391],["L",112.391,112.726],["og",112.92,113.074],["L",113.074,113.28],["står",113.28,113.615],["i",113.615,113.706],["nævneren",113.706,114.286]],"text":"Den halveres, fordi tau er to T over d w L, og L står i nævneren."},"slut":{"start":115.518,"end":125.349,"words":[["Kort",115.645,115.877],["sagt",115.877,116.354],["kilen",116.47,116.805],["tjekkes",116.805,117.153],["for",117.153,117.269],["forskydning",117.269,117.952],["to",118.055,118.339],["T",118.339,118.583],["over",118.583,118.79],["d",118.79,118.983],["w",118.983,119.498],["L",119.498,119.846],["og",119.988,120.156],["fladetryk",120.156,120.864],["fire",120.993,121.328],["T",121.328,121.638],["over",121.638,121.882],["d",121.882,122.089],["h",122.089,122.243],["L.",122.243,122.501],["Placér",122.501,122.939],["noter",122.939,123.403],["og",123.403,123.519],["skuldre",123.519,123.88],["væk",123.88,124.202],["fra",124.202,124.395],["det",124.395,124.46],["største",124.46,124.859],["moment",124.859,125.349]],"text":"Kort sagt: kilen tjekkes for forskydning, to T over d w L, og fladetryk, fire T over d h L. Placér noter og skuldre væk fra det største moment."}}}, { audio: 'kiler-dele.mp3', id: 'kiler-dele' });</script>
+</body>
+</html>

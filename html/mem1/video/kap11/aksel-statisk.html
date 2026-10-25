@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aksler: statisk dimensionering · video</title>
+<meta name="description" content="Bøjning og vridning i en aksel, von Mises og formlen for d ved statisk last.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 11: videoer</a><h1>Aksler: statisk dimensionering</h1><span class="meta">MEM1 · kapitel 11 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Aksler: statisk dimensionering"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Bøjning og vridning i en aksel, von Mises og formlen for d ved statisk last.</p><div class="chips"><a href="../../../../lab/mem1/aksel.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel11_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l11">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Aksler: statisk dimensionering (MEM1 kap. 11, slides 2–4)
+BP.scene({ header: 'MEM1 · kap. 11' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, moment, rect, PI, TAU } = B;
+
+  B.titel(0, 'Aksler: statisk', 'MEM1 · kapitel 11 · begreb (slide 2–4)', 'titel');
+  text(0, 'bøjning + vridning på én gang', 640, 520, 42, 'red', wt('titel', 'bøjes') - 0.2, we('titel', 'vrides'), { align: 'center' });
+
+  B.goto('aksel', 1);
+  {
+    const t0 = L('aksel').start;
+    line(1, [[160, 300], [900, 300]], 'black', 3, t0, t0 + 0.5); line(1, [[160, 360], [900, 360]], 'black', 3, t0 + 0.1, t0 + 0.6);
+    line(1, ell(900, 330, 14, 30, -PI / 2, PI / 2), 'black', 2.6, t0 + 0.5, t0 + 0.8);
+    text(1, 'P = T · ω', 1010, 420, 46, 'blue', wt('aksel', 'P') - 0.1, we('aksel', 'omega'));
+    const tl = L('laster').start;
+    moment(1, 900, 330, 60, -0.3 * PI, 0.6 * PI, 'green', tl, tl + 0.4); text(1, 'T', 960, 270, 36, 'green', tl + 0.2, tl + 0.5);
+    line(1, rect(420, 220, 40, 220).concat([[420, 222]]), 'black', 3, wt('laster', 'Tandhjul') - 0.2, wt('laster', 'Tandhjul') + 0.4);
+    arrow(1, [[440, 120], [440, 216]], 'red', 4, wt('laster', 'bøjning') - 0.3, wt('laster', 'bøjning'));
+    text(1, 'F → M', 460, 150, 34, 'red', wt('laster', 'bøjning'), wt('laster', 'bøjning') + 0.4);
+    arrow(1, [[120, 330], [156, 330]], 'blue', 3.4, wt('laster', 'aksialkraft') - 0.3, wt('laster', 'aksialkraft'), 12); text(1, 'F_a', 110, 300, 30, 'blue', wt('laster', 'aksialkraft'), wt('laster', 'aksialkraft') + 0.3, { align: 'right' });
+  }
+
+  B.goto('spaending', 2);
+  {
+    const t0 = L('spaending').start;
+    text(2, 'σ = 32 M / (π d³)', 140, 170, 46, 'red', wt('spaending', 'bøjningsspændingen') - 0.1, we('spaending', 'tredje'));
+    text(2, 'τ = 16 T / (π d³)', 640, 170, 46, 'green', wt('spaending', 'forskydningen') - 0.1, we('spaending', 'tredje', 1));
+    text(2, 'σ_{vM} = √(σ² + 3τ²) = (32/(π d³)) · √(M² + 0,75 T²)', 140, 290, 36, 'blue', L('vm').start + 0.3, we('vm', 'anden', 3));
+    const r = text(2, 'd = [ (32 n / (π S_y)) · √(M² + 0,75 T²) ]^{1/3}', 140, 410, 40, 'red', L('d').start + 0.3, we('d', 'tredjedel'));
+    box(2, 115, 355, 1000, 85, 'red', we('d', 'tredjedel'), we('d', 'tredjedel') + 0.6);
+    text(2, 'Tresca: √(M² + T²)', 140, 530, 40, 'green', L('tresca').start + 0.3, we('tresca', 'anden', 1));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Hvorfor 0,75 foran T²?'], ['3τ² = 3 · (16T/πd³)²', '= ¾ · (32T/πd³)²'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 11, slide 2–4 · Hamrock, Schmid & Jacobson, kap. 11', 'aksler og udmattelse', 'slut');
+  text(4, 'σ = 32M/(πd³)   τ = 16T/(πd³)', 200, 280, 44, 'blue', L('slut').start + 0.4, we('slut', 'tredje', 1));
+  text(4, 'von Mises: √(M² + 0,75 T²)', 200, 370, 44, 'red', wt('slut', 'von') - 0.1, we('slut', 'anden', 1));
+});
+
+</script>
+<script>BP.live({"duration":103.514,"audio":"aksel-statisk.mp3","order":["titel","aksel","laster","spaending","vm","d","tresca","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":6.66,"words":[["Aksler",0.614,1.156],["ved",1.156,1.297],["statisk",1.297,1.852],["last",1.852,2.328],["Hvor",3.206,3.361],["tyk",3.361,3.567],["skal",3.567,3.747],["en",3.747,3.85],["aksel",3.85,4.276],["være",4.276,4.778],["når",4.92,5.1],["den",5.101,5.281],["både",5.281,5.564],["bøjes",5.564,5.951],["og",5.951,6.106],["vrides",6.106,6.66]],"text":"Aksler ved statisk last. Hvor tyk skal en aksel være, når den både bøjes og vrides?"},"aksel":{"start":7.882,"end":14.351,"words":[["En",8.009,8.125],["transmissionsaksel",8.125,9.259],["overfører",9.259,9.929],["effekt",9.929,10.368],["og",10.368,10.496],["moment",10.496,11.051],["Effekten",11.954,12.521],["er",12.521,12.702],["P",12.702,12.934],["lig",12.934,13.114],["T",13.114,13.346],["gange",13.346,13.707],["omega",13.707,14.351]],"text":"En transmissionsaksel overfører effekt og moment. Effekten er P lig T gange omega."},"laster":{"start":15.576,"end":24.21,"words":[["En",15.716,15.845],["aksel",15.845,16.348],["har",16.348,16.515],["sjældent",16.515,16.915],["kun",16.915,17.172],["vridning",17.172,17.739],["Tandhjul",18.63,19.274],["remskiver",19.403,20.189],["og",20.189,20.28],["kædehjul",20.28,20.834],["giver",20.834,21.104],["bøjning",21.104,21.633],["og",21.774,21.929],["skrå",21.929,22.251],["tandhjul",22.251,22.741],["giver",22.741,23.076],["også",23.076,23.398],["aksialkraft",23.398,24.21]],"text":"En aksel har sjældent kun vridning. Tandhjul, remskiver og kædehjul giver bøjning, og skrå tandhjul giver også aksialkraft."},"spaending":{"start":25.43,"end":34.99,"words":[["For",25.557,25.699],["en",25.699,25.763],["massiv",25.764,26.111],["aksel",26.111,26.485],["med",26.485,26.691],["diameteren",26.691,27.271],["d",27.271,27.516],["er",27.516,27.606],["bøjningsspændingen",27.606,28.392],["sigma",28.392,28.779],["lig",28.779,28.998],["toogtredive",28.998,29.655],["M",29.655,29.99],["over",29.99,30.235],["pi",30.235,30.467],["d",30.467,30.648],["i",30.648,30.776],["tredje",30.776,31.331],["og",31.472,31.704],["forskydningen",31.704,32.233],["er",32.233,32.323],["tau",32.323,32.593],["lig",32.593,32.761],["seksten",32.761,33.212],["T",33.212,33.547],["over",33.547,33.779],["pi",33.779,34.037],["d",34.037,34.269],["i",34.269,34.436],["tredje",34.436,34.99]],"text":"For en massiv aksel med diameteren d er bøjningsspændingen sigma lig toogtredive M over pi d i tredje, og forskydningen er tau lig seksten T over pi d i tredje."},"vm":{"start":36.22,"end":49.983,"words":[["Med",36.36,36.553],["von",36.554,36.773],["Mises",36.773,37.275],["bliver",37.275,37.494],["den",37.494,37.713],["ækvivalente",37.713,38.345],["spænding",38.345,38.731],["kvadratroden",38.731,39.389],["af",39.389,39.453],["sigma",39.453,39.981],["i",39.981,40.175],["anden",40.175,40.471],["plus",40.471,40.729],["tre",40.729,40.999],["tau",40.999,41.425],["i",41.425,41.644],["anden",41.644,42.082],["Indsat",42.985,43.436],["er",43.436,43.552],["det",43.552,43.656],["toogtredive",43.656,44.377],["over",44.377,44.635],["pi",44.635,44.88],["d",44.88,45.047],["i",45.047,45.189],["tredje",45.189,45.511],["gange",45.511,45.808],["kvadratroden",45.808,46.478],["af",46.478,46.71],["M",46.71,46.942],["i",46.942,47.148],["anden",47.148,47.483],["plus",47.483,47.741],["nul",47.741,47.934],["komma",47.934,48.359],["syv",48.359,48.746],["fem",48.746,49.016],["T",49.016,49.3],["i",49.3,49.506],["anden",49.506,49.983]],"text":"Med von Mises bliver den ækvivalente spænding kvadratroden af sigma i anden plus tre tau i anden. Indsat er det toogtredive over pi d i tredje gange kvadratroden af M i anden plus nul komma syv fem T i anden."},"d":{"start":51.21,"end":62.252,"words":[["Sætter",51.324,51.659],["vi",51.66,51.788],["den",51.788,51.969],["lig",51.969,52.188],["S",52.188,52.407],["y",52.407,52.665],["over",52.665,52.922],["n",52.922,53.129],["og",53.129,53.206],["isolerer",53.206,53.644],["d",53.644,54.044],["får",54.185,54.314],["vi",54.314,54.417],["d",54.417,54.598],["lig",54.598,54.752],["toogtredive",54.752,55.435],["n",55.435,55.693],["over",55.693,55.951],["pi",55.951,56.183],["S",56.183,56.389],["y",56.389,56.518],["gange",56.518,56.814],["kvadratroden",56.814,57.471],["af",57.471,57.677],["M",57.678,57.897],["i",57.897,58.103],["anden",58.103,58.412],["plus",58.412,58.657],["nul",58.657,58.824],["komma",58.824,59.211],["syv",59.211,59.546],["fem",59.546,59.778],["T",59.778,59.997],["i",59.997,60.178],["anden",60.178,60.59],["opløftet",60.732,61.299],["til",61.299,61.453],["en",61.453,61.543],["tredjedel",61.544,62.252]],"text":"Sætter vi den lig S y over n og isolerer d, får vi d lig toogtredive n over pi S y gange kvadratroden af M i anden plus nul komma syv fem T i anden, opløftet til en tredjedel."},"tresca":{"start":63.488,"end":69.569,"words":[["Med",63.628,63.757],["Tresca",63.757,64.26],["bruger",64.26,64.53],["man",64.53,64.672],["i",64.672,64.711],["stedet",64.711,65.033],["det",65.033,65.239],["ækvivalente",65.239,65.87],["moment",65.87,66.437],["kvadratroden",66.579,67.301],["af",67.301,67.52],["M",67.52,67.752],["i",67.752,67.971],["anden",67.971,68.319],["plus",68.319,68.615],["T",68.615,68.925],["i",68.925,69.131],["anden",69.131,69.569]],"text":"Med Tresca bruger man i stedet det ækvivalente moment, kvadratroden af M i anden plus T i anden."},"tjek_q":{"start":70.798,"end":75.862,"words":[["Tjek",70.899,71.221],["dig",71.221,71.401],["selv",71.401,71.827],["Hvorfor",72.731,72.963],["står",72.963,73.195],["der",73.195,73.388],["nul",73.388,73.659],["komma",73.659,74.02],["syv",74.02,74.342],["fem",74.342,74.625],["foran",74.625,74.986],["T",74.986,75.244],["i",75.244,75.463],["anden",75.463,75.862]],"text":"Tjek dig selv. Hvorfor står der nul komma syv fem foran T i anden?"},"tjek_a":{"start":79.726,"end":88.41,"words":[["Fordi",79.853,80.214],["tre",80.214,80.459],["tau",80.459,80.768],["i",80.768,80.962],["anden",80.962,81.335],["med",81.335,81.554],["tau",81.554,81.825],["lig",81.825,81.98],["seksten",81.98,82.431],["T",82.431,82.791],["over",82.791,83.036],["pi",83.036,83.255],["d",83.255,83.41],["i",83.41,83.539],["tredje",83.539,83.925],["giver",83.925,84.183],["tre",84.183,84.454],["fjerdedele",84.454,85.008],["af",85.008,85.085],["toogtredive",85.085,85.794],["over",85.794,86.065],["pi",86.065,86.309],["d",86.309,86.464],["i",86.464,86.606],["tredje",86.606,86.928],["gange",86.928,87.237],["T",87.237,87.585],["i",87.727,87.946],["anden",87.946,88.41]],"text":"Fordi tre tau i anden med tau lig seksten T over pi d i tredje giver tre fjerdedele af toogtredive over pi d i tredje gange T, i anden."},"slut":{"start":89.628,"end":101.095,"words":[["Kort",89.755,89.987],["sagt",89.987,90.464],["sigma",90.58,91.044],["er",91.044,91.16],["toogtredive",91.16,91.804],["M",91.804,92.126],["over",92.126,92.358],["pi",92.358,92.59],["d",92.59,92.758],["i",92.758,92.887],["tredje",92.887,93.415],["tau",93.544,93.853],["er",93.853,93.943],["seksten",93.943,94.407],["T",94.407,94.717],["over",94.717,94.949],["pi",94.949,95.168],["d",95.168,95.348],["i",95.348,95.49],["tredje",95.49,96.018],["og",96.16,96.315],["von",96.315,96.482],["Mises",96.482,96.83],["giver",96.83,97.049],["kvadratroden",97.049,97.681],["af",97.681,97.9],["M",97.9,98.132],["i",98.132,98.338],["anden",98.338,98.673],["plus",98.673,98.918],["nul",98.918,99.111],["komma",99.111,99.523],["syv",99.523,99.91],["fem",99.91,100.181],["T",100.181,100.451],["i",100.451,100.657],["anden",100.657,101.095]],"text":"Kort sagt: sigma er toogtredive M over pi d i tredje, tau er seksten T over pi d i tredje, og von Mises giver kvadratroden af M i anden plus nul komma syv fem T i anden."}}}, { audio: 'aksel-statisk.mp3', id: 'aksel-statisk' });</script>
+</body>
+</html>

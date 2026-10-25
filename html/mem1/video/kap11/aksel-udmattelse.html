@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aksler: udmattelse med DE-Goodman · video</title>
+<meta name="description" content="DE-Goodman, stivhedskrav og kritisk hastighed med Dunkerley og Rayleigh.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 11: videoer</a><h1>Aksler: udmattelse med DE-Goodman</h1><span class="meta">MEM1 · kapitel 11 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Aksler: udmattelse med DE-Goodman"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>DE-Goodman, stivhedskrav og kritisk hastighed med Dunkerley og Rayleigh.</p><div class="chips"><a href="aksel-statisk.html">Se først: Aksler: statisk dimensionering</a><a href="../../../../lab/mem1/aksel.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel11_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l11">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Aksler: udmattelse med DE-Goodman, stivhed og kritisk hastighed (MEM1 kap. 11, slides 5–11)
+BP.scene({ header: 'MEM1 · kap. 11' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, plot, axes, dashed, PI, TAU } = B;
+
+  B.titel(0, 'Aksler: udmattelse', 'MEM1 · kapitel 11 · begreb (slide 5–11)', 'titel');
+  text(0, 'DE-Goodman', 640, 520, 44, 'red', wt('titel', 'udmattelse') - 0.2, we('titel', 'udmattelse'), { align: 'center' });
+
+  B.goto('hvorfor', 1);
+  {
+    const t0 = L('hvorfor').start;
+    const P = []; for (let j = 0; j <= 60; j++) { const u = j / 60; P.push([160 + 400 * u, 260 - 70 * Math.sin(u * 4 * PI)]); }
+    line(1, [[160, 260], [560, 260]], 'black', 2, t0, t0 + 0.3); plot(1, P, 'red', t0 + 0.3, we('hvorfor', 'roterer'));
+    text(1, 'bøjning: vekslende', 160, 380, 34, 'red', wt('komponenter', 'Bøjningen') - 0.1, we('komponenter', 'tredje'));
+    text(1, 'σ_a = 32M/(πd³), σ_m = 0', 160, 430, 34, 'red', wt('komponenter', 'amplitude') - 0.3, we('komponenter', 'tredje'));
+    line(1, [[700, 260], [1100, 260]], 'black', 2, wt('komponenter', 'Vridningen') - 0.3, wt('komponenter', 'Vridningen')); plot(1, [[700, 200], [1100, 200]], 'green', wt('komponenter', 'Vridningen'), wt('komponenter', 'middelspænding', 1));
+    text(1, 'vridning: konstant', 700, 380, 34, 'green', wt('komponenter', 'Vridningen') - 0.1, we('komponenter', 'middelspænding', 1));
+    text(1, 'τ_m = 16T/(πd³), τ_a = 0', 700, 430, 34, 'green', wt('komponenter', 'seksten') - 0.1, we('komponenter', 'tredje', 1));
+    const tf = L('formel').start;
+    const r = text(1, 'd = { (32 n/π) [ K_f M / S_e + (√3/2) T / S_u ] }^{1/3}', 140, 560, 40, 'blue', tf + 0.6, we('formel', 'tredjedel'));
+    box(1, 115, 505, 1080, 85, 'blue', we('formel', 'tredjedel'), we('formel', 'tredjedel') + 0.6);
+    text(1, 'S_e: korrigeret · S_u: trækstyrke · K_f: kærvfaktor', 140, 650, 30, 'black', L('symboler').start + 0.2, we('symboler', 'kærvfaktoren'));
+  }
+
+  B.goto('stivhed', 2);
+  {
+    const t0 = L('stivhed').start;
+    bubble(2, 'Stivhed', 150, 140, 50, 'blue', t0, t0 + 0.6);
+    text(2, 'θ: 0,25° – 1° pr. meter', 170, 220, 36, 'black', wt('stivhed', 'Vridningsvinklen') - 0.1, we('stivhed', 'meter'));
+    text(2, 'udbøjning: tandhjul i indgreb', 170, 275, 36, 'black', wt('stivhed', 'Udbøjningen') - 0.1, we('stivhed', 'indgreb'));
+    text(2, 'hældning ved kuglelejer ≤ 0,001 rad', 170, 330, 36, 'black', wt('stivhed', 'hældningen') - 0.1, we('stivhed', 'radian'));
+    const tk = L('kritisk').start;
+    text(2, 'ω_{cr} = √(k / m)', 170, 440, 46, 'red', wt('kritisk', 'kritiske') - 0.2, we('kritisk', 'm'));
+    text(2, 'y = e ω² / (ω_{cr}² − ω²)', 170, 530, 44, 'red', L('whirl').start + 0.2, we('whirl', 'anden', 2));
+    const ox = 760, oy = 640;
+    axes(2, ox, oy, 1180, 380, 'ω', 'y', L('whirl').start);
+    const Pa = [], Pb = []; for (let j = 0; j <= 30; j++) { const w = 0.95 * j / 30; Pa.push([ox + 200 * w, oy - Math.min(230, 14 * w * w / (1 - w * w))]); const w2 = 1.05 + 0.95 * j / 30; Pb.push([ox + 200 * w2, oy - Math.min(230, 14 * w2 * w2 / (w2 * w2 - 1))]); }
+    plot(2, Pa, 'red', wt('whirl', 'nævneren') - 0.3, wt('whirl', 'nævneren') + 0.4); plot(2, Pb, 'red', wt('whirl', 'nævneren'), wt('whirl', 'nævneren') + 0.6);
+    dashed(2, [ox + 200, oy], [ox + 200, 400], 'black', wt('whirl', 'kritiske') - 0.2, wt('whirl', 'kritiske') + 0.3);
+    text(2, 'ω_{cr}', ox + 180, oy + 40, 30, 'black', wt('whirl', 'kritiske'), wt('whirl', 'kritiske') + 0.3);
+    text(2, 'Dunkerley: nedre · Rayleigh: øvre', 170, 640, 30, 'green', L('flere').start + 0.2, we('flere', 'udbøjninger'));
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Hvorfor står K_f kun', 'ved bøjningsleddet?'], ['bøjningen er vekslende → udmattelse', 'vridningen er konstant → mod S_u'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 11, slide 5–11 · Hamrock, Schmid & Jacobson, kap. 11', 'kiler og akseldele', 'slut');
+  text(4, 'bøjning vekslende · vridning middel', 200, 280, 42, 'blue', L('slut').start + 0.4, we('slut', 'middel'));
+  text(4, 'DE-Goodman → d · tjek stivhed og ω_{cr}', 200, 360, 40, 'red', wt('slut', 'D') - 0.1, we('slut', 'hastighed'));
+});
+
+</script>
+<script>BP.live({"duration":123.486,"audio":"aksel-udmattelse.mp3","order":["titel","hvorfor","komponenter","formel","symboler","stivhed","kritisk","whirl","flere","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.369,"words":[["Aksler",0.601,1.206],["og",1.206,1.374],["udmattelse",1.374,2.224],["En",3.129,3.232],["roterende",3.232,3.735],["aksel",3.735,4.327],["skal",4.327,4.533],["næsten",4.534,4.997],["altid",4.997,5.397],["dimensioneres",5.397,6.273],["mod",6.273,6.57],["udmattelse",6.57,7.369]],"text":"Aksler og udmattelse. En roterende aksel skal næsten altid dimensioneres mod udmattelse."},"hvorfor":{"start":8.602,"end":13.961,"words":[["Selv",8.716,9.026],["med",9.026,9.206],["konstant",9.206,9.67],["tværlast",9.67,10.366],["skifter",10.366,10.83],["overfladen",10.83,11.358],["mellem",11.358,11.59],["træk",11.59,11.912],["og",11.912,12.015],["tryk",12.015,12.441],["når",12.634,12.866],["akslen",12.866,13.343],["roterer",13.343,13.961]],"text":"Selv med konstant tværlast skifter overfladen mellem træk og tryk, når akslen roterer."},"komponenter":{"start":15.192,"end":27.963,"words":[["Bøjningen",15.319,15.745],["er",15.745,15.848],["derfor",15.848,16.183],["fuldt",16.183,16.44],["vekslende",16.44,17.02],["med",17.162,17.317],["middelspænding",17.317,17.987],["nul",17.987,18.27],["og",18.27,18.412],["amplitude",18.412,18.992],["toogtredive",18.992,19.675],["M",19.675,20.036],["over",20.036,20.306],["pi",20.306,20.577],["d",20.577,20.822],["i",20.822,21.015],["tredje",21.015,21.569],["Vridningen",22.46,22.924],["fra",22.924,23.091],["et",23.091,23.156],["konstant",23.156,23.62],["moment",23.62,24.084],["er",24.084,24.238],["en",24.238,24.341],["ren",24.341,24.638],["middelspænding",24.638,25.424],["seksten",25.566,26.133],["T",26.133,26.429],["over",26.429,26.7],["pi",26.7,26.97],["d",26.97,27.215],["i",27.215,27.408],["tredje",27.408,27.963]],"text":"Bøjningen er derfor fuldt vekslende, med middelspænding nul og amplitude toogtredive M over pi d i tredje. Vridningen fra et konstant moment er en ren middelspænding, seksten T over pi d i tredje."},"formel":{"start":29.174,"end":41.312,"words":[["Kombinerer",29.314,29.739],["vi",29.739,29.881],["von",29.881,30.087],["Mises",30.087,30.5],["og",30.5,30.59],["Goodman",30.59,31.131],["får",31.273,31.415],["vi",31.415,31.544],["D",31.544,31.763],["E",31.763,31.917],["Goodman",31.917,32.239],["formlen",32.239,32.845],["d",32.974,33.167],["lig",33.167,33.309],["toogtredive",33.309,33.979],["n",33.979,34.25],["over",34.25,34.495],["pi",34.495,34.727],["gange",34.727,35.036],["K",35.036,35.294],["f",35.294,35.5],["M",35.5,35.706],["over",35.706,36.105],["S",36.105,36.402],["e",36.402,36.556],["plus",36.556,36.801],["kvadratroden",36.801,37.497],["af",37.497,37.626],["tre",37.626,37.91],["halve",37.91,38.167],["gange",38.167,38.464],["T",38.464,38.76],["over",38.76,39.018],["S",39.018,39.34],["u",39.34,39.662],["opløftet",39.804,40.345],["til",40.345,40.5],["en",40.5,40.603],["tredjedel",40.603,41.312]],"text":"Kombinerer vi von Mises og Goodman, får vi D E Goodman formlen: d lig toogtredive n over pi gange K f M over S e plus kvadratroden af tre halve gange T over S u, opløftet til en tredjedel."},"symboler":{"start":42.532,"end":48.755,"words":[["S",42.672,42.917],["e",42.917,43.188],["er",43.188,43.317],["den",43.317,43.51],["korrigerede",43.51,44.077],["udmattelsesgrænse",44.077,45.262],["S",45.404,45.688],["u",45.688,45.894],["er",45.894,45.945],["trækstyrken",45.945,46.744],["og",46.886,47.028],["K",47.028,47.363],["f",47.363,47.672],["er",47.672,47.801],["kærvfaktoren",47.801,48.755]],"text":"S e er den korrigerede udmattelsesgrænse, S u er trækstyrken, og K f er kærvfaktoren."},"stivhed":{"start":49.986,"end":64.432,"words":[["Styrke",50.1,50.719],["er",50.719,50.951],["ikke",50.951,51.299],["nok",51.299,51.75],["Vridningsvinklen",52.654,53.556],["er",53.556,53.697],["typisk",53.697,54.11],["begrænset",54.11,54.612],["til",54.612,54.754],["mellem",54.754,55.05],["en",55.05,55.153],["kvart",55.154,55.592],["og",55.592,55.772],["en",55.772,55.914],["grad",55.914,56.184],["pr.",56.184,56.416],["meter",56.416,56.958],["Udbøjningen",57.847,58.452],["må",58.452,58.607],["ikke",58.607,58.903],["få",58.904,59.032],["tandhjul",59.032,59.458],["til",59.458,59.612],["at",59.612,59.651],["gå",59.651,59.793],["ud",59.793,60.025],["af",60.025,60.115],["indgreb",60.115,60.759],["og",60.901,61.146],["hældningen",61.146,61.558],["ved",61.558,61.661],["kuglelejer",61.661,62.202],["bør",62.202,62.434],["være",62.434,62.654],["under",62.654,62.976],["en",62.976,63.13],["tusindedel",63.13,63.788],["radian",63.788,64.432]],"text":"Styrke er ikke nok. Vridningsvinklen er typisk begrænset til mellem en kvart og en grad pr. meter. Udbøjningen må ikke få tandhjul til at gå ud af indgreb, og hældningen ved kuglelejer bør være under en tusindedel radian."},"kritisk":{"start":65.648,"end":74.05,"words":[["Roterer",65.775,66.278],["akslen",66.278,66.806],["tæt",66.806,67.025],["på",67.025,67.167],["sin",67.167,67.386],["egenfrekvens",67.386,68.301],["begynder",68.443,68.829],["den",68.829,69.01],["at",69.01,69.074],["piske",69.074,69.667],["Den",70.558,70.712],["kritiske",70.712,71.228],["vinkelhastighed",71.228,72.078],["er",72.078,72.181],["kvadratroden",72.182,72.942],["af",72.942,73.096],["k",73.096,73.431],["over",73.432,73.715],["m.",73.715,74.05]],"text":"Roterer akslen tæt på sin egenfrekvens, begynder den at piske. Den kritiske vinkelhastighed er kvadratroden af k over m."},"whirl":{"start":75.286,"end":86.33,"words":[["Udbøjningen",75.413,75.955],["er",75.955,76.174],["e",76.174,76.354],["omega",76.354,76.844],["i",76.844,77.024],["anden",77.024,77.269],["divideret",77.269,77.888],["med",77.888,78.094],["omega",78.094,78.442],["kritisk",78.442,78.957],["i",78.957,79.15],["anden",79.15,79.421],["minus",79.421,79.743],["omega",79.743,80.349],["i",80.349,80.555],["anden",80.555,80.98],["Ved",81.871,81.974],["den",81.974,82.129],["kritiske",82.129,82.606],["hastighed",82.606,83.185],["går",83.185,83.417],["nævneren",83.417,83.817],["mod",83.817,83.997],["nul",83.997,84.41],["og",84.564,84.706],["udbøjningen",84.706,85.466],["eksploderer",85.466,86.33]],"text":"Udbøjningen er e omega i anden divideret med omega kritisk i anden minus omega i anden. Ved den kritiske hastighed går nævneren mod nul, og udbøjningen eksploderer."},"flere":{"start":87.564,"end":94.109,"words":[["Med",87.704,87.846],["flere",87.846,88.168],["masser",88.168,88.684],["giver",88.684,88.928],["Dunkerley",88.928,89.495],["en",89.495,89.676],["nedre",89.676,89.959],["grænse",89.959,90.526],["og",90.668,90.874],["Rayleigh",90.874,91.325],["giver",91.325,91.57],["en",91.57,91.686],["øvre",91.686,91.97],["grænse",91.97,92.511],["med",92.511,92.691],["de",92.691,92.782],["statiske",92.782,93.336],["udbøjninger",93.336,94.109]],"text":"Med flere masser giver Dunkerley en nedre grænse, og Rayleigh giver en øvre grænse med de statiske udbøjninger."},"tjek_q":{"start":95.33,"end":100.588,"words":[["Tjek",95.431,95.753],["dig",95.753,95.933],["selv",95.933,96.359],["Hvorfor",97.276,97.559],["indgår",97.559,97.959],["K",97.959,98.229],["f",98.23,98.358],["kun",98.358,98.732],["ved",98.732,98.938],["bøjningsleddet",98.938,99.608],["i",99.608,99.763],["D",99.763,99.969],["E",99.969,100.111],["Goodman",100.111,100.588]],"text":"Tjek dig selv. Hvorfor indgår K f kun ved bøjningsleddet i D E Goodman?"},"tjek_a":{"start":104.45,"end":112.594,"words":[["Fordi",104.577,104.938],["det",104.938,105.067],["er",105.067,105.131],["bøjningen",105.131,105.776],["der",105.918,106.098],["er",106.098,106.124],["vekslende",106.124,106.742],["og",106.742,106.884],["driver",106.884,107.232],["udmattelsen",107.232,108.07],["Vridningen",108.96,109.463],["er",109.463,109.592],["konstant",109.592,110.275],["så",110.416,110.648],["den",110.648,110.816],["indgår",110.816,111.28],["mod",111.28,111.563],["S",111.563,111.834],["u.",111.834,112.594]],"text":"Fordi det er bøjningen, der er vekslende og driver udmattelsen. Vridningen er konstant, så den indgår mod S u."},"slut":{"start":113.824,"end":121.052,"words":[["Kort",113.951,114.17],["sagt",114.17,114.66],["bøjning",114.776,115.137],["er",115.137,115.253],["vekslende",115.253,115.897],["vridning",116.013,116.438],["er",116.438,116.503],["middel",116.503,117.018],["D",117.147,117.366],["E",117.366,117.534],["Goodman",117.534,117.985],["giver",117.985,118.255],["d",118.255,118.642],["og",118.797,118.926],["tjek",118.926,119.17],["både",119.17,119.415],["stivhed",119.415,119.905],["og",119.905,120.008],["kritisk",120.008,120.433],["hastighed",120.433,121.052]],"text":"Kort sagt: bøjning er vekslende, vridning er middel, D E Goodman giver d, og tjek både stivhed og kritisk hastighed."}}}, { audio: 'aksel-udmattelse.mp3', id: 'aksel-udmattelse' });</script>
+</body>
+</html>

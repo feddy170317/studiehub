@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eksamensspørgsmål 9b: aksel med Tresca · video</title>
+<meta name="description" content="Eksamensspørgsmål 9b: Te = 500 Nm og d = 37,1 mm med Tresca.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 11: videoer</a><h1>Eksamensspørgsmål 9b: aksel med Tresca</h1><span class="meta">MEM1 · kapitel 11 · Jeppe læser op</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Eksamensspørgsmål 9b: aksel med Tresca"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Eksamensspørgsmål 9b: Te = 500 Nm og d = 37,1 mm med Tresca.</p><div class="chips"><a href="aksel-statisk.html">Se først: Aksler: statisk dimensionering</a><a href="../../../../lab/mem1/aksel.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel11_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l11">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Eksamensspørgsmål 9b: T = 300, M = 400 Nm, τall = 50 MPa → Te = 500 Nm, d = 37,1 mm (slide 17)
+BP.scene({ header: 'MEM1 · kap. 11' }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under } = B;
+
+  B.titel(0, 'Eksamensspørgsmål 9b', 'MEM1 · kapitel 11 · opgave (slide 17)', 'titel');
+  text(0, 'aksel med Tresca', 640, 520, 42, 'red', wt('titel', 'aksel') - 0.2, we('titel', 'forskydning'), { align: 'center' });
+
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start;
+    text(1, 'T = 300 N·m,  M = 400 N·m,  τ_{tilladt} = 50 MPa', 140, 160, 36, 'black', t0 + 0.2, we('data', 'megapascal'));
+    text(1, 'T_e = √(M² + T²)', 140, 260, 46, 'blue', L('ide').start + 0.3, we('ide', 'anden', 1));
+    text(1, '= √(400² + 300²) = 500 N·m', 520, 260, 42, 'blue', L('te').start + 0.2, we('te', 'newtonmeter'));
+    text(1, 'τ_{max} = 16 T_e / (π d³) ≤ 50', 140, 360, 42, 'red', L('tau').start + 0.2, we('tau', 'megapascal'));
+    text(1, 'd³ = 16 · 500 000 / (π · 50) ≈ 50 930 mm³', 140, 450, 38, 'red', L('d').start + 0.2, we('d', 'kubikmillimeter'));
+    const r = text(1, 'd = 37,1 mm  →  vælg 38–40 mm', 140, 550, 48, 'red', L('resultat').start + 0.2, we('resultat', 'millimeter', 1));
+    box(1, 115, 495, 820, 85, 'red', we('resultat', 'millimeter', 1), we('resultat', 'millimeter', 1) + 0.6);
+    text(1, 'M_e = ½ (M + T_e) = 450 N·m', 140, 660, 38, 'green', L('me').start + 0.2, we('me', 'newtonmeter'));
+  }
+
+  B.goto('udled', 2);
+  {
+    const t0 = L('udled').start;
+    bubble(2, 'Del a: udledning', 150, 140, 50, 'blue', t0, t0 + 0.6);
+    text(2, 'τ_{max} = √((σ/2)² + τ²)', 160, 240, 44, 'black', wt('udled', 'største') - 0.2, we('udled', 'anden', 1));
+    text(2, 'σ = 32M/(πd³),   τ = 16T/(πd³)', 160, 330, 40, 'blue', wt('udled', 'sigma', 1) - 0.1, we('udled', 'tredje', 1));
+    const r = text(2, 'τ_{max} = 16/(πd³) · √(M² + T²)', 160, 430, 46, 'red', wt('udled', 'bliver') - 0.1, we('udled', 'anden', 3));
+    box(2, 135, 375, 760, 85, 'red', we('udled', 'anden', 3), we('udled', 'anden', 3) + 0.6);
+  }
+
+  B.goto('tjek_q', 3);
+  B.tjek(3, ['Hvad er T_e, hvis M = 0?'], ['T_e = T', 'ren vridning'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 4);
+  B.slut(4, 'Abou-Hayt (2026), MEM1 Chapter 11, slide 17 (eksamensspm. 9) · Hamrock, Schmid & Jacobson, kap. 11', '', 'slut');
+  text(4, 'T_e = 500 N·m', 200, 280, 46, 'blue', L('slut').start + 0.4, we('slut', 'newtonmeter'));
+  text(4, 'd = 37,1 mm', 200, 370, 48, 'red', wt('slut', 'd') - 0.1, we('slut', 'millimeter'));
+});
+
+</script>
+<script>BP.live({"duration":121.062,"audio":"eksamen-spm9.mp3","order":["titel","data","ide","te","tau","d","resultat","me","udled","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":10.5,"words":[["Eksamensspørgsmål",0.64,1.774],["ni",1.774,2.071],["b",2.071,2.444],["En",3.361,3.49],["aksel",3.49,3.966],["med",3.966,4.16],["både",4.16,4.469],["bøjning",4.469,5.01],["og",5.01,5.165],["vridning",5.165,5.706],["Vi",6.608,6.711],["finder",6.711,6.995],["den",6.995,7.188],["mindste",7.188,7.536],["diameter",7.536,8.258],["med",8.258,8.464],["kriteriet",8.464,9.16],["for",9.16,9.314],["største",9.314,9.753],["forskydning",9.753,10.5]],"text":"Eksamensspørgsmål ni b. En aksel med både bøjning og vridning. Vi finder den mindste diameter med kriteriet for største forskydning."},"data":{"start":11.722,"end":21.503,"words":[["Akslen",11.862,12.403],["overfører",12.403,13.022],["tre",13.022,13.293],["hundrede",13.293,13.512],["newtonmeter",13.512,14.362],["og",14.362,14.517],["har",14.517,14.671],["et",14.672,14.736],["konstant",14.736,15.213],["bøjningsmoment",15.213,15.947],["på",15.947,16.089],["fire",16.089,16.398],["hundrede",16.398,16.669],["newtonmeter",16.669,17.532],["Den",18.423,18.552],["tilladte",18.552,18.951],["forskydningsspænding",18.951,19.944],["er",19.944,20.098],["halvtreds",20.098,20.562],["megapascal",20.562,21.503]],"text":"Akslen overfører tre hundrede newtonmeter og har et konstant bøjningsmoment på fire hundrede newtonmeter. Den tilladte forskydningsspænding er halvtreds megapascal."},"ide":{"start":22.728,"end":29.183,"words":[["Ved",22.868,22.958],["Tresca",22.958,23.397],["bruger",23.397,23.667],["vi",23.667,23.783],["det",23.783,23.964],["ækvivalente",23.964,24.608],["vridningsmoment",24.608,25.497],["T",25.626,25.948],["e",25.948,26.116],["lig",26.116,26.283],["kvadratroden",26.283,26.992],["af",26.992,27.185],["M",27.185,27.417],["i",27.417,27.623],["anden",27.623,27.958],["plus",27.958,28.255],["T",28.255,28.551],["i",28.551,28.744],["anden",28.744,29.183]],"text":"Ved Tresca bruger vi det ækvivalente vridningsmoment, T e lig kvadratroden af M i anden plus T i anden."},"te":{"start":30.398,"end":36.105,"words":[["Det",30.538,30.654],["er",30.654,30.744],["kvadratroden",30.744,31.44],["af",31.44,31.582],["fire",31.582,31.891],["hundrede",31.891,32.265],["i",32.265,32.458],["anden",32.458,32.729],["plus",32.729,32.961],["tre",32.961,33.206],["hundrede",33.206,33.554],["i",33.554,33.747],["anden",33.747,34.159],["altså",34.301,34.726],["fem",34.726,34.971],["hundrede",34.971,35.255],["newtonmeter",35.255,36.105]],"text":"Det er kvadratroden af fire hundrede i anden plus tre hundrede i anden, altså fem hundrede newtonmeter."},"tau":{"start":37.324,"end":43.572,"words":[["Den",37.451,37.567],["største",37.567,37.967],["forskydning",37.967,38.598],["er",38.598,38.727],["seksten",38.727,39.23],["T",39.23,39.462],["e",39.462,39.745],["over",39.745,40.041],["pi",40.042,40.273],["d",40.274,40.454],["i",40.454,40.621],["tredje",40.621,41.163],["og",41.304,41.433],["den",41.433,41.588],["skal",41.588,41.755],["højst",41.755,42.039],["være",42.039,42.219],["halvtreds",42.219,42.657],["megapascal",42.657,43.572]],"text":"Den største forskydning er seksten T e over pi d i tredje, og den skal højst være halvtreds megapascal."},"d":{"start":44.802,"end":54.158,"words":[["Så",44.929,45.161],["er",45.161,45.226],["d",45.226,45.432],["i",45.432,45.561],["tredje",45.561,45.909],["lig",45.909,46.128],["seksten",46.128,46.592],["gange",46.592,47.004],["fem",47.004,47.288],["hundrede",47.288,47.507],["tusind",47.507,47.867],["divideret",47.867,48.563],["med",48.563,48.782],["pi",48.782,49.027],["gange",49.027,49.311],["halvtreds",49.311,49.955],["Det",50.833,50.936],["giver",50.936,51.245],["cirka",51.245,51.606],["halvtreds",51.606,52.07],["tusind",52.07,52.598],["ni",52.598,52.843],["hundrede",52.843,53.127],["kubikmillimeter",53.127,54.158]],"text":"Så er d i tredje lig seksten gange fem hundrede tusind divideret med pi gange halvtreds. Det giver cirka halvtreds tusind ni hundrede kubikmillimeter."},"resultat":{"start":55.376,"end":62.348,"words":[["Kubikroden",55.516,56.238],["giver",56.238,56.496],["syvogtredive",56.496,57.153],["komma",57.153,57.591],["et",57.591,57.784],["millimeter",57.784,58.532],["Vi",59.435,59.525],["vælger",59.525,59.848],["mindst",59.848,60.196],["otteogtredive",60.196,61.046],["eller",61.046,61.304],["fyrre",61.304,61.626],["millimeter",61.626,62.348]],"text":"Kubikroden giver syvogtredive komma et millimeter. Vi vælger mindst otteogtredive eller fyrre millimeter."},"me":{"start":63.574,"end":74.566,"words":[["Det",63.701,63.817],["ækvivalente",63.817,64.462],["bøjningsmoment",64.462,65.286],["er",65.286,65.467],["en",65.467,65.583],["halv",65.583,65.802],["gange",65.802,66.15],["M",66.15,66.369],["plus",66.369,66.639],["T",66.639,66.923],["e",66.923,67.271],["altså",67.413,67.928],["fire",67.928,68.225],["hundrede",68.225,68.456],["og",68.456,68.482],["halvtreds",68.482,68.907],["newtonmeter",68.907,69.784],["Det",70.675,70.739],["bruges",70.739,71.242],["hvis",71.383,71.577],["man",71.577,71.731],["i",71.731,71.783],["stedet",71.783,72.092],["dimensionerer",72.092,72.827],["mod",72.827,73.097],["den",73.097,73.29],["største",73.29,73.729],["normalspænding",73.729,74.566]],"text":"Det ækvivalente bøjningsmoment er en halv gange M plus T e, altså fire hundrede og halvtreds newtonmeter. Det bruges, hvis man i stedet dimensionerer mod den største normalspænding."},"udled":{"start":75.78,"end":95.136,"words":[["Til",75.894,76.126],["del",76.126,76.371],["a",76.371,76.655],["skal",76.655,76.835],["du",76.835,76.925],["vise",76.925,77.428],["hvor",77.57,77.737],["de",77.737,77.853],["to",77.853,78.111],["formler",78.111,78.562],["kommer",78.562,78.858],["fra",78.858,79.296],["Den",80.187,80.303],["største",80.303,80.728],["forskydning",80.728,81.321],["er",81.321,81.463],["kvadratroden",81.463,82.082],["af",82.082,82.133],["sigma",82.133,82.481],["halve",82.481,82.919],["i",82.919,83.112],["anden",83.112,83.409],["plus",83.409,83.641],["tau",83.641,83.989],["i",83.989,84.221],["anden",84.221,84.62],["og",84.762,84.981],["med",84.981,85.071],["sigma",85.071,85.445],["lig",85.445,85.625],["toogtredive",85.625,86.244],["M",86.244,86.579],["over",86.579,86.811],["pi",86.811,87.017],["d",87.017,87.198],["i",87.198,87.326],["tredje",87.326,87.661],["og",87.661,87.752],["tau",87.752,88.022],["lig",88.022,88.203],["seksten",88.203,88.667],["T",88.667,89.015],["over",89.015,89.259],["pi",89.259,89.478],["d",89.478,89.633],["i",89.633,89.749],["tredje",89.749,90.136],["bliver",90.136,90.342],["det",90.342,90.419],["seksten",90.419,90.986],["over",90.986,91.244],["pi",91.244,91.463],["d",91.463,91.643],["i",91.643,91.759],["tredje",91.759,92.056],["gange",92.056,92.339],["kvadratroden",92.339,93.009],["af",93.009,93.203],["M",93.203,93.409],["i",93.409,93.615],["anden",93.615,93.937],["plus",93.937,94.221],["T",94.221,94.504],["i",94.504,94.697],["anden",94.698,95.136]],"text":"Til del a skal du vise, hvor de to formler kommer fra. Den største forskydning er kvadratroden af sigma halve i anden plus tau i anden, og med sigma lig toogtredive M over pi d i tredje og tau lig seksten T over pi d i tredje bliver det seksten over pi d i tredje gange kvadratroden af M i anden plus T i anden."},"tjek_q":{"start":96.362,"end":101.078,"words":[["Tjek",96.463,96.785],["dig",96.785,96.965],["selv",96.965,97.391],["Hvad",98.308,98.54],["er",98.54,98.656],["T",98.656,98.965],["e",98.965,99.287],["hvis",99.416,99.609],["bøjningsmomentet",99.609,100.524],["er",100.524,100.666],["nul",100.666,101.078]],"text":"Tjek dig selv. Hvad er T e, hvis bøjningsmomentet er nul?"},"tjek_a":{"start":104.954,"end":108.896,"words":[["Så",105.081,105.313],["er",105.313,105.378],["T",105.378,105.635],["e",105.635,105.79],["bare",105.79,106.022],["T.",106.022,106.37],["Formlen",106.37,106.95],["bliver",106.95,107.156],["den",107.156,107.336],["almindelige",107.336,107.878],["for",107.878,108.058],["ren",108.058,108.354],["vridning",108.355,108.896]],"text":"Så er T e bare T. Formlen bliver den almindelige for ren vridning."},"slut":{"start":110.128,"end":118.632,"words":[["Kort",110.255,110.461],["sagt",110.462,110.938],["T",111.067,111.389],["e",111.389,111.647],["er",111.647,111.776],["fem",111.776,112.034],["hundrede",112.034,112.266],["newtonmeter",112.266,113.116],["og",113.258,113.477],["d",113.477,113.696],["er",113.696,113.76],["syvogtredive",113.76,114.443],["komma",114.443,114.727],["et",114.727,114.804],["millimeter",114.804,115.358],["med",115.358,115.603],["Tresca",115.603,116.003],["og",116.003,116.093],["en",116.093,116.183],["tilladt",116.183,116.518],["forskydning",116.518,117.163],["på",117.163,117.343],["halvtreds",117.343,117.755],["megapascal",117.755,118.632]],"text":"Kort sagt: T e er fem hundrede newtonmeter, og d er syvogtredive komma et millimeter med Tresca og en tilladt forskydning på halvtreds megapascal."}}}, { audio: 'eksamen-spm9.mp3', id: 'eksamen-spm9' });</script>
+</body>
+</html>
