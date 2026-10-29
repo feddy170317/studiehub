@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI som studiemakker</title>
+<meta name="description" content="10-minutters oplæg om, hvordan en maskiningeniørstuderende på VIA bruger Claude til at bygge sit eget studiemateriale, og hvordan man gør det inden for reglerne.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600;700&display=swap">
+<style>
+:root{
+  --paper:#f6f3ec; --paper2:#ece7db; --ink:#16213a; --muted:#56607a;
+  --accent:#d9480f; --blue:#1f5fa8; --card:#fffdf8; --line:#d8d1c1;
+  --night:#16213a; --night-ink:#f3efe6; --night-muted:#aeb8cc;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#0e1526;overflow:hidden}
+body{font-family:Inter,"Segoe UI",Arial,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+#stage{position:fixed;left:50%;top:50%;width:1600px;height:900px;transform-origin:center center}
+.slide{position:absolute;inset:0;background:var(--paper);padding:88px 104px 96px;display:none;flex-direction:column;overflow:hidden}
+.slide.on{display:flex;animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.slide.night{background:var(--night);color:var(--night-ink)}
+.slide.alt{background:var(--paper2)}
+h1,h2,h3{font-family:"Space Grotesk","Segoe UI",Arial,sans-serif;letter-spacing:-.01em}
+h1{font-size:104px;line-height:1.02;font-weight:700}
+h2{font-size:60px;line-height:1.08;font-weight:700;margin-bottom:36px}
+h3{font-size:30px;line-height:1.2;font-weight:700;margin-bottom:10px}
+p,li{font-size:26px;line-height:1.45}
+.eyebrow{font-size:20px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+.night .eyebrow{color:#ff9a62}
+.muted{color:var(--muted)} .night .muted{color:var(--night-muted)}
+.lead{font-size:34px;line-height:1.35;max-width:1150px}
+.grow{flex:1}
+.row{display:flex;gap:40px}
+.col{display:flex;flex-direction:column;gap:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:30px 32px}
+.night .card{background:#1f2c4a;border-color:#33436a}
+.shot{border-radius:14px;border:1px solid var(--line);box-shadow:0 18px 40px -18px rgba(22,33,58,.45);display:block;width:100%;height:100%;object-fit:cover;object-position:top center;background:#0f1729}
+.cap{font-size:20px;color:var(--muted);margin-top:12px}
+.tag{display:inline-block;font-size:19px;font-weight:700;padding:6px 14px;border-radius:999px;background:#fde3d4;color:#9a3412;margin-right:8px}
+.tag.b{background:#dbe8f7;color:#1e4f8a}
+.foot{position:absolute;left:104px;right:104px;bottom:36px;display:flex;justify-content:space-between;font-size:18px;color:var(--muted)}
+.night .foot{color:var(--night-muted)}
+/* stat grid */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px 28px}
+.stat b{display:block;font-family:"Space Grotesk",Arial,sans-serif;font-size:66px;line-height:1;color:var(--accent);margin-bottom:8px}
+.stat span{font-size:23px;line-height:1.3;color:var(--ink)}
+/* flow */
+.flow{display:flex;align-items:stretch;gap:0}
+.step{flex:1;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px 24px;position:relative}
+.step .n{font-family:"Space Grotesk",Arial,sans-serif;font-size:22px;font-weight:700;color:var(--blue);margin-bottom:8px}
+.step p{font-size:22px}
+.arrow{width:46px;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:34px;font-weight:700}
+.private{background:#fff4ec;border-color:#f3c2a5}
+.public{background:#eef5fd;border-color:#b9d2ee}
+code,.mono{font-family:"Cascadia Code",Consolas,"Courier New",monospace}
+.cmd{background:var(--night);color:#ffd8bf;border-radius:12px;padding:18px 24px;font-size:26px}
+ul.ticks{list-style:none;display:flex;flex-direction:column;gap:14px}
+ul.ticks li{padding-left:40px;position:relative}
+ul.ticks li::before{content:"";position:absolute;left:4px;top:13px;width:16px;height:16px;border-radius:4px;background:var(--accent)}
+ul.ticks.blue li::before{background:var(--blue)}
+.night ul.ticks li::before{background:#ff9a62}
+.big-quote{font-family:"Space Grotesk",Arial,sans-serif;font-size:78px;line-height:1.08;font-weight:700;max-width:1300px}
+.big-quote span{color:#ff9a62}
+/* chrome */
+#bar{position:fixed;left:0;bottom:0;height:5px;background:var(--accent);transition:width .3s;z-index:5}
+#hud{position:fixed;right:14px;bottom:12px;z-index:6;display:flex;gap:6px;align-items:center;background:rgba(14,21,38,.82);padding:5px 6px 5px 12px;border-radius:12px;font:600 13px Inter,Arial,sans-serif;color:#c9d2e3}
+#hud button{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#e9eef8;border-radius:8px;padding:6px 10px;font:inherit;cursor:pointer}
+#hud button:hover{background:rgba(255,255,255,.18)}
+#timer{min-width:52px;text-align:right}
+#notes{position:fixed;left:0;right:0;bottom:0;max-height:38vh;overflow:auto;background:rgba(10,16,30,.96);color:#e8edf7;padding:18px 22px 46px;font:16px/1.55 Inter,Arial,sans-serif;display:none;z-index:4;border-top:2px solid var(--accent)}
+#notes.on{display:block}
+#notes b{color:#ff9a62}
+#help{position:fixed;left:14px;bottom:12px;z-index:6;font:12px Inter,Arial,sans-serif;color:#c9d2e3;background:rgba(14,21,38,.7);padding:4px 10px;border-radius:8px}
+@media (max-width:700px){#help{display:none}}
+</style>
+</head>
+<body>
+<div id="stage">
+
+<!-- 1 -->
+<section class="slide night" data-notes="Hej alle sammen. Jeg hedder Frederik, og jeg læser til maskiningeniør på 3. semester her i Horsens. Jeg er blevet bedt om at vise, hvordan jeg bruger AI i studiet. Jeg har ikke en datalogi-baggrund, så alt det her er bygget af en almindelig ingeniørstuderende med Claude som makker. Vi tager tre ting: hvad jeg har bygget, hvordan det virker, og reglerne, som I skal holde jer inden for.">
+  <div class="eyebrow">Produktionsteknologi · VIA Horsens</div>
+  <div class="grow"></div>
+  <h1>AI som<br>studiemakker</h1>
+  <p class="lead muted" style="margin-top:28px">Sådan har jeg bygget mit eget studiemateriale med Claude, og sådan gør du det inden for reglerne.</p>
+  <div class="grow"></div>
+  <p style="font-size:26px"><b>Frederik Rasmussen</b> <span class="muted">· Maskiningeniør, 3. semester</span></p>
+</section>
+
+<!-- 2 -->
+<section class="slide" data-notes="Udgangspunktet kender I sikkert. Lærebøgerne er tykke og på engelsk. Slides er stikord, der giver mening, når underviseren står og forklarer, men ikke tre uger senere. Og til en mundtlig eksamen skal man kunne forklare tingene med egne ord, ikke bare genkende dem. Jeg manglede noget mellem slides og bog: noget, jeg kunne øve mig på.">
+  <div class="eyebrow">Udgangspunktet</div>
+  <h2>Pensum er tungt.<br>Tiden er kort.</h2>
+  <div class="row" style="margin-top:20px">
+    <div class="card" style="flex:1"><h3>Tykke bøger</h3><p class="muted">Engelske lærebøger med hundredvis af sider pr. fag.</p></div>
+    <div class="card" style="flex:1"><h3>Slides er stikord</h3><p class="muted">De giver mening i timen, men sjældent tre uger efter.</p></div>
+    <div class="card" style="flex:1"><h3>Eksamen kræver forståelse</h3><p class="muted">Man skal kunne forklare med egne ord, ikke bare genkende.</p></div>
+  </div>
+  <div class="grow"></div>
+  <p class="lead" style="font-size:30px">Jeg manglede noget <b>mellem slides og bog</b>, noget man kan øve sig på.</p>
+</section>
+
+<!-- 3 -->
+<section class="slide alt" data-notes="Løsningen blev Studiehub: én hjemmeside, hvor alt mit studiemateriale ligger. Den kører gratis på GitHub Pages og virker på mobilen. Tallene her er fra i dag. Det vigtige er ikke mængden. Det vigtige er, at hvert stykke er lavet til ét formål: at jeg skal forstå et begreb eller øve mig på en eksamensopgave. Lad mig vise nogle af værktøjerne.">
+  <div class="eyebrow">Idéen</div>
+  <h2>Én hub til alt mit studiemateriale</h2>
+  <div class="stats">
+    <div class="stat"><b>43</b><span>formeloverblik som PDF, ét pr. kapitel</span></div>
+    <div class="stat"><b>60</b><span>quizzer med sværhedsgrader og point</span></div>
+    <div class="stat"><b>55</b><span>sæt flashcards til formler</span></div>
+    <div class="stat"><b>100+</b><span>korte forklaringsvideoer</span></div>
+    <div class="stat"><b>50+</b><span>interaktive figurer med skydere</span></div>
+    <div class="stat"><b>~30</b><span>3D-scenarier i et virtuelt laboratorium</span></div>
+    <div class="stat"><b>15</b><span>mundtlige eksamensspørgsmål gennemgået</span></div>
+    <div class="stat"><b>503</b><span>begreber koblet i et videnskort</span></div>
+  </div>
+  <div class="grow"></div>
+  <p class="muted" style="font-size:22px">Fag: Maskinelementer, Dynamik, Elektroteknik, Mekanik, Materialer, Matematik · Kører gratis på GitHub Pages</p>
+</section>
+
+<!-- 4 -->
+<section class="slide" data-notes="Det første værktøj er det mest kedelige og det mest nyttige: et formeloverblik pr. kapitel. Det er én til to sider med symboler, formler, forklaring af hvert bogstav, og en sidehenvisning til bogen. Bagefter tager jeg en quiz på ti spørgsmål, hvor svarene står i tilfældig rækkefølge, så man ikke kan gætte sig til dem. Bemærk sidehenvisningerne: overblikket erstatter ikke bogen, det peger ind i den.">
+  <div class="eyebrow">Værktøj 1 · Læs og test dig selv</div>
+  <h2>Formeloverblik + quiz pr. kapitel</h2>
+  <div class="row grow" style="min-height:0">
+    <div style="flex:1.05;min-height:0;display:flex;flex-direction:column"><img class="shot" src="img/overblik.jpg" alt="Formeloverblik for kapitel 2 i Maskinelementer med formelbokse og sidehenvisninger" style="object-fit:cover;background:#fff"></div>
+    <div style="flex:1;min-height:0;display:flex;flex-direction:column;gap:22px">
+      <img class="shot" src="img/quiz.jpg" alt="Quiz med fire svarmuligheder, sværhedsgrad og point" style="height:360px;flex:none">
+      <ul class="ticks" style="margin-top:6px;gap:8px">
+        <li style="font-size:24px">Hver formel har en forklaring af alle symboler</li>
+        <li style="font-size:24px">Sidehenvisning til bogen, så man kan slå op</li>
+        <li style="font-size:24px">Svarene blandes, så man ikke kan gætte sig til svaret</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 5 -->
+<section class="slide alt" data-notes="Det her er min favorit. I bogen er en gyroskop-præcession en statisk tegning. Her kan man trække i spinhastigheden og se, hvad der sker. Til højre er det samme i 3D: et spændingselement fra Mohrs cirkel, som man kan dreje rundt. Jeg har beskrevet med ord, hvad jeg ville se, og Claude har skrevet koden. Jeg tjekker altid tallene mod en håndberegning, før noget kommer på siden.">
+  <div class="eyebrow">Værktøj 2 · Se fysikken ske</div>
+  <h2>Interaktive figurer og et 3D-laboratorium</h2>
+  <div class="row grow" style="min-height:0">
+    <div style="flex:1;min-height:0;display:flex;flex-direction:column"><img class="shot" src="img/widget.jpg" alt="Interaktiv figur: gyroskopisk præcession med skydere for spinhastighed og moment"><p class="cap">Dynamik: træk i skyderne, og se præcessionen ændre sig</p></div>
+    <div style="flex:1;min-height:0;display:flex;flex-direction:column"><img class="shot" src="img/lab.jpg" alt="3D-laboratorium: spændingselement der drejes for at vise Mohrs cirkel"><p class="cap">Maskinelementer: drej spændingselementet i 3D</p></div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section class="slide" data-notes="Videoerne er tegnet som kuglepen på en kollegieblok, med en dansk oplæsningsstemme. Hver video forklarer ét begreb på to til fire minutter. Der er ingen tunge videofiler. Tegningen sker live i browseren, så en video fylder omkring én megabyte. Manuskriptet bygger på underviserens rækkefølge, men alle formuleringer og tegninger er mine egne.">
+  <div class="eyebrow">Værktøj 3 · Forklaret på 2–4 minutter</div>
+  <h2>Videoer, der tegnes live</h2>
+  <div class="row grow" style="min-height:0">
+    <div style="flex:1.6;min-height:0;display:flex;flex-direction:column"><img class="shot" src="img/video.jpg" alt="Forklaringsvideo i kuglepen-stil om hovedspændinger"></div>
+    <div class="col" style="flex:1;justify-content:center">
+      <div class="card"><h3>Ét begreb pr. video</h3><p class="muted">Kort nok til at se i bussen.</p></div>
+      <div class="card"><h3>Regneeksempler trin for trin</h3><p class="muted">Separate videoer, der regner opgaver.</p></div>
+      <div class="card"><h3>Ca. 1 MB pr. video</h3><p class="muted">Tegnes i browseren, ingen mp4.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="slide alt" data-notes="Til den mundtlige eksamen i Maskinelementer har vi fået en liste med femten spørgsmål. Til hvert spørgsmål har jeg en side, der først oversætter spørgsmålet: hvad beder de egentlig om? Så kommer en svarvejledning og en henvisning til bogens afsnit og sider. Jeg bruger den til at øve, ikke til at lære udenad. Jeg skal stadig selv kunne stå og forklare.">
+  <div class="eyebrow">Værktøj 4 · Mundtlig eksamen</div>
+  <h2>Et svar-lab til hvert eksamensspørgsmål</h2>
+  <div class="row grow" style="min-height:0">
+    <div style="flex:1.6;min-height:0;display:flex;flex-direction:column"><img class="shot" src="img/eksamen.jpg" alt="Side til eksamensspørgsmål 1 om Mohrs cirkel med oversættelse af spørgsmålet og henvisning til bogen"></div>
+    <div class="col" style="flex:1;justify-content:center">
+      <ul class="ticks blue">
+        <li>Spørgsmålet, som det står</li>
+        <li>"Oversat": hvad beder de egentlig om?</li>
+        <li>Henvisning til bogens afsnit og sider</li>
+        <li>Svarvejledning til print</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 8 -->
+<section class="slide" data-notes="To sidste værktøjer. Videnskortet viser, hvordan begreberne hænger sammen på tværs af fag: Mohrs cirkel i Maskinelementer bygger på spænding fra Mekanik, og så videre. Og QuizLive er en quiz i Kahoot-stil, som vi spiller sammen i studiegruppen før eksamen. Spørgsmålene laver Claude ud fra mine noter, og jeg retter dem igennem.">
+  <div class="eyebrow">Overblik og fællesskab</div>
+  <h2>Videnskort og quiz for hele holdet</h2>
+  <div class="row grow" style="min-height:0">
+    <div style="flex:1;min-height:0;display:flex;flex-direction:column"><img class="shot" src="img/videnskort.jpg" alt="Videnskort: graf med 503 begreber og 998 relationer på tværs af fag"><p class="cap">503 begreber, 998 forbindelser på tværs af fag</p></div>
+    <div style="flex:1;min-height:0;display:flex;flex-direction:column"><img class="shot" src="img/quizlive.jpg" alt="QuizLive: indtast spil-PIN for at deltage i en quiz med holdet"><p class="cap">QuizLive: holdet spiller fra mobilen med en PIN</p></div>
+  </div>
+</section>
+
+<!-- 9 -->
+<section class="slide alt" data-notes="Hvordan virker det så? Jeg bruger Claude Code, som er Claude, der kan arbejde direkte i mine mapper. Til venstre ligger mine kilder i en privat mappe på min egen computer. Den kommer aldrig på nettet. I midten har jeg lært Claude nogle faste opskrifter, som kaldes skills. Én kommando, for eksempel studiepakke, laver overblik, quiz og flashcards til et kapitel. Til højre kommer kun mit eget materiale på GitHub, som udgiver det som hjemmeside. Det sidste trin er det vigtigste: jeg læser alt igennem, før det bliver lagt op.">
+  <div class="eyebrow">Sådan virker det</div>
+  <h2>Fra kapitel til færdig studiepakke</h2>
+  <div class="grow"></div>
+  <div class="flow">
+    <div class="step private"><div class="n">1 · Privat mappe</div><h3>Mine kilder</h3><p class="muted">Egne noter, opgaver og kursusplaner. Bliver på min computer.</p></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="n">2 · Claude Code</div><h3>Faste opskrifter</h3><p class="muted">"Skills" beskriver, hvordan en quiz eller et overblik skal se ud.</p></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="n">3 · Jeg tjekker</div><h3>Læs og ret</h3><p class="muted">Tal regnes efter i hånden. Fejl rettes, før noget deles.</p></div>
+    <div class="arrow">→</div>
+    <div class="step public"><div class="n">4 · GitHub Pages</div><h3>Kun eget materiale</h3><p class="muted">Gratis hjemmeside, som holdet kan bruge.</p></div>
+  </div>
+  <div class="grow"></div>
+  <div class="row" style="align-items:center;gap:28px">
+    <div class="cmd mono">/studiepakke MEM1 kapitel 2</div>
+    <p class="muted" style="font-size:24px">Én kommando → overblik-PDF, quiz og flashcards, klar til gennemsyn.</p>
+  </div>
+</section>
+
+<!-- 10 -->
+<section class="slide" data-notes="Nu det vigtige, reglerne. To ting. For det første VIA. Reglerne for AI står i eksamensbeskrivelsen og kan være forskellige fra prøve til prøve. VIA's retningslinjer, for eksempel på socialrådgiveruddannelsen, siger, at du selv skal være forfatter til den faglige tekst, og at AI aldrig er en kilde. Bruger du AI til at finde noget, skal du finde og læse den originale kilde. For det andet ophavsret. Copydan Tekst og Node skriver direkte, at deres standardaftale ikke dækker upload af tekster til AI-tjenester. Og bøger og slides må ikke deles offentligt, heller ikke på GitHub. Det, jeg deler, er mine egne formuleringer, mine egne figurer og henvisninger til bogens sider.">
+  <div class="eyebrow">Reglerne</div>
+  <h2>Inden for VIA's regler og ophavsretten</h2>
+  <div class="row grow" style="min-height:0">
+    <div class="card" style="flex:1">
+      <p><span class="tag b">VIA</span></p>
+      <ul class="ticks blue" style="margin-top:18px">
+        <li><b>Tjek eksamensbeskrivelsen.</b> Reglerne for AI kan variere fra prøve til prøve.</li>
+        <li><b>Du er forfatter</b> til al faglig tekst. AI er ikke medforfatter.</li>
+        <li><b>AI er ikke en kilde.</b> Find og læs den originale kilde.</li>
+        <li><b>Ingen persondata</b> om andre i AI-værktøjer.</li>
+      </ul>
+    </div>
+    <div class="card" style="flex:1">
+      <p><span class="tag">Ophavsret</span></p>
+      <ul class="ticks" style="margin-top:18px">
+        <li><b>Del aldrig bøger eller slides</b> offentligt, heller ikke på GitHub.</li>
+        <li><b>Copydan-kopier må ikke uploades</b> til AI-tjenester. Standardaftalen dækker det ikke.</li>
+        <li><b>Del kun dit eget:</b> egne formuleringer, egne figurer, sidehenvisninger.</li>
+        <li><b>I tvivl?</b> Spørg underviseren eller biblioteket.</li>
+      </ul>
+    </div>
+  </div>
+  <p class="muted" style="font-size:19px;margin-top:18px">Kilder: Tekst &amp; Node, "Alt om kopiaftalen" (tekstognode.dk) · VIA, retningslinjer for generativ AI ved eksamener · din egen eksamensbeskrivelse</p>
+</section>
+
+<!-- 11 -->
+<section class="slide night" data-notes="Hvis I kun husker én ting: brug AI som træningsmakker, ikke som ghostwriter. Lad den forklare, lad den stille jer spørgsmål, lad den finde fejl i jeres løsning. Men det er jer, der skal regne og skrive. Og husk, at AI kan tage fejl, også i regnestykker, der ser overbevisende ud. Derfor regner jeg altid efter mod bogen eller facit.">
+  <div class="eyebrow">Det vigtigste råd</div>
+  <div class="grow"></div>
+  <p class="big-quote">Brug AI som <span>træningsmakker</span>, ikke som ghostwriter.</p>
+  <div class="grow"></div>
+  <div class="row">
+    <div class="card" style="flex:1"><h3>Lad den forklare</h3><p class="muted">"Forklar det, som om jeg ikke har læst kapitlet."</p></div>
+    <div class="card" style="flex:1"><h3>Lad den teste dig</h3><p class="muted">"Stil mig fem kontrolspørgsmål, ét ad gangen."</p></div>
+    <div class="card" style="flex:1"><h3>Tjek altid tallene</h3><p class="muted">AI regner forkert. Regn efter mod bog og facit.</p></div>
+  </div>
+</section>
+
+<!-- 12 -->
+<section class="slide alt" data-notes="Vil I prøve selv, så har jeg lavet en trin-for-trin-guide. Den viser opsætningen med GitHub og Claude, mappestrukturen, de første prompts, og den har en lille quiz om, hvad man må og ikke må. Scan koden, så har I den. Tak for ordet. Er der spørgsmål?">
+  <div class="eyebrow">Prøv selv</div>
+  <div class="row grow" style="align-items:center;gap:72px">
+    <div style="flex:1">
+      <h2 style="font-size:72px">Byg din egen<br>studiehub</h2>
+      <p class="lead muted" style="font-size:30px">En interaktiv trin-for-trin-guide: konti, opsætning, mappestruktur, de første prompts og en quiz om, hvad du må.</p>
+      <p style="margin-top:30px;font-size:24px" class="mono">feddy170317.github.io/studiehub/ai-foredrag/guide.html</p>
+      <p style="margin-top:40px;font-size:40px;font-family:'Space Grotesk',Arial,sans-serif;font-weight:700">Tak. Spørgsmål?</p>
+    </div>
+    <div class="card" style="padding:22px;flex:none"><img src="img/qr-guide.svg" alt="QR-kode til guiden" style="width:340px;height:340px;display:block"></div>
+  </div>
+</section>
+
+</div>
+
+<div id="notes"></div>
+<div id="bar"></div>
+<div id="help">← → skift · N noter · T ur · F fuldskærm</div>
+<div id="hud"><span id="timer"></span><button id="bt" title="Start/stop ur (T)">⏱</button><button id="bn" title="Noter (N)">Noter</button><button id="bp" aria-label="Forrige">‹</button><span id="count"></span><button id="bx" aria-label="Næste">›</button></div>
+
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var stage=document.getElementById('stage'), bar=document.getElementById('bar'),
+      count=document.getElementById('count'), notes=document.getElementById('notes'),
+      timerEl=document.getElementById('timer');
+  var i=0;
+  function fit(){
+    var s=Math.min(window.innerWidth/1600, window.innerHeight/900);
+    stage.style.transform='translate(-50%,-50%) scale('+s+')';
+  }
+  function show(n){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach(function(s,k){s.classList.toggle('on',k===i)});
+    bar.style.width=((i+1)/slides.length*100)+'%';
+    count.textContent=(i+1)+' / '+slides.length;
+    notes.innerHTML='<b>Slide '+(i+1)+':</b> '+(slides[i].getAttribute('data-notes')||'');
+    if(location.hash!=='#'+(i+1)) history.replaceState(null,'','#'+(i+1));
+  }
+  function go(d){show(i+d)}
+  var t0=null, acc=0, tick=null;
+  function fmt(ms){var s=Math.floor(ms/1000);return Math.floor(s/60)+':'+('0'+s%60).slice(-2)}
+  function toggleTimer(){
+    if(tick){acc+=Date.now()-t0;clearInterval(tick);tick=null;return}
+    t0=Date.now();tick=setInterval(function(){var ms=acc+Date.now()-t0;timerEl.textContent=fmt(ms);timerEl.style.color=ms>600000?'#ff7b5c':''},500);
+  }
+  function fs(){var d=document;if(!d.fullscreenElement){(d.documentElement.requestFullscreen||function(){}).call(d.documentElement)}else{d.exitFullscreen()}}
+  document.addEventListener('keydown',function(e){
+    var k=e.key;
+    if(k==='ArrowRight'||k==='PageDown'||k===' '){e.preventDefault();go(1)}
+    else if(k==='ArrowLeft'||k==='PageUp'){e.preventDefault();go(-1)}
+    else if(k==='Home')show(0); else if(k==='End')show(slides.length-1);
+    else if(k==='n'||k==='N')notes.classList.toggle('on');
+    else if(k==='t'||k==='T')toggleTimer();
+    else if(k==='f'||k==='F')fs();
+  });
+  stage.addEventListener('click',function(e){ (e.clientX>window.innerWidth/3)?go(1):go(-1) });
+  var sx=null;
+  document.addEventListener('touchstart',function(e){sx=e.touches[0].clientX},{passive:true});
+  document.addEventListener('touchend',function(e){if(sx===null)return;var dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40)go(dx<0?1:-1);sx=null});
+  document.getElementById('bp').onclick=function(){go(-1)};
+  document.getElementById('bx').onclick=function(){go(1)};
+  document.getElementById('bn').onclick=function(){notes.classList.toggle('on')};
+  document.getElementById('bt').onclick=toggleTimer;
+  window.addEventListener('resize',fit);
+  window.addEventListener('hashchange',function(){var n=parseInt(location.hash.slice(1),10);if(n&&n-1!==i)show(n-1)});
+  fit();
+  show((parseInt(location.hash.slice(1),10)||1)-1);
+})();
+</script>
+</body>
+</html>

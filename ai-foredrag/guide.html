@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Byg din studiehub</title>
+<meta name="description" content="Interaktiv trin-for-trin-guide: sæt Claude og GitHub op til dit studie, byg dit eget studiemateriale og hold dig inden for VIA's regler og ophavsretten.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600;700&display=swap">
+<style>
+:root{
+  --bg:#f6f3ec; --panel:#fffdf8; --ink:#16213a; --muted:#56607a; --line:#ddd6c6;
+  --accent:#c2410c; --accent-soft:#fde3d4; --blue:#1f5fa8; --blue-soft:#dbe8f7;
+  --ok:#15803d; --ok-soft:#dcf2e3; --bad:#b42318; --bad-soft:#fbe0dd; --mid:#a16207; --mid-soft:#fbefc9;
+  --code-bg:#16213a; --code-ink:#f3efe6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1626; --panel:#172137; --ink:#eef1f7; --muted:#a9b3c7; --line:#2b3753;
+    --accent:#ff8a50; --accent-soft:#3a2418; --blue:#7fb0ea; --blue-soft:#1b2c46;
+    --ok:#5fd38d; --ok-soft:#163223; --bad:#ff8a80; --bad-soft:#3a1c1a; --mid:#f2c14e; --mid-soft:#3a3016;
+    --code-bg:#0a101d; --code-ink:#f3efe6;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1626; --panel:#172137; --ink:#eef1f7; --muted:#a9b3c7; --line:#2b3753;
+  --accent:#ff8a50; --accent-soft:#3a2418; --blue:#7fb0ea; --blue-soft:#1b2c46;
+  --ok:#5fd38d; --ok-soft:#163223; --bad:#ff8a80; --bad-soft:#3a1c1a; --mid:#f2c14e; --mid-soft:#3a3016;
+  --code-bg:#0a101d; --code-ink:#f3efe6;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 Inter,"Segoe UI",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:"Space Grotesk","Segoe UI",Arial,sans-serif;line-height:1.15;letter-spacing:-.01em}
+a{color:var(--blue)}
+header.top{max-width:1180px;margin:0 auto;padding:36px 16px 10px;display:flex;gap:16px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}
+header.top h1{font-size:clamp(30px,5vw,46px);margin:0}
+header.top p{margin:6px 0 0;color:var(--muted);max-width:640px}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--panel)}
+.seg button{border:0;background:transparent;color:var(--ink);padding:7px 14px;font:600 14px Inter,Arial,sans-serif;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.prog{max-width:1180px;margin:14px auto 0;padding:0 16px}
+.prog .track{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.prog .fill{height:100%;width:0;background:var(--accent);transition:width .3s}
+.prog small{display:block;margin-top:6px;color:var(--muted)}
+.wrap{max-width:1180px;margin:0 auto;padding:22px 16px 80px;display:grid;grid-template-columns:270px 1fr;gap:28px;align-items:start}
+.wrap > *{min-width:0}
+nav.steps{position:sticky;top:16px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:10px}
+nav.steps ol{list-style:none;margin:0;padding:0}
+nav.steps button{width:100%;display:flex;gap:10px;align-items:center;text-align:left;border:0;background:transparent;color:var(--ink);padding:9px 10px;border-radius:10px;font:500 15px/1.3 Inter,Arial,sans-serif;cursor:pointer}
+nav.steps button:hover{background:var(--bg)}
+nav.steps button[aria-current="step"]{background:var(--accent-soft);font-weight:700}
+nav.steps .dot{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font:700 12px Inter,Arial,sans-serif;color:var(--muted)}
+nav.steps .done .dot{background:var(--ok);border-color:var(--ok);color:#fff}
+main section.step{display:none;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:30px clamp(18px,4vw,40px)}
+main section.step.on{display:block;animation:in .25s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+section.step h2{font-size:clamp(26px,3.6vw,36px);margin:4px 0 8px}
+section.step h3{font-size:21px;margin:28px 0 8px}
+.intro{font-size:19px;color:var(--muted);margin:0 0 18px}
+.box{border-radius:14px;padding:16px 18px;margin:16px 0;border:1px solid var(--line);background:var(--bg)}
+.box.warn{background:var(--accent-soft);border-color:transparent}
+.box.info{background:var(--blue-soft);border-color:transparent}
+.box b:first-child{display:block;margin-bottom:2px}
+ol.do{padding-left:22px} ol.do li{margin:8px 0}
+.kbd{font:600 13px "Cascadia Code",Consolas,monospace;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 6px;background:var(--bg)}
+.code{position:relative;margin:12px 0}
+.code pre{margin:0;background:var(--code-bg);color:var(--code-ink);border-radius:12px;padding:16px 18px;padding-right:86px;overflow:auto;font:14.5px/1.55 "Cascadia Code",Consolas,"Courier New",monospace;white-space:pre}
+.code .copy{position:absolute;top:10px;right:10px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#f3efe6;border-radius:8px;padding:5px 10px;font:600 13px Inter,Arial,sans-serif;cursor:pointer}
+.code .copy:hover{background:rgba(255,255,255,.2)}
+.code .label{display:block;font:600 12px Inter,Arial,sans-serif;color:var(--muted);margin-bottom:4px;letter-spacing:.04em;text-transform:uppercase}
+.prompt{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:10px 0;display:flex;gap:12px;align-items:flex-start;background:var(--bg)}
+.prompt p{margin:0;flex:1}
+.prompt .copy{flex:none;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:5px 10px;font:600 13px Inter,Arial,sans-serif;cursor:pointer}
+.good-bad{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.good-bad > div{border-radius:14px;padding:14px 16px}
+.good-bad .g{background:var(--ok-soft)} .good-bad .b{background:var(--bad-soft)}
+.good-bad h4{margin:0 0 6px;font:700 15px Inter,Arial,sans-serif}
+.good-bad ul{margin:0;padding-left:18px}
+.os-mac .win-only,.os-win .mac-only{display:none}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:30px;padding-top:20px;border-top:1px solid var(--line);flex-wrap:wrap}
+.btn{border:0;border-radius:12px;padding:11px 18px;font:700 15px Inter,Arial,sans-serif;cursor:pointer;background:var(--ink);color:var(--bg)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn:disabled{opacity:.35;cursor:default}
+label.check{display:flex;gap:10px;align-items:center;font-weight:600;cursor:pointer}
+label.check input{width:20px;height:20px;accent-color:var(--ok)}
+/* quiz */
+.q{border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:14px 0;background:var(--bg)}
+.q p.s{margin:0 0 10px;font-weight:600}
+.q .opts{display:flex;gap:8px;flex-wrap:wrap}
+.q .opts button{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:7px 14px;font:600 14px Inter,Arial,sans-serif;cursor:pointer}
+.q .opts button:disabled{cursor:default}
+.q .opts button.right{background:var(--ok);border-color:var(--ok);color:#fff}
+.q .opts button.wrong{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.q .why{display:none;margin:10px 0 0;font-size:15.5px}
+.q.answered .why{display:block}
+.q .verdict{font-weight:700}
+.score{font:700 18px "Space Grotesk",Arial,sans-serif;margin-top:8px}
+.tree{font:14.5px/1.6 "Cascadia Code",Consolas,monospace}
+ul.checklist{list-style:none;padding:0}
+ul.checklist li{margin:8px 0}
+.src{font-size:14px;color:var(--muted)}
+.src li{margin:4px 0}
+@media (max-width:860px){
+  .wrap{grid-template-columns:1fr}
+  nav.steps{position:static}
+  nav.steps ol{display:flex;overflow-x:auto;gap:4px}
+  nav.steps li{flex:none}
+  nav.steps button{white-space:nowrap}
+  nav.steps .t{display:none}
+  nav.steps button[aria-current="step"] .t{display:inline}
+  .good-bad{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body class="os-win">
+
+<header class="top">
+  <div>
+    <div class="eyebrow">Guide · AI i studiet</div>
+    <h1>Byg din egen studiehub</h1>
+    <p>Sæt Claude og GitHub op, lav dit eget studiemateriale, og hold dig inden for VIA's regler og ophavsretten. Ti korte trin.</p>
+  </div>
+  <div class="toolbar">
+    <div class="seg" role="group" aria-label="Styresystem">
+      <button data-os="win" aria-pressed="true">Windows</button>
+      <button data-os="mac" aria-pressed="false">Mac</button>
+    </div>
+    <div class="seg" role="group" aria-label="Tema">
+      <button data-theme-btn="light" aria-pressed="false">Lys</button>
+      <button data-theme-btn="dark" aria-pressed="false">Mørk</button>
+    </div>
+  </div>
+</header>
+
+<div class="prog"><div class="track"><div class="fill" id="fill"></div></div><small id="progtxt"></small></div>
+
+<div class="wrap">
+  <nav class="steps" aria-label="Trin"><ol id="nav"></ol></nav>
+
+  <main id="main">
+
+  <!-- 1 -->
+  <section class="step" data-title="Start her">
+    <div class="eyebrow">Trin 1</div>
+    <h2>Hvad du bygger</h2>
+    <p class="intro">En mappe på din computer, hvor Claude hjælper dig med at lave quizzer, formeloverblik og forklaringer til dine fag. Det færdige materiale kan du lægge på en gratis hjemmeside via GitHub.</p>
+    <div class="good-bad">
+      <div class="g"><h4>Det skal du bruge</h4><ul><li>1–2 timer første gang</li><li>En computer (Windows eller Mac)</li><li>En gratis GitHub-konto</li><li>Et betalt Claude-abonnement til Claude Code (Pro eller højere)</li></ul></div>
+      <div class="b" style="background:var(--blue-soft)"><h4>Det får du</h4><ul><li>En AI, der kender dine fag og dine regler</li><li>Faste opskrifter ("skills") til quiz og overblik</li><li>Din egen hjemmeside med dit materiale</li></ul></div>
+    </div>
+    <h3>Tre begreber</h3>
+    <ul>
+      <li><b>Claude Code:</b> Claude, der arbejder direkte i dine filer og mapper, i stedet for i et chatvindue.</li>
+      <li><b>Git og GitHub:</b> Git gemmer versioner af dine filer. GitHub gemmer dem online og kan vise dem som hjemmeside (GitHub Pages).</li>
+      <li><b>Skill:</b> En opskrift i en tekstfil, som fortæller Claude, hvordan en bestemt opgave skal løses hver gang.</li>
+    </ul>
+    <div class="box info"><b>Ingen kode nødvendig</b>Du skriver på dansk, hvad du vil have. Claude skriver koden, og du tjekker resultatet.</div>
+  </section>
+
+  <!-- 2 -->
+  <section class="step" data-title="Må jeg det?">
+    <div class="eyebrow">Trin 2 · 2 minutter</div>
+    <h2>Må jeg det?</h2>
+    <p class="intro">Inden du går i gang: otte situationer. Gæt, og se forklaringen.</p>
+    <div id="quiz"></div>
+    <div class="score" id="score"></div>
+    <div class="box warn"><b>Reglerne kan variere fra prøve til prøve</b>Reglerne for AI står i studieordningen og eksamensbeskrivelsen for den enkelte prøve. Læs dem, før du bruger AI til noget, der skal afleveres. I tvivl: spørg din underviser.</div>
+  </section>
+
+  <!-- 3 -->
+  <section class="step" data-title="Opret konti">
+    <div class="eyebrow">Trin 3</div>
+    <h2>Opret konti</h2>
+    <h3>GitHub</h3>
+    <ol class="do">
+      <li>Opret en konto på <a href="https://github.com/signup" target="_blank" rel="noopener">github.com/signup</a>.</li>
+      <li>Ansøg om <a href="https://education.github.com/pack" target="_blank" rel="noopener">GitHub Student Developer Pack</a> med din studiemail. Det giver dig gratis GitHub Pro, mens du studerer.</li>
+    </ol>
+    <h3>Claude</h3>
+    <ol class="do">
+      <li>Opret en konto på <a href="https://claude.ai" target="_blank" rel="noopener">claude.ai</a>.</li>
+      <li>Claude Code kræver et betalt abonnement (Pro eller højere). Gratisversionen kan bruges til almindelig chat.</li>
+      <li>Gå til indstillingerne under <b>Privatliv</b>, og beslut, om dine samtaler må bruges til at forbedre modellen. Slå det fra, hvis du er i tvivl.</li>
+    </ol>
+    <div class="box info"><b>Tjek, hvad VIA tilbyder</b>Undersøg, om VIA stiller et AI-værktøj til rådighed med dit VIA-login. Løsninger, som skolen har en aftale om, beskytter ofte dine data bedre.</div>
+    <div class="box warn"><b>Alt, Claude læser, sendes til behandling</b>Når Claude læser en fil, sendes indholdet til Anthropics servere. Læg derfor kun materiale i din studiemappe, som du har ret til at bruge med AI. Mere om det i trin 5.</div>
+  </section>
+
+  <!-- 4 -->
+  <section class="step" data-title="Installér værktøjer">
+    <div class="eyebrow">Trin 4</div>
+    <h2>Installér værktøjerne</h2>
+    <p class="intro">Tre programmer. Vælg dit styresystem øverst på siden.</p>
+    <h3>1 · VS Code</h3>
+    <p>Gratis editor, hvor du ser dine filer og taler med Claude. Hent den på <a href="https://code.visualstudio.com" target="_blank" rel="noopener">code.visualstudio.com</a>.</p>
+    <h3>2 · Git</h3>
+    <div class="win-only">
+      <p>Hent installeren på <a href="https://git-scm.com/downloads" target="_blank" rel="noopener">git-scm.com</a>, eller kør dette i PowerShell:</p>
+      <div class="code"><pre>winget install --id Git.Git -e</pre></div>
+    </div>
+    <div class="mac-only">
+      <p>Åbn Terminal, og kør:</p>
+      <div class="code"><pre>xcode-select --install</pre></div>
+    </div>
+    <h3>3 · Claude Code</h3>
+    <p><b>Nemmest:</b> Åbn VS Code → Udvidelser (<span class="kbd win-only">Ctrl+Shift+X</span><span class="kbd mac-only">Cmd+Shift+X</span>) → søg efter <b>Claude Code</b> fra Anthropic → Installér. Åbn Claude-panelet, og log ind med din Claude-konto.</p>
+    <p><b>Eller i terminalen:</b></p>
+    <div class="code win-only"><span class="label">PowerShell</span><pre>irm https://claude.ai/install.ps1 | iex</pre></div>
+    <div class="code mac-only"><span class="label">Terminal</span><pre>curl -fsSL https://claude.ai/install.sh | bash</pre></div>
+    <h3>Tjek, at det virker</h3>
+    <div class="code"><pre>git --version
+claude --version</pre></div>
+    <p>Begge skal svare med et versionsnummer. Gør de ikke det, så luk terminalen, åbn den igen, og prøv en gang til.</p>
+  </section>
+
+  <!-- 5 -->
+  <section class="step" data-title="Studiemappen">
+    <div class="eyebrow">Trin 5</div>
+    <h2>Lav din studiemappe</h2>
+    <p class="intro">Strukturen er det vigtigste. Den holder det private adskilt fra det, du deler.</p>
+    <div class="code"><pre class="tree">Studie/
+├── CLAUDE.md          ← Claudes husregler (trin 6)
+├── .gitignore         ← det, der ALDRIG må på GitHub
+├── kilder/            ← PRIVAT: dine egne noter og opgaver
+│   └── MEM1/
+├── fag/               ← dit eget materiale, som må deles
+│   └── MEM1/
+└── .claude/
+    └── skills/        ← dine faste opskrifter (trin 8)</pre></div>
+    <div class="win-only">
+      <p>Opret mapperne i PowerShell (fra fx Dokumenter):</p>
+      <div class="code"><pre>mkdir Studie\kilder, Studie\fag, Studie\.claude\skills</pre></div>
+    </div>
+    <div class="mac-only">
+      <p>Opret mapperne i Terminal:</p>
+      <div class="code"><pre>mkdir -p Studie/{kilder,fag,.claude/skills}</pre></div>
+    </div>
+    <p>Åbn mappen i VS Code: <b>File → Open Folder → Studie</b>.</p>
+    <h3>Opret .gitignore</h3>
+    <p>Lav en fil med navnet <code>.gitignore</code> i Studie-mappen. Den sørger for, at dine private kilder aldrig bliver lagt på GitHub:</p>
+    <div class="code"><span class="label">.gitignore</span><pre># Private kilder kommer aldrig på GitHub
+kilder/
+
+# PDF'er fra andre holdes ude (fjern linjen, hvis du selv laver PDF'er)
+*.pdf
+
+# Hemmeligheder
+.env</pre></div>
+    <h3>Hvad må ligge i kilder/?</h3>
+    <div class="good-bad">
+      <div class="g"><h4>Godt at bruge</h4><ul><li>Dine egne noter fra timerne</li><li>Dine egne opgaveløsninger</li><li>Kursusplaner og eksamensspørgsmål, du har fået udleveret</li><li>Åbne kilder (fx frie lærebøger og standarder med åben licens)</li></ul></div>
+      <div class="b"><h4>Kun med tilladelse</h4><ul><li>Lærebøger og kapitler som PDF</li><li>Kompendier, du har fået via VIA (Copydan-kopier)</li><li>Underviserens slides: spørg underviseren først</li><li>Alt med persondata om andre</li></ul></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section class="step" data-title="CLAUDE.md">
+    <div class="eyebrow">Trin 6</div>
+    <h2>Skriv dine husregler</h2>
+    <p class="intro"><code>CLAUDE.md</code> er en tekstfil, som Claude læser hver gang. Her fortæller du, hvem du er, hvordan du lærer bedst, og hvilke regler der gælder.</p>
+    <p>Lav filen i roden af Studie-mappen, og tilpas teksten i [klammer]:</p>
+    <div class="code"><span class="label">CLAUDE.md</span><pre># Mit studie
+Jeg læser [uddannelse] på VIA, [semester]. Fag: [fag 1], [fag 2], [fag 3].
+
+## Sådan hjælper du mig
+- Svar på dansk. Forklar, som om jeg ikke har læst kapitlet endnu.
+- Forklar trin for trin, og stil mig et kontrolspørgsmål bagefter.
+- Når jeg beder dig tjekke en opgave: giv et hint først, ikke hele løsningen.
+- Skriv formler med forklaring af alle symboler og enheder.
+- Sig tydeligt, når du er usikker. Henvis til kapitel og side, så jeg kan tjekke.
+
+## Regler
+- Alt i fag/ skal være mine egne formuleringer.
+  Kopiér aldrig tekst eller figurer fra bøger eller slides.
+- Mappen kilder/ er privat og må aldrig udgives.
+- Ingen persondata om andre (navne, karakterer, CPR) i filer.
+- Skriv aldrig tekst til eksamensafleveringer for mig.</pre></div>
+    <div class="box info"><b>Den bliver bedre over tid</b>Hver gang Claude gør noget, du ikke kan lide, så tilføj en linje i CLAUDE.md. Eller bed Claude om at gøre det: "Tilføj til CLAUDE.md, at du altid skal bruge SI-enheder."</div>
+  </section>
+
+  <!-- 7 -->
+  <section class="step" data-title="Første samtale">
+    <div class="eyebrow">Trin 7</div>
+    <h2>Din første samtale</h2>
+    <p class="intro">Åbn Claude-panelet i VS Code, og prøv en af disse. Ret navne på fag og filer til dine egne.</p>
+    <div id="prompts"></div>
+    <h3>Gode og dårlige vaner</h3>
+    <div class="good-bad">
+      <div class="g"><h4>Træningsmakker</h4><ul><li>"Forklar det, og stil mig spørgsmål"</li><li>"Find fejlen, men giv kun et hint"</li><li>"Lav en quiz ud fra mine noter"</li><li>"Hvor i bogen kan jeg læse mere?"</li></ul></div>
+      <div class="b"><h4>Ghostwriter</h4><ul><li>"Skriv indledningen til vores rapport"</li><li>"Her er hele bogen, lav mine noter"</li><li>"Løs opgaven, så jeg kan aflevere den"</li><li>Stole blindt på tallene</li></ul></div>
+    </div>
+    <div class="box warn"><b>AI kan tage fejl</b>Også i regnestykker, der ser overbevisende ud. Regn altid efter mod bogen, facit eller en håndberegning, før du stoler på et resultat.</div>
+  </section>
+
+  <!-- 8 -->
+  <section class="step" data-title="Din første skill">
+    <div class="eyebrow">Trin 8</div>
+    <h2>Lav din første skill</h2>
+    <p class="intro">Når du har bedt om det samme tre gange, så gør det til en skill. Så får du samme kvalitet hver gang med én kommando.</p>
+    <p>Lav mappen <code>.claude/skills/quiz/</code> og filen <code>SKILL.md</code> i den:</p>
+    <div class="code"><span class="label">.claude/skills/quiz/SKILL.md</span><pre>---
+name: quiz
+description: Lav en quiz med 10 spørgsmål til et kapitel ud fra mine noter.
+  Brug når jeg skriver /quiz eller beder om en quiz.
+---
+
+# Quiz-opskrift
+1. Læs mine noter om emnet i kilder/&lt;fag&gt;/.
+2. Lav 10 multiple choice-spørgsmål: 4 lette, 4 mellem, 2 svære.
+3. Forkerte svar skal være troværdige og omtrent lige så lange som det rigtige.
+4. Bland svarenes rækkefølge, hver gang siden åbnes.
+5. Vis kort forklaringen efter hvert svar.
+6. Gem quizzen som én HTML-fil i fag/&lt;fag&gt;/.
+7. Vis mig spørgsmålene, så jeg kan rette dem, før du er færdig.</pre></div>
+    <p>Brug den sådan i Claude-panelet:</p>
+    <div class="code"><pre>/quiz MEM1 kapitel 2</pre></div>
+    <h3>Idéer til flere skills</h3>
+    <ul>
+      <li><b>/overblik:</b> et formeloverblik pr. kapitel med symboler, enheder og sidehenvisninger</li>
+      <li><b>/flashcards:</b> vendekort med formlens navn på forsiden og formlen på bagsiden</li>
+      <li><b>/forklar:</b> et begreb forklaret i tre niveauer, fra hverdagssprog til eksamensniveau</li>
+    </ul>
+  </section>
+
+  <!-- 9 -->
+  <section class="step" data-title="Læg på GitHub">
+    <div class="eyebrow">Trin 9</div>
+    <h2>Læg det på GitHub</h2>
+    <p class="intro">Så har du en sikkerhedskopi, og du kan dele dit materiale som hjemmeside.</p>
+    <h3>1 · Lav et repository</h3>
+    <p>Gå til <a href="https://github.com/new" target="_blank" rel="noopener">github.com/new</a>, kald det <b>studie</b>, vælg <b>Private</b>, og klik <b>Create repository</b>.</p>
+    <h3>2 · Upload mappen</h3>
+    <p><b>Nemmest:</b> Bed Claude om det: "Læg Studie-mappen op i mit GitHub-repo studie. Tjek først, at intet fra kilder/ kommer med." Claude kører kommandoerne og forklarer dem.</p>
+    <p><b>Eller selv,</b> i terminalen inde i Studie-mappen (skift BRUGERNAVN ud):</p>
+    <div class="code"><pre>git init
+git add .
+git status
+git commit -m "Første version"
+git branch -M main
+git remote add origin https://github.com/BRUGERNAVN/studie.git
+git push -u origin main</pre></div>
+    <div class="box warn"><b>Kig på git status, før du committer</b>Listen viser, hvad der bliver uploadet. Står der noget fra kilder/ eller en PDF fra en bog, så stop og ret .gitignore.</div>
+    <h3>3 · Gør det til en hjemmeside (valgfrit)</h3>
+    <ol class="do">
+      <li>I dit repo: <b>Settings → Pages</b>.</li>
+      <li>Under <b>Source</b>: vælg <b>Deploy from a branch</b>, derefter <b>main</b> og <b>/ (root)</b>, og klik <b>Save</b>.</li>
+      <li>Efter et minut ligger siden på <code>BRUGERNAVN.github.io/studie</code>.</li>
+    </ol>
+    <div class="box warn"><b>Hjemmesiden er offentlig</b>Selvom dit repo er privat, kan alle på internettet se siden. GitHub Pages fra et privat repo kræver GitHub Pro, som du får med Student Pack. Læg kun dit eget materiale derop.</div>
+  </section>
+
+  <!-- 10 -->
+  <section class="step" data-title="Før du deler">
+    <div class="eyebrow">Trin 10</div>
+    <h2>Tjeklisten før du deler</h2>
+    <p class="intro">Gå listen igennem, hver gang du lægger noget nyt op.</p>
+    <ul class="checklist" id="checklist">
+      <li><label class="check"><input type="checkbox"> Alt er mine egne formuleringer og figurer</label></li>
+      <li><label class="check"><input type="checkbox"> Ingen sider, figurer eller slides fra bøger eller undervisere</label></li>
+      <li><label class="check"><input type="checkbox"> Der står kilde på: bog, kapitel og side</label></li>
+      <li><label class="check"><input type="checkbox"> Tal og formler er regnet efter mod bog eller facit</label></li>
+      <li><label class="check"><input type="checkbox"> Ingen persondata om andre</label></li>
+      <li><label class="check"><input type="checkbox"> Jeg har læst AI-reglerne i eksamensbeskrivelsen</label></li>
+    </ul>
+    <div class="box info" id="alldone" style="display:none"><b>Klar til at dele</b>Del linket med dit hold, og lav videre med én skill ad gangen.</div>
+    <h3>Kilder og videre læsning</h3>
+    <ul class="src">
+      <li>Tekst &amp; Node (Copydan): <a href="https://www.tekstognode.dk/kopier/kopiaftalen/" target="_blank" rel="noopener">Alt om kopiaftalen</a>. Standardaftalen dækker ikke prompts til AI-værktøjer, og det er ikke tilladt at uploade tekster til AI-tjenester uden deres særskilte AI-aftale. Kopier må ikke deles på åbne hjemmesider.</li>
+      <li>VIA: retningslinjer for brug af generativ AI ved eksamener (fx Socialrådgiveruddannelsen, opdateret 25.09.2025): AI må ikke være medforfatter og må ikke angives som kilde. De gældende regler for din prøve står i studieordningen og eksamensbeskrivelsen.</li>
+      <li>Anthropic: <a href="https://docs.claude.com/en/docs/claude-code/overview" target="_blank" rel="noopener">dokumentation for Claude Code</a>.</li>
+      <li>GitHub: <a href="https://docs.github.com/en/pages" target="_blank" rel="noopener">dokumentation for GitHub Pages</a>.</li>
+    </ul>
+    <p class="src">Guiden er ikke juridisk rådgivning. Er du i tvivl om ophavsret, så spørg VIA's bibliotek eller din underviser.</p>
+  </section>
+
+    <div class="foot">
+      <button class="btn ghost" id="prev">← Forrige</button>
+      <label class="check"><input type="checkbox" id="donebox"> Markér trinnet som færdigt</label>
+      <button class="btn" id="next">Næste →</button>
+    </div>
+  </main>
+</div>
+
+<script>
+(function(){
+  var store={get:function(k,d){try{var v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},
+             set:function(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+  var KEY='aiGuide.v1', state=store.get(KEY,{step:0,done:[],os:null,checks:[]});
+
+  /* ---------- quiz ---------- */
+  var Q=[
+    ["Bede Claude forklare en udledning fra timen og stille dig kontrolspørgsmål.","ja","Det er præcis det, AI er god til. Det er læring, og du afleverer ikke noget."],
+    ["Lægge underviserens slides på din offentlige GitHub-side, så holdet har dem samlet.","nej","Slides er beskyttet af ophavsret. Del dem kun der, hvor underviseren har lagt dem, fx på VIA's læringsplatform."],
+    ["Dele dit eget formeloverblik med sidehenvisninger til lærebogen.","ja","Formler og fakta er ikke beskyttet, og formuleringerne er dine egne. Henvis til bog, kapitel og side."],
+    ["Uploade kapitler, du har fået udleveret som PDF via VIA, til en AI, så den kan lave noter.","nej","Udleverede kapitler er typisk kopier under Copydan-aftalen. Tekst & Node skriver, at standardaftalen ikke dækker upload til AI-tjenester. Arbejd ud fra dine egne noter."],
+    ["Lade Claude skrive et afsnit til jeres projektrapport.","afh","Tjek eksamensbeskrivelsen. VIA's retningslinjer kræver typisk, at du selv er forfatter til den faglige tekst. Sprogrettelse er oftere tilladt end at lade AI skrive teksten. Oplys, at du har brugt AI, hvis det kræves."],
+    ["Kopiere en figur fra bogen ind i din offentlige quiz.","nej","Figurer er beskyttet ligesom tekst. Tegn din egen, eller bed Claude lave en ny figur ud fra din beskrivelse."],
+    ["Skrive gruppemedlemmernes navne og karakterer i en prompt for at få en oversigt.","nej","Det er persondata om andre. Hold dem ude af AI-værktøjer."],
+    ["Bruge AI til at finde litteratur og derefter angive AI'en som kilde.","nej","AI er ikke en kilde. Find og læs den originale kilde, og henvis til den."]
+  ];
+  var LBL={ja:"Ja",nej:"Nej",afh:"Det kommer an på"}, VERD={ja:"Ja.",nej:"Nej.",afh:"Det kommer an på."};
+  var quiz=document.getElementById('quiz'), right=0, answered=0;
+  function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+  shuffle(Q.slice()).forEach(function(q,n){
+    var d=document.createElement('div');d.className='q';
+    d.innerHTML='<p class="s">'+(n+1)+'. '+q[0]+'</p><div class="opts"></div><p class="why"><span class="verdict"></span> '+q[2]+'</p>';
+    var opts=d.querySelector('.opts');
+    ['ja','nej','afh'].forEach(function(k){
+      var b=document.createElement('button');b.textContent=LBL[k];
+      b.onclick=function(){
+        if(d.classList.contains('answered'))return;
+        d.classList.add('answered');answered++;
+        [].forEach.call(opts.children,function(x){x.disabled=true});
+        var ok=(k===q[1]); if(ok)right++;
+        b.classList.add(ok?'right':'wrong');
+        if(!ok)[].forEach.call(opts.children,function(x){if(x.textContent===LBL[q[1]])x.classList.add('right')});
+        d.querySelector('.verdict').textContent=(ok?'Rigtigt. ':'Ikke helt. ')+VERD[q[1]];
+        if(answered===Q.length)document.getElementById('score').textContent='Du fik '+right+' ud af '+Q.length+' rigtige.';
+      };
+      opts.appendChild(b);
+    });
+    quiz.appendChild(d);
+  });
+
+  /* ---------- prompts ---------- */
+  var P=[
+    "Jeg har lige haft om Mohrs cirkel. Forklar det trin for trin ud fra mine noter i kilder/MEM1/, og stil mig så tre kontrolspørgsmål, ét ad gangen.",
+    "Her er min løsning på opgave 3: [indsæt]. Find fejlen, men giv mig kun et hint, så jeg selv kan rette den.",
+    "Lav et formeloverblik over kapitel 2 ud fra mine noter: symboler, enheder, en kort forklaring pr. formel og en sidehenvisning til bogen. Gem det i fag/MEM1/.",
+    "Lav en quiz med 10 spørgsmål om kapitel 2 ud fra mine noter. Bland svarenes rækkefølge, og gem den som én HTML-fil i fag/MEM1/.",
+    "Hvilke begreber fra Mekanik 1 skal jeg kunne for at forstå kapitel 2? Lav en kort tjekliste."
+  ];
+  var pr=document.getElementById('prompts');
+  P.forEach(function(t){
+    var d=document.createElement('div');d.className='prompt';
+    var p=document.createElement('p');p.textContent=t;
+    var b=document.createElement('button');b.className='copy';b.textContent='Kopiér';
+    b.onclick=function(){copy(t,b)};
+    d.appendChild(p);d.appendChild(b);pr.appendChild(d);
+  });
+
+  /* ---------- copy buttons on code ---------- */
+  function copy(text,btn){
+    var done=function(){var o=btn.textContent;btn.textContent='Kopieret';setTimeout(function(){btn.textContent=o},1400)};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done,function(){fallback(text);done()})}
+    else{fallback(text);done()}
+  }
+  function fallback(t){var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(e){}document.body.removeChild(a)}
+  [].forEach.call(document.querySelectorAll('.code'),function(c){
+    if(c.querySelector('.tree'))return;
+    var b=document.createElement('button');b.className='copy';b.textContent='Kopiér';
+    b.onclick=function(){copy(c.querySelector('pre').textContent,b)};
+    c.appendChild(b);
+  });
+
+  /* ---------- steps ---------- */
+  var steps=[].slice.call(document.querySelectorAll('section.step')), nav=document.getElementById('nav');
+  var donebox=document.getElementById('donebox');
+  steps.forEach(function(s,i){
+    var li=document.createElement('li');
+    var b=document.createElement('button');
+    b.innerHTML='<span class="dot">'+(i+1)+'</span><span class="t">'+s.getAttribute('data-title')+'</span>';
+    b.onclick=function(){go(i)};
+    li.appendChild(b);nav.appendChild(li);
+  });
+  function render(){
+    var i=state.step;
+    steps.forEach(function(s,k){s.classList.toggle('on',k===i)});
+    [].forEach.call(nav.children,function(li,k){
+      li.classList.toggle('done',state.done.indexOf(k)>-1);
+      var b=li.firstChild;if(k===i)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');
+      b.querySelector('.dot').innerHTML=state.done.indexOf(k)>-1?'✓':String(k+1);
+    });
+    donebox.checked=state.done.indexOf(i)>-1;
+    document.getElementById('prev').disabled=i===0;
+    document.getElementById('next').textContent=i===steps.length-1?'Færdig ✓':'Næste →';
+    var pct=Math.round(state.done.length/steps.length*100);
+    document.getElementById('fill').style.width=pct+'%';
+    document.getElementById('progtxt').textContent=state.done.length+' af '+steps.length+' trin færdige';
+    store.set(KEY,state);
+  }
+  function go(i){state.step=Math.max(0,Math.min(steps.length-1,i));render();
+    var top=document.querySelector('.wrap').getBoundingClientRect().top+window.scrollY-10;
+    if(window.scrollY>top)window.scrollTo(0,top);}
+  function markDone(i,on){var k=state.done.indexOf(i);if(on&&k<0)state.done.push(i);if(!on&&k>-1)state.done.splice(k,1)}
+  donebox.onchange=function(){markDone(state.step,donebox.checked);render()};
+  document.getElementById('prev').onclick=function(){go(state.step-1)};
+  document.getElementById('next').onclick=function(){markDone(state.step,true);if(state.step<steps.length-1)go(state.step+1);else render()};
+
+  /* ---------- checklist ---------- */
+  var cbs=[].slice.call(document.querySelectorAll('#checklist input'));
+  function upd(){document.getElementById('alldone').style.display=cbs.every(function(c){return c.checked})?'block':'none';
+    state.checks=cbs.map(function(c){return c.checked});store.set(KEY,state)}
+  cbs.forEach(function(c,k){c.checked=!!(state.checks&&state.checks[k]);c.onchange=upd});upd();
+
+  /* ---------- OS + theme ---------- */
+  var os=state.os||(/Mac|iPhone|iPad/.test(navigator.platform||navigator.userAgent)?'mac':'win');
+  function setOS(v){os=v;state.os=v;document.body.classList.toggle('os-mac',v==='mac');document.body.classList.toggle('os-win',v==='win');
+    [].forEach.call(document.querySelectorAll('[data-os]'),function(b){b.setAttribute('aria-pressed',b.getAttribute('data-os')===v)});store.set(KEY,state)}
+  [].forEach.call(document.querySelectorAll('[data-os]'),function(b){b.onclick=function(){setOS(b.getAttribute('data-os'))}});
+  setOS(os);
+  var theme=store.get('aiGuide.theme',null);
+  function setTheme(v){theme=v;if(v)document.documentElement.setAttribute('data-theme',v);else document.documentElement.removeAttribute('data-theme');
+    [].forEach.call(document.querySelectorAll('[data-theme-btn]'),function(b){b.setAttribute('aria-pressed',b.getAttribute('data-theme-btn')===v)});store.set('aiGuide.theme',v)}
+  [].forEach.call(document.querySelectorAll('[data-theme-btn]'),function(b){b.onclick=function(){var v=b.getAttribute('data-theme-btn');setTheme(theme===v?null:v)}});
+  setTheme(theme);
+
+  render();
+})();
+</script>
+</body>
+</html>
