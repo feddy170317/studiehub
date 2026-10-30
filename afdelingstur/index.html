@@ -146,7 +146,7 @@ textarea { resize: vertical; min-height: 64px; }
 <body>
 <div class="wrap">
   <header>
-    <div class="eyebrow">EV · Blok 2 · JSF (35) · Lakrummet</div>
+    <div class="eyebrow">EV · Blok 2 · JSF · Lakrummet</div>
     <h1>Afdelingsturen</h1>
     <p class="lede">Foreslå en aktivitet og et spisested i Aarhus-området, og stem på dem du helst vil. Du har 3 stemmer i hver afstemning, og du kan flytte dem rundt, indtil afstemningen lukker.</p>
   </header>
@@ -227,7 +227,7 @@ textarea { resize: vertical; min-height: 64px; }
   var TEAMS = [
     { id: 'ev', name: 'EV', size: 8, color: 'var(--ev)' },
     { id: 'b2', name: 'Blok 2', size: 10, color: 'var(--b2)' },
-    { id: 'jsf', name: 'JSF (35)', size: 10, approx: true, color: 'var(--jsf)' },
+    { id: 'jsf', name: 'JSF', size: 10, approx: true, color: 'var(--jsf)' },
     { id: 'lak', name: 'Lakrummet', size: null, color: 'var(--lak)' },
     { id: 'andet', name: 'Andet', size: 0, hide: true, color: 'var(--andet)' }
   ];
@@ -273,7 +273,7 @@ textarea { resize: vertical; min-height: 64px; }
   function saveMe() { try { localStorage.setItem('afdtur_me', JSON.stringify(me)); } catch (e) {} }
 
   /* ---------- navn + hold ---------- */
-  $('g-teams').innerHTML = TEAMS.map(function (t) {
+  $('g-teams').innerHTML = TEAMS.filter(function (t) { return !t.hide; }).map(function (t) {
     return '<label><input type="radio" name="g-team" value="' + t.id + '"><span class="dot" style="background:' + t.color + '"></span>' + esc(t.name) + '</label>';
   }).join('');
   function openGate() {
