@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Afdelingsturen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: én smal kolonne som et opslag på kaffestuens tavle — hold-tæller øverst, faneblade for de to afstemninger, forslagskort sorteret efter stemmer. */
+:root {
+  --bg: #e9eef1;
+  --surface: #ffffff;
+  --ink: #14212c;
+  --muted: #5b6b78;
+  --line: #d3dbe1;
+  --accent: #0b6e7a;
+  --accent-ink: #ffffff;
+  --accent-soft: #d6ecee;
+  --lead: #c4561a;
+  --ev: #1f7a8c;
+  --b2: #d39a1c;
+  --h530: #7a4a8c;
+  --andet: #8a96a0;
+  --danger: #b3261e;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Figtree", "Segoe UI", system-ui, sans-serif;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f171d; --surface: #17232b; --ink: #e6edf1; --muted: #93a4b1; --line: #2a3a45;
+    --accent: #4fb7c3; --accent-ink: #08252a; --accent-soft: #163a40; --lead: #f08a4b;
+    --ev: #4fb7c3; --b2: #e8b74a; --h530: #b58ad0; --andet: #7c8a95; --danger: #ef7a70;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 16px/1.5 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: max(20px, env(safe-area-inset-top, 0px)) 48px;
+}
+.wrap { max-width: 760px; margin: 0 auto; display: grid; gap: 22px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.1; }
+h1 { font-size: clamp(2rem, 6vw, 2.9rem); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: 1.25rem; font-weight: 800; }
+.eyebrow { font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.lede { margin: 8px 0 0; color: var(--muted); max-width: 60ch; }
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.who { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: .92rem; color: var(--muted); }
+.who strong { color: var(--ink); }
+.linkbtn { background: none; border: 0; padding: 0; color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+
+/* hold-tæller */
+.teams { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.team { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; display: grid; gap: 6px; }
+.team .tname { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: .92rem; }
+.dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.team .tcount { font-family: var(--display); font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; }
+.team .tcount small { font-family: var(--body); font-size: .85rem; font-weight: 500; color: var(--muted); }
+.meter { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.meter i { display: block; height: 100%; border-radius: 3px; }
+.teams-note { font-size: .82rem; color: var(--muted); margin-top: -12px; }
+
+/* faner */
+.tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 4px; }
+.tab { border: 0; background: none; border-radius: 7px; padding: 10px 8px; font-weight: 700; display: flex; justify-content: center; align-items: baseline; gap: 8px; }
+.tab .tsub { font-weight: 500; font-size: .82rem; color: var(--muted); }
+.tab[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); }
+.tab[aria-selected="true"] .tsub { color: inherit; opacity: .8; }
+
+.panel { display: grid; gap: 12px; }
+.panel-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px; }
+.budget { display: flex; align-items: center; gap: 6px; font-size: .9rem; color: var(--muted); }
+.pip { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--accent); }
+.pip.on { background: var(--accent); }
+
+.list { display: grid; gap: 10px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 14px; }
+.card.lead { border-color: var(--lead); box-shadow: inset 4px 0 0 var(--lead); }
+.card h3 { font-size: 1.12rem; font-weight: 600; display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+.badge { font-family: var(--body); font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--lead); }
+.note { margin: 4px 0 0; color: var(--ink); overflow-wrap: anywhere; }
+.meta { margin: 6px 0 0; font-size: .82rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.meta a { color: var(--accent); overflow-wrap: anywhere; }
+.vote { align-self: start; display: grid; justify-items: center; gap: 2px; min-width: 64px; border: 2px solid var(--accent); background: var(--surface); color: var(--accent); border-radius: 10px; padding: 6px 10px; }
+.vote .n { font-family: var(--display); font-size: 1.5rem; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.vote .l { font-size: .72rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.vote[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.vote:disabled { opacity: .45; cursor: not-allowed; }
+.bar { grid-column: 1 / -1; display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--line); }
+.bar i { display: block; height: 100%; }
+.voters { grid-column: 1 / -1; font-size: .82rem; color: var(--muted); margin: -4px 0 0; }
+.del { grid-column: 1 / -1; justify-self: start; background: none; border: 0; padding: 0; font-size: .82rem; color: var(--danger); text-decoration: underline; text-underline-offset: 3px; }
+
+.empty { background: var(--surface); border: 1px dashed var(--line); border-radius: var(--r); padding: 18px; color: var(--muted); text-align: center; }
+
+form.add { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; display: grid; gap: 10px; }
+form.add h3 { font-size: 1.05rem; }
+.field { display: grid; gap: 4px; }
+.field label { font-size: .85rem; font-weight: 600; }
+.field .hint { font-size: .78rem; color: var(--muted); font-weight: 400; }
+input[type=text], input[type=url], textarea, select {
+  width: 100%; border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 10px 12px;
+}
+textarea { resize: vertical; min-height: 64px; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btn { border: 0; background: var(--accent); color: var(--accent-ink); font-weight: 700; border-radius: 8px; padding: 10px 18px; }
+.btn.ghost { background: none; color: var(--accent); border: 1px solid var(--line); }
+.msg { font-size: .85rem; color: var(--muted); }
+.msg.err { color: var(--danger); }
+
+/* navne-dialog */
+.gate { position: fixed; inset: 0; background: rgba(10, 20, 28, .55); display: grid; place-items: center; padding: 16px; z-index: 10; }
+.gate form { background: var(--surface); border-radius: 14px; padding: 22px; width: min(420px, 100%); display: grid; gap: 14px; }
+.teampick { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.teampick label { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 10px; font-weight: 600; cursor: pointer; }
+.teampick input { accent-color: var(--accent); }
+.teampick label:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+
+.status { font-size: .82rem; color: var(--muted); text-align: center; }
+.status.err { color: var(--danger); }
+
+@media (max-width: 520px) {
+  .teams { gap: 6px; }
+  .team { padding: 10px; }
+  .team .tname { font-size: .8rem; }
+  .tab { flex-direction: column; align-items: center; gap: 0; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .card { transition: border-color .2s; }
+  .meter i, .bar i { transition: width .3s; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">EV · Blok 2 · 5:30</div>
+    <h1>Afdelingsturen</h1>
+    <p class="lede">Foreslå en aktivitet og et spisested i Aarhus-området, og stem på dem du helst vil. Du har 3 stemmer i hver afstemning, og du kan flytte dem rundt, indtil afstemningen lukker.</p>
+  </header>
+
+  <div class="who" id="who"></div>
+
+  <section aria-label="Hvem har stemt">
+    <div class="teams" id="teams"></div>
+  </section>
+  <p class="teams-note">Antal kolleger på hvert hold, der har afgivet mindst én stemme.</p>
+
+  <div class="tabs" role="tablist" aria-label="Afstemninger">
+    <button class="tab" role="tab" id="tab-aktivitet" aria-controls="panel" aria-selected="true" data-cat="aktivitet" type="button">Aktivitet <span class="tsub" id="tsub-aktivitet"></span></button>
+    <button class="tab" role="tab" id="tab-mad" aria-controls="panel" aria-selected="false" data-cat="mad" type="button">Spisested <span class="tsub" id="tsub-mad"></span></button>
+  </div>
+
+  <section class="panel" id="panel" role="tabpanel">
+    <div class="panel-head">
+      <h2 id="panel-title">Hvad skal vi lave?</h2>
+      <div class="budget" id="budget"></div>
+    </div>
+    <div class="list" id="list"><div class="empty">Henter forslag …</div></div>
+
+    <form class="add" id="add" autocomplete="off">
+      <h3 id="add-title">Foreslå en aktivitet</h3>
+      <div class="field">
+        <label for="f-title">Navn</label>
+        <input type="text" id="f-title" maxlength="60" required>
+      </div>
+      <div class="field">
+        <label for="f-note">Kort beskrivelse <span class="hint">(valgfri: hvor, pris, varighed)</span></label>
+        <textarea id="f-note" maxlength="240"></textarea>
+      </div>
+      <div class="field">
+        <label for="f-link">Link <span class="hint">(valgfrit: hjemmeside eller menukort)</span></label>
+        <input type="url" id="f-link" maxlength="300" placeholder="https://">
+      </div>
+      <div class="row">
+        <button class="btn" type="submit">Tilføj forslag</button>
+        <span class="msg" id="add-msg"></span>
+      </div>
+    </form>
+  </section>
+
+  <p class="status" id="status">Forbinder …</p>
+</div>
+
+<div class="gate" id="gate" hidden>
+  <form id="gate-form" autocomplete="off">
+    <div>
+      <h2>Hvem er du?</h2>
+      <p class="lede">Dit navn vises ved dine forslag og stemmer, så vi kan se at alle er med.</p>
+    </div>
+    <div class="field">
+      <label for="g-name">Navn</label>
+      <input type="text" id="g-name" maxlength="30" required>
+    </div>
+    <div class="field">
+      <label>Hold</label>
+      <div class="teampick" id="g-teams"></div>
+    </div>
+    <div class="row">
+      <button class="btn" type="submit">Gem</button>
+      <button class="btn ghost" type="button" id="g-cancel" hidden>Annuller</button>
+      <span class="msg err" id="g-msg"></span>
+    </div>
+  </form>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var MAX_VOTES = 3;
+  var TEAMS = [
+    { id: 'ev', name: 'EV', size: 8, color: 'var(--ev)' },
+    { id: 'b2', name: 'Blok 2', size: 10, color: 'var(--b2)' },
+    { id: 'h530', name: '5:30', size: 10, color: 'var(--h530)' },
+    { id: 'andet', name: 'Andet', size: 0, color: 'var(--andet)' }
+  ];
+  var TEAM = {}; TEAMS.forEach(function (t) { TEAM[t.id] = t; });
+  var CATS = {
+    aktivitet: { title: 'Hvad skal vi lave?', add: 'Foreslå en aktivitet', ph: 'Fx minigolf, gokart, escape room' },
+    mad: { title: 'Hvor skal vi spise?', add: 'Foreslå et spisested i Aarhus-området', ph: 'Fx Aarhus Street Food' }
+  };
+  var SEED = [
+    ['aktivitet', 'Minigolf', 'Hyggeligt og alle kan være med.'],
+    ['aktivitet', 'Escape room', 'Hold på 4–6, der skal løse opgaver mod uret.'],
+    ['aktivitet', 'Gokart', 'Indendørs bane med tidtagning.'],
+    ['aktivitet', 'Fisketur', 'Put & take eller tur ud på vandet.'],
+    ['aktivitet', 'Bowling', 'Baner til hele afdelingen på én gang.'],
+    ['aktivitet', 'Bankospil', 'Kan kombineres med maden.'],
+    ['mad', 'Aarhus Street Food', 'Mange boder, så alle kan vælge selv.'],
+    ['mad', 'Flammen', 'Buffet med grill.'],
+    ['mad', 'Jensens Bøfhus', 'Bøf og klassikere.'],
+    ['mad', "Bone's", 'Spareribs og burgere.'],
+    ['mad', "Sticks'n'Sushi", 'Sushi og yakitori.']
+  ];
+
+  var ADMIN = location.hash === '#arrangoer';
+  var me = loadMe();
+  var cat = 'aktivitet';
+  try { if (localStorage.getItem('afdtur_tab') === 'mad') cat = 'mad'; } catch (e) {}
+  var suggestions = {}, votes = {}, ready = { s: false, v: false };
+  var db, sRef, vRef, pendingDelete = null;
+
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function safeUrl(u) { return /^https?:\/\//i.test(u || '') ? u : ''; }
+
+  function loadMe() {
+    var m = null;
+    try { m = JSON.parse(localStorage.getItem('afdtur_me') || 'null'); } catch (e) {}
+    if (!m || !m.key) {
+      m = m || {};
+      m.key = 'v' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    }
+    return m;
+  }
+  function saveMe() { try { localStorage.setItem('afdtur_me', JSON.stringify(me)); } catch (e) {} }
+
+  /* ---------- navn + hold ---------- */
+  $('g-teams').innerHTML = TEAMS.map(function (t) {
+    return '<label><input type="radio" name="g-team" value="' + t.id + '"><span class="dot" style="background:' + t.color + '"></span>' + esc(t.name) + '</label>';
+  }).join('');
+  function openGate() {
+    $('g-name').value = me.name || '';
+    var r = document.querySelector('input[name=g-team][value="' + (me.team || '') + '"]');
+    if (r) r.checked = true;
+    $('g-cancel').hidden = !me.name;
+    $('g-msg').textContent = '';
+    $('gate').hidden = false;
+    setTimeout(function () { $('g-name').focus(); }, 30);
+  }
+  $('g-cancel').onclick = function () { $('gate').hidden = true; };
+  $('gate-form').onsubmit = function (e) {
+    e.preventDefault();
+    var name = $('g-name').value.trim();
+    var t = document.querySelector('input[name=g-team]:checked');
+    if (!name) { $('g-msg').textContent = 'Skriv dit navn.'; return; }
+    if (!t) { $('g-msg').textContent = 'Vælg dit hold.'; return; }
+    me.name = name; me.team = t.value; saveMe();
+    $('gate').hidden = true;
+    if (vRef && votes[me.key]) vRef.child(me.key).update({ name: me.name, team: me.team });
+    render();
+  };
+
+  /* ---------- faner ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
+    b.onclick = function () {
+      cat = b.dataset.cat;
+      try { localStorage.setItem('afdtur_tab', cat); } catch (e) {}
+      pendingDelete = null;
+      render();
+    };
+  });
+
+  /* ---------- beregning ---------- */
+  function tally(c) {
+    var rows = {};
+    Object.keys(suggestions).forEach(function (id) {
+      var s = suggestions[id];
+      if (s.cat === c) rows[id] = { id: id, s: s, voters: [] };
+    });
+    Object.keys(votes).forEach(function (k) {
+      var v = votes[k], picks = (v && v[c]) || {};
+      Object.keys(picks).forEach(function (sid) {
+        if (rows[sid]) rows[sid].voters.push({ key: k, name: v.name || 'Ukendt', team: v.team || 'andet' });
+      });
+    });
+    return Object.keys(rows).map(function (id) { return rows[id]; }).sort(function (a, b) {
+      return b.voters.length - a.voters.length || (a.s.createdAt || 0) - (b.s.createdAt || 0);
+    });
+  }
+  function myPicks(c) {
+    var v = votes[me.key], picks = (v && v[c]) || {};
+    return Object.keys(picks).filter(function (sid) { return suggestions[sid] && suggestions[sid].cat === c; });
+  }
+
+  /* ---------- tegning ---------- */
+  function render() {
+    // hvem
+    $('who').innerHTML = me.name
+      ? 'Du stemmer som <strong>' + esc(me.name) + '</strong> (' + esc((TEAM[me.team] || TEAM.andet).name) + ') <button class="linkbtn" id="who-edit" type="button">Skift</button>' + (ADMIN ? ' · <strong>Arrangør-tilstand</strong>: du kan slette alle forslag.' : '')
+      : '<button class="linkbtn" id="who-edit" type="button">Skriv dit navn for at stemme</button>';
+    $('who-edit').onclick = openGate;
+
+    // hold-tæller
+    var active = {};
+    Object.keys(votes).forEach(function (k) {
+      var v = votes[k];
+      var n = Object.keys((v && v.aktivitet) || {}).length + Object.keys((v && v.mad) || {}).length;
+      if (n > 0) active[v.team || 'andet'] = (active[v.team || 'andet'] || 0) + 1;
+    });
+    $('teams').innerHTML = TEAMS.filter(function (t) { return t.size > 0; }).map(function (t) {
+      var n = active[t.id] || 0, pct = Math.min(100, Math.round(n / t.size * 100));
+      return '<div class="team"><div class="tname"><span class="dot" style="background:' + t.color + '"></span>' + esc(t.name) + '</div>' +
+        '<div class="tcount">' + n + ' <small>af ' + (t.id === 'h530' ? 'ca. ' : '') + t.size + '</small></div>' +
+        '<div class="meter"><i style="width:' + pct + '%;background:' + t.color + '"></i></div></div>';
+    }).join('');
+
+    // faner
+    Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
+      b.setAttribute('aria-selected', String(b.dataset.cat === cat));
+    });
+    ['aktivitet', 'mad'].forEach(function (c) {
+      var n = tally(c).length;
+      $('tsub-' + c).textContent = n + (n === 1 ? ' forslag' : ' forslag');
+    });
+
+    var C = CATS[cat];
+    $('panel-title').textContent = C.title;
+    $('add-title').textContent = C.add;
+    $('f-title').placeholder = C.ph;
+
+    var mine = myPicks(cat), left = MAX_VOTES - mine.length;
+    var pips = '';
+    for (var i = 0; i < MAX_VOTES; i++) pips += '<span class="pip' + (i < mine.length ? ' on' : '') + '"></span>';
+    $('budget').innerHTML = pips + '<span>' + (left > 0 ? left + ' ' + (left === 1 ? 'stemme' : 'stemmer') + ' tilbage' : 'Alle 3 stemmer brugt') + '</span>';
+
+    if (!ready.s || !ready.v) return;
+    var rows = tally(cat);
+    if (!rows.length) {
+      $('list').innerHTML = '<div class="empty">Ingen forslag endnu. Tilføj det første nedenfor.</div>';
+      return;
+    }
+    var top = rows[0].voters.length;
+    $('list').innerHTML = rows.map(function (r) {
+      var s = r.s, n = r.voters.length, mineOn = mine.indexOf(r.id) >= 0;
+      var isLead = n > 0 && n === top;
+      var byTeam = {};
+      r.voters.forEach(function (v) { byTeam[v.team] = (byTeam[v.team] || 0) + 1; });
+      var bar = n ? TEAMS.map(function (t) {
+        return byTeam[t.id] ? '<i style="width:' + (byTeam[t.id] / n * 100) + '%;background:' + t.color + '" title="' + esc(t.name) + ': ' + byTeam[t.id] + '"></i>' : '';
+      }).join('') : '';
+      var url = safeUrl(s.link);
+      var canDel = ADMIN || (s.byKey && s.byKey === me.key);
+      var delBtn = '';
+      if (canDel) {
+        delBtn = pendingDelete === r.id
+          ? '<button class="del" type="button" data-del="' + r.id + '" data-confirm="1">Klik igen for at slette «' + esc(s.title) + '»' + (n ? ' (' + n + ' stemmer forsvinder)' : '') + '</button>'
+          : '<button class="del" type="button" data-del="' + r.id + '">Slet forslag</button>';
+      }
+      return '<article class="card' + (isLead ? ' lead' : '') + '">' +
+        '<div><h3>' + esc(s.title) + (isLead ? ' <span class="badge">Fører' + (rows.filter(function (x) { return x.voters.length === top; }).length > 1 ? ' (delt)' : '') + '</span>' : '') + '</h3>' +
+        (s.note ? '<p class="note">' + esc(s.note) + '</p>' : '') +
+        '<p class="meta"><span>Foreslået af ' + esc(s.byName || 'arrangøren') + (s.byTeam && TEAM[s.byTeam] ? ' (' + esc(TEAM[s.byTeam].name) + ')' : '') + '</span>' +
+        (url ? '<a href="' + esc(url) + '" target="_blank" rel="noopener">Se hjemmeside ↗</a>' : '') + '</p></div>' +
+        '<button class="vote" type="button" data-vote="' + r.id + '" aria-pressed="' + mineOn + '"' + (!mineOn && left <= 0 ? ' disabled title="Fjern en af dine stemmer først"' : '') + ' aria-label="' + (mineOn ? 'Fjern din stemme fra ' : 'Stem på ') + esc(s.title) + '">' +
+        '<span class="n">' + n + '</span><span class="l">' + (mineOn ? 'Din stemme' : 'Stem') + '</span></button>' +
+        '<div class="bar" aria-hidden="true">' + bar + '</div>' +
+        (n ? '<p class="voters">' + r.voters.map(function (v) { return esc(v.name); }).join(', ') + '</p>' : '') +
+        delBtn + '</article>';
+    }).join('');
+  }
+
+  /* ---------- handlinger ---------- */
+  $('list').addEventListener('click', function (e) {
+    var vb = e.target.closest('[data-vote]');
+    if (vb) return toggleVote(vb.dataset.vote);
+    var db_ = e.target.closest('[data-del]');
+    if (db_) {
+      var id = db_.dataset.del;
+      if (db_.dataset.confirm) {
+        pendingDelete = null;
+        sRef.child(id).remove().catch(fail);
+      } else { pendingDelete = id; render(); }
+    }
+  });
+
+  function toggleVote(sid) {
+    if (!me.name) return openGate();
+    var on = myPicks(cat).indexOf(sid) >= 0;
+    if (!on && myPicks(cat).length >= MAX_VOTES) return;
+    var upd = { name: me.name, team: me.team || 'andet' };
+    upd[cat + '/' + sid] = on ? null : true;
+    vRef.child(me.key).update(upd).catch(fail);
+  }
+
+  $('add').onsubmit = function (e) {
+    e.preventDefault();
+    if (!me.name) return openGate();
+    var title = $('f-title').value.trim(), note = $('f-note').value.trim(), link = $('f-link').value.trim();
+    var msg = $('add-msg');
+    msg.className = 'msg';
+    if (!title) { msg.className = 'msg err'; msg.textContent = 'Skriv et navn på forslaget.'; return; }
+    if (link && !safeUrl(link)) { msg.className = 'msg err'; msg.textContent = 'Linket skal starte med https://'; return; }
+    var dupe = Object.keys(suggestions).some(function (id) {
+      var s = suggestions[id];
+      return s.cat === cat && s.title.trim().toLowerCase() === title.toLowerCase();
+    });
+    if (dupe) { msg.className = 'msg err'; msg.textContent = '«' + title + '» er allerede foreslået. Stem på det i listen.'; return; }
+    sRef.push({
+      cat: cat, title: title, note: note, link: link,
+      byName: me.name, byTeam: me.team || 'andet', byKey: me.key,
+      createdAt: firebase.database.ServerValue.TIMESTAMP
+    }).then(function () {
+      $('f-title').value = ''; $('f-note').value = ''; $('f-link').value = '';
+      msg.textContent = 'Tilføjet. Husk at stemme på det, hvis du vil have det.';
+    }).catch(fail);
+  };
+
+  function fail(err) {
+    $('status').className = 'status err';
+    $('status').textContent = 'Kunne ikke gemme (' + (err && err.code || 'fejl') + '). Tjek forbindelsen og prøv igen.';
+  }
+
+  /* ---------- firebase ---------- */
+  render();
+  if (!me.name) openGate();
+  try {
+    firebase.initializeApp(window.FIREBASE_CONFIG);
+    db = firebase.database();
+  } catch (e) { fail({ code: 'init' }); return; }
+  var root = db.ref('afdelingstur');
+  sRef = root.child('suggestions');
+  vRef = root.child('votes');
+
+  root.child('meta/seeded').transaction(function (cur) { return cur ? undefined : true; }, function (err, committed) {
+    if (err || !committed) return;
+    var base = Date.now();
+    SEED.forEach(function (s, i) {
+      sRef.push({ cat: s[0], title: s[1], note: s[2], link: '', byName: 'arrangøren', byTeam: '', byKey: 'seed', createdAt: base + i });
+    });
+  });
+
+  sRef.on('value', function (snap) { suggestions = snap.val() || {}; ready.s = true; render(); }, fail);
+  vRef.on('value', function (snap) { votes = snap.val() || {}; ready.v = true; render(); }, fail);
+  db.ref('.info/connected').on('value', function (snap) {
+    var s = $('status');
+    s.className = 'status';
+    s.textContent = snap.val() ? 'Opdateres live. Alle med linket ser de samme tal.' : 'Forbinder …';
+  });
+})();
+</script>
+</body>
+</html>
