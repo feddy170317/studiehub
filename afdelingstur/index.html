@@ -22,7 +22,8 @@
   --lead: #c4561a;
   --ev: #1f7a8c;
   --b2: #d39a1c;
-  --h530: #7a4a8c;
+  --jsf: #7a4a8c;
+  --lak: #b84a5e;
   --andet: #8a96a0;
   --danger: #b3261e;
   --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
@@ -33,10 +34,11 @@
   :root {
     --bg: #0f171d; --surface: #17232b; --ink: #e6edf1; --muted: #93a4b1; --line: #2a3a45;
     --accent: #4fb7c3; --accent-ink: #08252a; --accent-soft: #163a40; --lead: #f08a4b;
-    --ev: #4fb7c3; --b2: #e8b74a; --h530: #b58ad0; --andet: #7c8a95; --danger: #ef7a70;
+    --ev: #4fb7c3; --b2: #e8b74a; --jsf: #b58ad0; --lak: #e07a8c; --andet: #7c8a95; --danger: #ef7a70;
   }
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0; background: var(--bg); color: var(--ink);
@@ -60,7 +62,7 @@ button { cursor: pointer; }
 .linkbtn { background: none; border: 0; padding: 0; color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
 
 /* hold-tæller */
-.teams { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.teams { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
 .team { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; display: grid; gap: 6px; }
 .team .tname { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: .92rem; }
 .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
@@ -144,7 +146,7 @@ textarea { resize: vertical; min-height: 64px; }
 <body>
 <div class="wrap">
   <header>
-    <div class="eyebrow">EV · Blok 2 · 5:30</div>
+    <div class="eyebrow">EV · Blok 2 · JSF (35) · Lakrummet</div>
     <h1>Afdelingsturen</h1>
     <p class="lede">Foreslå en aktivitet og et spisested i Aarhus-området, og stem på dem du helst vil. Du har 3 stemmer i hver afstemning, og du kan flytte dem rundt, indtil afstemningen lukker.</p>
   </header>
@@ -225,8 +227,9 @@ textarea { resize: vertical; min-height: 64px; }
   var TEAMS = [
     { id: 'ev', name: 'EV', size: 8, color: 'var(--ev)' },
     { id: 'b2', name: 'Blok 2', size: 10, color: 'var(--b2)' },
-    { id: 'h530', name: '5:30', size: 10, color: 'var(--h530)' },
-    { id: 'andet', name: 'Andet', size: 0, color: 'var(--andet)' }
+    { id: 'jsf', name: 'JSF (35)', size: 10, approx: true, color: 'var(--jsf)' },
+    { id: 'lak', name: 'Lakrummet', size: null, color: 'var(--lak)' },
+    { id: 'andet', name: 'Andet', size: 0, hide: true, color: 'var(--andet)' }
   ];
   var TEAM = {}; TEAMS.forEach(function (t) { TEAM[t.id] = t; });
   var CATS = {
@@ -342,10 +345,10 @@ textarea { resize: vertical; min-height: 64px; }
       var n = Object.keys((v && v.aktivitet) || {}).length + Object.keys((v && v.mad) || {}).length;
       if (n > 0) active[v.team || 'andet'] = (active[v.team || 'andet'] || 0) + 1;
     });
-    $('teams').innerHTML = TEAMS.filter(function (t) { return t.size > 0; }).map(function (t) {
-      var n = active[t.id] || 0, pct = Math.min(100, Math.round(n / t.size * 100));
+    $('teams').innerHTML = TEAMS.filter(function (t) { return !t.hide; }).map(function (t) {
+      var n = active[t.id] || 0, pct = t.size ? Math.min(100, Math.round(n / t.size * 100)) : (n ? 100 : 0);
       return '<div class="team"><div class="tname"><span class="dot" style="background:' + t.color + '"></span>' + esc(t.name) + '</div>' +
-        '<div class="tcount">' + n + ' <small>af ' + (t.id === 'h530' ? 'ca. ' : '') + t.size + '</small></div>' +
+        '<div class="tcount">' + n + ' <small>' + (t.size ? 'af ' + (t.approx ? 'ca. ' : '') + t.size : 'har stemt') + '</small></div>' +
         '<div class="meter"><i style="width:' + pct + '%;background:' + t.color + '"></i></div></div>';
     }).join('');
 
