@@ -132,9 +132,13 @@ function runsOf(s) {
     } else { cur += c; i++; }
   }
   push(cur, 0);
-  return out;
+  if (!GRAESK) return out;
+  return out.flatMap((r) => r.t.split(/([Α-Ωα-ω]+'*)/).filter(Boolean).map((t) => ({ t, m: r.m, g: /^[Α-Ωα-ω]/.test(t) })));
 }
-function measureRuns(runs, size) { let w = 0; for (const r of runs) { mctx.font = HAND(r.m ? size * 0.62 : size); w += mctx.measureText(r.t).width; } return w; }
+// græske bogstaver tegnes i serif kursiv, når scenen beder om det (BP.scene({ graesk: true })): i håndskriften ligner α et a
+let GRAESK = false;
+const RFONT = (r, s) => (r.g ? `italic ${s * 1.08}px 'Cambria Math', 'Times New Roman', serif` : HAND(s));
+function measureRuns(runs, size) { let w = 0; for (const r of runs) { mctx.font = RFONT(r, r.m ? size * 0.62 : size); w += mctx.measureText(r.t).width; } return w; }
 function text(k, s, x, y, size, col, a, b, o = {}) {
   const font = o.font || 'hand', p = W(k, [[x, y]])[0];
   const it = { k: 'text', s, x: p[0], y: p[1], size, col, a, b, font, align: o.align || 'left', rot: o.rot || 0, bold: !!o.bold };
@@ -407,6 +411,32 @@ function clock(k, x, y, a, b) {
   DYN.push({ k: 'clock', x: p[0], y: p[1], a, b });
 }
 
+// ---------------------------------------------------------------- billeder (fx bogens formel-udklip)
+// BP.IMG = { navn: dataURI } indlejres af video.py byg fra <videomappe>/billeder/*.png og forudindlæses før scenen bygges.
+// img(k, navn, x, y, w, a, b) klistrer billedet på siden (øverste venstre hjørne i x, y; bredde w): det glider på plads og
+// toner frem på [a, b], med to tapestrimler. Returnerer { x, y, w, h } i lokale koordinater, så pennen kan skrive rundt om det.
+const IMGS = {};
+function img(k, name, x, y, w, a, b, o = {}) {
+  const im = IMGS[name]; if (!im) throw new Error('billede mangler: ' + name);
+  const h = w * im.naturalHeight / im.naturalWidth, p = W(k, [[x, y]])[0];
+  const it = { k: 'img', im, x: p[0], y: p[1], w, h, a, b, rot: o.rot ?? -0.008, tape: o.tape ?? true, bb: [p[0] - 40, p[1] - 40, p[0] + w + 40, p[1] + h + 40] };
+  ITEMS.push(it);
+  return { x, y, w, h, sec: k, cx: x + w / 2, cy: y + h / 2, x1: x + w, y1: y + h };
+}
+function drawImg(ctx, it, t) {
+  const u = eio(win(t, it.a, it.b));
+  ctx.save(); ctx.globalCompositeOperation = 'source-over';
+  ctx.translate(it.x + it.w / 2, it.y + it.h / 2 - (1 - u) * 18); ctx.rotate(it.rot * (2 - u)); const s = 1 + (1 - u) * 0.05; ctx.scale(s, s);
+  ctx.globalAlpha = u * 0.16; ctx.fillStyle = '#3a2f1c'; ctx.fillRect(-it.w / 2 + 5, -it.h / 2 + 7, it.w, it.h);
+  ctx.globalAlpha = u; ctx.fillStyle = '#fff'; ctx.fillRect(-it.w / 2 - 8, -it.h / 2 - 8, it.w + 16, it.h + 16);
+  ctx.drawImage(it.im, -it.w / 2, -it.h / 2, it.w, it.h);
+  if (it.tape) {
+    ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = `rgba(222,206,150,${0.55 * u})`;
+    for (const sx of [-1, 1]) { ctx.save(); ctx.translate(sx * (it.w / 2 - 4), -it.h / 2 - 4); ctx.rotate(sx * 0.6); ctx.fillRect(-34, -11, 68, 22); ctx.restore(); }
+  }
+  ctx.restore();
+}
+
 // ---------------------------------------------------------------- kamera
 // BP.view(t, k, [dx, dy, z]): kameraet står på sektion k fra tid t
 const camKey = (t, k, o = []) => CAM.push([t, 640 + (o[0] || 0), 360 + SEC * k + (o[1] || 0), o[2] || 1]);
@@ -457,7 +487,7 @@ function slut(k, kilde, naeste, id) {
   }
 }
 
-Object.assign(BP, { line, arrow, dot, text, bubble, hatch, box, rect, strike, ring, under, endX, startX, frac, matrix, capacitor, inductor, motorSym,
+Object.assign(BP, { img, line, arrow, dot, text, bubble, hatch, box, rect, strike, ring, under, endX, startX, frac, matrix, capacitor, inductor, motorSym,
   wire, resistor, source, ground, node, mesh, curArrow, flow, clock, goto, titel, seFoerst, tjek, slut, ink,
   beam, pin, roller, wall, distLoad, moment, axes, plot, dashed });
 
@@ -485,7 +515,7 @@ function drawHatch(ctx, it, prog) {
 function drawRuns(ctx, runs, x, y, size) {
   for (const r of runs) {
     const s = r.m ? size * 0.62 : size, dy = r.m === 1 ? size * 0.2 : r.m === 2 ? -size * 0.42 : 0;
-    ctx.font = HAND(s); ctx.fillText(r.t, x, y + dy); x += ctx.measureText(r.t).width;
+    ctx.font = RFONT(r, s); ctx.fillText(r.t, x, y + dy); x += ctx.measureText(r.t).width;
   }
 }
 function drawText(ctx, it, t) {
@@ -570,6 +600,7 @@ function explainer(ctx, Wd, Hd, t) {
     if (it.k === 'line') { ctx.fillStyle = ink(it.col, it.alpha); drawStroke(ctx, it.S, win(t, it.a, it.b)); }
     else if (it.k === 'text') drawText(ctx, it, t);
     else if (it.k === 'hatch') drawHatch(ctx, it, win(t, it.a, it.b));
+    else if (it.k === 'img') drawImg(ctx, it, t);
     else if (it.k === 'dot') { ctx.fillStyle = ink(it.col); ctx.beginPath(); ctx.arc(it.x, it.y, it.r, 0, TAU); ctx.fill(); }
   }
   for (const d of DYN) {
@@ -640,7 +671,7 @@ function grainFast(ctx, Wd, Hd) {
 
 // ---------------------------------------------------------------- afspiller
 let BUILD = null;
-BP.scene = (opts, fn) => { HEADER = opts.header || ''; BUILD = fn; };
+BP.scene = (opts, fn) => { HEADER = opts.header || ''; GRAESK = !!opts.graesk; BUILD = fn; };
 // Forbered scenen på et lærred: returnerer { render(t), DURATION, ready }. Bruges af BP.start (byg/render) og af
 // webafspilleren (afspiller.js, BP.live), som tegner videoen live i browseren synkront med lyden.
 BP.prepare = function (vo, cv) {
@@ -649,6 +680,8 @@ BP.prepare = function (vo, cv) {
   const render = (t) => { ctx.setTransform(1, 0, 0, 1, 0, 0); explainer(ctx, 1280, 720, clamp(t, 0, DURATION)); };
   const ready = (async () => {
     try { await Promise.all([BUB(80), HAND(40)].map((f) => document.fonts.load(f, 'AaÆØÅæøå09µΩ,'))); await document.fonts.ready; } catch (e) { /* tegn alligevel */ }
+    await Promise.all(Object.entries(BP.IMG || {}).map(([n, src]) => new Promise((res) => {
+      const im = new Image(); im.onload = () => { IMGS[n] = im; res(); }; im.onerror = res; im.src = src; })));
     camKey(0, 0);
     BUILD(BP);
     CAM.sort((a, b) => a[0] - b[0]);
