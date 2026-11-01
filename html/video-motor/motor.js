@@ -392,7 +392,7 @@ function axes(k, x0, y0, x1, y1, xl, yl, a, col = 'black') {
 function plot(k, pts, col, a, b, w = 3.6) { return line(k, pts, col, w, a, b, { wob: 0.35 }); }
 // graf i Mathcad-stil: tidsakse gennem nul, tal på akserne, kurver der tegnes i takt med stemmen.
 // o = {x, y, w, h, tmax, ymax, a, tl, yl, ticks: [[t, '0,1'], ...], yticks: [[v, '10'], ...],
-//      kurver: [{f: (t) => v, col, a, b, w}]}  ->  P(t, v) = [px, py] i panelets koordinater (til pile og etiketter)
+//      kurver: [{f: (t) => v, col, a, b, w, alpha}]}  ->  P(t, v) = [px, py] i panelets koordinater (til pile og etiketter)
 function graf(k, o) {
   const { x, y, w, h, tmax, ymax, a } = o, y0 = y + h / 2, col = o.col || 'black';
   const P = (t, v) => [x + t / tmax * w, y0 - v / ymax * h / 2];
@@ -413,7 +413,7 @@ function graf(k, o) {
   (o.kurver || []).forEach((c) => {
     const n = c.n || 260, pts = [];
     for (let i = 0; i <= n; i++) { const t = (c.t0 ?? 0) + ((c.t1 ?? tmax) - (c.t0 ?? 0)) * i / n; pts.push(P(t, c.f(t))); }
-    plot(k, pts, c.col || 'blue', c.a, c.b, c.w || 3.4);
+    line(k, pts, c.col || 'blue', c.w || 3.4, c.a, c.b, { wob: 0.35, alpha: c.alpha ?? 0.9 });  // alpha < 1 = overstregning (kurver oven i hinanden)
   });
   return P;
 }
