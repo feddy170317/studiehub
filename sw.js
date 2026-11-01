@@ -1,5 +1,5 @@
 // Auto-increment version: updated on each deploy
-const CACHE_VERSION = '20261101-005'; // Format: YYYYMMDD-NNN
+const CACHE_VERSION = '20261101-006'; // Format: YYYYMMDD-NNN
 const CACHE_NAME = `studiehub-${CACHE_VERSION}`;
 const urlsToCache = [
   '/',
@@ -52,7 +52,7 @@ self.addEventListener('fetch', event => {
   }
 
   // Network-first for undervisningsvideoerne og den fælles videomotor (opdateres løbende; mp4/mp3 hentes med Range og caches ikke)
-  if (/\/html\/([^/]+\/video|video-motor)\//.test(event.request.url)) {
+  if (/\/html\/([^/]+\/(video|opgaver)|video-motor)\//.test(event.request.url)) {
     // Sider og undertekster: forbi browserens HTTP-cache (GitHub Pages: max-age=600), så nye videoer ses med det samme
     const frisk = event.request.method === 'GET' && !event.request.headers.has('range') && !/\.(mp4|mp3)$/.test(event.request.url);
     return event.respondWith(
