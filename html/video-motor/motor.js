@@ -390,6 +390,38 @@ function axes(k, x0, y0, x1, y1, xl, yl, a, col = 'black') {
 }
 // graf/kurve gennem punkter (mindre rysten end en almindelig streg)
 function plot(k, pts, col, a, b, w = 3.6) { return line(k, pts, col, w, a, b, { wob: 0.35 }); }
+// graf i Mathcad-stil: tidsakse gennem nul, tal på akserne, kurver der tegnes i takt med stemmen.
+// o = {x, y, w, h, tmax, ymax, a, tl, yl, ticks: [[t, '0,1'], ...], yticks: [[v, '10'], ...],
+//      kurver: [{f: (t) => v, col, a, b, w}]}  ->  P(t, v) = [px, py] i panelets koordinater (til pile og etiketter)
+function graf(k, o) {
+  const { x, y, w, h, tmax, ymax, a } = o, y0 = y + h / 2, col = o.col || 'black';
+  const P = (t, v) => [x + t / tmax * w, y0 - v / ymax * h / 2];
+  arrow(k, [[x, y + h + 8], [x, y - 14]], col, 2.4, a, a + 0.5, 14);
+  arrow(k, [[x - 8, y0], [x + w + 40, y0]], col, 2.4, a + 0.2, a + 0.7, 14);
+  if (o.tl) text(k, o.tl, x + w + 30, y0 + 40, 28, col, a + 0.5, a + 0.8);
+  if (o.yl) text(k, o.yl, x - 14, y - 4, 28, col, a + 0.6, a + 0.9, { align: 'right' });
+  (o.ticks || []).forEach(([t, s], i) => {
+    const [px] = P(t, 0), ta = a + 0.6 + i * 0.06;
+    line(k, [[px, y0 - 7], [px, y0 + 7]], col, 2, ta, ta + 0.1, { wob: 0.1 });
+    text(k, s, px, y + h + 34, 24, col, ta, ta + 0.25, { align: 'center' });
+  });
+  (o.yticks || []).forEach(([v, s], i) => {
+    const [, py] = P(0, v), ta = a + 0.7 + i * 0.06;
+    line(k, [[x - 7, py], [x + 7, py]], col, 2, ta, ta + 0.1, { wob: 0.1 });
+    text(k, s, x - 14, py + 9, 24, col, ta, ta + 0.25, { align: 'right' });
+  });
+  (o.kurver || []).forEach((c) => {
+    const n = c.n || 260, pts = [];
+    for (let i = 0; i <= n; i++) { const t = (c.t0 ?? 0) + ((c.t1 ?? tmax) - (c.t0 ?? 0)) * i / n; pts.push(P(t, c.f(t))); }
+    plot(k, pts, c.col || 'blue', c.a, c.b, c.w || 3.4);
+  });
+  return P;
+}
+// pil med spids i begge ender (fx en periode mellem to toppe i en graf)
+function dobbeltpil(k, p, q, col, a, b) {
+  const m = [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
+  arrow(k, [m, p], col, 2.6, a, b, 14); arrow(k, [m, q], col, 2.6, a, b, 14);
+}
 // stiplet linje (fx hjælpelinjer i grafer)
 function dashed(k, p, q, col, a, b, d = 14) {
   const L = Math.hypot(q[0] - p[0], q[1] - p[1]), n = Math.max(1, Math.floor(L / (2 * d)));
@@ -489,7 +521,7 @@ function slut(k, kilde, naeste, id) {
 
 Object.assign(BP, { img, line, arrow, dot, text, bubble, hatch, box, rect, strike, ring, under, endX, startX, frac, matrix, capacitor, inductor, motorSym,
   wire, resistor, source, ground, node, mesh, curArrow, flow, clock, goto, titel, seFoerst, tjek, slut, ink,
-  beam, pin, roller, wall, distLoad, moment, axes, plot, dashed });
+  beam, pin, roller, wall, distLoad, moment, axes, plot, graf, dobbeltpil, dashed });
 
 // ---------------------------------------------------------------- rendering
 function drawStroke(ctx, S, p1, p0 = 0) {
