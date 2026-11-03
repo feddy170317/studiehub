@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eksempel: kilerem mod fladrem · video</title>
+<meta name="description" content="Kilerem mod fladrem: T = 576 Nm (+44 %) og halv forspænding ved samme moment.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 19: videoer</a><h1>Eksempel: kilerem mod fladrem</h1><span class="meta">MEM1 · kapitel 19 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Eksempel: kilerem mod fladrem"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Kilerem mod fladrem: T = 576 Nm (+44 %) og halv forspænding ved samme moment.</p><div class="chips"><a href="../../opgaver/l19/eksempel-kilerem-mod-fladrem.pdf">📐 Se udregningen i Mathcad (PDF)</a><a href="kileremme.html">Se først: Kileremme: kileeffekten</a><a href="../../Kapitel19_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l19">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Eksempel: kilerem mod fladrem med data fra question 16 (slide 10) og 2β = 40° (slide 6).
+// Flad: F_2 = 999 N, T = 400 N·m. Kile: μ' = 1,023, e = 24,9, F_2 = 120,5 N, T = 575,9 N·m (+44 %). Samme T: F_i 2000 → 1084 N.
+// Mathcad: Lektion 19/Opgaver/Eksempel kilerem mod fladrem
+BP.scene({ header: 'MEM1 · kap. 19', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, axes, PI, TAU } = B;
+
+  B.titel(0, 'Kilerem mod fladrem', 'MEM1 · kapitel 19 · eksempel (slide 6 og 10)', 'titel');
+  text(0, 'hvor meget vinder kilen?', 640, 540, 44, 'red', wt('titel', 'skifter') - 0.1, we('titel', 'vinder'), { align: 'center' });
+
+  // ---------------------------------------------------------------- 1 data
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start;
+    bubble(1, 'Data', 140, 130, 48, 'blue', t0 - 0.1, t0 + 0.5);
+    text(1, 'φ = π,   μ = 0,35', 160, 230, 40, 'black', wt('data', 'Omslutningen') - 0.1, we('data', 'fem'));
+    text(1, 'F_1 = 3000 N,   r = 0,2 m', 160, 300, 40, 'red', wt('data', 'største') - 0.1, we('data', 'meter'));
+    text(1, 'F_c ≈ 0', 160, 370, 40, 'black', wt('data', 'Hastigheden') - 0.1, we('data', 'nul'));
+    text(1, '2β = 40°  ⇒  β = 20°', 160, 440, 40, 'green', wt('data', 'Rillen') - 0.1, we('data', 'grader'));
+    // lille rille
+    const k = Math.tan(20 * PI / 180), xl = (y) => 820 + k * (y - 220), xr = (y) => 1040 - k * (y - 220);
+    const tr = wt('data', 'Rillen');
+    line(1, [[xl(220), 220], [xl(500), 500], [xr(500), 500], [xr(220), 220]], 'black', 3, tr - 0.1, tr + 0.5);
+    line(1, [[xl(250), 250], [xr(250), 250], [xr(360), 360], [xl(360), 360], [xl(250), 250]], 'blue', 3.6, tr + 0.2, tr + 0.7);
+  }
+
+  // ---------------------------------------------------------------- 2 fladrem og kilerem
+  B.goto('flad', 2);
+  {
+    const t0 = L('flad').start;
+    line(2, [[640, 110], [640, 640]], 'black', 2, t0, t0 + 0.4);
+    bubble(2, 'Fladrem', 160, 140, 44, 'blue', t0 - 0.1, t0 + 0.6);
+    text(2, 'e^{μφ} = e^{0,35π} = 3,0', 160, 250, 36, 'black', wt('flad', 'e') - 0.1, we('flad', 'tre'));
+    text(2, 'F_2 = 3000/3,0 = 999 N', 160, 330, 36, 'black', wt('flad', 'F') - 0.1, we('flad', 'newton'));
+    const tf = we('flad', 'newtonmeter');
+    const r1 = text(2, 'T = 400 N·m', 160, 430, 46, 'blue', wt('flad', 'momentet') - 0.1, tf);
+    ring(r1, 'blue', tf, tf + 0.5);
+    const tm = L('mu').start;
+    bubble(2, 'Kilerem', 700, 140, 44, 'red', tm - 0.1, tm + 0.6);
+    text(2, "μ' = 0,35/sin 20° = 1,02", 700, 250, 36, 'black', wt('mu', 'mærke') - 0.1, we('mu', 'to', 1));
+    text(2, "e^{μ'φ} = 24,9", 700, 330, 36, 'black', L('ev').start - 0.1, wt('ev', 'F') - 0.1);
+    text(2, 'F_2 = 3000/24,9 = 120 N', 700, 400, 36, 'black', wt('ev', 'F') - 0.1, we('ev', 'newton'));
+    const tv = we('moment', 'newtonmeter');
+    const r2 = text(2, 'T = 576 N·m', 700, 500, 46, 'red', L('moment').start - 0.1, tv);
+    ring(r2, 'red', tv, tv + 0.5);
+    text(2, '+44 %', 1010, 500, 40, 'green', wt('moment', 'fireogfyrre') - 0.1, we('moment', 'mere'));
+  }
+
+  // ---------------------------------------------------------------- 3 loftet + forspænding
+  B.goto('loft', 3);
+  {
+    const t0 = L('loft').start, x0 = 200, y0 = 500, s = 0.45;
+    text(3, 'T_max = F_1 · r = 3000 · 0,2 = 600 N·m', 140, 140, 38, 'black', wt('loft', 'loftet') - 0.1, we('loft', 'newtonmeter'));
+    // søjler: T flad, T kile, loft
+    line(3, [[x0 - 20, y0], [x0 + 420, y0]], 'black', 2.4, t0, t0 + 0.4);
+    box(3, x0 + 20, y0 - 400 * s, 110, 400 * s, 'blue', t0 + 0.3, t0 + 0.8);
+    text(3, '400', x0 + 75, y0 - 400 * s - 12, 28, 'blue', t0 + 0.5, t0 + 0.9, { align: 'center' });
+    box(3, x0 + 200, y0 - 576 * s, 110, 576 * s, 'red', t0 + 0.5, t0 + 1.0);
+    text(3, '576', x0 + 255, y0 - 576 * s + 36, 28, 'red', t0 + 0.7, t0 + 1.1, { align: 'center' });
+    const tl = wt('loft', 'højst');
+    B.dashed(3, [x0 - 20, y0 - 600 * s], [x0 + 420, y0 - 600 * s], 'green', tl - 0.1, tl + 0.5);
+    text(3, 'loft 600', x0 + 430, y0 - 600 * s + 8, 28, 'green', tl, tl + 0.5);
+    text(3, 'flad', x0 + 75, y0 + 34, 26, 'blue', t0 + 0.5, t0 + 0.9, { align: 'center' });
+    text(3, 'kile', x0 + 255, y0 + 34, 26, 'red', t0 + 0.7, t0 + 1.1, { align: 'center' });
+    // forspænding ved samme moment
+    const tf = L('forspaend').start;
+    bubble(3, 'Samme T = 400 N·m', 760, 200, 34, 'blue', tf - 0.1, tf + 0.6);
+    text(3, 'kile: F_1 = 2085 N,  F_2 = 84 N', 760, 290, 30, 'black', wt('forspaend', 'kun') - 0.1, we('forspaend', 'newton'));
+    text(3, 'F_i = (F_1 + F_2)/2:', 760, 360, 30, 'black', wt('forspaend', 'Forspændingen') - 0.1, wt('forspaend', 'falder') + 0.3);
+    const y1 = 620, sc = 0.09;
+    box(3, 780, y1 - 2000 * sc, 110, 2000 * sc, 'blue', wt('forspaend', 'fra') - 0.1, wt('forspaend', 'fra') + 0.4);
+    text(3, '2000 N', 835, y1 - 2000 * sc - 12, 26, 'blue', wt('forspaend', 'fra'), wt('forspaend', 'fra') + 0.5, { align: 'center' });
+    box(3, 960, y1 - 1084 * sc, 110, 1084 * sc, 'red', wt('forspaend', 'cirka') - 0.1, wt('forspaend', 'cirka') + 0.4);
+    text(3, '1084 N', 1015, y1 - 1084 * sc - 12, 26, 'red', wt('forspaend', 'cirka'), we('forspaend', 'newton', 1), { align: 'center' });
+    line(3, [[760, y1], [1100, y1]], 'black', 2.4, tf, tf + 0.4);
+    text(3, 'flad', 835, y1 + 32, 24, 'blue', tf + 0.3, tf + 0.6, { align: 'center' });
+    text(3, 'kile', 1015, y1 + 32, 24, 'red', tf + 0.3, tf + 0.6, { align: 'center' });
+    const tj = L('lejer').start;
+    const h = text(3, '⇒ næsten halv lejelast', 140, 640, 40, 'green', tj - 0.1, we('lejer', 'belastning'));
+    under(h, 'green', we('lejer', 'belastning'), we('lejer', 'belastning') + 0.4);
+  }
+
+  B.goto('tjek_q', 4);
+  B.tjek(4, ['Fladremmen skal bruge 180° for F_1/F_2 = 3.', 'Hvor meget skal kileremmen bruge?'], ['φ = ln 3 / μ\' = 61,6°', 'μ\' er næsten 3 × μ'], 'tjek_q', 'tjek_a');
+
+  // ---------------------------------------------------------------- 5 Mathcad-plot: F_1/F_2 mod φ
+  B.goto('tjek_vis', 5);
+  {
+    const t0 = L('tjek_vis').start, x0 = 230, y0 = 620, w = 700, h = 440, Y = 26, P = (f, v) => [x0 + f / PI * w, y0 - v / Y * h];
+    text(5, 'Mathcad-plot:  F_1/F_2 mod omslutningsvinklen', 640, 120, 30, 'black', t0, t0 + 0.8, { align: 'center' });
+    axes(5, x0, y0, x0 + w + 40, y0 - h - 20, 'φ', 'F_1/F_2', t0 + 0.2);
+    [[PI / 3, '60°'], [2 * PI / 3, '120°'], [PI, '180°']].forEach(([f, s], i) => { const p = P(f, 0); text(5, s, p[0], y0 + 34, 26, 'black', t0 + 0.5 + i * 0.1, t0 + 0.7 + i * 0.1, { align: 'center' }); });
+    [[3, '3'], [10, '10'], [20, '20']].forEach(([v, s], i) => { const p = P(0, v); text(5, s, x0 - 12, p[1] + 8, 24, 'black', t0 + 0.6 + i * 0.1, t0 + 0.8 + i * 0.1, { align: 'right' }); });
+    const mk = (mu) => { const p = []; for (let i = 0; i <= 120; i++) { const f = PI * i / 120; p.push(P(f, Math.exp(mu * f))); } return p; };
+    const tb = wt('tjek_vis', 'blå'), tr = wt('tjek_vis', 'røde');
+    line(5, mk(0.35), 'blue', 3.6, tb - 0.1, tb + 1.4, { wob: 0.35 });
+    line(5, mk(1.02333), 'red', 3.6, tr - 0.1, tr + 1.6, { wob: 0.35 });
+    B.dashed(5, P(0, 3), P(PI, 3), 'green', tb, tb + 0.8);
+    const p1 = P(PI, 3.0); dot(5, ...p1, 7, 'blue', tb + 1.2); text(5, '3,0', p1[0] + 14, p1[1] + 6, 28, 'blue', tb + 1.2, we('tjek_vis', 'grader'));
+    const t6 = wt('tjek_vis', 'enogtres'), p6 = P(61.56 * PI / 180, 3.0);
+    dot(5, ...p6, 8, 'red', t6); B.dashed(5, [p6[0], y0], p6, 'red', t6, t6 + 0.4);
+    text(5, '61,6°', p6[0] + 10, p6[1] - 16, 28, 'red', t6, we('tjek_vis', 'grader', 1));
+    const p2 = P(PI, 24.9); text(5, '24,9', p2[0] - 14, p2[1] + 8, 28, 'red', wt('tjek_vis', 'femogtyve') - 0.2, we('tjek_vis', 'femogtyve'), { align: 'right' });
+  }
+
+  B.goto('slut', 6);
+  B.slut(6, 'Abou-Hayt (2026), MEM1 Chapter 19, slide 6 og 10 · Mathcad: Lektion 19/Opgaver/Eksempel kilerem mod fladrem', 'ståltove', 'slut');
+  text(6, "μ' = μ / sin β:  T 400 → 576 N·m", 200, 290, 42, 'red', wt('slut', 'kileremmen') - 0.1, we('slut', 'procent'));
+  text(6, 'samme T: halv forspænding', 200, 390, 42, 'green', wt('slut', 'samme') - 0.1, we('slut', 'næsten'));
+});
+
+</script>
+<script>BP.live({"duration":148.177,"audio":"opg-kilerem.mp3","order":["titel","data","flad","mu","ev","moment","loft","forspaend","lejer","tjek_q","tjek_a","tjek_vis","slut"],"lines":{"titel":{"start":0.5,"end":8.941,"words":[["Eksempel",0.54,1.02],["Vi",2.2,2.28],["tager",2.48,2.74],["drevet",2.8,3.18],["fra",3.24,3.36],["eksamensspørgsmålet",3.56,4.561],["og",5.021,5.121],["skifter",5.281,5.641],["fladremmen",5.701,6.181],["ud",6.321,6.441],["med",6.541,6.641],["en",6.661,6.741],["kilerem",6.801,7.241],["Hvor",8.181,8.301],["meget",8.341,8.561],["vinder",8.621,8.881],["vi",8.901,8.941]],"text":"Eksempel. Vi tager drevet fra eksamensspørgsmålet og skifter fladremmen ud med en kilerem. Hvor meget vinder vi?"},"data":{"start":10.761,"end":27.244,"words":[["Omslutningen",10.801,11.502],["er",11.682,11.782],["pi",11.942,12.082],["radianer",12.222,12.742],["mu",13.582,13.682],["er",14.022,14.162],["nul",14.462,14.642],["komma",14.742,14.942],["tre",15.022,15.142],["fem",15.262,15.422],["den",16.262,16.382],["største",16.402,16.682],["remkraft",16.702,17.142],["er",17.262,17.362],["tre",17.522,17.662],["tusind",17.802,18.103],["newton",18.123,18.443],["og",19.083,19.163],["skivens",19.263,19.583],["radius",19.623,20.003],["er",20.163,20.263],["nul",20.383,20.523],["komma",20.583,20.763],["to",20.843,20.943],["meter",21.063,21.303],["Hastigheden",22.323,22.743],["er",22.763,22.823],["lav",22.843,23.003],["så",23.283,23.443],["F",24.083,24.103],["c",24.203,24.223],["er",24.523,24.603],["nul",24.663,24.824],["Rillen",25.824,26.064],["har",26.104,26.224],["vinklen",26.264,26.604],["fyrre",26.704,26.924],["grader",26.964,27.244]],"text":"Omslutningen er pi radianer, mu er nul komma tre fem, den største remkraft er tre tusind newton, og skivens radius er nul komma to meter. Hastigheden er lav, så F c er nul. Rillen har vinklen fyrre grader."},"flad":{"start":29.064,"end":39.726,"words":[["Først",29.104,29.364],["fladremmen",29.484,29.924],["e",30.924,30.944],["i",31.084,31.104],["mu",31.184,31.264],["phi",31.424,31.524],["er",31.804,31.904],["tre",32.064,32.224],["F",33.385,33.405],["to",33.465,33.565],["bliver",33.725,33.985],["tusind",34.085,34.445],["newton",34.465,34.785],["og",35.125,35.225],["momentet",35.325,35.745],["er",35.845,35.965],["to",36.105,36.225],["tusind",36.325,36.645],["gange",36.685,36.885],["nul",36.945,37.085],["komma",37.125,37.305],["to",37.365,37.465],["altså",37.925,38.205],["fire",38.685,38.865],["hundrede",38.925,39.205],["newtonmeter",39.205,39.726]],"text":"Først fladremmen. e i mu phi er tre. F to bliver tusind newton, og momentet er to tusind gange nul komma to, altså fire hundrede newtonmeter."},"mu":{"start":41.546,"end":50.887,"words":[["Nu",41.586,41.666],["kileremmen",41.726,42.206],["Beta",43.086,43.406],["er",43.566,43.646],["tyve",43.766,43.986],["grader",44.006,44.346],["så",44.846,45.006],["mu",45.326,45.426],["mærke",45.546,45.886],["er",46.066,46.146],["nul",46.266,46.406],["komma",46.466,46.606],["tre",46.666,46.786],["fem",46.906,47.047],["divideret",47.267,47.747],["med",47.807,47.907],["nul",47.947,48.087],["komma",48.127,48.307],["tre",48.367,48.487],["fire",48.607,48.787],["to",48.827,48.927],["altså",49.447,49.707],["en",50.187,50.307],["komma",50.367,50.567],["nul",50.607,50.747],["to",50.807,50.887]],"text":"Nu kileremmen. Beta er tyve grader, så mu mærke er nul komma tre fem divideret med nul komma tre fire to, altså en komma nul to."},"ev":{"start":52.027,"end":60.208,"words":[["e",52.067,52.087],["i",52.227,52.247],["mu",52.347,52.407],["mærke",52.527,52.787],["phi",52.867,52.947],["er",53.227,53.347],["fireogtyve",53.567,54.028],["komma",54.048,54.228],["ni",54.268,54.348],["F",55.328,55.348],["to",55.408,55.508],["bliver",55.628,55.888],["tre",56.268,56.408],["tusind",56.508,56.848],["divideret",56.928,57.448],["med",57.508,57.588],["fireogtyve",57.648,58.028],["komma",58.048,58.228],["ni",58.268,58.348],["altså",58.728,58.968],["hundrede",59.348,59.608],["og",59.608,59.668],["tyve",59.708,59.888],["newton",59.928,60.208]],"text":"e i mu mærke phi er fireogtyve komma ni. F to bliver tre tusind divideret med fireogtyve komma ni, altså hundrede og tyve newton."},"moment":{"start":61.269,"end":70.15,"words":[["Momentet",61.309,61.709],["er",61.829,61.949],["tre",62.229,62.389],["tusind",62.509,62.829],["minus",63.049,63.369],["hundrede",63.429,63.669],["og",63.669,63.709],["tyve",63.709,63.949],["gange",64.369,64.589],["nul",64.649,64.789],["komma",64.829,64.989],["to",65.049,65.149],["Det",65.709,65.809],["giver",65.829,66.009],["fem",66.429,66.569],["hundrede",66.629,66.889],["og",66.949,67.029],["seksoghalvfjerds",67.069,67.69],["newtonmeter",67.75,68.29],["fireogfyrre",69.03,69.53],["procent",69.57,69.87],["mere",69.93,70.15]],"text":"Momentet er tre tusind minus hundrede og tyve gange nul komma to. Det giver fem hundrede og seksoghalvfjerds newtonmeter, fireogfyrre procent mere."},"loft":{"start":71.97,"end":82.011,"words":[["Hvorfor",72.01,72.21],["ikke",72.25,72.35],["tre",72.39,72.51],["gange",72.59,72.77],["så",72.79,72.89],["meget",72.89,73.11],["Fordi",73.89,74.09],["F",74.41,74.43],["et",74.55,74.65],["er",74.79,74.87],["loftet",74.91,75.19],["Selv",75.991,76.171],["hvis",76.171,76.291],["F",76.491,76.511],["to",76.591,76.711],["var",76.791,76.891],["nul",76.951,77.111],["kunne",77.571,77.711],["momentet",77.711,78.031],["højst",78.111,78.451],["blive",78.491,78.651],["tre",78.691,78.811],["tusind",78.931,79.231],["gange",79.271,79.471],["nul",79.511,79.631],["komma",79.671,79.811],["to",79.871,79.971],["altså",80.471,80.711],["seks",81.071,81.251],["hundrede",81.291,81.511],["newtonmeter",81.511,82.011]],"text":"Hvorfor ikke tre gange så meget? Fordi F et er loftet. Selv hvis F to var nul, kunne momentet højst blive tre tusind gange nul komma to, altså seks hundrede newtonmeter."},"forspaend":{"start":83.831,"end":98.433,"words":[["Den",83.871,83.971],["rigtige",84.031,84.371],["gevinst",84.411,84.751],["er",84.951,85.031],["forspændingen",85.151,85.751],["Skal",86.731,86.951],["kileremmen",87.051,87.571],["kun",87.611,87.771],["klare",87.851,88.131],["de",88.151,88.231],["fire",88.251,88.351],["hundrede",88.631,88.851],["newtonmeter",88.851,89.391],["er",89.852,89.932],["F",90.172,90.192],["et",90.312,90.392],["to",90.732,90.852],["tusind",90.952,91.232],["og",91.252,91.292],["femogfirs",91.312,91.852],["og",92.232,92.312],["F",92.532,92.552],["to",92.632,92.732],["fireogfirs",92.972,93.492],["newton",93.532,93.832],["Forspændingen",94.872,95.392],["falder",95.452,95.692],["fra",95.752,95.852],["to",96.032,96.132],["tusind",96.232,96.552],["til",96.913,97.053],["cirka",97.073,97.333],["tusind",97.433,97.773],["og",97.793,97.853],["firs",97.893,98.093],["newton",98.133,98.433]],"text":"Den rigtige gevinst er forspændingen. Skal kileremmen kun klare de fire hundrede newtonmeter, er F et to tusind og femogfirs og F to fireogfirs newton. Forspændingen falder fra to tusind til cirka tusind og firs newton."},"lejer":{"start":98.973,"end":102.153,"words":[["Lejerne",99.013,99.433],["og",99.493,99.553],["akslen",99.713,100.113],["får",100.173,100.313],["altså",100.353,100.573],["næsten",100.633,100.973],["den",101.033,101.153],["halve",101.273,101.633],["belastning",101.673,102.153]],"text":"Lejerne og akslen får altså næsten den halve belastning."},"tjek_q":{"start":103.973,"end":110.934,"words":[["Tjek",104.013,104.193],["dig",104.213,104.313],["selv",104.353,104.534],["Fladremmen",105.314,105.874],["har",105.934,106.034],["brug",106.074,106.234],["for",106.294,106.394],["en",106.414,106.494],["halv",106.534,106.734],["omgang",106.794,107.134],["for",107.194,107.294],["at",107.314,107.354],["nå",107.394,107.514],["forholdet",107.594,108.034],["tre",108.074,108.214],["Hvor",108.914,109.054],["meget",109.094,109.334],["omslutning",109.414,109.934],["skal",109.954,110.114],["kileremmen",110.154,110.654],["bruge",110.694,110.934]],"text":"Tjek dig selv. Fladremmen har brug for en halv omgang for at nå forholdet tre. Hvor meget omslutning skal kileremmen bruge?"},"tjek_a":{"start":115.054,"end":119.634,"words":[["Kun",115.094,115.354],["enogtres",115.654,116.174],["komma",116.234,116.394],["seks",116.454,116.674],["grader",116.714,117.054],["fordi",117.354,117.574],["mu",117.714,117.794],["mærke",117.954,118.254],["er",118.294,118.354],["næsten",118.394,118.654],["tre",118.734,118.934],["gange",119.034,119.234],["så",119.294,119.414],["stor",119.414,119.634]],"text":"Kun enogtres komma seks grader, fordi mu mærke er næsten tre gange så stor."},"tjek_vis":{"start":121.454,"end":135.556,"words":[["Her",121.494,121.654],["er",121.714,121.794],["Mathcad-plottet",121.854,122.655],["af",122.755,122.835],["F",123.115,123.135],["et",123.295,123.395],["over",123.515,123.675],["F",123.815,123.835],["to",123.935,124.055],["mod",124.455,124.595],["omslutningsvinklen",124.715,125.595],["Den",126.495,126.615],["blå",126.675,126.875],["kurve",126.935,127.195],["er",127.255,127.315],["fladremmen",127.335,127.815],["der",128.155,128.255],["når",128.275,128.435],["tre",128.515,128.695],["ved",128.855,128.956],["hundrede",128.996,129.276],["og",129.276,129.316],["firs",129.336,129.556],["grader",129.576,129.876],["Den",130.456,130.556],["røde",130.616,130.836],["er",130.936,130.996],["kileremmen",131.016,131.496],["Den",132.156,132.256],["når",132.296,132.416],["tre",132.496,132.636],["allerede",132.756,133.056],["ved",133.076,133.156],["enogtres",133.256,133.656],["grader",133.696,134.036],["og",134.336,134.396],["ender",134.456,134.616],["på",134.616,134.716],["næsten",134.736,134.976],["femogtyve",135.056,135.556]],"text":"Her er Mathcad-plottet af F et over F to mod omslutningsvinklen. Den blå kurve er fladremmen, der når tre ved hundrede og firs grader. Den røde er kileremmen. Den når tre allerede ved enogtres grader og ender på næsten femogtyve."},"slut":{"start":137.376,"end":146.577,"words":[["Kort",137.416,137.636],["sagt",137.696,137.936],["kileremmen",138.576,139.136],["ganger",139.236,139.556],["friktionen",139.596,140.136],["med",140.176,140.276],["en",140.436,140.576],["over",140.676,140.836],["sinus",140.916,141.216],["beta",141.276,141.576],["Momentet",142.136,142.496],["stiger",142.556,142.816],["fireogfyrre",142.936,143.456],["procent",143.476,143.837],["og",144.237,144.317],["ved",144.337,144.417],["samme",144.477,144.697],["moment",144.737,145.017],["halveres",145.077,145.617],["forspændingen",145.677,146.257],["næsten",146.277,146.577]],"text":"Kort sagt: kileremmen ganger friktionen med en over sinus beta. Momentet stiger fireogfyrre procent, og ved samme moment halveres forspændingen næsten."}}}, { audio: 'opg-kilerem.mp3', id: 'opg-kilerem' });</script>
+</body>
+</html>

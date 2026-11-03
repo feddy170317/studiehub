@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eksempel 19.4: ståltov til teaterlys · video</title>
+<meta name="description" content="Eksempel 19.4: F_b = 36,8 kN, F_total = 50,7 kN og n = 6,2; D_min = 640 mm.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 19: videoer</a><h1>Eksempel 19.4: ståltov til teaterlys</h1><span class="meta">MEM1 · kapitel 19 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Eksempel 19.4: ståltov til teaterlys"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Eksempel 19.4: F_b = 36,8 kN, F_total = 50,7 kN og n = 6,2; D_min = 640 mm.</p><div class="chips"><a href="../../opgaver/l19/eksempel-19.4-staaltov.pdf">📐 Se udregningen i Mathcad (PDF)</a><a href="staaltove.html">Se først: Ståltove: træk og bøjning</a><a href="../../Kapitel19_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l19">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Hamrock eksempel 19.4 regnet med slide 7: F_r = 680 N, F_accel = 1293 N, σ_b = 152,6 MPa, F_b = 36,8 kN, F_total = 50,7 kN,
+// F_u = 640 MPa · π d²/4 = 314,2 kN, n = 6,19 ≥ 5; uden bøjning 22,5; D_min (n = 5) = 640 mm = 25,6 d.
+// Mathcad: Lektion 19/Opgaver/Eksempel 19.4 staaltov
+BP.scene({ header: 'MEM1 · kap. 19', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, axes, PI, TAU } = B;
+
+  B.titel(0, 'Eksempel 19.4: ståltov', 'MEM1 · kapitel 19 · Hamrock eks. 19.4 med slide 7', 'titel');
+  text(0, 'holder ét tov?', 640, 540, 46, 'red', wt('titel', 'Holder') - 0.1, we('titel', 'tov'), { align: 'center' });
+
+  // ---------------------------------------------------------------- 1 data + FBD
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start;
+    text(1, 'F_w = 12 kN,  h = 30 m,  a = 1 m/s²', 140, 140, 36, 'black', t0 - 0.1, we('data', 'anden'));
+    text(1, 'd = 25 mm, 6 × 19,  A_m = 2,41·10⁻⁴ m²', 140, 200, 36, 'blue', wt('data', 'Tovet') - 0.1, we('data', 'kvadratmeter'));
+    const tf = L('fbd').start, C = [330, 470];
+    box(1, C[0] - 70, C[1] - 45, 140, 90, 'black', tf - 0.1, tf + 0.4);
+    text(1, 'last', C[0], C[1] + 10, 28, 'black', tf + 0.2, tf + 0.5, { align: 'center' });
+    arrow(1, [[C[0], C[1] - 45], [C[0], C[1] - 180]], 'red', 3.6, wt('fbd', 'trækker') - 0.1, wt('fbd', 'trækker') + 0.4, 15);
+    text(1, 'F_t', C[0] + 14, C[1] - 150, 32, 'red', wt('fbd', 'trækker'), wt('fbd', 'op') + 0.2);
+    arrow(1, [[C[0], C[1] + 45], [C[0], C[1] + 170]], 'black', 3.6, wt('fbd', 'lasten', 1) - 0.1, wt('fbd', 'lasten', 1) + 0.4, 15);
+    text(1, 'F_w + F_r', C[0] + 14, C[1] + 150, 30, 'black', wt('fbd', 'lasten', 1), we('fbd', 'ned'));
+    text(1, '= ', C[0] + 140, C[1] + 10, 40, 'black', tf + 0.4, tf + 0.6);
+    box(1, C[0] + 200, C[1] - 45, 140, 90, 'black', tf + 0.4, tf + 0.8);
+    text(1, 'm', C[0] + 270, C[1] + 10, 30, 'black', tf + 0.6, tf + 0.9, { align: 'center' });
+    arrow(1, [[C[0] + 270, C[1] - 55], [C[0] + 270, C[1] - 150]], 'green', 3.4, tf + 0.7, tf + 1.1, 14);
+    text(1, 'm a', C[0] + 285, C[1] - 120, 30, 'green', tf + 0.8, tf + 1.2);
+    const tr = wt('fbd', 'vejer');
+    text(1, 'F_r = 3700 d² h g = 680 N', 760, 330, 30, 'black', tr - 0.1, we('fbd', 'newton'));
+    const ta = L('accel').start;
+    text(1, 'F_{accel} = (F_w + F_r)/g · a', 760, 420, 32, 'green', ta - 0.1, we('accel', 'g'));
+    const te = we('accel', 'newton');
+    const r = text(1, '= 1293 N', 820, 480, 38, 'green', wt('accel', 'giver') - 0.1, te);
+    ring(r, 'green', te, te + 0.5);
+  }
+
+  // ---------------------------------------------------------------- 2 bøjning
+  B.goto('boej', 2);
+  {
+    const t0 = L('boej').start, C = [300, 400], R = 170;
+    line(2, ell(C[0], C[1], R, R, 0, TAU), 'black', 3, t0, t0 + 0.5);
+    line(2, ell(C[0], C[1], R + 8, R + 8, PI, TAU), 'blue', 6, t0 + 0.3, t0 + 0.8);
+    line(2, [[C[0] - R - 8, C[1]], [C[0] - R - 8, 640]], 'blue', 6, t0 + 0.5, t0 + 0.8); line(2, [[C[0] + R + 8, C[1]], [C[0] + R + 8, 640]], 'blue', 6, t0 + 0.5, t0 + 0.8);
+    B.dobbeltpil(2, [C[0] - R, C[1]], [C[0] + R, C[1]], 'black', wt('boej', 'Skiven') - 0.1, wt('boej', 'Skiven') + 0.4);
+    text(2, 'D = 34 d = 850 mm', 620, 170, 36, 'black', wt('boej', 'Skiven') - 0.1, we('boej', 'millimeter'));
+    text(2, 'd_w = d/16 = 1,56 mm', 620, 240, 36, 'black', wt('boej', 'tråden') - 0.1, we('boej', 'millimeter', 1));
+    text(2, 'σ_b = E d_w / D = 83 000 · 1,56 / 850', 620, 320, 32, 'black', wt('boej', 'Sigma') - 0.1, we('boej', 'w') + 0.4);
+    const ts = we('boej', 'megapascal');
+    const r = text(2, '= 153 MPa', 700, 390, 40, 'red', wt('boej', 'altså', 1) - 0.1, ts);
+    ring(r, 'red', ts, ts + 0.4);
+    const tf = L('fb').start, te = we('fb', 'kilonewton');
+    const r2 = text(2, 'F_b = σ_b A_m = 36,8 kN', 620, 500, 42, 'red', tf - 0.1, te);
+    box(2, 600, 450, 520, 75, 'red', te, te + 0.5);
+    text(2, '≈ 3 × lasten!', 640, 590, 36, 'green', wt('fb', 'næsten') - 0.1, we('fb', 'lasten'));
+  }
+
+  // ---------------------------------------------------------------- 3 samlet last + sikkerhed (søjle)
+  B.goto('total', 3);
+  {
+    const t0 = L('total').start, x0 = 180, y0 = 620, s = 8;
+    text(3, 'F_{total} = 12,7 + 1,3 + 36,8 = 50,7 kN', 140, 140, 40, 'blue', t0 - 0.1, we('total', 'kilonewton'));
+    box(3, x0, y0 - 12.68 * s, 140, 12.68 * s, 'black', wt('total', 'tolv') - 0.1, wt('total', 'tolv') + 0.4);
+    box(3, x0, y0 - 13.97 * s, 140, 1.29 * s, 'green', wt('total', 'en') - 0.1, wt('total', 'en') + 0.3);
+    box(3, x0, y0 - 50.74 * s, 140, 36.77 * s, 'red', wt('total', 'seksogtredive') - 0.1, wt('total', 'seksogtredive') + 0.5);
+    text(3, 'statisk', x0 + 160, y0 - 50, 26, 'black', wt('total', 'tolv'), wt('total', 'tolv') + 0.4);
+    text(3, 'bøjning F_b', x0 + 160, y0 - 280, 28, 'red', wt('total', 'seksogtredive'), wt('total', 'seksogtredive') + 0.5);
+    const tb = L('brud').start;
+    text(3, 'F_u = 640 MPa · π d²/4 = 314 kN', 560, 280, 36, 'black', tb - 0.1, we('brud', 'kilonewton'));
+    const tn = we('brud', 'to');
+    const r = text(3, 'n = 314 / 50,7 = 6,2', 560, 360, 44, 'green', wt('brud', 'Sikkerhedsfaktoren') - 0.1, tn);
+    ring(r, 'green', tn, tn + 0.5);
+    const tv = L('vurdering').start;
+    text(3, '≥ 5 (hejseværk) ⇒ ét tov holder', 560, 440, 34, 'green', tv - 0.1, we('vurdering', 'holder'));
+    text(3, 'uden F_b:  n = 22,5', 560, 520, 34, 'red', wt('vurdering', 'uden') - 0.1, we('vurdering', 'toogtyve'));
+    text(3, '⇒ bøjningen dimensionerer', 560, 580, 34, 'red', wt('vurdering', 'bøjningen', 1) - 0.1, we('vurdering', 'tovet'));
+  }
+
+  B.goto('tjek_q', 4);
+  B.tjek(4, ['Hvor lille må skiven være,', 'før n falder under 5?'], ['F_b ≤ 314/5 − 14 ≈ 49 kN', '⇒ D ≥ 640 mm'], 'tjek_q', 'tjek_a');
+
+  // ---------------------------------------------------------------- 5 Mathcad-plot n(D)
+  B.goto('tjek_vis', 5);
+  {
+    const t0 = L('tjek_vis').start, x0 = 230, y0 = 620, w = 720, h = 420, D0 = 0.3, D1 = 2, Y = 12;
+    const P = (D, n) => [x0 + (D - D0) / (D1 - D0) * w, y0 - n / Y * h];
+    const nD = (D) => 314.159 / (13.9734 + 83e9 * 1.5625e-3 / D * 2.41e-4 / 1000);
+    text(5, 'Mathcad-plot:  sikkerhed mod skivediameter', 640, 120, 30, 'black', t0, t0 + 0.8, { align: 'center' });
+    axes(5, x0, y0, x0 + w + 40, y0 - h - 20, 'D (m)', 'n', t0 + 0.2);
+    [[0.5, '0,5'], [1, '1'], [1.5, '1,5'], [2, '2']].forEach(([D, s], i) => { const p = P(D, 0); text(5, s, p[0], y0 + 34, 26, 'black', t0 + 0.5 + i * 0.08, t0 + 0.7 + i * 0.08, { align: 'center' }); });
+    [[5, '5'], [10, '10']].forEach(([v, s], i) => { const p = P(D0, v); text(5, s, x0 - 12, p[1] + 8, 24, 'black', t0 + 0.6 + i * 0.1, t0 + 0.8 + i * 0.1, { align: 'right' }); });
+    const pts = []; for (let i = 0; i <= 140; i++) { const D = D0 + (D1 - D0) * i / 140; pts.push(P(D, nD(D))); }
+    const ts = wt('tjek_vis', 'små');
+    line(5, pts, 'blue', 3.6, ts - 0.3, we('tjek_vis', 'sikkerheden', 1) + 0.6, { wob: 0.35 });
+    B.dashed(5, P(D0, 5), P(D1, 5), 'black', ts, ts + 0.6);
+    const tk = wt('tjek_vis', 'krydser'), pk = P(0.6397, 5);
+    dot(5, ...pk, 8, 'red', tk); B.dashed(5, [pk[0], y0], pk, 'red', tk, tk + 0.4);
+    text(5, '640 mm = 25,6 d', pk[0] + 14, pk[1] + 40, 28, 'red', tk, we('tjek_vis', 'millimeter'));
+    const pe = P(0.85, nD(0.85)); dot(5, ...pe, 7, 'green', tk + 0.5);
+    text(5, 'eksemplet: 850 mm, n = 6,2', pe[0] + 14, pe[1] - 14, 26, 'green', tk + 0.5, we('tjek_vis', 'millimeter'));
+    text(5, 'bogens minimum: 26 d', 760, 560, 30, 'green', wt('tjek_vis', 'bogens') - 0.1, we('tjek_vis', 'd', 1));
+  }
+
+  B.goto('slut', 6);
+  B.slut(6, 'Hamrock et al., eksempel 19.4, lign. (19.14)–(19.18), tabel 19.6 · Abou-Hayt (2026), MEM1 Chapter 19, slide 7 · Mathcad: Lektion 19/Opgaver/Eksempel 19.4', 'rullekæder', 'slut');
+  text(6, 'F_{total} = 12,7 + 1,3 + 36,8 = 50,7 kN', 200, 280, 40, 'blue', wt('slut', 'total') - 0.1, we('slut', 'b'));
+  text(6, 'n = 6,2 ≥ 5', 200, 370, 44, 'green', wt('slut', 'sikkerheden') - 0.1, we('slut', 'to'));
+  text(6, 'større skive ⇒ mindre bøjning', 200, 460, 40, 'red', wt('slut', 'Jo') - 0.1, we('slut', 'bøjning'));
+});
+
+</script>
+<script>BP.live({"duration":158.808,"audio":"opg-19-4-staaltov.mp3","order":["titel","data","fbd","accel","boej","fb","total","brud","vurdering","tjek_q","tjek_a","tjek_vis","slut"],"lines":{"titel":{"start":0.5,"end":10.381,"words":[["Eksempel",0.54,1.16],["nitten",1.4,1.68],["fire",1.82,2.08],["fra",2.16,2.24],["bogen",2.34,2.64],["regnet",2.92,3.26],["med",3.32,3.46],["slidernes",3.78,4.281],["lastmodel",4.341,4.821],["Et",5.841,5.941],["ståltov",6.361,6.841],["hejser",6.941,7.281],["lysrigningen",7.361,8.061],["i",8.161,8.181],["et",8.221,8.301],["teater",8.341,8.761],["Holder",9.181,9.501],["ét",9.981,10.081],["tov",10.201,10.381]],"text":"Eksempel nitten fire fra bogen, regnet med slidernes lastmodel. Et ståltov hejser lysrigningen i et teater. Holder ét tov?"},"data":{"start":12.201,"end":28.263,"words":[["Lasten",12.241,12.601],["er",12.721,12.821],["tolv",13.141,13.441],["kilonewton",13.581,14.221],["og",14.721,14.781],["den",14.821,14.941],["hejses",15.061,15.481],["tredive",15.601,15.921],["meter",15.961,16.221],["med",16.421,16.561],["accelerationen",16.761,17.501],["en",17.681,17.801],["meter",17.881,18.121],["pr",18.201,18.321],["sekund",18.361,18.701],["i",18.781,18.801],["anden",18.921,19.142],["Tovet",19.982,20.322],["er",20.442,20.542],["femogtyve",20.902,21.402],["millimeter",21.402,21.902],["seks",22.262,22.462],["gange",22.522,22.722],["nitten",22.822,23.102],["med",23.622,23.762],["metalarealet",23.862,24.682],["to",25.002,25.122],["komma",25.262,25.442],["fire",25.622,25.862],["et",26.002,26.102],["gange",26.242,26.463],["ti",26.563,26.703],["i",26.883,26.903],["minus",27.003,27.303],["fjerde",27.363,27.643],["kvadratmeter",27.683,28.263]],"text":"Lasten er tolv kilonewton, og den hejses tredive meter med accelerationen en meter pr. sekund i anden. Tovet er femogtyve millimeter seks gange nitten med metalarealet to komma fire et gange ti i minus fjerde kvadratmeter."},"fbd":{"start":29.363,"end":39.604,"words":[["Frit",29.403,29.623],["legeme",29.683,29.923],["diagram",29.963,30.343],["af",30.383,30.443],["lasten",30.483,30.783],["Tovet",31.523,31.823],["trækker",31.903,32.223],["op",32.303,32.423],["og",32.823,32.903],["lasten",33.043,33.423],["plus",33.523,33.744],["tovets",33.804,34.064],["egen",34.224,34.404],["vægt",34.464,34.644],["trækker",34.764,35.024],["ned",35.064,35.204],["Tovet",35.964,36.204],["vejer",36.244,36.504],["niogtres",36.584,37.024],["kilo",37.064,37.304],["altså",37.744,38.024],["seks",38.284,38.504],["hundrede",38.524,38.764],["og",38.804,38.864],["firs",38.904,39.164],["newton",39.264,39.604]],"text":"Frit legeme diagram af lasten. Tovet trækker op, og lasten plus tovets egen vægt trækker ned. Tovet vejer niogtres kilo, altså seks hundrede og firs newton."},"accel":{"start":41.424,"end":51.646,"words":[["Massen",41.464,41.765],["skal",41.805,41.965],["accelereres",42.005,42.485],["opad",42.565,42.825],["Kraften",43.425,43.785],["til",43.825,43.945],["det",43.965,44.085],["er",44.285,44.365],["massen",44.625,44.925],["gange",45.005,45.225],["a",45.365,45.385],["altså",45.825,46.065],["tolv",46.405,46.605],["tusind",46.645,46.965],["seks",47.065,47.245],["hundrede",47.285,47.485],["og",47.485,47.525],["firs",47.525,47.785],["divideret",47.965,48.365],["med",48.405,48.485],["g",48.525,48.545],["Det",49.326,49.406],["giver",49.446,49.626],["tolv",49.626,50.106],["hundrede",50.186,50.486],["og",50.546,50.626],["treoghalvfems",50.666,51.286],["newton",51.326,51.646]],"text":"Massen skal accelereres opad. Kraften til det er massen gange a, altså tolv tusind seks hundrede og firs divideret med g. Det giver tolv hundrede og treoghalvfems newton."},"boej":{"start":53.466,"end":71.068,"words":[["Nu",53.506,53.586],["bøjningen",53.826,54.266],["Skiven",54.906,55.266],["er",55.406,55.506],["fireogtredive",55.806,56.386],["gange",56.426,56.626],["d",56.666,56.686],["altså",57.207,57.427],["otte",57.907,58.087],["hundrede",58.167,58.427],["og",58.427,58.487],["halvtreds",58.487,58.827],["millimeter",58.887,59.327],["og",59.807,59.887],["tråden",60.047,60.447],["er",60.587,60.667],["d",60.867,60.887],["over",61.147,61.327],["seksten",61.407,61.827],["en",62.387,62.487],["komma",62.567,62.767],["fem",62.847,63.007],["seks",63.127,63.327],["millimeter",63.387,63.807],["Sigma",64.968,65.268],["b",65.388,65.408],["er",65.728,65.828],["E",66.168,66.188],["gange",66.628,66.868],["d",66.988,67.008],["w",67.508,67.528],["over",67.888,68.068],["D",68.148,68.168],["altså",68.768,68.988],["hundrede",69.288,69.548],["og",69.568,69.628],["treoghalvtreds",69.648,70.228],["megapascal",70.508,71.068]],"text":"Nu bøjningen. Skiven er fireogtredive gange d, altså otte hundrede og halvtreds millimeter, og tråden er d over seksten, en komma fem seks millimeter. Sigma b er E gange d w over D, altså hundrede og treoghalvtreds megapascal."},"fb":{"start":72.029,"end":79.11,"words":[["Gange",72.069,72.289],["metalarealet",72.329,73.089],["giver",73.189,73.349],["det",73.369,73.489],["F",73.909,73.929],["b",74.069,74.089],["lig",74.569,74.709],["seksogtredive",74.709,75.489],["komma",75.529,75.689],["otte",75.809,76.049],["kilonewton",76.049,76.669],["Det",77.269,77.369],["er",77.389,77.429],["næsten",77.469,77.729],["tre",77.829,77.989],["gange",78.109,78.309],["så",78.349,78.449],["meget",78.469,78.629],["som",78.669,78.769],["lasten",78.809,79.11]],"text":"Gange metalarealet giver det F b lig seksogtredive komma otte kilonewton. Det er næsten tre gange så meget som lasten."},"total":{"start":80.93,"end":88.511,"words":[["Den",80.97,81.11],["samlede",81.25,81.63],["last",81.67,81.89],["er",82.03,82.13],["tolv",82.45,82.67],["komma",82.73,82.89],["syv",82.99,83.17],["plus",83.31,83.57],["en",83.85,83.95],["komma",84.03,84.21],["tre",84.27,84.43],["plus",84.77,84.95],["seksogtredive",84.97,85.65],["komma",85.67,85.83],["otte",85.95,86.15],["Det",86.73,86.83],["giver",86.85,87.01],["halvtreds",87.091,87.451],["komma",87.511,87.671],["syv",87.731,87.871],["kilonewton",87.951,88.511]],"text":"Den samlede last er tolv komma syv plus en komma tre plus seksogtredive komma otte. Det giver halvtreds komma syv kilonewton."},"brud":{"start":89.671,"end":99.752,"words":[["Brudstyrken",89.711,90.351],["er",90.531,90.631],["seks",90.911,91.131],["hundrede",91.171,91.431],["og",91.471,91.531],["fyrre",91.591,91.851],["megapascal",91.911,92.511],["gange",92.751,92.971],["tovets",93.031,93.331],["nominelle",93.411,93.851],["areal",93.931,94.271],["altså",94.672,94.892],["tre",95.012,95.132],["hundrede",95.232,95.492],["og",95.492,95.552],["fjorten",95.592,95.952],["kilonewton",95.992,96.532],["Sikkerhedsfaktoren",97.292,97.972],["bliver",98.032,98.192],["seks",98.192,99.592],["komma",99.592,99.712],["to",99.712,99.752]],"text":"Brudstyrken er seks hundrede og fyrre megapascal gange tovets nominelle areal, altså tre hundrede og fjorten kilonewton. Sikkerhedsfaktoren bliver seks komma to."},"vurdering":{"start":101.452,"end":111.694,"words":[["Kravet",101.492,101.652],["til",101.672,101.772],["hejseværk",101.812,102.312],["er",102.352,102.412],["fem",102.452,102.612],["så",103.032,103.212],["ét",103.513,103.593],["tov",103.653,103.833],["holder",103.893,104.153],["Men",104.793,104.933],["læg",105.133,105.273],["mærke",105.353,105.593],["til",105.673,105.833],["at",105.973,106.073],["uden",106.213,106.393],["bøjningen",106.473,106.953],["ville",107.113,107.273],["sikkerheden",107.333,107.793],["være",107.853,108.033],["over",108.153,108.353],["toogtyve",108.413,108.933],["Det",109.493,109.573],["er",109.593,109.633],["bøjningen",109.673,110.093],["over",110.133,110.293],["skiven",110.333,110.653],["der",110.693,110.793],["dimensionerer",110.814,111.394],["tovet",111.414,111.694]],"text":"Kravet til hejseværk er fem, så ét tov holder. Men læg mærke til, at uden bøjningen ville sikkerheden være over toogtyve. Det er bøjningen over skiven, der dimensionerer tovet."},"tjek_q":{"start":113.514,"end":117.454,"words":[["Tjek",113.554,113.714],["dig",113.734,113.814],["selv",113.854,114.034],["Hvor",114.594,114.734],["lille",114.794,115.014],["må",115.074,115.194],["skiven",115.274,115.574],["være",115.614,115.834],["før",115.954,116.114],["sikkerheden",116.214,116.654],["falder",116.714,116.974],["under",117.074,117.254],["fem",117.314,117.454]],"text":"Tjek dig selv. Hvor lille må skiven være, før sikkerheden falder under fem?"},"tjek_a":{"start":121.574,"end":130.496,"words":[["F",121.614,121.634],["b",121.714,121.734],["må",121.954,122.054],["højst",122.094,122.374],["være",122.414,122.575],["tre",122.575,122.735],["hundrede",122.815,122.975],["og",122.995,123.035],["fjorten",123.035,123.375],["divideret",123.455,123.815],["med",123.855,123.935],["fem",123.995,124.115],["minus",124.615,124.875],["fjorten",124.915,125.255],["altså",125.735,125.955],["cirka",126.035,126.315],["niogfyrre",126.655,127.175],["kilonewton",127.175,127.755],["Det",128.215,128.295],["giver",128.335,128.495],["D",128.555,128.575],["lig",128.775,128.915],["seks",128.935,129.455],["hundrede",129.495,129.735],["og",129.756,129.796],["fyrre",129.796,130.056],["millimeter",130.056,130.496]],"text":"F b må højst være tre hundrede og fjorten divideret med fem minus fjorten, altså cirka niogfyrre kilonewton. Det giver D lig seks hundrede og fyrre millimeter."},"tjek_vis":{"start":132.316,"end":145.037,"words":[["Her",132.356,132.516],["er",132.616,132.676],["Mathcad-plottet",132.756,133.556],["af",133.616,133.696],["sikkerheden",133.776,134.236],["mod",134.296,134.436],["skivediameteren",134.496,135.336],["Ved",135.776,135.876],["små",135.916,136.076],["skiver",136.116,136.416],["styrtdykker",136.776,137.356],["sikkerheden",137.416,137.856],["Kurven",138.617,138.857],["krydser",138.897,139.197],["fem",139.277,139.417],["ved",139.557,139.677],["seks",139.677,139.937],["hundrede",139.957,140.197],["og",140.217,140.257],["fyrre",140.257,140.477],["millimeter",140.497,140.957],["Det",141.337,141.417],["er",141.437,141.477],["femogtyve",141.477,141.997],["komma",142.057,142.217],["seks",142.297,142.477],["gange",142.517,142.697],["d",142.717,142.757],["præcis",143.277,143.577],["bogens",143.637,143.897],["minimum",143.957,144.297],["på",144.357,144.497],["seksogtyve",144.517,144.977],["d",145.017,145.037]],"text":"Her er Mathcad-plottet af sikkerheden mod skivediameteren. Ved små skiver styrtdykker sikkerheden. Kurven krydser fem ved seks hundrede og fyrre millimeter. Det er femogtyve komma seks gange d, præcis bogens minimum på seksogtyve d."},"slut":{"start":146.857,"end":157.338,"words":[["Kort",146.897,147.077],["sagt",147.117,147.337],["F",148.097,148.117],["total",148.197,148.557],["er",148.637,148.697],["statisk",148.777,149.197],["last",149.277,149.497],["plus",149.597,149.817],["acceleration",149.937,150.557],["plus",150.637,150.857],["F",151.077,151.097],["b",151.197,151.217],["Her",151.897,152.017],["er",152.037,152.077],["F",152.197,152.217],["b",152.297,152.317],["den",152.497,152.597],["største",152.677,152.977],["post",153.037,153.277],["og",153.677,153.737],["sikkerheden",153.777,154.178],["bliver",154.198,154.378],["seks",154.538,154.718],["komma",154.738,154.898],["to",154.958,155.038],["Jo",155.698,155.738],["større",155.798,156.018],["skive",156.058,156.298],["jo",156.638,156.718],["mindre",156.778,156.998],["bøjning",157.038,157.338]],"text":"Kort sagt: F total er statisk last plus acceleration plus F b. Her er F b den største post, og sikkerheden bliver seks komma to. Jo større skive, jo mindre bøjning."}}}, { audio: 'opg-19-4-staaltov.mp3', id: 'opg-19-4-staaltov' });</script>
+</body>
+</html>

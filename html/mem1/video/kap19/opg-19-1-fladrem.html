@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eksempel 19.1: fladrem med centrifugalkraft · video</title>
+<meta name="description" content="Eksempel 19.1: F1 = 1569 N, F2 = 805 N; med olie kun 8,29 kW, så remmen glider.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 19: videoer</a><h1>Eksempel 19.1: fladrem med centrifugalkraft</h1><span class="meta">MEM1 · kapitel 19 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Eksempel 19.1: fladrem med centrifugalkraft"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Eksempel 19.1: F1 = 1569 N, F2 = 805 N; med olie kun 8,29 kW, så remmen glider.</p><div class="chips"><a href="../../opgaver/l19/eksempel-19.1-fladrem-med-centrifugalkraft.pdf">📐 Se udregningen i Mathcad (PDF)</a><a href="remtraek.html">Se først: Fladremme: remligningen og centrifugalkraften</a><a href="../../../../lab/mem1/remtraek.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel19_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l19">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Hamrock eksempel 19.1 regnet med slide 4: u = 15,71 m/s, ΔF = 764 N, m' = 1,164 kg/m, F_c = 287 N, φ = 173,1°, e = 2,476,
+// F_2 = 805 N, F_1 = 1569 N, F_i = 1187 N; μ = 0,2: F_1 = 1451, F_2 = 923 N, P = 8,29 kW < 12 kW (glider); L = 5,95 m (bogen: 4,483 m).
+// Mathcad: Lektion 19/Opgaver/Eksempel 19.1 fladrem med centrifugalkraft
+BP.scene({ header: 'MEM1 · kap. 19', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, axes, PI, TAU } = B;
+
+  B.titel(0, 'Eksempel 19.1: fladrem', 'MEM1 · kapitel 19 · Hamrock eks. 19.1 med slide 4', 'titel');
+  text(0, '12 kW · glider remmen med olie?', 640, 540, 42, 'red', wt('titel', 'tjekker') - 0.1, we('titel', 'på'), { align: 'center' });
+
+  // ---------------------------------------------------------------- 1 drevet
+  B.goto('opgave', 1);
+  {
+    const t0 = L('opgave').start, c1 = [260, 360], c2 = [900, 360], r1 = 60, r2 = 180;
+    const tb = wt('opgave', 'Remmen');
+    text(1, 'rem 150 × 8 mm', 160, 140, 34, 'blue', tb - 0.1, we('opgave', 'tyk'));
+    const ts = wt('opgave', 'lille');
+    line(1, ell(c1[0], c1[1], r1, r1, 0, TAU), 'black', 3, ts - 0.1, ts + 0.4);
+    text(1, 'D_1 = 150 mm', c1[0], c1[1] + r1 + 140, 30, 'black', ts, we('opgave', 'millimeter', 2), { align: 'center' });
+    text(1, '2000 o/min', c1[0], c1[1] + r1 + 185, 30, 'red', wt('opgave', 'drejer') - 0.1, we('opgave', 'minuttet'), { align: 'center' });
+    const tl = wt('opgave', 'store');
+    line(1, ell(c2[0], c2[1], r2, r2, 0, TAU), 'black', 3, tl - 0.1, tl + 0.5);
+    text(1, 'D_2 = 450 mm', c2[0], c2[1] + r2 + 50, 30, 'black', tl, we('opgave', 'millimeter', 3), { align: 'center' });
+    line(1, [[c1[0] - 4, c1[1] - r1], [c2[0] - 12, c2[1] - r2]], 'blue', 4, tb, tb + 0.5);
+    line(1, [[c1[0] - 4, c1[1] + r1], [c2[0] - 12, c2[1] + r2]], 'blue', 4, tb + 0.2, tb + 0.7);
+    const tc = wt('opgave', 'centerafstanden');
+    B.dobbeltpil(1, [c1[0], c1[1]], [c2[0], c2[1]], 'green', tc - 0.1, tc + 0.4);
+    text(1, 'c = 2,5 m', 560, c1[1] - 14, 30, 'green', tc, we('opgave', 'meter'), { align: 'center' });
+    text(1, 'P = 12 kW,  ρ = 970 kg/m³', 640, 120, 30, 'black', t0 + 0.2, t0 + 0.8);
+  }
+
+  // ---------------------------------------------------------------- 2 hastighed, trækforskel, F_c, vinkel
+  B.goto('hastighed', 2);
+  {
+    const t0 = L('hastighed').start;
+    text(2, 'ω = 2000 · 2π/60 = 209 rad/s', 140, 140, 36, 'black', wt('hastighed', 'Omega') - 0.1, we('hastighed', 'sekund'));
+    const tu = we('hastighed', 'sekund', 1);
+    const r1 = text(2, 'u = ω · D_1/2 = 15,7 m/s', 140, 205, 38, 'blue', wt('hastighed', 'radius') - 0.1, tu);
+    under(r1, 'blue', tu, tu + 0.3);
+    const tf = L('forskel').start;
+    text(2, 'F_1 − F_2 = P/u = 12 000/15,7 = 764 N', 140, 290, 36, 'black', tf - 0.1, we('forskel', 'newton'));
+    const tc = L('fc').start, te = we('fc', 'newton');
+    text(2, "m' = ρ b t = 1,164 kg/m", 140, 380, 36, 'black', tc - 0.1, we('fc', 'meter'));
+    const r2 = text(2, "F_c = m' u² = 287 N", 640, 380, 40, 'green', wt('fc', 'Centrifugalkraften') - 0.1, te);
+    ring(r2, 'green', te, te + 0.5);
+    const tv = L('vinkel').start;
+    text(2, 'α = asin((D_2 − D_1)/(2c)) = 3,44°', 140, 480, 34, 'black', tv - 0.1, wt('vinkel', 'lidt') + 0.2);
+    text(2, 'φ = 180° − 2α = 173,1°', 140, 545, 38, 'blue', wt('vinkel', 'lidt') - 0.1, we('vinkel', 'grader'));
+  }
+
+  // ---------------------------------------------------------------- 3 F_1 og F_2
+  B.goto('ligning', 3);
+  {
+    const t0 = L('ligning').start;
+    text(3, '(F_1 − F_c)/(F_2 − F_c) = e^{μφ}', 140, 150, 40, 'black', t0, t0 + 1.2);
+    text(3, 'e^{0,30 · 3,021} = 2,476', 780, 150, 34, 'red', wt('ligning', 'e') - 0.1, we('ligning', 'otte'));
+    text(3, 'F_1 = F_2 + 764', 140, 220, 38, 'black', wt('ligning', 'sætter') - 0.1, we('ligning', 'fireogtres'));
+    text(3, '⇒ F_2 = 764/(e − 1) + F_c', 140, 290, 38, 'blue', wt('ligning', 'isolerer') - 0.1, we('ligning', 'to', 2));
+    const ta = L('svar_a').start, te = we('svar_a', 'newton', 1);
+    const r1 = text(3, 'F_2 = 518 + 287 = 805 N', 140, 380, 44, 'blue', ta - 0.1, we('svar_a', 'newton'));
+    const r2 = text(3, 'F_1 = 805 + 764 = 1569 N', 140, 460, 44, 'red', wt('svar_a', 'F', 1) - 0.1, te);
+    box(3, 120, 335, 640, 145, 'red', te, te + 0.5);
+    text(3, 'F_c lægges oven i begge parter', 140, 560, 34, 'green', wt('svar_a', 'Læg') - 0.1, we('svar_a', 'parter'));
+    text(3, 'F_i = (F_1 + F_2)/2 = 1187 N', 140, 630, 34, 'black', wt('svar_a', 'Læg') + 0.4, we('svar_a', 'parter') + 0.3);
+    // søjle: F_1 og F_2 delt i F_c og resten
+    const x0 = 860, y0 = 640, s = 0.3;
+    const tb = ta + 0.2;
+    box(3, x0, y0 - 287 * s, 100, 287 * s, 'green', tb, tb + 0.4); box(3, x0, y0 - 805 * s, 100, 518 * s, 'blue', tb + 0.3, tb + 0.7);
+    box(3, x0 + 140, y0 - 287 * s, 100, 287 * s, 'green', tb + 0.5, tb + 0.9); box(3, x0 + 140, y0 - 1569 * s, 100, 1282 * s, 'red', tb + 0.8, tb + 1.2);
+    text(3, 'F_2', x0 + 50, y0 + 32, 28, 'blue', tb + 0.3, tb + 0.6, { align: 'center' });
+    text(3, 'F_1', x0 + 190, y0 + 32, 28, 'red', tb + 0.8, tb + 1.1, { align: 'center' });
+    text(3, 'F_c', x0 - 12, y0 - 40, 26, 'green', tb, tb + 0.4, { align: 'right' });
+  }
+
+  // ---------------------------------------------------------------- 4 olie: μ = 0,2
+  B.goto('olie', 4);
+  {
+    const t0 = L('olie').start;
+    bubble(4, 'Olie: μ = 0,20', 140, 140, 44, 'red', t0 - 0.1, wt('olie', 'falder') + 0.4);
+    text(4, 'F_1 + F_2 = 2 F_i = 2 · 1187 N (fast)', 140, 240, 36, 'black', wt('olie', 'Forspændingen') - 0.1, we('olie', 'syvogfirs'));
+    text(4, 'e^{0,20 φ} = 1,830', 140, 310, 36, 'black', wt('olie', 'falder') - 0.1, wt('olie', 'falder') + 0.6);
+    const tg = L('glider').start;
+    text(4, 'F_1 = 1451 N,   F_2 = 923 N', 140, 400, 40, 'blue', tg - 0.1, we('glider', 'newton'));
+    const tp = we('glider', 'kilowatt');
+    text(4, 'P = (F_1 − F_2) · u = 8,29 kW', 140, 490, 42, 'black', wt('glider', 'Effekten') - 0.1, tp);
+    const tq = we('glider', 'glider');
+    const r = text(4, '8,29 < 12 kW  ⇒  remmen glider', 140, 590, 46, 'red', wt('glider', 'mindre') - 0.1, tq);
+    under(r, 'red', tq, tq + 0.4);
+  }
+
+  // ---------------------------------------------------------------- 5 remlængden
+  B.goto('laengde', 5);
+  {
+    const tl = L('laengde').start, c1 = [300, 420], c2 = [900, 420], r1 = 40, r2 = 120;
+    line(5, ell(c1[0], c1[1], r1, r1, 0, TAU), 'black', 3, tl, tl + 0.4); line(5, ell(c2[0], c2[1], r2, r2, 0, TAU), 'black', 3, tl + 0.1, tl + 0.5);
+    line(5, [[c1[0], c1[1] - r1], [c2[0], c2[1] - r2]], 'blue', 4, tl + 0.3, tl + 0.7); line(5, [[c1[0], c1[1] + r1], [c2[0], c2[1] + r2]], 'blue', 4, tl + 0.3, tl + 0.7);
+    text(5, 'L = √((2c)² − (D_2 − D_1)²) + π(D_1 + D_2)/2 + (D_2 − D_1)α', 140, 150, 32, 'black', tl, we('laengde', 'fem'));
+    const te = we('laengde', 'meter');
+    const r1x = text(5, 'L = 5,95 m', 140, 240, 46, 'green', wt('laengde', 'får') - 0.1, te);
+    ring(r1x, 'green', te, te + 0.5);
+    const tb = wt('laengde', 'Bogen');
+    const rb = text(5, 'bogen: 4,483 m', 640, 240, 40, 'black', tb - 0.1, we('laengde', 'meter', 1));
+    B.strike(rb,wt('laengde', 'passe'), we('laengde', 'passe') + 0.3);
+    const tg = wt('laengde', 'lige');
+    line(5, [[c1[0], c1[1] - r1], [c2[0], c2[1] - r2]], 'red', 6, tg - 0.1, tg + 0.4); line(5, [[c1[0], c1[1] + r1], [c2[0], c2[1] + r2]], 'red', 6, tg + 0.1, tg + 0.6);
+    text(5, '2 × ca. 2,5 m ≈ 5 m alene', 600, 620, 34, 'red', tg, we('laengde', 'meter', 2), { align: 'center' });
+  }
+
+  B.goto('tjek_q', 6);
+  B.tjek(6, ['Fast forspænding F_i:', 'ved hvilken u er effekten størst?'], ["u = √(F_i/(3m')) = 18,4 m/s", 'lidt over de 15,7 m/s'], 'tjek_q', 'tjek_a');
+
+  // ---------------------------------------------------------------- 6 Mathcad-plot P(u)
+  B.goto('tjek_vis', 7);
+  {
+    const t0 = L('tjek_vis').start, x0 = 230, y0 = 620, w = 720, h = 420, U = 32, Pm = 14;
+    const P = (u, p) => [x0 + u / U * w, y0 - p / Pm * h];
+    const Pi = (u) => (2.47553 - 1) / (2.47553 + 1) * 2 * (1186.92 - 1.164 * u * u) * u / 1000;
+    text(7, 'Mathcad-plot:  effekt mod remhastighed (fast F_i)', 640, 120, 30, 'black', t0, t0 + 0.8, { align: 'center' });
+    axes(7, x0, y0, x0 + w + 40, y0 - h - 20, 'u (m/s)', 'P (kW)', t0 + 0.2);
+    [[10, '10'], [20, '20'], [30, '30']].forEach(([u, s], i) => { const p = P(u, 0); text(7, s, p[0], y0 + 34, 26, 'black', t0 + 0.5 + i * 0.1, t0 + 0.7 + i * 0.1, { align: 'center' }); });
+    [[5, '5'], [10, '10']].forEach(([v, s], i) => { const p = P(0, v); text(7, s, x0 - 12, p[1] + 8, 24, 'black', t0 + 0.6 + i * 0.1, t0 + 0.8 + i * 0.1, { align: 'right' }); });
+    const pts = []; for (let i = 0; i <= 140; i++) { const u = 31.9 * i / 140; pts.push(P(u, Math.max(0, Pi(u)))); }
+    const tb = wt('tjek_vis', 'blå');
+    line(7, pts, 'blue', 3.6, tb - 0.1, we('tjek_vis', 'remkraften'), { wob: 0.35 });
+    const pm = P(18.437, Pi(18.437)), tt = wt('tjek_vis', 'topper');
+    dot(7, ...pm, 8, 'red', tt); B.dashed(7, [pm[0], y0], pm, 'red', tt, tt + 0.4);
+    text(7, '18,4 m/s:  12,4 kW', pm[0] + 14, pm[1] - 18, 28, 'red', tt, we('tjek_vis', 'sekund'));
+    const ts = wt('tjek_vis', 'sorte');
+    B.dashed(7, P(0, 12), P(32, 12), 'black', ts - 0.1, ts + 0.6);
+    text(7, '12 kW', P(32, 12)[0] + 10, P(32, 12)[1] + 8, 26, 'black', ts, we('tjek_vis', 'kilowatt'));
+    const pd = P(15.708, 12); dot(7, ...pd, 7, 'green', ts + 0.3);
+    text(7, 'drift: 15,7 m/s', pd[0] - 14, pd[1] + 40, 26, 'green', ts + 0.3, we('tjek_vis', 'kilowatt'), { align: 'right' });
+  }
+
+  B.goto('slut', 8);
+  B.slut(8, 'Hamrock et al., eksempel 19.1, lign. (19.3)–(19.9) · Abou-Hayt (2026), MEM1 Chapter 19, slide 4 · Mathcad: Lektion 19/Opgaver/Eksempel 19.1', 'kilerem mod fladrem', 'slut');
+  text(8, 'F_1 = 1569 N,  F_2 = 805 N', 200, 280, 42, 'blue', wt('slut', 'find') - 0.1, we('slut', 'remligningen'));
+  text(8, 'μ = 0,2: 8,29 kW < 12 kW ⇒ glider', 200, 380, 40, 'red', wt('slut', 'olie') - 0.1, we('slut', 'glider'));
+});
+
+</script>
+<script>BP.live({"duration":165.16,"audio":"opg-19-1-fladrem.mp3","order":["titel","opgave","hastighed","forskel","fc","vinkel","ligning","svar_a","olie","glider","laengde","tjek_q","tjek_a","tjek_vis","slut"],"lines":{"titel":{"start":0.5,"end":10.021,"words":[["Eksempel",0.54,0.94],["nitten",1.04,1.26],["et",1.3,1.4],["fra",1.44,1.52],["bogen",1.6,1.86],["En",2.5,2.58],["fladrem",2.66,3.08],["overfører",3.18,3.66],["tolv",3.78,4.04],["kilowatt",4.08,4.481],["Vi",5.181,5.241],["finder",5.281,5.481],["remkræfterne",5.521,6.121],["med",6.161,6.281],["centrifugalkraft",6.421,7.401],["og",7.521,7.581],["vi",7.621,7.681],["tjekker",7.781,8.121],["om",8.201,8.281],["remmen",8.361,8.621],["glider",8.681,9.001],["når",9.121,9.241],["der",9.241,9.321],["kommer",9.321,9.521],["olie",9.601,9.801],["på",9.861,10.021]],"text":"Eksempel nitten et fra bogen. En fladrem overfører tolv kilowatt. Vi finder remkræfterne med centrifugalkraft, og vi tjekker, om remmen glider, når der kommer olie på."},"opgave":{"start":11.841,"end":26.703,"words":[["Remmen",11.881,12.141],["er",12.261,12.341],["hundrede",12.481,12.822],["og",12.882,12.962],["halvtreds",12.962,13.322],["millimeter",13.382,13.782],["bred",13.802,14.022],["og",14.502,14.582],["otte",14.702,14.922],["millimeter",14.942,15.302],["tyk",15.342,15.522],["Den",16.482,16.602],["lille",16.642,16.822],["skive",16.842,17.122],["er",17.282,17.382],["hundrede",17.462,17.722],["og",17.722,17.762],["halvtreds",17.762,18.082],["millimeter",18.162,18.662],["og",18.782,18.842],["drejer",18.882,19.202],["to",19.342,19.502],["tusind",19.682,20.062],["omdrejninger",20.142,20.603],["i",20.623,20.643],["minuttet",20.683,21.003],["Den",21.723,21.863],["store",21.923,22.163],["skive",22.203,22.483],["er",22.623,22.703],["fire",22.843,23.043],["hundrede",23.063,23.223],["og",23.223,23.263],["halvtreds",23.263,23.603],["millimeter",23.663,24.103],["og",24.523,24.583],["centerafstanden",24.643,25.383],["er",25.483,25.563],["to",25.703,25.803],["komma",25.943,26.123],["fem",26.223,26.383],["meter",26.463,26.703]],"text":"Remmen er hundrede og halvtreds millimeter bred og otte millimeter tyk. Den lille skive er hundrede og halvtreds millimeter og drejer to tusind omdrejninger i minuttet. Den store skive er fire hundrede og halvtreds millimeter, og centerafstanden er to komma fem meter."},"hastighed":{"start":28.523,"end":41.165,"words":[["Først",28.563,28.804],["remhastigheden",28.844,29.444],["Omega",30.164,30.504],["er",30.664,30.724],["to",30.844,30.964],["tusind",31.124,31.444],["gange",31.484,31.684],["to",31.764,31.884],["pi",32.004,32.144],["over",32.364,32.544],["tres",32.584,32.864],["altså",33.424,33.724],["to",33.904,34.004],["hundrede",34.164,34.384],["og",34.384,34.444],["ni",34.444,34.504],["radianer",34.624,35.024],["pr",35.064,35.164],["sekund",35.184,35.504],["Gange",36.305,36.505],["radius",36.545,36.905],["på",36.965,37.105],["femoghalvfjerds",37.185,37.785],["millimeter",37.845,38.325],["giver",38.545,38.705],["det",38.705,38.805],["u",38.925,38.945],["lig",39.245,39.365],["femten",39.365,39.885],["komma",39.945,40.145],["syv",40.245,40.385],["meter",40.485,40.725],["pr",40.745,40.845],["sekund",40.885,41.165]],"text":"Først remhastigheden. Omega er to tusind gange to pi over tres, altså to hundrede og ni radianer pr. sekund. Gange radius på femoghalvfjerds millimeter giver det u lig femten komma syv meter pr. sekund."},"forskel":{"start":42.485,"end":51.627,"words":[["Effekten",42.525,42.945],["er",43.045,43.145],["F",43.385,43.405],["et",43.545,43.665],["minus",43.866,44.206],["F",44.406,44.426],["to",44.526,44.626],["gange",44.766,44.966],["u",45.066,45.086],["Så",45.966,46.086],["er",46.086,46.126],["forskellen",46.166,46.666],["tolv",46.786,47.026],["tusind",47.086,47.466],["divideret",47.606,48.106],["med",48.166,48.286],["femten",48.406,48.706],["komma",48.746,48.946],["syv",49.046,49.206],["altså",49.726,50.026],["syv",50.206,50.346],["hundrede",50.446,50.706],["og",50.746,50.826],["fireogtres",50.866,51.266],["newton",51.326,51.627]],"text":"Effekten er F et minus F to gange u. Så er forskellen tolv tusind divideret med femten komma syv, altså syv hundrede og fireogtres newton."},"fc":{"start":52.727,"end":60.928,"words":[["Remmen",52.767,53.007],["vejer",53.067,53.347],["en",53.547,53.667],["komma",53.747,53.987],["et",54.167,54.247],["seks",54.347,54.587],["kilo",54.647,54.887],["pr",54.927,55.047],["meter",55.087,55.327],["Centrifugalkraften",56.027,57.007],["er",57.107,57.187],["m",57.387,57.407],["mærke",57.507,57.867],["gange",57.927,58.107],["u",58.207,58.227],["i",58.347,58.367],["anden",58.447,58.647],["altså",59.108,59.388],["to",59.508,59.628],["hundrede",59.748,59.988],["og",60.028,60.088],["syvogfirs",60.148,60.588],["newton",60.608,60.928]],"text":"Remmen vejer en komma et seks kilo pr. meter. Centrifugalkraften er m mærke gange u i anden, altså to hundrede og syvogfirs newton."},"vinkel":{"start":62.748,"end":69.309,"words":[["Skiverne",62.788,63.148],["er",63.228,63.288],["forskellige",63.328,63.788],["så",64.128,64.228],["omslutningen",64.268,64.828],["på",64.868,64.948],["den",64.968,65.048],["lille",65.108,65.288],["skive",65.348,65.628],["er",65.768,65.848],["lidt",65.968,66.128],["under",66.248,66.428],["en",66.448,66.528],["halv",66.568,66.728],["omgang",66.768,67.108],["hundrede",67.589,67.889],["og",67.929,67.989],["treoghalvfjerds",68.029,68.629],["komma",68.649,68.809],["et",68.909,68.989],["grader",69.029,69.309]],"text":"Skiverne er forskellige, så omslutningen på den lille skive er lidt under en halv omgang: hundrede og treoghalvfjerds komma et grader."},"ligning":{"start":71.129,"end":78.89,"words":[["Remligningen",71.169,71.749],["giver",71.809,72.029],["e",72.229,72.249],["i",72.409,72.429],["mu",72.489,72.549],["phi",72.689,72.789],["lig",72.929,73.049],["to",73.069,73.309],["komma",73.429,73.589],["fire",73.669,73.969],["otte",73.989,74.209],["Vi",74.949,75.009],["sætter",75.069,75.269],["F",75.409,75.429],["et",75.529,75.609],["lig",75.669,75.79],["F",76.01,76.03],["to",76.11,76.21],["plus",76.35,76.51],["syv",76.53,76.77],["hundrede",76.79,76.99],["og",77.01,77.05],["fireogtres",77.05,77.45],["ind",77.55,77.67],["og",78.09,78.17],["isolerer",78.21,78.59],["F",78.71,78.73],["to",78.81,78.89]],"text":"Remligningen giver e i mu phi lig to komma fire otte. Vi sætter F et lig F to plus syv hundrede og fireogtres ind og isolerer F to."},"svar_a":{"start":80.47,"end":88.531,"words":[["F",80.51,80.53],["to",80.57,80.65],["bliver",80.73,80.97],["otte",81.15,81.33],["hundrede",81.37,81.59],["og",81.59,81.63],["fem",81.65,81.85],["newton",81.85,82.15],["og",82.51,82.59],["F",82.75,82.77],["et",82.87,82.97],["bliver",83.03,83.25],["femten",83.391,83.711],["hundrede",83.751,84.071],["og",84.111,84.191],["niogtres",84.231,84.671],["newton",84.711,85.031],["Læg",85.671,85.811],["mærke",85.851,86.051],["til",86.071,86.211],["at",86.251,86.351],["F",86.551,86.571],["c",86.671,86.691],["bare",86.971,87.171],["lægges",87.231,87.491],["oven",87.631,87.851],["i",87.911,87.931],["begge",88.011,88.211],["parter",88.251,88.531]],"text":"F to bliver otte hundrede og fem newton, og F et bliver femten hundrede og niogtres newton. Læg mærke til, at F c bare lægges oven i begge parter."},"olie":{"start":90.351,"end":98.432,"words":[["Nu",90.391,90.451],["kommer",90.491,90.671],["der",90.691,90.771],["olie",90.851,91.071],["på",91.131,91.291],["og",91.491,91.591],["mu",91.731,91.811],["falder",92.071,92.312],["til",92.352,92.492],["nul",92.572,92.712],["komma",92.772,92.932],["to",93.012,93.112],["Forspændingen",93.792,94.332],["er",94.352,94.412],["den",94.432,94.512],["samme",94.552,94.772],["så",94.952,95.092],["F",95.332,95.352],["et",95.432,95.532],["plus",95.652,95.912],["F",96.112,96.132],["to",96.212,96.292],["er",96.492,96.572],["stadig",96.632,96.932],["to",97.012,97.132],["gange",97.232,97.452],["elleve",97.532,97.692],["hundrede",97.712,97.912],["og",97.912,97.952],["syvogfirs",97.952,98.432]],"text":"Nu kommer der olie på, og mu falder til nul komma to. Forspændingen er den samme, så F et plus F to er stadig to gange elleve hundrede og syvogfirs."},"glider":{"start":99.132,"end":108.914,"words":[["Det",99.172,99.252],["giver",99.272,99.392],["F",99.552,99.572],["et",99.692,99.793],["lig",99.953,100.053],["fjorten",100.053,100.533],["hundrede",100.553,100.813],["og",100.813,100.853],["enoghalvtreds",100.933,101.453],["og",101.893,101.973],["F",102.113,102.133],["to",102.193,102.293],["lig",102.413,102.553],["ni",102.573,102.613],["hundrede",102.613,103.113],["og",103.113,103.153],["treogtyve",103.193,103.693],["newton",103.693,104.013],["Effekten",104.753,105.093],["bliver",105.133,105.273],["kun",105.293,105.453],["otte",105.633,105.793],["komma",105.833,105.973],["to",106.053,106.153],["ni",106.353,106.433],["kilowatt",106.593,106.973],["Det",107.394,107.474],["er",107.494,107.534],["mindre",107.554,107.734],["end",107.774,107.854],["tolv",107.874,108.114],["så",108.314,108.414],["remmen",108.434,108.634],["glider",108.674,108.914]],"text":"Det giver F et lig fjorten hundrede og enoghalvtreds og F to lig ni hundrede og treogtyve newton. Effekten bliver kun otte komma to ni kilowatt. Det er mindre end tolv, så remmen glider."},"laengde":{"start":110.734,"end":120.815,"words":[["Til",110.774,110.894],["sidst",110.914,111.114],["remlængden",111.374,111.834],["Med",112.534,112.614],["ligning",112.634,112.894],["nitten",112.914,113.154],["fem",113.234,113.374],["får",113.554,113.674],["vi",113.714,113.754],["fem",113.794,114.034],["komma",114.094,114.254],["ni",114.294,114.354],["fem",114.514,114.654],["meter",114.734,114.974],["Bogen",115.474,115.674],["skriver",115.694,115.934],["fire",116.015,116.195],["komma",116.255,116.415],["fire",116.495,116.815],["otte",116.815,116.995],["meter",117.035,117.275],["men",117.315,117.435],["det",117.635,117.715],["kan",117.735,117.815],["ikke",117.815,117.915],["passe",117.935,118.255],["for",118.615,118.695],["de",118.715,118.795],["to",118.815,118.895],["lige",119.055,119.235],["stykker",119.275,119.595],["er",119.655,119.735],["alene",119.755,120.055],["næsten",120.115,120.355],["fem",120.415,120.535],["meter",120.595,120.815]],"text":"Til sidst remlængden. Med ligning nitten fem får vi fem komma ni fem meter. Bogen skriver fire komma fire otte meter, men det kan ikke passe, for de to lige stykker er alene næsten fem meter."},"tjek_q":{"start":122.635,"end":127.776,"words":[["Tjek",122.675,122.835],["dig",122.875,122.955],["selv",122.995,123.175],["Ved",123.735,123.835],["hvilken",123.875,124.175],["hastighed",124.235,124.676],["kan",124.736,124.836],["remmen",124.876,125.116],["overføre",125.256,125.636],["mest",125.756,125.976],["effekt",125.996,126.256],["hvis",126.616,126.756],["forspændingen",126.816,127.336],["holdes",127.356,127.556],["fast",127.576,127.776]],"text":"Tjek dig selv. Ved hvilken hastighed kan remmen overføre mest effekt, hvis forspændingen holdes fast?"},"tjek_a":{"start":131.896,"end":139.177,"words":[["Ved",131.936,132.036],["kvadratroden",132.056,132.716],["af",132.856,132.936],["F",133.176,133.196],["i",133.356,133.376],["over",133.656,133.836],["tre",133.876,134.156],["m",134.176,134.196],["mærke",134.256,134.516],["Det",135.176,135.256],["giver",135.276,135.417],["atten",135.477,135.657],["komma",135.677,135.837],["fire",135.937,136.157],["meter",136.217,136.417],["pr",136.437,136.537],["sekund",136.577,136.857],["lidt",137.317,137.437],["over",137.477,137.637],["de",137.677,137.717],["femten",137.797,138.077],["komma",138.117,138.277],["syv",138.357,138.497],["remmen",138.597,138.797],["kører",138.837,139.057],["med",139.077,139.177]],"text":"Ved kvadratroden af F i over tre m mærke. Det giver atten komma fire meter pr. sekund, lidt over de femten komma syv, remmen kører med."},"tjek_vis":{"start":140.997,"end":153.239,"words":[["Her",141.037,141.177],["er",141.237,141.297],["Mathcad-plottet",141.337,142.017],["Den",142.537,142.637],["blå",142.677,142.817],["kurve",142.877,143.137],["er",143.217,143.277],["effekten",143.317,143.717],["med",143.777,143.897],["fast",143.957,144.178],["forspænding",144.198,144.638],["Den",145.098,145.218],["stiger",145.298,145.598],["topper",145.898,146.198],["ved",146.218,146.358],["atten",146.378,146.698],["komma",146.738,146.898],["fire",146.978,147.198],["meter",147.238,147.438],["pr",147.458,147.558],["sekund",147.598,147.858],["og",148.238,148.298],["falder",148.338,148.558],["så",148.598,148.738],["fordi",148.898,149.058],["centrifugalkraften",149.198,150.158],["æder",150.298,150.498],["remkraften",150.538,151.018],["Den",151.638,151.739],["sorte",151.759,152.019],["linje",152.079,152.339],["er",152.419,152.479],["de",152.499,152.559],["tolv",152.679,152.879],["kilowatt",152.919,153.239]],"text":"Her er Mathcad-plottet. Den blå kurve er effekten med fast forspænding. Den stiger, topper ved atten komma fire meter pr. sekund og falder så, fordi centrifugalkraften æder remkraften. Den sorte linje er de tolv kilowatt."},"slut":{"start":155.059,"end":163.54,"words":[["Kort",155.099,155.259],["sagt",155.279,155.479],["find",155.879,156.039],["u",156.159,156.179],["læg",156.739,156.859],["F",157.019,157.039],["c",157.099,157.119],["oven",157.419,157.599],["i",157.619,157.639],["begge",157.679,157.859],["parter",157.899,158.199],["og",158.559,158.619],["brug",158.659,158.779],["remligningen",158.859,159.379],["Med",160.019,160.099],["olie",160.159,160.32],["på",160.36,160.44],["skiven",160.46,160.76],["når",160.86,160.98],["remmen",161.04,161.28],["kun",161.34,161.5],["otte",161.72,161.88],["komma",161.92,162.06],["tre",162.14,162.28],["kilowatt",162.48,162.9],["og",163.22,163.28],["glider",163.3,163.54]],"text":"Kort sagt: find u, læg F c oven i begge parter, og brug remligningen. Med olie på skiven når remmen kun otte komma tre kilowatt og glider."}}}, { audio: 'opg-19-1-fladrem.mp3', id: 'opg-19-1-fladrem' });</script>
+</body>
+</html>

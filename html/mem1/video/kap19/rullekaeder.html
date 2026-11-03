@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rullekæder: polygoneffekten og levetid · video</title>
+<meta name="description" content="Polygoneffekten, mindst 17 tænder, slid/udmattelse og effektkravet.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 19: videoer</a><h1>Rullekæder: polygoneffekten og levetid</h1><span class="meta">MEM1 · kapitel 19 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Rullekæder: polygoneffekten og levetid"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Polygoneffekten, mindst 17 tænder, slid/udmattelse og effektkravet.</p><div class="chips"><a href="fleksible-elementer.html">Se først: Fleksible maskinelementer: friktion eller formlås</a><a href="../../Kapitel19_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l19">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Rullekæder: polygoneffekten, Z ≥ 17, slid/udmattelse og effektkravet (MEM1 kap. 19, Kapitel19_Slides slide 8–9 og 11)
+BP.scene({ header: 'MEM1 · kap. 19', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, axes, PI, TAU } = B;
+
+  B.titel(0, 'Rullekæder', 'MEM1 · kapitel 19 · begreb (slide 8–9)', 'titel');
+  text(0, 'Δv / v_{max} = 1 − cos(180°/Z)', 640, 540, 46, 'red', wt('titel', 'hvorfor') - 0.1, we('titel', 'tand'), { align: 'center' });
+
+  // ---------------------------------------------------------------- 1 kædens opbygning
+  B.goto('opbygning', 1);
+  {
+    const t0 = L('opbygning').start, y = 300, p = 130, x0 = 200;
+    const tr = wt('opbygning', 'rulleled'), tb = wt('opbygning', 'boltled');
+    for (let i = 0; i < 6; i++) {
+      const x = x0 + i * p, inner = i % 2 === 0;
+      box(1, x - 18, y - 52, p + 36, 104, inner ? 'blue' : 'black', (inner ? tr : tb) - 0.1 + i * 0.05, (inner ? tr : tb) + 0.4 + i * 0.05, { r: 50 });
+    }
+    for (let i = 0; i <= 6; i++) {
+      line(1, ell(x0 + i * p, y, 30, 30, 0, TAU), 'red', 3, tr + 0.3 + i * 0.06, tr + 0.6 + i * 0.06);
+      dot(1, x0 + i * p, y, 7, 'black', tb + 0.3 + i * 0.05);
+    }
+    B.dobbeltpil(1, [x0, y + 90], [x0 + p, y + 90], 'green', wt('opbygning', 'Rullerne') - 0.1, wt('opbygning', 'Rullerne') + 0.4);
+    text(1, 'pitch p', x0 + p / 2, y + 135, 28, 'green', wt('opbygning', 'Rullerne'), we('opbygning', 'kædehjulet'), { align: 'center' });
+    text(1, 'rulle', x0 + 3 * p, y - 80, 28, 'red', wt('opbygning', 'Rullerne'), we('opbygning', 'indgreb'), { align: 'center' });
+    text(1, 'lasker (rulleled / boltled)', x0, y + 200, 30, 'blue', tr, we('opbygning', 'boltled'));
+    text(1, 'formlås + lange centerafstande', x0, y + 260, 34, 'black', wt('opbygning', 'kombinerer') - 0.1, we('opbygning', 'centerafstande'));
+  }
+
+  // ---------------------------------------------------------------- 2 polygonen og hastigheden
+  B.goto('polygon', 2);
+  {
+    const t0 = L('polygon').start, Z = 6, R = 150, C1 = [330, 400], C2 = [830, 400];
+    const poly = (C, rot) => { const P = []; for (let i = 0; i <= Z; i++) { const v = -PI / 2 + rot + i * TAU / Z; P.push([C[0] + R * Math.cos(v), C[1] + R * Math.sin(v)]); } return P; };
+    const tp = wt('polygon', 'polygon');
+    line(2, ell(C1[0], C1[1], R, R, 0, TAU), 'black', 1.6, t0, t0 + 0.4); line(2, poly(C1, 0), 'blue', 3.6, tp - 0.1, tp + 0.6);
+    dot(2, ...C1, 6, 'black', t0 + 0.2);
+    text(2, 'Z sider', C1[0], C1[1] + R + 50, 30, 'blue', tp, we('polygon', 'sider'), { align: 'center' });
+    const th = L('hastighed').start;
+    line(2, ell(C2[0], C2[1], R, R, 0, TAU), 'black', 1.6, th, th + 0.4); line(2, poly(C2, PI / Z), 'blue', 3.6, th + 0.1, th + 0.5);
+    dot(2, ...C2, 6, 'black', th + 0.2);
+    const tr = wt('hastighed', 'hjørne');
+    line(2, [C1, [C1[0], C1[1] - R]], 'red', 3, tr - 0.1, tr + 0.4);
+    text(2, 'r', C1[0] + 12, C1[1] - 70, 32, 'red', tr, tr + 0.4);
+    arrow(2, [[C1[0] - 60, C1[1] - R - 30], [C1[0] + 80, C1[1] - R - 30]], 'red', 3.2, wt('hastighed', 'omega') - 0.1, wt('hastighed', 'omega') + 0.4, 14);
+    text(2, 'v_{max} = ω r', C1[0] - 70, C1[1] - R - 50, 30, 'red', wt('hastighed', 'omega'), we('hastighed', 'r', 1));
+    const tc = wt('hastighed', 'cosinus'), rc = R * Math.cos(PI / Z);
+    line(2, [C2, [C2[0], C2[1] - rc]], 'green', 3, wt('hastighed', 'vandret') - 0.1, wt('hastighed', 'vandret') + 0.4);
+    text(2, 'r cos(180°/Z)', C2[0] + 14, C2[1] - 50, 28, 'green', tc - 0.1, we('hastighed', 'Z'));
+    arrow(2, [[C2[0] - 50, C2[1] - rc - 30], [C2[0] + 50, C2[1] - rc - 30]], 'green', 3.2, tc, tc + 0.4, 14);
+    const tf = L('formel').start, te = we('formel', 'Z');
+    text(2, 'Δv / v_{max} = 1 − cos(180°/Z)', 330, 670, 42, 'red', wt('formel', 'relative') - 0.1, te);
+    box(2, 310, 615, 640, 75, 'red', te, te + 0.5);
+    text(2, 'v svinger', 900, 160, 32, 'black', tf - 0.1, wt('formel', 'svinger') + 0.3);
+  }
+
+  // ---------------------------------------------------------------- 3 graf: udsving mod antal tænder
+  B.goto('tal', 3);
+  {
+    const t0 = L('tal').start, x0 = 300, y0 = 600, w = 700, h = 400, X = 40, Y = 15;
+    const P = (z, d) => [x0 + (z - 4) / (X - 4) * w, y0 - d / Y * h];
+    axes(3, x0, y0, x0 + w + 40, y0 - h - 30, 'Z', 'Δv/v (%)', t0 - 0.2);
+    [[8, '8'], [17, '17'], [25, '25'], [40, '40']].forEach(([z, s], i) => { const p = P(z, 0); text(3, s, p[0], y0 + 34, 26, 'black', t0 + 0.3 + i * 0.05, t0 + 0.5 + i * 0.05, { align: 'center' }); });
+    [[5, '5'], [10, '10']].forEach(([d, s], i) => { const p = P(4, d); text(3, s, x0 - 12, p[1] + 8, 26, 'black', t0 + 0.4 + i * 0.05, t0 + 0.6 + i * 0.05, { align: 'right' }); });
+    const pts = []; for (let i = 0; i <= 140; i++) { const z = 6 + (X - 6) * i / 140; pts.push(P(z, 100 * (1 - Math.cos(PI / z)))); }
+    line(3, pts, 'blue', 3.6, t0 + 0.2, wt('tal', 'otte') + 0.5, { wob: 0.35 });
+    const t17 = wt('tal', 'sytten'), p17 = P(17, 1.703);
+    B.dashed(3, [p17[0], y0], [p17[0], y0 - h + 20], 'red', t17 - 0.1, t17 + 0.5);
+    dot(3, ...p17, 8, 'red', t17); text(3, '1,7 %', p17[0] + 16, p17[1] - 14, 30, 'red', t17, we('tal', 'procent'));
+    const t8 = wt('tal', 'otte'), p8 = P(8, 7.612);
+    dot(3, ...p8, 8, 'red', t8); text(3, '7,6 %', p8[0] + 16, p8[1] - 8, 30, 'red', t8, we('tal', 'procent', 1));
+    const tm = wt('tal', 'mindst');
+    text(3, 'Z_{min} ≥ 17', 760, 250, 40, 'green', tm - 0.1, we('tal', 'tænder', 2));
+    text(3, 'Z < 17: stød og støj', 760, 310, 32, 'green', wt('tal', 'Færre') - 0.1, we('tal', 'støj'));
+  }
+
+  // ---------------------------------------------------------------- 4 levetid og effekt
+  B.goto('slid', 4);
+  {
+    const t0 = L('slid').start;
+    bubble(4, 'Hvad slider kæden op?', 140, 130, 44, 'blue', t0 - 0.1, t0 + 0.8);
+    text(4, 'ikke ren træk, men slid og udmattelse', 150, 220, 34, 'black', wt('slid', 'sjældent') - 0.1, we('slid', 'udmattelse'));
+    text(4, '• slid i leddene ⇒ længere pitch ⇒ klatrer på tænderne', 150, 290, 30, 'red', wt('slid', 'leddene') - 0.1, we('slid', 'tænderne'));
+    const tu = L('udmattelse').start;
+    text(4, '• lasken: udmattelse af skiftende træk', 150, 345, 30, 'red', tu, we('udmattelse', 'trækkræfter'));
+    text(4, '• rullerne: knuses af slag mod tandroden', 150, 400, 30, 'red', wt('udmattelse', 'rullerne') - 0.1, we('udmattelse', 'hastighed'));
+    const te = L('effekt').start, tk = we('effekt', 'et');
+    text(4, 'P_{design} = P_{applied} · K_s ≤ P_{catalog} · K_1', 150, 520, 42, 'blue', wt('effekt', 'Designeffekten') - 0.1, tk);
+    box(4, 130, 465, 900, 80, 'blue', tk, tk + 0.5);
+    text(4, 'K_s = servicefaktor,  K_1 = strengfaktor', 150, 610, 30, 'green', wt('effekt', 'servicefaktoren') - 0.1, we('effekt', 'strengfaktoren'));
+  }
+
+  B.goto('tjek_q', 5);
+  B.tjek(5, ['Tænder fordobles: 12 → 24.', 'Hvad sker der med udsvinget?'], ['ca. 4 gange mindre (vinkel²)', '3,4 % → 0,9 %'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 6);
+  B.slut(6, 'Abou-Hayt (2026), MEM1 Chapter 19, slide 8–9 og 11 · Hamrock et al., afsnit 19.6', 'eksempel: rullekæde og polygoneffekt', 'slut');
+  text(6, 'Δv/v_{max} = 1 − cos(180°/Z)', 200, 280, 44, 'red', wt('slut', 'polygoneffekten') - 0.1, we('slut', 'Z'));
+  text(6, 'Z ≥ 17,  P · K_s ≤ P_{cat} · K_1', 200, 380, 42, 'blue', wt('slut', 'Brug') - 0.1, we('slut', 'strengfaktor'));
+});
+
+</script>
+<script>BP.live({"duration":121.069,"audio":"rullekaeder.mp3","order":["titel","opbygning","polygon","hastighed","formel","tal","slid","udmattelse","effekt","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.581,"words":[["Rullekæder",0.54,1.14],["En",2.28,2.38],["kæde",2.52,2.84],["griber",2.92,3.221],["i",3.281,3.301],["kædehjulet",3.381,3.941],["med",3.981,4.081],["tænder",4.141,4.441],["så",4.561,4.681],["den",4.681,4.821],["glider",4.921,5.201],["aldrig",5.261,5.541],["Men",5.961,6.081],["hvorfor",6.221,6.481],["rykker",6.561,6.781],["den",6.801,6.901],["lidt",6.921,7.041],["for",7.081,7.161],["hver",7.161,7.321],["tand",7.381,7.581]],"text":"Rullekæder. En kæde griber i kædehjulet med tænder, så den glider aldrig. Men hvorfor rykker den lidt for hver tand?"},"opbygning":{"start":9.401,"end":18.282,"words":[["En",9.441,9.521],["rullekæde",9.581,10.081],["består",10.121,10.401],["af",10.421,10.501],["skiftevis",10.521,11.001],["rulleled",11.101,11.561],["og",11.761,11.841],["boltled",12.001,12.441],["Rullerne",13.281,13.581],["går",13.601,13.721],["i",13.741,13.761],["indgreb",13.801,14.101],["med",14.141,14.221],["tænderne",14.261,14.561],["på",14.581,14.681],["kædehjulet",14.701,15.222],["Den",15.842,15.962],["kombinerer",16.062,16.502],["formlås",16.562,17.042],["med",17.142,17.242],["lange",17.362,17.582],["centerafstande",17.662,18.282]],"text":"En rullekæde består af skiftevis rulleled og boltled. Rullerne går i indgreb med tænderne på kædehjulet. Den kombinerer formlås med lange centerafstande."},"polygon":{"start":20.102,"end":25.363,"words":[["Leddene",20.142,20.402],["er",20.442,20.522],["stive",20.582,20.922],["Derfor",21.563,21.803],["lægger",21.823,22.023],["kæden",22.063,22.303],["sig",22.343,22.423],["ikke",22.423,22.523],["som",22.523,22.623],["en",22.643,22.723],["cirkel",22.803,23.083],["om",23.103,23.163],["hjulet",23.183,23.483],["men",23.683,23.803],["som",23.843,23.963],["en",23.983,24.063],["polygon",24.183,24.623],["med",24.683,24.783],["Z",24.863,24.883],["sider",25.083,25.363]],"text":"Leddene er stive. Derfor lægger kæden sig ikke som en cirkel om hjulet, men som en polygon med Z sider."},"hastighed":{"start":26.303,"end":37.565,"words":[["Når",26.343,26.463],["et",26.463,26.503],["hjørne",26.523,26.763],["står",26.783,26.924],["øverst",27.004,27.364],["er",27.484,27.564],["kæden",27.604,27.884],["i",27.924,27.944],["afstanden",28.024,28.444],["r",28.664,28.684],["fra",28.844,28.924],["centrum",29.024,29.364],["og",29.604,29.664],["kører",29.704,29.944],["med",29.984,30.084],["omega",30.544,30.924],["gange",30.984,31.264],["r",31.304,31.324],["Et",32.364,32.444],["halvt",32.464,32.645],["led",32.705,32.825],["senere",32.945,33.285],["ligger",33.385,33.585],["leddet",33.605,33.785],["vandret",33.825,34.165],["og",34.425,34.485],["afstanden",34.565,34.945],["er",34.945,34.985],["kun",35.005,35.165],["r",35.425,35.445],["gange",35.525,35.725],["cosinus",35.805,36.325],["til",36.385,36.505],["hundrede",36.545,36.785],["og",36.785,36.825],["firs",36.825,37.005],["grader",37.045,37.305],["over",37.345,37.485],["Z",37.545,37.565]],"text":"Når et hjørne står øverst, er kæden i afstanden r fra centrum og kører med omega gange r. Et halvt led senere ligger leddet vandret, og afstanden er kun r gange cosinus til hundrede og firs grader over Z."},"formel":{"start":38.646,"end":46.247,"words":[["Hastigheden",38.686,39.106],["svinger",39.146,39.406],["derfor",39.426,39.686],["Det",40.346,40.446],["relative",40.466,40.846],["udsving",40.886,41.226],["er",41.286,41.366],["delta",41.766,42.006],["v",42.106,42.126],["over",42.406,42.586],["v",42.646,42.666],["max",42.786,42.966],["lig",43.366,43.506],["en",43.747,43.907],["minus",44.047,44.347],["cosinus",44.407,44.907],["til",45.027,45.127],["hundrede",45.167,45.407],["og",45.407,45.447],["firs",45.467,45.687],["grader",45.707,45.987],["over",46.027,46.187],["Z",46.227,46.247]],"text":"Hastigheden svinger derfor. Det relative udsving er delta v over v max, lig en minus cosinus til hundrede og firs grader over Z."},"tal":{"start":48.067,"end":57.969,"words":[["Med",48.107,48.207],["sytten",48.247,48.487],["tænder",48.527,48.787],["er",48.907,48.987],["udsvinget",49.047,49.447],["en",49.447,49.647],["komma",49.667,49.808],["syv",49.928,50.048],["procent",50.088,50.408],["Med",50.928,51.028],["otte",51.128,51.308],["tænder",51.348,51.588],["er",51.748,51.808],["det",51.828,51.908],["syv",52.008,52.128],["komma",52.168,52.328],["seks",52.408,52.568],["procent",52.628,52.928],["Derfor",53.768,53.988],["kræver",54.028,54.248],["slides",54.328,54.748],["mindst",54.988,55.288],["sytten",55.449,55.709],["tænder",55.769,56.009],["Færre",56.649,56.869],["tænder",56.909,57.149],["giver",57.169,57.329],["stød",57.369,57.569],["og",57.669,57.729],["støj",57.769,57.969]],"text":"Med sytten tænder er udsvinget en komma syv procent. Med otte tænder er det syv komma seks procent. Derfor kræver slides mindst sytten tænder. Færre tænder giver stød og støj."},"slid":{"start":59.789,"end":67.931,"words":[["Kæder",59.829,60.089],["går",60.109,60.229],["sjældent",60.289,60.549],["i",60.569,60.589],["stykker",60.649,60.929],["af",60.929,60.989],["ren",61.029,61.169],["træk",61.229,61.49],["De",62.17,62.25],["begrænses",62.27,62.69],["af",62.73,62.81],["slid",62.89,63.11],["og",63.29,63.35],["udmattelse",63.45,63.93],["Slid",64.75,64.97],["i",65.07,65.09],["leddene",65.19,65.49],["gør",65.57,65.71],["pitchen",65.83,66.17],["længere",66.23,66.49],["så",66.71,66.81],["kæden",66.83,67.07],["klatrer",67.111,67.371],["op",67.411,67.511],["ad",67.531,67.591],["tænderne",67.611,67.931]],"text":"Kæder går sjældent i stykker af ren træk. De begrænses af slid og udmattelse. Slid i leddene gør pitchen længere, så kæden klatrer op ad tænderne."},"udmattelse":{"start":68.851,"end":74.352,"words":[["Lasken",68.891,69.231],["udmattes",69.311,69.711],["af",69.811,69.891],["de",69.911,69.991],["skiftende",70.111,70.491],["trækkræfter",70.531,71.051],["og",71.511,71.571],["rullerne",71.651,71.951],["kan",71.991,72.071],["knuses",72.091,72.471],["af",72.511,72.591],["slagene",72.651,72.972],["mod",73.012,73.132],["tandroden",73.192,73.632],["ved",73.652,73.732],["høj",73.772,73.892],["hastighed",73.972,74.352]],"text":"Lasken udmattes af de skiftende trækkræfter, og rullerne kan knuses af slagene mod tandroden ved høj hastighed."},"effekt":{"start":76.172,"end":85.894,"words":[["Derfor",76.212,76.472],["dimensioneres",76.512,77.032],["kæden",77.072,77.312],["efter",77.372,77.552],["effekt",77.592,77.912],["Designeffekten",78.652,79.393],["er",79.553,79.613],["den",79.633,79.713],["påførte",79.753,80.153],["effekt",80.173,80.473],["gange",80.633,80.853],["servicefaktoren",80.933,81.613],["K",81.673,81.693],["s",82.053,82.073],["Den",82.653,82.773],["må",82.833,82.953],["højst",83.073,83.453],["være",83.493,83.653],["katalogets",83.713,84.233],["effekt",84.293,84.533],["gange",84.593,84.794],["strengfaktoren",84.854,85.494],["K",85.554,85.574],["et",85.794,85.894]],"text":"Derfor dimensioneres kæden efter effekt. Designeffekten er den påførte effekt gange servicefaktoren K s. Den må højst være katalogets effekt gange strengfaktoren K et."},"tjek_q":{"start":87.714,"end":93.855,"words":[["Tjek",87.754,87.934],["dig",87.974,88.074],["selv",88.114,88.294],["Hvad",89.374,89.534],["sker",89.574,89.814],["der",89.854,89.934],["med",89.954,90.034],["hastighedsudsvinget",90.074,90.974],["hvis",90.995,91.115],["du",91.155,91.195],["fordobler",91.255,91.795],["antallet",91.855,92.295],["af",92.335,92.395],["tænder",92.455,92.715],["fra",92.775,92.835],["tolv",92.935,93.175],["til",93.215,93.315],["fireogtyve",93.355,93.855]],"text":"Tjek dig selv. Hvad sker der med hastighedsudsvinget, hvis du fordobler antallet af tænder fra tolv til fireogtyve?"},"tjek_a":{"start":97.975,"end":106.097,"words":[["Det",98.015,98.095],["bliver",98.115,98.295],["cirka",98.315,98.575],["fire",99.055,99.295],["gange",99.355,99.555],["mindre",99.595,99.896],["fordi",100.036,100.216],["en",100.416,100.576],["minus",100.636,100.896],["cosinus",100.936,101.416],["til",101.476,101.576],["en",101.596,101.656],["lille",101.716,101.916],["vinkel",101.956,102.236],["vokser",102.316,102.636],["med",102.636,102.756],["vinklen",102.776,103.076],["i",103.116,103.136],["anden",103.216,103.436],["Fra",103.976,104.056],["tre",104.116,104.216],["komma",104.296,104.436],["fire",104.496,104.676],["procent",104.696,104.976],["til",105.196,105.296],["nul",105.316,105.417],["komma",105.457,105.597],["ni",105.637,105.697],["procent",105.797,106.097]],"text":"Det bliver cirka fire gange mindre, fordi en minus cosinus til en lille vinkel vokser med vinklen i anden. Fra tre komma fire procent til nul komma ni procent."},"slut":{"start":107.917,"end":119.599,"words":[["Kort",107.957,108.157],["sagt",108.197,108.397],["polygoneffekten",109.137,109.977],["giver",110.037,110.217],["delta",110.277,110.577],["v",110.617,110.637],["over",110.917,111.117],["v",111.177,111.197],["max",111.377,111.578],["lig",111.798,111.918],["en",112.158,112.318],["minus",112.378,112.618],["cosinus",112.678,113.178],["til",113.218,113.318],["hundrede",113.358,113.598],["og",113.598,113.638],["firs",113.638,113.878],["grader",113.898,114.198],["over",114.218,114.398],["Z",114.458,114.478],["Brug",115.378,115.498],["mindst",115.558,115.778],["sytten",115.818,116.058],["tænder",116.118,116.378],["og",116.718,116.778],["dimensionér",116.818,117.339],["efter",117.459,117.659],["effekt",117.699,118.019],["med",118.079,118.159],["servicefaktor",118.219,118.899],["og",118.979,119.039],["strengfaktor",119.059,119.599]],"text":"Kort sagt: polygoneffekten giver delta v over v max lig en minus cosinus til hundrede og firs grader over Z. Brug mindst sytten tænder, og dimensionér efter effekt med servicefaktor og strengfaktor."}}}, { audio: 'rullekaeder.mp3', id: 'rullekaeder' });</script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kileremme: kileeffekten · video</title>
+<meta name="description" content="Kileeffekten: μ' = μ/sin β giver næsten tre gange så meget friktion.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 19: videoer</a><h1>Kileremme: kileeffekten</h1><span class="meta">MEM1 · kapitel 19 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Kileremme: kileeffekten"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Kileeffekten: μ' = μ/sin β giver næsten tre gange så meget friktion.</p><div class="chips"><a href="remtraek.html">Se først: Fladremme: remligningen og centrifugalkraften</a><a href="../../Kapitel19_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l19">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Kileremme: kileeffekten μ\' = μ/sin β (MEM1 kap. 19, Kapitel19_Slides slide 6 og 11; Hamrock 19.4, fig. 19.5)
+BP.scene({ header: 'MEM1 · kap. 19', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, PI } = B;
+
+  B.titel(0, 'Kileremme', 'MEM1 · kapitel 19 · begreb (slide 6)', 'titel');
+  text(0, 'μ\' = μ / sin β', 640, 540, 50, 'red', wt('titel', 'Hvorfor') - 0.1, we('titel', 'størrelse'), { align: 'center' });
+
+  // ---------------------------------------------------------------- 1 tværsnit i rillen + kræfter
+  B.goto('form', 1);
+  {
+    const t0 = L('form').start, k = Math.tan(20 * PI / 180);
+    const xl = (y) => 420 + k * (y - 200), xr = (y) => 700 - k * (y - 200);
+    // skivens rille: to flanker + bund
+    line(1, [[300, 200], [xl(200), 200], [xl(520), 520], [xr(520), 520], [xr(200), 200], [820, 200]], 'black', 3.2, t0, t0 + 0.9);
+    line(1, [[300, 200], [300, 600], [820, 600], [820, 200]], 'black', 1.6, t0 + 0.6, t0 + 1.0);
+    const tb = wt('form', 'trapezformet');
+    line(1, [[xl(230), 230], [xr(230), 230], [xr(370), 370], [xl(370), 370], [xl(230), 230]], 'blue', 4, tb - 0.1, tb + 0.6);
+    text(1, 'kilerem', 560, 312, 30, 'blue', tb + 0.3, we('form', 'tværsnit'), { align: 'center' });
+    const tf = wt('form', 'flanker');
+    line(1, [[xl(230), 230], [xl(370), 370]], 'red', 6, tf - 0.1, tf + 0.3); line(1, [[xr(230), 230], [xr(370), 370]], 'red', 6, tf, tf + 0.4);
+    text(1, '← rører ikke bunden', 640, 500, 26, 'green', wt('form', 'bunden') - 0.3, we('form', 'bunden'));
+    // vinkel 2β
+    const tk = L('kile').start, apex = [560, 200 + 140 / k];
+    B.dashed(1, [xl(520), 520], apex, 'black', wt('kile', 'vinkel') - 0.2, wt('kile', 'vinkel') + 0.3);
+    B.dashed(1, [xr(520), 520], apex, 'black', wt('kile', 'vinkel') - 0.2, wt('kile', 'vinkel') + 0.3);
+    line(1, ell(apex[0], apex[1], 70, 70, -PI / 2 - 0.35, -PI / 2 + 0.35), 'red', 2.6, wt('kile', 'beta') - 0.1, wt('kile', 'beta') + 0.3);
+    text(1, '2β = 34°–40°', 520, apex[1] + 6, 30, 'red', wt('kile', 'beta') - 0.1, we('kile', 'grader'), { align: 'right' });
+    arrow(1, [[560, 120], [560, 222]], 'black', 3.2, tk - 0.1, tk + 0.4, 14);
+    text(1, 'kiler sig fast', 580, 140, 28, 'black', tk, we('kile', 'fast'));
+    // normalkræfter
+    const tn = L('normal').start, nx = Math.cos(20 * PI / 180), ny = Math.sin(20 * PI / 180);
+    text(1, 'fladrem: dN', 880, 230, 32, 'black', tn - 0.1, wt('normal', 'skiven') + 0.2);
+    const pL = [xl(300), 300], pR = [xr(300), 300], tv = wt('normal', 'flanke');
+    arrow(1, [[pL[0] - 110 * nx, pL[1] + 110 * ny], pL], 'red', 3.4, tv - 0.1, tv + 0.4, 15);
+    arrow(1, [[pR[0] + 110 * nx, pR[1] + 110 * ny], pR], 'red', 3.4, tv - 0.1, tv + 0.4, 15);
+    text(1, 'kilerem: (dN/2)/sin β', 880, 300, 32, 'red', wt('normal', 'kileremmen') - 0.1, we('normal', 'flanke'));
+    text(1, 'pr. flanke', 900, 345, 28, 'red', tv, we('normal', 'flanke'));
+    text(1, 'sin β lille ⇒ stor N', 880, 420, 32, 'green', wt('normal', 'meget') - 0.1, we('normal', 'lille'));
+  }
+
+  // ---------------------------------------------------------------- 2 μ\' og faktoren 3
+  B.goto('mu', 2);
+  {
+    const t0 = L('mu').start;
+    bubble(2, 'Tilsyneladende friktion', 140, 130, 44, 'blue', t0 - 0.1, t0 + 0.8);
+    const te = we('mu', 'sinus');
+    const h = text(2, 'μ\' = μ / sin β', 160, 270, 56, 'red', wt('mu', 'friktionskoefficienten') - 0.1, te);
+    box(2, 140, 205, 430, 95, 'red', te + 0.4, te + 0.9);
+    text(2, '(F_1 − F_c)/(F_2 − F_c) = e^{μ\'φ}', 640, 270, 40, 'black', wt('mu', 'Resten') - 0.1, we('mu', 'mærke', 1));
+    const t1 = L('tre').start;
+    text(2, 'β = 20°:  sin β = 0,342', 160, 420, 42, 'blue', t1 - 0.1, we('tre', 'to'));
+    const tt = we('tre', 'tre', 1);
+    const r = text(2, '1 / sin β = 2,92 ≈ 3', 160, 510, 46, 'green', wt('tre', 'Friktionen') - 0.1, tt);
+    ring(r, 'green', tt, tt + 0.5);
+  }
+
+  // ---------------------------------------------------------------- 3 søjler: forholdet 3 mod 24,9
+  B.goto('eksp', 3);
+  {
+    const t0 = L('eksp').start, y0 = 600, s = 380 / 24.9;
+    text(3, 'μ = 0,35,  φ = π', 140, 130, 38, 'black', t0 - 0.1, wt('eksp', 'omgang') + 0.3);
+    line(3, [[160, y0], [700, y0]], 'black', 2.6, t0, t0 + 0.4);
+    const tf = wt('eksp', 'fra');
+    box(3, 240, y0 - 3 * s, 120, 3 * s, 'blue', tf - 0.1, tf + 0.4);
+    text(3, 'fladrem', 300, y0 + 40, 30, 'blue', tf, tf + 0.4, { align: 'center' });
+    text(3, '3,0', 300, y0 - 3 * s - 14, 34, 'blue', tf, tf + 0.4, { align: 'center' });
+    const tv = wt('eksp', 'femogtyve');
+    box(3, 460, y0 - 24.9 * s, 120, 24.9 * s, 'red', tv - 0.4, tv + 0.3);
+    text(3, 'kilerem', 520, y0 + 40, 30, 'red', tv, tv + 0.4, { align: 'center' });
+    text(3, '24,9', 520, y0 - 24.9 * s - 14, 34, 'red', tv, we('eksp', 'femogtyve'), { align: 'center' });
+    text(3, 'F_1/F_2', 160, 190, 30, 'black', t0 + 0.3, t0 + 0.7);
+    const tg = L('gevinst').start;
+    text(3, '• stort moment med små skiver', 700, 300, 32, 'green', tg, we('gevinst', 'centerafstande'));
+    text(3, '• korte centerafstande', 700, 350, 32, 'green', wt('gevinst', 'korte') - 0.1, we('gevinst', 'centerafstande'));
+    text(3, '• mindre forspænding', 700, 430, 32, 'blue', wt('gevinst', 'mindre') - 0.1, we('gevinst', 'forspænding'));
+    text(3, '⇒ mindre lejelast', 720, 480, 32, 'blue', wt('gevinst', 'lejerne') - 0.1, we('gevinst', 'belastet'));
+  }
+
+  B.goto('tjek_q', 4);
+  B.tjek(4, ['Rillen gøres smallere (β mindre).', 'Hvad sker der med μ\' ?'], ['sin β mindre ⇒ μ\' større', 'for smal: remmen sætter sig fast'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 5);
+  B.slut(5, 'Abou-Hayt (2026), MEM1 Chapter 19, slide 6 og 11 · Hamrock et al., afsnit 19.4, fig. 19.5', 'eksempel: kilerem mod fladrem', 'slut');
+  text(5, 'μ\' = μ / sin β ≈ 3 μ', 200, 290, 46, 'red', wt('slut', 'kileeffekten') - 0.1, we('slut', 'friktion'));
+  text(5, 'sæt μ\' ind i remligningen', 200, 390, 40, 'blue', wt('slut', 'Sæt') - 0.1, we('slut', 'kileremmen'));
+});
+
+</script>
+<script>BP.live({"duration":115.029,"audio":"kileremme.mp3","order":["titel","form","kile","normal","mu","tre","eksp","gevinst","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":6.501,"words":[["Kileremme",0.54,1.12],["Hvorfor",1.92,2.18],["kan",2.22,2.36],["en",2.36,2.4],["kilerem",2.5,3.041],["overføre",3.161,3.621],["meget",3.721,3.961],["mere",4.021,4.181],["moment",4.241,4.601],["end",4.721,4.821],["en",4.841,4.921],["fladrem",5.061,5.561],["af",5.701,5.781],["samme",5.841,6.041],["størrelse",6.121,6.501]],"text":"Kileremme. Hvorfor kan en kilerem overføre meget mere moment end en fladrem af samme størrelse?"},"form":{"start":8.321,"end":16.903,"words":[["En",8.361,8.441],["kilerem",8.521,9.002],["har",9.122,9.282],["et",9.402,9.502],["trapezformet",9.582,10.502],["tværsnit",10.602,11.042],["Den",11.802,11.902],["ligger",11.942,12.162],["nede",12.202,12.382],["i",12.462,12.482],["en",12.522,12.602],["V-formet",12.762,13.322],["rille",13.382,13.642],["og",13.963,14.023],["rører",14.083,14.263],["kun",14.323,14.463],["rillens",14.563,14.943],["to",15.043,15.163],["skrå",15.303,15.583],["flanker",15.663,16.043],["ikke",16.443,16.583],["bunden",16.643,16.903]],"text":"En kilerem har et trapezformet tværsnit. Den ligger nede i en V-formet rille og rører kun rillens to skrå flanker, ikke bunden."},"kile":{"start":18.083,"end":26.225,"words":[["Når",18.123,18.223],["remmen",18.243,18.443],["trækkes",18.483,18.843],["ned",18.963,19.103],["i",19.184,19.204],["rillen",19.284,19.584],["kiler",19.824,20.224],["den",20.244,20.344],["sig",20.384,20.504],["fast",20.524,20.804],["Rillens",21.544,21.824],["vinkel",21.904,22.164],["kalder",22.204,22.424],["vi",22.444,22.504],["to",22.684,22.804],["beta",22.964,23.304],["typisk",23.744,24.084],["mellem",24.124,24.364],["fireogtredive",24.545,25.205],["og",25.365,25.445],["fyrre",25.605,25.885],["grader",25.925,26.225]],"text":"Når remmen trækkes ned i rillen, kiler den sig fast. Rillens vinkel kalder vi to beta, typisk mellem fireogtredive og fyrre grader."},"normal":{"start":28.045,"end":38.967,"words":[["Hvor",28.085,28.265],["fladremmen",28.385,28.865],["trykker",28.925,29.245],["med",29.305,29.405],["d",29.565,29.585],["N",29.905,29.925],["mod",30.125,30.266],["skiven",30.346,30.726],["trykker",31.106,31.406],["kileremmen",31.466,32.086],["med",32.186,32.326],["d",32.466,32.486],["N",32.806,32.846],["halve",33.026,33.366],["divideret",33.646,34.166],["med",34.246,34.386],["sinus",34.466,34.806],["beta",34.946,35.286],["på",35.487,35.607],["hver",35.607,35.747],["flanke",35.787,36.087],["Det",36.767,36.847],["er",36.867,36.907],["meget",36.927,37.107],["mere",37.147,37.327],["fordi",37.707,37.847],["sinus",37.967,38.247],["beta",38.327,38.607],["er",38.687,38.747],["lille",38.767,38.967]],"text":"Hvor fladremmen trykker med d N mod skiven, trykker kileremmen med d N halve divideret med sinus beta på hver flanke. Det er meget mere, fordi sinus beta er lille."},"mu":{"start":40.787,"end":51.209,"words":[["Det",40.827,40.927],["svarer",40.967,41.207],["til",41.228,41.348],["at",41.388,41.448],["friktionskoefficienten",41.508,42.568],["bliver",42.628,42.868],["mu",43.128,43.228],["mærke",43.428,43.808],["lig",44.048,44.208],["mu",44.508,44.588],["divideret",44.948,45.448],["med",45.668,45.768],["sinus",45.808,46.088],["beta",46.128,46.368],["Resten",47.249,47.589],["af",47.629,47.689],["remligningen",47.749,48.309],["er",48.409,48.489],["den",48.489,48.589],["samme",48.649,48.869],["Vi",49.309,49.349],["skifter",49.369,49.649],["bare",49.669,49.829],["mu",49.909,49.989],["ud",50.209,50.309],["med",50.509,50.609],["mu",50.689,50.769],["mærke",50.909,51.209]],"text":"Det svarer til, at friktionskoefficienten bliver mu mærke, lig mu divideret med sinus beta. Resten af remligningen er den samme. Vi skifter bare mu ud med mu mærke."},"tre":{"start":53.029,"end":59.67,"words":[["Med",53.069,53.169],["beta",53.209,53.509],["lig",53.589,53.709],["tyve",53.869,54.129],["grader",54.149,54.489],["er",54.789,54.869],["sinus",54.929,55.249],["beta",55.329,55.629],["nul",56.149,56.309],["komma",56.369,56.569],["tre",56.649,56.789],["fire",56.929,57.129],["to",57.189,57.309],["Friktionen",58.11,58.53],["ganges",58.59,58.87],["altså",58.93,59.13],["med",59.13,59.23],["næsten",59.25,59.51],["tre",59.55,59.67]],"text":"Med beta lig tyve grader er sinus beta nul komma tre fire to. Friktionen ganges altså med næsten tre."},"eksp":{"start":61.49,"end":72.492,"words":[["Og",61.53,61.61],["den",61.65,61.77],["sidder",61.81,62.01],["i",62.05,62.07],["eksponenten",62.13,62.61],["Med",63.53,63.61],["tallene",63.65,63.931],["fra",63.991,64.091],["eksamensspørgsmålet",64.191,65.231],["mu",65.531,65.631],["nul",65.731,65.931],["komma",66.031,66.631],["tre",66.691,66.831],["fem",66.991,67.151],["og",67.651,67.711],["en",67.751,67.831],["halv",67.891,68.051],["omgang",68.131,68.471],["går",68.791,68.951],["forholdet",68.991,69.432],["F",69.632,69.652],["et",69.772,69.872],["over",70.052,70.232],["F",70.392,70.412],["to",70.492,70.612],["fra",70.832,70.912],["tre",71.012,71.172],["til",71.472,71.592],["næsten",71.612,71.892],["femogtyve",71.992,72.492]],"text":"Og den sidder i eksponenten. Med tallene fra eksamensspørgsmålet, mu nul komma tre fem og en halv omgang, går forholdet F et over F to fra tre til næsten femogtyve."},"gevinst":{"start":74.312,"end":82.774,"words":[["Derfor",74.352,74.612],["kan",74.652,74.752],["kileremme",74.772,75.273],["overføre",75.353,75.773],["et",75.813,75.893],["stort",75.953,76.193],["moment",76.253,76.553],["med",76.693,76.773],["små",76.813,76.993],["skiver",77.053,77.393],["og",77.573,77.633],["korte",77.693,77.973],["centerafstande",78.033,78.653],["Og",79.353,79.413],["de",79.453,79.493],["kan",79.533,79.633],["nøjes",79.653,79.873],["med",79.913,80.013],["en",80.033,80.113],["mindre",80.193,80.434],["forspænding",80.514,81.074],["så",81.374,81.474],["lejerne",81.514,81.854],["bliver",81.954,82.114],["mindre",82.114,82.334],["belastet",82.374,82.774]],"text":"Derfor kan kileremme overføre et stort moment med små skiver og korte centerafstande. Og de kan nøjes med en mindre forspænding, så lejerne bliver mindre belastet."},"tjek_q":{"start":84.594,"end":89.095,"words":[["Tjek",84.634,84.794],["dig",84.814,84.894],["selv",84.914,85.094],["Hvad",85.694,85.814],["sker",85.834,86.034],["der",86.074,86.155],["med",86.175,86.275],["mu",86.335,86.395],["mærke",86.535,86.855],["hvis",87.015,87.155],["rillen",87.215,87.455],["gøres",87.495,87.675],["smallere",87.715,88.115],["så",88.315,88.415],["beta",88.435,88.675],["bliver",88.695,88.835],["mindre",88.855,89.095]],"text":"Tjek dig selv. Hvad sker der med mu mærke, hvis rillen gøres smallere, så beta bliver mindre?"},"tjek_a":{"start":93.215,"end":102.057,"words":[["Mu",93.255,93.335],["mærke",93.475,93.735],["bliver",93.755,93.935],["større",93.975,94.295],["fordi",94.556,94.716],["sinus",94.856,95.156],["beta",95.216,95.436],["bliver",95.476,95.616],["mindre",95.636,95.856],["Remmen",96.436,96.676],["kiler",96.736,96.996],["sig",97.016,97.116],["hårdere",97.196,97.496],["fast",97.536,97.776],["Men",98.356,98.496],["bliver",98.596,98.776],["rillen",98.816,99.096],["for",99.176,99.276],["smal",99.356,99.616],["sætter",99.897,100.117],["remmen",100.157,100.397],["sig",100.437,100.537],["fast",100.617,100.877],["og",100.997,101.057],["slipper",101.117,101.397],["ikke",101.437,101.557],["rillen",101.557,101.797],["igen",101.837,102.057]],"text":"Mu mærke bliver større, fordi sinus beta bliver mindre. Remmen kiler sig hårdere fast. Men bliver rillen for smal, sætter remmen sig fast og slipper ikke rillen igen."},"slut":{"start":103.877,"end":113.559,"words":[["Kort",103.917,104.097],["sagt",104.137,104.357],["kileeffekten",104.817,105.477],["giver",105.537,105.737],["mu",105.837,105.897],["mærke",106.058,106.378],["lig",106.438,106.578],["mu",106.838,106.918],["over",107.078,107.258],["sinus",107.318,107.578],["beta",107.638,107.938],["næsten",108.478,108.818],["tre",108.898,109.058],["gange",109.178,109.418],["så",109.478,109.558],["meget",109.598,109.758],["friktion",109.778,110.158],["Sæt",110.918,111.078],["mu",111.118,111.179],["mærke",111.299,111.579],["ind",111.639,111.739],["i",111.759,111.779],["remligningen",111.839,112.399],["så",112.759,112.859],["har",112.879,112.979],["du",112.999,113.039],["kileremmen",113.099,113.559]],"text":"Kort sagt: kileeffekten giver mu mærke lig mu over sinus beta, næsten tre gange så meget friktion. Sæt mu mærke ind i remligningen, så har du kileremmen."}}}, { audio: 'kileremme.mp3', id: 'kileremme' });</script>
+</body>
+</html>
