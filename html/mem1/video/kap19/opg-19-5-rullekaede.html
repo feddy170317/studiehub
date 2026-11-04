@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eksempel 19.5: rullekæde og polygoneffekt · video</title>
+<meta name="description" content="Eksempel 19.5: 2,97 kW, 1247 N, 146 led og Δv/v = 0,79 %.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 19: videoer</a><h1>Eksempel 19.5: rullekæde og polygoneffekt</h1><span class="meta">MEM1 · kapitel 19 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Eksempel 19.5: rullekæde og polygoneffekt"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Eksempel 19.5: 2,97 kW, 1247 N, 146 led og Δv/v = 0,79 %.</p><div class="chips"><a href="../../opgaver/l19/eksempel-19.5-rullekaede.pdf">📐 Se udregningen i Mathcad (PDF)</a><a href="rullekaeder.html">Se først: Rullekæder: polygoneffekten og levetid</a><a href="../../Kapitel19_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l19">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Hamrock eksempel 19.5 regnet med slide 8–9: P = 0,9 · 3,3 / 1 = 2,97 kW, u = 2,381 m/s, F = 1247 N, 144,9 → 146 led = 927 mm,
+// Δv/v = 0,79 % (Z = 25), 1,70 % (17), 7,6 % (8). Mathcad: Lektion 19/Opgaver/Eksempel 19.5 rullekaede
+BP.scene({ header: 'MEM1 · kap. 19', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, axes, PI, TAU } = B;
+
+  B.titel(0, 'Eksempel 19.5: rullekæde', 'MEM1 · kapitel 19 · Hamrock eks. 19.5 med slide 8–9', 'titel');
+  text(0, 'effekt · træk · længde · Δv', 640, 540, 44, 'red', wt('titel', 'Hvor') - 0.1, we('titel', 'hastigheden'), { align: 'center' });
+
+  // ---------------------------------------------------------------- 1 drevet
+  B.goto('data', 1);
+  {
+    const t0 = L('data').start, c1 = [300, 380], c2 = [880, 380], r1 = 70, r2 = 220;
+    const poly = (C, r, Z) => { const P = []; for (let i = 0; i <= Z; i++) { const v = i * TAU / Z; P.push([C[0] + r * Math.cos(v), C[1] + r * Math.sin(v)]); } return P; };
+    line(1, poly(c1, r1, 25), 'black', 3, wt('data', 'lille') - 0.1, wt('data', 'lille') + 0.5);
+    line(1, poly(c2, r2, 100), 'black', 3, wt('data', 'Udvekslingen') - 0.1, wt('data', 'Udvekslingen') + 0.6);
+    line(1, [[c1[0], c1[1] - r1], [c2[0], c2[1] - r2]], 'blue', 4, t0 + 0.3, t0 + 0.8); line(1, [[c1[0], c1[1] + r1], [c2[0], c2[1] + r2]], 'blue', 4, t0 + 0.5, t0 + 1.0);
+    text(1, 'ANSI nr. 25, p = 6,35 mm, 4 strenge', 140, 130, 34, 'blue', t0 - 0.1, we('data', 'millimeter'));
+    text(1, 'Z_1 = 25', c1[0], c1[1] + r1 + 60, 32, 'black', wt('data', 'lille'), we('data', 'tænder'), { align: 'center' });
+    text(1, '900 o/min', c1[0], c1[1] + r1 + 105, 32, 'red', wt('data', 'drejer') - 0.1, we('data', 'minuttet'), { align: 'center' });
+    text(1, 'Z_2 = 100 (4 : 1)', c2[0], c2[1] + r2 + 50, 32, 'black', wt('data', 'Udvekslingen'), we('data', 'en'), { align: 'center' });
+  }
+
+  // ---------------------------------------------------------------- 2 (a) effekt og (b) træk
+  B.goto('effekt', 2);
+  {
+    const t0 = L('effekt').start;
+    const tf = we('effekt', 'et');
+    text(2, 'P_{applied} · K_s ≤ P_{catalog} · K_1', 140, 150, 42, 'blue', wt('effekt', 'designeffekten') - 0.1, tf);
+    text(2, 'P_{catalog} = 0,9 kW,  K_1 = 3,3 (4 strenge),  K_s = 1', 140, 230, 32, 'black', wt('effekt', 'Kataloget') - 0.1, we('effekt', 'en'));
+    const tp = we('pa', 'kilowatt');
+    const r = text(2, 'P = 0,9 · 3,3 / 1 = 2,97 kW', 140, 320, 46, 'red', L('pa').start - 0.1, tp);
+    box(2, 120, 268, 640, 75, 'red', tp, tp + 0.5);
+    const th = L('hast').start;
+    text(2, 'u = n p Z = 900/60 · 6,35 mm · 25', 140, 430, 36, 'black', th - 0.1, we('hast', 'femogtyve'));
+    text(2, '= 2,38 m/s', 300, 490, 40, 'blue', wt('hast', 'giver') - 0.1, we('hast', 'sekund'));
+    const tt = L('traek').start, te = we('traek', 'newton');
+    const r2 = text(2, 'F = P/u = 2970/2,38 = 1247 N', 140, 590, 42, 'red', tt - 0.1, te);
+    ring(r2, 'red', te, te + 0.5);
+    text(2, '4 × 3,89 kN > 15 kN', 800, 470, 30, 'green', wt('traek', 'Fire') - 0.1, we('traek', 'kilonewton'));
+    text(2, '⇒ slid, ikke brud', 820, 530, 30, 'green', wt('traek', 'slid') - 0.1, we('traek', 'begrænser'));
+  }
+
+  // ---------------------------------------------------------------- 3 (c) længde og (d) polygoneffekt
+  B.goto('laengde', 3);
+  {
+    const t0 = L('laengde').start;
+    text(3, 'c/p = 250/6,35 = 39,4 pitch', 140, 140, 34, 'black', wt('laengde', 'centerafstanden') - 0.1, we('laengde', 'millimeter'));
+    text(3, 'L/p = 2c/p + (Z_1 + Z_2)/2 + (Z_2 − Z_1)²/(4π² c/p)', 140, 205, 30, 'black', wt('laengde', 'ligning') - 0.1, wt('laengde', 'hundrede', 2) + 0.3);
+    text(3, '= 144,9  →  146 led (lige tal)', 160, 265, 36, 'blue', wt('laengde', 'hundrede', 2) - 0.1, we('laengde', 'led', 1));
+    const te = we('laengde', 'millimeter', 1);
+    const r = text(3, 'L = 146 · 6,35 = 927 mm', 160, 335, 40, 'red', wt('laengde', 'altså') - 0.1, te);
+    ring(r, 'red', te, te + 0.5);
+    const tp = L('polygon').start, tq = we('polygon', 'procent');
+    text(3, 'Δv/v_{max} = 1 − cos(180°/25) = 1 − cos 7,2°', 140, 450, 36, 'black', wt('polygon', 'delta') - 0.1, we('polygon', 'grader'));
+    const r2 = text(3, '= 0,79 %', 300, 520, 44, 'green', wt('polygon', 'Det') - 0.1, tq);
+    under(r2, 'green', tq, tq + 0.4);
+    text(3, '< 1,7 % ved Z = 17', 560, 520, 32, 'green', wt('polygon', 'under') - 0.1, we('polygon', 'tænder', 1));
+  }
+
+  B.goto('tjek_q', 4);
+  B.tjek(4, ['Hvor meget større bliver udsvinget', 'med 8 tænder i stedet for 17?'], ['7,6 % / 1,7 % ≈ 4,5 gange', 'lille vinkel: vokser med (1/Z)²'], 'tjek_q', 'tjek_a');
+
+  // ---------------------------------------------------------------- 5 Mathcad-plot Δv/v mod Z
+  B.goto('tjek_vis', 5);
+  {
+    const t0 = L('tjek_vis').start, x0 = 230, y0 = 620, w = 720, h = 420, Z0 = 6, Z1 = 40, Y = 14;
+    const P = (z, d) => [x0 + (z - Z0) / (Z1 - Z0) * w, y0 - d / Y * h];
+    text(5, 'Mathcad-plot:  Δv/v_{max} i procent mod antal tænder', 640, 120, 30, 'black', t0, t0 + 0.8, { align: 'center' });
+    axes(5, x0, y0, x0 + w + 40, y0 - h - 20, 'Z', '%', t0 + 0.2);
+    [[8, '8'], [17, '17'], [25, '25'], [40, '40']].forEach(([z, s], i) => { const p = P(z, 0); text(5, s, p[0], y0 + 34, 26, 'black', t0 + 0.5 + i * 0.08, t0 + 0.7 + i * 0.08, { align: 'center' }); });
+    [[5, '5'], [10, '10']].forEach(([v, s], i) => { const p = P(Z0, v); text(5, s, x0 - 12, p[1] + 8, 24, 'black', t0 + 0.6 + i * 0.1, t0 + 0.8 + i * 0.1, { align: 'right' }); });
+    // Mathcad plotter heltallige Z: punkter forbundet
+    const pts = []; for (let z = Z0; z <= Z1; z++) pts.push(P(z, 100 * (1 - Math.cos(PI / z))));
+    const ts = wt('tjek_vis', 'Under');
+    line(5, pts, 'blue', 3.6, ts - 0.4, we('tjek_vis', 'op') - 0.4, { wob: 0.3 });
+    const p17 = P(17, 1.703);
+    B.dashed(5, P(Z0, 1.703), P(Z1, 1.703), 'black', ts, ts + 0.6);
+    dot(5, ...p17, 8, 'red', ts + 0.3); text(5, '1,7 %', p17[0] + 12, p17[1] - 18, 28, 'red', ts + 0.3, we('tjek_vis', 'stejlt'));
+    const p8 = P(8, 7.612); dot(5, ...p8, 8, 'red', ts + 0.1); text(5, '7,6 %', p8[0] + 16, p8[1] - 6, 28, 'red', ts + 0.1, we('tjek_vis', 'stejlt'));
+    const p25 = P(25, 0.789), tf = wt('tjek_vis', 'flader');
+    dot(5, ...p25, 8, 'green', tf); text(5, 'Z = 25: 0,79 %', p25[0] + 10, p25[1] - 40, 28, 'green', tf, we('tjek_vis', 'ud'));
+  }
+
+  B.goto('slut', 6);
+  B.slut(6, 'Hamrock et al., eksempel 19.5, lign. (19.26), (19.30) · Abou-Hayt (2026), MEM1 Chapter 19, slide 8–9 · Mathcad: Lektion 19/Opgaver/Eksempel 19.5', 'eksamensspørgsmål 15', 'slut');
+  text(6, 'P = 2,97 kW,  F = 1247 N', 200, 280, 44, 'red', wt('slut', 'kæden') - 0.1, we('slut', 'newton'));
+  text(6, '146 led = 927 mm,  Δv/v = 0,8 %', 200, 380, 42, 'blue', wt('slut', 'kæden', 1) - 0.1, we('slut', 'procent'));
+});
+
+</script>
+<script>BP.live({"duration":142.29,"audio":"opg-19-5-rullekaede.mp3","order":["titel","data","effekt","pa","hast","traek","laengde","polygon","tjek_q","tjek_a","tjek_vis","slut"],"lines":{"titel":{"start":0.5,"end":8.501,"words":[["Eksempel",0.54,0.92],["nitten",1.04,1.26],["fem",1.34,1.48],["fra",1.64,1.72],["bogen",1.8,2.0],["En",2.76,2.86],["firestrenget",2.94,3.42],["rullekæde",3.46,3.981],["Hvor",4.441,4.541],["meget",4.561,4.721],["effekt",4.741,5.001],["må",5.041,5.141],["den",5.141,5.221],["overføre",5.301,5.721],["hvor",5.981,6.081],["stort",6.101,6.321],["er",6.341,6.421],["trækket",6.481,6.881],["og",7.321,7.381],["hvor",7.381,7.481],["meget",7.481,7.641],["svinger",7.681,7.921],["hastigheden",8.001,8.501]],"text":"Eksempel nitten fem fra bogen. En firestrenget rullekæde. Hvor meget effekt må den overføre, hvor stort er trækket, og hvor meget svinger hastigheden?"},"data":{"start":10.321,"end":21.243,"words":[["Kæden",10.361,10.661],["er",10.782,10.882],["ANSI",11.142,11.422],["nummer",11.542,11.762],["femogtyve",11.762,12.322],["med",12.502,12.602],["pitchen",12.662,13.042],["seks",13.102,13.462],["komma",13.482,13.642],["tre",13.722,13.842],["fem",13.982,14.122],["millimeter",14.162,14.582],["Det",15.302,15.402],["lille",15.442,15.582],["kædehjul",15.622,16.062],["har",16.122,16.242],["femogtyve",16.242,16.762],["tænder",16.762,17.022],["og",17.182,17.242],["drejer",17.302,17.583],["ni",17.683,17.763],["hundrede",17.923,18.203],["omdrejninger",18.243,18.703],["i",18.723,18.743],["minuttet",18.783,19.083],["Udvekslingen",19.863,20.383],["er",20.483,20.543],["fire",20.683,20.903],["til",20.963,21.063],["en",21.123,21.243]],"text":"Kæden er ANSI nummer femogtyve med pitchen seks komma tre fem millimeter. Det lille kædehjul har femogtyve tænder og drejer ni hundrede omdrejninger i minuttet. Udvekslingen er fire til en."},"effekt":{"start":23.063,"end":38.706,"words":[["Fra",23.103,23.163],["slides",23.243,23.623],["designeffekten",24.224,25.044],["er",25.184,25.264],["påført",25.384,25.784],["effekt",25.824,26.104],["gange",26.184,26.404],["K",26.484,26.504],["s",26.844,26.864],["og",27.424,27.484],["den",27.504,27.584],["må",27.604,27.704],["højst",27.764,28.044],["være",28.104,28.284],["katalogets",28.344,28.904],["effekt",28.964,29.244],["gange",29.324,29.544],["K",29.664,29.684],["et",29.924,30.044],["Kataloget",31.205,31.605],["giver",31.645,31.845],["nul",32.045,32.185],["komma",32.225,32.385],["ni",32.445,32.505],["kilowatt",32.605,32.985],["for",33.045,33.125],["én",33.225,33.325],["streng",33.385,33.625],["Fire",34.325,34.525],["strenge",34.565,34.805],["giver",34.865,35.025],["K",35.085,35.105],["et",35.285,35.385],["lig",35.485,35.625],["tre",35.705,35.805],["komma",35.885,36.025],["tre",36.085,36.225],["og",36.785,36.825],["driften",36.865,37.125],["er",37.145,37.205],["jævn",37.285,37.546],["så",37.666,37.806],["K",37.846,37.866],["s",38.126,38.146],["er",38.266,38.346],["en",38.566,38.706]],"text":"Fra slides: designeffekten er påført effekt gange K s, og den må højst være katalogets effekt gange K et. Kataloget giver nul komma ni kilowatt for én streng. Fire strenge giver K et lig tre komma tre, og driften er jævn, så K s er en."},"pa":{"start":40.006,"end":44.627,"words":[["Så",40.046,40.146],["må",40.166,40.246],["kæden",40.246,40.486],["overføre",40.526,40.886],["nul",40.886,41.106],["komma",41.146,41.286],["ni",41.366,41.426],["gange",41.606,41.846],["tre",41.926,42.046],["komma",42.126,42.266],["tre",42.326,42.446],["altså",42.766,43.006],["to",43.166,43.286],["komma",43.386,43.546],["ni",43.646,43.706],["syv",43.966,44.107],["kilowatt",44.227,44.627]],"text":"Så må kæden overføre nul komma ni gange tre komma tre, altså to komma ni syv kilowatt."},"hast":{"start":46.447,"end":56.748,"words":[["Kædehastigheden",46.487,47.227],["er",47.347,47.447],["omdrejninger",47.627,48.187],["gange",48.247,48.427],["pitch",48.447,48.707],["gange",48.807,49.007],["tænder",49.047,49.287],["ni",50.207,50.267],["hundrede",50.387,50.647],["over",50.647,50.787],["tres",50.807,51.048],["gange",51.208,51.428],["seks",51.628,51.828],["komma",51.868,51.988],["tre",52.028,52.148],["fem",52.248,52.388],["millimeter",52.428,52.868],["gange",53.028,53.268],["femogtyve",53.388,53.848],["Det",54.568,54.668],["giver",54.688,54.848],["to",55.008,55.108],["komma",55.228,55.368],["tre",55.468,55.608],["otte",55.848,56.048],["meter",56.108,56.308],["pr",56.328,56.428],["sekund",56.448,56.748]],"text":"Kædehastigheden er omdrejninger gange pitch gange tænder: ni hundrede over tres gange seks komma tre fem millimeter gange femogtyve. Det giver to komma tre otte meter pr. sekund."},"traek":{"start":58.069,"end":71.911,"words":[["Trækket",58.109,58.489],["er",58.669,58.769],["effekt",59.029,59.349],["divideret",59.469,59.849],["med",59.849,59.929],["hastighed",59.969,60.349],["to",61.249,61.349],["tusind",61.449,61.789],["ni",61.849,61.909],["hundrede",62.009,62.249],["og",62.249,62.289],["halvfjerds",62.289,62.729],["divideret",62.969,63.329],["med",63.349,63.429],["to",63.549,63.629],["komma",63.729,63.849],["tre",63.909,64.029],["otte",64.23,64.45],["Det",64.85,64.95],["giver",64.97,65.15],["tolv",65.27,65.51],["hundrede",65.57,65.81],["og",65.87,65.95],["syvogfyrre",66.01,66.49],["newton",66.49,66.81],["Fire",67.71,67.89],["strenge",67.93,68.23],["tåler",68.29,68.53],["over",68.57,68.71],["femten",68.77,69.07],["kilonewton",69.11,69.63],["så",69.99,70.11],["det",70.17,70.29],["er",70.37,70.45],["slid",70.55,70.77],["ikke",70.971,71.111],["brud",71.191,71.371],["der",71.431,71.531],["begrænser",71.531,71.911]],"text":"Trækket er effekt divideret med hastighed: to tusind ni hundrede og halvfjerds divideret med to komma tre otte. Det giver tolv hundrede og syvogfyrre newton. Fire strenge tåler over femten kilonewton, så det er slid, ikke brud, der begrænser."},"laengde":{"start":73.731,"end":87.773,"words":[["Det",73.771,73.851],["store",73.871,74.071],["hjul",74.091,74.331],["har",74.411,74.531],["hundrede",74.691,74.971],["tænder",75.011,75.251],["Med",75.951,76.051],["centerafstanden",76.091,76.751],["to",76.751,76.891],["hundrede",76.991,77.191],["og",77.191,77.231],["halvtreds",77.231,77.531],["millimeter",77.571,77.972],["giver",78.132,78.312],["ligning",78.352,78.652],["nitten",78.672,79.112],["seksogtyve",79.232,79.832],["hundrede",80.072,80.392],["og",80.452,80.532],["fireogfyrre",80.632,81.172],["komma",81.212,81.392],["ni",81.472,81.552],["led",81.692,81.852],["Vi",82.432,82.472],["runder",82.532,82.732],["op",82.752,82.832],["til",82.892,82.992],["et",83.012,83.072],["lige",83.112,83.292],["tal",83.332,83.552],["hundrede",84.052,84.392],["og",84.472,84.553],["seksogfyrre",84.613,85.093],["led",85.133,85.293],["altså",85.713,85.973],["ni",86.193,86.273],["hundrede",86.433,86.733],["og",86.773,86.833],["syvogtyve",86.873,87.353],["millimeter",87.353,87.773]],"text":"Det store hjul har hundrede tænder. Med centerafstanden to hundrede og halvtreds millimeter giver ligning nitten seksogtyve hundrede og fireogfyrre komma ni led. Vi runder op til et lige tal, hundrede og seksogfyrre led, altså ni hundrede og syvogtyve millimeter."},"polygon":{"start":89.593,"end":102.255,"words":[["Til",89.633,89.753],["sidst",89.773,89.973],["polygoneffekten",90.133,90.913],["Med",91.493,91.633],["femogtyve",91.813,92.213],["tænder",92.213,92.474],["er",92.594,92.694],["delta",92.874,93.154],["v",93.234,93.254],["over",93.654,93.854],["v",93.894,93.914],["max",94.094,94.254],["en",94.914,95.054],["minus",95.154,95.474],["cosinus",95.634,96.114],["til",96.214,96.354],["syv",96.594,96.694],["komma",96.774,96.934],["to",96.994,97.094],["grader",97.174,97.454],["Det",98.154,98.294],["er",98.394,98.494],["nul",98.674,98.814],["komma",98.874,99.055],["syv",99.215,99.335],["ni",99.395,99.455],["procent",99.555,99.875],["et",100.275,100.355],["godt",100.495,100.655],["stykke",100.735,101.015],["under",101.115,101.275],["grænsen",101.315,101.635],["ved",101.675,101.775],["sytten",101.795,102.015],["tænder",102.055,102.255]],"text":"Til sidst polygoneffekten. Med femogtyve tænder er delta v over v max en minus cosinus til syv komma to grader. Det er nul komma syv ni procent, et godt stykke under grænsen ved sytten tænder."},"tjek_q":{"start":104.075,"end":108.416,"words":[["Tjek",104.115,104.255],["dig",104.295,104.375],["selv",104.415,104.575],["Hvor",105.295,105.435],["meget",105.495,105.735],["større",105.795,106.095],["bliver",106.155,106.376],["udsvinget",106.456,106.876],["med",106.936,107.036],["otte",107.156,107.356],["tænder",107.416,107.676],["i",107.796,107.816],["stedet",107.876,108.056],["for",108.076,108.156],["sytten",108.196,108.416]],"text":"Tjek dig selv. Hvor meget større bliver udsvinget med otte tænder i stedet for sytten?"},"tjek_a":{"start":112.536,"end":116.717,"words":[["Cirka",112.576,112.796],["fire",112.916,113.136],["og",113.136,113.176],["en",113.176,113.236],["halv",113.296,113.436],["gang",113.476,113.616],["større",113.656,113.916],["syv",114.496,114.616],["komma",114.676,114.836],["seks",114.896,115.056],["procent",115.096,115.376],["mod",115.556,115.676],["en",115.877,115.977],["komma",116.017,116.177],["syv",116.237,116.357],["procent",116.417,116.717]],"text":"Cirka fire og en halv gang større: syv komma seks procent mod en komma syv procent."},"tjek_vis":{"start":118.537,"end":127.798,"words":[["Her",118.577,118.737],["er",118.857,118.937],["Mathcad-plottet",119.017,119.757],["af",119.837,119.917],["udsvinget",120.017,120.477],["mod",120.677,120.817],["antallet",121.017,121.417],["af",121.457,121.517],["tænder",121.557,121.797],["Under",122.277,122.477],["sytten",122.597,122.817],["tænder",122.857,123.097],["stiger",123.137,123.377],["kurven",123.397,123.658],["stejlt",123.678,123.958],["Over",124.358,124.538],["sytten",124.578,124.818],["flader",124.938,125.178],["den",125.198,125.298],["ud",125.378,125.478],["og",125.938,126.018],["der",126.058,126.158],["er",126.238,126.318],["ikke",126.458,126.598],["meget",126.658,126.838],["at",126.838,126.878],["hente",126.898,127.098],["ved",127.138,127.238],["at",127.238,127.278],["gå",127.278,127.378],["højere",127.398,127.638],["op",127.678,127.798]],"text":"Her er Mathcad-plottet af udsvinget mod antallet af tænder. Under sytten tænder stiger kurven stejlt. Over sytten flader den ud, og der er ikke meget at hente ved at gå højere op."},"slut":{"start":129.618,"end":140.82,"words":[["Kort",129.658,129.838],["sagt",129.878,130.078],["kæden",130.478,130.758],["må",130.798,130.918],["overføre",131.038,131.459],["to",131.699,131.799],["komma",131.919,132.099],["ni",132.179,132.239],["syv",132.419,132.559],["kilowatt",132.699,133.079],["trækket",133.579,133.979],["er",134.079,134.179],["tolv",134.439,134.639],["hundrede",134.699,134.979],["og",135.019,135.079],["syvogfyrre",135.159,135.619],["newton",135.619,135.959],["kæden",136.419,136.679],["får",136.719,136.879],["hundrede",137.019,137.319],["og",137.339,137.399],["seksogfyrre",137.439,137.92],["led",137.96,138.1],["og",138.6,138.68],["hastigheden",138.72,139.24],["svinger",139.32,139.6],["nul",139.86,140.0],["komma",140.06,140.22],["otte",140.32,140.52],["procent",140.52,140.82]],"text":"Kort sagt: kæden må overføre to komma ni syv kilowatt, trækket er tolv hundrede og syvogfyrre newton, kæden får hundrede og seksogfyrre led, og hastigheden svinger nul komma otte procent."}}}, { audio: 'opg-19-5-rullekaede.mp3', id: 'opg-19-5-rullekaede' });</script>
+</body>
+</html>

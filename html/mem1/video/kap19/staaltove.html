@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ståltove: træk og bøjning · video</title>
+<meta name="description" content="Bøjespænding σ_b = E·d_w/D, F_b og den samlede designlast.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 19: videoer</a><h1>Ståltove: træk og bøjning</h1><span class="meta">MEM1 · kapitel 19 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Ståltove: træk og bøjning"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Bøjespænding σ_b = E·d_w/D, F_b og den samlede designlast.</p><div class="chips"><a href="../../Kapitel19_Overblik.pdf">📄 Formeloverblik</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l19">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// Ståltove: træk + bøjning over skiven (MEM1 kap. 19, Kapitel19_Slides slide 7 og 11; Hamrock 19.5, lign. 19.18)
+BP.scene({ header: 'MEM1 · kap. 19', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, axes, PI, TAU } = B;
+
+  B.titel(0, 'Ståltove', 'MEM1 · kapitel 19 · begreb (slide 7)', 'titel');
+  text(0, 'σ_b = E · d_w / D', 640, 540, 50, 'red', wt('titel', 'bøjet') - 0.3, we('titel', 'bøjningen'), { align: 'center' });
+
+  // ---------------------------------------------------------------- 1 opbygning 6 × 19
+  B.goto('opbygning', 1);
+  {
+    const t0 = L('opbygning').start, C = [360, 380], R = 210, rs = 62, rk = 48;
+    line(1, ell(C[0], C[1], R, R, 0, TAU), 'black', 3, t0, t0 + 0.5);
+    const tr = wt('opbygning', 'ståltråde'), tk = wt('opbygning', 'kordeler'), tc = wt('opbygning', 'kerne');
+    line(1, ell(C[0], C[1], rk, rk, 0, TAU), 'green', 3, tc - 0.1, tc + 0.4);
+    for (let i = 0; i < 6; i++) {
+      const v = i * TAU / 6, c = [C[0] + 132 * Math.cos(v), C[1] + 132 * Math.sin(v)];
+      line(1, ell(c[0], c[1], rs, rs, 0, TAU), 'blue', 3, tk - 0.1 + i * 0.08, tk + 0.3 + i * 0.08);
+      for (let j = 0; j < 6; j++) {
+        const u = j * TAU / 6 + v;
+        line(1, ell(c[0] + 36 * Math.cos(u), c[1] + 36 * Math.sin(u), 15, 15, 0, TAU), 'black', 1.6, tr + j * 0.05 + i * 0.04, tr + 0.2 + j * 0.05 + i * 0.04);
+      }
+      line(1, ell(c[0], c[1], 15, 15, 0, TAU), 'black', 1.6, tr + 0.3 + i * 0.04, tr + 0.5 + i * 0.04);
+    }
+    text(1, 'tråd', 700, 210, 34, 'black', tr, we('opbygning', 'ståltråde'));
+    text(1, 'kordel', 700, 290, 34, 'blue', tk, we('opbygning', 'kordeler'));
+    text(1, 'kerne', 700, 370, 34, 'green', tc, we('opbygning', 'kerne'));
+    const t6 = wt('opbygning', 'Seks');
+    text(1, '6 × 19 = 6 kordeler', 700, 480, 38, 'red', t6 - 0.1, we('opbygning', 'kordeler', 1));
+    text(1, 'med 19 tråde i hver', 720, 535, 34, 'red', wt('opbygning', 'nitten', 1) - 0.1, we('opbygning', 'hver'));
+  }
+
+  // ---------------------------------------------------------------- 2 bøjning over skiven
+  B.goto('boej', 2);
+  {
+    const t0 = L('boej').start, C = [330, 400], r = 170;
+    line(2, ell(C[0], C[1], r, r, 0, TAU), 'black', 3, t0, t0 + 0.5); dot(2, ...C, 6, 'black', t0 + 0.4);
+    line(2, ell(C[0], C[1], r + 8, r + 8, PI, TAU), 'blue', 6, t0 + 0.3, t0 + 0.8);
+    line(2, [[C[0] - r - 8, C[1]], [C[0] - r - 8, 660]], 'blue', 6, t0 + 0.6, t0 + 0.9);
+    line(2, [[C[0] + r + 8, C[1]], [C[0] + r + 8, 660]], 'blue', 6, t0 + 0.6, t0 + 0.9);
+    const tD = wt('boej', 'diameteren');
+    B.dobbeltpil(2, [C[0] - r, C[1]], [C[0] + r, C[1]], 'black', tD - 0.1, tD + 0.4);
+    text(2, 'D', C[0], C[1] - 14, 34, 'black', tD, we('boej', 'D'), { align: 'center' });
+    const tw = wt('boej', 'w');
+    text(2, 'tråd: d_w', 560, 180, 34, 'blue', tw - 0.3, tw + 0.3);
+    const te = we('boej', 'divideret') + 0.5;
+    text(2, 'σ_b = E · d_w / D', 640, 300, 50, 'red', wt('boej', 'sigma') - 0.1, te);
+    box(2, 620, 240, 430, 82, 'red', te, te + 0.5);
+    const th = L('hvorfor').start;
+    text(2, 'bjælke:  σ = E · c / ρ', 640, 420, 36, 'black', th - 0.1, we('hvorfor', 'bjælketeorien'));
+    text(2, 'ρ = D/2,   c = d_w/2', 640, 490, 36, 'green', wt('hvorfor', 'Krumningsradius') - 0.1, we('hvorfor', 'halve', 1));
+    text(2, '⇒ de to halve går ud', 640, 560, 36, 'green', wt('hvorfor', 'De') - 0.1, we('hvorfor', 'hinanden'));
+  }
+
+  // ---------------------------------------------------------------- 3 lastmodel og sikkerhed
+  B.goto('kraft', 3);
+  {
+    const t0 = L('kraft').start;
+    bubble(3, 'Slidernes lastmodel', 140, 130, 44, 'blue', t0 - 0.1, t0 + 0.8);
+    const tk = we('kraft', 'over') + 0.4;
+    text(3, 'F_b = σ_b · A_m = E · A_m · d_w / D', 150, 260, 42, 'red', wt('kraft', 'F') - 0.1, tk);
+    const t1 = L('total').start, te = we('total', 'b');
+    text(3, 'F_{total} = F_{static} + F_{accel} + F_b', 150, 380, 44, 'blue', t1, te);
+    box(3, 130, 322, 780, 82, 'blue', te, te + 0.5);
+    text(3, 'statisk', 380, 450, 26, 'black', wt('total', 'statiske') - 0.1, we('total', 'last'), { align: 'center' });
+    text(3, 'acceleration', 600, 450, 26, 'black', wt('total', 'accelerationen') - 0.3, we('total', 'accelerationen'), { align: 'center' });
+    text(3, 'bøjning', 790, 450, 26, 'red', wt('total', 'bøjningskraften') - 0.1, we('total', 'b'), { align: 'center' });
+    const ts = L('sikkerhed').start, tn = we('sikkerhed', 'otte');
+    const r = text(3, 'n = F_{brud} / F_{total} ≥ 5 … 8', 150, 560, 44, 'green', ts, tn);
+    under(r, 'green', tn, tn + 0.4);
+  }
+
+  // ---------------------------------------------------------------- 4 σ_b mod D/d_w
+  B.goto('forhold', 4);
+  {
+    const t0 = L('forhold').start, x0 = 220, y0 = 600, w = 640, h = 400, X = 1000, Y = 900;
+    const P = (q, s) => [x0 + q / X * w, y0 - s / Y * h];
+    axes(4, x0, y0, x0 + w + 40, y0 - h - 30, 'D/d_w', 'σ_b (MPa)', t0 - 0.1);
+    [[200, '200'], [400, '400'], [600, '600'], [800, '800'], [1000, '1000']].forEach(([q, s], i) => {
+      const p = P(q, 0); text(4, s, p[0], y0 + 34, 24, 'black', t0 + 0.4 + i * 0.05, t0 + 0.6 + i * 0.05, { align: 'center' });
+    });
+    [[200, '200'], [400, '400'], [800, '800']].forEach(([v, s], i) => {
+      const p = P(0, v); text(4, s, x0 - 12, p[1] + 8, 24, 'black', t0 + 0.5 + i * 0.05, t0 + 0.7 + i * 0.05, { align: 'right' });
+    });
+    const pts = []; for (let i = 0; i <= 120; i++) { const q = 92 + (X - 92) * i / 120; pts.push(P(q, 83000 / q)); }
+    const tl = wt('forhold', 'lille');
+    line(4, pts, 'blue', 3.6, tl - 0.3, we('forhold', 'hurtigt'), { wob: 0.35 });
+    text(4, 'E = 83 GPa', 720, 200, 28, 'blue', tl, tl + 0.4);
+    const ta = wt('forhold', 'fire');
+    const p4 = P(400, 207.5);
+    B.dashed(4, [p4[0], y0], p4, 'red', ta - 0.1, ta + 0.4); dot(4, ...p4, 7, 'red', ta + 0.3);
+    text(4, 'D/d_w ≥ 400:  σ_b ≈ 210 MPa', p4[0] + 20, p4[1] - 24, 30, 'red', ta, we('forhold', 'levetid'));
+    text(4, 'lille skive ⇒ stor σ_b', 960, 360, 30, 'green', tl - 0.1, we('forhold', 'stor'));
+    text(4, '⇒ hurtig udmattelse', 960, 410, 30, 'green', wt('forhold', 'udmattes') - 0.1, we('forhold', 'hurtigt'));
+  }
+
+  B.goto('tjek_q', 5);
+  B.tjek(5, ['Bøjningen er problemet.', 'Hjælper to tove i stedet for ét?'], ['kun delvist: σ_b = E d_w / D er den samme', 'en større skive hjælper'], 'tjek_q', 'tjek_a');
+
+  B.goto('slut', 6);
+  B.slut(6, 'Abou-Hayt (2026), MEM1 Chapter 19, slide 7 og 11 · Hamrock et al., lign. (19.14)–(19.18)', 'eksempel: ståltov til teaterlys', 'slut');
+  text(6, 'σ_b = E d_w / D,   F_b = σ_b A_m', 200, 280, 44, 'red', wt('slut', 'sigma') - 0.1, we('slut', 'm'));
+  text(6, 'F_{total} = F_{static} + F_{accel} + F_b', 200, 380, 42, 'blue', wt('slut', 'total') - 0.1, we('slut', 'b', 3));
+  text(6, 'små skiver ⇒ stor bøjning', 200, 470, 40, 'green', wt('slut', 'Små') - 0.1, we('slut', 'bøjespændinger'));
+});
+
+</script>
+<script>BP.live({"duration":127.727,"audio":"staaltove.mp3","order":["titel","opbygning","boej","hvorfor","kraft","total","sikkerhed","forhold","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":8.121,"words":[["Ståltove",0.54,1.16],["Et",2.2,2.26],["tov",2.3,2.5],["der",2.58,2.66],["løber",2.7,2.94],["over",3.02,3.2],["en",3.24,3.301],["skive",3.401,3.801],["bliver",4.141,4.281],["ikke",4.281,4.401],["kun",4.401,4.541],["trukket",4.601,4.961],["Det",5.601,5.661],["bliver",5.681,5.801],["også",5.801,5.981],["bøjet",5.981,6.301],["Hvor",7.141,7.261],["stor",7.301,7.501],["er",7.561,7.621],["bøjningen",7.701,8.121]],"text":"Ståltove. Et tov, der løber over en skive, bliver ikke kun trukket. Det bliver også bøjet. Hvor stor er bøjningen?"},"opbygning":{"start":9.941,"end":20.083,"words":[["Et",9.981,10.082],["ståltov",10.122,10.542],["består",10.582,10.902],["af",10.962,11.042],["tynde",11.102,11.362],["ståltråde",11.422,12.022],["der",12.102,12.202],["er",12.222,12.282],["snoet",12.322,12.542],["sammen",12.602,12.862],["til",12.922,13.062],["kordeler",13.142,13.602],["og",14.042,14.102],["kordelerne",14.142,14.582],["er",14.622,14.682],["snoet",14.742,15.102],["om",15.182,15.262],["en",15.302,15.382],["kerne",15.442,15.762],["Seks",16.803,17.003],["gange",17.043,17.243],["nitten",17.283,17.543],["betyder",17.603,17.963],["seks",18.063,18.263],["kordeler",18.323,18.763],["med",19.103,19.223],["nitten",19.303,19.543],["tråde",19.583,19.823],["i",19.883,19.903],["hver",19.923,20.083]],"text":"Et ståltov består af tynde ståltråde, der er snoet sammen til kordeler, og kordelerne er snoet om en kerne. Seks gange nitten betyder seks kordeler med nitten tråde i hver."},"boej":{"start":21.903,"end":34.566,"words":[["Når",21.943,22.063],["tovet",22.103,22.343],["løber",22.363,22.584],["over",22.604,22.744],["en",22.784,22.824],["skive",22.884,23.164],["med",23.204,23.304],["diameteren",23.324,23.844],["D",23.964,23.984],["bøjes",24.644,24.944],["hver",25.004,25.164],["tråd",25.224,25.464],["med",25.504,25.584],["diameteren",25.624,26.164],["d",26.304,26.324],["w",26.784,26.804],["Trådens",27.724,28.084],["yderste",28.184,28.465],["fiber",28.545,28.845],["får",29.065,29.245],["bøjespændingen",29.445,30.145],["sigma",30.425,30.705],["b",30.805,30.825],["lig",31.385,31.525],["E",31.905,31.925],["gange",32.245,32.545],["d",32.965,32.985],["w",33.505,33.525],["divideret",34.025,34.406],["med",34.446,34.506],["D",34.546,34.566]],"text":"Når tovet løber over en skive med diameteren D, bøjes hver tråd med diameteren d w. Trådens yderste fiber får bøjespændingen sigma b lig E gange d w divideret med D."},"hvorfor":{"start":35.546,"end":44.987,"words":[["Det",35.586,35.666],["kommer",35.706,35.906],["fra",35.926,36.006],["bjælketeorien",36.126,36.826],["Krumningsradius",37.486,38.306],["er",38.386,38.466],["D",38.846,38.866],["halve",39.086,39.366],["og",39.826,39.886],["afstanden",39.986,40.387],["fra",40.407,40.487],["midten",40.567,40.847],["til",40.887,40.987],["yderfiberen",41.027,41.607],["er",41.887,41.967],["d",42.107,42.127],["w",42.667,42.687],["halve",42.827,43.047],["De",43.747,43.807],["to",43.887,43.967],["halve",44.087,44.327],["går",44.387,44.507],["ud",44.527,44.607],["med",44.627,44.687],["hinanden",44.707,44.987]],"text":"Det kommer fra bjælketeorien. Krumningsradius er D halve, og afstanden fra midten til yderfiberen er d w halve. De to halve går ud med hinanden."},"kraft":{"start":46.807,"end":58.569,"words":[["Slides",46.847,47.207],["laver",47.247,47.467],["bøjespændingen",47.547,48.167],["om",48.227,48.327],["til",48.407,48.527],["en",48.547,48.607],["ækvivalent",48.707,49.207],["kraft",49.247,49.527],["F",50.427,50.447],["b",50.607,50.627],["er",51.107,51.207],["sigma",51.407,51.687],["b",51.767,51.787],["gange",52.227,52.527],["metalarealet",52.728,53.528],["A",53.708,53.728],["m",53.968,53.988],["altså",54.568,54.848],["E",55.368,55.388],["gange",55.828,56.108],["A",56.288,56.308],["m",56.588,56.608],["gange",57.048,57.288],["d",57.488,57.508],["w",58.028,58.048],["over",58.348,58.509],["D",58.549,58.569]],"text":"Slides laver bøjespændingen om til en ækvivalent kraft. F b er sigma b gange metalarealet A m, altså E gange A m gange d w over D."},"total":{"start":59.809,"end":66.45,"words":[["Den",59.849,59.989],["samlede",60.049,60.389],["designlast",60.449,61.149],["er",61.489,61.569],["den",61.629,61.749],["statiske",61.889,62.389],["last",62.449,62.669],["plus",62.829,63.089],["kraften",63.129,63.529],["til",63.589,63.729],["accelerationen",63.789,64.49],["plus",64.91,65.19],["bøjningskraften",65.27,66.03],["F",66.33,66.35],["b",66.43,66.45]],"text":"Den samlede designlast er den statiske last plus kraften til accelerationen plus bøjningskraften F b."},"sikkerhed":{"start":68.27,"end":75.251,"words":[["Den",68.31,68.45],["samlede",68.51,68.85],["last",68.89,69.11],["sammenlignes",69.27,69.75],["med",69.77,69.87],["katalogets",69.89,70.39],["brudstyrke",70.49,71.091],["Sikkerhedsfaktoren",71.671,72.511],["skal",72.551,72.711],["være",72.711,72.851],["mellem",72.891,73.071],["fem",73.151,73.311],["og",73.391,73.451],["otte",73.571,73.791],["afhængigt",74.331,74.731],["af",74.731,74.791],["anvendelsen",74.811,75.251]],"text":"Den samlede last sammenlignes med katalogets brudstyrke. Sikkerhedsfaktoren skal være mellem fem og otte, afhængigt af anvendelsen."},"forhold":{"start":77.071,"end":88.373,"words":[["Læg",77.111,77.211],["mærke",77.251,77.411],["til",77.411,77.512],["forholdet",77.552,77.992],["D",78.252,78.272],["over",78.472,78.652],["d",78.712,78.732],["w",79.152,79.172],["Er",79.872,79.932],["skiven",79.972,80.232],["lille",80.272,80.492],["bliver",80.832,80.992],["bøjningen",81.032,81.432],["stor",81.512,81.752],["og",82.132,82.192],["trådene",82.252,82.592],["udmattes",82.712,83.072],["hurtigt",83.132,83.473],["Bogen",84.313,84.533],["anbefaler",84.573,85.113],["D",85.213,85.233],["over",85.433,85.613],["d",85.893,85.913],["w",86.153,86.173],["på",86.393,86.533],["mindst",86.593,86.873],["fire",87.013,87.273],["hundrede",87.353,87.633],["for",87.713,87.813],["lang",87.833,87.993],["levetid",88.033,88.373]],"text":"Læg mærke til forholdet D over d w. Er skiven lille, bliver bøjningen stor, og trådene udmattes hurtigt. Bogen anbefaler D over d w på mindst fire hundrede for lang levetid."},"tjek_q":{"start":90.193,"end":94.653,"words":[["Tjek",90.233,90.373],["dig",90.393,90.493],["selv",90.513,90.673],["Hjælper",91.313,91.593],["det",91.593,91.693],["at",91.713,91.773],["bruge",91.813,91.993],["to",92.153,92.313],["tove",92.473,92.733],["i",92.793,92.833],["stedet",92.853,93.033],["for",93.053,93.133],["ét",93.233,93.333],["hvis",93.653,93.773],["bøjningen",93.853,94.213],["er",94.213,94.273],["problemet",94.293,94.653]],"text":"Tjek dig selv. Hjælper det at bruge to tove i stedet for ét, hvis bøjningen er problemet?"},"tjek_a":{"start":98.773,"end":110.395,"words":[["Kun",98.813,98.993],["delvist",99.033,99.434],["Lasten",100.094,100.554],["deles",100.754,101.234],["men",101.654,101.794],["bøjespændingen",101.954,102.754],["i",102.814,102.834],["hver",102.894,103.054],["tråd",103.134,103.474],["er",103.534,103.594],["den",103.614,103.714],["samme",103.814,104.134],["for",104.354,104.454],["den",104.474,104.594],["afhænger",104.674,105.055],["kun",105.115,105.315],["af",105.475,105.555],["E",105.795,105.815],["d",106.215,106.235],["w",106.775,106.795],["og",107.015,107.115],["D",107.315,107.335],["Det",108.055,108.155],["der",108.195,108.275],["virkelig",108.335,108.675],["hjælper",108.715,109.075],["er",109.215,109.295],["en",109.355,109.435],["større",109.575,109.955],["skive",110.055,110.395]],"text":"Kun delvist. Lasten deles, men bøjespændingen i hver tråd er den samme, for den afhænger kun af E, d w og D. Det, der virkelig hjælper, er en større skive."},"slut":{"start":112.215,"end":126.257,"words":[["Kort",112.255,112.455],["sagt",112.495,112.695],["sigma",113.315,113.555],["b",113.655,113.675],["er",114.055,114.155],["E",114.475,114.495],["d",114.755,114.775],["w",115.255,115.275],["over",115.435,115.615],["D",115.695,115.715],["F",116.635,116.655],["b",116.775,116.795],["er",117.135,117.235],["sigma",117.395,117.635],["b",117.715,117.735],["gange",117.956,118.256],["A",118.476,118.496],["m",118.776,118.796],["og",119.336,119.436],["F",119.716,119.736],["total",119.776,120.196],["er",120.336,120.436],["statisk",120.636,121.056],["last",121.116,121.356],["plus",121.516,121.736],["acceleration",121.836,122.456],["plus",122.656,122.896],["F",123.136,123.156],["b",123.256,123.276],["Små",124.057,124.277],["skiver",124.337,124.697],["giver",125.057,125.217],["store",125.277,125.597],["bøjespændinger",125.637,126.257]],"text":"Kort sagt: sigma b er E d w over D, F b er sigma b gange A m, og F total er statisk last plus acceleration plus F b. Små skiver giver store bøjespændinger."}}}, { audio: 'staaltove.mp3', id: 'staaltove' });</script>
+</body>
+</html>
