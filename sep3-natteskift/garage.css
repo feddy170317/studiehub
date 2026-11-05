@@ -1,0 +1,247 @@
+/* Natteskift 3D: værkstedets DOM-overlay (Agent C). Alle klasser har præfikset gar-. */
+@import url('https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+.gar-root {
+  --gar-night: #0b111c; --gar-deck: rgba(13, 19, 30, 0.82); --gar-deck2: rgba(23, 34, 54, 0.9); --gar-line: rgba(70, 92, 124, 0.45);
+  --gar-snow: #e6edf6; --gar-muted: #8ea0b9; --gar-sodium: #f0a43a; --gar-sodium-dim: #7a5320; --gar-ice: #8cc6e6;
+  --gar-ok: #5cc28d; --gar-warn: #f2c14e; --gar-crit: #ee5a4b;
+  --gar-fd: "Saira Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --gar-fb: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --gar-fm: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --gar-gl: max(16px, env(safe-area-inset-left)); --gar-gr: max(16px, env(safe-area-inset-right));
+  --gar-gt: max(12px, env(safe-area-inset-top)); --gar-gb: max(12px, env(safe-area-inset-bottom));
+  position: fixed; inset: 0; z-index: 50; pointer-events: none; color: var(--gar-snow);
+  font: 14px/1.4 var(--gar-fb); -webkit-font-smoothing: antialiased; overflow: hidden;
+}
+.gar-root *, .gar-root *::before, .gar-root *::after { box-sizing: border-box; }
+.gar-root button { font: inherit; color: inherit; }
+.gar-root button:focus-visible, .gar-root input:focus-visible { outline: 2px solid var(--gar-sodium); outline-offset: 2px; }
+.gar-root kbd { font: 500 10px/1 var(--gar-fm); padding: 3px 5px 2px; border: 1px solid var(--gar-line); border-bottom-width: 2px; border-radius: 4px; color: var(--gar-muted); background: rgba(0, 0, 0, 0.25); }
+.gar-num { font-family: var(--gar-fm); font-variant-numeric: tabular-nums; }
+.gar-root h2, .gar-root h3, .gar-root h4 { margin: 0; font-family: var(--gar-fd); font-weight: 700; letter-spacing: 0.02em; }
+
+/* ankomst */
+.gar-fade { position: absolute; inset: 0; background: #000; opacity: 0; transition: opacity 1.1s ease; }
+.gar-arrive .gar-fade { opacity: 1; transition: none; }
+.gar-title { position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; animation: gar-title 2.3s ease forwards; }
+.gar-title small { display: block; font: 600 13px/1 var(--gar-fd); letter-spacing: 0.5em; color: var(--gar-sodium); text-transform: uppercase; margin-bottom: 6px; }
+.gar-title b { font: 800 clamp(48px, 9vw, 112px)/0.9 var(--gar-fd); letter-spacing: 0.06em; text-transform: uppercase;
+  background: linear-gradient(180deg, #fff 30%, #f0a43a 120%); -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 0 18px rgba(240, 164, 58, 0.45)); }
+@keyframes gar-title { 0% { opacity: 0; letter-spacing: 0.5em; } 18% { opacity: 1; } 60% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -60%); } }
+.gar-arrive .gar-top, .gar-arrive .gar-panel, .gar-arrive .gar-dock { opacity: 0; transform: translateY(-8px); }
+.gar-top, .gar-panel, .gar-dock { transition: opacity 0.6s ease 0.9s, transform 0.6s ease 0.9s; }
+
+/* topbjælke */
+.gar-top { position: absolute; left: 0; right: 0; top: 0; padding: var(--gar-gt) var(--gar-gr) 12px var(--gar-gl); display: flex; align-items: center; gap: 24px;
+  background: linear-gradient(180deg, rgba(5, 8, 13, 0.92), rgba(5, 8, 13, 0.55) 70%, rgba(5, 8, 13, 0)); pointer-events: auto; }
+.gar-brand { display: flex; flex-direction: column; min-width: 0; padding-left: 12px; border-left: 3px solid var(--gar-sodium); }
+.gar-brand small { font: 600 11px/1 var(--gar-fd); letter-spacing: 0.2em; color: var(--gar-sodium); text-transform: uppercase; }
+.gar-brand b { font: 800 26px/1.05 var(--gar-fd); letter-spacing: 0.04em; text-transform: uppercase; }
+.gar-stats { display: flex; gap: 22px; flex: 1; min-width: 0; justify-content: center; }
+.gar-stat { display: flex; flex-direction: column; min-width: 0; }
+.gar-k { font: 600 10.5px/1 var(--gar-fd); letter-spacing: 0.16em; text-transform: uppercase; color: var(--gar-muted); }
+.gar-v { font-size: 20px; font-weight: 500; line-height: 1.2; white-space: nowrap; }
+.gar-s { font-size: 11.5px; color: var(--gar-muted); white-space: nowrap; }
+.gar-bar { display: block; width: 92px; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, 0.08); overflow: hidden; margin-top: 3px; }
+.gar-bar b { display: block; height: 100%; background: var(--gar-ok); box-shadow: 0 0 8px var(--gar-ok); transition: width 0.2s linear; }
+.gar-bar.gar-low b { background: var(--gar-crit); box-shadow: 0 0 8px var(--gar-crit); }
+.gar-bar-ice b { background: var(--gar-ice); box-shadow: 0 0 8px var(--gar-ice); }
+.gar-exit { pointer-events: auto; display: inline-flex; align-items: center; gap: 10px; padding: 10px 16px 10px 18px; border-radius: 6px; cursor: pointer;
+  background: var(--gar-sodium); color: #1a1006 !important; border: 0; font: 700 17px/1 var(--gar-fd) !important; letter-spacing: 0.08em; text-transform: uppercase;
+  box-shadow: 0 0 0 1px rgba(255, 200, 120, 0.4), 0 6px 24px rgba(240, 164, 58, 0.35); }
+.gar-exit:hover { background: #ffb954; }
+.gar-exit kbd { color: #3d2606; border-color: rgba(0, 0, 0, 0.3); background: rgba(255, 255, 255, 0.2); }
+
+/* paneler */
+.gar-panel { position: absolute; top: 96px; bottom: 132px; width: 312px; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+.gar-shop { left: var(--gar-gl); }
+.gar-side { right: var(--gar-gr); }
+.gar-shop, .gar-worst, .gar-card { pointer-events: auto; background: var(--gar-deck); border: 1px solid var(--gar-line); border-radius: 8px;
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45); }
+.gar-shop { padding: 14px 12px 12px; min-height: 0; }
+.gar-ph { padding: 0 4px 8px; }
+.gar-ph h2 { font-size: 17px; text-transform: uppercase; letter-spacing: 0.08em; }
+.gar-sub { display: block; font-size: 12px; color: var(--gar-muted); }
+.gar-tabs { display: flex; flex-wrap: wrap; gap: 5px; padding: 0 2px 10px; }
+.gar-chip { position: relative; cursor: pointer; padding: 5px 9px 4px; border-radius: 4px; border: 1px solid var(--gar-line); background: rgba(255, 255, 255, 0.03);
+  font: 600 12.5px/1.1 var(--gar-fd) !important; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gar-muted) !important; }
+.gar-chip:hover { color: var(--gar-snow) !important; border-color: rgba(240, 164, 58, 0.5); }
+.gar-chip.gar-on { color: #1a1006 !important; background: var(--gar-sodium); border-color: var(--gar-sodium); }
+.gar-dot { position: absolute; top: -3px; right: -3px; width: 8px; height: 8px; border-radius: 50%; }
+.gar-dot-need { background: var(--gar-crit); box-shadow: 0 0 6px var(--gar-crit); animation: gar-blink 1.1s infinite; }
+.gar-dot-soon { background: var(--gar-warn); }
+@keyframes gar-blink { 50% { opacity: 0.35; } }
+.gar-list { overflow: auto; min-height: 0; display: flex; flex-direction: column; gap: 6px; padding: 2px; scrollbar-width: thin; scrollbar-color: #2a3a52 transparent; }
+.gar-item { position: relative; display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; text-align: left; cursor: pointer; padding: 9px 11px 9px 13px; border-radius: 6px;
+  background: var(--gar-deck2); border: 1px solid transparent; transition: border-color 0.15s, transform 0.15s, background 0.15s; }
+.gar-item::before { content: ""; position: absolute; left: 0; top: 8px; bottom: 8px; width: 3px; border-radius: 2px; background: #2c3b52; }
+.gar-item:hover:not(:disabled) { border-color: rgba(240, 164, 58, 0.6); transform: translateX(2px); background: rgba(34, 48, 72, 0.95); }
+.gar-item:disabled { cursor: default; opacity: 0.5; }
+.gar-in { font-weight: 700; font-size: 13.5px; grid-column: 1; }
+.gar-in em { font-style: normal; font: 600 10.5px/1 var(--gar-fd); letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 5px 1px; border-radius: 3px; margin-left: 4px;
+  background: rgba(92, 194, 141, 0.18); color: var(--gar-ok); vertical-align: 1px; }
+.gar-in em.gar-tag-need { background: rgba(238, 90, 75, 0.2); color: var(--gar-crit); }
+.gar-in em.gar-tag-soon { background: rgba(242, 193, 78, 0.18); color: var(--gar-warn); }
+.gar-is { grid-column: 1; font-size: 12px; color: var(--gar-muted); }
+.gar-ic { grid-column: 2; grid-row: 1 / span 2; align-self: center; font-size: 12px; color: var(--gar-sodium); white-space: nowrap; text-align: right; }
+.gar-need { border-color: rgba(238, 90, 75, 0.55); background: linear-gradient(90deg, rgba(238, 90, 75, 0.16), var(--gar-deck2) 60%); }
+.gar-need::before { background: var(--gar-crit); box-shadow: 0 0 8px var(--gar-crit); }
+.gar-soon::before { background: var(--gar-warn); }
+.gar-cur::before { background: var(--gar-ok); }
+.gar-empty { color: var(--gar-muted); font-size: 13px; margin: 6px 4px; }
+.gar-busy .gar-item, .gar-busy .gar-chip, .gar-busy .gar-wr { pointer-events: none; }
+.gar-busy .gar-item:not(.gar-primary) { opacity: 0.55; }
+
+/* mest belastede */
+.gar-worst { padding: 14px 12px 10px; min-height: 140px; display: flex; flex-direction: column; flex: 1 1 auto; overflow: hidden; }
+.gar-wl { list-style: none; margin: 0; padding: 0 2px; display: flex; flex-direction: column; gap: 4px; overflow: auto; min-height: 0; scrollbar-width: thin; scrollbar-color: #2a3a52 transparent; }
+.gar-wr { width: 100%; display: grid; grid-template-columns: 1fr auto; gap: 3px 8px; text-align: left; cursor: pointer; padding: 7px 9px; border-radius: 5px;
+  border: 1px solid transparent; background: rgba(255, 255, 255, 0.025); }
+.gar-wr:hover, .gar-wr.gar-on { border-color: rgba(240, 164, 58, 0.55); background: rgba(240, 164, 58, 0.06); }
+.gar-wn { font-weight: 700; font-size: 13px; }
+.gar-wn small { font: 600 10px/1 var(--gar-fm); color: var(--gar-muted); border: 1px solid var(--gar-line); border-radius: 3px; padding: 1px 3px; margin-left: 3px; }
+.gar-wp { font-size: 12.5px; font-weight: 600; }
+.gar-wt { grid-column: 1 / -1; font-size: 11.5px; color: var(--gar-muted); }
+.gar-hb { grid-column: 1 / -1; display: block; height: 4px; border-radius: 2px; background: rgba(255, 255, 255, 0.07); overflow: hidden; }
+.gar-hb b { display: block; height: 100%; background: var(--c, var(--gar-ok)); box-shadow: 0 0 8px var(--c, var(--gar-ok)); }
+.gar-l-ok { --c: var(--gar-ok); } .gar-l-warn { --c: var(--gar-warn); } .gar-l-crit { --c: var(--gar-crit); } .gar-l-fail { --c: var(--gar-crit); } .gar-l-na { --c: #55647a; }
+.gar-wr .gar-wp { color: var(--c); }
+.gar-wr.gar-l-fail { background: rgba(238, 90, 75, 0.1); }
+.gar-wr.gar-l-fail .gar-wp { animation: gar-blink 0.9s infinite; }
+
+/* infokort */
+.gar-card { padding: 14px 14px 12px; flex: 0 1 auto; overflow: auto; min-height: 0; max-height: calc(100% - 150px); scrollbar-width: thin; scrollbar-color: #2a3a52 transparent;
+  border-color: rgba(240, 164, 58, 0.55); box-shadow: 0 0 0 1px rgba(240, 164, 58, 0.15), 0 10px 40px rgba(0, 0, 0, 0.5); animation: gar-in 0.3s ease; }
+@keyframes gar-in { from { opacity: 0; transform: translateX(14px); } }
+.gar-ch { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.gar-ch small { font: 600 11px/1 var(--gar-fd); letter-spacing: 0.16em; text-transform: uppercase; color: var(--gar-sodium); }
+.gar-ch h3 { font-size: 26px; line-height: 1.05; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 4px; }
+.gar-x { cursor: pointer; width: 30px; height: 30px; flex: none; border-radius: 5px; border: 1px solid var(--gar-line); background: rgba(255, 255, 255, 0.04); font-size: 18px !important; line-height: 1 !important; }
+.gar-x:hover { border-color: var(--gar-sodium); }
+.gar-cond { margin: 12px 0 10px; padding: 10px 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.035); border-left: 3px solid var(--c); display: grid; gap: 4px; }
+.gar-cond b { font: 700 20px/1 var(--gar-fd); letter-spacing: 0.08em; text-transform: uppercase; color: var(--c); }
+.gar-cond span { font-size: 13.5px; }
+.gar-cond.gar-l-fail b { animation: gar-blink 0.9s infinite; }
+.gar-live { margin: 0 0 10px; }
+.gar-live h4 { font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gar-muted); margin-bottom: 6px; }
+.gar-lr { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; font-size: 12.5px; margin-bottom: 6px; --c: var(--gar-ice); }
+.gar-lr.gar-hot { --c: var(--gar-warn); }
+.gar-lr .gar-num { color: var(--c); }
+.gar-note { margin: 4px 0 0; font-size: 12px; color: var(--gar-muted); }
+.gar-info { margin: 0 0 12px; font-size: 13px; color: #c7d2e2; padding: 9px 11px; border-radius: 6px; background: rgba(140, 198, 230, 0.06); border: 1px dashed rgba(140, 198, 230, 0.22); }
+.gar-acts { display: flex; flex-direction: column; gap: 6px; }
+.gar-primary:not(:disabled) { border-color: var(--gar-sodium); background: linear-gradient(90deg, rgba(240, 164, 58, 0.24), rgba(240, 164, 58, 0.06)); }
+.gar-primary:not(:disabled) .gar-in::after { content: "Udskift"; display: none; }
+.gar-act .gar-in::before { content: "\25B8  "; color: var(--gar-sodium); }
+
+/* bundpanel */
+.gar-dock { position: absolute; left: 50%; bottom: var(--gar-gb); transform: translateX(-50%); pointer-events: auto; display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 10px 14px; border-radius: 10px; background: var(--gar-deck); border: 1px solid var(--gar-line); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45); max-width: calc(100vw - 2 * 16px); }
+.gar-arrive .gar-dock { transform: translate(-50%, 8px); }
+.gar-dockrow { display: flex; align-items: center; gap: 14px; }
+.gar-btn { cursor: pointer; display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px 8px; border-radius: 6px; border: 1px solid var(--gar-line); background: var(--gar-deck2);
+  font: 700 15px/1 var(--gar-fd) !important; letter-spacing: 0.1em; text-transform: uppercase; min-height: 38px; }
+.gar-btn:hover { border-color: rgba(240, 164, 58, 0.7); }
+.gar-btn[aria-pressed="true"] { background: var(--gar-sodium); color: #1a1006 !important; border-color: var(--gar-sodium); box-shadow: 0 0 18px rgba(240, 164, 58, 0.45); }
+.gar-btn[aria-pressed="true"] kbd { color: #3d2606; border-color: rgba(0, 0, 0, 0.3); }
+.gar-slider { display: flex; align-items: center; gap: 10px; }
+.gar-slider .gar-num { width: 46px; text-align: right; color: var(--gar-sodium); font-size: 13px; }
+.gar-slider input { -webkit-appearance: none; appearance: none; width: 230px; height: 28px; background: transparent; cursor: pointer; margin: 0; }
+.gar-slider input::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--gar-sodium), #3a2a12); }
+.gar-slider input::-moz-range-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--gar-sodium), #3a2a12); }
+.gar-slider input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; margin-top: -7px; border-radius: 3px; transform: rotate(45deg); background: #fff2dc; border: 2px solid var(--gar-sodium); box-shadow: 0 0 12px rgba(240, 164, 58, 0.8); }
+.gar-slider input::-moz-range-thumb { width: 14px; height: 14px; border-radius: 3px; transform: rotate(45deg); background: #fff2dc; border: 2px solid var(--gar-sodium); box-shadow: 0 0 12px rgba(240, 164, 58, 0.8); }
+.gar-legend { display: none; align-items: center; gap: 5px 10px; flex-wrap: wrap; justify-content: center; font-size: 11.5px; color: var(--gar-muted); }
+.gar-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; background: var(--c); margin-right: -5px; }
+.gar-legend i.gar-pulse { animation: gar-blink 0.9s infinite; box-shadow: 0 0 6px var(--c); }
+.gar-heat .gar-legend { display: flex; }
+.gar-mob { display: none; }
+.gar-badge { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--gar-crit); color: #fff; font: 600 11px/18px var(--gar-fm); text-align: center; }
+.gar-badge[hidden] { display: none; }
+
+.gar-hint { position: absolute; left: 50%; bottom: calc(var(--gar-gb) + 100px); transform: translateX(-50%); font-size: 12px; color: rgba(142, 160, 185, 0.8); white-space: nowrap;
+  pointer-events: none; transition: opacity 0.4s; text-shadow: 0 1px 4px #000; }
+.gar-heat .gar-hint { bottom: calc(var(--gar-gb) + 124px); }
+.gar-hint kbd { margin: 0 1px; }
+.gar-hassel .gar-hint { opacity: 0; }
+.gar-tip { position: fixed; z-index: 3; pointer-events: none; padding: 7px 10px; border-radius: 5px; background: rgba(8, 12, 20, 0.92); border: 1px solid rgba(240, 164, 58, 0.5);
+  display: grid; gap: 2px; max-width: 280px; font-size: 12px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5); }
+.gar-tip[hidden] { display: none; }
+.gar-tip b { font: 700 14px/1.1 var(--gar-fd); letter-spacing: 0.05em; text-transform: uppercase; }
+.gar-tip span { color: var(--c, var(--gar-muted)); }
+
+/* stempel ved udskiftning */
+.gar-stamp { position: absolute; left: 50%; top: 22%; transform: translate(-50%, -50%) rotate(-5deg); text-align: center; pointer-events: none; padding: 12px 26px 10px;
+  border: 3px solid var(--gar-sodium); border-radius: 8px; background: rgba(20, 12, 4, 0.55); box-shadow: 0 0 40px rgba(240, 164, 58, 0.35), inset 0 0 22px rgba(240, 164, 58, 0.2); }
+.gar-stamp[hidden] { display: none; }
+.gar-stamp small { display: block; font: 600 13px/1.2 var(--gar-fd); letter-spacing: 0.14em; text-transform: uppercase; color: #ffd9a3; }
+.gar-stamp b { display: block; font-size: clamp(26px, 4.4vw, 44px); line-height: 1.1; color: #fff3e0; text-shadow: 0 0 18px rgba(240, 164, 58, 0.9); font-weight: 600; letter-spacing: -0.01em; }
+.gar-stamp span { display: block; font-size: 12px; color: var(--gar-ice); margin-top: 2px; }
+.gar-stamp.gar-go { animation: gar-stamp 3.2s cubic-bezier(.2, .9, .3, 1.2) forwards; }
+@keyframes gar-stamp { 0% { opacity: 0; transform: translate(-50%, -50%) rotate(-5deg) scale(2.2); } 9% { opacity: 1; transform: translate(-50%, -50%) rotate(-5deg) scale(0.94); }
+  14% { transform: translate(-50%, -50%) rotate(-5deg) scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -62%) rotate(-5deg) scale(1); } }
+
+/* opladning: batteri- og saltbjælker over delen */
+.gar-charge { position: absolute; transform: translate(-50%, -100%); pointer-events: none; padding: 9px 12px 8px; border-radius: 7px; background: rgba(8, 14, 22, 0.86);
+  border: 1px solid rgba(92, 194, 141, 0.6); box-shadow: 0 0 24px rgba(92, 194, 141, 0.3); text-align: center; min-width: 180px; }
+.gar-charge[hidden] { display: none; }
+.gar-charge small { font: 600 11px/1 var(--gar-fd); letter-spacing: 0.16em; text-transform: uppercase; color: var(--gar-ok); }
+.gar-cells { display: flex; gap: 3px; margin: 6px 0 4px; }
+.gar-cells i { flex: 1; height: 16px; border-radius: 2px; background: rgba(255, 255, 255, 0.07); transition: background 0.15s, box-shadow 0.15s; }
+.gar-cells i.gar-full { background: var(--gar-ok); box-shadow: 0 0 8px var(--gar-ok); }
+.gar-charge b { font-size: 18px; }
+
+/* mellemstor skærm */
+@media (max-width: 1180px) {
+  .gar-stats { gap: 14px; }
+  .gar-stat:nth-child(2) .gar-s, .gar-stat:nth-child(3) .gar-s { display: none; }
+  .gar-panel { width: 290px; }
+  .gar-slider input { width: 160px; }
+}
+@media (max-width: 980px) {
+  .gar-brand small { display: none; }
+  .gar-stat:nth-child(2) { display: none; }
+}
+
+/* telefon: paneler som bundark */
+@media (max-width: 760px) {
+  .gar-top { flex-wrap: wrap; gap: 6px 12px; padding-bottom: 10px; background: linear-gradient(180deg, rgba(5, 8, 13, 0.95), rgba(5, 8, 13, 0.7) 80%, rgba(5, 8, 13, 0)); }
+  .gar-brand { order: 1; flex: 1; padding-left: 9px; }
+  .gar-brand b { font-size: 20px; }
+  .gar-exit { order: 2; padding: 8px 12px; font-size: 15px !important; }
+  .gar-exit kbd { display: none; }
+  .gar-stats { order: 3; flex-basis: 100%; justify-content: space-between; gap: 8px; }
+  .gar-stat:nth-child(2) { display: none; }
+  .gar-v { font-size: 15px; }
+  .gar-s { display: none; }
+  .gar-stat:first-child .gar-s { display: block; font-size: 10.5px; }
+  .gar-bar { width: 58px; }
+  .gar-k { font-size: 9.5px; letter-spacing: 0.12em; }
+  .gar-panel { top: auto; left: var(--gar-gl); right: var(--gar-gr); width: auto; bottom: calc(var(--gar-gb) + 128px); max-height: 46vh; display: none; }
+  .gar-sheet-shop .gar-shop, .gar-sheet-side .gar-side { display: flex; }
+  .gar-side { flex-direction: column; }
+  .gar-hassel.gar-sheet-side .gar-worst { display: none; }
+  .gar-card { max-height: 100%; }
+  .gar-dock { left: var(--gar-gl); right: var(--gar-gr); transform: none; max-width: none; padding: 8px 10px; gap: 7px; }
+  .gar-arrive .gar-dock { transform: translateY(8px); }
+  .gar-dockrow { width: 100%; gap: 8px; justify-content: space-between; }
+  .gar-dock .gar-btn { padding: 8px 10px 7px; font-size: 13.5px !important; }
+  .gar-dock .gar-btn kbd { display: none; }
+  .gar-slider { flex: 1; min-width: 0; gap: 6px; }
+  .gar-slider .gar-k { display: none; }
+  .gar-slider input { width: 100%; min-width: 0; }
+  .gar-slider .gar-num { width: 38px; font-size: 12px; }
+  .gar-mob { display: flex; }
+  .gar-mob .gar-btn { flex: 1; justify-content: center; }
+  .gar-tab2.gar-on { border-color: var(--gar-sodium); color: var(--gar-sodium) !important; }
+  .gar-hint { display: none; }
+  .gar-legend { font-size: 10.5px; }
+  .gar-stamp { top: 30%; }
+  .gar-title b { font-size: 56px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gar-title { animation-duration: 0.01s; }
+  .gar-stamp.gar-go { animation-duration: 2.2s; }
+}

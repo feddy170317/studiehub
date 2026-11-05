@@ -1,0 +1,794 @@
+{
+ "version": 1,
+ "nodes": {
+  "wheels": [
+   "hjul_VF",
+   "hjul_VB",
+   "hjul_HF",
+   "hjul_HB"
+  ],
+  "plov": "plov_pivot",
+  "plovLoeft": "plov_loeft_pivot",
+  "blink": "advarselsblink",
+  "lidar": "lidar",
+  "kamera": "kamera_foerer",
+  "root": "robot",
+  "cylindre": [
+   {
+    "hus": "vinkelcylinder_V_hus",
+    "stang": "vinkelcylinder_V_stang"
+   },
+   {
+    "hus": "vinkelcylinder_H_hus",
+    "stang": "vinkelcylinder_H_stang"
+   },
+   {
+    "hus": "loeftecylinder_hus",
+    "stang": "loeftecylinder_stang"
+   }
+  ]
+ },
+ "maal": {
+  "hjulDiameter": 0.412,
+  "sporvidde": 0.9,
+  "akselafstand": 0.727,
+  "hjulAkselHoejde": 0.206,
+  "plovLoeftAkse": "lokal Z, positiv vinkel loefter ploven",
+  "plovVinkelAkse": "lokal Y, rotation.y = ang (radianer), positiv = kaster til venstre"
+ },
+ "parts": [
+  {
+   "id": "motor_V",
+   "navn": "Gearmotor 48 V (venstre)",
+   "side": 0,
+   "gruppe": "drivlinje",
+   "nodes": [
+    "motor_V"
+   ],
+   "sim": {
+    "felt": "temp",
+    "slags": "temp"
+   },
+   "vaerk": "motor-0",
+   "explode": [
+    0.0,
+    0.12,
+    0.0
+   ],
+   "info": "Børstemotor med planetgear i = 5 og konsol. Tåler 1,5 Nm kontinuerligt og 4 Nm kortvarigt. Kobbertabet stiger med momentet i anden potens, så lang tid med tung plovlast koger viklingerne; ved 155 °C brænder den af."
+  },
+  {
+   "id": "elastisk_kobling_V",
+   "navn": "Elastisk kobling (venstre)",
+   "side": 0,
+   "gruppe": "drivlinje",
+   "nodes": [
+    "elastisk_kobling_V"
+   ],
+   "sim": {
+    "felt": null,
+    "slags": "ingen"
+   },
+   "vaerk": null,
+   "explode": [
+    0.0,
+    0.3,
+    0.0
+   ],
+   "info": "Klokobling med to klonav og en elastomerstjerne mellem motor og indgangsaksel. Den optager små fejlretninger og dæmper stød fra motoren. Stjernen er en sliddel, men den er ikke med i simuleringen."
+  },
+  {
+   "id": "gearhus_V",
+   "navn": "Gearhus (venstre)",
+   "side": 0,
+   "gruppe": "drivlinje",
+   "nodes": [
+    "gearhus_V",
+    "gearhuslaag_V"
+   ],
+   "sim": {
+    "felt": null,
+    "slags": "ingen"
+   },
+   "vaerk": null,
+   "explode": [
+    0.0,
+    0.0,
+    -0.4
+   ],
+   "info": "Lukket aluminiumshus med låg, boltet på chassiset. Det holder gearet i olie og sne og salt ude, og det bærer lejerne til indgangsakslen og mellemakslen."
+  },
+  {
+   "id": "gearhjul_V",
+   "navn": "Gearhjul z18/z72 (venstre)",
+   "side": 0,
+   "gruppe": "drivlinje",
+   "nodes": [
+    "indgangsaksel_V",
+    "tandhjul_V"
+   ],
+   "sim": {
+    "felt": null,
+    "slags": "ingen"
+   },
+   "vaerk": null,
+   "explode": [
+    0.0,
+    0.3,
+    -0.1
+   ],
+   "info": "Første gear: drevet z18 på indgangsakslen driver tandhjulet z72 m2 (i = 4). Tandhjulet sidder løst på slipkoblingens nav og bliver kun trukket med af friktionsskiverne. Med motorgearet (5) og kæden (2) giver det i alt i = 40."
+  },
+  {
+   "id": "slipkobling_V",
+   "navn": "Slipkobling (venstre)",
+   "side": 0,
+   "gruppe": "drivlinje",
+   "nodes": [
+    "glidenav_V",
+    "friktionsskive_V_1",
+    "friktionsskive_V_2",
+    "trykplade_V",
+    "tallerkenfjeder_V_1",
+    "tallerkenfjeder_V_2",
+    "spaendemoetrik_V"
+   ],
+   "sim": {
+    "felt": "clutchWear",
+    "slags": "skade"
+   },
+   "vaerk": "kob-0",
+   "explode": [
+    0.0,
+    0.5,
+    -0.18
+   ],
+   "info": "Glidenav med to friktionsskiver, trykplade og to tallerkenfjedre, spændt med en M42-møtrik. Den glider ved 36 Nm på mellemakslen og beskytter motor og aksel mod stød. Hver gang den glider under last, slides lamellerne; slidte lameller glider allerede ved 18 Nm."
+  },
+  {
+   "id": "mellemaksel_V",
+   "navn": "Mellemaksel (venstre)",
+   "side": 0,
+   "gruppe": "drivlinje",
+   "nodes": [
+    "mellemaksel_V"
+   ],
+   "sim": {
+    "felt": "shaftD",
+    "slags": "skade"
+   },
+   "vaerk": "aksel-0",
+   "explode": [
+    0.0,
+    0.5,
+    0.0
+   ],
+   "info": "Bærer slipkoblingen, tandhjulet z72 og det dobbelte kædehjul z15. Ø22 kædehjulssædet med pasfederspor er gruppens åbne udmattelsespunkt: over ca. 32 Nm lægges skaden sammen for hver omdrejning (Miners regel), og ved 100 % knækker akslen."
+  },
+  {
+   "id": "lejer_gear_V",
+   "navn": "Lejer i gearhuset (venstre)",
+   "side": 0,
+   "gruppe": "drivlinje",
+   "nodes": [
+    "leje_V_mel_inder",
+    "leje_V_mel_yder",
+    "leje_V_ind_inder",
+    "leje_V_ind_yder"
+   ],
+   "sim": {
+    "felt": "bearing",
+    "slags": "levetid"
+   },
+   "vaerk": "leje-0",
+   "explode": [
+    0.0,
+    0.5,
+    -0.36
+   ],
+   "info": "Kuglelejer 6205 på mellemakslen og 6204 på indgangsakslen. Levetiden (L10) falder med lasten i tredje potens, så tung plovlast og ballast æder af den. De skiftes sammen med hjullejerne."
+  },
+  {
+   "id": "kaede_V",
+   "navn": "Rullekæder (venstre)",
+   "side": 0,
+   "gruppe": "drivlinje",
+   "nodes": [
+    "kaede_VF",
+    "kaede_VB"
+   ],
+   "sim": {
+    "felt": "chain",
+    "slags": "laengning"
+   },
+   "vaerk": "kaede-0",
+   "explode": [
+    0.0,
+    0.0,
+    -0.1
+   ],
+   "info": "To rullekæder 08B-1 med 80 led fra det dobbelte kædehjul til for- og baghjulet, med kædeglidere over og under. Leddene slides og kæden længes med momentet i anden potens. Den kan strammes (stram-0) et par gange, men ved 3 % springer den over tænderne."
+  },
+  {
+   "id": "kaedehjul_V",
+   "navn": "Kædehjul (venstre)",
+   "side": 0,
+   "gruppe": "drivlinje",
+   "nodes": [
+    "kaedehjul_V_dobbelt",
+    "kaedehjul_VF",
+    "kaedehjul_VB"
+   ],
+   "sim": {
+    "felt": "chain",
+    "slags": "laengning"
+   },
+   "vaerk": "kaede-0",
+   "explode": [
+    0.0,
+    0.0,
+    -0.2
+   ],
+   "info": "Dobbelt kædehjul z15 på mellemakslen og kædehjul z30 på hver hjulaksel (i = 2). En længet kæde slider tænderne skæve, så de skiftes sammen med kæden."
+  },
+  {
+   "id": "hjulaksel_V",
+   "navn": "Hjulaksler og flangerør (venstre)",
+   "side": 0,
+   "gruppe": "drivlinje",
+   "nodes": [
+    "hjulaksel_VF",
+    "hjulaksel_VB",
+    "flangeroer_VF",
+    "flangeroer_VB"
+   ],
+   "sim": {
+    "felt": null,
+    "slags": "ingen"
+   },
+   "vaerk": null,
+   "explode": [
+    0.0,
+    0.0,
+    -0.32
+   ],
+   "info": "Hjulakslerne er lejret i et flangerør, der er boltet på chassiset, og bærer kædehjulet indvendigt og hjulet udvendigt. De bærer robottens vægt og er dimensioneret med god margin."
+  },
+  {
+   "id": "lejer_hjul_V",
+   "navn": "Hjullejer (venstre)",
+   "side": 0,
+   "gruppe": "drivlinje",
+   "nodes": [
+    "leje_VF_inder",
+    "leje_VF_yder",
+    "leje_VB_inder",
+    "leje_VB_yder"
+   ],
+   "sim": {
+    "felt": "bearing",
+    "slags": "levetid"
+   },
+   "vaerk": "leje-0",
+   "explode": [
+    0.0,
+    0.0,
+    -0.55
+   ],
+   "info": "To kuglelejer 6206 pr. hjul i flangerøret. De bærer robottens vægt plus ballast, og L10-levetiden falder med lasten i tredje potens. Et slidt leje larmer og øger rullemodstanden; et havareret leje begrænser farten til 0,3 m/s."
+  },
+  {
+   "id": "daek_V",
+   "navn": "Hjul og dæk (venstre)",
+   "side": 0,
+   "gruppe": "hjul",
+   "nodes": [
+    "hjul_VF",
+    "hjul_VB"
+   ],
+   "sim": {
+    "felt": "tire",
+    "slags": "daek"
+   },
+   "vaerk": null,
+   "vaerkPrefix": "daek-",
+   "explode": [
+    0.0,
+    0.0,
+    -0.95
+   ],
+   "info": "Ø410 mm hjul med fælg og dæk. Dækket bestemmer grebet (μ) på asfalt, sne og is: sommerdæk, vinterdæk, pigdæk eller kæder skiftes på værkstedet. Det er grebet, der sætter grænsen for, hvor meget sne ploven kan skubbe."
+  },
+  {
+   "id": "motor_H",
+   "navn": "Gearmotor 48 V (højre)",
+   "side": 1,
+   "gruppe": "drivlinje",
+   "nodes": [
+    "motor_H"
+   ],
+   "sim": {
+    "felt": "temp",
+    "slags": "temp"
+   },
+   "vaerk": "motor-1",
+   "explode": [
+    0.0,
+    0.12,
+    0.0
+   ],
+   "info": "Børstemotor med planetgear i = 5 og konsol. Tåler 1,5 Nm kontinuerligt og 4 Nm kortvarigt. Kobbertabet stiger med momentet i anden potens, så lang tid med tung plovlast koger viklingerne; ved 155 °C brænder den af."
+  },
+  {
+   "id": "elastisk_kobling_H",
+   "navn": "Elastisk kobling (højre)",
+   "side": 1,
+   "gruppe": "drivlinje",
+   "nodes": [
+    "elastisk_kobling_H"
+   ],
+   "sim": {
+    "felt": null,
+    "slags": "ingen"
+   },
+   "vaerk": null,
+   "explode": [
+    0.0,
+    0.3,
+    0.0
+   ],
+   "info": "Klokobling med to klonav og en elastomerstjerne mellem motor og indgangsaksel. Den optager små fejlretninger og dæmper stød fra motoren. Stjernen er en sliddel, men den er ikke med i simuleringen."
+  },
+  {
+   "id": "gearhus_H",
+   "navn": "Gearhus (højre)",
+   "side": 1,
+   "gruppe": "drivlinje",
+   "nodes": [
+    "gearhus_H",
+    "gearhuslaag_H"
+   ],
+   "sim": {
+    "felt": null,
+    "slags": "ingen"
+   },
+   "vaerk": null,
+   "explode": [
+    0.0,
+    0.0,
+    0.4
+   ],
+   "info": "Lukket aluminiumshus med låg, boltet på chassiset. Det holder gearet i olie og sne og salt ude, og det bærer lejerne til indgangsakslen og mellemakslen."
+  },
+  {
+   "id": "gearhjul_H",
+   "navn": "Gearhjul z18/z72 (højre)",
+   "side": 1,
+   "gruppe": "drivlinje",
+   "nodes": [
+    "indgangsaksel_H",
+    "tandhjul_H"
+   ],
+   "sim": {
+    "felt": null,
+    "slags": "ingen"
+   },
+   "vaerk": null,
+   "explode": [
+    0.0,
+    0.3,
+    0.1
+   ],
+   "info": "Første gear: drevet z18 på indgangsakslen driver tandhjulet z72 m2 (i = 4). Tandhjulet sidder løst på slipkoblingens nav og bliver kun trukket med af friktionsskiverne. Med motorgearet (5) og kæden (2) giver det i alt i = 40."
+  },
+  {
+   "id": "slipkobling_H",
+   "navn": "Slipkobling (højre)",
+   "side": 1,
+   "gruppe": "drivlinje",
+   "nodes": [
+    "glidenav_H",
+    "friktionsskive_H_1",
+    "friktionsskive_H_2",
+    "trykplade_H",
+    "tallerkenfjeder_H_1",
+    "tallerkenfjeder_H_2",
+    "spaendemoetrik_H"
+   ],
+   "sim": {
+    "felt": "clutchWear",
+    "slags": "skade"
+   },
+   "vaerk": "kob-1",
+   "explode": [
+    0.0,
+    0.5,
+    0.18
+   ],
+   "info": "Glidenav med to friktionsskiver, trykplade og to tallerkenfjedre, spændt med en M42-møtrik. Den glider ved 36 Nm på mellemakslen og beskytter motor og aksel mod stød. Hver gang den glider under last, slides lamellerne; slidte lameller glider allerede ved 18 Nm."
+  },
+  {
+   "id": "mellemaksel_H",
+   "navn": "Mellemaksel (højre)",
+   "side": 1,
+   "gruppe": "drivlinje",
+   "nodes": [
+    "mellemaksel_H"
+   ],
+   "sim": {
+    "felt": "shaftD",
+    "slags": "skade"
+   },
+   "vaerk": "aksel-1",
+   "explode": [
+    0.0,
+    0.5,
+    0.0
+   ],
+   "info": "Bærer slipkoblingen, tandhjulet z72 og det dobbelte kædehjul z15. Ø22 kædehjulssædet med pasfederspor er gruppens åbne udmattelsespunkt: over ca. 32 Nm lægges skaden sammen for hver omdrejning (Miners regel), og ved 100 % knækker akslen."
+  },
+  {
+   "id": "lejer_gear_H",
+   "navn": "Lejer i gearhuset (højre)",
+   "side": 1,
+   "gruppe": "drivlinje",
+   "nodes": [
+    "leje_H_mel_inder",
+    "leje_H_mel_yder",
+    "leje_H_ind_inder",
+    "leje_H_ind_yder"
+   ],
+   "sim": {
+    "felt": "bearing",
+    "slags": "levetid"
+   },
+   "vaerk": "leje-1",
+   "explode": [
+    0.0,
+    0.5,
+    0.36
+   ],
+   "info": "Kuglelejer 6205 på mellemakslen og 6204 på indgangsakslen. Levetiden (L10) falder med lasten i tredje potens, så tung plovlast og ballast æder af den. De skiftes sammen med hjullejerne."
+  },
+  {
+   "id": "kaede_H",
+   "navn": "Rullekæder (højre)",
+   "side": 1,
+   "gruppe": "drivlinje",
+   "nodes": [
+    "kaede_HF",
+    "kaede_HB"
+   ],
+   "sim": {
+    "felt": "chain",
+    "slags": "laengning"
+   },
+   "vaerk": "kaede-1",
+   "explode": [
+    0.0,
+    0.0,
+    0.1
+   ],
+   "info": "To rullekæder 08B-1 med 80 led fra det dobbelte kædehjul til for- og baghjulet, med kædeglidere over og under. Leddene slides og kæden længes med momentet i anden potens. Den kan strammes (stram-1) et par gange, men ved 3 % springer den over tænderne."
+  },
+  {
+   "id": "kaedehjul_H",
+   "navn": "Kædehjul (højre)",
+   "side": 1,
+   "gruppe": "drivlinje",
+   "nodes": [
+    "kaedehjul_H_dobbelt",
+    "kaedehjul_HF",
+    "kaedehjul_HB"
+   ],
+   "sim": {
+    "felt": "chain",
+    "slags": "laengning"
+   },
+   "vaerk": "kaede-1",
+   "explode": [
+    0.0,
+    0.0,
+    0.2
+   ],
+   "info": "Dobbelt kædehjul z15 på mellemakslen og kædehjul z30 på hver hjulaksel (i = 2). En længet kæde slider tænderne skæve, så de skiftes sammen med kæden."
+  },
+  {
+   "id": "hjulaksel_H",
+   "navn": "Hjulaksler og flangerør (højre)",
+   "side": 1,
+   "gruppe": "drivlinje",
+   "nodes": [
+    "hjulaksel_HF",
+    "hjulaksel_HB",
+    "flangeroer_HF",
+    "flangeroer_HB"
+   ],
+   "sim": {
+    "felt": null,
+    "slags": "ingen"
+   },
+   "vaerk": null,
+   "explode": [
+    0.0,
+    0.0,
+    0.32
+   ],
+   "info": "Hjulakslerne er lejret i et flangerør, der er boltet på chassiset, og bærer kædehjulet indvendigt og hjulet udvendigt. De bærer robottens vægt og er dimensioneret med god margin."
+  },
+  {
+   "id": "lejer_hjul_H",
+   "navn": "Hjullejer (højre)",
+   "side": 1,
+   "gruppe": "drivlinje",
+   "nodes": [
+    "leje_HF_inder",
+    "leje_HF_yder",
+    "leje_HB_inder",
+    "leje_HB_yder"
+   ],
+   "sim": {
+    "felt": "bearing",
+    "slags": "levetid"
+   },
+   "vaerk": "leje-1",
+   "explode": [
+    0.0,
+    0.0,
+    0.55
+   ],
+   "info": "To kuglelejer 6206 pr. hjul i flangerøret. De bærer robottens vægt plus ballast, og L10-levetiden falder med lasten i tredje potens. Et slidt leje larmer og øger rullemodstanden; et havareret leje begrænser farten til 0,3 m/s."
+  },
+  {
+   "id": "daek_H",
+   "navn": "Hjul og dæk (højre)",
+   "side": 1,
+   "gruppe": "hjul",
+   "nodes": [
+    "hjul_HF",
+    "hjul_HB"
+   ],
+   "sim": {
+    "felt": "tire",
+    "slags": "daek"
+   },
+   "vaerk": null,
+   "vaerkPrefix": "daek-",
+   "explode": [
+    0.0,
+    0.0,
+    0.95
+   ],
+   "info": "Ø410 mm hjul med fælg og dæk. Dækket bestemmer grebet (μ) på asfalt, sne og is: sommerdæk, vinterdæk, pigdæk eller kæder skiftes på værkstedet. Det er grebet, der sætter grænsen for, hvor meget sne ploven kan skubbe."
+  },
+  {
+   "id": "plovskjold",
+   "navn": "Plovskjold med skær",
+   "side": null,
+   "gruppe": "plov",
+   "nodes": [
+    "plovskjold"
+   ],
+   "sim": {
+    "felt": "plovH",
+    "slags": "plov"
+   },
+   "vaerk": "plov",
+   "explode": [
+    0.6,
+    0.0,
+    0.0
+   ],
+   "info": "1,40 m bredt krumt skjold med slidskinne i stål og to slidsko. Kører robotten ind i en kantsten eller et hegn over 0,5 m/s, bøjes skjoldet, og det kaster dårligere. Det rettes ud på værkstedet."
+  },
+  {
+   "id": "plovramme",
+   "navn": "Drejeramme og A-ramme",
+   "side": null,
+   "gruppe": "plov",
+   "nodes": [
+    "drejeramme",
+    "a_ramme",
+    "plovbeslag"
+   ],
+   "sim": {
+    "felt": null,
+    "slags": "ingen"
+   },
+   "vaerk": null,
+   "explode": [
+    0.32,
+    0.0,
+    0.0
+   ],
+   "info": "Plovbeslaget er boltet på chassiset. A-rammen hænger i to hængselbolte og løftes af løftecylinderen; forrest sidder drejetappen Ø26, som drejerammen og skjoldet vinkles om."
+  },
+  {
+   "id": "plovcylindre",
+   "navn": "Vinkel- og løftecylindre",
+   "side": null,
+   "gruppe": "plov",
+   "nodes": [
+    "vinkelcylinder_V_hus",
+    "vinkelcylinder_V_stang",
+    "vinkelcylinder_H_hus",
+    "vinkelcylinder_H_stang",
+    "loeftecylinder_hus",
+    "loeftecylinder_stang"
+   ],
+   "sim": {
+    "felt": null,
+    "slags": "ingen"
+   },
+   "vaerk": null,
+   "explode": [
+    0.32,
+    0.28,
+    0.0
+   ],
+   "info": "To dobbeltvirkende vinkelcylindre drejer skjoldet op til ±40° om drejetappen, og en løftecylinder hæver A-rammen og ploven under transport."
+  },
+  {
+   "id": "hydraulikstation",
+   "navn": "Hydraulikstation",
+   "side": null,
+   "gruppe": "plov",
+   "nodes": [
+    "hydraulikstation",
+    "ventilblok"
+   ],
+   "sim": {
+    "felt": null,
+    "slags": "ingen"
+   },
+   "vaerk": null,
+   "explode": [
+    0.0,
+    0.32,
+    0.0
+   ],
+   "info": "Lille 48 V pumpe med tank og ventilblok, der styrer de tre plovcylindre."
+  },
+  {
+   "id": "batteri",
+   "navn": "Batteri 48 V",
+   "side": null,
+   "gruppe": "energi",
+   "nodes": [
+    "batteri"
+   ],
+   "sim": {
+    "felt": "soc",
+    "slags": "batteri"
+   },
+   "vaerk": "lad100",
+   "explode": [
+    0.0,
+    0.6,
+    0.0
+   ],
+   "info": "48 V litiumbatteri med 2,56 kWh. Kulde sænker den brugbare kapacitet, og tung plovlast trækker mange watt. Lad op på ladestationen (1,5 kW)."
+  },
+  {
+   "id": "motorstyring",
+   "navn": "Motorstyringer",
+   "side": null,
+   "gruppe": "energi",
+   "nodes": [
+    "motorstyring"
+   ],
+   "sim": {
+    "felt": null,
+    "slags": "ingen"
+   },
+   "vaerk": null,
+   "explode": [
+    0.0,
+    0.6,
+    0.0
+   ],
+   "info": "To motorstyringer, én pr. side. De styrer hver sides hjulfart, så robotten drejer som en bæltekøretøj (skid-steer)."
+  },
+  {
+   "id": "saltspreder",
+   "navn": "Saltspreder",
+   "side": null,
+   "gruppe": "salt",
+   "nodes": [
+    "saltspreder"
+   ],
+   "sim": {
+    "felt": "saltKg",
+    "slags": "salt"
+   },
+   "vaerk": "salt",
+   "explode": [
+    -0.45,
+    0.1,
+    0.0
+   ],
+   "info": "Beholder til 60 kg vejsalt med spredetallerken bagpå. Spreder 15 g/m² i en 2 m bred bane. Salt smelter isen, men virker næsten ikke under −10 °C."
+  },
+  {
+   "id": "chassis",
+   "navn": "Chassis",
+   "side": null,
+   "gruppe": "krop",
+   "nodes": [
+    "chassis"
+   ],
+   "sim": {
+    "felt": null,
+    "slags": "ingen"
+   },
+   "vaerk": null,
+   "explode": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "info": "Svejst stålramme, som drivmodulerne, batteriet og plovbeslaget er boltet på."
+  },
+  {
+   "id": "kappe",
+   "navn": "Kappe",
+   "side": null,
+   "gruppe": "krop",
+   "nodes": [
+    "kappe",
+    "noedstop"
+   ],
+   "sim": {
+    "felt": null,
+    "slags": "ingen"
+   },
+   "vaerk": null,
+   "explode": [
+    0.0,
+    0.95,
+    0.0
+   ],
+   "info": "Orange kappe over elektronik og batteri, med nødstop bagpå. Den holder sne og smeltevand ude og gør robotten synlig om natten."
+  },
+  {
+   "id": "lidar",
+   "navn": "Lidar",
+   "side": null,
+   "gruppe": "sensor",
+   "nodes": [
+    "lidar"
+   ],
+   "sim": {
+    "felt": null,
+    "slags": "ingen"
+   },
+   "vaerk": null,
+   "explode": [
+    0.0,
+    1.08,
+    0.0
+   ],
+   "info": "Roterende lidar, som autopiloten bruger til at finde vej og se forhindringer. Kraftigt snefald giver støj i målingerne."
+  },
+  {
+   "id": "advarselsblink",
+   "navn": "Advarselsblink",
+   "side": null,
+   "gruppe": "sensor",
+   "nodes": [
+    "advarselsblink"
+   ],
+   "sim": {
+    "felt": null,
+    "slags": "ingen"
+   },
+   "vaerk": null,
+   "explode": [
+    0.0,
+    1.08,
+    0.0
+   ],
+   "info": "Orange blink, der lyser, mens robotten kører, så folk på pladsen kan se den i mørke."
+  }
+ ]
+}

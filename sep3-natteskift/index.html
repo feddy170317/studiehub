@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta name="robots" content="noindex">
+<meta charset="utf-8">
+<title>Natteskift 3D</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="garage.css">
+
+<div id="game">
+  <div id="loadNote">Henter 3D-modeller …</div>
+  <div id="hud" hidden>
+    <header class="hud-top">
+      <div class="hud-stats">
+        <div class="hs glass clock"><span class="k">Klokken</span><span class="v" id="vClock">02:00</span><span class="s" id="vLeft">4 t 00 min tilbage</span></div>
+        <div class="hs glass ryd"><span class="k">Ryddet</span><span class="v" id="vRyd">0 %</span><div class="pbar"><i id="pRyd"></i><b style="left:95%"></b></div><span class="s">krav 95 % kl. 06:00</span></div>
+        <div class="hs glass bat"><span class="k">Batteri</span><span class="v" id="vBat">100 %</span><div class="pbar"><i id="pBat" class="ok"></i></div><span class="s" id="vBatS">2,56 kWh</span></div>
+        <div class="hs glass vejr"><span class="k">Vejr</span><span class="v sm" id="vVejr">–</span><span class="s" id="vVejrS">–</span></div>
+      </div>
+      <div class="hud-ctrls">
+        <div class="row">
+          <div class="seg" id="segSpeed" role="group" aria-label="Tidsfaktor">
+            <button data-s="1">1×</button><button data-s="5">5×</button><button data-s="10">10×</button><button data-s="20" aria-pressed="true">20×</button><button data-s="40">40×</button>
+          </div>
+          <button class="btn" id="btnAuto" title="Autopilot (P)">Autopilot<kbd>P</kbd></button>
+          <button class="btn" id="btnPause" title="Pause (Esc)">Pause</button>
+          <button class="btn" id="btnHelp" title="Hjælp (H)" aria-label="Hjælp">?</button>
+        </div>
+        <div class="row">
+          <div class="seg cams" id="segCam" role="group" aria-label="Kamera">
+            <span class="lbl">Kamera <kbd>C</kbd></span>
+            <button data-cam="chase" aria-pressed="true">Jagt</button><button data-cam="fp">Fører</button><button data-cam="top">Top</button><button data-cam="orbit">Kran</button><button data-cam="overview">Oversigt</button>
+          </div>
+          <button class="btn" id="btnTele" title="Telemetri (T)">Telemetri</button>
+        </div>
+      </div>
+    </header>
+
+    <aside id="tele" class="glass">
+      <div class="thead" id="teleHead"><b>Telemetri</b><span id="teleSub">351 kg · vinterdæk</span></div>
+      <div class="tbody">
+        <section class="sec">
+          <h3>Drivlinje <span>venstre · højre</span></h3>
+          <table class="dt"><tbody id="dtBody"></tbody></table>
+        </section>
+        <section class="sec">
+          <h3>Hjul og underlag</h3>
+          <div class="surf" id="surf"></div>
+        </section>
+        <section class="sec">
+          <h3>Kræfter <span>fritlegeme</span></h3>
+          <div class="rows" id="forceRows"></div>
+        </section>
+        <section class="sec">
+          <h3>Plov <span id="hPlov">40° · kaster til venstre</span></h3>
+          <div class="rows" id="plovRows"></div>
+        </section>
+        <section class="sec">
+          <h3>Energi og salt</h3>
+          <div class="rows" id="energyRows"></div>
+        </section>
+        <section class="sec desk-only">
+          <h3>Taster</h3>
+          <div class="keys" style="font-size:12px;color:var(--muted)">
+            <kbd>W A S D</kbd><span>kør og drej</span>
+            <kbd>Shift</kbd><span>transportfart 1,5 m/s</span>
+            <kbd>Z X</kbd><span>arbejdsfart ned og op</span>
+            <kbd>Q E</kbd><span>plovvinkel venstre og højre</span>
+            <kbd>Mellemrum</kbd><span>løft eller sænk ploven</span>
+            <kbd>F</kbd><span>saltspreder</span>
+            <kbd>C</kbd><span>skift kamera, M oversigt</span>
+            <kbd>V</kbd><span>værksted (på ladestationen)</span>
+            <kbd>B</kbd><span>bjærgning</span>
+            <kbd>1–5</kbd><span>tidsfaktor</span>
+          </div>
+        </section>
+      </div>
+    </aside>
+
+    <div id="toasts" aria-live="polite"></div>
+    <button class="btn primary" id="stationBtn" hidden>Åbn værkstedet (V)</button>
+    <div id="chips"></div>
+    <div id="inst" class="glass"><canvas id="instCv" aria-label="Fart, plov og kræfter"></canvas></div>
+    <div id="mapBox" class="glass" title="Oversigt (M)"><canvas id="mini" aria-label="Oversigtskort"></canvas></div>
+    <div id="touch">
+      <div class="pad">
+        <span></span><button data-k="fwd">Frem</button><span></span>
+        <button data-k="left">Ven.</button><button data-k="back">Bak</button><button data-k="right">Hø.</button>
+      </div>
+      <div class="act">
+        <button data-a="angL">Plov ◄</button><button data-a="angR">Plov ►</button><button data-a="lift">Løft</button>
+        <button data-a="salt">Salt</button><button data-k="boost">Turbo</button><button data-a="cam">Kamera</button>
+      </div>
+    </div>
+  </div>
+  <div id="pauseVeil" hidden>PAUSE</div>
+</div>
+
+<div class="modal" id="mStart">
+  <div class="card">
+    <div class="eyebrow">Klokken er 02:00</div>
+    <h1>Natteskift <em>3D</em></h1>
+    <p>Du er den autonome snerydder fra vores SEP3-projekt: 4WD skid-steer, 351 kg, 1,40 m vinkelplov og en slipkobling på 36 Nm i hver side. Arealet på 2.000 m² (80 × 25 m) skal være ryddet, inden produktionen starter kl. 06:00. Du har fire timer.</p>
+    <p>Fysikken bygger på gruppens beregningskæde i Bilag D. Plovens kapacitet, trækkraft, friktion og momenter i drivlinjen bliver regnet ud, mens du kører. Overbelaster du den, går den i stykker, og så koster værkstedet tid.</p>
+    <h2>Vælg vejret</h2>
+    <div class="scen" id="scenList"></div>
+    <h2>Udstyr</h2>
+    <div class="opts">
+      <div class="opt"><label>Dæk</label><div class="seg" id="segTire"></div></div>
+      <div class="opt"><label>Ballast</label><div class="seg" id="segBallast"><button data-b="0" aria-pressed="true">0 kg</button><button data-b="50">+50 kg</button><button data-b="100">+100 kg</button></div></div>
+      <div class="opt"><label>Sværhedsgrad</label><div class="seg" id="segDiff"><button data-d="ing" aria-pressed="true">Ingeniør</button><button data-d="oevelse">Øvelse</button></div></div>
+    </div>
+    <p class="hint">Ingeniør: gruppens tal uden rabat. Øvelse: dobbelt plovkapacitet, mindre slid og større batteri.</p>
+    <div class="actions">
+      <button class="btn big primary" id="btnStart" disabled>Indlæser …</button>
+      <button class="btn" id="btnHelp2">Sådan spiller du</button>
+      <span class="hint desk-only">Tip: P er autopilot, C skifter kamera (jagt, fører, top, kran).</span>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="mShop" hidden>
+  <div class="card">
+    <div class="eyebrow" id="shopEyebrow">Ladestation og værksted</div>
+    <h1 style="font-size:clamp(30px,5vw,44px)">Værkstedet</h1>
+    <p>Hvert indgreb koster tid. Sneen bliver ved med at falde, mens robotten står inde.</p>
+    <div id="shopBody"></div>
+    <div class="actions">
+      <button class="btn big primary" id="btnShopClose">Kør ud igen</button>
+      <span id="shopTotals" class="num hint"></span>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="mEnd" hidden>
+  <div class="card">
+    <div class="eyebrow">Klokken er 06:00. Produktionen starter</div>
+    <div class="verdict" id="endVerdict">–</div>
+    <p id="endText"></p>
+    <canvas id="endChart"></canvas>
+    <div class="endgrid" id="endGrid"></div>
+    <h2>Det, der satte grænsen</h2>
+    <ul class="lessons" id="endLessons"></ul>
+    <div class="actions">
+      <button class="btn big primary" id="btnAgain">Prøv igen</button>
+      <button class="btn" id="btnNew">Vælg andet vejr</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="mHelp" hidden>
+  <div class="card">
+    <div class="eyebrow">Sådan spiller du</div>
+    <h1 style="font-size:clamp(30px,5vw,44px)">Spillets regler og fysik</h1>
+    <div class="help">
+      <div>
+        <h2>Målet</h2>
+        <p>Kl. 06:00 skal mindst 95 % af de 2.000 m² have under 1,5 cm sne og ingen blank is. Sne, der ligger i rabatten og depotet, tæller ikke.</p>
+        <p>Ploven kaster sneen til den side, den vender mod. Kør i baner, og vend plovsiden ved hver vending, så sneen hele tiden går samme vej ud mod kanten. Autopilotens baner starter på midten og arbejder sig ud.</p>
+        <h2>Taster</h2>
+        <div class="keys">
+          <kbd>W A S D</kbd><span>kør og drej. Robotten holder kursen, når du slipper A og D</span>
+          <kbd>Shift</kbd><span>transportfart</span>
+          <kbd>Z X</kbd><span>arbejdsfart 0,2 til 1,5 m/s</span>
+          <kbd>Q E</kbd><span>plovvinkel i trin på 10°, fra 40° venstre til 40° højre</span>
+          <kbd>Mellemrum</kbd><span>løft eller sænk ploven</span>
+          <kbd>F</kbd><span>saltspreder</span>
+          <kbd>P</kbd><span>autopilot til og fra</span>
+          <kbd>C</kbd><span>skift kamera: jagt, fører, top og kran (træk med musen)</span>
+          <kbd>M</kbd><span>oversigt over hele arealet, musehjulet zoomer</span>
+          <kbd>T</kbd><span>telemetri til og fra</span>
+          <kbd>V</kbd><span>værksted, når robotten holder på ladestationen</span>
+          <kbd>B</kbd><span>bjærgning til værkstedet (tid og penge)</span>
+          <kbd>1–5</kbd><span>tidsfaktor 1× til 40×</span>
+          <kbd>Esc</kbd><span>pause</span>
+        </div>
+      </div>
+      <div>
+        <h2>Hvad der går i stykker</h2>
+        <p><b>Hjulspin:</b> trækkraften kan højst blive μ · N. På is giver vinterdæk μ = 0,10, så robotten kan kun trække ca. 345 N. Skift til pigdæk eller kæder.</p>
+        <p><b>Slipkobling:</b> glider ved 36 Nm på mellemakslen (ca. 345 N trækkraft pr. side). Den beskytter motor og aksel mod stød, men den slides, når den glider længe.</p>
+        <p><b>Motor:</b> tåler 1,5 Nm kontinuerligt. Over det stiger temperaturen. Ved 155 °C brænder viklingerne af. Ved lav fart køler blæseren dårligere.</p>
+        <p><b>Mellemaksel:</b> kædehjulssædet på Ø22 er gruppens åbne udmattelsespunkt. Langvarig drift nær glidemomentet bruger levetiden op.</p>
+        <p><b>Lejer og kæde:</b> slides med last og omdrejninger. Ballast giver mere friktion, men også mere slid og energiforbrug.</p>
+        <p><b>Snevold:</b> bliver kanten højere end 1 m, kan ploven ikke kaste mere derover, og sneen falder tilbage.</p>
+      </div>
+    </div>
+    <h2>Modellen</h2>
+    <div class="tblwrap">
+    <table class="model"><tbody>
+      <tr><td>Masse</td><td class="num">351,3 kg + ballast</td><td>Bilag D, masseiteration</td></tr>
+      <tr><td>Hjulradius, gearing</td><td class="num">r = 0,20 m, i = 5 · 4 · 2 = 40</td><td>Bilag D</td></tr>
+      <tr><td>Virkningsgrader</td><td class="num">η = 0,94 · 0,97 · 0,96, el 0,85</td><td>Bilag D</td></tr>
+      <tr><td>Plov</td><td class="num">B = 1,40 m, H = 0,50 m, R = 0,40 m, kile 0,179 m²</td><td>Bilag D.1.2</td></tr>
+      <tr><td>Plovkraft</td><td class="num">F = μ<sub>G</sub> · m<sub>kile</sub> · g + ρ · h · B<sub>eff</sub> · v²</td><td>μ<sub>G</sub> = 0,5, kilen fyldes og tømmes i spillet</td></tr>
+      <tr><td>Kapacitet</td><td class="num">h<sub>kap</sub> = k · A · (sin θ − μ<sub>B</sub> cos θ) / B<sub>eff</sub></td><td>k = 1,5, μ<sub>B</sub> = 0,15</td></tr>
+      <tr><td>Rullemodstand</td><td class="num">c<sub>rr</sub> = 0,035 (+ sne under hjulene)</td><td>Bilag D</td></tr>
+      <tr><td>Friktion</td><td class="num">tabel med 4 dæk × 3 underlag</td><td>Bilag D, antagelser</td></tr>
+      <tr><td>Slipkobling</td><td class="num">36 Nm på mellemakslen</td><td>Bilag D</td></tr>
+      <tr><td>Batteri</td><td class="num">2,56 kWh, kuldefaktor 0,7 ved −15 °C</td><td>Bilag D, opladning 1,5 kW (spillets antagelse)</td></tr>
+      <tr><td>Motor</td><td class="num">1,5 Nm kontinuerligt, 4 Nm maks.</td><td>Spillets antagelse</td></tr>
+      <tr><td>Slid</td><td class="num">Miner, L10 og kædelængning</td><td>Accelereret, så det kan nås på fire timer</td></tr>
+    </tbody></table>
+    </div>
+    <p class="hint">Spillet er bygget på gruppens antagelser og er ikke en kilde til rapporten. Tallene skal stadig kildebelægges eller testes. Sneens højde er overdrevet 25 % i 3D, så voldene kan ses.</p>
+    <div class="actions"><button class="btn big primary" id="btnHelpClose">Tilbage</button></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="sim.js" charset="utf-8"></script>
+<script src="hud.js" charset="utf-8"></script>
+<script src="world.js" charset="utf-8"></script>
+<script src="garage.js" charset="utf-8"></script>
+<script>window.Natteskift3D && window.Natteskift3D.boot();</script>
+
+</html>
