@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Produktionsteknolog Quiz</title>
+<meta name="description" content="Testquizzer til alle fag på produktionsteknologuddannelsen, 1.–4. semester. Lavet med AI som eksempel på, hvad studerende og undervisere kan bygge.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600;700&display=swap">
+<style>
+:root{
+  --bg:#f6f3ec; --panel:#fffdf8; --ink:#16213a; --muted:#56607a; --line:#ddd6c6;
+  --accent:#c2410c; --accent-soft:#fde3d4; --blue:#1f5fa8; --blue-soft:#dbe8f7;
+  --ok:#15803d; --ok-soft:#dcf2e3; --bad:#b42318; --bad-soft:#fbe0dd; --gold:#a16207;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1626; --panel:#172137; --ink:#eef1f7; --muted:#a9b3c7; --line:#2b3753;
+    --accent:#ff8a50; --accent-soft:#3a2418; --blue:#7fb0ea; --blue-soft:#1b2c46;
+    --ok:#5fd38d; --ok-soft:#163223; --bad:#ff8a80; --bad-soft:#3a1c1a; --gold:#f2c14e;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1626; --panel:#172137; --ink:#eef1f7; --muted:#a9b3c7; --line:#2b3753;
+  --accent:#ff8a50; --accent-soft:#3a2418; --blue:#7fb0ea; --blue-soft:#1b2c46;
+  --ok:#5fd38d; --ok-soft:#163223; --bad:#ff8a80; --bad-soft:#3a1c1a; --gold:#f2c14e;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 Inter,"Segoe UI",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:"Space Grotesk","Segoe UI",Arial,sans-serif;line-height:1.15;letter-spacing:-.01em;margin:0}
+a{color:var(--blue)}
+.wrap{max-width:1100px;margin:0 auto;padding:0 16px}
+header{padding:34px 0 8px}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+header h1{font-size:clamp(32px,5.4vw,52px);margin:6px 0 8px}
+header p{margin:0;color:var(--muted);max-width:720px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--panel)}
+.seg button{border:0;background:transparent;color:var(--ink);padding:7px 14px;font:600 14px Inter,Arial,sans-serif;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.tabs{display:flex;gap:8px;margin:24px 0 6px;flex-wrap:wrap}
+.tabs button{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:14px;padding:12px 18px;font:700 16px Inter,Arial,sans-serif;cursor:pointer;text-align:left}
+.tabs button small{display:block;font-weight:500;font-size:13px;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tabs button[aria-selected="true"] small{color:var(--bg);opacity:.75}
+.tema{color:var(--muted);margin:14px 0 18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px;cursor:pointer;text-align:left;color:var(--ink);font:inherit;display:flex;flex-direction:column;gap:6px;transition:transform .15s, box-shadow .15s}
+.card:hover{transform:translateY(-2px);box-shadow:0 12px 28px -18px rgba(22,33,58,.5)}
+.card .ic{font-size:28px;line-height:1}
+.card h3{font-size:20px}
+.card p{margin:0;color:var(--muted);font-size:15px}
+.card .meta{margin-top:auto;padding-top:10px;display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+.card .best{color:var(--gold);font-weight:700}
+.note{font-size:14px;color:var(--muted);margin:18px 0 0}
+.teach{margin:40px 0 60px;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:26px clamp(18px,4vw,34px)}
+.teach h2{font-size:28px;margin-bottom:6px}
+.teach .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:16px}
+.teach .cols div{background:var(--bg);border-radius:14px;padding:16px}
+.teach h3{font-size:18px;margin-bottom:4px}
+.teach p{margin:0;font-size:15.5px}
+.prompt{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:16px;background:var(--bg)}
+.prompt p{flex:1;margin:0;font-size:15.5px}
+.btn{border:0;border-radius:12px;padding:11px 18px;font:700 15px Inter,Arial,sans-serif;cursor:pointer;background:var(--ink);color:var(--bg)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.small{padding:6px 12px;font-size:13px;border-radius:9px}
+/* quiz */
+#quiz{display:none;padding:26px 0 60px}
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.hud{display:flex;gap:16px;font-weight:700;font-size:15px}
+.hud span b{font-family:"Space Grotesk",Arial,sans-serif;font-size:20px;color:var(--accent)}
+.bar{height:8px;background:var(--line);border-radius:99px;margin:14px 0 20px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+.qbox{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:24px clamp(18px,4vw,32px)}
+.lvl{display:inline-block;font-size:12.5px;font-weight:700;padding:4px 10px;border-radius:999px;margin-bottom:10px}
+.lvl.l1{background:var(--ok-soft);color:var(--ok)} .lvl.l2{background:var(--blue-soft);color:var(--blue)} .lvl.l3{background:var(--accent-soft);color:var(--accent)}
+.qbox h2{font-size:clamp(21px,3vw,26px);font-family:Inter,Arial,sans-serif;font-weight:700;line-height:1.35;margin-bottom:18px}
+.opts{display:grid;gap:10px}
+.opts button{border:1.5px solid var(--line);background:var(--bg);color:var(--ink);border-radius:14px;padding:14px 16px;font:500 16.5px/1.4 Inter,Arial,sans-serif;text-align:left;cursor:pointer;display:flex;gap:12px;align-items:center}
+.opts button:hover:not(:disabled){border-color:var(--blue)}
+.opts button .k{flex:none;width:28px;height:28px;border-radius:8px;border:1px solid var(--line);display:grid;place-items:center;font-weight:700;font-size:13px;color:var(--muted)}
+.opts button:disabled{cursor:default}
+.opts button.right{border-color:var(--ok);background:var(--ok-soft)}
+.opts button.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.why{display:none;margin-top:16px;padding:14px 16px;border-radius:14px;background:var(--blue-soft);font-size:15.5px}
+.why.on{display:block}
+.why b{display:block;margin-bottom:2px}
+.qfoot{display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:10px}
+.pop{font-weight:700;color:var(--ok);min-height:1.4em}
+.end{text-align:center;padding:30px 10px}
+.end .big{font-family:"Space Grotesk",Arial,sans-serif;font-size:64px;color:var(--accent);line-height:1}
+.end h2{font-size:30px;margin:10px 0}
+.end p{color:var(--muted)}
+.end .btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+footer{border-top:1px solid var(--line);padding:22px 0 40px;color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<div id="hub">
+  <header>
+    <div class="top">
+      <div>
+        <div class="eyebrow">VIA Produktionsteknolog · Testquiz</div>
+        <h1>Produktionsteknolog Quiz</h1>
+        <p>En testquiz til hvert fag fra 1. til 4. semester. Vælg et semester og et fag. Svære spørgsmål giver flere point, og rigtige svar i træk giver combo.</p>
+      </div>
+      <div class="seg" role="group" aria-label="Tema">
+        <button data-theme-btn="light" aria-pressed="false">Lys</button>
+        <button data-theme-btn="dark" aria-pressed="false">Mørk</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <p class="tema" id="tema"></p>
+  <div class="grid" id="grid"></div>
+  <p class="note">Fagene følger VIA's beskrivelse af uddannelsen og den nationale studieordning. VIA beskriver 1. og 2. semester samlet, så fordelingen af fag mellem de to semestre er et forslag. Spørgsmålene er demo-quizzer lavet med AI og gennemgået. De er ikke officielt eksamensmateriale.</p>
+
+  <section class="teach">
+    <div class="eyebrow">Til undervisere</div>
+    <h2>Byg en quiz til jeres egen undervisning</h2>
+    <p class="muted" style="color:var(--muted)">Quizzerne her er lavet ud fra studieordningens fagbeskrivelser. Med jeres egne slides og noter kan en quiz ramme præcis det, I har gennemgået.</p>
+    <div class="cols">
+      <div><h3>Exit-quiz efter lektionen</h3><p>Fem spørgsmål om dagens emne, som de studerende tager på mobilen inden de går.</p></div>
+      <div><h3>Quiz på storskærm</h3><p>Hele holdet spiller samtidig med en PIN i <a href="../quizlive/">QuizLive</a>, i Kahoot-stil.</p></div>
+      <div><h3>Find misforståelserne</h3><p>De forkerte svar bygges på typiske fejl, så I kan se, hvad holdet har misforstået.</p></div>
+      <div><h3>Jeres eget materiale</h3><p>Brug kun materiale, I selv har rettighederne til, fx egne slides og noter. Ingen lærebogssider.</p></div>
+    </div>
+    <div class="prompt"><p id="tprompt">Her er mine slides fra dagens lektion i Konstruktion om bøjning af bjælker. Lav en quiz med 8 multiple choice-spørgsmål: 3 lette, 3 mellem og 2 svære. Byg de forkerte svar på typiske misforståelser, og hold svarene omtrent lige lange. Skriv en kort forklaring til hvert svar. Gem quizzen som én HTML-fil.</p><button class="btn small ghost" id="tcopy">Kopiér</button></div>
+    <p style="margin-top:16px;font-size:15.5px">Sådan sætter man det hele op: <a href="../ai-foredrag/guide.html">trin-for-trin-guiden</a>.</p>
+  </section>
+</div>
+
+<div id="quiz"></div>
+
+<footer>Lavet af Frederik Rasmussen (Maskiningeniør, VIA Horsens) med Claude som eksempel på AI i undervisningen · <a href="../ai-foredrag/">Præsentationen</a> · <a href="../ai-foredrag/guide.html">Guiden</a></footer>
+</div>
+
+<script src="data.js"></script>
+<script>
+(function(){
+  var store={get:function(k,d){try{var v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},
+             set:function(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+  var S=window.PT.semestre, best=store.get('ptQuiz.best',{}), sem=store.get('ptQuiz.sem',0);
+  var tabs=document.getElementById('tabs'), grid=document.getElementById('grid'), hub=document.getElementById('hub'), qv=document.getElementById('quiz');
+  var LV={1:['Let',100,'l1'],2:['Mellem',200,'l2'],3:['Svær',300,'l3']};
+
+  function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+
+  function renderTabs(){
+    tabs.innerHTML='';
+    S.forEach(function(s,i){
+      var b=document.createElement('button');b.setAttribute('role','tab');b.setAttribute('aria-selected',i===sem);
+      b.innerHTML=esc(s.titel)+'<small>'+s.fag.length+' fag</small>';
+      b.onclick=function(){sem=i;store.set('ptQuiz.sem',i);renderTabs();renderGrid()};
+      tabs.appendChild(b);
+    });
+  }
+  function renderGrid(){
+    var s=S[sem];document.getElementById('tema').textContent=s.tema;grid.innerHTML='';
+    s.fag.forEach(function(f){
+      var c=document.createElement('button');c.className='card';
+      var b=best[f.id];
+      c.innerHTML='<span class="ic" aria-hidden="true">'+f.ikon+'</span><h3>'+esc(f.navn)+'</h3><p>'+esc(f.om)+'</p><div class="meta"><span>'+f.spm.length+' spørgsmål</span>'+(b?'<span class="best">Bedste: '+b+' p</span>':'<span>Ikke spillet</span>')+'</div>';
+      c.onclick=function(){start(f)};
+      grid.appendChild(c);
+    });
+  }
+
+  var cur,qs,idx,score,combo,right;
+  function start(f){
+    cur=f;idx=0;score=0;combo=0;right=0;
+    // let → mellem → svær, blandet inden for hvert niveau
+    qs=[1,2,3].reduce(function(acc,l){return acc.concat(shuffle(f.spm.filter(function(q){return q[0]===l})))},[]);
+    hub.style.display='none';qv.style.display='block';window.scrollTo(0,0);show();
+  }
+  function show(){
+    var q=qs[idx], lv=LV[q[0]];
+    var opts=shuffle([{t:q[2],ok:true}].concat(q[3].map(function(t){return{t:t,ok:false}})));
+    qv.innerHTML='<div class="qhead"><button class="btn ghost small" id="back">← Alle fag</button>'+
+      '<div class="hud"><span>Spm. <b>'+(idx+1)+'</b>/'+qs.length+'</span><span>Combo <b>×'+mult()+'</b></span><span>Point <b>'+score+'</b></span></div></div>'+
+      '<div class="bar"><i style="width:'+(idx/qs.length*100)+'%"></i></div>'+
+      '<div class="qbox"><div class="eyebrow" style="margin-bottom:8px">'+esc(cur.navn)+'</div><span class="lvl '+lv[2]+'">'+lv[0]+' · '+lv[1]+' p</span>'+
+      '<h2>'+esc(q[1])+'</h2><div class="opts" id="opts"></div>'+
+      '<div class="why" id="why"></div><div class="qfoot"><span class="pop" id="pop"></span><button class="btn" id="next" style="visibility:hidden">'+(idx===qs.length-1?'Se resultat':'Næste →')+'</button></div></div>';
+    var box=document.getElementById('opts');
+    opts.forEach(function(o,k){
+      var b=document.createElement('button');b.innerHTML='<span class="k">'+'ABCD'[k]+'</span><span>'+esc(o.t)+'</span>';
+      b.onclick=function(){answer(o,b,q,lv)};b._ok=o.ok;box.appendChild(b);
+    });
+    document.getElementById('back').onclick=home;
+    document.getElementById('next').onclick=function(){idx++; if(idx<qs.length)show(); else end();};
+  }
+  function mult(){return combo>=4?3:combo>=2?2:1}
+  function answer(o,b,q,lv){
+    var all=document.querySelectorAll('#opts button');
+    [].forEach.call(all,function(x){x.disabled=true;if(x._ok)x.classList.add('right')});
+    var pop=document.getElementById('pop');
+    if(o.ok){combo++;right++;var p=lv[1]*mult();score+=p;pop.textContent='+'+p+' point'+(mult()>1?' (combo ×'+mult()+')':'');}
+    else{combo=0;b.classList.add('wrong');pop.textContent='';}
+    var w=document.getElementById('why');w.innerHTML='<b>'+(o.ok?'Rigtigt.':'Ikke helt. Svaret er: '+esc(q[2]))+'</b>'+esc(q[4]);w.classList.add('on');
+    var n=document.getElementById('next');n.style.visibility='visible';n.focus();
+  }
+  function end(){
+    var prev=best[cur.id]||0; if(score>prev){best[cur.id]=score;store.set('ptQuiz.best',best)}
+    var pct=right/qs.length, title=pct===1?'Fejlfrit!':pct>=.75?'Rigtig godt':pct>=.5?'Godt på vej':'Kig fagbeskrivelsen igennem, og prøv igen';
+    qv.innerHTML='<div class="qbox end"><div class="eyebrow">'+esc(cur.navn)+'</div><div class="big">'+score+'</div><h2>'+title+'</h2>'+
+      '<p>'+right+' af '+qs.length+' rigtige'+(score>prev&&prev?' · ny rekord':'')+'</p>'+
+      '<div class="btns"><button class="btn" id="again">Prøv igen</button><button class="btn ghost" id="home">Alle fag</button></div></div>';
+    document.getElementById('again').onclick=function(){start(cur)};
+    document.getElementById('home').onclick=home;
+  }
+  function home(){qv.style.display='none';hub.style.display='block';renderGrid();window.scrollTo(0,0)}
+  document.addEventListener('keydown',function(e){
+    if(qv.style.display!=='block')return;
+    var k='abcd'.indexOf(e.key.toLowerCase()); var bs=document.querySelectorAll('#opts button');
+    if(k>-1&&bs[k]&&!bs[k].disabled)bs[k].click();
+    else if(e.key==='Enter'){var n=document.getElementById('next');if(n&&n.style.visibility==='visible'){e.preventDefault();n.click()}}
+  });
+
+  document.getElementById('tcopy').onclick=function(){
+    var t=document.getElementById('tprompt').textContent, b=this;
+    var done=function(){b.textContent='Kopieret';setTimeout(function(){b.textContent='Kopiér'},1400)};
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,done);else done();
+  };
+  var theme=store.get('ptQuiz.theme',null);
+  function setTheme(v){theme=v;if(v)document.documentElement.setAttribute('data-theme',v);else document.documentElement.removeAttribute('data-theme');
+    [].forEach.call(document.querySelectorAll('[data-theme-btn]'),function(b){b.setAttribute('aria-pressed',b.getAttribute('data-theme-btn')===v)});store.set('ptQuiz.theme',v)}
+  [].forEach.call(document.querySelectorAll('[data-theme-btn]'),function(b){b.onclick=function(){var v=b.getAttribute('data-theme-btn');setTheme(theme===v?null:v)}});
+  setTheme(theme);
+  if(sem>=S.length)sem=0;
+  renderTabs();renderGrid();
+})();
+</script>
+</body>
+</html>
