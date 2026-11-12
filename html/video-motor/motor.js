@@ -520,9 +520,19 @@ function slut(k, kilde, naeste, id) {
   }
 }
 
+// formel fra bogen (eller en regneregel) i en boks med nummeret bagved: formel(k, '18-2', 'T = ...', x, y, size, a, b)
+// x, y = tekstens start/grundlinje; a = boksen tegnes, teksten skrives fra a + 0.3 til b
+function formel(k, nr, s, x, y, size, a, b, col = 'blue') {
+  const bb = Math.max(b, a + 0.9);
+  const it = text(k, s, x, y, size, col, a + 0.3, bb);
+  const w = it.w + 44, h = size * 1.55;
+  box(k, x - 22, y - size * 1.08, w, h, col, a, a + 0.35, { sa: bb, sb: bb + 0.5 });
+  if (nr) text(k, '(' + nr + ')', x + w - 4, y, Math.round(size * 0.68), 'black', a + 0.15, a + 0.5);
+  return it;
+}
 Object.assign(BP, { img, line, arrow, dot, text, bubble, hatch, box, rect, strike, ring, under, endX, startX, frac, matrix, capacitor, inductor, motorSym,
   wire, resistor, source, ground, node, mesh, curArrow, flow, clock, goto, titel, seFoerst, tjek, slut, ink,
-  beam, pin, roller, wall, distLoad, moment, axes, plot, graf, dobbeltpil, dashed });
+  beam, pin, roller, wall, distLoad, moment, axes, plot, graf, dobbeltpil, dashed, formel });
 
 // ---------------------------------------------------------------- rendering
 function drawStroke(ctx, S, p1, p0 = 0) {
