@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Typer af plan bevægelse · video</title>
-<meta name="description" content="Translation, rotation om fast akse og generel plan bevægelse, og hvorfor en mekanisme ofte har én frihedsgrad.">
+<meta name="description" content="Grundig gennemgang: stift legeme, de fire typer plan bevægelse, udledning af v_B = v_A ved translation og slidens parallelogram-eksempel (v_G = 4 m/s).">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
 <link rel="stylesheet" href="../../../video-motor/afspiller.css">
 </head>
 <body>
-<div class="top"><a href="index.html">← Kapitel 16: videoer</a><h1>Typer af plan bevægelse</h1><span class="meta">DYN2 · kapitel 16 · Jeppe læser op</span></div>
+<div class="top"><a href="index.html">← Kapitel 16: videoer</a><h1>Typer af plan bevægelse</h1><span class="meta">DYN2 · kapitel 16 · AI-stemme (Google Gemini)</span></div>
 <div id="vid">
   <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Typer af plan bevægelse"></canvas><div id="cap" aria-live="polite"></div>
     <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
@@ -24,66 +24,155 @@
     <button id="fs" title="Fuld skærm (f)">⛶</button>
   </div>
 </div>
-<div class="under"><p>Translation, rotation om fast akse og generel plan bevægelse, og hvorfor en mekanisme ofte har én frihedsgrad.</p><div class="chips"><a href="../../../../lab/dyn2/plan-bevaegelse.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel16_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/dyn2/l05">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<div class="under"><p>Grundig gennemgang: stift legeme, de fire typer plan bevægelse, udledning af v_B = v_A ved translation og slidens parallelogram-eksempel (v_G = 4 m/s).</p><div class="chips"><a href="../../../../lab/dyn2/plan-bevaegelse.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel16_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/dyn2/l05">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
 <script src="../../../video-motor/harness.js"></script>
 <script src="../../../video-motor/motor.js"></script>
 <script src="../../../video-motor/afspiller.js"></script>
 <script>
-// Typer af plan bevægelse (DYN2 Lektion 5, Kinematik I, HI 16.1–16.2)
-BP.scene({ header: 'DYN2 · kap. 16' }, (B) => {
-  const { wt, we, L, text, bubble, line, arrow, box, dot, ring, under, ell, rect, dashed, PI, TAU } = B;
+// DYN2 kap. 16.1–16.2 Typer af plan bevægelse, dybdegående version (2026-11-12). Slides "Kinematik I" (slide 1–5).
+// Stift: |r_{B/A}| konstant; translation: r_{B/A} konstant ⇒ v_B = v_A, a_B = a_A. Eks. slide 5: v_A = ωr = 4·1 = 4 m/s, AB translaterer ⇒ v_G = 4 m/s.
+BP.scene({ header: 'DYN2 · kap. 16.1–16.2', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, dot, ring, under, ell, rect, hatch, dashed, endX, PI } = B;
+  const S = (id) => L(id).start;
+  const ringet = (k, s, x, y, size, col, a, te) => { const r = text(k, s, x, y, size, col, a, te); ring(r, col, te, te + 0.5); return r; };
+  const kasse = (k, x, y, a, b, col = 'blue', w = 90, h = 50) => line(k, rect(x - w / 2, y - h / 2, w, h).concat([[x - w / 2, y - h / 2 + 2]]), col, 3, a, b);
 
-  B.titel(0, 'Typer af plan bevægelse', 'DYN2 · Hibbeler kap. 16 · begreb (Kinematik I)', 'titel');
-  text(0, 'hvordan bevæger legemet sig?', 640, 520, 42, 'red', wt('titel', 'hvordan') - 0.3, we('titel', 'sig'), { align: 'center' });
+  // ---------------------------------------------------------------- 0 titel
+  B.titel(0, 'Typer af plan bevægelse', 'DYN2 · Hibbeler kap. 16.1–16.2 · slides Kinematik I', 'titel');
+  text(0, 'translation · rotation · generel plan', 640, 540, 44, 'red', wt('titel', 'bevæger') - 0.1, we('titel', 'hastigheden'), { align: 'center' });
 
+  // ---------------------------------------------------------------- 1 stift legeme og de fire typer
   B.goto('stift', 1);
+  bubble(1, 'Stift legeme', 130, 135, 50, 'blue', S('stift') - 0.1, S('stift') + 0.8);
   {
-    const t0 = L('stift').start;
-    dot(1, 300, 300, 8, 'blue', t0 + 0.3); dot(1, 500, 200, 8, 'blue', t0 + 0.4);
-    text(1, 'A', 280, 340, 32, 'blue', t0 + 0.3, t0 + 0.6); text(1, 'B', 515, 195, 32, 'blue', t0 + 0.4, t0 + 0.7);
-    line(1, [[300, 300], [500, 200]], 'black', 2.6, wt('stift', 'Afstanden') - 0.2, wt('stift', 'Afstanden') + 0.4);
-    text(1, '|r_{B/A}| = konstant', 640, 260, 40, 'red', wt('stift', 'konstant') - 0.4, we('stift', 'konstant'));
-    const typ = [['retlinet translation', 'Retlinet'], ['generel translation', 'generel'], ['rotation om fast akse', 'rotation'], ['generel plan bevægelse', 'plan', 1]];
-    typ.forEach(([s, w, n], i) => text(1, (i + 1) + '. ' + s, 160 + 520 * (i % 2), 450 + 60 * Math.floor(i / 2), 34, 'blue', wt('typer', w, n || 0) - 0.2, we('typer', w, n || 0) + 0.5));
+    const t0 = wt('stift', 'afstanden'), A = [820, 200], Bp = [1060, 150];
+    line(1, [[760, 230], [900, 140], [1110, 120], [1140, 220], [960, 270], [760, 232]], 'black', 3, t0 - 0.6, t0);
+    dot(1, A[0], A[1], 8, 'red', t0); text(1, 'A', A[0] - 30, A[1] + 8, 28, 'red', t0, t0 + 0.3);
+    dot(1, Bp[0], Bp[1], 8, 'red', t0 + 0.1); text(1, 'B', Bp[0] + 12, Bp[1] - 8, 28, 'red', t0 + 0.1, t0 + 0.4);
+    arrow(1, [A, Bp], 'red', 3, wt('stift', 'vektoren') - 0.1, wt('stift', 'vektoren') + 0.4, 12);
+    text(1, 'r_{B/A}', 920, 160, 26, 'red', wt('stift', 'vektoren'), wt('stift', 'vektoren') + 0.3);
+  }
+  text(1, '| r_{B/A} | = konstant', 180, 250, 42, 'red', wt('stift', 'Længden') - 0.1, we('stift', 'konstant'));
+  {
+    const ty = S('typer'), y = 470, P = [270, 530, 790, 1050];
+    const nav = ['retlinet translation', 'generel translation', 'rotation om fast akse', 'generel plan'];
+    const ord = ['Retlinet', 'generel', 'rotation', 'plan'];
+    nav.forEach((n, i) => { const t = wt('typer', ord[i], i === 3 ? 0 : 0) - 0.1; text(1, n, P[i], 640, 21, 'black', t, t + 0.6, { align: 'center' }); });
+    const t1 = wt('typer', 'Retlinet');
+    kasse(1, P[0] - 70, y, t1, t1 + 0.3); kasse(1, P[0] + 60, y, t1 + 0.2, t1 + 0.5);
+    arrow(1, [[P[0] - 20, y], [P[0] + 10, y]], 'red', 2.4, t1 + 0.2, t1 + 0.4, 10);
+    const t2 = wt('typer', 'generel');
+    kasse(1, P[1] - 70, y + 40, t2, t2 + 0.3); kasse(1, P[1] + 60, y - 40, t2 + 0.2, t2 + 0.5);
+    line(1, ell(P[1] - 5, y + 120, 90, 120, -2.6, -0.6), 'red', 2.2, t2 + 0.2, t2 + 0.6);
+    const t3 = wt('typer', 'rotation');
+    dot(1, P[2] - 60, y + 30, 8, 'black', t3);
+    line(1, [[P[2] - 60, y + 30], [P[2] + 60, y - 40]], 'blue', 8, t3, t3 + 0.4);
+    arrow(1, ell(P[2] - 60, y + 30, 100, 100, -0.8, -0.1), 'red', 2.2, t3 + 0.3, t3 + 0.6, 10);
+    const t4 = wt('typer', 'plan');
+    line(1, [[P[3] - 110, y + 60], [P[3] + 110, y + 60]], 'black', 2.4, t4 - 0.1, t4 + 0.2);
+    line(1, ell(P[3] - 40, y, 60, 60, 0, 2 * PI), 'blue', 3, t4, t4 + 0.4);
+    line(1, [[P[3] - 40, y], [P[3] - 40 + 60 * Math.cos(-1), y + 60 * Math.sin(-1)]], 'blue', 2.4, t4 + 0.2, t4 + 0.4);
+    arrow(1, [[P[3] + 30, y], [P[3] + 100, y]], 'red', 2.4, t4 + 0.3, t4 + 0.5, 10);
   }
 
+  // ---------------------------------------------------------------- 2 translation: v_B = v_A
   B.goto('translation', 2);
+  bubble(2, 'Translation', 130, 135, 50, 'blue', S('translation') - 0.1, S('translation') + 0.8);
   {
-    const t0 = L('translation').start;
-    line(2, rect(160, 200, 160, 90).concat([[160, 202]]), 'black', 3, t0, t0 + 0.4); line(2, rect(420, 140, 160, 90).concat([[420, 142]]), 'black', 3, t0 + 0.3, t0 + 0.7);
-    arrow(2, [[240, 245], [500, 185]], 'red', 3, t0 + 0.6, t0 + 1.0, 13);
-    text(2, 'v_A = v_B,  a_A = a_B', 160, 380, 40, 'red', wt('translation', 'samme') - 0.3, we('translation', 'acceleration'));
-    const tr = L('rotation').start;
-    line(2, ell(880, 250, 110, 110, 0, TAU), 'blue', 2.6, tr, tr + 0.8, { alpha: 0.7 }); dot(2, 880, 250, 7, 'black', tr);
-    line(2, [[880, 250], [990, 250]], 'black', 3, tr + 0.2, tr + 0.5);
-    text(2, 'cirkelbaner om aksen', 760, 400, 32, 'blue', tr + 0.3, we('rotation', 'aksen'));
-    const tg = L('generel').start;
-    line(2, ell(300, 560, 70, 70, 0, TAU), 'green', 3, tg, tg + 0.5); line(2, [[180, 630], [660, 630]], 'black', 2.4, tg + 0.2, tg + 0.5);
-    arrow(2, [[300, 560], [420, 560]], 'green', 3, tg + 0.5, tg + 0.8, 12);
-    text(2, 'flytter sig + drejer', 460, 570, 34, 'green', tg + 0.4, we('generel', 'plejlstang'));
-    text(2, 'ofte kun 1 frihedsgrad', 820, 660, 34, 'red', L('dof').start + 0.3, we('dof', 'alle'));
+    const t0 = S('translation');
+    [[820, 300], [1060, 230]].forEach(([x, y], i) => {
+      const a = t0 + 0.3 + i * 0.6;
+      line(2, rect(x - 80, y - 40, 160, 80).concat([[x - 80, y - 38]]), 'blue', 3, a, a + 0.4);
+      dot(2, x - 50, y + 10, 7, 'red', a + 0.3); dot(2, x + 50, y - 15, 7, 'red', a + 0.3);
+      arrow(2, [[x - 50, y + 10], [x + 50, y - 15]], 'red', 2.6, a + 0.3, a + 0.6, 10);
+    });
+    text(2, 'r_{B/A} konstant: samme længde og retning', 720, 420, 24, 'red', wt('translation', 'hverken') - 0.1, we('translation', 'retning'));
+  }
+  text(2, 'd/dt ( r_{B/A} ) = 0', 180, 250, 40, 'black', wt('translation', 'konstant') - 0.1, we('translation', 'nul'));
+  text(2, 'r_B = r_A + r_{B/A}', 180, 340, 40, 'black', S('translation2') + 0.1, we('translation2', 'A', 1));
+  text(2, 'd/dt:   v_B = v_A + 0', 180, 410, 40, 'black', wt('translation2', 'differentierer') - 0.1, we('translation2', 'nul'));
+  ringet(2, 'v_B = v_A,     a_B = a_A', 180, 510, 46, 'red', wt('translation2', 'Så') - 0.1, we('translation3', 'A', 1));
+  text(2, 'retlinet: rette baner     generel: krumme baner, ingen drejning', 180, 630, 30, 'green', S('translation4') + 0.1, we('translation4', 'drejer'));
+
+  // ---------------------------------------------------------------- 3 rotation og generel plan bevægelse
+  B.goto('rotation', 3);
+  bubble(3, 'Rotation og generel plan', 130, 135, 50, 'blue', S('rotation') - 0.1, S('rotation') + 0.8);
+  {
+    const t0 = S('rotation'), O = [380, 420];
+    dot(3, O[0], O[1], 9, 'black', t0);
+    line(3, [O, [O[0] + 230, O[1] - 110]], 'blue', 9, t0 + 0.1, t0 + 0.5);
+    [80, 160, 240].forEach((r, i) => line(3, ell(O[0], O[1], r, r, -1.4, 0.4), 'red', 2, t0 + 0.4 + 0.2 * i, t0 + 0.8 + 0.2 * i));
+    text(3, 'cirkler om aksen', O[0] - 100, O[1] + 120, 30, 'red', wt('rotation', 'cirkler') - 0.1, we('rotation', 'aksen'));
+    text(3, 'langt ude: hurtigere', O[0] - 100, O[1] + 165, 28, 'green', wt('rotation', 'langt') - 0.1, we('rotation', 'tæt'));
+    const tg = S('generel'), C = [900, 420];
+    line(3, [[720, C[1] + 100], [1180, C[1] + 100]], 'black', 2.6, tg, tg + 0.3);
+    line(3, ell(C[0], C[1], 100, 100, 0, 2 * PI), 'blue', 3, tg + 0.1, tg + 0.6);
+    arrow(3, [C, [C[0] + 150, C[1]]], 'red', 3, tg + 0.4, tg + 0.8, 12);
+    arrow(3, ell(C[0], C[1], 60, 60, -2.4, -0.6), 'green', 2.4, tg + 0.6, tg + 1.0, 10);
+    text(3, 'flytter sig + drejer', C[0] - 120, C[1] + 165, 30, 'blue', wt('generel', 'både') - 0.1, we('generel', 'drejer'));
   }
 
-  B.goto('eks', 3);
+  // ---------------------------------------------------------------- 4 én frihedsgrad og slide-eksemplet
+  B.goto('dof', 4);
+  bubble(4, 'Én frihedsgrad', 130, 135, 50, 'blue', S('dof') - 0.1, S('dof') + 0.8);
+  text(4, 'dele slavet sammen  ⇒  1 dof:  kend én bevægelse, kend alle', 180, 230, 32, 'black', wt('dof', 'slavet') - 0.1, we('dof', 'alle'));
   {
-    const t0 = L('eks').start;
-    dot(3, 300, 420, 8, 'black', t0); dot(3, 700, 420, 8, 'black', t0 + 0.1);
-    line(3, [[300, 420], [380, 270]], 'blue', 4, t0 + 0.2, t0 + 0.6); line(3, [[700, 420], [780, 270]], 'blue', 4, t0 + 0.3, t0 + 0.7);
-    line(3, [[380, 270], [780, 270]], 'red', 5, wt('eks2', 'Stangen') - 0.2, wt('eks2', 'Stangen') + 0.4);
-    text(3, 'A', 360, 250, 32, 'black', t0 + 0.5, t0 + 0.8); dot(3, 580, 270, 7, 'red', wt('eks2', 'tyngdepunkt') - 0.1); text(3, 'G', 575, 250, 30, 'red', wt('eks2', 'tyngdepunkt'), wt('eks2', 'tyngdepunkt') + 0.3);
-    text(3, 'v_A = ω r = 4 · 1 = 4 m/s', 160, 560, 40, 'blue', wt('eks', 'Punktet') - 0.1, we('eks', 'sekund', 1));
-    text(3, 'AB translaterer ⇒ v_G = v_A = 4 m/s', 160, 630, 40, 'red', wt('eks2', 'translaterer') - 0.2, we('eks2', 'sekund'));
+    const t0 = S('eks'), O1 = [840, 590], O2 = [1080, 590], r = 140, th = 1.05;
+    const A = [O1[0] + r * Math.cos(th), O1[1] - r * Math.sin(th)], Bp = [O2[0] + r * Math.cos(th), O2[1] - r * Math.sin(th)];
+    [O1, O2].forEach((O, i) => { dot(4, O[0], O[1], 9, 'black', t0 + 0.1 * i); hatch(4, rect(O[0] - 30, O[1] + 10, 60, 14), 'black', t0, t0 + 0.4, { gap: 6 }); });
+    line(4, [O1, A], 'black', 5, t0 + 0.2, t0 + 0.6); line(4, [O2, Bp], 'black', 5, t0 + 0.3, t0 + 0.7);
+    text(4, 'ω = 4 rad/s', O1[0] - 70, O1[1] + 60, 26, 'black', wt('eks', 'omega') - 0.1, we('eks', 'sekund'));
+    text(4, 'r = 1 m', O1[0] + 50, O1[1] - 20, 26, 'black', wt('eks', 'meter') - 0.1, we('eks', 'lange'));
+    const te = wt('eks2', 'Stangen');
+    line(4, [A, Bp], 'blue', 9, te - 0.1, te + 0.5);
+    text(4, 'A', A[0] - 34, A[1] - 6, 28, 'blue', te, te + 0.3); text(4, 'B', Bp[0] + 14, Bp[1] - 6, 28, 'blue', te, te + 0.3);
+    dashed(4, O1, O2, 'green', wt('eks2', 'parallelogram') - 0.1, wt('eks2', 'parallelogram') + 0.4);
+    const tv = wt('eks1', 'Farten');
+    arrow(4, [A, [A[0] - 100 * Math.sin(th), A[1] - 100 * Math.cos(th)]], 'red', 3, tv - 0.1, tv + 0.4, 12);
+    text(4, 'v_A', A[0] - 120, A[1] - 60, 28, 'red', tv, tv + 0.3);
+    const tg = wt('eks3', 'tyngdepunktet');
+    const G = [(A[0] + Bp[0]) / 2, A[1]];
+    dot(4, G[0], G[1], 7, 'red', tg - 0.1);
+    arrow(4, [G, [G[0] - 100 * Math.sin(th), G[1] - 100 * Math.cos(th)]], 'red', 3, tg, tg + 0.4, 12);
+    text(4, 'v_G', G[0] - 110, G[1] - 70, 28, 'red', tg + 0.1, tg + 0.4);
+  }
+  B.formel(4, '16-8', 'v = ω · r', 180, 340, 38, wt('eks1', 'Farten') - 0.1, we('eks1', 'r'));
+  text(4, 'v_A = 4 · 1 = 4 m/s', 180, 420, 38, 'black', wt('eks1', 'Fire') - 0.1, we('eks1', 'sekund'));
+  text(4, 'parallelogram ⇒ AB skifter ikke retning', 180, 500, 30, 'green', wt('eks2', 'Armene') - 0.1, we('eks2', 'retning'));
+  ringet(4, 'translation ⇒ v_G = v_A = 4 m/s', 180, 600, 38, 'red', S('eks3') + 0.1, we('eks3', 'sekund'));
+
+  // ---------------------------------------------------------------- 5 tjek
+  B.goto('tjek_q', 5);
+  B.tjek(5, ['Pariserhjul: gondolen hænger', 'altid lodret. Hvilken bevægelse?'], ['generel translation: drejer ikke,', 'men følger en cirkelbane'], 'tjek_q', 'tjek_a');
+
+  // ---------------------------------------------------------------- 6 tjek vist: pariserhjul
+  B.goto('tjek_vis', 6);
+  {
+    const t0 = S('tjek_vis'), C = [640, 340], R = 190;
+    line(6, ell(C[0], C[1], R, R, 0, 2 * PI), 'black', 3, t0, t0 + 0.6);
+    dot(6, C[0], C[1], 8, 'black', t0 + 0.3);
+    const tg = wt('tjek_vis', 'gondolen');
+    [-0.4, 0.9, 2.2, 3.5, 4.8].forEach((a, i) => {
+      const P = [C[0] + R * Math.cos(a), C[1] + R * Math.sin(a)], u = tg + 0.25 * i;
+      line(6, [C, P], 'black', 1.6, u - 0.2, u, { alpha: 0.5 });
+      line(6, [P, [P[0], P[1] + 26]], 'blue', 2.4, u, u + 0.15);
+      kasse(6, P[0], P[1] + 50, u + 0.1, u + 0.35, 'blue', 60, 44);
+    });
+    const th = wt('tjek_vis', 'hjørner');
+    line(6, ell(C[0] - 30, C[1] + 72, R, R, 0, 2 * PI), 'red', 2, th - 0.1, th + 0.8, { alpha: 0.6 });
+    line(6, ell(C[0] + 30, C[1] + 72, R, R, 0, 2 * PI), 'green', 2, th + 0.2, th + 1.0, { alpha: 0.6 });
+    text(6, 'to ens cirkler, forskudt', 640, 670, 32, 'red', th + 0.4, we('tjek_vis', 'hinanden'), { align: 'center' });
   }
 
-  B.goto('tjek_q', 4);
-  B.tjek(4, ['Pariserhjul: gondolen hænger lodret.', 'Hvilken bevægelse?'], ['generel translation', 'drejer ikke, men cirkelbane'], 'tjek_q', 'tjek_a');
-
-  B.goto('slut', 5);
-  B.slut(5, 'DYN2 slides Kinematik I · Hibbeler (2023), kap. 16.1–16.2', 'rotation om fast akse', 'slut');
-  text(5, 'translation · rotation · generel plan', 200, 280, 42, 'blue', L('slut').start + 0.4, we('slut', 'gang'));
+  // ---------------------------------------------------------------- 7 slut
+  B.goto('slut', 7);
+  B.slut(7, 'DYN2 slides Kinematik I, slide 1–5 · Hibbeler (2023), kap. 16.1–16.2', 'rotation om fast akse', 'slut');
+  text(7, 'stift:  | r_{B/A} | konstant', 200, 250, 40, 'blue', wt('slut', 'stift') - 0.1, we('slut', 'afstand'));
+  text(7, 'translation:  r_{B/A} konstant ⇒ v_B = v_A', 200, 335, 40, 'red', wt('slut', 'Translation') - 0.1, we('slut', 'A', 1));
+  text(7, 'rotation: cirkler,   generel plan: begge', 200, 420, 40, 'green', wt('slut', 'Rotation') - 0.1, we('slut', 'dele'));
 });
 
 </script>
-<script>BP.live({"duration":119.142,"audio":"plan-bevaegelse-typer.mp3","order":["titel","stift","typer","translation","rotation","generel","dof","eks","eks2","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.433,"words":[["Typer",0.614,1.117],["af",1.117,1.272],["plan",1.272,1.594],["bevægelse",1.594,2.341],["Før",3.232,3.49],["vi",3.49,3.593],["regner",3.593,3.966],["på",3.966,4.16],["et",4.16,4.224],["stift",4.224,4.572],["legeme",4.572,5.126],["skal",5.255,5.487],["vi",5.487,5.603],["vide",5.603,6.041],["hvordan",6.183,6.557],["det",6.557,6.647],["bevæger",6.647,6.995],["sig",6.995,7.433]],"text":"Typer af plan bevægelse. Før vi regner på et stift legeme, skal vi vide, hvordan det bevæger sig."},"stift":{"start":8.65,"end":15.158,"words":[["Et",8.777,8.88],["stift",8.88,9.254],["legeme",9.254,9.679],["deformeres",9.679,10.349],["ikke",10.35,10.826],["Afstanden",11.73,12.271],["mellem",12.271,12.542],["to",12.542,12.799],["vilkårlige",12.799,13.263],["punkter",13.263,13.702],["A",13.702,13.921],["og",13.921,13.959],["B",13.959,14.359],["er",14.359,14.475],["konstant",14.475,15.158]],"text":"Et stift legeme deformeres ikke. Afstanden mellem to vilkårlige punkter A og B er konstant."},"typer":{"start":16.392,"end":25.786,"words":[["Der",16.519,16.674],["er",16.674,16.7],["fire",16.7,16.996],["typer",16.996,17.331],["plan",17.331,17.679],["bevægelse",17.679,18.427],["Retlinet",19.317,19.858],["translation",19.858,20.722],["generel",20.864,21.289],["translation",21.289,22.127],["rotation",22.268,23.003],["om",23.003,23.222],["en",23.222,23.325],["fast",23.325,23.66],["akse",23.66,24.15],["og",24.15,24.266],["generel",24.266,24.755],["plan",24.755,25.065],["bevægelse",25.065,25.786]],"text":"Der er fire typer plan bevægelse. Retlinet translation, generel translation, rotation om en fast akse og generel plan bevægelse."},"translation":{"start":27.014,"end":35.48,"words":[["Ved",27.154,27.257],["translation",27.257,27.927],["ændrer",27.927,28.224],["linjen",28.224,28.559],["fra",28.559,28.778],["A",28.778,28.997],["til",28.997,29.165],["B",29.165,29.422],["hverken",29.422,29.783],["længde",29.783,30.286],["eller",30.286,30.53],["retning",30.531,31.097],["Derfor",31.988,32.336],["har",32.336,32.529],["alle",32.529,32.826],["punkter",32.826,33.135],["samme",33.135,33.444],["hastighed",33.444,34.05],["og",34.05,34.166],["samme",34.166,34.566],["acceleration",34.566,35.48]],"text":"Ved translation ændrer linjen fra A til B hverken længde eller retning. Derfor har alle punkter samme hastighed og samme acceleration."},"rotation":{"start":36.724,"end":41.503,"words":[["Ved",36.864,36.967],["rotation",36.967,37.586],["om",37.586,37.805],["en",37.805,37.908],["fast",37.908,38.282],["akse",38.282,38.746],["bevæger",38.746,39.197],["alle",39.197,39.493],["punkter",39.493,39.802],["sig",39.802,40.073],["i",40.073,40.15],["cirkler",40.15,40.666],["om",40.666,40.859],["aksen",40.859,41.503]],"text":"Ved rotation om en fast akse bevæger alle punkter sig i cirkler om aksen."},"generel":{"start":42.738,"end":49.914,"words":[["Generel",42.865,43.239],["plan",43.239,43.497],["bevægelse",43.497,44.167],["er",44.167,44.347],["en",44.347,44.463],["kombination",44.463,45.262],["legemet",45.404,45.855],["både",45.855,46.139],["flytter",46.139,46.448],["sig",46.448,46.718],["og",46.718,46.821],["drejer",46.821,47.35],["som",47.492,47.724],["en",47.724,47.801],["rullende",47.801,48.084],["cylinder",48.084,48.664],["eller",48.664,49.038],["en",49.038,49.218],["plejlstang",49.218,49.914]],"text":"Generel plan bevægelse er en kombination: legemet både flytter sig og drejer, som en rullende cylinder eller en plejlstang."},"dof":{"start":51.128,"end":59.788,"words":[["I",51.268,51.333],["en",51.333,51.436],["mekanisme",51.436,52.119],["er",52.119,52.235],["delene",52.235,52.66],["ofte",52.66,52.956],["låst",52.956,53.266],["sammen",53.266,53.768],["så",53.91,54.116],["hele",54.116,54.387],["systemet",54.387,54.889],["kun",54.889,55.134],["har",55.134,55.353],["én",55.353,55.585],["frihedsgrad",55.585,56.32],["Kender",57.198,57.468],["vi",57.468,57.661],["én",57.662,57.855],["bevægelse",57.855,58.615],["kender",58.744,59.04],["vi",59.04,59.156],["dem",59.156,59.35],["alle",59.35,59.788]],"text":"I en mekanisme er delene ofte låst sammen, så hele systemet kun har én frihedsgrad. Kender vi én bevægelse, kender vi dem alle."},"eks":{"start":61.006,"end":74.176,"words":[["Et",61.146,61.249],["eksempel",61.249,61.894],["fra",61.894,62.061],["slides",62.061,62.667],["To",63.558,63.841],["arme",63.841,64.137],["drejer",64.137,64.447],["om",64.447,64.576],["faste",64.576,64.949],["akser",64.949,65.413],["med",65.413,65.658],["omega",65.658,66.109],["lig",66.109,66.354],["fire",66.354,66.663],["radianer",66.663,67.166],["pr.",67.166,67.385],["sekund",67.385,67.939],["og",67.939,68.107],["er",68.107,68.222],["en",68.222,68.326],["meter",68.326,68.609],["lange",68.609,69.086],["Punktet",69.975,70.362],["A",70.362,70.645],["har",70.645,70.826],["hastigheden",70.826,71.367],["omega",71.367,71.818],["r",71.818,72.153],["altså",72.295,72.733],["fire",72.733,73.042],["meter",73.042,73.351],["pr.",73.351,73.596],["sekund",73.596,74.176]],"text":"Et eksempel fra slides. To arme drejer om faste akser med omega lig fire radianer pr. sekund og er en meter lange. Punktet A har hastigheden omega r, altså fire meter pr. sekund."},"eks2":{"start":75.396,"end":85.151,"words":[["Stangen",75.51,75.961],["A",75.961,76.013],["B",76.013,76.374],["er",76.374,76.49],["forbundet",76.49,76.979],["til",76.979,77.121],["begge",77.121,77.456],["arme",77.456,77.894],["som",78.036,78.294],["bevæger",78.294,78.642],["sig",78.642,78.861],["ens",78.861,79.351],["Derfor",80.241,80.68],["translaterer",80.68,81.466],["stangen",81.466,81.981],["og",82.136,82.252],["dens",82.252,82.535],["tyngdepunkt",82.535,83.102],["har",83.102,83.347],["også",83.347,83.708],["fire",83.708,84.004],["meter",84.004,84.314],["pr.",84.314,84.545],["sekund",84.545,85.151]],"text":"Stangen A B er forbundet til begge arme, som bevæger sig ens. Derfor translaterer stangen, og dens tyngdepunkt har også fire meter pr. sekund."},"tjek_q":{"start":86.378,"end":94.007,"words":[["Tjek",86.479,86.801],["dig",86.801,86.981],["selv",86.981,87.407],["Et",88.285,88.414],["pariserhjul",88.414,89.161],["drejer",89.162,89.703],["Hvilken",90.618,90.966],["bevægelse",90.966,91.494],["har",91.494,91.687],["en",91.687,91.79],["gondol",91.79,92.422],["der",92.564,92.731],["altid",92.731,93.182],["hænger",93.182,93.414],["lodret",93.414,94.007]],"text":"Tjek dig selv. Et pariserhjul drejer. Hvilken bevægelse har en gondol, der altid hænger lodret?"},"tjek_a":{"start":97.874,"end":106.121,"words":[["Generel",97.975,98.477],["translation",98.477,99.289],["Gondolen",100.194,100.812],["drejer",100.812,101.199],["ikke",101.199,101.663],["så",101.792,102.062],["alle",102.062,102.32],["dens",102.32,102.565],["punkter",102.565,102.887],["har",102.887,103.003],["samme",103.003,103.312],["hastighed",103.312,103.931],["men",104.072,104.253],["de",104.253,104.343],["bevæger",104.343,104.678],["sig",104.678,105.026],["i",105.026,105.181],["en",105.181,105.284],["cirkelbane",105.284,106.121]],"text":"Generel translation. Gondolen drejer ikke, så alle dens punkter har samme hastighed, men de bevæger sig i en cirkelbane."},"slut":{"start":107.344,"end":116.711,"words":[["Kort",107.471,107.677],["sagt",107.678,108.193],["translation",108.322,108.966],["betyder",108.966,109.327],["samme",109.327,109.649],["hastighed",109.649,110.152],["overalt",110.152,110.822],["rotation",110.964,111.595],["om",111.595,111.724],["fast",111.724,112.033],["akse",112.033,112.381],["betyder",112.381,112.755],["cirkelbaner",112.755,113.592],["og",113.734,113.876],["generel",113.876,114.327],["plan",114.327,114.572],["bevægelse",114.572,115.19],["er",115.19,115.319],["begge",115.319,115.629],["dele",115.629,115.938],["på",115.938,116.118],["én",116.118,116.337],["gang",116.337,116.711]],"text":"Kort sagt: translation betyder samme hastighed overalt, rotation om fast akse betyder cirkelbaner, og generel plan bevægelse er begge dele på én gang."}}}, { audio: 'plan-bevaegelse-typer.mp3', id: 'plan-bevaegelse-typer' });</script>
+<script>BP.live({"duration":187.947,"audio":"plan-bevaegelse-typer.mp3","order":["titel","stift","typer","translation","translation2","translation3","translation4","rotation","generel","dof","eks","eks1","eks2","eks3","tjek_q","tjek_a","tjek_vis","slut"],"lines":{"titel":{"start":0.5,"end":11.381,"words":[["Typer",0.54,0.92],["af",1.06,1.14],["plan",1.22,1.54],["bevægelse",1.66,2.14],["Før",2.98,3.14],["vi",3.2,3.24],["regner",3.32,3.6],["på",3.64,3.76],["et",3.76,3.84],["stift",3.9,4.16],["legeme",4.22,4.48],["skal",4.66,4.801],["vi",4.821,4.861],["vide",4.941,5.181],["hvordan",5.221,5.541],["det",5.621,5.701],["bevæger",5.721,6.041],["sig",6.081,6.201],["Vi",6.961,7.001],["definerer",7.081,7.561],["begreberne",7.621,8.081],["præcist",8.141,8.721],["og",8.901,8.981],["udleder",9.061,9.461],["hvad",9.521,9.681],["translation",9.741,10.301],["betyder",10.381,10.741],["for",10.781,10.861],["hastigheden",10.901,11.381]],"text":"Typer af plan bevægelse. Før vi regner på et stift legeme, skal vi vide, hvordan det bevæger sig. Vi definerer begreberne præcist og udleder, hvad translation betyder for hastigheden."},"stift":{"start":13.201,"end":24.243,"words":[["Et",13.241,13.321],["stift",13.421,13.721],["legeme",13.821,14.081],["deformeres",14.241,14.722],["ikke",14.762,14.902],["Præcist",15.382,15.822],["betyder",15.862,16.182],["det",16.222,16.302],["afstanden",16.702,17.182],["mellem",17.242,17.462],["to",17.562,17.682],["vilkårlige",17.842,18.342],["punkter",18.382,18.702],["A",18.942,18.962],["og",19.102,19.162],["B",19.202,19.222],["ændrer",19.702,19.962],["sig",20.002,20.122],["aldrig",20.242,20.502],["Længden",21.262,21.582],["af",21.642,21.702],["vektoren",21.742,22.202],["r",22.542,22.562],["B",22.722,22.742],["over",23.082,23.283],["A",23.383,23.403],["er",23.723,23.803],["konstant",23.823,24.243]],"text":"Et stift legeme deformeres ikke. Præcist betyder det: afstanden mellem to vilkårlige punkter A og B ændrer sig aldrig. Længden af vektoren r B over A er konstant."},"typer":{"start":25.423,"end":34.224,"words":[["Der",25.463,25.563],["er",25.603,25.663],["fire",25.743,26.023],["typer",26.143,26.443],["plan",26.523,26.763],["bevægelse",26.863,27.283],["Retlinet",27.983,28.403],["translation",28.463,29.023],["generel",29.463,29.823],["translation",29.863,30.423],["rotation",30.863,31.363],["om",31.483,31.563],["en",31.583,31.663],["fast",31.723,31.943],["akse",32.043,32.304],["og",32.744,32.804],["generel",32.924,33.324],["plan",33.444,33.684],["bevægelse",33.784,34.224]],"text":"Der er fire typer plan bevægelse. Retlinet translation, generel translation, rotation om en fast akse og generel plan bevægelse."},"translation":{"start":36.044,"end":44.405,"words":[["Ved",36.084,36.204],["translation",36.284,36.904],["ændrer",37.044,37.304],["vektoren",37.364,37.804],["fra",37.864,37.964],["A",38.164,38.184],["til",38.444,38.564],["B",38.604,38.624],["hverken",38.884,39.184],["længde",39.284,39.604],["eller",39.744,39.904],["retning",39.944,40.244],["Hele",40.764,41.004],["vektoren",41.044,41.424],["er",41.484,41.544],["konstant",41.585,42.005],["så",42.245,42.345],["dens",42.365,42.505],["afledte",42.605,43.005],["med",43.105,43.205],["hensyn",43.225,43.545],["til",43.585,43.685],["tiden",43.725,44.025],["er",44.145,44.205],["nul",44.245,44.405]],"text":"Ved translation ændrer vektoren fra A til B hverken længde eller retning. Hele vektoren er konstant, så dens afledte med hensyn til tiden er nul."},"translation2":{"start":45.425,"end":59.306,"words":[["Positionen",45.465,46.065],["af",46.165,46.225],["B",46.285,46.305],["er",46.745,46.825],["positionen",46.925,47.485],["af",47.605,47.665],["A",47.805,47.825],["plus",48.145,48.365],["r",48.625,48.645],["B",48.845,48.865],["over",49.065,49.245],["A",49.345,49.365],["Vi",50.185,50.225],["differentierer",50.285,50.846],["v",51.546,51.566],["B",51.866,51.886],["er",52.366,52.446],["v",52.586,52.606],["A",52.886,52.906],["plus",53.206,53.466],["den",53.586,53.726],["afledte",53.826,54.266],["af",54.486,54.566],["r",54.786,54.806],["B",54.886,54.906],["over",55.126,55.306],["A",55.366,55.386],["Men",56.146,56.266],["den",56.466,56.566],["er",56.606,56.666],["nul",56.706,56.826],["Så",57.506,57.666],["er",57.786,57.886],["v",58.046,58.066],["B",58.266,58.286],["lig",58.626,58.766],["v",59.046,59.066],["A",59.286,59.306]],"text":"Positionen af B er positionen af A plus r B over A. Vi differentierer: v B er v A plus den afledte af r B over A. Men den er nul. Så er v B lig v A."},"translation3":{"start":60.587,"end":68.007,"words":[["Differentierer",60.627,61.167],["vi",61.207,61.267],["én",61.407,61.507],["gang",61.567,61.727],["til",61.807,61.947],["får",62.167,62.307],["vi",62.347,62.407],["a",62.827,62.847],["B",63.087,63.107],["lig",63.467,63.607],["a",63.847,63.867],["A",64.167,64.187],["Alle",65.007,65.167],["punkter",65.207,65.507],["har",65.547,65.667],["altså",65.687,65.947],["samme",66.027,66.247],["hastighed",66.347,66.767],["og",66.967,67.027],["samme",67.127,67.347],["acceleration",67.447,68.007]],"text":"Differentierer vi én gang til, får vi a B lig a A. Alle punkter har altså samme hastighed og samme acceleration."},"translation4":{"start":69.348,"end":76.628,"words":[["Ved",69.388,69.488],["retlinet",69.568,69.988],["translation",70.068,70.588],["går",70.728,70.848],["punkterne",70.868,71.248],["i",71.348,71.368],["rette",71.488,71.708],["linjer",71.768,72.048],["Ved",72.708,72.808],["generel",72.868,73.248],["translation",73.288,73.828],["går",73.948,74.048],["de",74.068,74.128],["i",74.188,74.208],["krumme",74.268,74.568],["baner",74.628,74.908],["men",75.088,75.228],["legemet",75.368,75.688],["drejer",75.768,76.068],["stadig",76.148,76.408],["ikke",76.488,76.628]],"text":"Ved retlinet translation går punkterne i rette linjer. Ved generel translation går de i krumme baner, men legemet drejer stadig ikke."},"rotation":{"start":78.448,"end":85.348,"words":[["Ved",78.488,78.588],["rotation",78.668,79.168],["om",79.228,79.308],["en",79.328,79.408],["fast",79.468,79.668],["akse",79.768,80.008],["bevæger",80.208,80.488],["alle",80.568,80.728],["punkter",80.788,81.048],["sig",81.088,81.188],["i",81.248,81.268],["cirkler",81.368,81.728],["om",81.768,81.868],["aksen",81.888,82.168],["Punkter",82.728,83.028],["langt",83.128,83.328],["fra",83.368,83.448],["aksen",83.528,83.788],["går",83.908,84.028],["hurtigere",84.048,84.468],["end",84.568,84.668],["punkter",84.688,84.968],["tæt",85.008,85.168],["på",85.208,85.348]],"text":"Ved rotation om en fast akse bevæger alle punkter sig i cirkler om aksen. Punkter langt fra aksen går hurtigere end punkter tæt på."},"generel":{"start":86.448,"end":94.369,"words":[["Generel",86.488,86.889],["plan",86.989,87.209],["bevægelse",87.309,87.729],["er",87.869,87.929],["en",87.949,88.009],["kombination",88.049,88.609],["legemet",89.169,89.449],["både",89.549,89.749],["flytter",89.829,90.089],["sig",90.129,90.249],["og",90.409,90.489],["drejer",90.529,90.829],["som",91.469,91.589],["en",91.609,91.709],["rullende",91.809,92.109],["cylinder",92.169,92.549],["eller",92.749,92.949],["en",93.009,93.109],["plejlstang",93.209,93.809],["i",93.929,93.949],["en",93.989,94.049],["motor",94.089,94.369]],"text":"Generel plan bevægelse er en kombination: legemet både flytter sig og drejer, som en rullende cylinder eller en plejlstang i en motor."},"dof":{"start":96.189,"end":104.73,"words":[["I",96.229,96.249],["en",96.349,96.429],["mekanisme",96.489,97.11],["er",97.27,97.35],["delene",97.41,97.79],["ofte",97.87,98.11],["slavet",98.21,98.59],["sammen",98.67,98.99],["så",99.25,99.35],["hele",99.39,99.63],["systemet",99.69,100.17],["kun",100.21,100.37],["har",100.43,100.57],["én",100.87,100.99],["frihedsgrad",101.19,101.75],["Kender",102.47,102.69],["vi",102.71,102.75],["én",102.89,103.03],["bevægelse",103.07,103.49],["kender",103.73,103.97],["vi",103.99,104.03],["dem",104.07,104.17],["alle",104.51,104.73]],"text":"I en mekanisme er delene ofte slavet sammen, så hele systemet kun har én frihedsgrad. Kender vi én bevægelse, kender vi dem alle."},"eks":{"start":106.55,"end":114.49,"words":[["Et",106.59,106.67],["eksempel",106.69,107.13],["fra",107.19,107.27],["slides",107.37,107.77],["To",108.73,108.87],["arme",109.07,109.33],["drejer",109.39,109.73],["om",109.83,109.91],["faste",110.05,110.33],["akser",110.41,110.71],["med",110.89,110.99],["omega",111.07,111.41],["lig",111.49,111.59],["fire",111.73,111.95],["radianer",111.99,112.41],["pr",112.43,112.53],["sekund",112.55,112.89],["og",113.15,113.23],["er",113.33,113.45],["en",113.75,113.89],["meter",113.95,114.21],["lange",114.25,114.49]],"text":"Et eksempel fra slides. To arme drejer om faste akser med omega lig fire radianer pr. sekund og er en meter lange."},"eks1":{"start":115.611,"end":123.711,"words":[["Armens",115.651,115.951],["ende",116.051,116.231],["A",116.411,116.431],["bevæger",116.791,117.091],["sig",117.131,117.231],["i",117.291,117.311],["en",117.371,117.451],["cirkel",117.511,117.831],["Farten",118.451,118.771],["i",118.811,118.831],["en",118.851,118.931],["cirkelbevægelse",118.991,119.731],["er",119.871,119.951],["omega",120.091,120.411],["gange",120.491,120.671],["r",120.851,120.871],["Fire",121.411,121.631],["gange",121.691,121.871],["en",121.971,122.131],["giver",122.331,122.531],["fire",122.791,123.031],["meter",123.091,123.291],["pr",123.311,123.411],["sekund",123.431,123.711]],"text":"Armens ende A bevæger sig i en cirkel. Farten i en cirkelbevægelse er omega gange r. Fire gange en giver fire meter pr. sekund."},"eks2":{"start":124.872,"end":135.453,"words":[["Stangen",124.912,125.292],["A",125.432,125.452],["B",125.612,125.632],["er",125.932,125.992],["forbundet",126.032,126.392],["til",126.432,126.552],["begge",126.572,126.812],["arme",126.932,127.152],["Armene",127.872,128.092],["er",128.112,128.172],["lige",128.212,128.372],["lange",128.412,128.692],["og",128.772,128.832],["drejer",128.872,129.132],["ens",129.232,129.472],["så",129.912,130.052],["A",130.272,130.292],["B",130.492,130.512],["og",130.912,130.972],["de",131.012,131.072],["to",131.132,131.232],["akser",131.372,131.672],["danner",131.812,132.072],["et",132.092,132.152],["parallelogram",132.192,132.753],["A",133.453,133.473],["B",133.573,133.593],["skifter",133.953,134.293],["derfor",134.313,134.613],["aldrig",134.793,135.053],["retning",135.133,135.453]],"text":"Stangen A B er forbundet til begge arme. Armene er lige lange og drejer ens, så A, B og de to akser danner et parallelogram. A B skifter derfor aldrig retning."},"eks3":{"start":135.953,"end":142.454,"words":[["Altså",135.993,136.273],["translaterer",136.533,137.313],["stangen",137.353,137.653],["Alle",138.293,138.473],["dens",138.513,138.653],["punkter",138.693,138.953],["har",138.993,139.073],["samme",139.153,139.353],["hastighed",139.393,139.853],["også",140.213,140.433],["tyngdepunktet",140.453,140.973],["G",141.013,141.033],["fire",141.613,141.814],["meter",141.854,142.074],["pr",142.074,142.174],["sekund",142.214,142.454]],"text":"Altså translaterer stangen. Alle dens punkter har samme hastighed, også tyngdepunktet G: fire meter pr. sekund."},"tjek_q":{"start":144.274,"end":150.194,"words":[["Tjek",144.314,144.514],["dig",144.534,144.634],["selv",144.674,144.854],["Et",145.794,145.874],["pariserhjul",145.914,146.514],["drejer",146.574,146.974],["Hvilken",147.534,147.814],["bevægelse",147.834,148.294],["har",148.334,148.434],["en",148.454,148.534],["gondol",148.594,149.074],["der",149.214,149.314],["altid",149.334,149.594],["hænger",149.614,149.814],["lodret",149.854,150.194]],"text":"Tjek dig selv. Et pariserhjul drejer. Hvilken bevægelse har en gondol, der altid hænger lodret?"},"tjek_a":{"start":154.314,"end":160.734,"words":[["Generel",154.354,154.754],["translation",154.834,155.334],["Gondolen",155.954,156.354],["drejer",156.414,156.694],["ikke",156.774,156.934],["så",157.174,157.294],["alle",157.354,157.514],["dens",157.534,157.654],["punkter",157.694,157.994],["har",158.034,158.134],["samme",158.174,158.394],["hastighed",158.454,158.894],["men",159.254,159.354],["de",159.374,159.414],["bevæger",159.454,159.794],["sig",159.834,159.954],["i",160.014,160.034],["en",160.074,160.134],["cirkelbane",160.234,160.734]],"text":"Generel translation. Gondolen drejer ikke, så alle dens punkter har samme hastighed, men de bevæger sig i en cirkelbane."},"tjek_vis":{"start":162.554,"end":171.055,"words":[["Her",162.594,162.734],["kan",162.754,162.854],["du",162.854,162.914],["se",162.954,163.034],["det",163.094,163.174],["Hjulet",163.654,163.995],["drejer",164.055,164.415],["men",164.615,164.775],["gondolen",164.835,165.255],["hænger",165.295,165.475],["lodret",165.515,165.835],["hele",166.075,166.355],["vejen",166.375,166.575],["rundt",166.615,166.795],["Dens",167.375,167.535],["to",167.575,167.675],["hjørner",167.755,168.115],["følger",168.215,168.455],["to",168.515,168.615],["ens",168.855,169.035],["cirkler",169.115,169.495],["forskudt",169.795,170.175],["i",170.275,170.295],["forhold",170.355,170.655],["til",170.655,170.755],["hinanden",170.755,171.055]],"text":"Her kan du se det. Hjulet drejer, men gondolen hænger lodret hele vejen rundt. Dens to hjørner følger to ens cirkler, forskudt i forhold til hinanden."},"slut":{"start":172.875,"end":186.477,"words":[["Kort",172.915,173.115],["sagt",173.155,173.375],["stift",174.116,174.436],["betyder",174.596,174.896],["konstant",174.916,175.276],["afstand",175.356,175.716],["Translation",176.276,176.856],["betyder",177.016,177.396],["at",177.436,177.516],["r",177.736,177.756],["B",178.016,178.036],["over",178.236,178.396],["A",178.476,178.496],["er",178.636,178.696],["konstant",178.716,179.156],["så",179.356,179.456],["v",179.496,179.516],["B",179.716,179.736],["er",180.096,180.156],["v",180.176,180.196],["A",180.396,180.416],["Rotation",181.416,181.896],["om",181.936,181.996],["fast",182.076,182.276],["akse",182.377,182.637],["giver",182.817,183.017],["cirkelbaner",183.117,183.717],["og",184.317,184.377],["generel",184.417,184.757],["plan",184.817,185.017],["bevægelse",185.077,185.477],["er",185.937,186.017],["begge",186.057,186.257],["dele",186.297,186.477]],"text":"Kort sagt: stift betyder konstant afstand. Translation betyder, at r B over A er konstant, så v B er v A. Rotation om fast akse giver cirkelbaner, og generel plan bevægelse er begge dele."}}}, { audio: 'plan-bevaegelse-typer.mp3', id: 'plan-bevaegelse-typer' });</script>
 </body>
 </html>
