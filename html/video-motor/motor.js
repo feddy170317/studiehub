@@ -77,7 +77,7 @@ const camAt = (keys, t) => {
 Object.assign(BP, { seg, ell, head, clamp, win, eio, PI, TAU, SEC });
 
 // 4-farvet Bic: blå (hovedblæk), rød (strøm/rettelser), sort, grøn (resultat/kontrol)
-const INK = { blue: [28, 50, 158], red: [196, 34, 44], black: [34, 32, 44], green: [20, 118, 72] };
+const INK = { blue: [28, 50, 158], red: [196, 34, 44], black: [34, 32, 44], green: [20, 118, 72], gray: [160, 160, 170] };
 const ink = (c, a = 0.9) => H.rgba(INK[c], a);
 const HAND = (s) => `${s}px 'Gloria Hallelujah', 'Comic Sans MS', cursive`;
 const BUB = (s) => `700 ${s}px Fredoka`;

@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Den ikke-ideelle transformer og prøverne · video</title>
+<meta name="description" content="Ækvivalentkredsløbet (r_w, L_w, r_c, L_c) og hvordan tomgangs- og kortslutningsprøven bestemmer det.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Dag 10: videoer</a><h1>Den ikke-ideelle transformer og prøverne</h1><span class="meta">ELE1 · dag 10 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Den ikke-ideelle transformer og prøverne"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Ækvivalentkredsløbet (r_w, L_w, r_c, L_c) og hvordan tomgangs- og kortslutningsprøven bestemmer det.</p><div class="chips"><a href="ideel-transformer.html">Se først: Den ideelle transformer</a><a href="../../dag/Dag10_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/ele1/dag10">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// ELE1 Dag 10 · Den ikke-ideelle transformer: ækvivalentkredsløb (r_w, L_w i serie; r_c ∥ L_c) og prøverne (bogens opg. 6.50).
+// Tomgang: r_c = V²/P, Y = I/V, G = 1/r_c, B = √(Y² − G²), L_c = 1/(ωB). Kortslutning: r_w = P/I², |Z| = V/I, X = √(Z² − r_w²), L_w = X/ω.
+BP.scene({ header: 'ELE1 · Dag 10', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, dot, ring, under, ell, rect, hatch, dashed, PI } = B;
+  const S = (id) => L(id).start;
+  const ringet = (k, s, x, y, size, col, a, te) => { const r = text(k, s, x, y, size, col, a, te); ring(r, col, te, te + 0.5); return r; };
+  const trafo = (k, x, y0, y1, a, b, col = 'blue', gap = 46) => {
+    B.inductor(k, [x, y0], [x, y1], a, b, { col });
+    B.inductor(k, [x + gap, y1], [x + gap, y0], a + 0.1, b + 0.1, { col });
+    line(k, [[x + gap / 2 - 5, y0 + 6], [x + gap / 2 - 5, y1 - 6]], 'black', 2.4, a + 0.2, b);
+    line(k, [[x + gap / 2 + 5, y0 + 6], [x + gap / 2 + 5, y1 - 6]], 'black', 2.4, a + 0.2, b);
+  };
+  // ækvivalentkredsløbet; cs = farve på seriegrenen, cp = farve på parallelgrenen
+  const ekv = (k, x0, y0, s, t0, cs = 'blue', cp = 'blue') => {
+    const yb = y0 + 260 * s, X = (d) => x0 + d * s;
+    dot(k, X(0), y0, 7, 'black', t0); dot(k, X(0), yb, 7, 'black', t0);
+    B.resistor(k, [X(0), y0], [X(170), y0], t0, t0 + 0.4, { col: cs, label: 'r_w', side: 1, size: 28 });
+    B.inductor(k, [X(170), y0], [X(330), y0], t0 + 0.2, t0 + 0.6, { col: cs });
+    text(k, 'L_w', X(250), y0 - 30, 28, cs, t0 + 0.4, t0 + 0.7, { align: 'center' });
+    B.wire(k, [[X(330), y0], [X(560), y0]], t0 + 0.4, t0 + 0.6, 'black');
+    B.wire(k, [[X(400), y0], [X(400), y0 + 40 * s]], t0 + 0.5, t0 + 0.6, cp);
+    B.wire(k, [[X(370), y0 + 40 * s], [X(470), y0 + 40 * s]], t0 + 0.5, t0 + 0.6, cp);
+    B.resistor(k, [X(370), y0 + 40 * s], [X(370), yb - 40 * s], t0 + 0.6, t0 + 1.0, { col: cp, label: 'r_c', side: -1, size: 28 });
+    B.inductor(k, [X(470), y0 + 40 * s], [X(470), yb - 40 * s], t0 + 0.7, t0 + 1.1, { col: cp });
+    text(k, 'L_c', X(500), (y0 + yb) / 2 + 10, 28, cp, t0 + 0.9, t0 + 1.2);
+    B.wire(k, [[X(370), yb - 40 * s], [X(470), yb - 40 * s]], t0 + 0.9, t0 + 1.0, cp);
+    B.wire(k, [[X(400), yb - 40 * s], [X(400), yb]], t0 + 0.9, t0 + 1.0, cp);
+    B.wire(k, [[X(0), yb], [X(560), yb]], t0 + 0.8, t0 + 1.0, 'black');
+    trafo(k, X(560), y0, yb, t0 + 1.0, t0 + 1.5, 'black');
+    text(k, 'ideel', X(565), yb + 36, 26, 'black', t0 + 1.3, t0 + 1.5);
+  };
+
+  // ---------------------------------------------------------------- 0 titel
+  B.titel(0, 'Den ikke-ideelle transformer', 'ELE1 · Dag 10 · ækvivalentkredsløb og prøver (bogens opg. 6.50)', 'titel');
+  text(0, 'tomgangsprøve  +  kortslutningsprøve', 640, 540, 44, 'red', wt('titel', 'målinger') - 0.1, we('titel', 'kortslutningsprøven'), { align: 'center' });
+
+  // ---------------------------------------------------------------- 1 de fire tab og kredsløbet
+  B.goto('tab', 1);
+  bubble(1, 'Hvad er ikke ideelt?', 130, 135, 50, 'blue', S('tab') - 0.1, S('tab') + 0.8);
+  text(1, 'r_w:  viklingernes kobbermodstand', 160, 230, 32, 'black', wt('tab', 'modstand') - 0.1, we('tab', 'w'));
+  text(1, 'L_w:  flux der slipper ud (spredning)', 160, 280, 32, 'black', wt('tab', 'slipper') - 0.1, we('tab', 'w', 1));
+  text(1, 'r_c:  jerntab (hvirvelstrømme)', 160, 330, 32, 'black', wt('tab2', 'hvirvelstrømme') - 0.1, we('tab2', 'c'));
+  text(1, 'L_c:  magnetisering af kernen', 160, 380, 32, 'black', wt('tab2', 'magnetiseres') - 0.1, we('tab2', 'c', 1));
+  ekv(1, 300, 440, 0.62, S('kreds'));
+
+  // ---------------------------------------------------------------- 2 tomgangsprøven
+  B.goto('oc', 2);
+  bubble(2, 'Tomgangsprøven', 130, 135, 50, 'blue', S('oc') - 0.1, S('oc') + 0.8);
+  ekv(2, 850, 190, 0.55, S('oc') - 0.2, 'gray', 'red');
+  text(2, 'sekundær åben, mærkespænding V', 160, 230, 32, 'black', wt('oc', 'åben') - 0.1, we('oc', 'effekt'));
+  text(2, 'lille strøm ⇒ r_w, L_w ignoreres', 160, 290, 32, 'black', S('oc2') + 0.1, we('oc2', 'ignoreres'));
+  B.formel(2, 'modstand', 'P = V² / R   ⇒   r_c = V² / P', 160, 390, 34, wt('oc3', 'effekten') - 0.1, we('oc3', 'P'));
+  text(2, 'Y = I / V,     G = 1 / r_c', 160, 480, 36, 'black', S('oc4') + 0.1, we('oc4', 'hinanden'));
+  B.formel(2, 'Pythagoras', 'B = √( Y² − G² ),     L_c = 1 / ( ω B )', 160, 590, 34, S('oc5') + 0.1, we('oc5', 'B', 1), 'red');
+
+  // ---------------------------------------------------------------- 3 kortslutningsprøven
+  B.goto('sc', 3);
+  bubble(3, 'Kortslutningsprøven', 130, 135, 50, 'blue', S('sc') - 0.1, S('sc') + 0.8);
+  ekv(3, 850, 190, 0.55, S('sc') - 0.2, 'red', 'gray');
+  text(3, 'sekundær kortsluttet, mærkestrøm I', 160, 230, 32, 'black', wt('sc', 'kortsluttes') - 0.1, we('sc', 'mærkestrøm'));
+  text(3, 'lille V ⇒ r_c, L_c ignoreres', 160, 290, 32, 'black', S('sc2') + 0.1, we('sc2', 'serie'));
+  B.formel(3, 'modstand', 'P = I² · R   ⇒   r_w = P / I²', 160, 390, 34, wt('sc3', 'effekten') - 0.1, we('sc3', 'anden', 1));
+  text(3, '| Z | = V / I', 160, 480, 36, 'black', S('sc4') + 0.1, we('sc4', 'I'));
+  B.formel(3, 'Pythagoras', 'X = √( Z² − r_w² ),     L_w = X / ω', 160, 590, 34, wt('sc4', 'Pythagoras') - 0.1, we('sc4', 'omega'), 'red');
+
+  // ---------------------------------------------------------------- 4 hvorfor to prøver
+  B.goto('hvorfor', 4);
+  bubble(4, 'Hvorfor to prøver?', 130, 150, 50, 'blue', S('hvorfor') - 0.1, S('hvorfor') + 0.8);
+  text(4, 'tomgang: fuld spænding  →  jerntab (r_c, L_c)', 180, 320, 38, 'red', wt('hvorfor', 'Tomgangsprøven') - 0.1, we('hvorfor', 'jerntabet'));
+  text(4, 'kortslutning: fuld strøm  →  kobbertab (r_w, L_w)', 180, 420, 38, 'blue', wt('hvorfor', 'Kortslutningsprøven') - 0.1, we('hvorfor', 'kobbertabet'));
+
+  // ---------------------------------------------------------------- 5 tjek
+  B.goto('tjek_q', 5);
+  B.tjek(5, ['Hvorfor kan r_c og L_c ignoreres', 'i kortslutningsprøven?'], ['spændingen er lille ⇒ strømmen', 'i parallelgrenen er næsten nul'], 'tjek_q', 'tjek_a');
+
+  // ---------------------------------------------------------------- 6 tjek vist
+  B.goto('tjek_vis', 6);
+  {
+    const t0 = S('tjek_vis');
+    text(6, 'tomgang', 320, 150, 36, 'red', t0, t0 + 0.4, { align: 'center' });
+    ekv(6, 130, 240, 0.6, wt('tjek_vis', 'tomgang') - 0.2, 'gray', 'red');
+    const tk = wt('tjek_vis', 'kortslutning');
+    text(6, 'kortslutning', 960, 150, 36, 'blue', tk - 0.2, tk + 0.3, { align: 'center' });
+    ekv(6, 720, 240, 0.6, tk - 0.2, 'blue', 'gray');
+    text(6, 'hver prøve måler kun den fremhævede del', 640, 620, 34, 'black', wt('tjek_vis', 'Hver') - 0.1, we('tjek_vis', 'op', 1), { align: 'center' });
+  }
+
+  // ---------------------------------------------------------------- 7 slut
+  B.goto('slut', 7);
+  B.slut(7, 'ELE1 slides Day 10 · Rizzoni & Kearns (2022), afsnit 6.4 og opgave 6.50', 'trefase: fase- og linjespændinger', 'slut');
+  text(7, 'tomgang:  r_c = V²/P,   B = √(Y² − G²),   L_c = 1/(ωB)', 200, 260, 36, 'red', S('slut') + 0.3, we('slut', 'anden', 2));
+  text(7, 'kortslutning:  r_w = P/I²,   X = √(Z² − r_w²),   L_w = X/ω', 200, 350, 36, 'blue', wt('slut', 'Kortslutningsprøven') - 0.1, we('slut', 'anden', 5));
+});
+
+</script>
+<script>BP.live({"duration":205.049,"audio":"ikke-ideel-transformer.mp3","order":["titel","tab","tab2","kreds","oc","oc2","oc3","oc4","oc5","sc","sc2","sc3","sc4","hvorfor","tjek_q","tjek_a","tjek_vis","slut"],"lines":{"titel":{"start":0.5,"end":12.041,"words":[["Den",0.54,0.66],["ikke-ideelle",0.8,1.44],["transformer",1.48,2.1],["En",3.08,3.16],["rigtig",3.24,3.5],["transformer",3.54,4.06],["har",4.08,4.18],["tab",4.24,4.56],["Vi",5.221,5.261],["ser",5.361,5.541],["på",5.581,5.781],["ækvivalentkredsløbet",6.041,7.161],["og",7.661,7.721],["på",7.761,7.881],["to",7.921,8.021],["målinger",8.161,8.601],["der",8.641,8.721],["bestemmer",8.741,9.061],["det",9.081,9.161],["tomgangsprøven",9.941,10.781],["og",11.021,11.081],["kortslutningsprøven",11.141,12.041]],"text":"Den ikke-ideelle transformer. En rigtig transformer har tab. Vi ser på ækvivalentkredsløbet og på to målinger, der bestemmer det: tomgangsprøven og kortslutningsprøven."},"tab":{"start":13.861,"end":27.903,"words":[["En",13.901,14.001],["rigtig",14.041,14.301],["transformer",14.321,14.861],["har",14.881,14.981],["fire",15.081,15.341],["ting",15.421,15.622],["som",15.682,15.782],["den",15.822,15.922],["ideelle",15.982,16.302],["ikke",16.342,16.462],["har",16.502,16.642],["Viklingerne",17.582,18.042],["er",18.102,18.162],["kobbertråd",18.262,18.862],["med",18.902,19.002],["en",19.022,19.082],["modstand",19.142,19.622],["r",20.162,20.182],["w",20.582,20.602],["Og",21.502,21.562],["ikke",21.642,21.782],["al",21.842,21.942],["flux",22.022,22.222],["går",22.342,22.462],["gennem",22.482,22.702],["begge",22.782,23.002],["spoler",23.062,23.462],["Den",24.202,24.342],["del",24.402,24.562],["der",24.582,24.682],["slipper",24.702,24.982],["ud",25.062,25.182],["virker",25.503,25.763],["som",25.783,25.883],["en",25.903,25.983],["spole",26.043,26.443],["i",26.523,26.543],["serie",26.623,26.943],["L",27.503,27.523],["w",27.883,27.903]],"text":"En rigtig transformer har fire ting, som den ideelle ikke har. Viklingerne er kobbertråd med en modstand, r w. Og ikke al flux går gennem begge spoler. Den del, der slipper ud, virker som en spole i serie, L w."},"tab2":{"start":29.003,"end":40.664,"words":[["Jernkernen",29.043,29.663],["har",29.723,29.823],["også",29.883,30.083],["tab",30.103,30.343],["fordi",30.783,30.983],["den",31.063,31.163],["bliver",31.183,31.363],["varm",31.403,31.623],["af",31.723,31.783],["hvirvelstrømme",31.823,32.463],["Det",33.223,33.303],["modelleres",33.343,33.763],["som",33.783,33.843],["en",33.923,33.963],["modstand",34.003,34.423],["r",34.723,34.743],["c",34.903,34.923],["Og",36.024,36.084],["kernen",36.124,36.484],["skal",36.524,36.664],["magnetiseres",36.684,37.504],["hvilket",38.024,38.284],["kræver",38.344,38.624],["en",38.644,38.724],["strøm",38.804,39.064],["gennem",39.164,39.344],["en",39.384,39.464],["spole",39.544,39.944],["L",40.504,40.524],["c",40.644,40.664]],"text":"Jernkernen har også tab, fordi den bliver varm af hvirvelstrømme. Det modelleres som en modstand r c. Og kernen skal magnetiseres, hvilket kræver en strøm gennem en spole L c."},"kreds":{"start":42.304,"end":53.525,"words":[["I",42.344,42.364],["ækvivalentkredsløbet",42.424,43.524],["sidder",43.604,43.864],["r",44.144,44.164],["w",44.564,44.584],["og",44.785,44.865],["L",45.065,45.085],["w",45.425,45.445],["i",45.645,45.665],["serie",45.785,46.105],["på",46.145,46.245],["primærsiden",46.265,46.965],["r",47.825,47.845],["c",47.945,47.965],["og",48.185,48.265],["L",48.445,48.465],["c",48.565,48.585],["sidder",48.865,49.085],["parallelt",49.105,49.565],["hen",49.645,49.805],["over",49.865,50.065],["primærsiden",50.105,50.745],["Derefter",51.625,52.065],["kommer",52.245,52.465],["en",52.485,52.565],["ideel",52.625,52.925],["transformer",52.985,53.525]],"text":"I ækvivalentkredsløbet sidder r w og L w i serie på primærsiden. r c og L c sidder parallelt hen over primærsiden. Derefter kommer en ideel transformer."},"oc":{"start":55.345,"end":64.565,"words":[["Tomgangsprøven",55.385,56.185],["Sekundærsiden",57.225,57.965],["er",57.985,58.065],["åben",58.165,58.425],["så",58.645,58.745],["der",58.765,58.845],["løber",58.865,59.045],["ingen",59.065,59.185],["strøm",59.245,59.465],["til",59.545,59.645],["lasten",59.685,60.025],["Vi",60.825,60.885],["sætter",60.965,61.165],["mærkespændingen",61.225,61.865],["på",61.885,62.005],["primærsiden",62.025,62.725],["og",62.825,62.885],["måler",62.925,63.185],["spænding",63.245,63.605],["strøm",63.745,63.985],["og",64.125,64.185],["effekt",64.225,64.565]],"text":"Tomgangsprøven. Sekundærsiden er åben, så der løber ingen strøm til lasten. Vi sætter mærkespændingen på primærsiden og måler spænding, strøm og effekt."},"oc2":{"start":65.766,"end":73.466,"words":[["Strømmen",65.806,66.166],["er",66.206,66.286],["lille",66.346,66.586],["så",67.066,67.186],["spændingsfaldet",67.206,67.806],["over",67.846,68.026],["r",68.166,68.186],["w",68.566,68.586],["og",68.766,68.826],["L",68.986,69.006],["w",69.366,69.386],["kan",69.526,69.646],["ignoreres",69.686,70.206],["Al",70.946,71.046],["strøm",71.126,71.366],["går",71.446,71.546],["gennem",71.586,71.806],["r",72.046,72.066],["c",72.166,72.186],["og",72.466,72.546],["L",72.726,72.746],["c",72.846,72.866],["parallelt",73.046,73.466]],"text":"Strømmen er lille, så spændingsfaldet over r w og L w kan ignoreres. Al strøm går gennem r c og L c parallelt."},"oc3":{"start":74.546,"end":83.147,"words":[["Kun",74.586,74.746],["modstanden",74.827,75.267],["r",75.447,75.467],["c",75.587,75.607],["optager",75.827,76.167],["effekt",76.207,76.547],["For",77.387,77.467],["en",77.487,77.547],["modstand",77.587,77.987],["er",78.047,78.107],["effekten",78.147,78.567],["V",78.687,78.707],["i",78.907,78.927],["anden",79.067,79.327],["over",79.467,79.627],["R",79.807,79.827],["Så",80.747,80.867],["er",80.927,81.007],["r",81.167,81.187],["c",81.307,81.327],["lig",81.767,81.907],["V",82.167,82.187],["i",82.367,82.387],["anden",82.527,82.767],["over",82.887,83.087],["P",83.127,83.147]],"text":"Kun modstanden r c optager effekt. For en modstand er effekten V i anden over R. Så er r c lig V i anden over P."},"oc4":{"start":84.688,"end":97.609,"words":[["Admittans",84.728,85.328],["er",85.428,85.488],["det",85.508,85.588],["omvendte",85.628,86.028],["af",86.088,86.148],["impedans",86.248,86.788],["altså",87.388,87.608],["strøm",87.648,87.908],["over",88.008,88.168],["spænding",88.208,88.528],["For",89.448,89.568],["parallelle",89.588,90.008],["grene",90.068,90.388],["lægges",90.448,90.708],["admittanserne",90.768,91.368],["sammen",91.448,91.728],["Den",92.628,92.748],["resistive",92.808,93.348],["del",93.408,93.628],["G",93.868,93.888],["og",94.549,94.609],["den",94.629,94.709],["reaktive",94.769,95.249],["del",95.289,95.489],["B",95.809,95.829],["står",96.409,96.589],["vinkelret",96.649,97.109],["på",97.129,97.249],["hinanden",97.269,97.609]],"text":"Admittans er det omvendte af impedans, altså strøm over spænding. For parallelle grene lægges admittanserne sammen. Den resistive del, G, og den reaktive del, B, står vinkelret på hinanden."},"oc5":{"start":98.089,"end":108.89,"words":[["Derfor",98.129,98.369],["gælder",98.389,98.589],["Pythagoras",98.629,99.269],["B",99.649,99.669],["er",99.929,100.009],["kvadratroden",100.049,100.749],["af",100.849,100.949],["Y",101.189,101.209],["i",101.349,101.369],["anden",101.489,101.689],["minus",101.769,102.109],["G",102.269,102.289],["i",102.489,102.509],["anden",102.609,102.809],["Spolens",103.469,103.929],["susceptans",104.09,104.65],["er",104.77,104.85],["en",105.03,105.17],["over",105.31,105.49],["omega",105.57,105.85],["L",106.03,106.05],["c",106.15,106.17],["så",106.81,106.93],["L",107.19,107.21],["c",107.29,107.31],["er",107.61,107.71],["en",107.99,108.13],["over",108.27,108.47],["omega",108.55,108.81],["B",108.87,108.89]],"text":"Derfor gælder Pythagoras: B er kvadratroden af Y i anden minus G i anden. Spolens susceptans er en over omega L c, så L c er en over omega B."},"sc":{"start":110.71,"end":118.371,"words":[["Kortslutningsprøven",110.75,111.55],["Sekundærsiden",112.27,112.99],["kortsluttes",113.07,113.61],["og",113.75,113.83],["vi",113.87,113.91],["skruer",113.97,114.251],["langsomt",114.371,114.791],["op",114.871,114.971],["for",115.031,115.131],["spændingen",115.151,115.531],["indtil",115.631,115.851],["der",115.871,115.951],["løber",115.971,116.171],["mærkestrøm",116.211,116.691],["Spændingen",117.291,117.611],["er",117.611,117.671],["derfor",117.691,117.911],["meget",117.951,118.151],["lille",118.171,118.371]],"text":"Kortslutningsprøven. Sekundærsiden kortsluttes, og vi skruer langsomt op for spændingen, indtil der løber mærkestrøm. Spændingen er derfor meget lille."},"sc2":{"start":119.231,"end":125.632,"words":[["Ved",119.271,119.371],["så",119.391,119.511],["lille",119.551,119.711],["spænding",119.751,120.051],["løber",120.111,120.311],["der",120.331,120.411],["næsten",120.491,120.791],["ingen",120.871,121.051],["strøm",121.091,121.331],["gennem",121.411,121.631],["r",121.771,121.791],["c",121.891,121.911],["og",122.131,122.211],["L",122.351,122.371],["c",122.431,122.451],["Al",123.071,123.171],["strøm",123.231,123.451],["går",123.511,123.631],["gennem",123.651,123.851],["r",123.972,123.992],["w",124.312,124.332],["og",124.532,124.592],["L",124.752,124.772],["w",125.092,125.112],["i",125.272,125.292],["serie",125.372,125.632]],"text":"Ved så lille spænding løber der næsten ingen strøm gennem r c og L c. Al strøm går gennem r w og L w i serie."},"sc3":{"start":126.372,"end":133.813,"words":[["Kun",126.412,126.572],["r",126.812,126.832],["w",127.152,127.172],["optager",127.332,127.652],["effekt",127.672,127.952],["For",128.352,128.452],["en",128.472,128.532],["modstand",128.572,128.932],["er",128.972,129.032],["effekten",129.072,129.472],["I",129.672,129.692],["i",129.812,129.832],["anden",129.972,130.152],["gange",130.192,130.472],["R",130.512,130.532],["Så",131.192,131.312],["er",131.412,131.492],["r",131.652,131.672],["w",131.972,131.992],["lig",132.332,132.472],["P",132.672,132.692],["over",133.072,133.252],["I",133.352,133.372],["i",133.492,133.512],["anden",133.613,133.813]],"text":"Kun r w optager effekt. For en modstand er effekten I i anden gange R. Så er r w lig P over I i anden."},"sc4":{"start":134.853,"end":145.454,"words":[["Impedansens",134.893,135.433],["størrelse",135.453,135.853],["er",135.993,136.073],["V",136.293,136.313],["over",136.533,136.693],["I",136.793,136.813],["Med",137.453,137.553],["Pythagoras",137.573,138.133],["er",138.273,138.373],["reaktansen",138.513,139.093],["kvadratroden",139.193,139.873],["af",139.973,140.053],["Z",140.193,140.213],["i",140.453,140.473],["anden",140.593,140.793],["minus",140.873,141.153],["r",141.413,141.433],["w",141.773,141.793],["i",141.953,141.973],["anden",142.033,142.213],["og",142.913,142.993],["L",143.213,143.233],["w",143.574,143.594],["er",143.834,143.914],["reaktansen",143.994,144.534],["divideret",144.614,144.994],["med",145.034,145.114],["omega",145.174,145.454]],"text":"Impedansens størrelse er V over I. Med Pythagoras er reaktansen kvadratroden af Z i anden minus r w i anden, og L w er reaktansen divideret med omega."},"hvorfor":{"start":147.274,"end":157.575,"words":[["Hvorfor",147.314,147.574],["to",147.634,147.714],["prøver",147.814,148.114],["Tomgangsprøven",148.834,149.474],["kører",149.514,149.754],["ved",149.794,149.874],["fuld",149.914,150.094],["spænding",150.134,150.454],["så",150.574,150.674],["den",150.694,150.794],["viser",150.814,151.054],["jerntabet",151.114,151.614],["Kortslutningsprøven",152.094,152.874],["kører",152.914,153.134],["ved",153.154,153.254],["fuld",153.314,153.494],["strøm",153.554,153.794],["så",153.934,154.054],["den",154.054,154.135],["viser",154.175,154.395],["kobbertabet",154.435,154.995],["Hver",155.415,155.575],["prøve",155.635,155.895],["isolerer",155.975,156.415],["sin",156.535,156.715],["del",156.795,156.955],["af",157.015,157.055],["kredsløbet",157.095,157.575]],"text":"Hvorfor to prøver? Tomgangsprøven kører ved fuld spænding, så den viser jerntabet. Kortslutningsprøven kører ved fuld strøm, så den viser kobbertabet. Hver prøve isolerer sin del af kredsløbet."},"tjek_q":{"start":159.395,"end":163.435,"words":[["Tjek",159.435,159.575],["dig",159.615,159.695],["selv",159.755,159.915],["Hvorfor",160.395,160.615],["kan",160.655,160.755],["man",160.775,160.875],["ignorere",160.975,161.375],["r",161.655,161.675],["c",161.755,161.775],["og",162.015,162.075],["L",162.235,162.255],["c",162.315,162.335],["i",162.535,162.555],["kortslutningsprøven",162.635,163.435]],"text":"Tjek dig selv. Hvorfor kan man ignorere r c og L c i kortslutningsprøven?"},"tjek_a":{"start":167.555,"end":173.496,"words":[["Fordi",167.595,167.795],["spændingen",167.955,168.416],["er",168.456,168.536],["meget",168.576,168.836],["lille",168.856,169.076],["Strømmen",169.676,170.016],["gennem",170.076,170.256],["den",170.276,170.396],["parallelle",170.456,170.816],["gren",170.856,171.096],["er",171.216,171.296],["spænding",171.396,171.756],["over",171.856,172.036],["impedans",172.116,172.576],["så",172.736,172.836],["den",172.856,172.956],["er",172.976,173.036],["næsten",173.076,173.336],["nul",173.356,173.496]],"text":"Fordi spændingen er meget lille. Strømmen gennem den parallelle gren er spænding over impedans, så den er næsten nul."},"tjek_vis":{"start":175.316,"end":184.077,"words":[["Her",175.356,175.476],["kan",175.516,175.596],["du",175.616,175.656],["se",175.696,175.776],["det",175.856,175.936],["Ved",176.496,176.576],["tomgang",176.616,177.016],["lyser",177.056,177.296],["den",177.316,177.416],["parallelle",177.476,177.896],["gren",177.936,178.156],["op",178.216,178.316],["og",178.516,178.577],["serieleddet",178.657,179.117],["er",179.157,179.197],["gråt",179.197,179.437],["Ved",180.017,180.097],["kortslutning",180.157,180.697],["er",180.797,180.857],["det",180.857,180.937],["omvendt",180.977,181.277],["Hver",182.017,182.177],["prøve",182.277,182.537],["måler",182.617,182.897],["kun",182.937,183.097],["den",183.197,183.337],["del",183.417,183.597],["der",183.637,183.717],["er",183.737,183.777],["lyst",183.777,183.957],["op",183.997,184.077]],"text":"Her kan du se det. Ved tomgang lyser den parallelle gren op, og serieleddet er gråt. Ved kortslutning er det omvendt. Hver prøve måler kun den del, der er lyst op."},"slut":{"start":185.897,"end":203.579,"words":[["Kort",185.937,186.097],["sagt",186.137,186.337],["tomgangsprøven",186.737,187.437],["giver",187.517,187.717],["r",188.057,188.077],["c",188.177,188.197],["lig",188.457,188.597],["V",188.757,188.777],["i",188.977,188.997],["anden",189.117,189.338],["over",189.418,189.578],["P",189.618,189.638],["og",190.358,190.438],["L",190.678,190.698],["c",190.798,190.818],["fra",191.078,191.178],["B",191.318,191.338],["lig",191.618,191.758],["kvadratroden",191.818,192.398],["af",192.438,192.518],["Y",192.638,192.658],["i",192.798,192.818],["anden",192.918,193.118],["minus",193.158,193.418],["G",193.498,193.518],["i",193.718,193.738],["anden",193.818,193.998],["Kortslutningsprøven",194.858,195.578],["giver",195.618,195.818],["r",196.138,196.158],["w",196.498,196.518],["lig",196.698,196.838],["P",197.058,197.078],["over",197.438,197.598],["I",197.698,197.718],["i",197.838,197.858],["anden",197.998,198.198],["og",198.698,198.778],["L",198.978,198.998],["w",199.319,199.339],["fra",199.499,199.619],["X",199.879,199.899],["lig",200.219,200.359],["kvadratroden",200.459,201.059],["af",201.159,201.259],["Z",201.439,201.459],["i",201.639,201.659],["anden",201.759,201.939],["minus",202.119,202.439],["r",202.679,202.699],["w",202.999,203.019],["i",203.259,203.279],["anden",203.379,203.579]],"text":"Kort sagt: tomgangsprøven giver r c lig V i anden over P og L c fra B lig kvadratroden af Y i anden minus G i anden. Kortslutningsprøven giver r w lig P over I i anden og L w fra X lig kvadratroden af Z i anden minus r w i anden."}}}, { audio: 'ikke-ideel-transformer.mp3', id: 'ikke-ideel-transformer' });</script>
+</body>
+</html>

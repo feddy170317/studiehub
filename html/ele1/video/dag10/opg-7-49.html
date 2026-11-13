@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opgave 7.49: transformerens virkningsgrad · video</title>
+<meta name="description" content="Øvelse 2 (7.49): 70 A ved 90 V gennem 3:1-transformer; blindstrøm i C₂ giver η = 48 %.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Dag 10: videoer</a><h1>Opgave 7.49: transformerens virkningsgrad</h1><span class="meta">ELE1 · dag 10 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Opgave 7.49: transformerens virkningsgrad"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Øvelse 2 (7.49): 70 A ved 90 V gennem 3:1-transformer; blindstrøm i C₂ giver η = 48 %.</p><div class="chips"><a href="../../opgaver/dag10/opgave-7.49-transformer-virkningsgrad.pdf">📐 Se udregningen i Mathcad (PDF)</a><a href="ideel-transformer.html">Se først: Den ideelle transformer</a><a href="../../dag/Dag10_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/ele1/dag10">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// ELE1 Dag 10 · Øvelse 2 = opgave 7.49 (bogens 6.49). Mathcad: Dag 10/Opgaver/Opgave 7.49 transformer virkningsgrad.mcdx
+// P_L = 6300 W; V_W = 270 V, I_W = 23,3 A; I_L = 270/(−j5) = j54 A; I_S = 23,3 + j54, |I_S| = 58,8 A; P_Rs = 6921 W; P_S = 13 221 W; η = 0,477.
+// Uden C2: tab 1089 W, η = 0,853.
+BP.scene({ header: 'ELE1 · Dag 10 · opgave 7.49', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, dot, ring, under, ell, rect, hatch, dashed, PI } = B;
+  const S = (id) => L(id).start;
+  const rectc = (x, y, w, h) => rect(x, y, w, h).concat([[x, y]]);
+  const ringet = (k, s, x, y, size, col, a, te) => { const r = text(k, s, x, y, size, col, a, te); ring(r, col, te, te + 0.5); return r; };
+  const trafo = (k, x, y0, y1, a, b, col = 'blue', gap = 46) => {
+    B.inductor(k, [x, y0], [x, y1], a, b, { col });
+    B.inductor(k, [x + gap, y1], [x + gap, y0], a + 0.1, b + 0.1, { col });
+    line(k, [[x + gap / 2 - 5, y0 + 6], [x + gap / 2 - 5, y1 - 6]], 'black', 2.4, a + 0.2, b);
+    line(k, [[x + gap / 2 + 5, y0 + 6], [x + gap / 2 + 5, y1 - 6]], 'black', 2.4, a + 0.2, b);
+  };
+
+  // ---------------------------------------------------------------- 0 titel
+  B.titel(0, 'Opgave 7.49', 'ELE1 · Dag 10 · øvelse 2 (bogens 6.49)', 'titel');
+  text(0, 'η = P_L / P_S = ?', 640, 540, 48, 'red', wt('titel', 'virkningsgraden') - 0.1, we('titel', 'lasten'), { align: 'center' });
+
+  // ---------------------------------------------------------------- 1 kredsløbet
+  B.goto('opgave', 1);
+  {
+    const t0 = S('opgave');
+    B.source(1, [220, 560], [220, 320], 'V', t0, t0 + 0.5);
+    B.resistor(1, [220, 320], [370, 320], wt('opgave', 'modstand') - 0.1, wt('opgave', 'modstand') + 0.4, { label: 'R_s = 2 Ω', side: 1, size: 28 });
+    B.capacitor(1, [370, 320], [500, 320], wt('opgave', 'kondensator') - 0.1, wt('opgave', 'kondensator') + 0.4, {});
+    text(1, '−j10 Ω', 400, 280, 26, 'blue', wt('opgave', 'kondensator'), wt('opgave', 'kondensator') + 0.4);
+    B.wire(1, [[500, 320], [660, 320]], wt('opgave', 'C', 1) - 0.1, wt('opgave', 'C', 1) + 0.3);
+    B.capacitor(1, [560, 320], [560, 560], wt('opgave', 'C', 1) - 0.1, wt('opgave', 'C', 1) + 0.4, {});
+    text(1, '−j5 Ω', 580, 450, 26, 'blue', wt('opgave', 'parallelt') - 0.1, wt('opgave', 'parallelt') + 0.4);
+    trafo(1, 660, 320, 560, wt('opgave', 'Transformeren') - 0.1, wt('opgave', 'Transformeren') + 0.5);
+    text(1, '3 : 1', 650, 290, 28, 'black', wt('opgave', 'tre') - 0.1, wt('opgave', 'tre') + 0.3);
+    B.wire(1, [[220, 560], [660, 560]], t0 + 0.3, t0 + 0.7);
+    B.wire(1, [[706, 320], [860, 320]], t0 + 0.6, t0 + 0.9); B.wire(1, [[706, 560], [860, 560]], t0 + 0.6, t0 + 0.9);
+    dot(1, 860, 320, 7, 'black', t0 + 0.8); dot(1, 860, 560, 7, 'black', t0 + 0.8);
+    text(1, '90 V,  70 A', 890, 430, 30, 'red', t0 + 0.8, t0 + 1.2); text(1, '(resistiv last)', 890, 475, 26, 'red', t0 + 1.0, t0 + 1.4);
+  }
+
+  // ---------------------------------------------------------------- 2 lasteffekt og primærsiden
+  B.goto('pl', 2);
+  bubble(2, 'Last og primærside', 130, 135, 50, 'blue', S('pl') - 0.1, S('pl') + 0.8);
+  text(2, 'resistiv last:  strøm og spænding i fase', 160, 240, 34, 'black', wt('pl', 'resistiv') - 0.1, we('pl', 'strøm'));
+  ringet(2, 'P_L = 90 · 70 = 6300 W', 160, 330, 44, 'red', S('pl2') + 0.1, we('pl2', 'watt'));
+  B.formel(2, '6.30', 'V_1 = V_2 / N,     I_1 = N · I_2,     N = 1/3', 160, 450, 34, wt('prim', 'ligning') - 0.1, we('prim', 'volt'));
+  text(2, 'V_W = 3 · 90 = 270 V', 160, 550, 40, 'black', wt('prim', 'V') - 0.1, we('prim', 'volt'));
+  text(2, 'I_W = 70 / 3 = 23,3 A', 640, 550, 40, 'black', S('prim2') + 0.1, we('prim2', 'ampere'));
+  text(2, '(stadig 6,3 kW: ideel)', 640, 620, 30, 'green', wt('prim2', 'Effekten') - 0.1, we('prim2', 'ideel'));
+
+  // ---------------------------------------------------------------- 3 C2 og kildestrømmen
+  B.goto('c2', 3);
+  bubble(3, 'Kondensatorstrøm og KCL', 130, 135, 50, 'blue', S('c2') - 0.1, S('c2') + 0.8);
+  text(3, 'I_L = V_W / ( −j 5 ) = 270 / ( −j 5 ) = j 54 A', 160, 250, 36, 'black', wt('c2', 'Ohms') - 0.1, we('c2b', 'ampere'));
+  text(3, '(kondensator: strøm 90° foran spænding)', 160, 310, 28, 'green', wt('c2b', 'kondensators') - 0.1, we('c2b', 'spændingen'));
+  text(3, 'KCL:  I_S = I_W + I_L = 23,3 + j 54 A', 160, 400, 38, 'black', S('kcl') + 0.1, we('kcl', 'ampere'));
+  ringet(3, '| I_S | = √( 23,3² + 54² ) = 58,8 A', 160, 500, 40, 'red', S('kcl2') + 0.1, we('kcl2', 'ampere'));
+  {
+    const t0 = S('kcl2'), O = [900, 600], s = 6;
+    arrow(3, [O, [O[0] + 23.3 * s, O[1]]], 'blue', 3.2, t0, t0 + 0.4, 12); text(3, 'I_W', O[0] + 40, O[1] + 36, 28, 'blue', t0 + 0.2, t0 + 0.5);
+    arrow(3, [[O[0] + 23.3 * s, O[1]], [O[0] + 23.3 * s, O[1] - 54 * s]], 'green', 3.2, t0 + 0.3, t0 + 0.7, 12); text(3, 'I_L', O[0] + 23.3 * s + 12, O[1] - 160, 28, 'green', t0 + 0.5, t0 + 0.8);
+    arrow(3, [O, [O[0] + 23.3 * s, O[1] - 54 * s]], 'red', 3.6, t0 + 0.7, t0 + 1.2, 14); text(3, 'I_S', O[0] + 10, O[1] - 180, 30, 'red', t0 + 1.0, t0 + 1.3);
+  }
+
+  // ---------------------------------------------------------------- 4 tabet og kildeeffekten
+  B.goto('tab', 4);
+  bubble(4, 'Hvor går effekten?', 130, 135, 50, 'blue', S('tab') - 0.1, S('tab') + 0.8);
+  text(4, 'kondensatorer: ingen middeleffekt', 160, 240, 36, 'black', wt('tab', 'Kondensatorer') - 0.1, we('tab', 'aflader'));
+  text(4, 'P_{Rs} = | I_S |² · R_s = 58,8² · 2 = 6921 W', 160, 340, 38, 'black', S('tab2') + 0.1, we('tab2', 'watt'));
+  ringet(4, 'P_S = 6300 + 6921 = 13 221 W', 160, 460, 42, 'red', S('ps') + 0.1, we('ps', 'watt'));
+  B.formel(4, '6.39', 'kontrol:  P_S = Re( V_S · I_S* )', 160, 580, 34, wt('ps', 'Mathcad') - 0.1, we('ps', 'konjugeret'));
+
+  // ---------------------------------------------------------------- 5 virkningsgraden
+  B.goto('eta', 5);
+  bubble(5, 'Virkningsgraden', 130, 135, 50, 'blue', S('eta') - 0.1, S('eta') + 0.8);
+  text(5, 'η = P_L / P_S = 6,3 / 13,22', 160, 260, 42, 'black', wt('eta', 'lasteffekt') - 0.1, we('eta', 'to', 1));
+  ringet(5, 'η = 0,477  ≈  48 %', 160, 380, 48, 'red', S('eta2') + 0.1, we('eta2', 'procent'));
+  text(5, 'C_2 trækker 54 A blindstrøm gennem R_s', 160, 520, 36, 'green', S('hvorfor') + 0.1, we('hvorfor', 'dér'));
+
+  // ---------------------------------------------------------------- 6 tjek
+  B.goto('tjek_q', 6);
+  B.tjek(6, ['Hvad ville virkningsgraden', 'være uden C_2?'], ['I_S = 23,3 A  ⇒  tab = 1089 W', 'η = 6300 / 7389 = 85 %'], 'tjek_q', 'tjek_a');
+
+  // ---------------------------------------------------------------- 7 tjek vist
+  B.goto('tjek_vis', 7);
+  {
+    const t0 = S('tjek_vis'), y0 = 600, sc = 0.03;
+    [[300, 'med C_2', 6300, 6921, 'Med'], [760, 'uden C_2', 6300, 1089, 'Uden']].forEach(([x, nv, pl, tab, ord], i) => {
+      const t = wt('tjek_vis', ord) - 0.1;
+      line(7, rectc(x, y0 - pl * sc, 140, pl * sc), 'blue', 3, t, t + 0.4); hatch(7, rect(x, y0 - pl * sc, 140, pl * sc), 'blue', t + 0.2, t + 0.5, { gap: 9 });
+      line(7, rectc(x, y0 - (pl + tab) * sc, 140, tab * sc), 'red', 3, t + 0.3, t + 0.7);
+      text(7, nv, x + 70, y0 + 40, 30, 'black', t, t + 0.3, { align: 'center' });
+      text(7, 'last 6,3 kW', x + 155, y0 - pl * sc / 2 + 10, 24, 'blue', t + 0.3, t + 0.6);
+      text(7, 'tab ' + (tab / 1000).toFixed(1).replace('.', ',') + ' kW', x + 155, y0 - pl * sc - tab * sc / 2 + 10, 24, 'red', t + 0.5, t + 0.8);
+    });
+  }
+
+  // ---------------------------------------------------------------- 8 slut
+  B.goto('slut', 8);
+  B.slut(8, 'ELE1 slides Day 10, øvelse 2 · Rizzoni & Kearns (2022), opg. 6.49 og lign. 6.30, 6.39 · Mathcad: Opgave 7.49', 'opgave 7.50', 'slut');
+  text(8, 'P_L = 6300 W,   I_S = 23,3 + j54 A', 200, 250, 40, 'blue', S('slut') + 0.3, we('slut', 'Kirchhoff'));
+  text(8, 'P_S = 13 221 W   ⇒   η = 48 %', 200, 335, 42, 'red', wt('slut', 'tabet') - 0.1, we('slut', 'procent'));
+});
+
+</script>
+<script>BP.live({"duration":209.078,"audio":"opg-7-49.mp3","order":["titel","opgave","pl","pl2","prim","prim2","c2","c2b","kcl","kcl2","tab","tab2","ps","eta","eta2","hvorfor","tjek_q","tjek_a","tjek_vis","slut"],"lines":{"titel":{"start":0.5,"end":10.861,"words":[["Opgave",0.54,0.96],["syv",1.22,1.38],["niogfyrre",1.52,2.06],["En",2.9,3.0],["transformer",3.14,3.8],["leverer",3.86,4.24],["halvfjerds",4.34,4.92],["ampere",5.02,5.421],["ved",5.521,5.641],["halvfems",5.781,6.261],["volt",6.301,6.541],["til",6.681,6.821],["en",6.901,7.001],["resistiv",7.081,7.541],["last",7.601,7.841],["Vi",8.601,8.661],["finder",8.721,8.961],["virkningsgraden",9.021,9.701],["fra",9.761,9.841],["kilden",9.961,10.321],["til",10.401,10.521],["lasten",10.561,10.861]],"text":"Opgave syv niogfyrre. En transformer leverer halvfjerds ampere ved halvfems volt til en resistiv last. Vi finder virkningsgraden fra kilden til lasten."},"opgave":{"start":12.681,"end":25.722,"words":[["Kilden",12.721,13.061],["har",13.121,13.241],["en",13.261,13.321],["modstand",13.361,13.741],["på",13.841,14.021],["to",14.241,14.401],["ohm",14.641,14.861],["og",15.141,15.221],["en",15.341,15.421],["kondensator",15.501,16.242],["C",16.382,16.402],["et",16.462,16.782],["i",16.962,16.982],["serie",17.102,17.402],["Kondensatoren",18.082,18.782],["C",18.902,18.922],["to",19.122,19.242],["sidder",19.482,19.702],["parallelt",19.742,20.242],["med",20.342,20.442],["primærviklingen",20.502,21.222],["Transformeren",21.722,22.342],["er",22.442,22.522],["tre",22.722,22.902],["til",23.042,23.162],["en",23.242,23.382],["Det",23.842,23.962],["er",24.022,24.102],["bogens",24.142,24.402],["opgave",24.482,24.822],["seks",24.982,25.202],["niogfyrre",25.262,25.722]],"text":"Kilden har en modstand på to ohm og en kondensator C et i serie. Kondensatoren C to sidder parallelt med primærviklingen. Transformeren er tre til en. Det er bogens opgave seks niogfyrre."},"pl":{"start":27.542,"end":34.982,"words":[["Først",27.582,27.842],["effekten",27.942,28.382],["i",28.442,28.462],["lasten",28.542,28.902],["Lasten",29.562,29.902],["er",29.982,30.042],["resistiv",30.182,30.722],["så",30.982,31.142],["strøm",31.302,31.562],["og",31.642,31.722],["spænding",31.762,32.142],["er",32.222,32.282],["i",32.322,32.342],["fase",32.442,32.782],["og",33.102,33.202],["effekten",33.342,33.782],["er",33.842,33.902],["spænding",33.942,34.282],["gange",34.462,34.682],["strøm",34.742,34.982]],"text":"Først effekten i lasten. Lasten er resistiv, så strøm og spænding er i fase, og effekten er spænding gange strøm."},"pl2":{"start":35.542,"end":38.823,"words":[["Halvfems",35.582,36.022],["gange",36.122,36.342],["halvfjerds",36.403,36.803],["giver",36.963,37.143],["seks",37.423,37.603],["tusind",37.663,37.963],["tre",38.063,38.223],["hundrede",38.343,38.623],["watt",38.663,38.823]],"text":"Halvfems gange halvfjerds giver seks tusind tre hundrede watt."},"prim":{"start":40.643,"end":53.264,"words":[["Nu",40.683,40.763],["primærsiden",40.823,41.403],["Forholdet",42.163,42.583],["tre",42.683,42.823],["til",42.923,43.023],["en",43.103,43.223],["betyder",43.383,43.783],["at",43.843,43.923],["spændingen",43.983,44.443],["er",44.523,44.583],["tre",44.623,44.763],["gange",44.863,45.043],["større",45.143,45.483],["på",45.563,45.683],["primærsiden",45.683,46.283],["Ligning",46.863,47.144],["seks",47.144,47.524],["tredive",47.564,47.884],["giver",47.984,48.204],["V",48.704,48.724],["W",49.244,49.264],["er",49.724,49.804],["tre",50.084,50.264],["gange",50.444,50.684],["halvfems",50.784,51.284],["altså",51.484,51.744],["to",51.944,52.064],["hundrede",52.164,52.464],["og",52.504,52.564],["halvfjerds",52.604,53.024],["volt",53.064,53.264]],"text":"Nu primærsiden. Forholdet tre til en betyder, at spændingen er tre gange større på primærsiden. Ligning seks tredive giver: V W er tre gange halvfems, altså to hundrede og halvfjerds volt."},"prim2":{"start":54.144,"end":63.145,"words":[["Strømmen",54.184,54.504],["er",54.564,54.644],["tre",54.664,54.764],["gange",54.844,55.024],["mindre",55.104,55.404],["halvfjerds",55.844,56.244],["over",56.364,56.544],["tre",56.584,56.704],["treogtyve",57.125,57.645],["komma",57.705,57.885],["tre",57.965,58.105],["ampere",58.225,58.565],["Effekten",59.345,59.745],["er",59.785,59.885],["stadig",59.945,60.265],["seks",60.385,60.585],["komma",60.625,60.805],["tre",60.865,60.985],["kilowatt",61.085,61.445],["fordi",61.685,61.845],["transformeren",61.925,62.545],["er",62.645,62.725],["ideel",62.805,63.145]],"text":"Strømmen er tre gange mindre: halvfjerds over tre, treogtyve komma tre ampere. Effekten er stadig seks komma tre kilowatt, fordi transformeren er ideel."},"c2":{"start":64.965,"end":73.386,"words":[["C",65.005,65.025],["to",65.185,65.285],["sidder",65.445,65.625],["parallelt",65.645,66.065],["med",66.145,66.225],["primærviklingen",66.265,66.985],["så",67.285,67.405],["den",67.486,67.606],["har",67.666,67.766],["også",67.926,68.166],["to",68.186,68.266],["hundrede",68.366,68.646],["og",68.666,68.726],["halvfjerds",68.746,69.126],["volt",69.166,69.366],["Ohms",70.206,70.426],["lov",70.466,70.626],["med",70.746,70.846],["den",70.866,70.966],["komplekse",71.006,71.526],["impedans",71.606,72.106],["minus",72.406,72.786],["j",72.946,72.966],["fem",73.066,73.126],["ohm",73.126,73.386]],"text":"C to sidder parallelt med primærviklingen, så den har også to hundrede og halvfjerds volt. Ohms lov med den komplekse impedans minus j fem ohm."},"c2b":{"start":73.556,"end":84.397,"words":[["To",73.596,73.656],["hundrede",73.676,73.856],["og",74.696,74.996],["halvfjerds",75.116,75.476],["over",75.636,75.836],["minus",75.916,76.256],["j",76.336,76.356],["fem",76.496,76.736],["er",77.036,77.116],["j",77.236,77.256],["fireoghalvtreds",77.597,78.257],["ampere",78.357,78.717],["Den",79.317,79.437],["er",79.477,79.537],["drejet",79.577,79.837],["halvfems",79.877,80.297],["grader",80.337,80.637],["fordi",80.777,80.957],["en",81.057,81.137],["kondensators",81.177,81.797],["strøm",81.817,82.057],["altid",82.237,82.577],["er",82.677,82.757],["halvfems",82.797,83.197],["grader",83.237,83.497],["foran",83.617,83.977],["spændingen",84.017,84.397]],"text":"To hundrede og halvfjerds over minus j fem er j fireoghalvtreds ampere. Den er drejet halvfems grader, fordi en kondensators strøm altid er halvfems grader foran spændingen."},"kcl":{"start":86.217,"end":95.158,"words":[["Kirchhoffs",86.257,86.617],["strømlov",86.637,87.037],["kildestrømmen",87.597,88.177],["deler",88.338,88.598],["sig",88.638,88.758],["i",88.798,88.818],["kondensatorstrømmen",88.878,89.838],["og",89.938,90.018],["primærstrømmen",90.098,90.858],["I",91.438,91.458],["S",91.798,91.818],["er",92.038,92.138],["treogtyve",92.338,92.858],["komma",92.918,93.098],["tre",93.158,93.278],["plus",93.418,93.618],["j",93.698,93.718],["fireoghalvtreds",93.758,94.658],["ampere",94.758,95.158]],"text":"Kirchhoffs strømlov: kildestrømmen deler sig i kondensatorstrømmen og primærstrømmen. I S er treogtyve komma tre plus j fireoghalvtreds ampere."},"kcl2":{"start":95.858,"end":104.339,"words":[["Størrelsen",95.898,96.298],["findes",96.358,96.638],["med",96.698,96.798],["Pythagoras",96.838,97.438],["kvadratroden",97.918,98.599],["af",98.699,98.799],["treogtyve",98.899,99.439],["komma",99.479,99.659],["tre",99.719,99.839],["i",99.939,99.959],["anden",100.039,100.239],["plus",100.379,100.599],["fireoghalvtreds",100.759,101.299],["i",101.339,101.359],["anden",101.419,101.619],["Det",102.219,102.299],["giver",102.319,102.499],["otteoghalvtreds",102.679,103.219],["komma",103.319,103.519],["otte",103.699,103.899],["ampere",103.959,104.339]],"text":"Størrelsen findes med Pythagoras: kvadratroden af treogtyve komma tre i anden plus fireoghalvtreds i anden. Det giver otteoghalvtreds komma otte ampere."},"tab":{"start":106.159,"end":115.64,"words":[["Hvor",106.199,106.339],["går",106.399,106.559],["effekten",106.659,107.059],["tabt",107.099,107.359],["Kondensatorer",108.419,109.22],["optager",109.28,109.58],["ingen",109.58,109.7],["middeleffekt",109.74,110.34],["De",110.86,110.94],["oplader",111.16,111.66],["og",111.78,111.84],["aflader",111.94,112.34],["bare",112.38,112.6],["Kun",113.28,113.44],["modstanden",113.54,114.06],["på",114.12,114.28],["to",114.38,114.48],["ohm",114.64,114.82],["brænder",114.94,115.16],["effekt",115.18,115.48],["af",115.56,115.64]],"text":"Hvor går effekten tabt? Kondensatorer optager ingen middeleffekt. De oplader og aflader bare. Kun modstanden på to ohm brænder effekt af."},"tab2":{"start":116.86,"end":125.561,"words":[["Effekten",116.9,117.36],["i",117.48,117.5],["en",117.56,117.64],["modstand",117.68,118.16],["er",118.441,118.521],["strømmen",118.641,118.961],["i",119.021,119.041],["anden",119.141,119.361],["gange",119.441,119.621],["modstanden",119.661,120.141],["Otteoghalvtreds",121.041,121.561],["komma",121.621,121.781],["otte",121.901,122.141],["i",122.141,122.161],["anden",122.241,122.421],["gange",122.461,122.641],["to",122.681,122.781],["giver",123.201,123.381],["seks",123.541,123.741],["tusind",123.801,124.141],["ni",124.241,124.301],["hundrede",124.441,124.761],["og",124.761,124.801],["enogtyve",124.921,125.381],["watt",125.381,125.561]],"text":"Effekten i en modstand er strømmen i anden gange modstanden. Otteoghalvtreds komma otte i anden gange to giver seks tusind ni hundrede og enogtyve watt."},"ps":{"start":127.381,"end":141.643,"words":[["Kilden",127.421,127.741],["leverer",127.801,128.201],["altså",128.301,128.541],["seks",128.541,128.982],["tusind",129.042,129.322],["tre",129.362,129.482],["hundrede",129.582,129.862],["plus",130.022,130.202],["seks",130.222,130.702],["tusind",130.742,131.022],["ni",131.042,131.102],["hundrede",131.182,131.482],["og",131.482,131.522],["enogtyve",131.522,131.922],["i",132.422,132.442],["alt",132.522,132.682],["tretten",133.062,133.382],["tusind",133.422,133.762],["to",133.862,133.962],["hundrede",134.042,134.342],["og",134.342,134.402],["enogtyve",134.482,134.942],["watt",134.942,135.102],["Mathcad",136.102,136.522],["tjekker",136.562,136.802],["det",136.822,136.902],["ved",137.102,137.222],["at",137.282,137.362],["regne",137.442,137.642],["kildespændingen",137.702,138.382],["ud",138.463,138.583],["og",138.883,138.943],["tage",138.983,139.143],["realdelen",139.203,139.803],["af",139.963,140.063],["V",140.223,140.243],["gange",140.583,140.803],["I",140.903,140.923],["konjugeret",141.083,141.643]],"text":"Kilden leverer altså seks tusind tre hundrede plus seks tusind ni hundrede og enogtyve, i alt tretten tusind to hundrede og enogtyve watt. Mathcad tjekker det ved at regne kildespændingen ud og tage realdelen af V gange I konjugeret."},"eta":{"start":143.463,"end":148.703,"words":[["Virkningsgraden",143.503,144.203],["er",144.363,144.443],["lasteffekt",144.543,145.103],["over",145.203,145.383],["kildeeffekt",145.423,145.983],["seks",146.723,146.903],["komma",146.943,147.063],["tre",147.123,147.223],["over",147.563,147.763],["tretten",147.923,148.183],["komma",148.203,148.363],["to",148.423,148.503],["to",148.603,148.703]],"text":"Virkningsgraden er lasteffekt over kildeeffekt: seks komma tre over tretten komma to to."},"eta2":{"start":149.624,"end":153.144,"words":[["Det",149.664,149.764],["giver",149.784,149.964],["nul",150.284,150.424],["komma",150.484,150.684],["fire",150.864,151.064],["syv",151.164,151.304],["syv",151.404,151.564],["altså",151.884,152.124],["otteogfyrre",152.384,152.824],["procent",152.824,153.144]],"text":"Det giver nul komma fire syv syv, altså otteogfyrre procent."},"hvorfor":{"start":154.964,"end":164.365,"words":[["Hvorfor",155.004,155.264],["så",155.304,155.424],["dårligt",155.464,155.824],["C",156.804,156.824],["to",157.004,157.104],["trækker",157.264,157.544],["en",157.584,157.644],["blindstrøm",157.684,158.124],["på",158.184,158.324],["fireoghalvtreds",158.444,159.044],["ampere",159.104,159.485],["Den",160.245,160.365],["gør",160.405,160.525],["intet",160.585,160.765],["nyttigt",160.825,161.085],["men",161.385,161.505],["den",161.625,161.745],["skal",161.765,161.925],["gennem",162.045,162.325],["de",162.445,162.505],["to",162.565,162.685],["ohm",162.825,162.965],["og",163.305,163.365],["afsætter",163.465,163.845],["effekt",163.885,164.165],["dér",164.225,164.365]],"text":"Hvorfor så dårligt? C to trækker en blindstrøm på fireoghalvtreds ampere. Den gør intet nyttigt, men den skal gennem de to ohm og afsætter effekt dér."},"tjek_q":{"start":166.185,"end":169.125,"words":[["Tjek",166.225,166.385],["dig",166.405,166.485],["selv",166.525,166.685],["Hvad",167.125,167.265],["ville",167.305,167.445],["virkningsgraden",167.505,168.145],["være",168.185,168.365],["uden",168.525,168.725],["C",168.845,168.865],["to",169.025,169.125]],"text":"Tjek dig selv. Hvad ville virkningsgraden være uden C to?"},"tjek_a":{"start":173.245,"end":184.426,"words":[["Så",173.285,173.405],["er",173.425,173.505],["kildestrømmen",173.545,174.125],["kun",174.165,174.305],["treogtyve",174.445,174.925],["komma",174.965,175.125],["tre",175.165,175.285],["ampere",175.385,175.685],["Tabet",176.605,176.885],["bliver",176.925,177.145],["treogtyve",177.465,177.905],["komma",177.945,178.105],["tre",178.165,178.285],["i",178.385,178.405],["anden",178.485,178.665],["gange",178.685,178.845],["to",178.885,178.985],["altså",179.345,179.605],["et",180.005,180.105],["tusind",180.165,180.505],["otteogfirs",180.505,181.265],["watt",181.305,181.465],["Virkningsgraden",182.566,183.186],["bliver",183.226,183.406],["femogfirs",183.566,184.046],["procent",184.106,184.426]],"text":"Så er kildestrømmen kun treogtyve komma tre ampere. Tabet bliver treogtyve komma tre i anden gange to, altså et tusind otteogfirs watt. Virkningsgraden bliver femogfirs procent."},"tjek_vis":{"start":186.246,"end":193.727,"words":[["Her",186.286,186.406],["kan",186.446,186.526],["du",186.546,186.586],["se",186.626,186.706],["det",186.786,186.866],["Med",187.646,187.746],["C",187.926,187.946],["to",188.126,188.226],["går",188.406,188.526],["over",188.586,188.766],["halvdelen",188.826,189.306],["af",189.346,189.406],["effekten",189.446,189.786],["tabt",189.826,190.046],["i",190.106,190.126],["to",190.186,190.286],["ohm",190.426,190.566],["Uden",191.586,191.786],["C",191.866,191.886],["to",192.046,192.146],["er",192.486,192.566],["tabet",192.606,192.867],["kun",192.887,193.007],["en",193.087,193.167],["lille",193.207,193.387],["stribe",193.427,193.727]],"text":"Her kan du se det. Med C to går over halvdelen af effekten tabt i to ohm. Uden C to er tabet kun en lille stribe."},"slut":{"start":195.547,"end":207.608,"words":[["Kort",195.587,195.767],["sagt",195.787,195.987],["regn",196.467,196.687],["lasteffekten",196.787,197.427],["flyt",197.967,198.147],["strøm",198.207,198.447],["og",198.607,198.667],["spænding",198.727,199.067],["over",199.167,199.347],["transformeren",199.387,199.927],["læg",200.567,200.687],["blindstrømmen",200.867,201.407],["fra",201.487,201.567],["C",201.787,201.807],["to",201.967,202.067],["til",202.187,202.307],["med",202.407,202.507],["Kirchhoff",202.527,202.907],["og",203.388,203.448],["find",203.488,203.648],["tabet",203.708,204.028],["i",204.188,204.208],["R",204.468,204.488],["S",204.728,204.748],["Virkningsgraden",205.848,206.448],["er",206.548,206.628],["otteogfyrre",206.848,207.308],["procent",207.308,207.608]],"text":"Kort sagt: regn lasteffekten, flyt strøm og spænding over transformeren, læg blindstrømmen fra C to til med Kirchhoff, og find tabet i R S. Virkningsgraden er otteogfyrre procent."}}}, { audio: 'opg-7-49.mp3', id: 'opg-7-49' });</script>
+</body>
+</html>

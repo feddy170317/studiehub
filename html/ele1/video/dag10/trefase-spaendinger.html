@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trefase: fase- og linjespændinger · video</title>
+<meta name="description" content="Recap Day 9: hvorfor tre faser, fasespændinger, og udledning af V_L = √3·V_f drejet 30°.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Dag 10: videoer</a><h1>Trefase: fase- og linjespændinger</h1><span class="meta">ELE1 · dag 10 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Trefase: fase- og linjespændinger"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Recap Day 9: hvorfor tre faser, fasespændinger, og udledning af V_L = √3·V_f drejet 30°.</p><div class="chips"><a href="../../dag/Dag10_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/ele1/dag10">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// ELE1 Dag 10 (recap Day 9) · Trefase: fase- og linjespændinger (Rizzoni & Kearns 6.5: (6.47)–(6.53)). Dybdegående 2026-11-12.
+// V_an = V∠0, V_bn = V∠−120°, V_cn = V∠120°; sum = 0; V_ab = V − V(−½ − j√3/2) = V(3/2 + j√3/2) = √3 V∠30°. 230 V ⇒ 398 V ≈ 400 V.
+BP.scene({ header: 'ELE1 · Dag 10', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, dot, ring, under, ell, rect, hatch, dashed, PI } = B;
+  const S = (id) => L(id).start;
+  const ringet = (k, s, x, y, size, col, a, te) => { const r = text(k, s, x, y, size, col, a, te); ring(r, col, te, te + 0.5); return r; };
+  const D = PI / 180;
+  // viser fra centrum c med længde r og vinkel v (grader, mod uret)
+  const P = (c, r, v) => [c[0] + r * Math.cos(v * D), c[1] - r * Math.sin(v * D)];
+
+  // ---------------------------------------------------------------- 0 titel
+  B.titel(0, 'Trefasesystemet', 'ELE1 · Dag 10 (recap Day 9) · Rizzoni & Kearns afsnit 6.5', 'titel');
+  text(0, 'V_L = √3 · V_f   og   30° foran', 640, 540, 46, 'red', wt('titel', 'udleder') - 0.1, we('titel', 'grader'), { align: 'center' });
+
+  // ---------------------------------------------------------------- 1 tre faser og fordelene
+  B.goto('hvad', 1);
+  bubble(1, 'Tre faser', 130, 135, 50, 'blue', S('hvad') - 0.1, S('hvad') + 0.8);
+  {
+    const t0 = wt('hvad', 'forskudt'), X0 = 200, Y0 = 330, W = 880, A = 110, sx = (t) => X0 + t * W, sy = (v) => Y0 - v * A;
+    arrow(1, [[X0 - 10, Y0], [X0 + W + 30, Y0]], 'black', 2.2, t0 - 0.6, t0 - 0.2, 12);
+    [['blue', 0, 'a'], ['red', 120, 'b'], ['green', 240, 'c']].forEach(([col, f, nv], i) => {
+      const pts = []; for (let t = 0; t <= 1.001; t += 0.01) pts.push([sx(t), sy(Math.cos(2 * PI * 2 * t - f * D))]);
+      line(1, pts, col, 3, t0 + 0.4 * i, t0 + 0.4 * i + 1.0);
+      text(1, nv, sx(1) + 14, sy(Math.cos(2 * PI * 2 - f * D)) + 10, 28, col, t0 + 0.4 * i + 0.8, t0 + 0.4 * i + 1.1);
+    });
+    text(1, '120° mellem faserne', X0, Y0 + 160, 30, 'black', t0 + 0.6, we('hvad', 'grader'));
+  }
+  B.formel(1, '6.53', 'p_a + p_b + p_c = 3 V² / R = konstant', 180, 560, 36, wt('fordel', 'summen') - 0.1, we('fordel', 'svinger'), 'red');
+  text(1, '⇒ jævnt moment', 870, 560, 32, 'green', wt('fordel', 'jævnt') - 0.1, we('fordel', 'motorer'));
+  text(1, 'mindre kobber  ·  roterende felt: motorer starter selv', 180, 650, 32, 'green', S('fordel2') + 0.1, we('fordel2', 'selv'));
+
+  // ---------------------------------------------------------------- 2 Y-forbindelse og fasespændinger
+  B.goto('y', 2);
+  bubble(2, 'Fasespændinger', 130, 135, 50, 'blue', S('y') - 0.1, S('y') + 0.8);
+  {
+    const t0 = S('y') + 0.2, c = [950, 400], r = 190;
+    dot(2, c[0], c[1], 8, 'black', t0); text(2, 'n', c[0] - 34, c[1] + 10, 30, 'black', t0, t0 + 0.3);
+    const tv = wt('fase', 'V');
+    [[0, 'blue', 'V_{an}', 'nul'], [-120, 'red', 'V_{bn}', 'minus'], [120, 'green', 'V_{cn}', 'plus']].forEach(([v, col, nv, ord], i) => {
+      const t = wt('fase', ord) - 0.1, e = P(c, r, v);
+      arrow(2, [c, e], col, 3.4, t, t + 0.4, 14);
+      text(2, nv, e[0] + (v === 0 ? 10 : -60), e[1] + (v < 0 ? 40 : v > 0 ? -12 : 10), 30, col, t + 0.2, t + 0.5);
+    });
+    const ts = wt('sum', 'trekant');
+    const a = P(c, r, 0), bb = P(c, r, -120);
+    const s0 = [360, 655], s1 = P(s0, 110, 0), s2 = P(s1, 110, 120);
+    arrow(2, [s0, s1], 'blue', 2.6, ts - 0.1, ts + 0.3, 10);
+    arrow(2, [s1, s2], 'green', 2.6, ts + 0.2, ts + 0.5, 10);
+    arrow(2, [s2, P(s2, 110, -120)], 'red', 2.6, ts + 0.4, ts + 0.7, 10);
+  }
+  text(2, 'Y: alle tre kilder i nulpunktet n', 160, 230, 32, 'black', wt('y', 'nulpunktet') - 0.1, we('y', 'fasespændingen'));
+  B.formel(2, '6.47', 'V_{an} = V∠0°,   V_{bn} = V∠−120°,   V_{cn} = V∠120°', 160, 340, 30, wt('fase', 'ligning') - 0.1, we('fase', 'grader', 2));
+  B.formel(2, '6.48', 'V_{an} + V_{bn} + V_{cn} = 0', 160, 470, 38, wt('sum', 'ligning') - 0.1, we('sum', 'otteogfyrre'), 'red');
+  text(2, 'lukket trekant', 160, 560, 32, 'green', wt('sum', 'trekant') - 0.1, we('sum', 'trekant'));
+
+  // ---------------------------------------------------------------- 3 udledning af linjespændingen
+  B.goto('linje', 3);
+  bubble(3, 'Linjespænding', 130, 135, 50, 'blue', S('linje') - 0.1, S('linje') + 0.8);
+  text(3, 'V_{ab} = V_{an} − V_{bn}', 180, 230, 42, 'black', wt('linje', 'forskellen') - 0.1, we('linje', 'n', 1));
+  text(3, 'V_{bn} = V ( cos(−120°) + j sin(−120°) ) = V ( −½ − j √3/2 )', 180, 310, 32, 'black', S('udled') + 0.1, we('udled', 'V', 3));
+  text(3, 'V_{ab} = V + ½ V + j (√3/2) V = (3/2) V + j (√3/2) V', 180, 390, 34, 'black', S('udled2') + 0.1, we('udled2', 'V', 2));
+  B.formel(3, 'Pythagoras', '| V_{ab} | = V √( 9/4 + 3/4 ) = √3 · V', 180, 490, 38, S('udled3') + 0.1, we('udled3', 'V'), 'red');
+  B.formel(3, 'vinkel', 'arctan( (√3/2) / (3/2) ) = arctan( 1/√3 ) = 30°', 180, 610, 34, S('udled4') + 0.1, we('udled4', 'grader'), 'red');
+
+  // ---------------------------------------------------------------- 4 (6.50) og danske tal
+  B.goto('linje2', 4);
+  B.formel(4, '6.50', 'V_{ab} = √3 V∠30°,   V_{bc} = √3 V∠−90°,   V_{ca} = √3 V∠150°', 150, 240, 30, wt('linje2', 'ligning') - 0.1, we('linje2', 'frem'), 'red');
+  ringet(4, 'Danmark:  V_f = 230 V   ⇒   V_L = √3 · 230 = 400 V', 160, 420, 40, 'blue', wt('linje2', 'Danmark') - 0.1, we('linje2', 'volt', 1));
+
+  // ---------------------------------------------------------------- 5 tjek
+  B.goto('tjek_q', 5);
+  B.tjek(5, ['V_f = 230 V.', 'Hvad er linjespændingen?'], ['V_L = √3 · 230 = 398 V', '≈ 400 V'], 'tjek_q', 'tjek_a');
+
+  // ---------------------------------------------------------------- 6 tjek vist: viserdiagram med V_ab
+  B.goto('tjek_vis', 6);
+  {
+    const t0 = S('tjek_vis'), c = [560, 400], r = 180;
+    dot(6, c[0], c[1], 8, 'black', t0);
+    const tb = wt('tjek_vis', 'blå');
+    [[0, 'V_{an}'], [-120, 'V_{bn}'], [120, 'V_{cn}']].forEach(([v, nv], i) => {
+      const e = P(c, r, v); arrow(6, [c, e], 'blue', 3.4, tb - 0.1 + 0.2 * i, tb + 0.3 + 0.2 * i, 14);
+      text(6, nv, e[0] + (v === 0 ? 12 : -70), e[1] + (v < 0 ? 40 : v > 0 ? -12 : 10), 28, 'blue', tb + 0.2 * i, tb + 0.4 + 0.2 * i);
+    });
+    const tr = wt('tjek_vis', 'røde');
+    const a = P(c, r, 0), bb = P(c, r, -120);
+    arrow(6, [bb, a], 'red', 4, tr - 0.1, tr + 0.6, 16);
+    text(6, 'V_{ab} = √3 V', (a[0] + bb[0]) / 2 + 30, (a[1] + bb[1]) / 2 + 30, 32, 'red', tr + 0.3, tr + 0.8);
+    dashed(6, c, P(c, r * Math.sqrt(3), 30), 'red', wt('tjek_vis', 'drejet') - 0.1, wt('tjek_vis', 'drejet') + 0.5);
+    line(6, ell(c[0], c[1], 90, 90, -30 * D, 0), 'red', 2.4, wt('tjek_vis', 'tredive') - 0.1, wt('tjek_vis', 'tredive') + 0.3);
+    text(6, '30°', c[0] + 100, c[1] - 14, 28, 'red', wt('tjek_vis', 'tredive'), wt('tjek_vis', 'tredive') + 0.3);
+  }
+
+  // ---------------------------------------------------------------- 7 slut
+  B.goto('slut', 7);
+  B.slut(7, 'ELE1 slides Day 9–10 · Rizzoni & Kearns (2022), afsnit 6.5 · lign. 6.47–6.53', 'balanceret Y- og Δ-belastning', 'slut');
+  text(7, 'tre faser, 120° imellem, summen er 0', 200, 250, 40, 'blue', S('slut') + 0.3, we('slut', 'nul'));
+  text(7, 'konstant samlet effekt', 200, 330, 40, 'green', wt('slut', 'konstant') - 0.1, we('slut', 'effekt'));
+  text(7, 'V_L = √3 · V_f,  drejet 30°', 200, 410, 42, 'red', wt('slut', 'Linjespændingen') - 0.1, we('slut', 'grader', 1));
+});
+
+</script>
+<script>BP.live({"duration":195.599,"audio":"trefase-spaendinger.mp3","order":["titel","hvad","fordel","fordel2","y","fase","sum","linje","udled","udled2","udled3","udled4","linje2","tjek_q","tjek_a","tjek_vis","slut"],"lines":{"titel":{"start":0.5,"end":10.661,"words":[["Trefasesystemet",0.54,1.66],["Hvorfor",2.26,2.54],["bruger",2.58,2.84],["man",2.9,3.08],["tre",3.22,3.36],["faser",3.52,3.96],["og",4.12,4.2],["hvordan",4.36,4.62],["hænger",4.66,4.88],["fasespændinger",4.98,5.861],["og",6.001,6.081],["linjespændinger",6.141,6.761],["sammen",6.821,7.081],["Vi",7.841,7.921],["udleder",8.081,8.521],["kvadratroden",8.601,9.141],["af",9.161,9.221],["tre",9.261,9.401],["og",9.721,9.801],["de",9.841,9.901],["tredive",10.001,10.321],["grader",10.361,10.661]],"text":"Trefasesystemet. Hvorfor bruger man tre faser, og hvordan hænger fasespændinger og linjespændinger sammen? Vi udleder kvadratroden af tre og de tredive grader."},"hvad":{"start":12.481,"end":22.042,"words":[["Et",12.521,12.641],["trefasesystem",12.801,13.681],["har",13.821,13.981],["tre",14.121,14.281],["spændingskilder",14.461,15.122],["med",15.182,15.282],["samme",15.362,15.542],["størrelse",15.602,16.022],["og",16.162,16.242],["samme",16.342,16.542],["frekvens",16.602,17.022],["De",17.802,17.882],["er",17.922,17.962],["forskudt",17.962,18.362],["en",18.502,18.602],["tredjedel",18.702,19.182],["periode",19.222,19.562],["fra",19.602,19.682],["hinanden",19.742,20.122],["altså",20.582,20.802],["hundrede",20.962,21.282],["og",21.282,21.322],["tyve",21.382,21.682],["grader",21.682,22.042]],"text":"Et trefasesystem har tre spændingskilder med samme størrelse og samme frekvens. De er forskudt en tredjedel periode fra hinanden, altså hundrede og tyve grader."},"fordel":{"start":23.142,"end":35.584,"words":[["Hvorfor",23.182,23.462],["tre",23.702,23.822],["faser",23.902,24.222],["For",25.143,25.223],["det",25.243,25.303],["første",25.323,25.643],["er",25.743,25.823],["den",25.863,25.983],["samlede",26.083,26.403],["effekt",26.423,26.603],["konstant",26.623,27.023],["i",27.063,27.083],["tiden",27.143,27.443],["Slides",28.083,28.343],["viser",28.403,28.663],["det",28.683,28.783],["summen",29.203,29.503],["af",29.503,29.543],["de",29.563,29.603],["tre",29.663,29.783],["effekter",29.883,30.303],["er",30.403,30.483],["tre",30.603,30.743],["V",30.903,30.923],["i",31.063,31.083],["anden",31.183,31.403],["over",31.463,31.623],["R",31.783,31.803],["uden",32.383,32.523],["noget",32.563,32.703],["der",32.703,32.783],["svinger",32.823,33.103],["Det",33.964,34.044],["giver",34.084,34.244],["jævnt",34.304,34.544],["moment",34.604,34.944],["i",35.044,35.064],["motorer",35.124,35.584]],"text":"Hvorfor tre faser? For det første er den samlede effekt konstant i tiden. Slides viser det: summen af de tre effekter er tre V i anden over R, uden noget, der svinger. Det giver jævnt moment i motorer."},"fordel2":{"start":36.624,"end":45.485,"words":[["For",36.664,36.764],["det",36.764,36.844],["andet",36.924,37.124],["kan",37.224,37.384],["man",37.424,37.564],["overføre",37.684,38.044],["mere",38.124,38.304],["effekt",38.344,38.624],["med",38.684,38.784],["mindre",38.844,39.084],["kobber",39.164,39.484],["og",40.184,40.244],["for",40.264,40.364],["det",40.384,40.444],["tredje",40.484,40.824],["laver",41.204,41.404],["tre",41.424,41.544],["faser",41.684,42.064],["et",42.184,42.264],["roterende",42.324,42.804],["magnetfelt",42.844,43.425],["som",43.785,43.885],["får",43.925,44.045],["motorer",44.065,44.485],["til",44.545,44.665],["at",44.665,44.725],["starte",44.745,45.065],["af",45.065,45.105],["sig",45.105,45.225],["selv",45.285,45.485]],"text":"For det andet kan man overføre mere effekt med mindre kobber, og for det tredje laver tre faser et roterende magnetfelt, som får motorer til at starte af sig selv."},"y":{"start":47.305,"end":55.626,"words":[["I",47.345,47.365],["en",47.405,47.465],["Y-forbindelse",47.585,48.245],["er",48.425,48.485],["de",48.505,48.565],["tre",48.625,48.745],["kilder",48.845,49.105],["samlet",49.145,49.465],["i",49.545,49.565],["et",49.625,49.685],["fælles",49.765,50.025],["punkt",50.065,50.305],["nulpunktet",50.605,51.165],["n",51.405,51.425],["Spændingen",52.205,52.665],["fra",52.725,52.805],["en",52.885,52.966],["fase",53.066,53.406],["til",53.466,53.566],["nulpunktet",53.606,54.086],["kaldes",54.386,54.666],["fasespændingen",54.826,55.626]],"text":"I en Y-forbindelse er de tre kilder samlet i et fælles punkt, nulpunktet n. Spændingen fra en fase til nulpunktet kaldes fasespændingen."},"fase":{"start":56.886,"end":68.607,"words":[["Fasespændingerne",56.926,57.726],["er",57.846,57.946],["ligning",58.466,58.766],["seks",58.986,59.206],["syvogfyrre",59.406,59.966],["V",60.626,60.646],["a",60.866,60.886],["n",61.206,61.226],["er",61.626,61.726],["V",61.986,62.006],["ved",62.307,62.427],["nul",62.527,62.687],["grader",62.767,63.087],["V",63.567,63.587],["b",63.727,63.747],["n",64.067,64.087],["ved",64.427,64.527],["minus",64.707,65.047],["hundrede",65.087,65.327],["og",65.327,65.367],["tyve",65.367,65.547],["grader",65.547,65.827],["og",66.327,66.387],["V",66.447,66.467],["c",66.647,66.667],["n",66.967,66.987],["ved",67.167,67.287],["plus",67.387,67.627],["hundrede",67.807,68.067],["og",68.067,68.107],["tyve",68.107,68.327],["grader",68.327,68.607]],"text":"Fasespændingerne er ligning seks syvogfyrre: V a n er V ved nul grader, V b n ved minus hundrede og tyve grader, og V c n ved plus hundrede og tyve grader."},"sum":{"start":69.627,"end":78.608,"words":[["Lægger",69.667,69.867],["man",69.867,69.967],["dem",70.027,70.127],["sammen",70.207,70.467],["giver",70.587,70.727],["det",70.727,70.807],["nul",70.867,71.027],["Det",71.968,72.088],["er",72.088,72.128],["ligning",72.148,72.428],["seks",72.828,73.028],["otteogfyrre",73.248,73.748],["Tre",74.428,74.568],["lige",74.808,74.988],["lange",75.008,75.228],["pile",75.288,75.648],["med",75.688,75.788],["hundrede",75.828,76.068],["og",76.068,76.108],["tyve",76.108,76.308],["grader",76.308,76.588],["imellem",76.628,76.928],["danner",77.288,77.548],["en",77.628,77.708],["lukket",77.808,78.108],["trekant",78.188,78.608]],"text":"Lægger man dem sammen, giver det nul. Det er ligning seks otteogfyrre. Tre lige lange pile med hundrede og tyve grader imellem danner en lukket trekant."},"linje":{"start":80.428,"end":88.429,"words":[["Linjespændingen",80.468,81.188],["er",81.288,81.368],["spændingen",81.409,81.769],["mellem",81.809,82.009],["to",82.049,82.149],["faser",82.289,82.609],["fx",83.189,83.349],["V",83.869,83.889],["a",84.109,84.129],["b",84.309,84.329],["Den",85.349,85.469],["er",85.489,85.549],["forskellen",85.589,86.109],["V",86.569,86.589],["a",86.769,86.809],["n",87.089,87.129],["minus",87.409,87.769],["V",87.889,87.909],["b",88.089,88.109],["n",88.409,88.429]],"text":"Linjespændingen er spændingen mellem to faser, fx V a b. Den er forskellen V a n minus V b n."},"udled":{"start":89.509,"end":104.191,"words":[["Lad",89.549,89.649],["os",89.649,89.709],["regne",89.749,89.909],["den",89.909,90.029],["ud",90.069,90.169],["V",91.19,91.21],["a",91.43,91.45],["n",91.69,91.71],["er",91.99,92.07],["V",92.11,92.13],["V",93.09,93.11],["b",93.39,93.41],["n",93.71,93.73],["er",93.99,94.07],["V",94.13,94.15],["gange",94.49,94.73],["cosinus",94.79,95.27],["minus",95.35,95.65],["hundrede",95.69,95.93],["og",95.93,95.97],["tyve",96.01,96.27],["plus",96.73,96.99],["j",97.25,97.27],["sinus",97.65,98.01],["minus",98.37,98.67],["hundrede",98.79,99.03],["og",99.03,99.07],["tyve",99.07,99.29],["altså",100.05,100.331],["minus",100.751,101.051],["en",101.131,101.231],["halv",101.271,101.451],["V",101.511,101.531],["minus",102.091,102.371],["j",102.431,102.451],["kvadratroden",102.711,103.351],["af",103.471,103.531],["tre",103.571,103.711],["halve",103.851,104.131],["V",104.171,104.191]],"text":"Lad os regne den ud. V a n er V. V b n er V gange cosinus minus hundrede og tyve plus j sinus minus hundrede og tyve, altså minus en halv V minus j kvadratroden af tre halve V."},"udled2":{"start":105.731,"end":114.932,"words":[["Forskellen",105.771,106.291],["er",106.431,106.511],["V",106.771,106.791],["plus",106.991,107.231],["en",107.311,107.391],["halv",107.431,107.611],["V",107.651,107.671],["plus",108.091,108.331],["j",108.471,108.491],["kvadratroden",108.751,109.371],["af",109.411,109.491],["tre",109.531,109.652],["halve",109.792,110.052],["V",110.092,110.112],["Det",111.252,111.372],["er",111.472,111.552],["tre",111.732,111.892],["halve",112.052,112.312],["V",112.372,112.392],["plus",112.732,112.972],["j",113.152,113.172],["kvadratroden",113.452,114.112],["af",114.212,114.292],["tre",114.312,114.452],["halve",114.572,114.852],["V",114.912,114.932]],"text":"Forskellen er V plus en halv V plus j kvadratroden af tre halve V. Det er tre halve V plus j kvadratroden af tre halve V."},"udled3":{"start":116.512,"end":125.573,"words":[["Størrelsen",116.552,117.032],["findes",117.112,117.432],["med",117.492,117.572],["Pythagoras",117.612,118.172],["kvadratroden",118.952,119.573],["af",119.653,119.733],["ni",119.813,119.893],["fjerdedele",120.033,120.553],["plus",120.613,120.813],["tre",120.873,120.993],["fjerdedele",121.093,121.553],["gange",121.953,122.213],["V",122.393,122.413],["Det",123.593,123.713],["er",123.793,123.853],["kvadratroden",124.013,124.573],["af",124.633,124.693],["tre",124.753,124.893],["gange",125.273,125.493],["V",125.553,125.573]],"text":"Størrelsen findes med Pythagoras: kvadratroden af ni fjerdedele plus tre fjerdedele, gange V. Det er kvadratroden af tre gange V."},"udled4":{"start":127.353,"end":135.494,"words":[["Vinklen",127.393,127.793],["er",127.913,127.993],["arcus",128.153,128.414],["tangens",128.474,128.934],["af",129.114,129.174],["kvadratroden",129.214,129.754],["af",129.774,129.834],["tre",129.854,129.954],["halve",130.074,130.334],["over",130.594,130.794],["tre",130.954,131.074],["halve",131.214,131.454],["altså",132.074,132.334],["en",132.554,132.714],["over",132.834,133.034],["kvadratroden",133.074,133.634],["af",133.654,133.714],["tre",133.734,133.854],["Det",134.614,134.694],["er",134.734,134.794],["tredive",134.854,135.174],["grader",135.214,135.494]],"text":"Vinklen er arcus tangens af kvadratroden af tre halve over tre halve, altså en over kvadratroden af tre. Det er tredive grader."},"linje2":{"start":137.314,"end":149.796,"words":[["Det",137.354,137.454],["giver",137.494,137.654],["ligning",137.694,137.974],["seks",137.994,138.234],["halvtreds",138.254,138.615],["alle",139.555,139.775],["linjespændinger",139.955,140.635],["er",140.815,140.875],["kvadratroden",140.895,141.515],["af",141.575,141.635],["tre",141.675,141.815],["gange",142.035,142.215],["fasespændingen",142.275,142.975],["og",143.195,143.255],["drejet",143.315,143.555],["tredive",143.595,143.875],["grader",143.915,144.155],["frem",144.175,144.335],["I",145.655,145.675],["Danmark",145.735,146.055],["er",146.095,146.135],["fasespændingen",146.175,146.775],["to",146.835,146.935],["hundrede",147.035,147.215],["og",147.215,147.255],["tredive",147.255,147.535],["volt",147.575,147.796],["og",148.016,148.096],["linjespændingen",148.156,148.796],["er",148.916,148.976],["fire",149.076,149.256],["hundrede",149.316,149.556],["volt",149.556,149.796]],"text":"Det giver ligning seks halvtreds: alle linjespændinger er kvadratroden af tre gange fasespændingen og drejet tredive grader frem. I Danmark er fasespændingen to hundrede og tredive volt, og linjespændingen er fire hundrede volt."},"tjek_q":{"start":151.616,"end":156.136,"words":[["Tjek",151.656,151.816],["dig",151.836,151.916],["selv",151.956,152.116],["Fasespændingen",152.976,153.636],["er",153.696,153.756],["to",153.796,153.876],["hundrede",153.976,154.176],["og",154.176,154.216],["tredive",154.216,154.476],["volt",154.516,154.736],["Hvad",155.116,155.276],["er",155.356,155.436],["linjespændingen",155.536,156.136]],"text":"Tjek dig selv. Fasespændingen er to hundrede og tredive volt. Hvad er linjespændingen?"},"tjek_a":{"start":160.256,"end":166.816,"words":[["Kvadratroden",160.296,160.796],["af",160.816,160.876],["tre",160.896,161.016],["gange",161.316,161.496],["to",161.556,161.636],["hundrede",161.696,161.856],["og",161.856,161.896],["tredive",161.896,162.216],["altså",162.636,162.856],["cirka",162.936,163.196],["tre",163.296,163.416],["hundrede",163.516,163.736],["og",163.796,163.856],["otteoghalvfems",163.976,164.536],["volt",164.596,164.796],["Det",165.556,165.636],["kaldes",165.656,165.936],["fire",166.196,166.356],["hundrede",166.396,166.596],["volt",166.616,166.816]],"text":"Kvadratroden af tre gange to hundrede og tredive, altså cirka tre hundrede og otteoghalvfems volt. Det kaldes fire hundrede volt."},"tjek_vis":{"start":168.636,"end":182.118,"words":[["Her",168.676,168.796],["kan",168.816,168.916],["du",168.916,168.976],["se",169.036,169.116],["det",169.216,169.296],["i",169.436,169.456],["viserdiagrammet",169.576,170.336],["De",171.497,171.577],["tre",171.677,171.797],["fasespændinger",171.957,172.677],["er",172.797,172.857],["blå",172.877,173.077],["Linjespændingen",174.037,174.657],["V",174.717,174.737],["a",174.897,174.917],["b",175.077,175.097],["er",175.517,175.577],["den",175.617,175.697],["røde",175.757,175.977],["pil",176.037,176.257],["fra",176.457,176.577],["spidsen",176.577,176.917],["af",176.997,177.057],["V",177.097,177.117],["b",177.237,177.257],["n",177.477,177.497],["til",177.857,177.977],["spidsen",177.997,178.317],["af",178.417,178.497],["V",178.537,178.557],["a",178.737,178.757],["n",178.977,178.997],["Den",180.198,180.318],["er",180.358,180.418],["længere",180.478,180.778],["og",181.018,181.078],["drejet",181.138,181.418],["tredive",181.478,181.778],["grader",181.818,182.118]],"text":"Her kan du se det i viserdiagrammet. De tre fasespændinger er blå. Linjespændingen V a b er den røde pil fra spidsen af V b n til spidsen af V a n. Den er længere og drejet tredive grader."},"slut":{"start":183.938,"end":194.079,"words":[["Kort",183.978,184.178],["sagt",184.218,184.438],["tre",185.138,185.278],["faser",185.438,185.778],["forskudt",185.878,186.218],["hundrede",186.378,186.638],["og",186.638,186.678],["tyve",186.678,186.898],["grader",186.898,187.198],["summer",187.398,187.638],["til",187.678,187.778],["nul",187.798,187.938],["og",188.198,188.258],["giver",188.298,188.458],["konstant",188.478,188.818],["effekt",188.878,189.118],["Linjespændingen",190.059,190.699],["er",190.799,190.859],["kvadratroden",190.879,191.439],["af",191.459,191.519],["tre",191.559,191.679],["gange",191.819,192.019],["fasespændingen",192.039,192.679],["og",192.919,192.999],["drejet",193.039,193.359],["tredive",193.439,193.739],["grader",193.779,194.079]],"text":"Kort sagt: tre faser forskudt hundrede og tyve grader summer til nul og giver konstant effekt. Linjespændingen er kvadratroden af tre gange fasespændingen og drejet tredive grader."}}}, { audio: 'trefase-spaendinger.mp3', id: 'trefase-spaendinger' });</script>
+</body>
+</html>

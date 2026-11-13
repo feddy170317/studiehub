@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opgave 7.50: tomgangs- og kortslutningsprøve · video</title>
+<meta name="description" content="Øvelse 3 (7.50): tomgangs- og kortslutningsprøve giver r_c = 1815 Ω, L_c = 0,68 H, r_w = 0,943 Ω, L_w = 0,35 mH.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Dag 10: videoer</a><h1>Opgave 7.50: tomgangs- og kortslutningsprøve</h1><span class="meta">ELE1 · dag 10 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Opgave 7.50: tomgangs- og kortslutningsprøve"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Øvelse 3 (7.50): tomgangs- og kortslutningsprøve giver r_c = 1815 Ω, L_c = 0,68 H, r_w = 0,943 Ω, L_w = 0,35 mH.</p><div class="chips"><a href="../../opgaver/dag10/opgave-7.50-tomgangs-og-kortslutningsproeve.pdf">📐 Se udregningen i Mathcad (PDF)</a><a href="ikke-ideel-transformer.html">Se først: Den ikke-ideelle transformer og prøverne</a><a href="../../dag/Dag10_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/ele1/dag10">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// ELE1 Dag 10 · Øvelse 3 = opgave 7.50 (bogens 6.50). Mathcad: Dag 10/Opgaver/Opgave 7.50 tomgangs- og kortslutningsproeve.mcdx
+// Tomgang 241 V, 0,95 A, 32 W: r_c = 1815 Ω, Y = 3,94 mS, G = 0,551 mS, B = 3,90 mS, L_c = 0,680 H.
+// Kortslutning 5 V, 5,25 A, 26 W: r_w = 0,943 Ω, |Z| = 0,952 Ω, X = 0,131 Ω, L_w = 0,348 mH. ω = 377 rad/s.
+BP.scene({ header: 'ELE1 · Dag 10 · opgave 7.50', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, dot, ring, under, ell, rect, hatch, dashed, PI } = B;
+  const S = (id) => L(id).start;
+  const ringet = (k, s, x, y, size, col, a, te) => { const r = text(k, s, x, y, size, col, a, te); ring(r, col, te, te + 0.5); return r; };
+  const trafo = (k, x, y0, y1, a, b, col = 'blue', gap = 46) => {
+    B.inductor(k, [x, y0], [x, y1], a, b, { col });
+    B.inductor(k, [x + gap, y1], [x + gap, y0], a + 0.1, b + 0.1, { col });
+    line(k, [[x + gap / 2 - 5, y0 + 6], [x + gap / 2 - 5, y1 - 6]], 'black', 2.4, a + 0.2, b);
+    line(k, [[x + gap / 2 + 5, y0 + 6], [x + gap / 2 + 5, y1 - 6]], 'black', 2.4, a + 0.2, b);
+  };
+  const ekv = (k, x0, y0, s, t0, cs = 'blue', cp = 'blue', v = null) => {
+    const yb = y0 + 260 * s, X = (d) => x0 + d * s;
+    dot(k, X(0), y0, 7, 'black', t0); dot(k, X(0), yb, 7, 'black', t0);
+    B.resistor(k, [X(0), y0], [X(170), y0], t0, t0 + 0.4, { col: cs, label: v ? v[0] : 'r_w', side: 1, size: 26 });
+    B.inductor(k, [X(170), y0], [X(330), y0], t0 + 0.2, t0 + 0.6, { col: cs });
+    text(k, v ? v[1] : 'L_w', X(250), y0 - 30, 26, cs, t0 + 0.4, t0 + 0.7, { align: 'center' });
+    B.wire(k, [[X(330), y0], [X(560), y0]], t0 + 0.4, t0 + 0.6, 'black');
+    B.wire(k, [[X(400), y0], [X(400), y0 + 40 * s]], t0 + 0.5, t0 + 0.6, cp);
+    B.wire(k, [[X(370), y0 + 40 * s], [X(470), y0 + 40 * s]], t0 + 0.5, t0 + 0.6, cp);
+    B.resistor(k, [X(370), y0 + 40 * s], [X(370), yb - 40 * s], t0 + 0.6, t0 + 1.0, { col: cp, label: v ? v[2] : 'r_c', side: -1, size: 26 });
+    B.inductor(k, [X(470), y0 + 40 * s], [X(470), yb - 40 * s], t0 + 0.7, t0 + 1.1, { col: cp });
+    text(k, v ? v[3] : 'L_c', X(500), (y0 + yb) / 2 + 10, 26, cp, t0 + 0.9, t0 + 1.2);
+    B.wire(k, [[X(370), yb - 40 * s], [X(470), yb - 40 * s]], t0 + 0.9, t0 + 1.0, cp);
+    B.wire(k, [[X(400), yb - 40 * s], [X(400), yb]], t0 + 0.9, t0 + 1.0, cp);
+    B.wire(k, [[X(0), yb], [X(560), yb]], t0 + 0.8, t0 + 1.0, 'black');
+    trafo(k, X(560), y0, yb, t0 + 1.0, t0 + 1.5, 'black');
+  };
+
+  // ---------------------------------------------------------------- 0 titel
+  B.titel(0, 'Opgave 7.50', 'ELE1 · Dag 10 · øvelse 3 (bogens 6.50)', 'titel');
+  text(0, 'r_c, L_c, r_w, L_w = ?', 640, 540, 48, 'red', wt('titel', 'ækvivalentkredsløb') - 0.1, we('titel', 'kortslutningsprøve'), { align: 'center' });
+
+  // ---------------------------------------------------------------- 1 data og kredsløb
+  B.goto('opgave', 1);
+  bubble(1, 'Måledata', 130, 135, 50, 'blue', S('opgave') - 0.1, S('opgave') + 0.8);
+  text(1, 'tomgang:   V = 241 V,   I = 0,95 A,   P = 32 W', 160, 240, 34, 'red', wt('opgave', 'Tomgangsprøven') - 0.1, we('opgave', 'watt'));
+  text(1, 'kortslutning:   V = 5 V,   I = 5,25 A,   P = 26 W', 160, 300, 34, 'blue', wt('opgave', 'Kortslutningsprøven') - 0.1, we('opgave', 'watt', 1));
+  text(1, 'ω = 377 rad/s', 160, 360, 34, 'black', wt('opgave', 'Omega') - 0.1, we('opgave', 'sekund'));
+  ekv(1, 380, 420, 0.62, S('kreds'));
+
+  // ---------------------------------------------------------------- 2 tomgang: r_c
+  B.goto('oc', 2);
+  bubble(2, 'Tomgangsprøven', 130, 135, 50, 'red', S('oc') - 0.1, S('oc') + 0.8);
+  text(2, 'sekundær åben ⇒ al strøm gennem r_c ∥ L_c', 160, 240, 34, 'black', S('oc') + 0.4, we('oc', 'effekt'));
+  B.formel(2, 'modstand', 'P = V² / R   ⇒   r_c = V² / P', 160, 350, 36, wt('oc2', 'modstand') - 0.1, we('oc2', 'P'));
+  ringet(2, 'r_c = 241² / 32 = 1815 Ω', 160, 460, 44, 'red', wt('oc2', 'To') - 0.1, we('oc2', 'ohm'));
+
+  // ---------------------------------------------------------------- 3 tomgang: L_c via admittans
+  B.goto('y', 3);
+  bubble(3, 'Magnetiseringsinduktansen', 130, 135, 50, 'red', S('y') - 0.1, S('y') + 0.8);
+  text(3, 'Y = I / V = 0,95 / 241 = 3,94 mS', 160, 240, 38, 'black', S('y') + 0.1, we('y', 'millisiemens'));
+  text(3, 'G = 1 / r_c = 0,551 mS', 160, 320, 38, 'black', S('y2') + 0.1, we('y2', 'millisiemens'));
+  B.formel(3, 'Pythagoras', 'B = √( Y² − G² ) = √( 3,94² − 0,551² ) = 3,90 mS', 160, 430, 32, wt('y3', 'Susceptansen') - 0.1, we('y3', 'millisiemens'));
+  ringet(3, 'L_c = 1 / ( ω B ) = 1 / ( 377 · 0,00390 ) = 0,68 H', 160, 560, 36, 'red', S('lc') + 0.1, we('lc', 'henry'));
+  {
+    const t0 = S('y2') + 0.5, O = [1000, 360], s = 40;
+    arrow(3, [O, [O[0] + 0.551 * s * 2, O[1]]], 'blue', 3, t0, t0 + 0.4, 10); text(3, 'G', O[0] + 10, O[1] + 34, 26, 'blue', t0 + 0.2, t0 + 0.5);
+    arrow(3, [[O[0] + 0.551 * s * 2, O[1]], [O[0] + 0.551 * s * 2, O[1] - 3.90 * s]], 'green', 3, t0 + 0.4, t0 + 0.8, 10); text(3, 'B', O[0] + 0.551 * s * 2 + 10, O[1] - 80, 26, 'green', t0 + 0.6, t0 + 0.9);
+    arrow(3, [O, [O[0] + 0.551 * s * 2, O[1] - 3.90 * s]], 'red', 3.2, t0 + 0.8, t0 + 1.2, 12); text(3, 'Y', O[0] - 26, O[1] - 80, 28, 'red', t0 + 1.0, t0 + 1.3);
+  }
+
+  // ---------------------------------------------------------------- 4 kortslutning: r_w og L_w
+  B.goto('sc', 4);
+  bubble(4, 'Kortslutningsprøven', 130, 135, 50, 'blue', S('sc') - 0.1, S('sc') + 0.8);
+  text(4, 'lav V ⇒ al strøm gennem r_w og L_w', 160, 240, 34, 'black', S('sc') + 0.4, we('sc', 'w', 1));
+  B.formel(4, 'modstand', 'P = I² · R   ⇒   r_w = P / I²', 160, 340, 36, wt('sc2', 'modstand') - 0.1, we('sc2', 'anden', 1));
+  ringet(4, 'r_w = 26 / 5,25² = 0,943 Ω', 160, 440, 40, 'blue', wt('sc2', 'Seksogtyve') - 0.1, we('sc2', 'ohm'));
+  text(4, '| Z | = 5 / 5,25 = 0,952 Ω', 160, 530, 36, 'black', S('z') + 0.1, we('z', 'ohm'));
+  text(4, 'X = √( 0,952² − 0,943² ) = 0,131 Ω', 160, 600, 36, 'black', S('z2') + 0.1, we('z2', 'ohm'));
+  ringet(4, 'L_w = 0,131 / 377 = 0,35 mH', 160, 670, 36, 'blue', S('lw') + 0.1, we('lw', 'millihenry'));
+
+  // ---------------------------------------------------------------- 5 tjek
+  B.goto('tjek_q', 5);
+  B.tjek(5, ['Hvilken prøve viser jerntabet,', 'og hvilken kobbertabet?'], ['tomgang: fuld spænding → jerntab', 'kortslutning: fuld strøm → kobbertab'], 'tjek_q', 'tjek_a');
+
+  // ---------------------------------------------------------------- 6 tjek vist: kredsløbet med værdier
+  B.goto('tjek_vis', 6);
+  text(6, 'ækvivalentkredsløbet', 640, 140, 34, 'black', S('tjek_vis'), S('tjek_vis') + 0.6, { align: 'center' });
+  ekv(6, 300, 260, 0.9, S('tjek_vis') + 0.2, 'blue', 'red', ['0,943 Ω', '0,35 mH', '1815 Ω', '0,68 H']);
+
+  // ---------------------------------------------------------------- 7 slut
+  B.goto('slut', 7);
+  B.slut(7, 'ELE1 slides Day 10, øvelse 3 · Rizzoni & Kearns (2022), opg. 6.50 · Mathcad: Opgave 7.50', 'opgave 7.51', 'slut');
+  text(7, 'tomgang:   r_c = 1815 Ω,   L_c = 0,68 H', 200, 260, 40, 'red', wt('slut', 'Tomgang') - 0.1, we('slut', 'admittansen'));
+  text(7, 'kortslutning:   r_w = 0,943 Ω,   L_w = 0,35 mH', 200, 350, 40, 'blue', wt('slut', 'Kortslutning') - 0.1, we('slut', 'impedansen'));
+});
+
+</script>
+<script>BP.live({"duration":199.647,"audio":"opg-7-50.mp3","order":["titel","opgave","kreds","oc","oc2","y","y2","y3","lc","sc","sc2","z","z2","lw","tjek_q","tjek_a","tjek_vis","slut"],"lines":{"titel":{"start":0.5,"end":8.161,"words":[["Opgave",0.54,0.92],["syv",1.04,1.16],["halvtreds",1.24,1.64],["Vi",2.44,2.5],["bestemmer",2.56,2.94],["en",3.06,3.16],["rigtig",3.32,3.6],["transformers",3.64,4.38],["ækvivalentkredsløb",4.54,5.581],["ud",5.761,5.861],["fra",5.921,6.001],["en",6.081,6.141],["tomgangsprøve",6.221,6.981],["og",7.161,7.241],["en",7.281,7.341],["kortslutningsprøve",7.381,8.161]],"text":"Opgave syv halvtreds. Vi bestemmer en rigtig transformers ækvivalentkredsløb ud fra en tomgangsprøve og en kortslutningsprøve."},"opgave":{"start":9.981,"end":26.343,"words":[["Tomgangsprøven",10.021,10.741],["gav",10.841,11.021],["to",11.241,11.381],["hundrede",11.521,11.841],["og",11.901,11.981],["enogfyrre",12.081,12.521],["volt",12.581,12.841],["nul",13.341,13.501],["komma",13.561,13.781],["ni",14.001,14.081],["fem",14.201,14.401],["ampere",14.421,14.821],["og",15.302,15.402],["toogtredive",15.622,16.182],["watt",16.222,16.382],["Kortslutningsprøven",17.402,18.202],["gav",18.282,18.442],["fem",18.782,18.922],["volt",18.982,19.202],["fem",19.642,19.782],["komma",19.862,20.022],["to",20.102,20.202],["fem",20.322,20.462],["ampere",20.522,20.882],["og",21.162,21.242],["seksogtyve",21.442,21.902],["watt",21.942,22.082],["Omega",22.922,23.302],["er",23.602,23.682],["tre",23.762,23.902],["hundrede",24.002,24.282],["og",24.402,24.482],["syvoghalvfjerds",24.563,25.163],["radianer",25.223,25.683],["pr",25.863,26.003],["sekund",26.023,26.343]],"text":"Tomgangsprøven gav to hundrede og enogfyrre volt, nul komma ni fem ampere og toogtredive watt. Kortslutningsprøven gav fem volt, fem komma to fem ampere og seksogtyve watt. Omega er tre hundrede og syvoghalvfjerds radianer pr. sekund."},"kreds":{"start":28.163,"end":39.564,"words":[["Ækvivalentkredsløbet",28.203,29.363],["har",29.443,29.583],["viklingsmodstanden",29.703,30.623],["r",30.863,30.883],["w",31.343,31.363],["og",31.723,31.803],["spredningsinduktansen",32.023,33.083],["L",33.263,33.283],["w",33.603,33.623],["i",33.823,33.843],["serie",33.963,34.243],["Jerntabsmodstanden",35.044,35.984],["r",36.184,36.204],["c",36.324,36.344],["og",36.804,36.864],["magnetiseringsinduktansen",36.944,38.244],["L",38.464,38.484],["c",38.584,38.604],["sidder",38.964,39.184],["parallelt",39.204,39.564]],"text":"Ækvivalentkredsløbet har viklingsmodstanden r w og spredningsinduktansen L w i serie. Jerntabsmodstanden r c og magnetiseringsinduktansen L c sidder parallelt."},"oc":{"start":41.384,"end":48.525,"words":[["Først",41.424,41.664],["tomgangsprøven",41.784,42.484],["Sekundærsiden",43.304,44.044],["er",44.204,44.284],["åben",44.364,44.604],["så",44.765,44.865],["al",44.925,45.025],["strøm",45.065,45.285],["går",45.365,45.485],["gennem",45.525,45.705],["den",45.725,45.845],["parallelle",45.885,46.245],["gren",46.265,46.485],["Kun",46.945,47.105],["r",47.425,47.445],["c",47.545,47.565],["optager",47.965,48.265],["effekt",48.265,48.525]],"text":"Først tomgangsprøven. Sekundærsiden er åben, så al strøm går gennem den parallelle gren. Kun r c optager effekt."},"oc2":{"start":49.745,"end":62.406,"words":[["Effekten",49.785,50.165],["i",50.225,50.245],["en",50.285,50.345],["modstand",50.385,50.805],["er",51.065,51.165],["V",51.485,51.505],["i",51.745,51.765],["anden",51.865,52.125],["over",52.285,52.445],["R",52.625,52.645],["Vi",53.225,53.285],["isolerer",53.365,53.805],["R",54.066,54.086],["r",54.866,54.886],["c",54.946,54.966],["er",55.466,55.546],["V",55.646,55.666],["i",55.846,55.866],["anden",55.986,56.226],["over",56.446,56.606],["P",56.646,56.666],["To",57.406,57.506],["hundrede",57.606,57.966],["og",57.986,58.066],["enogfyrre",58.146,58.706],["i",58.706,58.726],["anden",58.806,59.046],["over",59.326,59.506],["toogtredive",59.546,60.066],["giver",60.326,60.486],["et",60.486,60.706],["tusind",60.746,61.086],["otte",61.246,61.406],["hundrede",61.406,61.686],["og",61.766,61.846],["femten",61.926,62.226],["ohm",62.306,62.406]],"text":"Effekten i en modstand er V i anden over R. Vi isolerer R: r c er V i anden over P. To hundrede og enogfyrre i anden over toogtredive giver et tusind otte hundrede og femten ohm."},"y":{"start":64.226,"end":73.126,"words":[["Nu",64.266,64.326],["spolen",64.386,64.726],["Admittansen",65.606,66.166],["er",66.366,66.446],["strøm",66.506,66.746],["over",66.926,67.086],["spænding",67.106,67.426],["nul",67.926,68.066],["komma",68.146,68.326],["ni",68.366,68.446],["fem",68.586,68.746],["over",69.026,69.226],["to",69.306,69.406],["hundrede",69.526,69.826],["og",69.826,69.886],["enogfyrre",69.946,70.406],["Det",70.806,70.926],["er",70.986,71.086],["tre",71.306,71.446],["komma",71.566,71.766],["ni",71.826,71.886],["fire",72.026,72.266],["millisiemens",72.486,73.126]],"text":"Nu spolen. Admittansen er strøm over spænding, nul komma ni fem over to hundrede og enogfyrre. Det er tre komma ni fire millisiemens."},"y2":{"start":74.087,"end":83.288,"words":[["Ledningsevnen",74.127,74.707],["fra",74.807,74.887],["r",75.087,75.107],["c",75.227,75.247],["er",75.687,75.767],["en",75.907,76.047],["over",76.207,76.367],["r",76.507,76.527],["c",76.627,76.647],["nul",77.207,77.347],["komma",77.387,77.587],["fem",77.647,77.787],["fem",77.887,78.027],["millisiemens",78.207,78.787],["Den",79.547,79.667],["resistive",79.727,80.307],["og",80.447,80.507],["den",80.527,80.607],["reaktive",80.667,81.107],["del",81.147,81.347],["står",81.467,81.627],["vinkelret",81.667,82.067],["så",82.327,82.427],["vi",82.447,82.487],["bruger",82.547,82.727],["Pythagoras",82.747,83.288]],"text":"Ledningsevnen fra r c er en over r c, nul komma fem fem millisiemens. Den resistive og den reaktive del står vinkelret, så vi bruger Pythagoras."},"y3":{"start":84.068,"end":92.208,"words":[["Susceptansen",84.108,84.728],["er",84.968,85.068],["kvadratroden",85.168,85.828],["af",85.928,86.008],["tre",86.108,86.248],["komma",86.368,86.568],["ni",86.628,86.688],["fire",86.808,87.028],["i",87.128,87.148],["anden",87.208,87.428],["minus",87.788,88.088],["nul",88.188,88.328],["komma",88.388,88.568],["fem",88.668,88.788],["fem",88.908,89.048],["i",89.268,89.288],["anden",89.368,89.588],["altså",89.968,90.188],["tre",90.408,90.528],["komma",90.628,90.828],["ni",90.888,90.968],["nul",91.148,91.328],["millisiemens",91.628,92.208]],"text":"Susceptansen er kvadratroden af tre komma ni fire i anden minus nul komma fem fem i anden, altså tre komma ni nul millisiemens."},"lc":{"start":94.028,"end":104.229,"words":[["En",94.068,94.168],["spoles",94.288,94.808],["susceptans",94.968,95.608],["er",95.748,95.848],["en",96.388,96.528],["over",96.648,96.868],["omega",96.988,97.328],["L",97.528,97.548],["Vi",98.168,98.228],["isolerer",98.308,98.788],["L",99.388,99.408],["c",99.488,99.508],["en",99.808,100.448],["over",100.528,100.728],["omega",100.828,101.188],["gange",101.268,101.468],["B",101.508,101.528],["Det",102.408,102.508],["giver",102.528,102.729],["nul",102.869,103.009],["komma",103.049,103.229],["seks",103.349,103.569],["otte",103.729,103.929],["henry",103.969,104.229]],"text":"En spoles susceptans er en over omega L. Vi isolerer L c: en over omega gange B. Det giver nul komma seks otte henry."},"sc":{"start":106.049,"end":114.17,"words":[["Nu",106.089,106.169],["kortslutningsprøven",106.249,107.129],["Spændingen",107.869,108.249],["er",108.269,108.329],["lav",108.389,108.569],["så",108.769,108.889],["den",108.909,109.009],["parallelle",109.089,109.569],["gren",109.609,109.829],["trækker",109.909,110.189],["næsten",110.289,110.589],["ingen",110.649,110.829],["strøm",110.889,111.129],["Al",111.869,111.989],["strøm",112.049,112.289],["går",112.349,112.489],["gennem",112.549,112.789],["r",112.97,112.99],["w",113.33,113.35],["og",113.55,113.63],["L",113.79,113.81],["w",114.15,114.17]],"text":"Nu kortslutningsprøven. Spændingen er lav, så den parallelle gren trækker næsten ingen strøm. Al strøm går gennem r w og L w."},"sc2":{"start":115.05,"end":126.211,"words":[["Effekten",115.09,115.51],["i",115.59,115.61],["en",115.67,115.73],["modstand",115.77,116.17],["er",116.29,116.39],["I",116.81,116.83],["i",116.97,116.99],["anden",117.09,117.29],["gange",117.33,117.61],["R",117.67,117.69],["Vi",118.35,118.41],["isolerer",118.49,118.91],["r",119.73,119.75],["w",120.07,120.09],["er",120.11,120.41],["P",120.63,120.65],["over",120.95,121.15],["I",121.29,121.31],["i",121.43,121.45],["anden",121.55,121.73],["Seksogtyve",121.73,123.111],["over",123.131,123.311],["fem",123.311,123.531],["komma",123.591,123.751],["to",123.811,123.911],["fem",124.011,124.171],["i",124.231,124.251],["anden",124.311,124.471],["giver",124.551,124.691],["nul",125.091,125.231],["komma",125.291,125.451],["ni",125.551,125.631],["fire",125.771,126.091],["ohm",126.091,126.211]],"text":"Effekten i en modstand er I i anden gange R. Vi isolerer: r w er P over I i anden. Seksogtyve over fem komma to fem i anden giver nul komma ni fire ohm."},"z":{"start":128.031,"end":133.672,"words":[["Impedansens",128.071,128.631],["størrelse",128.671,129.071],["er",129.151,129.231],["spænding",129.331,129.631],["over",129.651,129.791],["strøm",129.811,130.031],["fem",130.531,130.691],["over",130.751,130.891],["fem",130.891,131.071],["komma",131.131,131.271],["to",131.331,131.411],["fem",131.491,131.631],["altså",132.051,132.252],["nul",132.632,132.772],["komma",132.812,132.972],["ni",133.072,133.152],["fem",133.272,133.432],["ohm",133.532,133.672]],"text":"Impedansens størrelse er spænding over strøm: fem over fem komma to fem, altså nul komma ni fem ohm."},"z2":{"start":134.492,"end":142.093,"words":[["Med",134.532,134.632],["Pythagoras",134.652,135.212],["er",135.332,135.412],["reaktansen",135.472,136.032],["kvadratroden",136.352,137.072],["af",137.152,137.252],["nul",137.452,137.592],["komma",137.632,137.812],["ni",137.892,137.972],["fem",138.092,138.252],["i",138.332,138.352],["anden",138.392,138.572],["minus",138.612,138.892],["nul",139.092,139.232],["komma",139.272,139.432],["ni",139.512,139.592],["fire",139.712,140.032],["i",140.032,140.052],["anden",140.112,140.292],["Det",140.692,140.792],["er",140.852,140.932],["nul",141.052,141.192],["komma",141.232,141.412],["et",141.513,141.673],["tre",141.693,141.793],["ohm",141.973,142.093]],"text":"Med Pythagoras er reaktansen kvadratroden af nul komma ni fem i anden minus nul komma ni fire i anden. Det er nul komma et tre ohm."},"lw":{"start":142.993,"end":149.233,"words":[["Reaktansen",143.033,143.533],["er",143.633,143.713],["omega",143.893,144.253],["gange",144.353,144.553],["L",144.733,144.753],["w",145.073,145.093],["Vi",145.773,145.833],["dividerer",145.953,146.393],["med",146.413,146.493],["omega",146.553,146.833],["og",146.973,147.033],["får",147.073,147.213],["nul",147.633,147.793],["komma",147.833,147.993],["tre",148.113,148.253],["fem",148.413,148.553],["millihenry",148.733,149.233]],"text":"Reaktansen er omega gange L w. Vi dividerer med omega og får nul komma tre fem millihenry."},"tjek_q":{"start":151.053,"end":156.194,"words":[["Tjek",151.093,151.253],["dig",151.293,151.373],["selv",151.413,151.573],["Hvilken",152.334,152.654],["prøve",152.714,152.934],["fortæller",152.974,153.314],["noget",153.354,153.574],["om",153.674,153.774],["jerntabet",153.974,154.554],["og",154.974,155.034],["hvilken",155.034,155.334],["om",155.394,155.474],["kobbertabet",155.614,156.194]],"text":"Tjek dig selv. Hvilken prøve fortæller noget om jerntabet, og hvilken om kobbertabet?"},"tjek_a":{"start":160.314,"end":167.175,"words":[["Tomgangsprøven",160.354,161.034],["viser",161.074,161.314],["jerntabet",161.374,161.874],["fordi",161.914,162.074],["den",162.114,162.214],["kører",162.254,162.514],["ved",162.554,162.634],["fuld",162.714,162.894],["spænding",162.954,163.274],["Kortslutningsprøven",163.894,164.695],["viser",164.735,164.975],["kobbertabet",165.035,165.655],["fordi",165.895,166.035],["den",166.075,166.175],["kører",166.195,166.455],["ved",166.515,166.615],["fuld",166.675,166.875],["strøm",166.955,167.175]],"text":"Tomgangsprøven viser jerntabet, fordi den kører ved fuld spænding. Kortslutningsprøven viser kobbertabet, fordi den kører ved fuld strøm."},"tjek_vis":{"start":168.995,"end":183.136,"words":[["Her",169.035,169.175],["er",169.235,169.315],["hele",169.435,169.735],["ækvivalentkredsløbet",169.835,170.835],["med",170.995,171.115],["værdierne",171.275,171.715],["r",172.595,172.615],["c",172.695,172.715],["på",172.915,173.075],["atten",173.275,173.475],["hundrede",173.515,173.875],["ohm",173.895,174.055],["og",174.216,174.316],["L",174.736,174.756],["c",174.876,174.896],["på",175.116,175.236],["nul",175.296,175.436],["komma",175.496,175.656],["seks",175.756,175.956],["otte",176.096,176.296],["henry",176.336,176.556],["parallelt",176.636,176.996],["r",177.736,177.756],["w",178.096,178.116],["på",178.276,178.436],["nul",178.656,178.796],["komma",178.836,178.976],["ni",179.056,179.116],["fire",179.236,179.536],["ohm",179.556,179.716],["og",179.756,179.836],["L",179.996,180.016],["w",180.376,180.396],["på",180.576,180.716],["nul",180.976,181.116],["komma",181.156,181.316],["tre",181.396,181.516],["fem",181.736,181.876],["millihenry",181.996,182.456],["i",182.656,182.676],["serie",182.836,183.136]],"text":"Her er hele ækvivalentkredsløbet med værdierne. r c på atten hundrede ohm og L c på nul komma seks otte henry parallelt. r w på nul komma ni fire ohm og L w på nul komma tre fem millihenry i serie."},"slut":{"start":184.956,"end":198.177,"words":[["Kort",184.996,185.176],["sagt",185.216,185.436],["tomgang",186.036,186.416],["giver",186.476,186.696],["r",187.056,187.076],["c",187.176,187.196],["lig",187.456,187.596],["V",187.756,187.776],["i",187.956,187.976],["anden",188.056,188.236],["over",188.276,188.416],["P",188.456,188.476],["og",189.016,189.116],["L",189.576,189.596],["c",189.716,189.736],["fra",189.936,190.056],["Pythagoras",190.196,190.796],["på",190.836,190.936],["admittansen",190.956,191.436],["Kortslutning",192.156,192.716],["giver",192.756,192.936],["r",193.256,193.276],["w",193.656,193.676],["lig",193.897,194.037],["P",194.177,194.197],["over",194.437,194.597],["I",194.697,194.717],["i",194.817,194.837],["anden",194.917,195.137],["og",195.277,195.357],["L",195.817,195.837],["w",196.177,196.197],["fra",196.377,196.497],["Pythagoras",196.637,197.237],["på",197.317,197.457],["impedansen",197.577,198.177]],"text":"Kort sagt: tomgang giver r c lig V i anden over P og L c fra Pythagoras på admittansen. Kortslutning giver r w lig P over I i anden og L w fra Pythagoras på impedansen."}}}, { audio: 'opg-7-50.mp3', id: 'opg-7-50' });</script>
+</body>
+</html>

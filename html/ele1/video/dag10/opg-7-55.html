@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opgave 7.55: flere sekundærviklinger · video</title>
+<meta name="description" content="Øvelse 5 (7.55): fire sekundærviklinger kombineret i serie til 24,67, 36,67, 18 og 54,67∠180° V.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Dag 10: videoer</a><h1>Opgave 7.55: flere sekundærviklinger</h1><span class="meta">ELE1 · dag 10 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Opgave 7.55: flere sekundærviklinger"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Øvelse 5 (7.55): fire sekundærviklinger kombineret i serie til 24,67, 36,67, 18 og 54,67∠180° V.</p><div class="chips"><a href="../../opgaver/dag10/opgave-7.55-flere-sekundaerviklinger.pdf">📐 Se udregningen i Mathcad (PDF)</a><a href="ideel-transformer.html">Se først: Den ideelle transformer</a><a href="../../dag/Dag10_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/ele1/dag10">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// ELE1 Dag 10 · Øvelse 5 = opgave 7.55 (bogens 6.55). Mathcad: Dag 10/Opgaver/Opgave 7.55 flere sekundaerviklinger.mcdx
+// 120 V; a 1/15 → 8 V, b 1/4 → 30 V, c 1/12 → 10 V, d 1/18 → 6,67 V. a) a+c+d = 24,67; b) b+d = 36,67; c) a+c = 18; d) −(a+b+c+d) = −54,67 V.
+// Tjek: 22 V = 30 − 8 (b med a vendt).
+BP.scene({ header: 'ELE1 · Dag 10 · opgave 7.55', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, dot, ring, under, ell, rect, hatch, dashed, PI } = B;
+  const S = (id) => L(id).start;
+  const rectc = (x, y, w, h) => rect(x, y, w, h).concat([[x, y]]);
+  const ringet = (k, s, x, y, size, col, a, te) => { const r = text(k, s, x, y, size, col, a, te); ring(r, col, te, te + 0.5); return r; };
+  const VV = { a: 8, b: 30, c: 10, d: 6.667 }, COL = { a: 'blue', b: 'red', c: 'green', d: 'black' };
+
+  // ---------------------------------------------------------------- 0 titel
+  B.titel(0, 'Opgave 7.55', 'ELE1 · Dag 10 · øvelse 5 (bogens 6.55)', 'titel');
+  text(0, '24,67 V   36,67 V   18 V   54,67 V∠180°', 640, 540, 42, 'red', wt('titel', 'fire') - 0.1, we('titel', 'spændinger'), { align: 'center' });
+
+  // ---------------------------------------------------------------- 1 transformeren og spændingerne
+  B.goto('opgave', 1);
+  bubble(1, 'Fire viklinger', 130, 135, 50, 'blue', S('opgave') - 0.1, S('opgave') + 0.8);
+  {
+    const t0 = S('opgave') + 0.2;
+    B.inductor(1, [760, 200], [760, 620], t0, t0 + 0.6, { loops: 10, body: 380 });
+    text(1, '120 V', 640, 420, 32, 'blue', t0 + 0.3, t0 + 0.6);
+    line(1, [[795, 200], [795, 620]], 'black', 2.4, t0 + 0.4, t0 + 0.8); line(1, [[805, 200], [805, 620]], 'black', 2.4, t0 + 0.4, t0 + 0.8);
+    const th = S('hver2');
+    ['a', 'b', 'c', 'd'].forEach((v, i) => {
+      const y0 = 210 + i * 105, t = wt('hver2', 'Vikling', i) - 0.1;
+      B.inductor(1, [840, y0 + 80], [840, y0], t, t + 0.4, { loops: 3, body: 60, col: COL[v] });
+      text(1, v, 870, y0 + 10, 26, COL[v], t, t + 0.3); text(1, v + "'", 870, y0 + 84, 26, COL[v], t, t + 0.3);
+      text(1, (v === 'd' ? '6,67' : String(VV[v])) + ' V', 930, y0 + 50, 32, COL[v], t + 0.2, t + 0.5);
+    });
+  }
+  text(1, 'N:  1/15,  1/4,  1/12,  1/18', 160, 250, 34, 'black', wt('opgave', 'forholdene') - 0.1, we('opgave', 'attendedel'));
+  B.formel(1, '6.30', 'V_2 = N · V_1', 160, 360, 38, wt('hver', 'ligning') - 0.1, we('hver', 'primærspændingen'));
+  text(1, 'a:  120 / 15 = 8 V', 160, 460, 34, 'blue', wt('hver2', 'Vikling') - 0.1, we('hver2', 'volt'));
+  text(1, 'b: 30 V,   c: 10 V,   d: 6,67 V', 160, 530, 34, 'black', wt('hver2', 'Vikling', 1) - 0.1, we('hver2', 'volt', 3));
+
+  // ---------------------------------------------------------------- 2 serieforbindelse
+  B.goto('serie', 2);
+  bubble(2, 'Viklinger i serie', 130, 135, 50, 'blue', S('serie') - 0.1, S('serie') + 0.8);
+  {
+    const t0 = wt('serie', 'batterier');
+    [[300, 'blue', '8 V'], [480, 'green', '10 V']].forEach(([x, col, s], i) => {
+      line(2, rectc(x, 300, 140, 70), col, 3, t0 + 0.3 * i, t0 + 0.3 * i + 0.4); text(2, s, x + 70, 345, 32, col, t0 + 0.3 * i + 0.2, t0 + 0.3 * i + 0.5, { align: 'center' });
+      text(2, '+', x + 120, 290, 30, col, t0 + 0.3 * i + 0.3, t0 + 0.3 * i + 0.5); text(2, '−', x + 6, 290, 30, col, t0 + 0.3 * i + 0.3, t0 + 0.3 * i + 0.5);
+    });
+    line(2, [[440, 335], [480, 335]], 'black', 3, t0 + 0.5, t0 + 0.7);
+    text(2, 'slut → start:  8 + 10 = 18 V', 300, 450, 36, 'black', wt('serie', 'lægges') - 0.1, we('serie', 'sammen'));
+  }
+  text(2, 'vendt vikling:  spændingen trækkes fra', 300, 540, 34, 'red', S('serie2') + 0.1, we('serie2', 'fra'));
+  text(2, 'udgang målt modsat:  fortegnsskift = 180°', 300, 610, 34, 'red', wt('serie2', 'måler') - 0.1, we('serie2', 'grader'));
+
+  // ---------------------------------------------------------------- 3 a, b, c
+  B.goto('a', 3);
+  bubble(3, 'a), b) og c)', 130, 135, 50, 'blue', S('a') - 0.1, S('a') + 0.8);
+  text(3, 'a)  8 + 10 + 6,67 = 24,67 V', 160, 250, 38, 'black', S('a') + 0.3, we('a', 'syv', 1));
+  text(3, "a' → c,   c' → d,   udgang a til d'", 220, 310, 32, 'blue', S('a2') + 0.1, we('a2', 'mærke', 2));
+  text(3, 'b)  30 + 6,67 = 36,67 V', 160, 410, 38, 'black', S('b') + 0.1, we('b', 'passer'));
+  text(3, "b' → d,   udgang b til d'", 220, 470, 32, 'blue', wt('b', 'forbinder') - 0.1, we('b', 'mærke', 1));
+  text(3, 'c)  8 + 10 = 18 V', 160, 570, 38, 'black', S('c') + 0.1, we('c', 'atten', 1));
+  text(3, "a' → c,   udgang a til c'", 220, 630, 32, 'blue', wt('c', 'forbinder') - 0.1, we('c', 'mærke', 1));
+
+  // ---------------------------------------------------------------- 4 d
+  B.goto('d', 4);
+  bubble(4, 'd) 54,67 V ∠180°', 130, 135, 50, 'blue', S('d') - 0.1, S('d') + 0.8);
+  text(4, '8 + 30 + 10 + 6,67 = 54,67 V', 160, 260, 40, 'black', wt('d', 'Summen') - 0.1, we('d', 'syv', 1));
+  text(4, "alle i serie:  a' → b,  b' → c,  c' → d", 160, 360, 36, 'blue', S('d2') + 0.1, we('d2', 'serie'));
+  ringet(4, "180°:  udgang målt fra d' til a   ⇒   −54,67 V", 160, 470, 38, 'red', wt('d2', 'Hundrede') - 0.1, we('d2', 'a'));
+
+  // ---------------------------------------------------------------- 5 tjek
+  B.goto('tjek_q', 5);
+  B.tjek(5, ['Hvordan kan man få', '22 V?'], ['30 − 8 = 22 V: b i serie med a,', 'men a vendt'], 'tjek_q', 'tjek_a');
+
+  // ---------------------------------------------------------------- 6 tjek vist: stablede søjler
+  B.goto('tjek_vis', 6);
+  {
+    const t0 = S('tjek_vis'), y0 = 600, sc = 7.5;
+    const kombi = [['a + c + d', ['a', 'c', 'd'], '24,67'], ['b + d', ['b', 'd'], '36,67'], ['a + c', ['a', 'c'], '18'], ['alle', ['a', 'b', 'c', 'd'], '54,67']];
+    kombi.forEach(([nv, ls, sum], i) => {
+      const x = 220 + i * 250, t = t0 + 0.4 + 0.7 * i; let y = y0;
+      ls.forEach((v, j) => { const h = VV[v] * sc; line(6, rectc(x, y - h, 110, h), COL[v], 3, t + 0.15 * j, t + 0.15 * j + 0.3); text(6, v, x + 50, y - h / 2 + 10, 24, COL[v], t + 0.15 * j + 0.1, t + 0.15 * j + 0.3); y -= h; });
+      text(6, sum + ' V', x + 55, y - 14, 28, 'black', t + 0.4, t + 0.7, { align: 'center' });
+      text(6, nv, x + 55, y0 + 40, 26, 'black', t, t + 0.3, { align: 'center' });
+    });
+  }
+
+  // ---------------------------------------------------------------- 7 slut
+  B.goto('slut', 7);
+  B.slut(7, 'ELE1 slides Day 10, øvelse 5 · Rizzoni & Kearns (2022), opg. 6.55 og lign. 6.30 · Mathcad: Opgave 7.55', 'opgave 7.58', 'slut');
+  text(7, 'hver vikling:  V = N · 120 V', 200, 250, 40, 'blue', S('slut') + 0.3, we('slut', 'primærspændingen'));
+  text(7, 'serie lægger sammen,  vendt trækker fra', 200, 335, 40, 'black', wt('slut', 'Serieforbindelse') - 0.1, we('slut', 'fra'));
+  text(7, '180° = udgang målt modsat', 200, 420, 40, 'red', wt('slut', 'hundrede') - 0.1, we('slut', 'vej'));
+});
+
+</script>
+<script>BP.live({"duration":163.808,"audio":"opg-7-55.mp3","order":["titel","opgave","hver","hver2","serie","serie2","a","a2","b","c","d","d2","tjek_q","tjek_a","tjek_vis","slut"],"lines":{"titel":{"start":0.5,"end":9.241,"words":[["Opgave",0.54,0.94],["syv",0.98,1.28],["femoghalvtreds",1.8,2.44],["En",3.26,3.36],["transformer",3.42,4.101],["med",4.141,4.241],["fire",4.361,4.621],["sekundærviklinger",4.741,5.501],["Vi",6.381,6.441],["finder",6.481,6.661],["hvordan",6.661,6.861],["de",6.921,6.981],["skal",7.041,7.161],["forbindes",7.201,7.601],["for",7.661,7.761],["at",7.761,7.841],["give",7.861,8.001],["fire",8.081,8.361],["bestemte",8.441,8.841],["spændinger",8.881,9.241]],"text":"Opgave syv femoghalvtreds. En transformer med fire sekundærviklinger. Vi finder, hvordan de skal forbindes for at give fire bestemte spændinger."},"opgave":{"start":11.061,"end":20.263,"words":[["Primærspændingen",11.101,11.841],["er",11.941,12.021],["hundrede",12.161,12.442],["og",12.442,12.482],["tyve",12.562,12.802],["volt",12.842,13.082],["Viklingerne",13.942,14.382],["har",14.542,14.722],["forholdene",14.962,15.422],["en",15.762,15.862],["femtendedel",15.982,16.562],["en",17.022,17.102],["fjerdedel",17.162,17.682],["en",18.242,18.322],["tolvtedel",18.382,18.922],["og",19.462,19.542],["en",19.582,19.662],["attendedel",19.802,20.263]],"text":"Primærspændingen er hundrede og tyve volt. Viklingerne har forholdene en femtendedel, en fjerdedel, en tolvtedel og en attendedel."},"hver":{"start":22.083,"end":31.464,"words":[["Hver",22.123,22.263],["vikling",22.323,22.623],["er",22.703,22.783],["sin",22.823,22.943],["egen",23.083,23.303],["ideelle",23.383,23.723],["transformer",23.763,24.303],["med",24.563,24.663],["samme",24.783,25.043],["primærspænding",25.103,25.743],["Ligning",26.783,27.063],["seks",27.083,27.403],["tredive",27.463,27.843],["sekundærspændingen",28.824,29.604],["er",29.764,29.844],["N",30.064,30.104],["gange",30.244,30.524],["primærspændingen",30.684,31.464]],"text":"Hver vikling er sin egen ideelle transformer med samme primærspænding. Ligning seks tredive: sekundærspændingen er N gange primærspændingen."},"hver2":{"start":32.844,"end":44.846,"words":[["Vikling",32.884,33.164],["a",33.244,33.264],["giver",33.444,33.664],["hundrede",33.824,34.144],["og",34.144,34.224],["tyve",34.224,34.444],["over",34.524,34.664],["femten",34.724,35.064],["altså",35.484,35.745],["otte",36.025,36.225],["volt",36.265,36.485],["Vikling",37.365,37.665],["b",37.745,37.765],["giver",38.145,38.365],["tredive",38.605,38.965],["volt",39.025,39.245],["Vikling",40.025,40.305],["c",40.365,40.385],["giver",40.725,40.905],["ti",41.145,41.265],["volt",41.385,41.625],["Og",42.365,42.425],["vikling",42.465,42.725],["d",42.805,42.825],["giver",43.145,43.325],["seks",43.546,43.726],["komma",43.786,43.966],["seks",44.086,44.386],["syv",44.406,44.526],["volt",44.646,44.846]],"text":"Vikling a giver hundrede og tyve over femten, altså otte volt. Vikling b giver tredive volt. Vikling c giver ti volt. Og vikling d giver seks komma seks syv volt."},"serie":{"start":46.666,"end":53.747,"words":[["Viklinger",46.706,47.046],["kan",47.066,47.166],["sættes",47.186,47.386],["i",47.446,47.466],["serie",47.546,47.826],["ligesom",48.026,48.246],["batterier",48.366,48.786],["Forbinder",49.586,49.906],["man",49.926,50.026],["slutningen",50.106,50.566],["af",50.606,50.666],["én",50.746,50.866],["vikling",50.926,51.267],["med",51.387,51.487],["starten",51.527,51.847],["af",51.867,51.907],["den",51.927,52.007],["næste",52.047,52.307],["lægges",52.747,52.947],["spændingerne",52.987,53.407],["sammen",53.487,53.747]],"text":"Viklinger kan sættes i serie, ligesom batterier. Forbinder man slutningen af én vikling med starten af den næste, lægges spændingerne sammen."},"serie2":{"start":54.987,"end":63.088,"words":[["Vender",55.027,55.227],["man",55.247,55.327],["en",55.347,55.427],["vikling",55.447,55.747],["trækkes",55.927,56.227],["dens",56.247,56.387],["spænding",56.407,56.687],["fra",56.747,56.847],["Og",57.887,57.947],["måler",57.987,58.207],["man",58.227,58.327],["udgangen",58.427,58.827],["den",58.908,59.028],["modsatte",59.088,59.448],["vej",59.488,59.628],["skifter",60.048,60.368],["fortegnet",60.408,60.888],["Det",61.548,61.628],["svarer",61.668,61.868],["til",61.888,62.008],["hundrede",62.068,62.408],["og",62.408,62.448],["firs",62.468,62.728],["grader",62.768,63.088]],"text":"Vender man en vikling, trækkes dens spænding fra. Og måler man udgangen den modsatte vej, skifter fortegnet. Det svarer til hundrede og firs grader."},"a":{"start":64.908,"end":75.05,"words":[["Del",64.948,65.108],["a",65.208,65.228],["fireogtyve",65.268,66.568],["komma",66.608,66.768],["seks",66.869,67.049],["syv",67.109,67.249],["volt",67.309,67.529],["Vi",68.569,68.609],["leder",68.669,68.849],["efter",68.869,69.049],["en",69.069,69.149],["kombination",69.169,69.709],["otte",70.609,70.849],["plus",70.949,71.129],["ti",71.209,71.309],["plus",71.609,71.749],["seks",71.769,72.089],["komma",72.129,72.289],["seks",72.369,72.629],["syv",72.649,72.769],["giver",73.169,73.329],["præcis",73.349,73.809],["fireogtyve",73.989,74.449],["komma",74.469,74.63],["seks",74.71,74.93],["syv",74.95,75.05]],"text":"Del a, fireogtyve komma seks syv volt. Vi leder efter en kombination: otte plus ti plus seks komma seks syv giver præcis fireogtyve komma seks syv."},"a2":{"start":76.17,"end":83.011,"words":[["Så",76.21,76.33],["forbinder",76.33,76.65],["vi",76.67,76.73],["a",76.95,76.97],["mærke",77.17,77.51],["til",77.69,77.83],["c",77.91,77.93],["og",78.63,78.69],["c",78.79,78.81],["mærke",78.99,79.29],["til",79.45,79.57],["d",79.63,79.65],["Udgangen",80.83,81.19],["tages",81.23,81.53],["mellem",81.59,81.79],["a",81.95,81.97],["og",82.351,82.431],["d",82.531,82.551],["mærke",82.751,83.011]],"text":"Så forbinder vi a mærke til c og c mærke til d. Udgangen tages mellem a og d mærke."},"b":{"start":84.831,"end":95.852,"words":[["Del",84.871,85.011],["b",85.071,85.091],["seksogtredive",85.091,86.611],["komma",86.651,86.791],["seks",86.851,87.091],["syv",87.111,87.231],["volt",87.291,87.471],["Tredive",87.491,88.871],["plus",89.031,89.171],["seks",89.191,89.451],["komma",89.491,89.631],["seks",89.711,89.951],["syv",89.971,90.071],["passer",90.272,90.552],["Vi",91.512,91.552],["forbinder",91.612,91.932],["b",92.092,92.112],["mærke",92.332,92.632],["til",92.832,92.972],["d",93.012,93.032],["og",93.752,93.812],["tager",93.832,93.992],["udgangen",94.072,94.432],["mellem",94.492,94.692],["b",94.772,94.792],["og",95.232,95.312],["d",95.392,95.412],["mærke",95.592,95.852]],"text":"Del b, seksogtredive komma seks syv volt. Tredive plus seks komma seks syv passer. Vi forbinder b mærke til d og tager udgangen mellem b og d mærke."},"c":{"start":97.672,"end":106.274,"words":[["Del",97.712,97.872],["c",97.972,97.992],["atten",98.873,99.073],["volt",99.113,99.313],["Otte",100.313,100.493],["plus",100.513,100.693],["ti",100.753,100.833],["er",101.213,101.293],["atten",101.373,101.573],["Vi",102.073,102.133],["forbinder",102.173,102.553],["a",102.713,102.733],["mærke",102.913,103.233],["til",103.313,103.453],["c",103.553,103.573],["og",104.013,104.093],["tager",104.133,104.333],["udgangen",104.413,104.813],["mellem",104.873,105.093],["a",105.293,105.313],["og",105.613,105.693],["c",105.793,105.813],["mærke",105.993,106.274]],"text":"Del c, atten volt. Otte plus ti er atten. Vi forbinder a mærke til c og tager udgangen mellem a og c mærke."},"d":{"start":108.094,"end":119.195,"words":[["Del",108.134,108.294],["d",108.374,108.394],["fireoghalvtreds",109.134,109.714],["komma",109.754,109.914],["seks",110.034,110.234],["syv",110.294,110.454],["volt",110.534,110.754],["ved",110.914,111.014],["hundrede",111.094,111.354],["og",111.394,111.434],["firs",111.434,111.674],["grader",111.694,112.014],["Summen",112.794,113.094],["af",113.214,113.274],["alle",113.354,113.514],["fire",113.594,113.874],["er",114.034,114.114],["otte",114.435,114.675],["plus",114.755,114.915],["tredive",114.955,115.335],["plus",115.395,115.575],["ti",115.635,115.755],["plus",115.935,116.075],["seks",116.095,116.355],["komma",116.395,116.535],["seks",116.595,116.875],["syv",116.895,117.015],["altså",117.475,117.755],["fireoghalvtreds",117.975,118.555],["komma",118.575,118.735],["seks",118.815,119.055],["syv",119.075,119.195]],"text":"Del d, fireoghalvtreds komma seks syv volt ved hundrede og firs grader. Summen af alle fire er otte plus tredive plus ti plus seks komma seks syv, altså fireoghalvtreds komma seks syv."},"d2":{"start":119.955,"end":127.636,"words":[["Vi",119.995,120.035],["sætter",120.115,120.335],["alle",120.495,120.655],["fire",120.715,120.935],["i",120.995,121.015],["serie",121.075,121.375],["Hundrede",121.935,122.196],["og",122.216,122.256],["firs",122.256,122.476],["grader",122.516,122.816],["betyder",122.836,123.176],["modsat",123.256,123.596],["fortegn",123.636,124.096],["så",124.476,124.576],["vi",124.596,124.636],["tager",124.696,124.876],["udgangen",124.956,125.356],["den",125.396,125.516],["modsatte",125.596,126.036],["vej",126.076,126.216],["mellem",126.456,126.676],["d",126.796,126.816],["mærke",126.996,127.336],["og",127.476,127.536],["a",127.616,127.636]],"text":"Vi sætter alle fire i serie. Hundrede og firs grader betyder modsat fortegn, så vi tager udgangen den modsatte vej, mellem d mærke og a."},"tjek_q":{"start":129.456,"end":132.017,"words":[["Tjek",129.496,129.656],["dig",129.676,129.776],["selv",129.816,129.976],["Hvordan",130.396,130.637],["kan",130.677,130.777],["man",130.797,130.877],["få",130.917,131.057],["toogtyve",131.217,131.757],["volt",131.797,132.017]],"text":"Tjek dig selv. Hvordan kan man få toogtyve volt?"},"tjek_a":{"start":136.137,"end":141.177,"words":[["Tredive",136.177,136.537],["minus",136.597,136.837],["otte",136.957,137.197],["Sæt",137.697,137.857],["b",137.957,137.977],["og",138.137,138.197],["a",138.277,138.297],["i",138.417,138.437],["serie",138.517,138.817],["men",139.237,139.337],["med",139.377,139.457],["a",139.557,139.577],["vendt",139.777,139.997],["så",140.157,140.257],["dens",140.257,140.377],["spænding",140.397,140.737],["trækkes",140.757,141.057],["fra",141.097,141.177]],"text":"Tredive minus otte. Sæt b og a i serie, men med a vendt, så dens spænding trækkes fra."},"tjek_vis":{"start":142.997,"end":149.697,"words":[["Her",143.037,143.157],["kan",143.197,143.297],["du",143.317,143.357],["se",143.397,143.457],["de",143.557,143.617],["fire",143.657,143.857],["kombinationer",143.917,144.557],["som",144.597,144.697],["søjler",144.777,145.137],["bygget",145.417,145.717],["af",145.797,145.877],["viklingernes",145.957,146.457],["spændinger",146.497,146.937],["Hver",147.437,147.597],["farve",147.697,147.957],["er",148.017,148.077],["en",148.097,148.177],["vikling",148.257,148.577],["og",148.657,148.697],["højden",148.757,149.097],["er",149.277,149.357],["summen",149.417,149.697]],"text":"Her kan du se de fire kombinationer som søjler, bygget af viklingernes spændinger. Hver farve er en vikling, og højden er summen."},"slut":{"start":151.517,"end":162.338,"words":[["Kort",151.557,151.737],["sagt",151.777,151.997],["regn",152.417,152.637],["hver",152.677,152.817],["viklings",152.937,153.277],["spænding",153.297,153.617],["som",153.677,153.817],["N",154.197,154.257],["gange",154.357,154.577],["primærspændingen",154.637,155.397],["Serieforbindelse",155.917,156.617],["lægger",156.677,156.877],["sammen",156.917,157.177],["en",157.597,157.697],["vendt",157.757,157.957],["vikling",158.037,158.357],["trækker",158.417,158.657],["fra",158.697,158.818],["og",159.278,159.338],["hundrede",159.378,159.598],["og",159.598,159.638],["firs",159.638,159.838],["grader",159.878,160.138],["betyder",160.158,160.518],["at",160.638,160.718],["udgangen",160.858,161.198],["måles",161.238,161.558],["den",161.618,161.738],["modsatte",161.818,162.178],["vej",162.198,162.338]],"text":"Kort sagt: regn hver viklings spænding som N gange primærspændingen. Serieforbindelse lægger sammen, en vendt vikling trækker fra, og hundrede og firs grader betyder, at udgangen måles den modsatte vej."}}}, { audio: 'opg-7-55.mp3', id: 'opg-7-55' });</script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Den ideelle transformer · video</title>
+<meta name="description" content="Omsætningsforhold N = n₂/n₁, V₂ = N·V₁, I₂ = I₁/N, effektbevarelse og reflekteret impedans Z₁ = Z₂/N².">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Dag 10: videoer</a><h1>Den ideelle transformer</h1><span class="meta">ELE1 · dag 10 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Den ideelle transformer"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Omsætningsforhold N = n₂/n₁, V₂ = N·V₁, I₂ = I₁/N, effektbevarelse og reflekteret impedans Z₁ = Z₂/N².</p><div class="chips"><a href="../../dag/Dag10_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/ele1/dag10">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// ELE1 Dag 10 · Den ideelle transformer (Rizzoni & Kearns 6.4: (6.29)–(6.32)). Dybdegående version 2026-11-12.
+// N = n2/n1; V2 = N V1, I2 = I1/N; S1 = S2; Z1 = Z2/N². Eks.: 8 Ω bag N = 2 ses som 2 Ω. Tjek: 230 → 12 V, 5 A ⇒ I1 = 0,26 A, 60 W.
+BP.scene({ header: 'ELE1 · Dag 10', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, dot, ring, under, ell, rect, hatch, dashed, PI } = B;
+  const S = (id) => L(id).start;
+  const rectc = (x, y, w, h) => rect(x, y, w, h).concat([[x, y]]);
+  const ringet = (k, s, x, y, size, col, a, te) => { const r = text(k, s, x, y, size, col, a, te); ring(r, col, te, te + 0.5); return r; };
+  const trafo = (k, x, y0, y1, a, b, col = 'blue', gap = 46) => {
+    B.inductor(k, [x, y0], [x, y1], a, b, { col });
+    B.inductor(k, [x + gap, y1], [x + gap, y0], a + 0.1, b + 0.1, { col });
+    line(k, [[x + gap / 2 - 5, y0 + 6], [x + gap / 2 - 5, y1 - 6]], 'black', 2.4, a + 0.2, b);
+    line(k, [[x + gap / 2 + 5, y0 + 6], [x + gap / 2 + 5, y1 - 6]], 'black', 2.4, a + 0.2, b);
+  };
+
+  // ---------------------------------------------------------------- 0 titel
+  B.titel(0, 'Den ideelle transformer', 'ELE1 · Dag 10 · Rizzoni & Kearns afsnit 6.4', 'titel');
+  text(0, 'V_2 = N·V_1      I_2 = I_1 / N', 640, 540, 48, 'red', wt('titel', 'spændingen') - 0.1, we('titel', 'bruger'), { align: 'center' });
+
+  // ---------------------------------------------------------------- 1 opbygning, flux og Faraday
+  B.goto('opbygning', 1);
+  bubble(1, 'Opbygning', 130, 135, 50, 'blue', S('opbygning') - 0.1, S('opbygning') + 0.8);
+  {
+    const t0 = wt('opbygning', 'jernkerne'), x0 = 720, y0 = 220, w = 400, h = 330;
+    line(1, rectc(x0, y0, w, h).concat([[x0, y0 + 2]]), 'black', 5, t0 - 0.1, t0 + 0.6);
+    line(1, rectc(x0 + 70, y0 + 70, w - 140, h - 140).concat([[x0 + 70, y0 + 72]]), 'black', 3, t0, t0 + 0.6);
+    const tp = wt('opbygning', 'Primærspolen');
+    for (let i = 0; i < 6; i++) line(1, [[x0 - 30, y0 + 90 + i * 28], [x0 + 100, y0 + 76 + i * 28]], 'blue', 3, tp + i * 0.05, tp + 0.2 + i * 0.05);
+    text(1, 'n_1', x0 - 90, y0 + 180, 36, 'blue', tp + 0.2, tp + 0.5);
+    const ts = wt('opbygning', 'sekundærspolen');
+    for (let i = 0; i < 10; i++) line(1, [[x0 + w - 100, y0 + 76 + i * 17], [x0 + w + 30, y0 + 90 + i * 17]], 'green', 3, ts + i * 0.04, ts + 0.2 + i * 0.04);
+    text(1, 'n_2', x0 + w + 40, y0 + 180, 36, 'green', ts + 0.2, ts + 0.5);
+    const tf = wt('flux', 'jernkernen');
+    arrow(1, [[x0 + 35, y0 + 250], [x0 + 35, y0 + 40], [x0 + w - 35, y0 + 40], [x0 + w - 35, y0 + 250]], 'red', 3, tf - 0.1, tf + 0.9, 14);
+    text(1, 'φ', x0 + w / 2 - 10, y0 + 28, 40, 'red', tf + 0.4, tf + 0.8);
+  }
+  text(1, 'ingen ledning mellem spolerne', 160, 260, 32, 'black', wt('opbygning', 'ingen') - 0.1, we('opbygning', 'dem'));
+  text(1, 'samme flux φ i begge', 160, 340, 34, 'red', wt('flux', 'samme') - 0.1, we('flux', 'flux'));
+  text(1, 'Faraday:  spænding ∝ antal vindinger', 160, 620, 34, 'black', S('faraday') + 0.1, we('faraday', 'vindinger', 1));
+
+  // ---------------------------------------------------------------- 2 omsætningsforhold N
+  B.goto('n', 2);
+  bubble(2, 'Omsætningsforhold', 130, 135, 50, 'blue', S('n') - 0.1, S('n') + 0.8);
+  B.formel(2, '6.29', 'N = n_2 / n_1', 180, 260, 48, wt('n', 'ligning') - 0.1, we('n', 'primærsiden'), 'red');
+  B.formel(2, '6.30', 'V_2 = N · V_1', 180, 400, 46, wt('v2', 'sekundærspændingen') - 0.1, we('v2', 'tredive'));
+  text(2, 'N > 1: op       N < 1: ned', 180, 530, 38, 'black', S('op_ned') + 0.1, we('op_ned', 'ned'));
+  text(2, '"1 : n"  betyder  N = n', 180, 610, 38, 'green', wt('op_ned', 'forhold') - 0.1, we('op_ned', 'n', 1));
+  trafo(2, 880, 300, 460, S('n'), S('n') + 0.8);
+  text(2, 'n_1', 830, 390, 32, 'blue', S('n') + 0.5, S('n') + 0.8); text(2, 'n_2', 960, 390, 32, 'blue', S('n') + 0.6, S('n') + 0.9);
+
+  // ---------------------------------------------------------------- 3 effekt, strøm og prikker
+  B.goto('effekt', 3);
+  bubble(3, 'Effekt og strøm', 130, 135, 50, 'blue', S('effekt') - 0.1, S('effekt') + 0.8);
+  B.formel(3, '6.31', 'S_1 = S_2   (ingen tab)', 180, 250, 42, wt('effekt', 'ligning') - 0.1, we('effekt', 'enogtredive'));
+  text(3, 'V_1 · I_1 = V_2 · I_2 = N V_1 · I_2', 180, 360, 40, 'black', S('strom') + 0.1, wt('strom', 'Hvis'));
+  ringet(3, 'I_2 = I_1 / N', 180, 460, 48, 'red', wt('strom', 'mindre') - 0.1, we('strom', 'N', 2));
+  text(3, '(6.30)', 520, 460, 30, 'black', wt('strom', 'ligning') - 0.1, we('strom', 'tredive'));
+  {
+    const t0 = S('prik');
+    trafo(3, 880, 360, 520, t0, t0 + 0.6);
+    dot(3, 870, 350, 8, 'red', t0 + 0.4); dot(3, 940, 350, 8, 'red', t0 + 0.4);
+    const ti = wt('prik', 'Strøm');
+    arrow(3, [[800, 360], [868, 360]], 'green', 3, ti - 0.1, ti + 0.3, 12); text(3, 'I_1', 790, 340, 28, 'green', ti, ti + 0.3);
+    arrow(3, [[940, 360], [1010, 360]], 'green', 3, ti + 0.3, ti + 0.7, 12); text(3, 'I_2', 1000, 340, 28, 'green', ti + 0.4, ti + 0.7);
+    text(3, 'ind i prik  →  ud af prik', 760, 600, 30, 'red', ti, we('prik', 'sekundærsiden'));
+  }
+
+  // ---------------------------------------------------------------- 4 reflekteret impedans
+  B.goto('refl', 4);
+  bubble(4, 'Hvad ser kilden?', 130, 135, 50, 'blue', S('refl') - 0.1, S('refl') + 0.8);
+  text(4, 'Z_1 = V_1 / I_1', 180, 250, 44, 'black', wt('refl', 'Impedans') - 0.1, we('refl', 'strøm'));
+  text(4, '= ( V_2 / N ) / ( N · I_2 )', 300, 340, 42, 'black', S('refl2') + 0.1, we('refl2', 'to', 2));
+  B.formel(4, '6.32', 'Z_1 = Z_2 / N²', 180, 480, 52, wt('refl3', 'ligning') - 0.1, we('refl3', 'anden'), 'red');
+  text(4, 'de to N ganges sammen', 700, 480, 32, 'green', S('refl3') + 0.1, we('refl3', 'nævneren'));
+
+  // ---------------------------------------------------------------- 5 eksempel
+  B.goto('eks', 5);
+  bubble(5, 'Eksempel', 130, 135, 50, 'blue', S('eks') - 0.1, S('eks') + 0.8);
+  {
+    const t0 = S('eks') + 0.3;
+    B.source(5, [300, 520], [300, 300], 'V', t0, t0 + 0.6);
+    B.wire(5, [[300, 300], [520, 300]], t0 + 0.3, t0 + 0.6); B.wire(5, [[300, 520], [520, 520]], t0 + 0.3, t0 + 0.6);
+    trafo(5, 520, 300, 520, t0 + 0.5, t0 + 1.1);
+    B.wire(5, [[566, 300], [760, 300]], t0 + 0.8, t0 + 1.1); B.wire(5, [[566, 520], [760, 520]], t0 + 0.8, t0 + 1.1);
+    B.resistor(5, [760, 300], [760, 520], t0 + 1.0, t0 + 1.4, { label: '8 Ω', side: 1 });
+    text(5, 'N = 2', 500, 270, 32, 'black', t0 + 0.8, t0 + 1.1);
+    const tz = wt('eks', 'otte', 1);
+    ringet(5, 'Z_1 = 8 / 2² = 2 Ω', 820, 620, 44, 'red', tz - 0.1, we('eks', 'ohm', 1));
+  }
+  text(5, 'tilpas en last til en kilde', 160, 230, 34, 'green', S('eks2') + 0.1, we('eks2', 'kilde'));
+
+  // ---------------------------------------------------------------- 6 tjek
+  B.goto('tjek_q', 6);
+  B.tjek(6, ['230 V → 12 V, lasten trækker 5 A.', 'Hvor stor er primærstrømmen?'], ['N = 12/230,  I_1 = N · I_2 = 0,26 A', 'P = 60 W på begge sider'], 'tjek_q', 'tjek_a');
+
+  // ---------------------------------------------------------------- 7 tjek vist
+  B.goto('tjek_vis', 7);
+  {
+    const t0 = S('tjek_vis'), y0 = 580, s = 1.4;
+    text(7, 'primær', 340, 160, 34, 'blue', t0, t0 + 0.4, { align: 'center' }); text(7, 'sekundær', 900, 160, 34, 'green', t0 + 0.2, t0 + 0.6, { align: 'center' });
+    const tv = wt('tjek_vis', 'Spændingen');
+    line(7, rectc(240, y0 - 230 * s, 80, 230 * s), 'blue', 3, tv - 0.1, tv + 0.4); text(7, '230 V', 280, y0 - 230 * s - 12, 28, 'blue', tv, tv + 0.3, { align: 'center' });
+    line(7, rectc(800, y0 - 12 * s, 80, 12 * s), 'green', 3, tv + 0.2, tv + 0.6); text(7, '12 V', 840, y0 - 12 * s - 12, 28, 'green', tv + 0.2, tv + 0.5, { align: 'center' });
+    const ti = wt('tjek_vis', 'strømmen');
+    line(7, rectc(360, y0 - 0.26 * 60, 80, 0.26 * 60), 'red', 3, ti - 0.1, ti + 0.4); text(7, '0,26 A', 400, y0 - 30, 28, 'red', ti, ti + 0.3, { align: 'center' });
+    line(7, rectc(920, y0 - 5 * 60, 80, 5 * 60), 'red', 3, ti + 0.2, ti + 0.6); text(7, '5 A', 960, y0 - 5 * 60 - 12, 28, 'red', ti + 0.2, ti + 0.5, { align: 'center' });
+    const tp = wt('tjek_vis', 'Produktet');
+    text(7, 'V · I = 60 W', 340, 640, 34, 'black', tp - 0.1, tp + 0.5, { align: 'center' }); text(7, 'V · I = 60 W', 900, 640, 34, 'black', tp + 0.2, tp + 0.8, { align: 'center' });
+  }
+
+  // ---------------------------------------------------------------- 8 slut
+  B.goto('slut', 8);
+  B.slut(8, 'ELE1 slides Day 10 · Rizzoni & Kearns (2022), afsnit 6.4 · lign. 6.29–6.32', 'maksimal effektoverførsel med transformer', 'slut');
+  text(8, 'N = n_2 / n_1', 200, 250, 44, 'blue', S('slut') + 0.3, we('slut', 'et'));
+  text(8, 'V_2 = N V_1,     I_2 = I_1 / N,     S_1 = S_2', 200, 335, 40, 'red', wt('slut', 'Spændingen') - 0.1, we('slut', 'samme'));
+  text(8, 'Z_1 = Z_2 / N²', 200, 420, 44, 'green', wt('slut', 'impedans') - 0.1, we('slut', 'anden'));
+});
+
+</script>
+<script>BP.live({"duration":208.779,"audio":"ideel-transformer.mp3","order":["titel","opbygning","flux","faraday","n","v2","op_ned","effekt","strom","prik","refl","refl2","refl3","eks","eks2","tjek_q","tjek_a","tjek_vis","slut"],"lines":{"titel":{"start":0.5,"end":10.181,"words":[["Den",0.54,0.68],["ideelle",0.82,1.22],["transformer",1.24,1.84],["Hvordan",2.26,2.52],["to",2.68,2.78],["spoler",2.92,3.3],["på",3.34,3.48],["samme",3.52,3.72],["jernkerne",3.82,4.34],["kan",4.4,4.52],["sætte",4.58,4.74],["spændingen",4.78,5.2],["op",5.321,5.441],["eller",5.501,5.661],["ned",5.701,5.841],["Vi",6.741,6.801],["starter",6.861,7.181],["helt",7.421,7.621],["fra",7.641,7.741],["bunden",7.761,8.041],["og",8.201,8.281],["hver",8.341,8.501],["formel",8.601,8.881],["bliver",8.901,9.061],["vist",9.101,9.361],["før",9.541,9.701],["vi",9.741,9.781],["bruger",9.841,10.061],["den",10.081,10.181]],"text":"Den ideelle transformer. Hvordan to spoler på samme jernkerne kan sætte spændingen op eller ned. Vi starter helt fra bunden, og hver formel bliver vist, før vi bruger den."},"opbygning":{"start":12.001,"end":21.042,"words":[["En",12.041,12.121],["transformer",12.161,12.741],["er",12.841,12.901],["to",12.961,13.081],["spoler",13.201,13.541],["viklet",13.601,13.921],["om",14.001,14.081],["samme",14.181,14.381],["jernkerne",14.441,14.981],["Primærspolen",15.621,16.342],["sidder",16.422,16.642],["ved",16.682,16.762],["kilden",16.782,17.142],["og",17.342,17.442],["sekundærspolen",17.642,18.422],["sidder",18.522,18.742],["ved",18.782,18.862],["lasten",18.882,19.222],["Der",19.922,20.002],["er",20.042,20.082],["ingen",20.122,20.282],["ledning",20.322,20.642],["mellem",20.702,20.922],["dem",20.962,21.042]],"text":"En transformer er to spoler viklet om samme jernkerne. Primærspolen sidder ved kilden, og sekundærspolen sidder ved lasten. Der er ingen ledning mellem dem."},"flux":{"start":22.042,"end":32.843,"words":[["Vekselstrømmen",22.082,22.722],["i",22.842,22.862],["primærspolen",22.922,23.642],["laver",23.822,24.082],["et",24.182,24.262],["magnetisk",24.382,24.902],["felt",24.962,25.182],["der",25.322,25.422],["skifter",25.462,25.722],["retning",25.762,26.042],["hele",26.163,26.383],["tiden",26.423,26.663],["Jernkernen",27.603,28.143],["leder",28.203,28.423],["feltet",28.463,28.743],["over",28.803,28.983],["til",29.023,29.163],["sekundærspolen",29.263,30.063],["så",30.303,30.443],["begge",30.543,30.763],["spoler",30.803,31.163],["mærker",31.223,31.523],["den",31.563,31.683],["samme",31.783,31.983],["magnetiske",32.063,32.603],["flux",32.643,32.843]],"text":"Vekselstrømmen i primærspolen laver et magnetisk felt, der skifter retning hele tiden. Jernkernen leder feltet over til sekundærspolen, så begge spoler mærker den samme magnetiske flux."},"faraday":{"start":34.463,"end":44.904,"words":[["Faradays",34.503,35.023],["induktionslov",35.123,35.863],["siger",36.003,36.264],["at",36.384,36.484],["en",36.604,36.684],["skiftende",36.784,37.184],["flux",37.244,37.444],["inducerer",37.704,38.184],["en",38.264,38.344],["spænding",38.404,38.744],["i",38.864,38.884],["hver",38.964,39.124],["vinding",39.204,39.484],["Alle",40.364,40.524],["vindinger",40.564,40.904],["mærker",40.944,41.224],["samme",41.364,41.544],["flux",41.624,41.824],["så",42.364,42.484],["spændingen",42.584,43.004],["er",43.084,43.144],["proportional",43.164,43.784],["med",43.864,43.944],["antallet",44.004,44.444],["af",44.484,44.544],["vindinger",44.584,44.904]],"text":"Faradays induktionslov siger, at en skiftende flux inducerer en spænding i hver vinding. Alle vindinger mærker samme flux, så spændingen er proportional med antallet af vindinger."},"n":{"start":46.724,"end":57.866,"words":[["Derfor",46.764,47.105],["er",47.285,47.365],["spændingsforholdet",47.385,48.185],["lig",48.445,48.585],["vindingsforholdet",48.705,49.465],["Bogen",50.245,50.525],["kalder",50.585,50.805],["det",50.805,50.885],["N",51.005,51.025],["ligning",51.525,51.785],["seks",51.825,52.145],["niogtyve",52.225,53.665],["N",53.705,53.745],["er",53.945,54.025],["antal",54.065,54.385],["vindinger",54.425,54.765],["på",54.845,54.985],["sekundærsiden",55.045,55.825],["over",56.085,56.265],["antal",56.345,56.625],["vindinger",56.665,57.006],["på",57.066,57.206],["primærsiden",57.246,57.866]],"text":"Derfor er spændingsforholdet lig vindingsforholdet. Bogen kalder det N, ligning seks niogtyve: N er antal vindinger på sekundærsiden over antal vindinger på primærsiden."},"v2":{"start":59.266,"end":64.506,"words":[["Så",59.306,59.446],["er",59.466,59.526],["sekundærspændingen",59.546,60.346],["N",60.706,60.726],["gange",60.946,61.166],["primærspændingen",61.226,61.946],["Det",62.426,62.546],["er",62.626,62.706],["første",62.786,63.066],["halvdel",63.106,63.446],["af",63.526,63.586],["ligning",63.626,63.866],["seks",63.906,64.146],["tredive",64.186,64.506]],"text":"Så er sekundærspændingen N gange primærspændingen. Det er første halvdel af ligning seks tredive."},"op_ned":{"start":65.666,"end":75.607,"words":[["Er",65.706,65.786],["N",65.946,65.966],["større",66.246,66.546],["end",66.566,66.666],["en",66.726,66.867],["sættes",67.187,67.407],["spændingen",67.547,67.907],["op",67.987,68.107],["Er",68.787,68.867],["N",69.027,69.047],["mindre",69.307,69.587],["end",69.627,69.727],["en",69.787,69.907],["sættes",70.307,70.527],["den",70.547,70.667],["ned",70.727,70.867],["Et",72.027,72.107],["forhold",72.147,72.547],["skrevet",72.747,73.067],["en",73.427,73.547],["til",73.647,73.767],["n",73.887,73.907],["betyder",74.207,74.587],["N",75.007,75.027],["lig",75.287,75.427],["n",75.587,75.607]],"text":"Er N større end en, sættes spændingen op. Er N mindre end en, sættes den ned. Et forhold skrevet en til n betyder N lig n."},"effekt":{"start":77.427,"end":85.148,"words":[["En",77.467,77.547],["ideel",77.648,77.948],["transformer",77.988,78.588],["har",78.668,78.788],["ingen",78.828,79.008],["tab",79.048,79.288],["Al",80.028,80.148],["effekt",80.208,80.508],["der",80.608,80.708],["går",80.728,80.828],["ind",80.848,80.948],["på",80.988,81.108],["primærsiden",81.128,81.748],["kommer",81.968,82.168],["ud",82.208,82.308],["på",82.368,82.488],["sekundærsiden",82.508,83.208],["Det",83.728,83.828],["er",83.848,83.888],["ligning",83.908,84.188],["seks",84.208,84.508],["enogtredive",84.648,85.148]],"text":"En ideel transformer har ingen tab. Al effekt, der går ind på primærsiden, kommer ud på sekundærsiden. Det er ligning seks enogtredive."},"strom":{"start":86.428,"end":99.07,"words":[["Effekt",86.468,86.828],["er",87.028,87.088],["spænding",87.128,87.468],["gange",87.528,87.709],["strøm",87.749,87.969],["Hvis",88.409,88.549],["spændingen",88.609,89.009],["bliver",89.089,89.289],["N",89.529,89.569],["gange",89.689,89.929],["større",90.029,90.409],["må",90.689,90.809],["strømmen",90.849,91.209],["blive",91.309,91.709],["N",91.729,91.789],["gange",91.869,92.089],["mindre",92.169,92.489],["for",92.709,92.809],["at",92.829,92.909],["produktet",92.949,93.409],["er",93.429,93.489],["det",93.509,93.589],["samme",93.649,93.869],["Det",94.529,94.609],["giver",94.649,94.829],["anden",94.909,95.109],["halvdel",95.169,95.569],["af",95.609,95.669],["ligning",95.709,95.989],["seks",96.009,96.269],["tredive",96.309,96.609],["I",97.189,97.209],["to",97.349,97.489],["er",97.81,97.89],["I",98.03,98.05],["et",98.25,98.37],["over",98.73,98.93],["N",99.05,99.07]],"text":"Effekt er spænding gange strøm. Hvis spændingen bliver N gange større, må strømmen blive N gange mindre, for at produktet er det samme. Det giver anden halvdel af ligning seks tredive: I to er I et over N."},"prik":{"start":100.69,"end":108.871,"words":[["Prikkerne",100.73,101.07],["på",101.11,101.21],["symbolet",101.23,101.71],["viser",101.77,102.07],["hvilke",102.15,102.41],["ender",102.57,102.79],["der",102.83,102.93],["har",102.95,103.05],["samme",103.11,103.31],["polaritet",103.37,103.93],["Strøm",104.49,104.75],["ind",104.99,105.09],["i",105.13,105.15],["prikken",105.21,105.51],["på",105.57,105.67],["primærsiden",105.69,106.39],["svarer",106.51,106.79],["til",106.83,106.95],["strøm",106.97,107.23],["ud",107.41,107.51],["af",107.57,107.631],["prikken",107.671,107.991],["på",108.031,108.151],["sekundærsiden",108.171,108.871]],"text":"Prikkerne på symbolet viser, hvilke ender der har samme polaritet. Strøm ind i prikken på primærsiden svarer til strøm ud af prikken på sekundærsiden."},"refl":{"start":110.691,"end":119.112,"words":[["Nu",110.731,110.791],["det",110.851,110.931],["vigtigste",110.951,111.351],["trick",111.411,111.631],["Hvilken",112.431,112.751],["impedans",112.831,113.411],["ser",113.631,113.811],["kilden",113.931,114.291],["når",114.451,114.571],["der",114.571,114.671],["sidder",114.711,114.951],["en",114.991,115.071],["last",115.171,115.451],["bag",115.591,115.711],["transformeren",115.771,116.391],["Impedans",117.371,117.852],["er",118.032,118.112],["spænding",118.172,118.532],["over",118.672,118.832],["strøm",118.872,119.112]],"text":"Nu det vigtigste trick. Hvilken impedans ser kilden, når der sidder en last bag transformeren? Impedans er spænding over strøm."},"refl2":{"start":119.752,"end":130.913,"words":[["Vi",119.792,119.852],["indsætter",119.912,120.312],["V",120.732,120.752],["et",120.972,121.072],["er",121.292,121.412],["V",121.692,121.712],["to",121.912,122.012],["over",122.132,122.312],["N",122.472,122.492],["og",123.052,123.132],["I",123.252,123.272],["et",123.452,123.572],["er",123.752,123.832],["N",124.092,124.112],["gange",124.232,124.472],["I",124.572,124.592],["to",124.732,124.832],["Så",125.852,125.992],["er",126.092,126.192],["V",126.332,126.352],["et",126.592,126.692],["over",126.832,127.012],["I",127.132,127.152],["et",127.312,127.412],["lig",127.813,127.973],["V",128.373,128.393],["to",128.593,128.693],["over",128.813,128.973],["N",129.113,129.133],["delt",129.673,129.893],["med",129.953,130.073],["N",130.313,130.333],["I",130.653,130.673],["to",130.813,130.913]],"text":"Vi indsætter: V et er V to over N, og I et er N gange I to. Så er V et over I et lig V to over N, delt med N I to."},"refl3":{"start":131.913,"end":141.434,"words":[["De",131.953,132.033],["to",132.093,132.193],["N'er",132.373,132.533],["ganges",132.573,132.793],["sammen",132.853,133.073],["i",133.093,133.113],["nævneren",133.173,133.513],["Det",134.373,134.453],["giver",134.493,134.653],["ligning",134.673,134.953],["seks",135.153,135.393],["toogtredive",135.473,136.013],["impedansen",136.593,137.173],["set",137.273,137.453],["fra",137.493,137.573],["primærsiden",137.633,138.334],["er",138.534,138.614],["sekundærimpedansen",138.934,139.994],["divideret",140.114,140.634],["med",140.694,140.814],["N",141.014,141.034],["i",141.114,141.134],["anden",141.214,141.434]],"text":"De to N'er ganges sammen i nævneren. Det giver ligning seks toogtredive: impedansen set fra primærsiden er sekundærimpedansen divideret med N i anden."},"eks":{"start":143.254,"end":151.695,"words":[["Et",143.294,143.374],["eksempel",143.414,143.774],["En",144.414,144.494],["højttaler",144.534,144.974],["på",144.994,145.114],["otte",145.234,145.454],["ohm",145.554,145.734],["sidder",145.854,146.074],["bag",146.094,146.234],["en",146.254,146.314],["transformer",146.374,146.954],["med",146.994,147.114],["N",147.334,147.354],["lig",147.454,147.574],["to",147.674,147.794],["Kilden",148.575,148.895],["ser",149.015,149.215],["otte",149.555,149.755],["over",149.835,150.015],["to",150.055,150.155],["i",150.295,150.315],["anden",150.435,150.615],["altså",150.935,151.175],["to",151.275,151.415],["ohm",151.575,151.695]],"text":"Et eksempel. En højttaler på otte ohm sidder bag en transformer med N lig to. Kilden ser otte over to i anden, altså to ohm."},"eks2":{"start":153.055,"end":158.816,"words":[["En",153.095,153.175],["transformer",153.195,153.695],["kan",153.735,153.855],["altså",153.855,154.055],["få",154.055,154.155],["en",154.175,154.255],["last",154.275,154.475],["til",154.495,154.595],["at",154.615,154.675],["se",154.695,154.775],["mindre",154.875,155.195],["eller",155.275,155.415],["større",155.475,155.835],["ud",155.915,156.015],["Det",156.655,156.755],["bruger",156.795,157.015],["vi",157.035,157.095],["til",157.135,157.255],["at",157.275,157.315],["tilpasse",157.355,157.815],["en",157.855,157.915],["last",157.975,158.215],["til",158.336,158.456],["en",158.476,158.516],["kilde",158.556,158.816]],"text":"En transformer kan altså få en last til at se mindre eller større ud. Det bruger vi til at tilpasse en last til en kilde."},"tjek_q":{"start":160.636,"end":168.536,"words":[["Tjek",160.676,160.816],["dig",160.856,160.956],["selv",160.996,161.156],["En",161.956,162.016],["transformer",162.056,162.536],["sætter",162.576,162.796],["tohundrede",162.876,163.236],["og",163.236,163.276],["tredive",163.276,163.596],["volt",163.656,163.856],["ned",163.956,164.076],["til",164.136,164.276],["tolv",164.316,164.556],["volt",164.576,164.796],["Lasten",165.396,165.716],["trækker",165.756,166.076],["fem",166.196,166.336],["ampere",166.416,166.756],["Hvor",167.456,167.576],["stor",167.576,167.736],["er",167.796,167.856],["primærstrømmen",167.896,168.536]],"text":"Tjek dig selv. En transformer sætter tohundrede og tredive volt ned til tolv volt. Lasten trækker fem ampere. Hvor stor er primærstrømmen?"},"tjek_a":{"start":172.656,"end":182.137,"words":[["N",172.696,172.716],["er",172.976,173.076],["tolv",173.256,173.536],["over",173.696,173.856],["tohundrede",173.896,174.256],["og",174.256,174.296],["tredive",174.296,174.616],["Primærstrømmen",175.356,175.996],["er",176.036,176.116],["N",176.316,176.356],["gange",176.476,176.696],["sekundærstrømmen",176.796,177.536],["altså",177.736,177.976],["nul",178.176,178.316],["komma",178.356,178.516],["to",178.576,178.676],["seks",178.836,179.016],["ampere",179.056,179.396],["Effekten",180.076,180.516],["er",180.616,180.676],["tres",180.756,181.076],["watt",181.156,181.317],["på",181.437,181.557],["begge",181.617,181.837],["sider",181.897,182.137]],"text":"N er tolv over tohundrede og tredive. Primærstrømmen er N gange sekundærstrømmen, altså nul komma to seks ampere. Effekten er tres watt på begge sider."},"tjek_vis":{"start":183.957,"end":193.378,"words":[["Her",183.997,184.117],["kan",184.137,184.237],["du",184.237,184.297],["se",184.337,184.417],["det",184.517,184.597],["Spændingen",185.057,185.457],["falder",185.577,185.857],["med",185.877,185.957],["en",185.997,186.057],["faktor",186.137,186.477],["nitten",186.577,186.817],["komma",186.857,187.017],["to",187.097,187.197],["og",187.617,187.697],["strømmen",187.757,188.097],["falder",188.217,188.477],["med",188.497,188.597],["samme",188.637,188.837],["faktor",188.917,189.217],["den",189.237,189.337],["anden",189.377,189.557],["vej",189.577,189.717],["Produktet",190.377,190.877],["tres",191.237,191.477],["watt",191.557,191.717],["er",192.118,192.198],["det",192.218,192.318],["samme",192.378,192.618],["på",192.678,192.798],["begge",192.838,193.038],["sider",193.138,193.378]],"text":"Her kan du se det. Spændingen falder med en faktor nitten komma to, og strømmen falder med samme faktor den anden vej. Produktet, tres watt, er det samme på begge sider."},"slut":{"start":195.198,"end":207.299,"words":[["Kort",195.238,195.418],["sagt",195.458,195.658],["N",196.558,196.578],["er",196.998,197.098],["n",197.278,197.298],["to",197.398,197.518],["over",197.758,197.918],["n",198.038,198.058],["et",198.118,198.198],["Spændingen",198.938,199.358],["ganges",199.398,199.738],["med",199.798,199.878],["N",199.978,200.018],["strømmen",200.578,200.918],["divideres",200.998,201.458],["med",201.478,201.578],["N",201.698,201.738],["og",202.218,202.278],["effekten",202.318,202.799],["er",202.879,202.939],["den",202.959,203.039],["samme",203.119,203.339],["En",204.119,204.199],["impedans",204.219,204.639],["bag",204.699,204.799],["transformeren",204.839,205.459],["ses",205.619,205.819],["som",205.859,205.979],["Z",206.119,206.139],["over",206.619,206.799],["N",206.959,206.979],["i",207.039,207.059],["anden",207.119,207.299]],"text":"Kort sagt: N er n to over n et. Spændingen ganges med N, strømmen divideres med N, og effekten er den samme. En impedans bag transformeren ses som Z over N i anden."}}}, { audio: 'ideel-transformer.mp3', id: 'ideel-transformer' });</script>
+</body>
+</html>

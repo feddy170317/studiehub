@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opgave 7.51: ækvivalentkredsløb for en stor transformer · video</title>
+<meta name="description" content="Øvelse 4 (7.51): 460 kVA-transformer; mærkestrøm 100 A, r_c = 105,8 kΩ, L_c = 17,5 H, r_w = 5 mΩ, L_w = 0,14 mH.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Dag 10: videoer</a><h1>Opgave 7.51: ækvivalentkredsløb for en stor transformer</h1><span class="meta">ELE1 · dag 10 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Opgave 7.51: ækvivalentkredsløb for en stor transformer"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Øvelse 4 (7.51): 460 kVA-transformer; mærkestrøm 100 A, r_c = 105,8 kΩ, L_c = 17,5 H, r_w = 5 mΩ, L_w = 0,14 mH.</p><div class="chips"><a href="../../opgaver/dag10/opgave-7.51-transformerens-ekvivalentkredsloeb.pdf">📐 Se udregningen i Mathcad (PDF)</a><a href="opg-7-50.html">Se først: Opgave 7.50: tomgangs- og kortslutningsprøve</a><a href="../../dag/Dag10_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/ele1/dag10">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// ELE1 Dag 10 · Øvelse 4 = opgave 7.51 (bogens 6.51). Mathcad: Dag 10/Opgaver/Opgave 7.51 transformerens ekvivalentkredsloeb.mcdx
+// 460 kVA, tomgang 4600 V, 0,7 A, 200 W; kortslutning 50 W, 5,2 V; 60 Hz. I_sc = 460k/4600 = 100 A, ω = 377 rad/s.
+// r_c = 105,8 kΩ, Y = 152,2 µS, G = 9,45 µS, B = 151,9 µS, L_c = 17,5 H; r_w = 5 mΩ, Z = 52 mΩ, X = 51,8 mΩ, L_w = 0,137 mH.
+BP.scene({ header: 'ELE1 · Dag 10 · opgave 7.51', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, dot, ring, under, ell, rect, hatch, dashed, PI } = B;
+  const S = (id) => L(id).start;
+  const ringet = (k, s, x, y, size, col, a, te) => { const r = text(k, s, x, y, size, col, a, te); ring(r, col, te, te + 0.5); return r; };
+
+  // ---------------------------------------------------------------- 0 titel
+  B.titel(0, 'Opgave 7.51', 'ELE1 · Dag 10 · øvelse 4 (bogens 6.51)', 'titel');
+  text(0, '460 kVA:  r_c, L_c, r_w, L_w = ?', 640, 540, 46, 'red', wt('titel', 'stor') - 0.1, we('titel', 'givet'), { align: 'center' });
+
+  // ---------------------------------------------------------------- 1 data og mærkestrøm
+  B.goto('opgave', 1);
+  bubble(1, 'Data og mærkestrøm', 130, 135, 50, 'blue', S('opgave') - 0.1, S('opgave') + 0.8);
+  text(1, 'tomgang:   4600 V,   0,7 A,   200 W', 160, 240, 34, 'red', wt('opgave', 'Tomgangsprøven') - 0.1, we('opgave', 'watt'));
+  text(1, 'kortslutning:   50 W,   5,2 V,   I = ?', 160, 300, 34, 'blue', wt('opgave', 'Kortslutningsprøven') - 0.1, we('opgave', 'volt', 1));
+  text(1, 'kortslutning ved mærkestrøm,  tomgang ved mærkespænding', 160, 390, 30, 'black', S('strom') + 0.1, we('strom', 'volt'));
+  ringet(1, 'I = S / V = 460 000 / 4600 = 100 A', 160, 490, 40, 'red', S('strom2') + 0.1, we('strom2', 'ampere'));
+  text(1, 'ω = 2π · 60 = 377 rad/s', 160, 600, 38, 'black', S('omega') + 0.1, we('omega', 'sekund'));
+
+  // ---------------------------------------------------------------- 2 tomgang
+  B.goto('oc', 2);
+  bubble(2, 'Tomgangsprøven', 130, 135, 50, 'red', S('oc') - 0.1, S('oc') + 0.8);
+  B.formel(2, 'modstand', 'r_c = V² / P = 4600² / 200 = 105,8 kΩ', 160, 250, 36, S('oc') + 0.2, we('oc', 'kiloohm'), 'red');
+  text(2, 'Y = I / V = 0,7 / 4600 = 152,2 µS', 160, 360, 38, 'black', S('oc2') + 0.1, we('oc2', 'mikrosiemens'));
+  text(2, 'G = 1 / r_c = 9,45 µS', 160, 430, 38, 'black', wt('oc2', 'Ledningsevnen') - 0.1, we('oc2', 'mikrosiemens', 1));
+  text(2, 'B = √( Y² − G² ) = 151,9 µS   (Pythagoras)', 160, 520, 36, 'black', S('oc3') + 0.1, we('oc3', 'mikrosiemens'));
+  ringet(2, 'L_c = 1 / ( ω B ) = 17,5 H', 160, 620, 42, 'red', wt('oc3', 'Så') - 0.1, we('oc3', 'henry'));
+
+  // ---------------------------------------------------------------- 3 kortslutning
+  B.goto('sc', 3);
+  bubble(3, 'Kortslutningsprøven', 130, 135, 50, 'blue', S('sc') - 0.1, S('sc') + 0.8);
+  B.formel(3, 'modstand', 'r_w = P / I² = 50 / 100² = 5 mΩ', 160, 250, 38, S('sc') + 0.2, we('sc', 'milliohm'));
+  text(3, '| Z | = 5,2 / 100 = 52 mΩ', 160, 360, 38, 'black', S('sc2') + 0.1, we('sc2', 'milliohm'));
+  text(3, 'X = √( 52² − 5² ) = 51,8 mΩ', 160, 440, 38, 'black', wt('sc2', 'Pythagoras') - 0.1, we('sc2', 'milliohm', 1));
+  ringet(3, 'L_w = X / ω = 0,0518 / 377 = 0,14 mH', 160, 560, 40, 'blue', S('sc3') + 0.1, we('sc3', 'millihenry'));
+
+  // ---------------------------------------------------------------- 4 sammenligning
+  B.goto('sammen', 4);
+  bubble(4, 'Sammenlign med 7.50', 130, 150, 50, 'blue', S('sammen') - 0.1, S('sammen') + 0.8);
+  text(4, 'r_c:   1,8 kΩ   →   106 kΩ    (lille jerntab)', 180, 320, 38, 'red', wt('sammen', 'r') - 0.1, we('sammen', 'lille'));
+  text(4, 'r_w:   0,94 Ω   →   5 mΩ    (tykke viklinger)', 180, 420, 38, 'blue', wt('sammen', 'r', 1) - 0.1, we('sammen', 'viklinger'));
+
+  // ---------------------------------------------------------------- 5 tjek
+  B.goto('tjek_q', 5);
+  B.tjek(5, ['Kobbertab 50 W ved fuld last.', 'Hvor stort ved halv last?'], ['P = I² r_w: halv strøm ⇒ 1/4', '50 / 4 = 12,5 W'], 'tjek_q', 'tjek_a');
+
+  // ---------------------------------------------------------------- 6 tjek vist: tab mod last
+  B.goto('tjek_vis', 6);
+  {
+    const t0 = S('tjek_vis'), X0 = 220, Y0 = 600, W = 820, H = 380, sx = (x) => X0 + x * W, sy = (p) => Y0 - p / 300 * H;
+    arrow(6, [[X0 - 10, Y0], [X0 + W + 30, Y0]], 'black', 2.4, t0, t0 + 0.4, 12); arrow(6, [[X0, Y0 + 10], [X0, Y0 - H - 20]], 'black', 2.4, t0 + 0.1, t0 + 0.5, 12);
+    text(6, 'last (andel af mærkestrøm)', X0 + W - 300, Y0 + 60, 26, 'black', t0 + 0.3, t0 + 0.6); text(6, 'tab (W)', X0 - 20, Y0 - H - 30, 26, 'black', t0 + 0.3, t0 + 0.6, { align: 'right' });
+    [[0.5, '½'], [1, '1']].forEach(([x, s], i) => text(6, s, sx(x), Y0 + 32, 26, 'black', t0 + 0.4, t0 + 0.6, { align: 'center' }));
+    const tk = wt('tjek_vis', 'Kobbertabet');
+    const pk = []; for (let x = 0; x <= 1.001; x += 0.02) pk.push([sx(x), sy(50 * x * x)]);
+    line(6, pk, 'blue', 3.4, tk - 0.1, tk + 1.2);
+    dot(6, sx(0.5), sy(12.5), 8, 'blue', tk + 0.6); text(6, '12,5 W', sx(0.5) - 20, sy(12.5) - 18, 26, 'blue', tk + 0.6, tk + 0.9);
+    dot(6, sx(1), sy(50), 8, 'blue', tk + 1.0); text(6, '50 W kobber', sx(1) - 160, sy(50) - 18, 26, 'blue', tk + 1.0, tk + 1.3);
+    const tj = wt('tjek_vis', 'Jerntabet');
+    line(6, [[sx(0), sy(200)], [sx(1), sy(200)]], 'red', 3.4, tj - 0.1, tj + 0.8);
+    text(6, '200 W jern (konstant)', sx(0.35), sy(200) - 16, 28, 'red', tj + 0.3, tj + 0.8);
+  }
+
+  // ---------------------------------------------------------------- 7 slut
+  B.goto('slut', 7);
+  B.slut(7, 'ELE1 slides Day 10, øvelse 4 · Rizzoni & Kearns (2022), opg. 6.51 · Mathcad: Opgave 7.51', 'opgave 7.55', 'slut');
+  text(7, 'I = S / V = 100 A', 200, 240, 40, 'black', wt('slut', 'mærkestrømmen') - 0.1, we('slut', 'V'));
+  text(7, 'r_c = 105,8 kΩ,   L_c = 17,5 H', 200, 320, 40, 'red', wt('slut', 'r') - 0.1, we('slut', 'henry'));
+  text(7, 'r_w = 5 mΩ,   L_w = 0,14 mH', 200, 400, 40, 'blue', wt('slut', 'milliohm') - 0.6, we('slut', 'millihenry'));
+});
+
+</script>
+<script>BP.live({"duration":162.419,"audio":"opg-7-51.mp3","order":["titel","opgave","strom","strom2","omega","oc","oc2","oc3","sc","sc2","sc3","sammen","tjek_q","tjek_a","tjek_vis","slut"],"lines":{"titel":{"start":0.5,"end":12.022,"words":[["Opgave",0.54,0.86],["syv",0.94,1.1],["enoghalvtreds",1.2,1.76],["Samme",2.48,2.66],["metode",2.72,3.08],["som",3.18,3.34],["i",3.42,3.44],["opgave",3.54,3.84],["syv",3.981,4.141],["halvtreds",4.201,4.581],["men",5.121,5.261],["for",5.381,5.481],["en",5.521,5.581],["stor",5.701,5.941],["transformer",6.021,6.601],["på",6.681,6.841],["fire",6.941,7.141],["hundrede",7.181,7.421],["og",7.421,7.481],["tres",7.521,7.781],["kilovoltampere",7.961,8.761],["Strømmen",9.941,10.261],["i",10.321,10.341],["kortslutningsprøven",10.401,11.221],["er",11.361,11.442],["ikke",11.562,11.702],["givet",11.742,12.022]],"text":"Opgave syv enoghalvtreds. Samme metode som i opgave syv halvtreds, men for en stor transformer på fire hundrede og tres kilovoltampere. Strømmen i kortslutningsprøven er ikke givet."},"opgave":{"start":13.842,"end":25.703,"words":[["Tomgangsprøven",13.882,14.582],["gav",14.702,14.882],["fire",15.062,15.262],["tusind",15.322,15.642],["seks",15.722,15.902],["hundrede",15.922,16.142],["volt",16.162,16.382],["nul",16.922,17.062],["komma",17.102,17.262],["syv",17.342,17.482],["ampere",17.542,17.902],["og",18.182,18.262],["to",18.402,18.502],["hundrede",18.582,18.802],["watt",18.802,18.962],["Kortslutningsprøven",19.943,20.823],["gav",20.903,21.043],["halvtreds",21.123,21.523],["watt",21.583,21.743],["og",22.163,22.243],["fem",22.323,22.463],["komma",22.543,22.703],["to",22.763,22.843],["volt",22.943,23.143],["Frekvensen",24.203,24.683],["er",24.903,24.983],["tres",25.103,25.363],["hertz",25.403,25.703]],"text":"Tomgangsprøven gav fire tusind seks hundrede volt, nul komma syv ampere og to hundrede watt. Kortslutningsprøven gav halvtreds watt og fem komma to volt. Frekvensen er tres hertz."},"strom":{"start":27.523,"end":35.004,"words":[["Kortslutningsprøven",27.563,28.403],["laves",28.443,28.683],["ved",28.743,28.823],["mærkestrøm",28.903,29.403],["Tomgangsprøven",30.143,30.803],["laves",30.843,31.063],["ved",31.103,31.203],["mærkespænding",31.263,31.943],["så",32.443,32.583],["mærkespændingen",32.663,33.323],["er",33.423,33.503],["fire",33.623,33.823],["tusind",33.903,34.223],["seks",34.323,34.503],["hundrede",34.543,34.763],["volt",34.803,35.004]],"text":"Kortslutningsprøven laves ved mærkestrøm. Tomgangsprøven laves ved mærkespænding, så mærkespændingen er fire tusind seks hundrede volt."},"strom2":{"start":36.004,"end":44.365,"words":[["Mærkestrømmen",36.044,36.604],["er",36.764,36.844],["mærkeeffekt",36.944,37.584],["over",37.784,37.984],["mærkespænding",38.064,38.684],["fire",39.444,39.624],["hundrede",39.644,39.864],["og",39.864,39.904],["tres",39.944,40.144],["tusind",40.184,40.524],["over",40.724,40.904],["fire",41.004,41.184],["tusind",41.224,41.524],["seks",41.584,41.764],["hundrede",41.784,42.044],["Det",42.885,42.965],["giver",42.985,43.145],["præcis",43.185,43.585],["hundrede",43.725,44.025],["ampere",44.045,44.365]],"text":"Mærkestrømmen er mærkeeffekt over mærkespænding: fire hundrede og tres tusind over fire tusind seks hundrede. Det giver præcis hundrede ampere."},"omega":{"start":46.185,"end":51.726,"words":[["Vinkelfrekvensen",46.225,46.965],["er",47.125,47.205],["to",47.345,47.485],["pi",47.605,47.725],["gange",47.905,48.105],["frekvensen",48.125,48.625],["altså",49.165,49.425],["tre",49.505,49.625],["hundrede",49.705,49.925],["og",49.945,50.005],["syvoghalvfjerds",50.085,50.706],["radianer",50.786,51.246],["pr",51.286,51.406],["sekund",51.446,51.726]],"text":"Vinkelfrekvensen er to pi gange frekvensen, altså tre hundrede og syvoghalvfjerds radianer pr. sekund."},"oc":{"start":53.546,"end":62.747,"words":[["Tomgangsprøven",53.586,54.266],["r",55.246,55.266],["c",55.366,55.386],["er",55.446,55.866],["V",55.966,55.986],["i",56.166,56.186],["anden",56.246,56.466],["over",56.606,56.786],["P",56.826,56.846],["fire",56.866,57.046],["tusind",58.086,58.386],["seks",58.466,58.646],["hundrede",58.666,58.927],["i",58.927,58.947],["anden",58.987,59.187],["over",59.347,59.527],["to",59.587,59.707],["hundrede",59.827,60.087],["Det",60.807,60.887],["giver",60.927,61.067],["hundrede",61.187,61.427],["og",61.427,61.467],["fem",61.547,61.707],["komma",61.787,61.947],["otte",62.087,62.347],["kiloohm",62.347,62.747]],"text":"Tomgangsprøven. r c er V i anden over P: fire tusind seks hundrede i anden over to hundrede. Det giver hundrede og fem komma otte kiloohm."},"oc2":{"start":63.627,"end":74.489,"words":[["Admittansen",63.667,64.247],["er",64.427,64.507],["nul",64.567,64.707],["komma",64.747,64.907],["syv",64.987,65.147],["over",65.267,65.427],["fire",65.507,65.687],["tusind",65.747,66.027],["seks",66.087,66.267],["hundrede",66.307,66.548],["altså",67.128,67.368],["hundrede",67.488,67.768],["og",67.768,67.828],["tooghalvtreds",67.868,68.488],["mikrosiemens",68.608,69.248],["Ledningsevnen",70.248,70.848],["er",70.988,71.068],["en",71.168,71.308],["over",71.408,71.588],["r",71.748,71.768],["c",71.868,71.888],["ni",72.748,72.828],["komma",72.968,73.148],["fire",73.268,73.488],["fem",73.588,73.728],["mikrosiemens",73.849,74.489]],"text":"Admittansen er nul komma syv over fire tusind seks hundrede, altså hundrede og tooghalvtreds mikrosiemens. Ledningsevnen er en over r c, ni komma fire fem mikrosiemens."},"oc3":{"start":75.409,"end":83.35,"words":[["Pythagoras",75.449,76.049],["giver",76.129,76.309],["susceptansen",76.389,77.049],["hundrede",77.189,77.449],["og",77.449,77.489],["enoghalvtreds",77.529,78.029],["komma",78.089,78.269],["ni",78.349,78.429],["mikrosiemens",78.589,79.249],["Så",80.049,80.189],["er",80.229,80.289],["L",80.429,80.449],["c",80.529,80.549],["en",80.849,80.989],["over",81.049,81.209],["omega",81.269,81.55],["B",81.61,81.63],["sytten",81.65,82.59],["komma",82.63,82.79],["fem",82.89,83.01],["henry",83.11,83.35]],"text":"Pythagoras giver susceptansen hundrede og enoghalvtreds komma ni mikrosiemens. Så er L c en over omega B, sytten komma fem henry."},"sc":{"start":85.17,"end":92.571,"words":[["Kortslutningsprøven",85.21,86.01],["r",87.03,87.05],["w",87.39,87.41],["er",87.45,87.71],["P",87.81,87.83],["over",88.15,88.35],["I",88.45,88.47],["i",88.61,88.63],["anden",88.73,88.97],["halvtreds",89.69,90.051],["over",90.171,90.331],["hundrede",90.411,90.691],["i",90.731,90.751],["anden",90.831,91.051],["altså",91.531,91.751],["fem",91.891,92.031],["milliohm",92.171,92.571]],"text":"Kortslutningsprøven. r w er P over I i anden: halvtreds over hundrede i anden, altså fem milliohm."},"sc2":{"start":93.231,"end":101.332,"words":[["Impedansen",93.271,93.851],["er",93.991,94.071],["fem",94.211,94.351],["komma",94.411,94.571],["to",94.631,94.731],["over",94.971,95.131],["hundrede",95.151,95.451],["altså",95.731,95.971],["tooghalvtreds",96.151,96.771],["milliohm",96.851,97.191],["Pythagoras",97.732,98.352],["giver",98.392,98.572],["reaktansen",98.612,99.212],["enoghalvtreds",99.612,100.192],["komma",100.392,100.572],["otte",100.712,100.912],["milliohm",100.972,101.332]],"text":"Impedansen er fem komma to over hundrede, altså tooghalvtreds milliohm. Pythagoras giver reaktansen enoghalvtreds komma otte milliohm."},"sc3":{"start":101.952,"end":105.973,"words":[["L",101.992,102.012],["w",102.432,102.452],["er",102.672,102.752],["reaktansen",102.792,103.352],["over",103.452,103.632],["omega",103.752,104.132],["nul",104.512,104.652],["komma",104.712,104.873],["et",105.013,105.113],["fire",105.173,105.393],["millihenry",105.473,105.973]],"text":"L w er reaktansen over omega: nul komma et fire millihenry."},"sammen":{"start":107.793,"end":116.614,"words":[["Sammenlign",107.833,108.253],["med",108.293,108.373],["opgave",108.413,108.713],["syv",108.813,108.953],["halvtreds",108.993,109.373],["Her",109.713,109.853],["er",109.953,110.013],["r",110.193,110.233],["c",110.333,110.353],["meget",110.613,110.893],["større",110.933,111.313],["så",111.453,111.573],["jerntabet",111.613,112.093],["er",112.133,112.193],["lille",112.233,112.453],["Og",112.853,112.913],["r",113.073,113.093],["w",113.454,113.474],["er",113.674,113.754],["meget",113.794,113.994],["mindre",114.074,114.414],["fordi",114.614,114.794],["en",114.854,114.914],["stor",114.974,115.154],["transformer",115.214,115.794],["har",115.874,115.974],["tykke",116.034,116.234],["viklinger",116.274,116.614]],"text":"Sammenlign med opgave syv halvtreds. Her er r c meget større, så jerntabet er lille. Og r w er meget mindre, fordi en stor transformer har tykke viklinger."},"tjek_q":{"start":118.434,"end":123.375,"words":[["Tjek",118.474,118.634],["dig",118.674,118.754],["selv",118.774,118.934],["Hvor",119.614,119.734],["stort",119.774,120.014],["er",120.094,120.174],["kobbertabet",120.254,120.854],["ved",120.934,121.034],["halv",121.094,121.274],["last",121.334,121.574],["hvis",121.834,121.955],["det",121.975,122.075],["er",122.095,122.155],["halvtreds",122.175,122.535],["watt",122.595,122.735],["ved",122.815,122.915],["fuld",122.955,123.115],["last",123.155,123.375]],"text":"Tjek dig selv. Hvor stort er kobbertabet ved halv last, hvis det er halvtreds watt ved fuld last?"},"tjek_a":{"start":127.495,"end":133.656,"words":[["Kobbertabet",127.535,128.095],["er",128.215,128.315],["I",128.455,128.475],["i",128.615,128.635],["anden",128.755,128.975],["gange",129.015,129.295],["r",129.335,129.355],["w",129.695,129.715],["Halv",130.135,130.315],["strøm",130.335,130.575],["giver",130.795,130.995],["en",131.035,131.115],["fjerdedel",131.175,131.675],["af",131.715,131.775],["tabet",131.795,132.095],["altså",132.435,132.675],["tolv",132.876,133.096],["og",133.156,133.216],["en",133.236,133.296],["halv",133.316,133.476],["watt",133.516,133.656]],"text":"Kobbertabet er I i anden gange r w. Halv strøm giver en fjerdedel af tabet, altså tolv og en halv watt."},"tjek_vis":{"start":135.476,"end":143.877,"words":[["Her",135.516,135.636],["kan",135.656,135.756],["du",135.756,135.816],["se",135.856,135.936],["det",135.996,136.096],["Kobbertabet",136.516,137.136],["vokser",137.216,137.556],["med",137.556,137.656],["strømmen",137.676,138.016],["i",138.076,138.096],["anden",138.196,138.396],["så",138.676,138.796],["kurven",138.816,139.236],["er",139.336,139.396],["en",139.416,139.476],["parabel",139.496,139.936],["Jerntabet",140.576,141.076],["på",141.116,141.216],["to",141.236,141.316],["hundrede",141.376,141.577],["watt",141.617,141.757],["er",141.837,141.917],["konstant",141.937,142.377],["fordi",142.537,142.737],["spændingen",142.877,143.377],["er",143.457,143.517],["den",143.537,143.637],["samme",143.677,143.877]],"text":"Her kan du se det. Kobbertabet vokser med strømmen i anden, så kurven er en parabel. Jerntabet på to hundrede watt er konstant, fordi spændingen er den samme."},"slut":{"start":145.697,"end":160.939,"words":[["Kort",145.737,145.917],["sagt",145.957,146.157],["find",146.617,146.817],["mærkestrømmen",146.897,147.537],["som",147.697,147.837],["S",148.077,148.097],["over",148.197,148.337],["V",148.377,148.397],["brug",148.897,149.037],["derefter",149.097,149.477],["de",149.497,149.557],["samme",149.617,149.817],["fire",149.917,150.138],["formler",150.178,150.538],["som",150.638,150.758],["i",150.798,150.818],["syv",150.878,151.038],["halvtreds",151.078,151.438],["r",152.198,152.218],["c",152.318,152.338],["er",152.398,152.478],["hundrede",152.478,152.698],["og",152.798,152.898],["fem",153.058,153.198],["komma",153.278,153.438],["otte",153.538,153.718],["kiloohm",153.758,154.218],["L",154.718,154.738],["c",154.838,154.858],["sytten",154.858,155.438],["komma",155.478,155.638],["fem",155.678,155.818],["henry",155.878,156.138],["r",156.658,156.678],["w",157.058,157.078],["fem",157.498,157.639],["milliohm",157.719,158.119],["og",158.479,158.539],["L",158.719,158.739],["w",159.099,159.119],["nul",159.559,159.699],["komma",159.739,159.899],["et",160.039,160.139],["fire",160.199,160.419],["millihenry",160.499,160.939]],"text":"Kort sagt: find mærkestrømmen som S over V, brug derefter de samme fire formler som i syv halvtreds. r c er hundrede og fem komma otte kiloohm, L c sytten komma fem henry, r w fem milliohm og L w nul komma et fire millihenry."}}}, { audio: 'opg-7-51.mp3', id: 'opg-7-51' });</script>
+</body>
+</html>
