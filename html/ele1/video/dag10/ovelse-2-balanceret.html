@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Øvelse 2 (7.49): balanceret last · video</title>
+<meta name="description" content="Øvelse 2 (7.49): 3 × 10 Ω på 220 V. I = 22 A, I_N = 0, P = 3V²/R = 14,52 kW.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Dag 10: videoer</a><h1>Øvelse 2 (7.49): balanceret last</h1><span class="meta">ELE1 · dag 10 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Øvelse 2 (7.49): balanceret last"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Øvelse 2 (7.49): 3 × 10 Ω på 220 V. I = 22 A, I_N = 0, P = 3V²/R = 14,52 kW.</p><div class="chips"><a href="../../opgaver/dag10/opgave-7.49-trefase-balanceret-last.pdf">📐 Se udregningen i Mathcad (PDF)</a><a href="y-last-nulleder.html">Se først: Y-last med nulleder: balanceret og ubalanceret</a><a href="../../dag/Dag10_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/ele1/dag10">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// ELE1 Dag 10 · Øvelse 2 = opgave 7.49 i slides (ældre udgave). Mathcad: Dag 10/Opgaver/Opgave 7.49 trefase balanceret last.mcdx
+// 220 V rms ∠0/120/240, 3 × 10 Ω med nulleder: I = 22 A, I_W = -11 + j19,05, I_B = -11 - j19,05; I_N = 0; P = 3·220²/10 = 14 520 W.
+BP.scene({ header: 'ELE1 · Dag 10 · øvelse 2 (7.49)', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, dot, ring, under, ell, rect, hatch, dashed, PI } = B;
+  const S = (id) => L(id).start;
+  const ringet = (k, s, x, y, size, col, a, te) => { const r = text(k, s, x, y, size, col, a, te); ring(r, col, te, te + 0.5); return r; };
+  const D = PI / 180, P = (c, r, v) => [c[0] + r * Math.cos(v * D), c[1] - r * Math.sin(v * D)];
+
+  // ---------------------------------------------------------------- 0 titel
+  B.titel(0, 'Øvelse 2', 'ELE1 · Dag 10 · opgave 7.49 i slides', 'titel');
+  text(0, '3 × 10 Ω:   I_N = ?    P = ?', 640, 540, 46, 'red', wt('titel', 'ti') - 0.1, we('titel', 'effekt'), { align: 'center' });
+
+  // ---------------------------------------------------------------- 1 opgaven og kredsløbet
+  B.goto('opgave', 1);
+  bubble(1, 'Opgaven', 130, 135, 50, 'blue', S('opgave') - 0.1, S('opgave') + 0.8);
+  text(1, 'V_R = 220∠0° V', 140, 240, 32, 'red', wt('opgave', 'hundrede') - 0.1, we('opgave', 'grader'));
+  text(1, 'V_W = 220∠120° V', 140, 295, 32, 'blue', wt('opgave', 'hundrede') + 0.2, we('opgave', 'grader'));
+  text(1, 'V_B = 220∠240° V', 140, 350, 32, 'green', wt('opgave', 'hundrede') + 0.4, we('opgave', 'grader'));
+  text(1, '(effektivværdier)', 140, 405, 28, 'black', wt('opgave', 'effektivværdier') - 0.1, we('opgave', 'effektivværdier'));
+  ringet(1, 'tre ens Z  ⇒  balanceret', 140, 560, 34, 'red', wt('opgave2', 'Tre') - 0.1, we('opgave2', 'balanceret'));
+  {
+    const x0 = 650, cols = [x0 + 420, x0 + 270, x0 + 120], ys = [200, 250, 300], t0 = wt('opgave2', 'modstand');
+    ['R', 'W', 'B'].forEach((nv, i) => {
+      const x = cols[i], y = ys[i], t = t0 + 0.3 * i;
+      text(1, nv, x0 - 34, y + 10, 28, 'black', t - 0.3, t);
+      B.wire(1, [[x0, y], [x, y], [x, 340]], t - 0.3, t + 0.1);
+      B.resistor(1, [x, 340], [x, 460], t, t + 0.5, {});
+      text(1, '10 Ω', x + 24, 412, 26, 'blue', t + 0.2, t + 0.6);
+      B.wire(1, [[x, 460], [x, 520]], t + 0.3, t + 0.5);
+    });
+    const tb = wt('opgave2', 'stjernepunktet');
+    B.wire(1, [[cols[2], 520], [cols[0], 520]], tb - 0.1, tb + 0.4); dot(1, cols[1], 520, 8, 'black', tb + 0.3);
+    const tn = wt('opgave2', 'nullederen');
+    text(1, 'N', x0 - 34, 610, 28, 'black', tn - 0.1, tn + 0.2);
+    B.wire(1, [[x0, 600], [cols[1], 600], [cols[1], 520]], tn - 0.1, tn + 0.4);
+  }
+
+  // ---------------------------------------------------------------- 2 Ohms lov
+  B.goto('ohm', 2);
+  bubble(2, 'Strømmene', 130, 135, 50, 'blue', S('ohm') - 0.1, S('ohm') + 0.8);
+  B.formel(2, '6.60', 'I = V / Z', 160, 240, 42, wt('ohm', 'ligning') - 0.1, we('ohm', 'Z'), 'red');
+  text(2, 'modstand: vinkel 0°  ⇒  I i fase med V', 160, 340, 32, 'black', wt('ohm', 'modstand') - 0.1, we('ohm', 'spændingen'));
+  text(2, '220 / 10 = 22 A', 160, 430, 38, 'black', S('ohm2') + 0.1, we('ohm2', 'toogtyve'));
+  text(2, 'I_R = 22∠0°,   I_W = 22∠120°,   I_B = 22∠240° A', 160, 530, 32, 'red', wt('ohm2', 'Så') - 0.1, we('ohm2', 'grader', 2));
+
+  // ---------------------------------------------------------------- 3 KCL og summen
+  B.goto('kcl', 3);
+  bubble(3, 'Nullederen', 130, 135, 50, 'blue', S('kcl') - 0.1, S('kcl') + 0.8);
+  B.formel(3, '6.51', 'I_N = I_R + I_W + I_B', 160, 230, 38, S('kcl') + 0.2, we('kcl', 'enoghalvtreds'), 'red');
+  text(3, 'I_R = 22 + j 0', 160, 320, 32, 'red', wt('rekt', 'R') - 0.1, we('rekt', 'toogtyve'));
+  text(3, 'I_W = 22 cos 120° + j 22 sin 120° = −11 + j 19,05', 160, 390, 30, 'blue', wt('rekt', 'W') - 0.1, we('rekt', 'fem'));
+  text(3, 'I_B = −11 − j 19,05   (sin 240° < 0)', 160, 460, 30, 'green', S('rekt2') + 0.1, we('rekt2', 'negativ'));
+  text(3, 'Re:  22 − 11 − 11 = 0      Im:  19,05 − 19,05 = 0', 160, 550, 32, 'black', S('sum') + 0.1, we('sum', 'nul', 3));
+  ringet(3, 'I_N = 0 A', 160, 640, 42, 'red', wt('sum', 'Nullederstrømmen') - 0.1, we('sum', 'ampere'));
+
+  // ---------------------------------------------------------------- 4 hvorfor altid nul
+  B.goto('hvorfor', 4);
+  bubble(4, 'Hvorfor altid nul?', 130, 150, 50, 'blue', S('hvorfor') - 0.1, S('hvorfor') + 0.8);
+  B.formel(4, '6.51', 'I_N = ( V_{an} + V_{bn} + V_{cn} ) / Z', 160, 330, 40, wt('hvorfor', 'ligning') - 0.1, we('hvorfor', 'Z'), 'red');
+  B.formel(4, '6.48', 'V_{an} + V_{bn} + V_{cn} = 0   ⇒   I_N = 0', 160, 470, 40, wt('hvorfor', 'balancerede') - 0.1, we('hvorfor', 'nul'), 'green');
+
+  // ---------------------------------------------------------------- 5 effekten
+  B.goto('effekt', 5);
+  bubble(5, 'Effekten', 130, 135, 50, 'blue', S('effekt') - 0.1, S('effekt') + 0.8);
+  text(5, 'én modstand:  V² / R = 220² / 10 = 4840 W', 160, 250, 36, 'black', wt('effekt', 'Hver') - 0.1, we('effekt', 'watt'));
+  B.formel(5, '6.53', 'P = 3 V² / R = konstant', 160, 380, 42, S('effekt2') + 0.1, we('effekt2', 'tid'), 'red');
+  ringet(5, 'P = 3 · 4840 = 14 520 W', 160, 520, 46, 'red', wt('effekt2', 'Tre', 2) - 0.1, we('effekt2', 'watt'));
+
+  // ---------------------------------------------------------------- 6 kontrol
+  B.goto('kontrol', 6);
+  bubble(6, 'Kontrol', 130, 150, 50, 'blue', S('kontrol') - 0.1, S('kontrol') + 0.8);
+  B.formel(6, '6.12', 'P_{fase} = I² R = 22² · 10 = 4840 W', 160, 320, 40, S('kontrol') + 0.2, we('kontrol', 'watt'));
+  text(6, '3 · 4840 W = 14,52 kW   ✓', 160, 460, 42, 'green', wt('kontrol', 'Gange', 2) - 0.1, we('kontrol', 'kilowatt'));
+
+  // ---------------------------------------------------------------- 7 plottet
+  B.goto('plot', 7);
+  {
+    const t0 = S('plot'), X0 = 200, Y0 = 400, W = 900, A = 6.5, T = 1 / 60, tmax = 2 * T, sx = (t) => X0 + t / tmax * W, sy = (v) => Y0 - v * A;
+    text(7, 'Mathcad-plot:  strømmene over tid (60 Hz)', 640, 120, 32, 'black', t0, t0 + 0.8, { align: 'center' });
+    arrow(7, [[X0 - 10, Y0], [X0 + W + 30, Y0]], 'black', 2.4, t0, t0 + 0.4, 12); arrow(7, [[X0, Y0 + 230], [X0, Y0 - 230]], 'black', 2.4, t0 + 0.1, t0 + 0.5, 12);
+    text(7, 't', X0 + W + 20, Y0 + 36, 28, 'black', t0 + 0.3, t0 + 0.6); text(7, 'i (A)', X0 - 20, Y0 - 240, 28, 'black', t0 + 0.3, t0 + 0.6, { align: 'right' });
+    const w = 2 * PI * 60, k = (ph) => { const p = []; for (let t = 0; t <= tmax + 1e-9; t += tmax / 200) p.push([sx(t), sy(31.1 * Math.cos(w * t + ph * D))]); return p; };
+    const ta = wt('plot', 'amplitude');
+    line(7, k(0), 'red', 3, ta - 0.6, ta + 0.6); line(7, k(120), 'blue', 3, ta - 0.3, ta + 0.9); line(7, k(240), 'green', 3, ta, ta + 1.2);
+    const ts = wt('plot', 'sorte');
+    line(7, [[sx(0), Y0], [sx(tmax), Y0]], 'black', 5, ts - 0.1, ts + 0.8);
+    text(7, 'summen = 0', sx(tmax) - 180, Y0 + 50, 30, 'black', ts + 0.3, ts + 0.8);
+    text(7, '31,1 A = √2 · 22 A', X0 + 20, sy(31.1) - 14, 26, 'red', ta + 0.4, ta + 0.8);
+  }
+
+  // ---------------------------------------------------------------- 8 tjek
+  B.goto('tjek_q', 8);
+  B.tjek(8, ['Hvad sker der med strømmene,', 'hvis nullederen klippes over?'], ['ingenting: N førte ingen strøm', 'hver modstand får stadig 220 V'], 'tjek_q', 'tjek_a');
+
+  // ---------------------------------------------------------------- 9 tjek vist: lukket trekant
+  B.goto('tjek_vis', 9);
+  {
+    const s = [520, 560], t0 = wt('tjek_vis', 'pile');
+    const pts = [s]; [0, 120, 240].forEach((v) => pts.push(P(pts[pts.length - 1], 300, v)));
+    [['red', 'I_R'], ['blue', 'I_W'], ['green', 'I_B']].forEach(([col, nv], i) => {
+      arrow(9, [pts[i], pts[i + 1]], col, 3.8, t0 - 0.1 + 0.4 * i, t0 + 0.3 + 0.4 * i, 14);
+      const m = [(pts[i][0] + pts[i + 1][0]) / 2, (pts[i][1] + pts[i + 1][1]) / 2];
+      text(9, nv, m[0] + (i === 0 ? -20 : i === 1 ? 26 : -80), m[1] + (i === 0 ? 44 : 0), 30, col, t0 + 0.2 + 0.4 * i, t0 + 0.5 + 0.4 * i);
+    });
+    dot(9, s[0], s[1], 10, 'black', wt('tjek_vis', 'startede'));
+    text(9, 'slutter, hvor den startede  ⇒  I_N = 0', 640, 660, 32, 'black', wt('tjek_vis', 'mangler') - 0.1, we('tjek_vis', 'nullederen'), { align: 'center' });
+  }
+
+  // ---------------------------------------------------------------- 10 slut
+  B.goto('slut', 10);
+  B.slut(10, 'ELE1 slides Day 10, øvelse 2 (opg. 7.49) · Rizzoni & Kearns (2022), lign. 6.12, 6.48, 6.51, 6.53, 6.60 · Mathcad: Opgave 7.49', 'øvelse 3', 'slut');
+  text(10, '3 × 22 A, 120° imellem', 200, 240, 40, 'blue', wt('slut', 'balanceret') - 0.1, we('slut', 'imellem'));
+  text(10, 'I_N = 0 A', 200, 320, 40, 'red', wt('slut', 'Nullederstrømmen') - 0.1, we('slut', 'nul', 1));
+  text(10, 'P = 3 V² / R = 14,52 kW', 200, 400, 40, 'green', wt('slut', 'effekten') - 0.1, we('slut', 'kilowatt'));
+});
+
+</script>
+<script>BP.live({"duration":211.469,"audio":"ovelse-2-balanceret.mp3","order":["titel","opgave","opgave2","ohm","ohm2","kcl","rekt","rekt2","sum","hvorfor","effekt","effekt2","kontrol","plot","tjek_q","tjek_a","tjek_vis","slut"],"lines":{"titel":{"start":0.5,"end":13.521,"words":[["Øvelse",0.54,0.9],["to",1.0,1.1],["opgave",1.48,1.86],["syv",1.9,2.12],["niogfyrre",2.56,3.1],["Samme",4.56,4.8],["opbygning",4.96,5.481],["som",5.601,5.781],["øvelse",5.961,6.181],["et",6.281,6.381],["men",6.741,6.881],["nu",7.161,7.241],["er",7.301,7.361],["alle",7.361,7.501],["tre",7.541,7.681],["faser",7.841,8.221],["en",8.361,8.441],["modstand",8.501,8.921],["på",9.021,9.161],["ti",9.281,9.401],["ohm",9.521,9.661],["Vi",10.781,10.821],["finder",10.901,11.141],["strømmen",11.161,11.501],["i",11.621,11.641],["nullederen",11.761,12.341],["og",12.581,12.681],["den",12.821,12.921],["reelle",12.981,13.201],["effekt",13.241,13.521]],"text":"Øvelse to, opgave syv niogfyrre. Samme opbygning som øvelse et, men nu er alle tre faser en modstand på ti ohm. Vi finder strømmen i nullederen og den reelle effekt."},"opgave":{"start":15.341,"end":23.882,"words":[["Kilden",15.381,15.702],["har",15.742,15.882],["tre",15.962,16.122],["fasespændinger",16.262,16.982],["på",17.082,17.262],["to",17.542,17.642],["hundrede",17.702,17.882],["og",17.882,17.922],["tyve",17.922,18.142],["volt",18.142,18.342],["ved",18.702,18.822],["nul",19.102,19.282],["hundrede",19.682,19.942],["og",19.942,20.022],["tyve",20.022,20.302],["og",20.582,20.662],["to",20.802,20.882],["hundrede",20.922,21.102],["og",21.102,21.142],["fyrre",21.162,21.382],["grader",21.442,21.722],["Vi",22.322,22.382],["regner",22.442,22.682],["dem",22.702,22.802],["som",22.882,23.022],["effektivværdier",23.122,23.882]],"text":"Kilden har tre fasespændinger på to hundrede og tyve volt ved nul, hundrede og tyve og to hundrede og fyrre grader. Vi regner dem som effektivværdier."},"opgave2":{"start":25.422,"end":35.803,"words":[["Følger",25.462,25.702],["vi",25.722,25.763],["ledningerne",25.863,26.303],["går",26.523,26.643],["hver",26.663,26.823],["fase",26.883,27.183],["gennem",27.263,27.483],["sin",27.503,27.623],["egen",27.643,27.803],["modstand",27.823,28.223],["på",28.283,28.403],["ti",28.463,28.583],["ohm",28.723,28.843],["til",29.063,29.163],["stjernepunktet",29.183,29.783],["og",30.263,30.343],["stjernepunktet",30.383,31.003],["sidder",31.063,31.243],["på",31.263,31.383],["nullederen",31.443,31.943],["Tre",32.783,32.943],["ens",33.103,33.283],["impedanser",33.323,33.883],["betyder",34.123,34.523],["at",34.623,34.723],["lasten",34.823,35.143],["er",35.183,35.243],["balanceret",35.263,35.803]],"text":"Følger vi ledningerne, går hver fase gennem sin egen modstand på ti ohm til stjernepunktet, og stjernepunktet sidder på nullederen. Tre ens impedanser betyder, at lasten er balanceret."},"ohm":{"start":37.623,"end":46.544,"words":[["Hver",37.663,37.823],["fase",37.883,38.223],["er",38.383,38.463],["Ohms",38.623,38.843],["lov",38.903,39.063],["ligning",39.443,39.723],["seks",39.743,40.003],["tres",40.043,40.203],["I",41.023,41.043],["er",41.403,41.483],["V",41.543,41.563],["over",41.763,41.903],["Z",41.983,42.003],["En",43.023,43.103],["modstand",43.123,43.523],["har",43.583,43.703],["vinklen",43.763,44.083],["nul",44.203,44.383],["så",44.723,44.843],["strømmen",44.843,45.123],["får",45.163,45.323],["samme",45.423,45.623],["vinkel",45.683,45.943],["som",46.003,46.123],["spændingen",46.163,46.544]],"text":"Hver fase er Ohms lov, ligning seks tres: I er V over Z. En modstand har vinklen nul, så strømmen får samme vinkel som spændingen."},"ohm2":{"start":46.694,"end":60.675,"words":[["To",46.734,48.114],["hundrede",48.194,48.374],["og",48.374,48.414],["tyve",48.414,48.694],["divideret",48.694,49.014],["med",49.034,49.134],["ti",49.194,49.294],["er",49.654,49.734],["toogtyve",49.894,50.374],["Så",51.294,51.434],["I",51.734,51.754],["R",52.034,52.054],["er",52.354,52.454],["toogtyve",52.554,52.934],["ampere",52.974,53.314],["ved",53.574,53.654],["nul",53.714,53.874],["grader",53.914,54.234],["I",54.954,54.974],["W",55.354,55.374],["er",55.734,55.814],["toogtyve",55.854,56.234],["ampere",56.254,56.575],["ved",56.795,56.875],["hundrede",56.895,57.095],["og",57.095,57.155],["tyve",57.155,57.335],["grader",57.355,57.655],["og",58.055,58.135],["I",58.295,58.315],["B",58.455,58.475],["er",58.855,58.915],["toogtyve",58.955,59.315],["ampere",59.335,59.615],["ved",59.675,59.755],["to",59.775,59.855],["hundrede",59.915,60.075],["og",60.075,60.115],["fyrre",60.135,60.355],["grader",60.395,60.675]],"text":"To hundrede og tyve divideret med ti er toogtyve. Så I R er toogtyve ampere ved nul grader, I W er toogtyve ampere ved hundrede og tyve grader, og I B er toogtyve ampere ved to hundrede og fyrre grader."},"kcl":{"start":62.575,"end":67.796,"words":[["Nullederstrømmen",62.615,63.355],["er",63.495,63.595],["summen",63.675,63.915],["af",63.935,63.995],["de",64.015,64.075],["tre",64.135,64.255],["Kirchhoffs",64.655,65.115],["strømlov",65.135,65.575],["i",65.635,65.655],["stjernepunktet",65.715,66.335],["ligning",66.696,66.936],["seks",66.956,67.196],["enoghalvtreds",67.276,67.796]],"text":"Nullederstrømmen er summen af de tre, Kirchhoffs strømlov i stjernepunktet, ligning seks enoghalvtreds."},"rekt":{"start":69.676,"end":83.917,"words":[["Vi",69.716,69.776],["omregner",69.856,70.196],["til",70.236,70.336],["rektangulær",70.356,70.896],["form",70.976,71.176],["med",71.396,71.516],["cosinus",71.576,72.016],["og",72.096,72.156],["sinus",72.196,72.536],["I",73.736,73.756],["R",73.996,74.016],["er",74.376,74.456],["toogtyve",74.556,76.436],["I",76.436,76.456],["W",76.817,76.837],["er",76.857,76.937],["toogtyve",77.037,77.497],["gange",77.537,77.717],["cosinus",77.777,78.157],["hundrede",78.197,78.417],["og",78.417,78.457],["tyve",78.477,78.717],["som",79.057,79.177],["er",79.197,79.277],["minus",79.317,79.577],["elleve",79.657,79.877],["plus",80.457,80.637],["j",80.737,80.757],["toogtyve",80.777,81.597],["gange",81.637,81.817],["sinus",81.877,82.137],["hundrede",82.177,82.377],["og",82.377,82.417],["tyve",82.417,82.637],["som",82.957,83.057],["er",83.077,83.137],["nitten",83.137,83.377],["komma",83.397,83.537],["nul",83.557,83.697],["fem",83.757,83.917]],"text":"Vi omregner til rektangulær form med cosinus og sinus. I R er toogtyve. I W er toogtyve gange cosinus hundrede og tyve, som er minus elleve, plus j toogtyve gange sinus hundrede og tyve, som er nitten komma nul fem."},"rekt2":{"start":85.377,"end":91.358,"words":[["I",85.417,85.437],["B",85.537,85.557],["er",85.917,86.037],["minus",86.277,86.557],["elleve",86.677,86.897],["minus",87.258,87.538],["j",87.658,87.678],["nitten",87.738,88.298],["komma",88.538,88.678],["nul",88.718,88.838],["fem",88.918,89.058],["fordi",89.518,89.698],["sinus",89.818,90.078],["to",90.098,90.158],["hundrede",90.178,90.478],["og",90.478,90.518],["fyrre",90.558,90.798],["er",90.858,90.918],["negativ",90.958,91.358]],"text":"I B er minus elleve minus j nitten komma nul fem, fordi sinus to hundrede og fyrre er negativ."},"sum":{"start":92.718,"end":104.999,"words":[["Realdelene",92.758,93.298],["toogtyve",93.878,94.658],["minus",94.658,94.878],["elleve",94.958,95.158],["minus",95.458,95.678],["elleve",95.758,95.958],["er",96.438,96.498],["nul",96.538,96.678],["Imaginærdelene",97.259,98.119],["nitten",98.959,99.199],["komma",99.259,99.439],["nul",99.499,99.659],["fem",99.759,99.919],["minus",100.319,100.679],["nitten",100.859,101.059],["komma",101.099,101.259],["nul",101.319,101.439],["fem",101.539,101.699],["er",102.099,102.159],["nul",102.219,102.359],["Nullederstrømmen",103.179,103.899],["er",104.159,104.219],["nul",104.299,104.479],["ampere",104.619,104.999]],"text":"Realdelene: toogtyve minus elleve minus elleve er nul. Imaginærdelene: nitten komma nul fem minus nitten komma nul fem er nul. Nullederstrømmen er nul ampere."},"hvorfor":{"start":106.819,"end":118.381,"words":[["Det",106.859,106.959],["gælder",106.999,107.259],["for",107.319,107.459],["enhver",107.579,107.96],["balanceret",108.18,108.72],["last",108.78,109.06],["Bogen",109.58,109.82],["viser",109.86,110.14],["det",110.18,110.3],["i",110.44,110.46],["ligning",110.6,110.94],["seks",110.96,111.3],["enoghalvtreds",111.42,112.02],["summen",112.8,113.12],["af",113.22,113.3],["strømmene",113.32,113.78],["er",113.9,113.98],["summen",114.08,114.38],["af",114.48,114.56],["spændingerne",114.6,115.08],["over",115.18,115.36],["Z",115.44,115.46],["og",115.94,116.0],["balancerede",116.04,116.74],["fasespændinger",116.78,117.58],["summer",117.72,118.001],["til",118.041,118.181],["nul",118.221,118.381]],"text":"Det gælder for enhver balanceret last. Bogen viser det i ligning seks enoghalvtreds: summen af strømmene er summen af spændingerne over Z, og balancerede fasespændinger summer til nul."},"effekt":{"start":120.201,"end":128.181,"words":[["Nu",120.241,120.321],["effekten",120.601,121.021],["Hver",121.941,122.101],["modstand",122.161,122.521],["optager",122.601,123.021],["V",123.101,123.121],["i",123.361,123.381],["anden",123.481,123.661],["over",123.701,123.821],["R",123.841,123.861],["to",123.861,123.901],["hundrede",123.901,124.081],["og",124.661,124.841],["tyve",124.961,125.241],["i",125.241,125.261],["anden",125.341,125.561],["over",125.661,125.821],["ti",125.881,125.981],["er",126.241,126.321],["fire",126.381,126.561],["tusind",126.641,126.961],["otte",127.081,127.261],["hundrede",127.301,127.561],["og",127.601,127.661],["fyrre",127.701,127.941],["watt",128.001,128.181]],"text":"Nu effekten. Hver modstand optager V i anden over R: to hundrede og tyve i anden over ti er fire tusind otte hundrede og fyrre watt."},"effekt2":{"start":128.862,"end":142.963,"words":[["Der",128.902,128.982],["er",129.002,129.062],["tre",129.082,129.202],["faser",129.322,129.662],["så",129.982,130.082],["den",130.082,130.182],["samlede",130.242,130.582],["effekt",130.622,130.922],["er",131.022,131.102],["tre",131.202,131.382],["gange",131.582,131.782],["V",131.842,131.862],["i",132.042,132.062],["anden",132.162,132.322],["over",132.362,132.502],["R",132.682,132.702],["Det",133.322,133.422],["er",133.502,133.602],["ligning",133.662,133.942],["seks",133.982,134.222],["treoghalvtreds",134.242,134.862],["og",135.302,135.362],["den",135.382,135.482],["samlede",135.522,135.822],["effekt",135.842,136.142],["er",136.142,136.322],["endda",136.322,136.502],["konstant",136.582,136.942],["i",136.982,137.002],["tid",137.062,137.242],["Tre",138.082,138.202],["gange",138.302,138.462],["fire",138.522,138.722],["tusind",138.782,139.123],["otte",139.283,139.463],["hundrede",139.523,139.763],["og",139.763,139.823],["fyrre",139.863,140.123],["giver",140.423,140.603],["fjorten",140.783,141.143],["tusind",141.203,141.523],["fem",141.703,141.843],["hundrede",141.923,142.203],["og",142.303,142.363],["tyve",142.403,142.723],["watt",142.783,142.963]],"text":"Der er tre faser, så den samlede effekt er tre gange V i anden over R. Det er ligning seks treoghalvtreds, og den samlede effekt er endda konstant i tid. Tre gange fire tusind otte hundrede og fyrre giver fjorten tusind fem hundrede og tyve watt."},"kontrol":{"start":144.783,"end":156.004,"words":[["Kontrol",144.823,145.143],["med",145.163,145.243],["strømmen",145.263,145.583],["I",146.423,146.443],["i",146.603,146.623],["anden",146.763,147.003],["gange",147.063,147.423],["R",147.483,147.503],["pr",147.703,147.883],["fase",147.963,148.303],["er",148.523,148.603],["toogtyve",148.663,149.223],["i",149.283,149.303],["anden",149.403,149.584],["gange",149.624,149.824],["ti",149.884,150.004],["altså",150.444,150.684],["fire",150.744,150.924],["tusind",150.984,151.284],["otte",151.404,151.584],["hundrede",151.584,151.804],["og",151.804,151.844],["fyrre",151.864,152.084],["watt",152.124,152.304],["Gange",152.884,153.084],["tre",153.124,153.264],["giver",153.644,153.804],["igen",153.844,154.064],["fjorten",154.444,154.804],["komma",154.864,155.044],["fem",155.124,155.264],["to",155.364,155.484],["kilowatt",155.624,156.004]],"text":"Kontrol med strømmen: I i anden gange R pr. fase er toogtyve i anden gange ti, altså fire tusind otte hundrede og fyrre watt. Gange tre giver igen fjorten komma fem to kilowatt."},"plot":{"start":157.824,"end":168.285,"words":[["Her",157.864,158.024],["er",158.164,158.244],["Mathcad-plottet",158.284,159.044],["af",159.124,159.184],["de",159.224,159.264],["tre",159.324,159.464],["strømme",159.584,159.884],["over",159.964,160.105],["tid",160.165,160.345],["De",161.085,161.165],["har",161.205,161.305],["samme",161.385,161.665],["amplitude",161.745,162.345],["og",162.685,162.745],["er",162.765,162.825],["forskudt",162.825,163.205],["en",163.265,163.345],["tredjedel",163.405,163.865],["periode",163.925,164.345],["Den",164.965,165.065],["sorte",165.125,165.345],["kurve",165.405,165.705],["er",165.805,165.885],["summen",165.945,166.225],["og",166.585,166.665],["den",166.685,166.825],["ligger",166.885,167.085],["på",167.085,167.205],["nul",167.285,167.465],["hele",167.745,167.985],["tiden",168.045,168.285]],"text":"Her er Mathcad-plottet af de tre strømme over tid. De har samme amplitude og er forskudt en tredjedel periode. Den sorte kurve er summen, og den ligger på nul hele tiden."},"tjek_q":{"start":170.105,"end":174.226,"words":[["Tjek",170.145,170.305],["dig",170.325,170.425],["selv",170.445,170.626],["Hvad",171.366,171.506],["sker",171.546,171.786],["der",171.826,171.906],["med",171.926,172.006],["strømmene",172.026,172.486],["hvis",172.686,172.866],["nullederen",173.126,173.686],["klippes",173.746,174.026],["over",174.086,174.226]],"text":"Tjek dig selv. Hvad sker der med strømmene, hvis nullederen klippes over?"},"tjek_a":{"start":178.346,"end":185.267,"words":[["Ingenting",178.386,178.746],["Nullederen",179.366,179.826],["førte",179.886,180.146],["ingen",180.166,180.326],["strøm",180.366,180.606],["så",180.906,181.006],["stjernepunktet",181.026,181.646],["bliver",181.686,181.886],["ved",181.946,182.046],["nul",182.106,182.286],["volt",182.346,182.586],["og",182.886,182.966],["hver",183.006,183.166],["modstand",183.226,183.627],["får",183.707,183.827],["stadig",183.847,184.147],["to",184.227,184.347],["hundrede",184.467,184.707],["og",184.707,184.747],["tyve",184.767,184.987],["volt",185.047,185.267]],"text":"Ingenting. Nullederen førte ingen strøm, så stjernepunktet bliver ved nul volt, og hver modstand får stadig to hundrede og tyve volt."},"tjek_vis":{"start":187.087,"end":195.328,"words":[["Her",187.127,187.247],["kan",187.267,187.367],["du",187.387,187.427],["se",187.487,187.567],["det",187.647,187.747],["De",188.347,188.407],["tre",188.487,188.607],["strømme",188.747,189.107],["som",189.207,189.327],["pile",189.387,189.747],["efter",189.867,190.087],["hinanden",190.127,190.487],["slutter",190.707,191.027],["præcis",191.067,191.607],["hvor",191.747,191.887],["de",191.927,191.987],["startede",192.047,192.447],["Der",192.907,193.007],["mangler",193.027,193.247],["intet",193.267,193.427],["stykke",193.467,193.747],["så",194.007,194.107],["der",194.127,194.207],["er",194.247,194.307],["intet",194.427,194.648],["til",194.708,194.808],["nullederen",194.848,195.328]],"text":"Her kan du se det. De tre strømme som pile efter hinanden slutter præcis, hvor de startede. Der mangler intet stykke, så der er intet til nullederen."},"slut":{"start":197.148,"end":209.869,"words":[["Kort",197.188,197.368],["sagt",197.428,197.628],["balanceret",198.108,198.728],["last",198.808,199.068],["giver",199.208,199.408],["tre",199.528,199.688],["lige",199.868,200.028],["store",200.068,200.328],["strømme",200.368,200.688],["med",200.768,200.848],["hundrede",200.908,201.168],["og",201.168,201.208],["tyve",201.208,201.448],["grader",201.448,201.748],["imellem",201.788,202.068],["og",202.308,202.368],["summen",202.428,202.728],["er",202.848,202.928],["nul",202.988,203.128],["Nullederstrømmen",203.708,204.448],["er",204.668,204.748],["nul",204.868,205.048],["og",205.549,205.609],["effekten",205.649,206.089],["er",206.309,206.389],["tre",206.449,206.589],["gange",206.709,206.929],["V",206.969,206.989],["i",207.189,207.209],["anden",207.309,207.469],["over",207.529,207.649],["R",207.829,207.849],["fjorten",208.309,208.649],["komma",208.769,208.949],["fem",209.009,209.149],["to",209.229,209.329],["kilowatt",209.509,209.869]],"text":"Kort sagt: balanceret last giver tre lige store strømme med hundrede og tyve grader imellem, og summen er nul. Nullederstrømmen er nul, og effekten er tre gange V i anden over R, fjorten komma fem to kilowatt."}}}, { audio: 'ovelse-2-balanceret.mp3', id: 'ovelse-2-balanceret' });</script>
+</body>
+</html>

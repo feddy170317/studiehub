@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Øvelse 5 (7.55): motorviklingernes strømme · video</title>
+<meta name="description" content="Øvelse 5 (7.55): motorviklinger 40 Ω + 5 mH ved 60 Hz. Z = 40,04∠2,7° Ω, I = 10,39 A, I_N = 0.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Dag 10: videoer</a><h1>Øvelse 5 (7.55): motorviklingernes strømme</h1><span class="meta">ELE1 · dag 10 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Øvelse 5 (7.55): motorviklingernes strømme"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Øvelse 5 (7.55): motorviklinger 40 Ω + 5 mH ved 60 Hz. Z = 40,04∠2,7° Ω, I = 10,39 A, I_N = 0.</p><div class="chips"><a href="../../opgaver/dag10/opgave-7.55-motorviklinger-stroemme.pdf">📐 Se udregningen i Mathcad (PDF)</a><a href="y-last-nulleder.html">Se først: Y-last med nulleder: balanceret og ubalanceret</a><a href="../../dag/Dag10_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/ele1/dag10">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// ELE1 Dag 10 · Øvelse 5 = opgave 7.55 i slides (ældre udgave). Mathcad: Dag 10/Opgaver/Opgave 7.55 motorviklinger strømme.mcdx
+// R = 40 Ω, L = 5 mH, 60 Hz: ω = 377, X_L = 1,885 Ω, Z = 40,04∠2,70°. 416 V (fase) ∠-30/210/90 → I = 10,39 A ∠-32,7 / ∠207,3 / ∠87,3.
+// I_R = 8,742 - j5,612 A; I_N = 0. Tjek: P = 3·10,39²·40 = 12,95 kW.
+BP.scene({ header: 'ELE1 · Dag 10 · øvelse 5 (7.55)', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, dot, ring, under, ell, rect, hatch, dashed, PI } = B;
+  const S = (id) => L(id).start;
+  const ringet = (k, s, x, y, size, col, a, te) => { const r = text(k, s, x, y, size, col, a, te); ring(r, col, te, te + 0.5); return r; };
+  const D = PI / 180, P = (c, r, v) => [c[0] + r * Math.cos(v * D), c[1] - r * Math.sin(v * D)];
+
+  // ---------------------------------------------------------------- 0 titel
+  B.titel(0, 'Øvelse 5', 'ELE1 · Dag 10 · opgave 7.55 i slides', 'titel');
+  text(0, 'I_R,  I_W,  I_B,  I_N = ?', 640, 540, 46, 'red', wt('titel', 'fasestrømme') - 0.1, we('titel', 'nullederen'), { align: 'center' });
+
+  // ---------------------------------------------------------------- 1 opgaven og viklingerne
+  B.goto('opgave', 1);
+  bubble(1, 'Opgaven', 130, 135, 50, 'blue', S('opgave') - 0.1, S('opgave') + 0.8);
+  text(1, 'R = 40 Ω,  L = 5 mH,  f = 60 Hz', 140, 240, 30, 'black', wt('opgave', 'modstand') - 0.1, we('opgave', 'hertz'));
+  text(1, 'V_R = 416∠−30° V', 140, 320, 32, 'red', wt('opgave2', 'fire') - 0.1, we('opgave2', 'grader'));
+  text(1, 'V_W = 416∠210° V', 140, 375, 32, 'blue', wt('opgave2', 'fire') + 0.2, we('opgave2', 'grader'));
+  text(1, 'V_B = 416∠90° V', 140, 430, 32, 'green', wt('opgave2', 'fire') + 0.4, we('opgave2', 'grader'));
+  ringet(1, '416 V = fasespænding', 140, 530, 32, 'red', wt('opgave3', 'læser') - 0.1, we('opgave3', 'fasespændingen'));
+  text(1, '(som i figur b)', 140, 585, 28, 'black', wt('opgave3', 'figur') - 0.1, we('opgave3', 'stjernepunktet'));
+  text(1, '120° imellem', 140, 645, 28, 'green', wt('opgave3', 'Spændingerne') - 0.1, we('opgave3', 'imellem'));
+  {
+    const x0 = 720, cols = [x0 + 400, x0 + 260, x0 + 120], ys = [200, 250, 300], t0 = wt('opgave', 'vikling');
+    ['R', 'W', 'B'].forEach((nv, i) => {
+      const x = cols[i], y = ys[i], t = t0 + 0.3 * i;
+      text(1, nv, x0 - 34, y + 10, 28, 'black', t - 0.3, t);
+      B.wire(1, [[x0, y], [x, y], [x, 330]], t - 0.3, t + 0.1);
+      B.resistor(1, [x, 330], [x, 400], t, t + 0.4, {});
+      B.inductor(1, [x, 410], [x, 480], t + 0.2, t + 0.6, {});
+      B.wire(1, [[x, 400], [x, 410]], t + 0.2, t + 0.3); B.wire(1, [[x, 480], [x, 520]], t + 0.4, t + 0.6);
+    });
+    text(1, '40 Ω', cols[0] + 22, 375, 24, 'blue', t0 + 0.4, t0 + 0.8); text(1, '5 mH', cols[0] + 22, 455, 24, 'blue', t0 + 0.5, t0 + 0.9);
+    const tb = wt('opgave2', 'stjernepunktet');
+    B.wire(1, [[cols[2], 520], [cols[0], 520]], tb - 0.1, tb + 0.4); dot(1, cols[1], 520, 8, 'black', tb + 0.3);
+    const tn = wt('opgave2', 'nullederen');
+    text(1, 'N', x0 - 34, 610, 28, 'black', tn - 0.1, tn + 0.2);
+    B.wire(1, [[x0, 600], [cols[1], 600], [cols[1], 520]], tn - 0.1, tn + 0.4);
+  }
+
+  // ---------------------------------------------------------------- 2 impedansen af én vikling
+  B.goto('omega', 2);
+  bubble(2, 'Impedansen', 130, 135, 50, 'blue', S('omega') - 0.1, S('omega') + 0.8);
+  B.formel(2, '6.9', 'ω = 2π · 60 = 377 rad/s', 160, 230, 36, wt('omega', 'ligning') - 0.1, we('omega', 'sekund'), 'red');
+  text(2, 'X_L = ω L = 377 · 0,005 = 1,885 Ω', 160, 330, 36, 'black', S('xl') + 0.1, we('xl', 'ohm'));
+  text(2, 'serie:   Z = R + j X_L = 40 + j 1,885 Ω', 160, 420, 36, 'black', S('z') + 0.1, we('z', 'ohm'));
+  B.formel(2, 'Pythagoras', '| Z | = √( 40² + 1,885² ) = 40,04 Ω', 160, 520, 36, wt('z2', 'Pythagoras') - 0.1, we('z2', 'ohm'), 'blue');
+  ringet(2, 'θ = arctan( 1,885 / 40 ) = 2,7°', 160, 620, 36, 'red', wt('z2', 'Vinklen') - 0.1, we('z2', 'grader'));
+
+  // ---------------------------------------------------------------- 3 strømmene
+  B.goto('ohm', 3);
+  bubble(3, 'Strømmene', 130, 135, 50, 'blue', S('ohm') - 0.1, S('ohm') + 0.8);
+  B.formel(3, '6.60', 'I = V / Z', 160, 230, 40, wt('ohm', 'ligning') - 0.1, we('ohm', 'Z'), 'red');
+  ringet(3, '| I | = 416 / 40,04 = 10,39 A', 160, 340, 38, 'black', wt('ohm2', 'Fire') - 0.1, we('ohm2', 'ampere'));
+  text(3, 'I_R:   −30° − 2,7° = −32,7°', 160, 440, 34, 'red', S('ohm3') + 0.1, we('ohm3', 'grader'));
+  text(3, 'I_W:   210° − 2,7° = 207,3° = −152,7°', 160, 520, 34, 'blue', wt('ohm3', 'ti') - 0.4, we('ohm3', 'syv', 4));
+  text(3, 'I_B:   90° − 2,7° = 87,3°', 160, 600, 34, 'green', wt('ohm3', 'Halvfems') - 0.1, we('ohm3', 'grader', 2));
+
+  // ---------------------------------------------------------------- 4 rektangulær form
+  B.goto('rekt', 4);
+  bubble(4, 'Rektangulær form', 130, 150, 50, 'blue', S('rekt') - 0.1, S('rekt') + 0.8);
+  text(4, 'I_R = 10,39 · ( cos(−32,7°) + j sin(−32,7°) )', 160, 320, 38, 'black', S('rekt') + 0.3, we('rekt', 'grader'));
+  ringet(4, 'I_R = 8,74 − j 5,61 A', 160, 450, 46, 'red', wt('rekt', 'Det') - 0.1, we('rekt', 'ampere'));
+
+  // ---------------------------------------------------------------- 5 strømmen kommer efter
+  B.goto('efter', 5);
+  bubble(5, 'Strømmen kommer efter', 130, 135, 50, 'blue', S('efter') - 0.1, S('efter') + 0.8);
+  text(5, 'I ligger 2,7° efter V', 160, 260, 38, 'red', S('efter') + 0.2, we('efter', 'spænding'));
+  text(5, 'spolen forsinker strømmen', 160, 350, 34, 'black', wt('efter', 'spolen') - 0.1, we('efter', 'sent'));
+  text(5, 'X_L = 1,9 Ω  ≪  R = 40 Ω', 160, 450, 34, 'black', wt('efter', 'reaktansen') - 0.1, we('efter', 'modstanden'));
+  text(5, '⇒  lille forsinkelse', 160, 520, 34, 'green', wt('efter', 'forsinkelsen') - 0.1, we('efter', 'lille', 1));
+  {
+    const O = [820, 520], t0 = S('efter');
+    arrow(5, [O, P(O, 360, 0)], 'black', 2, t0, t0 + 0.3, 10);
+    arrow(5, [O, P(O, 330, 30)], 'blue', 3.6, t0 + 0.2, t0 + 0.6, 14); text(5, 'V', P(O, 340, 30)[0] + 6, P(O, 340, 30)[1] - 6, 30, 'blue', t0 + 0.4, t0 + 0.7);
+    arrow(5, [O, P(O, 260, 27.3)], 'red', 3.6, t0 + 0.6, t0 + 1.0, 14); text(5, 'I', P(O, 270, 22)[0] + 4, P(O, 270, 22)[1] + 18, 30, 'red', t0 + 0.8, t0 + 1.1);
+    text(5, '2,7°', P(O, 200, 29)[0] + 26, P(O, 200, 29)[1] + 6, 26, 'green', t0 + 0.9, t0 + 1.2);
+  }
+
+  // ---------------------------------------------------------------- 6 nullederen
+  B.goto('nul', 6);
+  bubble(6, 'Nullederen', 130, 135, 50, 'blue', S('nul') - 0.1, S('nul') + 0.8);
+  text(6, 'balanceret:  ens R og ens L', 160, 260, 38, 'black', wt('nul', 'Motoren') - 0.1, we('nul', 'ens', 1));
+  B.formel(6, '6.51', 'I_N = I_R + I_W + I_B', 160, 380, 40, S('nul2') + 0.1, we('nul2', 'enoghalvtreds'), 'red');
+  text(6, 'tre lige store strømme, 120° imellem', 160, 480, 32, 'black', wt('nul2', 'tre') - 0.1, we('nul2', 'imellem'));
+  ringet(6, 'I_N = 0 A', 160, 590, 46, 'red', wt('nul2', 'N') - 0.4, we('nul2', 'ampere'));
+
+  // ---------------------------------------------------------------- 7 antagelsen
+  B.goto('antag', 7);
+  bubble(7, 'Antagelsen', 130, 150, 50, 'blue', S('antag') - 0.1, S('antag') + 0.8);
+  text(7, 'hvis 416 V i stedet var linjespændingen:', 160, 320, 36, 'black', wt('antag', 'Hvis') - 0.1, we('antag', 'linjespændingen'));
+  text(7, 'I = 10,39 / √3 = 6,0 A', 160, 430, 42, 'green', wt('antag', 'skulle') - 0.1, we('antag', 'ampere'));
+
+  // ---------------------------------------------------------------- 8 tjek
+  B.goto('tjek_q', 8);
+  B.tjek(8, ['Hvor meget aktiv effekt', 'optager motoren i alt?'], ['kun modstandene:  P = 3 I² R', '= 3 · 10,39² · 40 = 12,95 kW'], 'tjek_q', 'tjek_a');
+
+  // ---------------------------------------------------------------- 9 tjek vist: viserdiagram for fase R
+  B.goto('tjek_vis', 9);
+  {
+    const O = [520, 300], t0 = S('tjek_vis');
+    arrow(9, [[O[0] - 60, O[1]], [O[0] + 460, O[1]]], 'black', 2.2, t0, t0 + 0.4, 10); arrow(9, [[O[0], O[1] + 300], [O[0], O[1] - 140]], 'black', 2.2, t0, t0 + 0.4, 10);
+    text(9, 'Re', O[0] + 440, O[1] + 36, 26, 'black', t0 + 0.2, t0 + 0.5); text(9, 'Im', O[0] + 14, O[1] - 120, 26, 'black', t0 + 0.2, t0 + 0.5);
+    const tb = wt('tjek_vis', 'blå');
+    arrow(9, [O, P(O, 420, -30)], 'blue', 3.8, tb - 0.1, tb + 0.5, 14);
+    text(9, 'V_R = 416∠−30° V', P(O, 420, -30)[0] - 40, P(O, 420, -30)[1] - 26, 28, 'blue', tb + 0.3, tb + 0.7);
+    const tr = wt('tjek_vis', 'røde');
+    arrow(9, [O, P(O, 300, -32.7)], 'red', 3.8, tr - 0.1, tr + 0.5, 14);
+    text(9, 'I_R = 10,39∠−32,7° A', 560, 580, 28, 'red', tr + 0.3, tr + 0.7);
+    line(9, ell(O[0], O[1], 120, 120, 30 * D, 32.7 * D), 'green', 3, tr + 0.4, tr + 0.8);
+    text(9, '2,7° efter', 545, 480, 28, 'green', tr + 0.5, tr + 0.9);
+  }
+
+  // ---------------------------------------------------------------- 10 slut
+  B.goto('slut', 10);
+  B.slut(10, 'ELE1 slides Day 10, øvelse 5 (opg. 7.55) · Rizzoni & Kearns (2022), lign. 6.9, 6.51, 6.60 · Mathcad: Opgave 7.55', 'øvelse 6', 'slut');
+  text(10, 'Z = R + jωL = 40,04∠2,7° Ω', 200, 240, 38, 'blue', S('slut') + 0.3, we('slut', 'grader'));
+  text(10, 'I = V / Z = 10,39 A,  2,7° efter V', 200, 320, 38, 'red', wt('slut', 'Hver') - 0.1, we('slut', 'spændingen'));
+  text(10, 'balanceret  ⇒  I_N = 0', 200, 400, 38, 'green', wt('slut', 'Motoren') - 0.1, we('slut', 'nul'));
+});
+
+</script>
+<script>BP.live({"duration":219.147,"audio":"ovelse-5-motor.mp3","order":["titel","opgave","opgave2","opgave3","omega","xl","z","z2","ohm","ohm2","ohm3","rekt","efter","nul","nul2","antag","tjek_q","tjek_a","tjek_vis","slut"],"lines":{"titel":{"start":0.5,"end":11.281,"words":[["Øvelse",0.54,0.8],["fem",0.94,1.12],["opgave",1.4,1.82],["syv",1.98,2.14],["femoghalvtreds",2.22,2.86],["Hver",3.94,4.12],["vikling",4.26,4.64],["i",4.72,4.74],["en",4.82,4.9],["trefasemotor",4.94,5.801],["er",5.861,5.921],["en",5.921,5.981],["modstand",6.021,6.421],["i",6.501,6.521],["serie",6.661,6.961],["med",6.961,7.041],["en",7.061,7.101],["spole",7.161,7.501],["Vi",8.521,8.581],["finder",8.621,8.861],["de",8.901,8.961],["tre",9.041,9.201],["fasestrømme",9.341,10.021],["og",10.121,10.201],["strømmen",10.301,10.621],["i",10.661,10.681],["nullederen",10.741,11.281]],"text":"Øvelse fem, opgave syv femoghalvtreds. Hver vikling i en trefasemotor er en modstand i serie med en spole. Vi finder de tre fasestrømme og strømmen i nullederen."},"opgave":{"start":13.101,"end":19.262,"words":[["Hver",13.141,13.301],["vikling",13.381,13.701],["har",13.761,13.921],["en",14.021,14.121],["modstand",14.241,14.681],["på",14.761,14.961],["fyrre",15.061,15.321],["ohm",15.441,15.581],["og",15.621,15.701],["en",15.741,15.801],["induktans",15.861,16.361],["på",16.421,16.541],["fem",16.601,16.761],["millihenry",16.822,17.302],["Frekvensen",17.962,18.442],["er",18.542,18.642],["tres",18.762,18.962],["hertz",19.002,19.262]],"text":"Hver vikling har en modstand på fyrre ohm og en induktans på fem millihenry. Frekvensen er tres hertz."},"opgave2":{"start":21.162,"end":31.583,"words":[["Viklingerne",21.202,21.662],["forbindes",21.722,22.142],["i",22.262,22.282],["Y",22.462,22.482],["og",22.882,22.962],["stjernepunktet",23.082,23.762],["sidder",23.822,24.022],["på",24.062,24.162],["nullederen",24.182,24.682],["Ved",25.542,25.622],["terminalerne",25.662,26.222],["står",26.282,26.462],["spændingerne",26.522,26.942],["fire",27.082,27.283],["hundrede",27.363,27.563],["og",27.563,27.603],["seksten",27.643,27.963],["volt",28.023,28.243],["ved",28.323,28.443],["minus",28.563,28.883],["tredive",28.943,29.323],["to",29.843,29.963],["hundrede",30.063,30.363],["og",30.403,30.443],["ti",30.443,30.563],["og",30.843,30.903],["halvfems",30.923,31.283],["grader",31.303,31.583]],"text":"Viklingerne forbindes i Y, og stjernepunktet sidder på nullederen. Ved terminalerne står spændingerne fire hundrede og seksten volt ved minus tredive, to hundrede og ti og halvfems grader."},"opgave3":{"start":32.523,"end":42.464,"words":[["Som",32.563,32.683],["i",32.723,32.743],["figur",32.803,33.063],["b",33.163,33.183],["sidder",33.543,33.763],["hver",33.803,33.963],["vikling",34.043,34.363],["mellem",34.403,34.623],["sin",34.683,34.803],["terminal",34.843,35.303],["og",35.363,35.423],["stjernepunktet",35.463,36.083],["Vi",36.703,36.743],["læser",36.803,37.023],["derfor",37.043,37.323],["fire",37.443,37.644],["hundrede",37.704,37.964],["og",37.964,38.004],["seksten",38.024,38.364],["volt",38.424,38.624],["som",38.684,38.804],["fasespændingen",38.904,39.664],["Spændingerne",40.444,40.844],["har",40.944,41.104],["hundrede",41.224,41.504],["og",41.504,41.564],["tyve",41.564,41.804],["grader",41.804,42.124],["imellem",42.164,42.464]],"text":"Som i figur b sidder hver vikling mellem sin terminal og stjernepunktet. Vi læser derfor fire hundrede og seksten volt som fasespændingen. Spændingerne har hundrede og tyve grader imellem."},"omega":{"start":44.284,"end":52.065,"words":[["Først",44.324,44.604],["vinkelfrekvensen",44.724,45.464],["ligning",45.824,46.084],["seks",46.124,46.384],["ni",46.444,46.524],["omega",47.164,47.524],["er",47.664,47.764],["to",47.944,48.104],["pi",48.244,48.385],["gange",48.525,48.745],["tres",48.805,49.065],["altså",49.385,49.645],["tre",49.805,49.945],["hundrede",50.045,50.285],["og",50.285,50.325],["syvoghalvfjerds",50.465,51.085],["radianer",51.145,51.585],["pr",51.605,51.705],["sekund",51.765,52.065]],"text":"Først vinkelfrekvensen, ligning seks ni: omega er to pi gange tres, altså tre hundrede og syvoghalvfjerds radianer pr. sekund."},"xl":{"start":53.125,"end":60.746,"words":[["En",53.165,53.245],["spoles",53.265,53.625],["reaktans",53.665,54.165],["er",54.305,54.405],["omega",54.565,54.905],["gange",54.965,55.265],["L",55.325,55.345],["Tre",56.165,56.265],["hundrede",56.365,56.565],["og",56.565,56.605],["syvoghalvfjerds",56.665,57.345],["gange",57.465,57.725],["nul",57.865,58.045],["komma",58.105,58.285],["nul",58.385,58.525],["nul",58.565,58.726],["fem",58.826,58.986],["giver",59.266,59.466],["en",59.606,59.706],["komma",59.766,60.346],["otte",60.346,60.546],["otte",60.546,60.646],["ohm",60.646,60.746]],"text":"En spoles reaktans er omega gange L. Tre hundrede og syvoghalvfjerds gange nul komma nul nul fem giver en komma otte otte ohm."},"z":{"start":62.186,"end":68.526,"words":[["Modstand",62.226,62.586],["og",62.606,62.666],["spole",62.706,63.026],["i",63.106,63.126],["serie",63.206,63.506],["lægges",63.626,63.826],["sammen",63.886,64.186],["Impedansen",64.866,65.406],["er",65.506,65.586],["fyrre",65.766,66.026],["plus",66.226,66.506],["j",66.906,66.926],["en",66.926,66.966],["komma",66.966,67.126],["otte",67.126,67.486],["otte",68.166,68.406],["ohm",68.426,68.526]],"text":"Modstand og spole i serie lægges sammen. Impedansen er fyrre plus j en komma otte otte ohm."},"z2":{"start":70.447,"end":85.608,"words":[["I",70.487,70.507],["polær",70.587,70.907],["form",70.967,71.187],["størrelsen",71.767,72.167],["er",72.247,72.307],["Pythagoras",72.367,72.987],["kvadratroden",73.467,74.067],["af",74.127,74.207],["fyrre",74.307,74.567],["i",74.627,74.647],["anden",74.727,74.947],["plus",75.087,75.327],["en",75.527,75.647],["komma",75.707,76.227],["otte",76.247,76.347],["otte",76.347,76.467],["i",76.527,76.547],["anden",76.647,76.907],["altså",77.487,77.727],["fyrre",77.847,78.107],["komma",78.167,78.347],["nul",78.427,78.587],["fire",78.707,79.007],["ohm",79.067,79.207],["Vinklen",80.108,80.468],["er",80.588,80.688],["arcus",81.188,81.448],["tangens",81.488,81.908],["til",81.988,82.128],["en",82.308,82.428],["komma",82.488,82.668],["otte",82.788,83.028],["otte",83.028,83.248],["over",83.368,83.508],["fyrre",83.588,83.848],["altså",84.368,84.608],["to",84.688,84.808],["komma",84.908,85.068],["syv",85.168,85.288],["grader",85.328,85.608]],"text":"I polær form: størrelsen er Pythagoras, kvadratroden af fyrre i anden plus en komma otte otte i anden, altså fyrre komma nul fire ohm. Vinklen er arcus tangens til en komma otte otte over fyrre, altså to komma syv grader."},"ohm":{"start":87.428,"end":94.029,"words":[["Stjernepunktet",87.468,88.088],["sidder",88.148,88.348],["på",88.368,88.488],["nullederen",88.528,89.068],["så",89.388,89.508],["hver",89.548,89.708],["strøm",89.788,90.048],["er",90.128,90.188],["Ohms",90.268,90.468],["lov",90.528,90.688],["ligning",91.049,91.329],["seks",91.329,91.409],["tres",91.689,91.929],["fasespændingen",92.569,93.309],["divideret",93.389,93.789],["med",93.809,93.909],["Z",94.009,94.029]],"text":"Stjernepunktet sidder på nullederen, så hver strøm er Ohms lov, ligning seks tres: fasespændingen divideret med Z."},"ohm2":{"start":94.969,"end":104.17,"words":[["Divider",95.009,95.329],["størrelserne",95.369,95.829],["og",95.989,96.049],["træk",96.069,96.289],["vinklerne",96.349,96.649],["fra",96.709,96.809],["Fire",97.669,97.829],["hundrede",97.829,98.069],["og",98.089,98.129],["seksten",98.129,98.509],["divideret",98.629,98.989],["med",99.009,99.089],["fyrre",99.169,99.409],["komma",99.469,99.609],["nul",99.689,99.829],["fire",99.929,100.189],["er",100.469,100.549],["ti",100.649,100.749],["komma",100.869,101.069],["tre",101.149,101.29],["ni",101.41,101.47],["ampere",101.63,102.01],["Den",102.69,102.79],["er",102.81,102.89],["ens",102.95,103.15],["for",103.21,103.29],["alle",103.41,103.57],["tre",103.61,103.73],["faser",103.85,104.17]],"text":"Divider størrelserne og træk vinklerne fra. Fire hundrede og seksten divideret med fyrre komma nul fire er ti komma tre ni ampere. Den er ens for alle tre faser."},"ohm3":{"start":105.09,"end":121.471,"words":[["Vinklerne",105.13,105.49],["minus",106.17,106.43],["tredive",106.49,106.83],["minus",107.17,107.43],["to",107.49,107.57],["komma",107.65,107.81],["syv",107.91,108.05],["er",108.29,108.37],["minus",108.51,108.79],["toogtredive",108.87,109.39],["komma",109.43,109.59],["syv",109.65,109.79],["grader",109.81,110.05],["To",110.73,110.83],["hundrede",110.89,111.07],["og",111.09,111.13],["ti",111.17,111.27],["minus",111.43,111.651],["to",111.691,111.771],["komma",111.831,111.971],["syv",112.031,112.391],["er",112.391,112.491],["to",112.851,112.951],["hundrede",113.011,113.211],["og",113.211,113.251],["syv",113.311,113.451],["komma",113.511,113.651],["tre",113.711,113.831],["grader",113.911,114.171],["det",114.571,114.671],["samme",114.691,114.871],["som",114.911,115.031],["minus",115.111,115.491],["hundrede",115.491,115.891],["og",115.891,115.931],["tooghalvtreds",116.251,116.711],["komma",116.751,116.871],["syv",116.931,117.071],["Halvfems",117.871,118.371],["minus",118.591,118.931],["to",119.031,119.131],["komma",119.191,119.331],["syv",119.411,119.551],["er",119.831,119.931],["syvogfirs",120.171,120.671],["komma",120.751,120.911],["tre",120.971,121.091],["grader",121.191,121.471]],"text":"Vinklerne: minus tredive minus to komma syv er minus toogtredive komma syv grader. To hundrede og ti minus to komma syv er to hundrede og syv komma tre grader, det samme som minus hundrede og tooghalvtreds komma syv. Halvfems minus to komma syv er syvogfirs komma tre grader."},"rekt":{"start":123.291,"end":134.152,"words":[["I",123.331,123.351],["rektangulær",123.431,124.011],["form",124.071,124.271],["er",124.591,124.671],["I",124.771,124.791],["R",125.031,125.051],["ti",125.451,125.531],["komma",125.631,125.811],["tre",125.891,126.031],["ni",126.151,126.231],["gange",126.591,126.791],["cosinus",126.871,127.411],["og",127.551,127.611],["sinus",127.671,127.991],["til",128.051,128.171],["minus",128.191,128.451],["toogtredive",128.511,129.011],["komma",129.051,129.191],["syv",129.271,129.391],["grader",129.431,129.711],["Det",130.211,130.311],["giver",130.351,130.531],["otte",130.671,130.851],["komma",130.891,131.051],["syv",131.151,131.431],["fire",131.431,131.631],["minus",131.831,132.131],["j",132.311,132.331],["fem",132.451,132.751],["komma",132.811,132.972],["seks",133.052,133.272],["en",133.432,133.552],["ampere",133.752,134.152]],"text":"I rektangulær form er I R ti komma tre ni gange cosinus og sinus til minus toogtredive komma syv grader. Det giver otte komma syv fire minus j fem komma seks en ampere."},"efter":{"start":135.972,"end":145.633,"words":[["Alle",136.012,136.192],["tre",136.232,136.372],["strømme",136.492,136.792],["ligger",136.972,137.172],["to",137.232,137.332],["komma",137.412,137.572],["syv",137.652,137.792],["grader",137.832,138.132],["efter",138.252,138.472],["deres",138.492,138.632],["spænding",138.672,139.012],["Det",139.792,139.872],["er",139.892,139.952],["spolen",139.972,140.332],["der",140.372,140.472],["får",140.492,140.592],["strømmen",140.612,140.892],["til",140.932,141.032],["at",141.032,141.072],["komme",141.112,141.252],["lidt",141.292,141.392],["for",141.432,141.512],["sent",141.572,141.812],["Fordi",142.412,142.552],["reaktansen",142.632,143.152],["er",143.192,143.252],["lille",143.312,143.532],["i",143.612,143.632],["forhold",143.672,143.912],["til",143.912,144.012],["modstanden",144.052,144.493],["er",144.693,144.753],["forsinkelsen",144.793,145.293],["lille",145.433,145.633]],"text":"Alle tre strømme ligger to komma syv grader efter deres spænding. Det er spolen, der får strømmen til at komme lidt for sent. Fordi reaktansen er lille i forhold til modstanden, er forsinkelsen lille."},"nul":{"start":147.453,"end":153.293,"words":[["Nu",147.493,147.573],["nullederen",147.813,148.333],["Motoren",149.113,149.453],["er",149.473,149.533],["balanceret",149.553,150.113],["fordi",150.493,150.673],["de",150.753,150.813],["tre",150.873,150.993],["modstande",151.093,151.433],["er",151.473,151.533],["ens",151.613,151.813],["og",152.013,152.073],["de",152.093,152.153],["tre",152.193,152.313],["spoler",152.413,152.793],["er",152.933,152.993],["ens",153.073,153.293]],"text":"Nu nullederen. Motoren er balanceret, fordi de tre modstande er ens og de tre spoler er ens."},"nul2":{"start":154.313,"end":163.574,"words":[["Kirchhoffs",154.353,154.713],["strømlov",154.753,155.173],["i",155.253,155.273],["stjernepunktet",155.334,155.974],["ligning",156.214,156.474],["seks",156.474,156.714],["enoghalvtreds",156.774,157.254],["tre",157.694,157.854],["lige",158.034,158.194],["store",158.214,158.454],["strømme",158.474,158.794],["med",159.034,159.134],["hundrede",159.234,159.494],["og",159.494,159.554],["tyve",159.554,159.774],["grader",159.774,160.054],["imellem",160.074,160.354],["summer",160.574,160.814],["til",160.854,160.974],["nul",161.014,161.154],["I",162.094,162.114],["N",162.354,162.374],["er",162.714,162.774],["nul",162.894,163.054],["ampere",163.214,163.574]],"text":"Kirchhoffs strømlov i stjernepunktet, ligning seks enoghalvtreds: tre lige store strømme med hundrede og tyve grader imellem summer til nul. I N er nul ampere."},"antag":{"start":165.394,"end":174.555,"words":[["En",165.434,165.514],["bemærkning",165.554,166.014],["om",166.054,166.114],["antagelsen",166.194,166.715],["Hvis",167.455,167.635],["fire",167.755,167.935],["hundrede",167.955,168.175],["og",168.195,168.235],["seksten",168.255,168.595],["volt",168.635,168.855],["i",168.995,169.015],["stedet",169.075,169.355],["var",169.375,169.475],["linjespændingen",169.515,170.255],["skulle",170.535,170.735],["alle",170.835,171.015],["strømme",171.055,171.315],["deles",171.395,171.715],["med",171.775,171.875],["kvadratroden",171.895,172.375],["af",172.375,172.435],["tre",172.475,172.595],["og",173.055,173.115],["de",173.135,173.175],["ville",173.215,173.355],["blive",173.375,173.575],["seks",173.815,174.075],["ampere",174.175,174.555]],"text":"En bemærkning om antagelsen. Hvis fire hundrede og seksten volt i stedet var linjespændingen, skulle alle strømme deles med kvadratroden af tre, og de ville blive seks ampere."},"tjek_q":{"start":176.375,"end":179.716,"words":[["Tjek",176.415,176.575],["dig",176.595,176.675],["selv",176.715,176.875],["Hvor",177.335,177.456],["meget",177.496,177.736],["aktiv",177.876,178.176],["effekt",178.216,178.496],["optager",178.596,178.916],["motoren",178.956,179.316],["i",179.396,179.416],["alt",179.536,179.716]],"text":"Tjek dig selv. Hvor meget aktiv effekt optager motoren i alt?"},"tjek_a":{"start":183.836,"end":190.716,"words":[["Kun",183.876,184.036],["modstandene",184.116,184.656],["optager",184.796,185.116],["effekt",185.136,185.396],["Tre",185.976,186.136],["gange",186.256,186.516],["ti",186.756,186.836],["komma",186.936,187.096],["tre",187.156,187.276],["ni",187.396,187.456],["i",187.556,187.576],["anden",187.696,187.896],["gange",187.936,188.136],["fyrre",188.216,188.456],["giver",188.816,188.996],["tolv",189.276,189.496],["komma",189.536,189.736],["ni",189.796,189.856],["fem",189.996,190.156],["kilowatt",190.316,190.716]],"text":"Kun modstandene optager effekt. Tre gange ti komma tre ni i anden gange fyrre giver tolv komma ni fem kilowatt."},"tjek_vis":{"start":192.536,"end":200.896,"words":[["Her",192.576,192.716],["er",192.756,192.836],["viserdiagrammet",192.876,193.636],["for",193.676,193.776],["fase",193.816,194.096],["R",194.276,194.296],["Den",195.156,195.276],["blå",195.316,195.496],["pil",195.576,195.796],["er",195.856,195.936],["spændingen",195.976,196.396],["ved",196.556,196.656],["minus",196.716,197.016],["tredive",197.076,197.396],["grader",197.396,197.676],["og",197.996,198.056],["den",198.076,198.176],["røde",198.216,198.396],["er",198.456,198.516],["strømmen",198.556,198.896],["der",199.196,199.296],["ligger",199.316,199.496],["to",199.596,199.716],["komma",199.796,199.956],["syv",200.056,200.176],["grader",200.236,200.516],["efter",200.656,200.896]],"text":"Her er viserdiagrammet for fase R. Den blå pil er spændingen ved minus tredive grader, og den røde er strømmen, der ligger to komma syv grader efter."},"slut":{"start":202.716,"end":217.677,"words":[["Kort",202.756,202.956],["sagt",202.996,203.196],["Z",203.876,203.896],["er",203.916,204.276],["R",204.576,204.596],["plus",204.696,204.996],["j",205.196,205.216],["omega",205.456,205.716],["L",205.896,205.916],["fyrre",206.516,206.716],["komma",206.736,206.876],["nul",206.916,207.056],["fire",207.136,207.436],["ohm",207.436,207.556],["ved",207.756,207.856],["to",207.916,207.996],["komma",208.076,208.216],["syv",208.276,208.376],["grader",208.416,208.656],["Hver",209.356,209.536],["strøm",209.596,209.816],["er",209.916,209.976],["V",210.036,210.056],["over",210.216,210.376],["Z",210.436,210.456],["ti",210.576,211.176],["komma",211.276,211.456],["tre",211.516,211.636],["ni",211.736,211.796],["ampere",211.896,212.276],["to",212.676,212.776],["komma",212.877,213.017],["syv",213.097,213.237],["grader",213.297,213.577],["efter",213.717,213.937],["spændingen",213.977,214.337],["Motoren",215.057,215.397],["er",215.417,215.477],["balanceret",215.497,216.057],["så",216.397,216.517],["nullederstrømmen",216.577,217.257],["er",217.417,217.477],["nul",217.537,217.677]],"text":"Kort sagt: Z er R plus j omega L, fyrre komma nul fire ohm ved to komma syv grader. Hver strøm er V over Z, ti komma tre ni ampere, to komma syv grader efter spændingen. Motoren er balanceret, så nullederstrømmen er nul."}}}, { audio: 'ovelse-5-motor.mp3', id: 'ovelse-5-motor' });</script>
+</body>
+</html>

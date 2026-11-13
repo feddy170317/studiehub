@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Øvelse 3 (7.50): ovn i Y og trekant · video</title>
+<meta name="description" content="Øvelse 3 (7.50): ovn 3 × 10 Ω på 380 V. Y: 21,9 A og 14,44 kW; Δ: 38 A (linje 65,8 A) og 43,32 kW.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Dag 10: videoer</a><h1>Øvelse 3 (7.50): ovn i Y og trekant</h1><span class="meta">ELE1 · dag 10 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Øvelse 3 (7.50): ovn i Y og trekant"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Øvelse 3 (7.50): ovn 3 × 10 Ω på 380 V. Y: 21,9 A og 14,44 kW; Δ: 38 A (linje 65,8 A) og 43,32 kW.</p><div class="chips"><a href="../../opgaver/dag10/opgave-7.50-ovn-i-y-og-delta.pdf">📐 Se udregningen i Mathcad (PDF)</a><a href="y-og-delta-belastning.html">Se først: Balanceret Y- og Δ-belastning</a><a href="../../dag/Dag10_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/ele1/dag10">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// ELE1 Dag 10 · Øvelse 3 = opgave 7.50 i slides (ældre udgave). Mathcad: Dag 10/Opgaver/Opgave 7.50 ovn i Y og delta.mcdx
+// R = 10 Ω, V_L = 380 V. Y: V_f = 219,4 V, I = 21,94 A, P = 14,44 kW. Δ: I_R = 38 A, I_linje = 65,8 A, P = 43,32 kW (3 ×).
+BP.scene({ header: 'ELE1 · Dag 10 · øvelse 3 (7.50)', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, dot, ring, under, ell, rect, hatch, dashed, PI } = B;
+  const S = (id) => L(id).start;
+  const rectc = (x, y, w, h) => rect(x, y, w, h).concat([[x, y]]);
+  const ringet = (k, s, x, y, size, col, a, te) => { const r = text(k, s, x, y, size, col, a, te); ring(r, col, te, te + 0.5); return r; };
+  const D = PI / 180, P = (c, r, v) => [c[0] + r * Math.cos(v * D), c[1] - r * Math.sin(v * D)];
+  // modstand mellem p og q: ledning - zigzag - ledning
+  const R = (k, p, q, a, b, col = 'blue') => {
+    const m1 = [p[0] + (q[0] - p[0]) * 0.28, p[1] + (q[1] - p[1]) * 0.28], m2 = [p[0] + (q[0] - p[0]) * 0.72, p[1] + (q[1] - p[1]) * 0.72];
+    B.wire(k, [p, m1], a, a + (b - a) * 0.3); B.resistor(k, m1, m2, a + (b - a) * 0.2, b - (b - a) * 0.2, { col }); B.wire(k, [m2, q], b - (b - a) * 0.3, b);
+  };
+
+  // ---------------------------------------------------------------- 0 titel
+  B.titel(0, 'Øvelse 3', 'ELE1 · Dag 10 · opgave 7.50 i slides', 'titel');
+  text(0, 'ovn:  3 × 10 Ω  på  380 V  ·  Y  og  Δ', 640, 540, 44, 'red', wt('titel', 'modstande') - 0.1, we('titel', 'trekant'), { align: 'center' });
+
+  // ---------------------------------------------------------------- 1 opgaven
+  B.goto('opgave', 1);
+  bubble(1, 'Opgaven', 130, 135, 50, 'blue', S('opgave') - 0.1, S('opgave') + 0.8);
+  ringet(1, 'V_L = 380 V', 160, 260, 44, 'red', wt('opgave', 'trefase') - 0.1, we('opgave', 'linjespændingen'));
+  text(1, '= spændingen mellem to faser', 160, 330, 32, 'black', wt('opgave', 'spændingen') - 0.1, we('opgave', 'faser'));
+  text(1, 'R = 10 Ω  i hver fase', 160, 420, 36, 'blue', S('opgave2') + 0.1, S('opgave2') + 1.2);
+  text(1, 'a)  strømmen i modstandene', 160, 510, 34, 'black', wt('opgave2', 'strømmen') - 0.1, we('opgave2', 'modstandene'));
+  text(1, 'b)  ovnens effekt', 160, 570, 34, 'black', wt('opgave2', 'effekt') - 0.1, we('opgave2', 'effekt'));
+  text(1, '…  i Y  og  i Δ', 160, 640, 34, 'green', wt('opgave2', 'Y') - 0.1, we('opgave2', 'trekant'));
+
+  // ---------------------------------------------------------------- 2 linje- og fasespænding
+  B.goto('linje', 2);
+  bubble(2, 'Linje og fase', 130, 135, 50, 'blue', S('linje') - 0.1, S('linje') + 0.8);
+  B.formel(2, '6.50', 'V_{ab} = V_{an} − V_{bn} = √3 V ∠30°', 160, 280, 40, wt('linje', 'Ligning') - 0.1, we('linje', 'grader'), 'red');
+  text(2, 'kun størrelsen:', 160, 420, 34, 'black', S('linje2') + 0.1, we('linje2', 'størrelsen'));
+  ringet(2, 'V_f = V_L / √3', 160, 510, 46, 'blue', wt('linje2', 'Fasespændingen') - 0.1, we('linje2', 'tre'));
+
+  // ---------------------------------------------------------------- 3 Y-forbindelse
+  B.goto('y', 3);
+  bubble(3, 'Y-forbindelse', 130, 135, 50, 'blue', S('y') - 0.1, S('y') + 0.8);
+  {
+    const c = [960, 440], t0 = wt('y', 'modstand');
+    [[90, 'a'], [210, 'b'], [330, 'c']].forEach(([v, nv], i) => {
+      const e = P(c, 210, v); R(3, c, e, t0 + 0.3 * i, t0 + 0.3 * i + 0.7);
+      dot(3, e[0], e[1], 7, 'black', t0 + 0.3 * i + 0.6); text(3, nv, e[0] + (i === 1 ? -36 : 14), e[1] + (i === 0 ? -8 : 30), 30, 'black', t0 + 0.3 * i + 0.6, t0 + 0.3 * i + 0.9);
+    });
+    dot(3, c[0], c[1], 8, 'red', wt('y', 'stjernepunktet')); text(3, 'n', c[0] + 14, c[1] + 30, 28, 'red', wt('y', 'stjernepunktet'), wt('y', 'stjernepunktet') + 0.3);
+    text(3, 'V_f', c[0] + 14, c[1] - 110, 30, 'red', wt('y', 'fasespændingen') - 0.1, we('y', 'fasespændingen'));
+  }
+  text(3, 'hver R får V_f', 160, 250, 34, 'black', wt('y', 'fasespændingen') - 0.1, we('y', 'fasespændingen'));
+  text(3, 'V_f = 380 / √3 = 219,4 V', 160, 350, 36, 'black', S('y2') + 0.1, we('y2', 'volt'));
+  ringet(3, 'I_Y = 219,4 / 10 = 21,9 A', 160, 460, 38, 'red', wt('y3', 'Ohms') - 0.1, we('y3', 'ampere'));
+  text(3, 'Y: ledningsstrøm = strøm i R', 160, 570, 32, 'green', wt('y3', 'Y') - 0.1, we('y3', 'ledningsstrømmen'));
+
+  // ---------------------------------------------------------------- 4 Δ-forbindelse
+  B.goto('d', 4);
+  bubble(4, 'Δ-forbindelse', 130, 135, 50, 'blue', S('d') - 0.1, S('d') + 0.8);
+  {
+    const A = [960, 230], Bp = [770, 560], C = [1150, 560], t0 = wt('d', 'modstand');
+    R(4, A, Bp, t0, t0 + 0.6); R(4, Bp, C, t0 + 0.3, t0 + 0.9); R(4, C, A, t0 + 0.6, t0 + 1.2);
+    [[A, [960, 160]], [Bp, [700, 620]], [C, [1220, 620]]].forEach(([p, q], i) => { dot(4, p[0], p[1], 7, 'black', t0 + 0.8); B.wire(4, [p, q], t0 + 0.8, t0 + 1.1); });
+    text(4, 'V_L', 945, 610, 30, 'red', wt('d', 'linjespændingen') - 0.1, we('d', 'linjespændingen'));
+    const th = wt('d3', 'hjørne');
+    arrow(4, [[960, 165], [960, 215]], 'red', 3.4, th - 0.1, th + 0.4, 12);
+    text(4, 'I_{linje}', 980, 190, 28, 'red', th + 0.1, th + 0.5);
+  }
+  text(4, 'hver R får hele V_L = 380 V', 160, 250, 32, 'black', S('d') + 0.2, we('d', 'volt'));
+  ringet(4, 'I_Δ = 380 / 10 = 38 A', 160, 350, 38, 'red', S('d2') + 0.1, we('d2', 'ampere'));
+  text(4, 'hjørne: to strømme med 120° imellem', 160, 450, 30, 'black', wt('d3', 'hjørne') - 0.1, we('d3', 'imellem'));
+  ringet(4, 'I_{linje} = √3 · 38 = 65,8 A', 160, 550, 38, 'blue', wt('d3', 'kvadratroden') - 0.1, we('d3', 'ampere'));
+
+  // ---------------------------------------------------------------- 5 effekten
+  B.goto('p', 5);
+  bubble(5, 'Effekten', 130, 135, 50, 'blue', S('p') - 0.1, S('p') + 0.8);
+  B.formel(5, '6.53', 'P = 3 V² / R', 160, 270, 44, S('p') + 0.3, we('p', 'treoghalvtreds'), 'red');
+  text(5, 'V = spændingen over én modstand', 160, 360, 30, 'black', wt('p', 'spændingen') - 0.1, we('p', 'R'));
+  ringet(5, 'P_Y = 3 · 219,4² / 10 = 14,44 kW', 160, 470, 40, 'blue', S('p2') + 0.1, we('p2', 'kilowatt'));
+  ringet(5, 'P_Δ = 3 · 380² / 10 = 43,32 kW', 160, 590, 40, 'red', S('p3') + 0.1, we('p3', 'kilowatt'));
+
+  // ---------------------------------------------------------------- 6 forholdet
+  B.goto('forhold', 6);
+  bubble(6, 'Hvorfor 3 gange?', 130, 150, 50, 'blue', S('forhold') - 0.1, S('forhold') + 0.8);
+  text(6, 'P_Δ / P_Y = 3', 160, 290, 46, 'red', S('forhold') + 0.1, we('forhold', 'effekt'));
+  text(6, 'spænding √3 gange større,  P ∝ V²', 160, 400, 36, 'black', wt('forhold', 'Hver') - 0.1, we('forhold', 'anden'));
+  ringet(6, '( √3 )² = 3', 160, 520, 46, 'green', wt('forhold', 'Kvadratroden', 1) - 0.1, we('forhold', 'tre', 3));
+
+  // ---------------------------------------------------------------- 7 tjek
+  B.goto('tjek_q', 7);
+  B.tjek(7, ['Hvor meget effekt afsætter', 'én modstand i Δ?'], ['380² / 10 = 14,44 kW', '= hele ovnen i Y'], 'tjek_q', 'tjek_a');
+
+  // ---------------------------------------------------------------- 8 tjek vist: søjler
+  B.goto('tjek_vis', 8);
+  {
+    const y0 = 600, sc = 9, t0 = S('tjek_vis');
+    line(8, [[260, y0], [1020, y0]], 'black', 2.4, t0, t0 + 0.4);
+    [[360, 'Y', 14.44, 'blue', 'Y'], [700, 'Δ', 43.32, 'red', 'trekant']].forEach(([x, nv, p, col, ord]) => {
+      const t = wt('tjek_vis', ord, ord === 'Y' ? 0 : 0) - 0.1, h = p * sc;
+      line(8, rectc(x, y0 - h, 160, h), col, 3, t, t + 0.5); hatch(8, rect(x, y0 - h, 160, h), col, t + 0.2, t + 0.7, { gap: 10 });
+      text(8, nv, x + 80, y0 + 44, 34, 'black', t, t + 0.3, { align: 'center' });
+      text(8, String(p).replace('.', ',') + ' kW', x + 80, y0 - h - 18, 32, col, t + 0.4, t + 0.8, { align: 'center' });
+    });
+    text(8, '× 3', 600, 330, 40, 'green', wt('tjek_vis', 'meget') - 0.2, we('tjek_vis', 'meget'), { align: 'center' });
+  }
+
+  // ---------------------------------------------------------------- 9 slut
+  B.goto('slut', 9);
+  B.slut(9, 'ELE1 slides Day 10, øvelse 3 (opg. 7.50) · Rizzoni & Kearns (2022), lign. 6.50, 6.53 · Mathcad: Opgave 7.50', 'øvelse 4', 'slut');
+  text(9, 'Y:  V_f = V_L / √3,   I = 21,9 A,   P = 14,44 kW', 200, 240, 36, 'blue', wt('slut', 'Y') - 0.1, we('slut', 'tre'));
+  text(9, 'Δ:  V_L,   I = 38 A (linje 65,8 A),   P = 43,32 kW', 200, 320, 36, 'red', wt('slut', 'trekant') - 0.1, we('slut', 'linjespændingen', 1));
+  text(9, 'Δ giver 3 gange så meget effekt', 200, 400, 36, 'green', wt('slut', 'Trekant', 1) - 0.1, we('slut', 'meget'));
+});
+
+</script>
+<script>BP.live({"duration":194.478,"audio":"ovelse-3-ovn.mp3","order":["titel","opgave","opgave2","linje","linje2","y","y2","y3","d","d2","d3","p","p2","p3","forhold","tjek_q","tjek_a","tjek_vis","slut"],"lines":{"titel":{"start":0.5,"end":12.341,"words":[["Øvelse",0.54,0.78],["tre",0.86,1.0],["opgave",1.6,1.92],["syv",1.98,2.1],["halvtreds",2.18,2.56],["En",3.48,3.56],["trefaset",3.62,4.2],["ovn",4.28,4.48],["til",4.64,4.76],["varmebehandling",4.8,5.321],["af",5.341,5.421],["stål",5.441,5.721],["har",6.041,6.161],["tre",6.201,6.341],["modstande",6.461,6.921],["på",7.041,7.141],["ti",7.181,7.301],["ohm",7.421,7.561],["og",7.881,7.941],["sidder",7.981,8.181],["på",8.221,8.341],["tre",8.401,8.501],["hundrede",8.601,8.761],["og",8.801,8.841],["firs",8.841,9.021],["volt",9.061,9.241],["Vi",10.081,10.141],["finder",10.201,10.401],["strøm",10.461,10.721],["og",10.781,10.861],["effekt",10.901,11.221],["i",11.301,11.321],["Y",11.481,11.501],["og",11.821,11.881],["i",11.921,11.941],["trekant",11.981,12.341]],"text":"Øvelse tre, opgave syv halvtreds. En trefaset ovn til varmebehandling af stål har tre modstande på ti ohm og sidder på tre hundrede og firs volt. Vi finder strøm og effekt i Y og i trekant."},"opgave":{"start":14.161,"end":19.402,"words":[["Når",14.201,14.321],["man",14.321,14.401],["siger",14.462,14.662],["trefase",14.722,15.262],["tre",15.342,15.462],["hundrede",15.522,15.682],["og",15.682,15.722],["firs",15.742,15.942],["volt",16.002,16.222],["er",16.502,16.562],["det",16.582,16.662],["linjespændingen",16.702,17.382],["Det",17.942,18.062],["er",18.062,18.102],["spændingen",18.122,18.502],["mellem",18.542,18.762],["to",18.842,18.982],["faser",19.102,19.402]],"text":"Når man siger trefase tre hundrede og firs volt, er det linjespændingen. Det er spændingen mellem to faser."},"opgave2":{"start":20.542,"end":28.703,"words":[["Vi",20.582,20.622],["skal",20.662,20.782],["svare",20.802,20.962],["på",20.962,21.042],["to",21.062,21.122],["spørgsmål",21.202,21.582],["Hvor",22.222,22.342],["stor",22.382,22.582],["er",22.642,22.722],["strømmen",22.762,23.082],["i",23.182,23.202],["modstandene",23.242,23.702],["og",24.163,24.243],["hvor",24.303,24.423],["stor",24.443,24.623],["er",24.663,24.723],["ovnens",24.823,25.123],["effekt",25.223,25.563],["når",25.703,25.823],["modstandene",25.843,26.323],["er",26.383,26.443],["forbundet",26.483,26.823],["i",26.923,26.943],["Y",27.063,27.083],["og",27.543,27.583],["når",27.623,27.723],["de",27.743,27.783],["er",27.803,27.843],["forbundet",27.843,28.183],["i",28.283,28.303],["trekant",28.343,28.703]],"text":"Vi skal svare på to spørgsmål. Hvor stor er strømmen i modstandene, og hvor stor er ovnens effekt, når modstandene er forbundet i Y, og når de er forbundet i trekant?"},"linje":{"start":30.523,"end":40.324,"words":[["Først",30.563,30.843],["sammenhængen",30.983,31.503],["mellem",31.603,31.823],["linje-",31.903,32.203],["og",32.343,32.403],["fasespænding",32.463,33.103],["Ligning",33.844,34.104],["seks",34.104,34.384],["halvtreds",34.404,34.744],["linjespændingen",35.924,36.604],["er",36.744,36.824],["kvadratroden",36.904,37.564],["af",37.624,37.684],["tre",37.724,37.884],["gange",38.164,38.404],["fasespændingen",38.484,39.164],["og",39.344,39.404],["drejet",39.464,39.684],["tredive",39.744,40.024],["grader",40.064,40.324]],"text":"Først sammenhængen mellem linje- og fasespænding. Ligning seks halvtreds: linjespændingen er kvadratroden af tre gange fasespændingen og drejet tredive grader."},"linje2":{"start":41.344,"end":46.305,"words":[["Vi",41.384,41.424],["skal",41.464,41.584],["kun",41.604,41.724],["bruge",41.744,41.904],["størrelsen",41.924,42.324],["Fasespændingen",43.045,43.725],["er",43.745,43.805],["derfor",43.825,44.105],["linjespændingen",44.205,44.865],["divideret",44.945,45.445],["med",45.485,45.585],["kvadratroden",45.645,46.125],["af",46.125,46.185],["tre",46.205,46.305]],"text":"Vi skal kun bruge størrelsen. Fasespændingen er derfor linjespændingen divideret med kvadratroden af tre."},"y":{"start":48.125,"end":53.006,"words":[["I",48.165,48.185],["Y",48.385,48.405],["sidder",48.825,49.045],["hver",49.065,49.225],["modstand",49.265,49.625],["mellem",49.645,49.805],["en",49.905,50.005],["fase",50.065,50.385],["og",50.485,50.545],["stjernepunktet",50.565,51.125],["Den",51.705,51.805],["får",51.845,51.985],["altså",52.025,52.225],["fasespændingen",52.305,53.006]],"text":"I Y sidder hver modstand mellem en fase og stjernepunktet. Den får altså fasespændingen."},"y2":{"start":53.926,"end":57.766,"words":[["Tre",53.966,54.086],["hundrede",54.146,54.306],["og",54.306,54.346],["firs",54.346,54.626],["divideret",54.786,55.146],["med",55.166,55.226],["kvadratroden",55.266,55.726],["af",55.726,55.786],["tre",55.826,55.946],["er",56.326,56.386],["to",56.466,56.566],["hundrede",56.646,56.826],["og",56.826,56.866],["nitten",56.866,57.046],["komma",57.106,57.266],["fire",57.346,57.546],["volt",57.566,57.766]],"text":"Tre hundrede og firs divideret med kvadratroden af tre er to hundrede og nitten komma fire volt."},"y3":{"start":58.946,"end":67.527,"words":[["Strømmen",58.986,59.306],["er",59.406,59.486],["Ohms",59.566,59.786],["lov",59.826,59.966],["to",59.966,60.006],["hundrede",60.006,60.906],["og",60.906,60.946],["nitten",60.986,61.186],["komma",61.206,61.366],["fire",61.426,61.646],["divideret",61.746,62.047],["med",62.067,62.147],["ti",62.187,62.307],["er",62.747,62.827],["enogtyve",62.987,63.467],["komma",63.547,63.707],["ni",63.747,63.827],["ampere",63.947,64.207],["I",65.247,65.267],["Y",65.427,65.447],["er",65.807,65.867],["den",65.867,65.967],["samme",66.047,66.247],["strøm",66.307,66.527],["også",66.627,66.847],["ledningsstrømmen",66.967,67.527]],"text":"Strømmen er Ohms lov: to hundrede og nitten komma fire divideret med ti er enogtyve komma ni ampere. I Y er den samme strøm også ledningsstrømmen."},"d":{"start":69.347,"end":74.328,"words":[["I",69.387,69.407],["trekant",69.467,69.867],["sidder",70.007,70.187],["hver",70.207,70.327],["modstand",70.387,70.747],["mellem",70.787,70.987],["to",71.047,71.187],["faser",71.307,71.607],["Den",72.168,72.288],["får",72.308,72.408],["hele",72.468,72.688],["linjespændingen",72.728,73.348],["på",73.408,73.508],["tre",73.528,73.628],["hundrede",73.688,73.848],["og",73.848,73.888],["firs",73.888,74.108],["volt",74.148,74.328]],"text":"I trekant sidder hver modstand mellem to faser. Den får hele linjespændingen på tre hundrede og firs volt."},"d2":{"start":75.188,"end":84.369,"words":[["Strømmen",75.228,75.508],["i",75.548,75.568],["modstanden",75.608,76.068],["er",77.268,77.328],["tre",77.348,77.448],["hundrede",78.928,80.488],["og",80.708,80.808],["firs",80.888,81.969],["divideret",82.109,82.429],["med",82.449,82.529],["ti",82.569,82.669],["altså",83.189,83.409],["otteogtredive",83.529,83.989],["ampere",84.109,84.369]],"text":"Strømmen i modstanden er tre hundrede og firs divideret med ti, altså otteogtredive ampere."},"d3":{"start":85.129,"end":98.85,"words":[["I",85.169,85.189],["hvert",85.249,85.509],["hjørne",85.529,85.789],["af",85.789,85.849],["trekanten",85.889,86.469],["mødes",86.669,86.989],["to",87.089,87.229],["modstande",87.369,87.829],["Ledningsstrømmen",88.569,89.229],["er",89.349,89.429],["forskellen",89.469,90.009],["mellem",90.069,90.289],["to",90.409,90.549],["strømme",90.69,91.01],["med",91.15,91.25],["hundrede",91.33,91.63],["og",91.67,91.71],["tyve",91.71,92.01],["grader",92.01,92.31],["imellem",92.33,92.63],["og",93.27,93.33],["den",93.37,93.47],["bliver",93.53,93.75],["kvadratroden",94.33,95.05],["af",95.15,95.21],["tre",95.31,95.45],["gange",95.55,95.75],["større",95.81,96.09],["femogtres",96.85,97.37],["komma",97.61,97.81],["otte",98.01,98.23],["ampere",98.55,98.85]],"text":"I hvert hjørne af trekanten mødes to modstande. Ledningsstrømmen er forskellen mellem to strømme med hundrede og tyve grader imellem, og den bliver kvadratroden af tre gange større: femogtres komma otte ampere."},"p":{"start":100.67,"end":109.61,"words":[["Nu",100.71,100.79],["effekten",100.87,101.29],["En",102.19,102.33],["modstand",102.39,102.79],["optager",102.91,103.27],["spændingen",103.31,103.71],["over",103.85,104.05],["den",104.09,104.23],["i",104.33,104.35],["anden",104.49,104.73],["divideret",105.05,105.49],["med",105.53,105.61],["R",105.77,105.79],["og",106.33,106.39],["der",106.43,106.51],["er",106.55,106.61],["tre",106.65,106.77],["modstande",106.89,107.29],["Det",107.95,108.05],["er",108.07,108.11],["ligning",108.13,108.43],["seks",108.49,108.81],["treoghalvtreds",109.03,109.61]],"text":"Nu effekten. En modstand optager spændingen over den i anden divideret med R, og der er tre modstande. Det er ligning seks treoghalvtreds."},"p2":{"start":110.671,"end":119.092,"words":[["I",110.711,110.731],["Y",110.951,110.971],["tre",111.611,111.791],["gange",111.951,112.231],["to",112.691,112.791],["hundrede",112.891,113.131],["og",113.131,113.171],["nitten",113.171,113.411],["komma",113.471,113.671],["fire",113.771,114.011],["i",114.071,114.091],["anden",114.191,114.431],["over",114.751,114.911],["ti",114.991,115.111],["Det",116.011,116.091],["giver",116.131,116.331],["fjorten",116.731,117.191],["komma",117.451,117.671],["fire",117.831,118.071],["fire",118.171,118.411],["kilowatt",118.611,119.092]],"text":"I Y: tre gange to hundrede og nitten komma fire i anden over ti. Det giver fjorten komma fire fire kilowatt."},"p3":{"start":119.992,"end":128.232,"words":[["I",120.032,120.052],["trekant",120.152,120.592],["tre",121.252,121.412],["gange",121.752,121.992],["tre",122.212,122.352],["hundrede",122.452,122.672],["og",122.672,122.712],["firs",122.712,122.972],["i",123.092,123.112],["anden",123.232,123.452],["over",123.552,123.712],["ti",123.752,123.852],["Det",124.612,124.692],["giver",124.732,124.932],["treogfyrre",125.412,126.192],["komma",126.432,126.652],["tre",126.772,126.952],["to",127.292,127.432],["kilowatt",127.852,128.232]],"text":"I trekant: tre gange tre hundrede og firs i anden over ti. Det giver treogfyrre komma tre to kilowatt."},"forhold":{"start":130.052,"end":142.513,"words":[["Trekant",130.092,130.532],["giver",130.672,130.852],["præcis",130.892,131.412],["tre",131.692,131.892],["gange",132.032,132.232],["så",132.292,132.372],["meget",132.412,132.572],["effekt",132.592,132.852],["Hver",133.672,133.832],["modstand",133.892,134.312],["får",134.392,134.572],["kvadratroden",134.692,135.392],["af",135.432,135.492],["tre",135.552,135.712],["gange",135.992,136.192],["mere",136.292,136.572],["spænding",136.652,136.992],["og",137.452,137.512],["effekten",137.552,137.932],["går",137.992,138.132],["med",138.152,138.253],["spændingen",138.293,138.693],["i",138.913,138.933],["anden",139.113,139.333],["Kvadratroden",140.173,140.773],["af",140.793,140.853],["tre",140.893,141.013],["i",141.333,141.353],["anden",141.493,141.713],["er",142.253,142.333],["tre",142.393,142.513]],"text":"Trekant giver præcis tre gange så meget effekt. Hver modstand får kvadratroden af tre gange mere spænding, og effekten går med spændingen i anden. Kvadratroden af tre i anden er tre."},"tjek_q":{"start":144.333,"end":148.414,"words":[["Tjek",144.373,144.513],["dig",144.553,144.633],["selv",144.673,144.853],["Hvor",145.693,145.813],["meget",145.853,146.053],["effekt",146.093,146.393],["afsætter",146.553,146.953],["én",147.193,147.333],["modstand",147.433,147.853],["i",147.953,147.973],["trekant",148.033,148.414]],"text":"Tjek dig selv. Hvor meget effekt afsætter én modstand i trekant?"},"tjek_a":{"start":152.534,"end":162.475,"words":[["Tre",152.574,152.674],["hundrede",152.774,152.974],["og",152.974,153.014],["firs",153.014,153.274],["i",153.454,153.474],["anden",153.614,153.854],["over",153.954,154.114],["ti",154.194,154.274],["er",154.974,155.074],["fjorten",155.774,156.154],["komma",156.434,156.634],["fire",156.774,157.034],["fire",157.134,157.374],["kilowatt",157.454,157.834],["Én",158.674,158.814],["modstand",159.014,159.414],["i",159.494,159.514],["trekant",159.574,159.974],["bruger",160.114,160.315],["lige",160.395,160.575],["så",160.595,160.715],["meget",160.735,160.975],["som",161.035,161.155],["hele",161.295,161.635],["ovnen",161.735,162.015],["i",162.295,162.315],["Y",162.455,162.475]],"text":"Tre hundrede og firs i anden over ti er fjorten komma fire fire kilowatt. Én modstand i trekant bruger lige så meget som hele ovnen i Y."},"tjek_vis":{"start":164.295,"end":175.216,"words":[["Her",164.335,164.475],["er",164.515,164.595],["de",164.615,164.655],["to",164.715,164.815],["forbindelser",164.915,165.415],["side",165.655,165.815],["om",165.855,165.915],["side",165.995,166.235],["som",166.375,166.495],["søjler",166.595,166.915],["Y",167.715,167.735],["giver",167.895,168.155],["fjorten",168.395,168.775],["komma",168.915,169.075],["fire",169.195,169.415],["fire",169.496,169.716],["kilowatt",169.776,170.176],["og",170.776,170.836],["trekant",170.876,171.236],["giver",171.296,171.456],["treogfyrre",171.696,172.336],["komma",172.576,172.756],["tre",172.876,173.016],["to",173.216,173.316],["kilowatt",173.476,173.856],["tre",174.416,174.556],["gange",174.676,174.856],["så",174.916,175.016],["meget",175.036,175.216]],"text":"Her er de to forbindelser side om side som søjler. Y giver fjorten komma fire fire kilowatt, og trekant giver treogfyrre komma tre to kilowatt, tre gange så meget."},"slut":{"start":177.036,"end":192.978,"words":[["Kort",177.076,177.276],["sagt",177.336,177.576],["i",178.136,178.156],["Y",178.376,178.396],["får",178.756,178.916],["modstanden",178.996,179.437],["fasespændingen",179.537,180.317],["linjespændingen",180.797,181.477],["over",181.637,181.837],["kvadratroden",181.957,182.637],["af",182.657,182.717],["tre",182.757,182.877],["I",183.677,183.697],["trekant",183.777,184.237],["får",184.517,184.657],["den",184.697,184.777],["hele",184.897,185.217],["linjespændingen",185.297,185.937],["Strømmen",186.537,186.897],["er",187.097,187.177],["Ohms",187.277,187.457],["lov",187.497,187.637],["og",188.117,188.177],["effekten",188.217,188.597],["er",188.658,188.738],["tre",188.778,188.918],["gange",189.018,189.218],["V",189.278,189.298],["i",189.558,189.578],["anden",189.678,189.898],["over",190.038,190.218],["R",190.358,190.378],["Trekant",191.118,191.518],["giver",191.558,191.718],["tre",191.998,192.218],["gange",192.338,192.538],["så",192.618,192.718],["meget",192.738,192.978]],"text":"Kort sagt: i Y får modstanden fasespændingen, linjespændingen over kvadratroden af tre. I trekant får den hele linjespændingen. Strømmen er Ohms lov, og effekten er tre gange V i anden over R. Trekant giver tre gange så meget."}}}, { audio: 'ovelse-3-ovn.mp3', id: 'ovelse-3-ovn' });</script>
+</body>
+</html>
