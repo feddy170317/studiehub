@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MEM1 mundtlig eksamen: ny liste (9 spm.)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<link rel="stylesheet" href="../eksamen/assets/eksamen.css">
+<style>
+  .spm { display: grid; grid-template-columns: 3rem 1fr; gap: .2rem .9rem; align-items: start; }
+  .spm .n { font-size: 1.6rem; font-weight: 700; color: var(--cy); line-height: 1.2; }
+  .spm h3 { margin: 0; }
+  .spm .kap { opacity: .7; font-size: .9rem; margin: .1rem 0 .5rem; }
+  .spm .links { margin-top: .4rem; }
+  .snart { opacity: .75; font-size: .92rem; }
+  ul.fmt { margin: .4rem 0 0 1.1rem; }
+</style>
+</head>
+<body>
+<div class="topbar"><a href="../../../index.html">&#8592; Studiehub</a><a href="Mundtlige_eksamensspoergsmaal_ny_9.pdf">&#128196; Spørgsmålslisten (PDF)</a><span class="sp"></span><span class="now">MEM1 &middot; ny liste</span></div>
+<header class="hero"><div class="nr">MUNDTLIG EKSAMEN &middot; NY LISTE</div>
+<h1>Machine Elements and Design of Machines: 9 spørgsmål</h1>
+<div class="kap">Kapitel 9&ndash;19 &middot; svar-lab, videoer og Mathcad pr. spørgsmål</div></header>
+<main>
+<section>
+<h2 class="sec"><span class="ic">&#9201;</span>Sådan foregår eksamen (20 minutter)</h2>
+<div class="card">
+<ul class="fmt">
+<li><b>Del 1, semesterprojekt (5 min):</b> du vælger ét maskinelement fra semesterprojektet og forklarer funktion, valg, dimensionering, beregninger, materialevalg og antagelser.</li>
+<li><b>Del 2, trukket spørgsmål (15 min):</b> først teorien (del a), så designopgaven (del b) med tydelige trin, formler og enheder.</li>
+<li>I begge dele lægges der vægt på, at du <b>begrunder dine valg</b>, siger dine <b>antagelser</b> højt og <b>vurderer, om resultatet er teknisk rimeligt</b>. Det er ikke nok at gengive formler.</li>
+</ul>
+</div>
+<div class="note">Den nye liste er de gamle spørgsmål 7&ndash;15 i ny nummerering, med de samme tal i designopgaverne. Nyt: spm. 6 beder også om stigningsvinklen $\lambda$ og selvlåsningsbetingelsen, og spm. 2 skriver $p_o=0$. Hver side har en 15-minutters plan, et modelsvar ord for ord, antagelser og en vurdering af resultatet.</div>
+</section>
+
+<section>
+<h2 class="sec"><span class="ic">&#128218;</span>Spørgsmålene</h2>
+<div id="liste"></div>
+</section>
+</main>
+<footer>MEM1 &mdash; Maskinelementer og design af maskiner &middot; VIA Horsens<br>
+<a href="../eksamen/index.html">Den tidligere liste med 15 spørgsmål</a> &middot; <a href="../../../index.html">Studiehub</a></footer>
+
+<script>
+// [nr, titel, kapitel, ny side eller null, gammel side, videomappe, mathcad-pdf]
+var SPM = [
+ [1, 'Søjleknækning: overgangen mellem Euler og Johnson', '9 Søjler', 'sp01_soejleknaekning.html', 'sp07_soejleknaekning.html', 'kap09', 'eksamen-spm-01-soejleknaekning.pdf'],
+ [2, 'Tykvæggede trykbeholdere', '10 Cylindre', 'sp02_trykbeholder.html', 'sp08_trykbeholder.html', 'kap10', 'eksamen-spm-02-tykvaegget-trykbeholder.pdf'],
+ [3, 'Akseldimensionering ved kombineret bøjning og torsion', '11 Aksler', null, 'sp09_akseldesign.html'],
+ [4, 'Levetid og bæreevne for rullelejer', '13 Rullelejer', null, 'sp10_rulleleje.html'],
+ [5, 'Bøjespænding i cylindriske tandhjul (Lewis)', '14 Tandhjul', null, 'sp11_lewis.html'],
+ [6, 'Kraftskruer: moment og selvlåsning', '16 Kraftskruer', null, 'sp12_bevaegelsesskrue.html'],
+ [7, 'Heliske trykfjedre: spænding og udbøjning', '17 Fjedre', null, 'sp13_fjeder.html'],
+ [8, 'Lamelfriktionskoblinger (konstant tryk vs. konstant slid)', '18 Koblinger', null, 'sp14_kobling.html'],
+ [9, 'Fladremstransmission og remfriktion', '19 Remme', null, 'sp15_remtraek.html']
+];
+var h = '';
+SPM.forEach(function (s) {
+  var l = '';
+  if (s[3]) {
+    l = '<a href="' + s[3] + '"><span class="k">SVAR-LAB</span>15-min plan, modelsvar, live-lab</a>' +
+        '<a href="../video/' + s[5] + '/eks-spm' + s[0] + '-a.html"><span class="k">VIDEO</span>Del (a): teori</a>' +
+        '<a href="../video/' + s[5] + '/eks-spm' + s[0] + '-b.html"><span class="k">VIDEO</span>Del (b): designopgave</a>' +
+        '<a href="../opgaver/eksamen/' + s[6] + '"><span class="k">MATHCAD</span>Del (a) og (b) som PDF</a>';
+  } else {
+    l = '<a href="../eksamen/' + s[4] + '"><span class="k">GAMMEL SIDE</span>Samme tal, 20-min plan</a>';
+  }
+  h += '<div class="card spm" style="margin-top:.8rem"><div class="n">' + s[0] + '</div><div><h3>' + s[1] + '</h3>' +
+       '<div class="kap">Kapitel ' + s[2] + '</div><div class="links">' + l + '</div>' +
+       (s[3] ? '' : '<div class="snart">Ny side med videoer og modelsvar er på vej. Indtil da: den gamle side har samme tal.</div>') + '</div></div>';
+});
+document.getElementById('liste').innerHTML = h;
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body,{delimiters:[{left:'$',right:'$',display:false}]})"></script>
+</body>
+</html>

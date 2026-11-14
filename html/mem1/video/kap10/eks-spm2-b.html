@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spm. 2b: hydraulikcylinder, spændinger på indersiden · video</title>
+<meta name="description" content="Ny liste, spm. 2b: σ_θ = 130 MPa og σ_r = −50 MPa på indersiden, kontrol med tyndvægsformlen og Tresca.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 10: videoer</a><h1>Spm. 2b: hydraulikcylinder, spændinger på indersiden</h1><span class="meta">MEM1 · kapitel 10 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Spm. 2b: hydraulikcylinder, spændinger på indersiden"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Ny liste, spm. 2b: σ_θ = 130 MPa og σ_r = −50 MPa på indersiden, kontrol med tyndvægsformlen og Tresca.</p><div class="chips"><a href="../../opgaver/l10/eksamen-spm-02-tykvaegget-trykbeholder.pdf">📐 Se udregningen i Mathcad (PDF)</a><a href="eks-spm2-a.html">Se først: Spm. 2a: tykvæggede cylindre og Lamés ligninger (teori)</a><a href="../../../../lab/mem1/trykbeholder.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel10_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l10">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// MEM1 mundtlig eksamen (ny liste) · Spm. 2b: r_i = 40, r_o = 60 mm, p_i = 50 MPa, p_o = 0.
+// σ_θ(r_i) = 50·5200/2000 = 130 MPa, σ_r(r_i) = −50 MPa, σ_θ(r_o) = 80 MPa; tyndvæg 125 MPa; Tresca 180 MPa; r_o = 80: 83,3 MPa.
+// Mathcad: Lektion 10/Opgaver/Eksamen spm 02 Tykvaegget trykbeholder.
+BP.scene({ header: 'MEM1 · mundtlig eksamen · spm. 2b', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, dot, ring, under, ell, rect, hatch, dashed, plot, PI } = B;
+  const S = (id) => L(id).start;
+  const ringet = (k, s, x, y, size, col, a, te) => { const r = text(k, s, x, y, size, col, a, te); ring(r, col, te, te + 0.5); return r; };
+  const roer = (k, cx, cy, ri, ro, col, a, b) => {
+    line(k, ell(cx, cy, ro, ro, 0, 2 * PI), col, 3.4, a, a + (b - a) * 0.4);
+    line(k, ell(cx, cy, ri, ri, 0, 2 * PI), col, 3.4, a + (b - a) * 0.2, a + (b - a) * 0.6);
+    for (let i = 0; i < 36; i++) {
+      const v = i / 36 * 2 * PI + 0.3, t = a + (b - a) * (0.5 + 0.5 * i / 36);
+      line(k, [[cx + (ri + 4) * Math.cos(v), cy + (ri + 4) * Math.sin(v)], [cx + (ro - 4) * Math.cos(v + 0.12), cy + (ro - 4) * Math.sin(v + 0.12)]], col, 1.4, t, t + 0.05, { alpha: 0.5 });
+    }
+  };
+  // fordeling gennem væggen for r_o = 60 (opgaven)
+  const fordeling = (k, x0, y0, w, sy, ta) => {
+    const P = (r, s) => [x0 + (r - 40) / 20 * w, y0 - s * sy];
+    line(k, [[x0, y0 + 60 * sy], [x0, y0 - 145 * sy]], 'black', 2.6, ta, ta + 0.4);
+    arrow(k, [[x0 - 10, y0], [x0 + w + 40, y0]], 'black', 2.6, ta + 0.1, ta + 0.5, 14);
+    line(k, [[x0 + w, y0 + 60 * sy], [x0 + w, y0 - 145 * sy]], 'black', 2.6, ta + 0.2, ta + 0.6);
+    text(k, 'r_i = 40', x0, y0 + 60 * sy + 34, 26, 'black', ta + 0.3, ta + 0.6, { align: 'center' });
+    text(k, 'r_o = 60', x0 + w, y0 + 60 * sy + 34, 26, 'black', ta + 0.3, ta + 0.6, { align: 'center' });
+    return P;
+  };
+
+  // ---------------------------------------------------------------- 0 titel
+  B.titel(0, 'Spm. 2b: hydraulikcylinderen', 'designopgaven: σ_θ og σ_r på indersiden', 'titel');
+  text(0, 'r_i = 40 mm,   r_o = 60 mm,   p_i = 50 MPa', 640, 540, 40, 'red', wt('titel', 'omkredsspændingen') - 0.1, we('titel', 'overflade'), { align: 'center' });
+
+  // ---------------------------------------------------------------- 1 data og tyk/tynd
+  B.goto('data', 1);
+  bubble(1, 'Givet', 130, 135, 50, 'blue', S('data') - 0.1, S('data') + 0.8);
+  {
+    const cx = 950, cy = 400, t0 = S('data');
+    roer(1, cx, cy, 120, 180, 'black', t0, t0 + 1.2);
+    for (let i = 0; i < 8; i++) { const v = i * PI / 4 + 0.2; arrow(1, [[cx + 40 * Math.cos(v), cy + 40 * Math.sin(v)], [cx + 114 * Math.cos(v), cy + 114 * Math.sin(v)]], 'blue', 2.6, wt('data', 'tryk') + i * 0.05, wt('data', 'tryk') + 0.3 + i * 0.05, 12); }
+    text(1, 'p_i', cx - 18, cy + 10, 32, 'blue', wt('data', 'tryk'), wt('data', 'tryk') + 0.4);
+    const tr = wt('data', 'indre');
+    line(1, [[cx, cy], [cx, cy - 120]], 'green', 2.6, tr, tr + 0.3); text(1, '40', cx + 8, cy - 70, 26, 'green', tr + 0.2, tr + 0.5);
+    const to = wt('data', 'ydre');
+    line(1, [[cx, cy], [cx + 180, cy]], 'red', 2.6, to, to + 0.3); text(1, '60', cx + 140, cy - 10, 26, 'red', to + 0.2, to + 0.5);
+  }
+  text(1, 'r_i = 40 mm,   r_o = 60 mm', 160, 230, 36, 'black', wt('data', 'indre') - 0.1, we('data', 'millimeter', 1));
+  text(1, 'p_i = 50 MPa,   p_o = 0', 160, 300, 36, 'black', wt('data', 'tryk') - 0.3, we('data', 'nul'));
+  text(1, 'd_i / t = 80 / 20 = 4', 160, 420, 38, 'black', wt('tyk', 'diameter') - 0.1, we('tyk', 'fire'));
+  ringet(1, '4 < 40  ⇒  tykvægget, Lamé', 160, 510, 38, 'red', wt('tyk', 'langt') - 0.1, we('tyk', 'Lamé'));
+
+  // ---------------------------------------------------------------- 2 omkredsspændingen
+  B.goto('kvad', 2);
+  bubble(2, 'Omkredsspændingen', 130, 135, 50, 'blue', S('kvad') - 0.1, S('kvad') + 0.8);
+  text(2, 'r_o² = 60² = 3600,     r_i² = 40² = 1600', 160, 230, 36, 'black', wt('kvad', 'Tres') - 0.1, we('kvad', 'hundrede', 1));
+  B.formel(2, '10.26', 'σ_{θ,max} = p_i (r_o² + r_i²) / (r_o² − r_i²)', 180, 340, 36, wt('theta', 'ligning') - 0.1, we('theta', 'seksogtyve'), 'red');
+  text(2, 'σ_θ = 50 · (3600 + 1600) / (3600 − 1600)', 160, 440, 36, 'black', wt('theta', 'halvtreds') - 0.1, we('theta', 'hundrede', 3));
+  text(2, '= 50 · 5200 / 2000 = 50 · 2,6', 160, 520, 36, 'black', S('theta2') + 0.1, we('theta2', 'seks', 1));
+  ringet(2, 'σ_θ = 130 MPa  (træk)', 160, 620, 44, 'red', wt('theta2', 'altså') - 0.1, we('theta2', 'træk'));
+
+  // ---------------------------------------------------------------- 3 radialspændingen og kontrollen
+  B.goto('radial', 3);
+  bubble(3, 'Radialspændingen', 130, 135, 50, 'blue', S('radial') - 0.1, S('radial') + 0.8);
+  B.formel(3, '10.25', 'σ_r = − p_i', 180, 240, 40, S('radial') + 0.2, we('radial', 'i'), 'blue');
+  ringet(3, 'σ_r = − 50 MPa  (tryk)', 160, 340, 44, 'blue', wt('radial', 'minus', 1) - 0.1, we('radial', 'tryk'));
+  B.formel(3, '10.23', 'σ_r = p_i r_i² / (r_o² − r_i²) · (1 − r_o² / r²)', 180, 460, 30, wt('kontrol', 'ligning') - 0.1, we('kontrol', 'i', 0), 'black');
+  text(3, '1 − 3600 / 1600 = 1 − 2,25 = − 1,25', 160, 550, 34, 'black', wt('kontrol', 'Parentesen') - 0.1, we('kontrol', 'femogtyve', 1));
+  text(3, '50 · 1600 / 2000 = 40', 160, 610, 34, 'black', wt('kontrol', 'Foran') - 0.1, we('kontrol', 'fyrre'));
+  ringet(3, '40 · (− 1,25) = − 50  ✓', 160, 670, 36, 'green', wt('kontrol', 'Fyrre', 1) - 0.1, we('kontrol', 'passer'));
+
+  // ---------------------------------------------------------------- 4 hele væggen
+  B.goto('ude', 4);
+  bubble(4, 'Gennem væggen', 130, 135, 50, 'blue', S('ude') - 0.1, S('ude') + 0.8);
+  {
+    const P = fordeling(4, 220, 470, 540, 1.55, S('ude'));
+    const tt = wt('ude', 'omkredsspændingen'), tr = wt('ude', 'radialspændingen');
+    const th = [], rr = []; for (let r = 40; r <= 60.01; r += 0.5) { th.push(P(r, 40 * (1 + 3600 / (r * r)))); rr.push(P(r, 40 * (1 - 3600 / (r * r)))); }
+    plot(4, rr, 'blue', tr, tr + 0.9); plot(4, th, 'red', tt, tt + 1.1);
+    const tf = wt('ude', 'falder');
+    dot(4, P(40, 130)[0], P(40, 130)[1], 9, 'red', tf); text(4, '130', P(40, 130)[0] + 16, P(40, 130)[1] - 6, 30, 'red', tf, tf + 0.4);
+    dot(4, P(60, 80)[0], P(60, 80)[1], 9, 'red', tf + 0.5); text(4, '80', P(60, 80)[0] + 16, P(60, 80)[1] - 6, 30, 'red', tf + 0.5, tf + 0.9);
+    dot(4, P(40, -50)[0], P(40, -50)[1], 9, 'blue', tr); text(4, '− 50', P(40, -50)[0] - 14, P(40, -50)[1] + 10, 30, 'blue', tr, tr + 0.4, { align: 'right' });
+    text(4, '0', P(60, 0)[0] + 14, P(60, 0)[1] + 30, 30, 'blue', tr + 0.6, tr + 1.0);
+    text(4, 'σ_θ', P(50, 98)[0], P(50, 98)[1] - 16, 32, 'red', tt + 0.8, tt + 1.2);
+    text(4, 'σ_r', P(50, -14)[0], P(50, -14)[1] + 40, 32, 'blue', tr + 0.6, tr + 1.0);
+  }
+  text(4, 'σ i MPa,  r i mm', 860, 250, 28, 'black', S('ude'), S('ude') + 0.6);
+
+  // ---------------------------------------------------------------- 5 tyndvægsformlen som kontrol
+  B.goto('tyndv', 5);
+  bubble(5, 'Er det rimeligt?', 130, 135, 50, 'blue', S('tyndv') - 0.1, S('tyndv') + 0.8);
+  B.formel(5, 'tyndvæg', 'σ_θ ≈ p r_m / t', 180, 240, 40, wt('tyndv', 'Tyndvægsformlen') - 0.1, we('tyndv', 't'), 'black');
+  text(5, '= 50 · 50 / 20 = 125 MPa', 160, 330, 38, 'black', wt('tyndv', 'middelradius') - 0.1, we('tyndv', 'megapascal'));
+  {
+    const t0 = wt('tyndv', 'tæt'), y0 = 640, sc = 1.9;
+    [[760, 125, 'black', 'tyndvæg 125', 'middel'], [960, 130, 'red', 'Lamé 130', 'top']].forEach(([x, v, col, et, ek], i) => {
+      const a = t0 + 0.4 * i, h = v * sc;
+      line(5, rect(x, y0 - h, 140, h).concat([[x, y0 - h]]), col, 3, a, a + 0.5);
+      hatch(5, rect(x, y0 - h, 140, h), col, a + 0.3, a + 0.8, { gap: 10 });
+      text(5, et, x + 70, y0 + 36, 26, col, a + 0.3, a + 0.8, { align: 'center' });
+    });
+    line(5, [[720, y0], [1140, y0]], 'black', 2.4, t0, t0 + 0.4);
+  }
+  text(5, 'tyndvæg = middelværdi', 160, 470, 34, 'black', wt('tyndv', 'middelværdi') - 0.6, we('tyndv', 'middelværdi'));
+  ringet(5, 'Lamé = toppen på indersiden', 160, 550, 34, 'red', wt('tyndv', 'Lamé') - 0.1, we('tyndv', 'indersiden'));
+
+  // ---------------------------------------------------------------- 6 Tresca
+  B.goto('tresca', 6);
+  bubble(6, 'Sikkerhed: Tresca', 130, 135, 50, 'blue', S('tresca') - 0.1, S('tresca') + 0.8);
+  text(6, 'σ_1 = 130,   σ_3 = − 50  MPa', 160, 250, 38, 'black', wt('tresca', 'hovedspændingerne') - 0.1, we('tresca', 'halvtreds'));
+  ringet(6, 'σ_1 − σ_3 = 180 MPa', 160, 350, 44, 'red', wt('tresca', 'Tresca') - 0.1, we('tresca', 'megapascal'));
+  text(6, 'sammenlign med S_y:  n = S_y / 180', 160, 450, 34, 'green', wt('tresca', 'sammenlignes') - 0.1, we('tresca', 'flydespænding'));
+  {
+    const t0 = wt('tresca', 'forskellen'), y = 580, x0 = 640, s = 2.4;
+    arrow(6, [[x0 - 80 * s, y], [x0 + 150 * s, y]], 'black', 2.4, t0 - 0.3, t0 + 0.2, 13);
+    line(6, [[x0, y - 10], [x0, y + 10]], 'black', 2, t0 - 0.2, t0); text(6, '0', x0, y + 36, 24, 'black', t0 - 0.2, t0, { align: 'center' });
+    dot(6, x0 - 50 * s, y, 9, 'blue', t0); text(6, '− 50', x0 - 50 * s, y + 36, 26, 'blue', t0, t0 + 0.3, { align: 'center' });
+    dot(6, x0 + 130 * s, y, 9, 'red', t0); text(6, '130', x0 + 130 * s, y + 36, 26, 'red', t0, t0 + 0.3, { align: 'center' });
+    B.dobbeltpil(6, [x0 - 50 * s, y - 30], [x0 + 130 * s, y - 30], 'green', t0 + 0.2, t0 + 0.7);
+    text(6, '180', x0 + 40 * s, y - 42, 28, 'green', t0 + 0.5, t0 + 0.9, { align: 'center' });
+  }
+
+  // ---------------------------------------------------------------- 7 antagelser
+  B.goto('antag', 7);
+  bubble(7, 'Antagelser', 130, 135, 50, 'blue', S('antag') - 0.1, S('antag') + 0.8);
+  text(7, '•  lang cylinder', 160, 250, 36, 'black', wt('antag', 'lang') - 0.3, we('antag', 'cylinder'));
+  text(7, '•  lineært elastisk materiale', 160, 330, 36, 'black', wt('antag', 'lineært') - 0.1, we('antag', 'materiale'));
+  text(7, '•  intet udvendigt tryk (p_o = 0)', 160, 410, 36, 'black', wt('antag', 'intet') - 0.1, we('antag', 'tryk'));
+  text(7, '•  aksialspænding fra endebunde ignoreres', 160, 490, 36, 'red', wt('antag', 'aksialspændingen') - 0.6, we('antag', 'endebundene'));
+
+  // ---------------------------------------------------------------- 8 tjek: r_o = 80 mm
+  B.goto('tjek_q', 8);
+  B.tjek(8, ['Hvad bliver σ_θ på indersiden', 'med r_o = 80 mm?'], ['(6400 + 1600) / (6400 − 1600) ≈ 1,67', 'σ_θ = 50 · 1,67 ≈ 83 MPa'], 'tjek_q', 'tjek_a');
+  {
+    const t0 = wt('tjek_a', 'Væggen'), y0 = 680, sc = 1.3;
+    [[800, 130, 'red', 'r_o = 60'], [1000, 83.3, 'blue', 'r_o = 80']].forEach(([x, v, col, et], i) => {
+      const a = t0 + 0.3 * i, h = v * sc;
+      line(8, rect(x, y0 - h, 120, h).concat([[x, y0 - h]]), col, 3, a, a + 0.5);
+      hatch(8, rect(x, y0 - h, 120, h), col, a + 0.3, a + 0.8, { gap: 10 });
+      text(8, et + ':  ' + String(v).replace('.', ','), x + 60, y0 - h - 14, 24, col, a + 0.3, a + 0.8, { align: 'center' });
+    });
+  }
+
+  // ---------------------------------------------------------------- 9 slut
+  B.goto('slut', 9);
+  B.slut(9, 'MEM1 mundtlig eksamen, ny liste, spm. 2b · Hamrock m.fl., kap. 10, lign. (10.23)–(10.26) · Mathcad: Eksamen spm 02 Tykvægget trykbeholder', 'spm. 3: akseldimensionering', 'slut');
+  text(9, 'σ_θ = 130 MPa  (træk)', 200, 260, 42, 'red', wt('slut', 'sigma') - 0.1, we('slut', 'træk'));
+  text(9, 'σ_r = − 50 MPa  (tryk)', 200, 340, 42, 'blue', wt('slut', 'sigma', 1) - 0.1, we('slut', 'tryk'));
+  text(9, 'begge på indersiden, hvor σ er størst', 200, 420, 34, 'black', wt('slut', 'begge') - 0.1, we('slut', 'størst'));
+});
+
+</script>
+<script>BP.live({"duration":199.368,"audio":"eks-spm2-b.mp3","order":["titel","data","tyk","kvad","theta","theta2","radial","kontrol","ude","tyndv","tresca","antag","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":12.121,"words":[["Spørgsmål",0.54,1.56],["to",1.98,2.26],["del",2.66,2.88],["b",3.14,3.16],["En",4.26,4.38],["tykvægget",4.66,5.341],["hydraulikcylinder",5.501,6.421],["Vi",7.741,7.801],["beregner",7.841,8.281],["omkredsspændingen",8.521,9.401],["og",9.601,9.701],["radialspændingen",9.821,10.721],["på",10.821,10.941],["den",10.961,11.061],["indvendige",11.221,11.681],["overflade",11.721,12.121]],"text":"Spørgsmål to, del b. En tykvægget hydraulikcylinder. Vi beregner omkredsspændingen og radialspændingen på den indvendige overflade."},"data":{"start":13.941,"end":23.082,"words":[["Den",13.981,14.101],["indre",14.261,14.501],["radius",14.561,15.001],["er",15.122,15.222],["fyrre",15.362,15.602],["millimeter",15.642,16.062],["den",16.562,16.702],["ydre",16.822,17.042],["er",17.222,17.302],["tres",17.462,17.802],["millimeter",17.882,18.302],["og",18.722,18.782],["det",18.802,18.882],["indvendige",18.942,19.342],["tryk",19.362,19.602],["er",19.762,19.842],["halvtreds",19.922,20.422],["megapascal",20.562,21.102],["Det",21.982,22.082],["udvendige",22.182,22.562],["tryk",22.582,22.762],["er",22.822,22.902],["nul",22.942,23.082]],"text":"Den indre radius er fyrre millimeter, den ydre er tres millimeter, og det indvendige tryk er halvtreds megapascal. Det udvendige tryk er nul."},"tyk":{"start":24.122,"end":34.964,"words":[["Først",24.162,24.362],["tjekker",24.402,24.663],["vi",24.683,24.743],["at",24.823,24.883],["den",24.923,25.023],["virkelig",25.123,25.483],["er",25.523,25.583],["tykvægget",25.623,26.123],["Den",26.863,27.003],["indre",27.163,27.363],["diameter",27.423,27.883],["er",27.983,28.063],["firs",28.243,28.523],["millimeter",28.563,29.003],["og",29.263,29.343],["vægtykkelsen",29.443,30.083],["er",30.183,30.243],["tyve",30.303,30.643],["Forholdet",31.343,31.743],["er",31.823,31.883],["fire",32.003,32.263],["langt",32.863,33.083],["under",33.123,33.263],["fyrre",33.283,33.503],["Vi",34.064,34.124],["skal",34.184,34.304],["altså",34.344,34.524],["bruge",34.544,34.764],["Lamé",34.804,34.964]],"text":"Først tjekker vi, at den virkelig er tykvægget. Den indre diameter er firs millimeter, og vægtykkelsen er tyve. Forholdet er fire, langt under fyrre. Vi skal altså bruge Lamé."},"kvad":{"start":36.784,"end":44.005,"words":[["Vi",36.824,36.884],["starter",36.944,37.184],["med",37.204,37.264],["kvadraterne",37.284,37.744],["Tres",38.444,38.704],["i",38.864,38.884],["anden",39.024,39.324],["er",39.544,39.644],["tre",40.004,40.144],["tusind",40.324,40.644],["seks",40.724,40.904],["hundrede",40.924,41.184],["Fyrre",41.864,42.124],["i",42.244,42.264],["anden",42.324,42.564],["er",42.724,42.824],["et",43.104,43.204],["tusind",43.264,43.584],["seks",43.605,43.785],["hundrede",43.805,44.005]],"text":"Vi starter med kvadraterne. Tres i anden er tre tusind seks hundrede. Fyrre i anden er et tusind seks hundrede."},"theta":{"start":45.305,"end":58.706,"words":[["Omkredsspændingen",45.345,46.065],["på",46.105,46.205],["indersiden",46.245,46.705],["ligning",46.925,47.245],["ti",47.405,47.525],["seksogtyve",47.725,48.885],["sigma",48.885,49.185],["theta",49.325,49.685],["er",50.105,50.225],["halvtreds",50.625,51.105],["gange",51.205,51.485],["tre",51.765,51.925],["tusind",52.105,52.425],["seks",52.465,52.645],["hundrede",52.685,52.945],["plus",53.166,53.426],["et",53.706,53.806],["tusind",53.866,54.166],["seks",54.206,54.386],["hundrede",54.426,54.666],["divideret",55.106,55.566],["med",55.646,55.746],["tre",55.866,56.026],["tusind",56.166,56.466],["seks",56.546,56.746],["hundrede",56.786,57.306],["minus",57.306,57.686],["et",57.826,57.906],["tusind",57.966,58.226],["seks",58.246,58.426],["hundrede",58.446,58.706]],"text":"Omkredsspændingen på indersiden, ligning ti seksogtyve: sigma theta er halvtreds gange tre tusind seks hundrede plus et tusind seks hundrede, divideret med tre tusind seks hundrede minus et tusind seks hundrede."},"theta2":{"start":59.746,"end":71.247,"words":[["Tælleren",59.786,60.126],["i",60.166,60.186],["brøken",60.226,60.566],["er",60.706,60.786],["fem",60.786,61.206],["tusind",61.286,61.626],["to",61.666,61.746],["hundrede",61.846,62.126],["og",62.567,62.627],["nævneren",62.687,63.067],["er",63.227,63.307],["to",63.447,63.527],["tusind",63.647,63.927],["Brøken",64.607,64.907],["er",64.927,65.007],["to",65.047,65.127],["komma",65.207,65.347],["seks",65.407,65.627],["og",66.047,66.107],["sigma",66.147,66.367],["theta",66.427,66.747],["er",66.967,67.047],["halvtreds",67.267,67.687],["gange",67.807,68.027],["to",68.127,68.227],["komma",68.327,68.467],["seks",68.527,68.747],["altså",69.107,69.327],["hundrede",69.387,69.687],["og",69.747,69.807],["tredive",69.847,70.207],["megapascal",70.307,70.867],["i",70.947,70.967],["træk",71.027,71.247]],"text":"Tælleren i brøken er fem tusind to hundrede, og nævneren er to tusind. Brøken er to komma seks, og sigma theta er halvtreds gange to komma seks, altså hundrede og tredive megapascal i træk."},"radial":{"start":73.067,"end":79.127,"words":[["Radialspændingen",73.107,73.867],["på",73.927,74.047],["indersiden",74.107,74.587],["er",74.767,74.847],["minus",75.147,75.527],["p",75.607,75.627],["i",75.867,75.887],["altså",76.427,76.667],["minus",76.987,77.267],["halvtreds",77.327,77.727],["megapascal",77.867,78.347],["Det",78.787,78.887],["er",78.887,78.927],["tryk",78.927,79.127]],"text":"Radialspændingen på indersiden er minus p i, altså minus halvtreds megapascal. Det er tryk."},"kontrol":{"start":80.187,"end":103.83,"words":[["Vi",80.227,80.287],["kan",80.327,80.407],["tjekke",80.447,80.667],["den",80.707,80.827],["med",80.887,80.967],["den",80.987,81.087],["fulde",81.227,81.467],["ligning",81.527,81.827],["ti",82.048,82.168],["treogtyve",82.408,82.928],["ved",83.168,83.308],["r",83.668,83.688],["lig",83.888,84.028],["r",84.228,84.248],["i",84.388,84.408],["Parentesen",85.308,85.848],["en",86.288,86.448],["minus",86.628,86.968],["r",87.328,87.348],["o",87.508,87.528],["i",87.748,87.768],["anden",87.828,88.068],["over",88.228,88.408],["r",88.808,88.828],["i",88.948,88.968],["i",89.148,89.168],["anden",89.228,89.428],["bliver",89.868,90.108],["en",90.468,90.608],["minus",90.708,91.008],["to",91.068,91.168],["komma",91.268,91.429],["femogtyve",91.489,91.909],["altså",92.369,92.569],["minus",92.869,93.209],["et",93.389,93.489],["komma",93.549,93.729],["femogtyve",94.889,95.109],["Foran",95.109,95.289],["står",95.449,95.669],["halvtreds",95.789,96.249],["gange",96.329,96.549],["seksten",96.569,96.969],["hundrede",97.009,97.369],["over",97.389,97.549],["to",97.589,97.689],["tusind",97.809,98.149],["som",98.409,98.509],["er",98.529,98.589],["fyrre",98.629,98.849],["Fyrre",99.669,99.929],["gange",100.029,100.229],["minus",100.309,100.589],["et",100.71,100.87],["komma",100.93,101.11],["femogtyve",101.15,101.61],["er",101.99,102.05],["minus",102.11,102.37],["halvtreds",102.39,102.71],["Det",103.45,103.53],["passer",103.57,103.83]],"text":"Vi kan tjekke den med den fulde ligning ti treogtyve ved r lig r i. Parentesen en minus r o i anden over r i i anden bliver en minus to komma femogtyve, altså minus et komma femogtyve. Foran står halvtreds gange seksten hundrede over to tusind, som er fyrre. Fyrre gange minus et komma femogtyve er minus halvtreds. Det passer."},"ude":{"start":105.65,"end":115.491,"words":[["Til",105.69,105.81],["sammenligning",105.85,106.33],["på",106.51,106.63],["ydersiden",106.71,107.19],["er",107.27,107.33],["radialspændingen",107.39,108.27],["nul",108.37,108.53],["og",108.85,108.91],["omkredsspændingen",108.99,109.69],["er",109.77,109.85],["firs",109.97,110.27],["megapascal",110.41,110.95],["Omkredsspændingen",111.811,112.471],["falder",112.531,112.791],["altså",112.851,113.071],["fra",113.091,113.171],["hundrede",113.251,113.491],["og",113.491,113.531],["tredive",113.531,113.891],["til",114.071,114.211],["firs",114.311,114.611],["gennem",114.891,115.151],["væggen",115.211,115.491]],"text":"Til sammenligning: på ydersiden er radialspændingen nul, og omkredsspændingen er firs megapascal. Omkredsspændingen falder altså fra hundrede og tredive til firs gennem væggen."},"tyndv":{"start":117.311,"end":136.293,"words":[["Er",117.351,117.411],["resultatet",117.451,117.911],["rimeligt",117.971,118.311],["Tyndvægsformlen",119.151,119.931],["p",120.171,120.191],["gange",120.471,120.811],["r",120.871,120.891],["over",121.051,121.211],["t",121.271,121.291],["med",121.952,122.052],["middelradius",122.092,122.732],["halvtreds",122.872,123.332],["ville",123.792,123.932],["give",123.972,124.152],["halvtreds",124.292,124.672],["gange",124.892,125.072],["halvtreds",125.072,125.432],["over",125.572,125.712],["tyve",125.772,125.992],["altså",126.332,126.552],["hundrede",126.632,126.852],["og",126.852,126.892],["femogtyve",126.992,127.512],["megapascal",127.692,128.212],["Den",129.072,129.192],["ligger",129.212,129.392],["tæt",129.432,129.592],["på",129.632,129.812],["men",130.092,130.232],["under",130.632,130.833],["Det",131.593,131.693],["passer",131.733,132.033],["tyndvægsformlen",132.593,133.333],["giver",133.373,133.553],["en",133.613,133.693],["middelværdi",133.773,134.253],["og",134.593,134.653],["Lamé",134.693,134.913],["viser",135.133,135.373],["toppen",135.413,135.713],["på",135.733,135.853],["indersiden",135.893,136.293]],"text":"Er resultatet rimeligt? Tyndvægsformlen p gange r over t, med middelradius halvtreds, ville give halvtreds gange halvtreds over tyve, altså hundrede og femogtyve megapascal. Den ligger tæt på, men under. Det passer: tyndvægsformlen giver en middelværdi, og Lamé viser toppen på indersiden."},"tresca":{"start":138.113,"end":148.994,"words":[["Hvis",138.153,138.293],["censor",138.333,138.613],["spørger",138.653,138.893],["til",138.893,139.013],["sikkerheden",139.033,139.473],["på",139.953,140.073],["indersiden",140.113,140.553],["er",140.633,140.713],["hovedspændingerne",140.753,141.414],["hundrede",141.574,141.794],["og",141.794,141.834],["tredive",141.834,142.154],["og",142.374,142.434],["minus",142.454,142.674],["halvtreds",142.694,143.014],["Tresca",143.734,144.034],["giver",144.114,144.274],["forskellen",144.294,144.734],["hundrede",144.914,145.214],["og",145.234,145.274],["firs",145.274,145.534],["megapascal",145.634,146.114],["Det",146.854,146.954],["skal",146.994,147.134],["sammenlignes",147.154,147.634],["med",147.674,147.774],["materialets",147.794,148.374],["flydespænding",148.454,148.994]],"text":"Hvis censor spørger til sikkerheden: på indersiden er hovedspændingerne hundrede og tredive og minus halvtreds. Tresca giver forskellen, hundrede og firs megapascal. Det skal sammenlignes med materialets flydespænding."},"antag":{"start":150.814,"end":159.895,"words":[["Husk",150.854,151.074],["at",151.094,151.174],["nævne",151.214,151.435],["antagelserne",151.515,152.055],["en",152.595,152.695],["lang",152.855,153.035],["cylinder",153.115,153.515],["lineært",154.175,154.595],["elastisk",154.635,155.035],["materiale",155.075,155.535],["intet",156.175,156.395],["udvendigt",156.455,156.795],["tryk",156.815,157.015],["og",157.555,157.595],["vi",157.635,157.675],["ser",157.735,157.875],["bort",157.955,158.115],["fra",158.155,158.315],["aksialspændingen",158.355,159.135],["fra",159.195,159.275],["endebundene",159.415,159.895]],"text":"Husk at nævne antagelserne: en lang cylinder, lineært elastisk materiale, intet udvendigt tryk, og vi ser bort fra aksialspændingen fra endebundene."},"tjek_q":{"start":161.715,"end":166.895,"words":[["Tjek",161.755,161.935],["dig",161.975,162.075],["selv",162.095,162.275],["Hvad",162.795,162.935],["bliver",162.955,163.135],["omkredsspændingen",163.175,163.835],["på",163.875,163.975],["indersiden",164.015,164.455],["hvis",164.535,164.655],["den",164.675,164.795],["ydre",164.895,165.095],["radius",165.195,165.595],["øges",165.755,165.955],["til",166.015,166.135],["firs",166.215,166.435],["millimeter",166.495,166.895]],"text":"Tjek dig selv. Hvad bliver omkredsspændingen på indersiden, hvis den ydre radius øges til firs millimeter?"},"tjek_a":{"start":170.515,"end":186.937,"words":[["Brøken",170.555,170.855],["bliver",170.895,171.115],["seks",171.315,171.475],["tusind",171.515,171.775],["fire",171.815,171.975],["hundrede",171.995,172.235],["plus",172.315,172.515],["seksten",172.535,172.995],["hundrede",173.035,173.295],["over",173.675,173.835],["seks",173.856,174.076],["tusind",174.116,174.376],["fire",174.416,174.576],["hundrede",174.596,174.876],["minus",174.876,175.156],["seksten",175.176,175.476],["hundrede",175.516,175.756],["Altså",176.316,176.516],["otte",176.676,176.856],["tusind",176.936,177.276],["over",177.356,177.496],["fire",177.496,177.756],["tusind",177.816,178.076],["otte",178.116,178.296],["hundrede",178.296,178.556],["cirka",178.936,179.136],["et",179.216,179.316],["komma",179.316,179.436],["syv",179.476,179.616],["Sigma",180.516,180.736],["theta",180.776,181.056],["bliver",181.196,181.396],["cirka",181.436,181.716],["treogfirs",181.836,182.476],["megapascal",182.536,183.036],["Væggen",183.837,184.117],["er",184.177,184.237],["dobbelt",184.337,184.597],["så",184.617,184.717],["tyk",184.757,184.937],["men",185.337,185.437],["spændingen",185.497,185.857],["falder",185.917,186.137],["kun",186.177,186.317],["med",186.337,186.437],["en",186.437,186.477],["tredjedel",186.497,186.937]],"text":"Brøken bliver seks tusind fire hundrede plus seksten hundrede, over seks tusind fire hundrede minus seksten hundrede. Altså otte tusind over fire tusind otte hundrede, cirka et komma syv. Sigma theta bliver cirka treogfirs megapascal. Væggen er dobbelt så tyk, men spændingen falder kun med en tredjedel."},"slut":{"start":188.757,"end":197.898,"words":[["Kort",188.797,188.997],["sagt",189.057,189.237],["sigma",189.797,190.017],["theta",190.077,190.357],["er",190.477,190.557],["hundrede",190.617,190.877],["og",190.877,190.917],["tredive",190.917,191.217],["megapascal",191.297,191.857],["i",191.957,191.977],["træk",192.037,192.277],["og",192.757,192.817],["sigma",192.857,193.057],["r",193.257,193.277],["er",193.478,193.538],["minus",193.638,193.958],["halvtreds",193.998,194.338],["megapascal",194.398,194.958],["i",195.098,195.118],["tryk",195.178,195.378],["begge",196.038,196.238],["på",196.258,196.378],["indersiden",196.398,196.798],["hvor",196.938,197.078],["spændingerne",197.138,197.538],["er",197.558,197.618],["størst",197.638,197.898]],"text":"Kort sagt: sigma theta er hundrede og tredive megapascal i træk, og sigma r er minus halvtreds megapascal i tryk, begge på indersiden, hvor spændingerne er størst."}}}, { audio: 'eks-spm2-b.mp3', id: 'eks-spm2-b' });</script>
+</body>
+</html>

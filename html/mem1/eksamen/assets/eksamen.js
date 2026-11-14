@@ -213,7 +213,7 @@ var Eks = (function () {
     h += '<div class="qp"><span class="tag">(b)</span><b>Designopgave:</b> ' + rich(d.spmB) + '</div></div>';
     if (d.bog) h += '<div class="note"><b>&#128214; Find det i bogen</b> (Hamrock, Schmid &amp; Jacobson, <i>Fundamentals of Machine Elements</i>, 3. udg., trykte sidetal): ' + rich(d.bog) + '</div>';
     var pdfn = d.pdf || ('pdf/Svarvejledning_' + (d.nr < 10 ? '0' : '') + d.nr + '.pdf'), pdfu = url(pdfn);
-    h += '<div class="note gr"><b>&#128196; Svarvejledning som PDF:</b> <a style="color:var(--cy)" href="' + pdfu + '">' + pdfn.split('/').pop() + '</a> &mdash; samme gennemgang i eksamens-layout, til print og noter.</div>';
+    if (d.pdf !== false) h += '<div class="note gr"><b>&#128196; Svarvejledning som PDF:</b> <a style="color:var(--cy)" href="' + pdfu + '">' + pdfn.split('/').pop() + '</a> &mdash; samme gennemgang i eksamens-layout, til print og noter.</div>';
     h += '</section>';
     return h;
   }
@@ -242,8 +242,11 @@ var Eks = (function () {
 
   function buildPlan(d) {
     if (!d.plan) return '';
-    var h = '<section id="plan">' + secHead('&#9201;', 'Din 20-minutters tavleplan');
-    h += '<div class="note">Eksaminationen er kort. Planen her bruger <b>ca. 14 minutter</b> på din egen fremlæggelse og efterlader luft til spørgsmål. Hold rækkefølgen &mdash; den fortæller en historie.</div>';
+    var min = d.minutter || 20;
+    var h = '<section id="plan">' + secHead('&#9201;', 'Din ' + min + '-minutters tavleplan');
+    h += '<div class="note">' + (min === 15
+      ? 'Eksamen er 20 minutter: <b>5 min semesterprojekt</b>, derefter <b>15 min</b> til det trukne spørgsmål. Planen fylder de 15 minutter: teori, designopgave og din vurdering af resultatet. Censor afbryder ofte undervejs, så tag spørgsmålene, når de kommer, og find tilbage til planen.'
+      : 'Eksaminationen er kort. Planen her bruger <b>ca. 14 minutter</b> på din egen fremlæggelse og efterlader luft til spørgsmål. Hold rækkefølgen &mdash; den fortæller en historie.') + '</div>';
     h += '<div class="plan" style="margin-top:.9rem">';
     d.plan.forEach(function (r) {
       h += '<div class="row ' + (r.k || '') + '"><div class="t">' + esc(r.t) + '</div>' +
@@ -251,6 +254,38 @@ var Eks = (function () {
     });
     h += '</div></section>';
     return h;
+  }
+
+  // videoer + Mathcad til spørgsmålet (ny liste)
+  function buildMedia(d) {
+    if (!d.media) return '';
+    var h = '<section id="media">' + secHead('&#127916;', 'Se det forklaret &mdash; videoer og Mathcad');
+    h += '<div class="links">' + d.media.map(function (m) {
+      return '<a href="' + url(m.u) + '"><span class="k">' + esc(m.k) + '</span>' + esc(m.t) + '</a>';
+    }).join('') + '</div></section>';
+    return h;
+  }
+  // modelsvar: hele fremlæggelsen ord for ord, med tidsstempler
+  function buildModel(d) {
+    if (!d.modelsvar) return '';
+    var h = '<section id="modelsvar">' + secHead('&#127908;', 'Modelsvar &mdash; sådan kan det lyde, ord for ord');
+    h += '<div class="note">Læs det højt med uret ved siden af. Det er ikke meningen, at du skal lære det udenad, men at du hører, hvor meget der kan siges på hvert minut, og hvordan teorien og tallene bindes sammen. Det, der står på tavlen, er markeret med &#9998;.</div>';
+    d.modelsvar.forEach(function (del) {
+      h += '<h3 style="margin:1.1rem 0 .4rem">' + esc(del.h) + '</h3>';
+      del.afsnit.forEach(function (a) {
+        h += '<div class="step open"><div class="sh"><div class="n" style="width:auto;padding:0 .5rem">' + esc(a.t) + '</div><div class="ttl">' + rich(a.o) + '</div></div><div class="sb">' +
+             (a.tavle ? '<div class="lbl">&#9998; På tavlen</div>' + (Array.isArray(a.tavle) ? a.tavle : [a.tavle]).map(function (m) { return mathBlock(m); }).join('') : '') +
+             '<div class="lbl">Sig</div><div class="say">&bdquo;' + rich(a.s) + '&ldquo;</div></div></div>';
+      });
+    });
+    return h + '</section>';
+  }
+  function buildCheck(d) {
+    if (!d.antagelser && !d.rimelighed) return '';
+    var h = '<section id="vurdering">' + secHead('&#9989;', 'Antagelser og vurdering &mdash; det censor lytter efter');
+    if (d.antagelser) h += '<div class="card"><h3>Antagelser du skal sige højt</h3><ul>' + d.antagelser.map(function (a) { return '<li>' + rich(a) + '</li>'; }).join('') + '</ul></div>';
+    if (d.rimelighed) h += '<div class="card" style="margin-top:.8rem"><h3>Er resultatet teknisk rimeligt?</h3><ul>' + d.rimelighed.map(function (a) { return '<li>' + rich(a) + '</li>'; }).join('') + '</ul></div>';
+    return h + '</section>';
   }
 
   function buildSteps(d) {
@@ -411,16 +446,16 @@ var Eks = (function () {
     var d = QDATA;
     document.title = 'Spm. ' + d.nr + ': ' + d.titel + ' - MEM1 eksamen';
 
-    var nav = '<div class="topbar"><a href="' + url('index.html') + '">&#8592; Alle 16 spørgsmål</a>' +
+    var nav = '<div class="topbar"><a href="' + url('index.html') + '">&#8592; Alle ' + (d.antal || 16) + ' spørgsmål</a>' +
       (d.prev ? '<a href="' + url(d.prev) + '">&#8249; Forrige</a>' : '') +
       (d.next ? '<a href="' + url(d.next) + '">Næste &#8250;</a>' : '') +
-      '<span class="sp"></span><span class="now">' + (d.udgaaet ? 'Udgået (ikke pensum)' : 'Spm ' + d.nr + '/15') + ' &middot; Kap. ' + d.kapitel + '</span></div>';
+      '<span class="sp"></span><span class="now">' + (d.udgaaet ? 'Udgået (ikke pensum)' : 'Spm ' + d.nr + '/' + (d.antal || 15)) + ' &middot; Kap. ' + d.kapitel + '</span></div>';
 
-    var hero = '<header class="hero"><div class="nr">MUNDTLIG EKSAMEN &middot; SPØRGSMÅL ' + d.nr + '</div>' +
+    var hero = '<header class="hero"><div class="nr">MUNDTLIG EKSAMEN &middot; SPØRGSMÅL ' + d.nr + (d.liste ? ' &middot; ' + esc(d.liste) : '') + '</div>' +
       '<h1>' + esc(d.titel) + '</h1><div class="kap">Kapitel ' + d.kapitel + ' &middot; ' + esc(d.kapitelNavn) + '</div></header>';
 
-    var body = '<main>' + buildQuestion(d) + buildPlain(d) + buildStory(d) + buildPlan(d) +
-      buildSteps(d) + buildLab(d) + buildTraps(d) + buildQA(d) + buildLinks(d) + '</main>';
+    var body = '<main>' + buildQuestion(d) + buildMedia(d) + buildPlain(d) + buildStory(d) + buildPlan(d) + buildModel(d) +
+      buildSteps(d) + buildLab(d) + buildCheck(d) + buildTraps(d) + buildQA(d) + buildLinks(d) + '</main>';
 
     var foot = '<footer>MEM1 &mdash; Maskinelementer og design af maskiner &middot; VIA Horsens<br>' +
       '<a href="' + url('index.html') + '">Oversigt over alle spørgsmål</a> &middot; ' +

@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spm. 1a: søjleknækning, Euler og Johnson (teori) · video</title>
+<meta name="description" content="Ny liste, spm. 1a: knækning som ustabilitet, Euler udledt, E, I og L_e, Johnson og overgangen ved S_y/2.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 9: videoer</a><h1>Spm. 1a: søjleknækning, Euler og Johnson (teori)</h1><span class="meta">MEM1 · kapitel 9 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Spm. 1a: søjleknækning, Euler og Johnson (teori)"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Ny liste, spm. 1a: knækning som ustabilitet, Euler udledt, E, I og L_e, Johnson og overgangen ved S_y/2.</p><div class="chips"><a href="../../opgaver/l09/eksamen-spm-01-soejleknaekning.pdf">📐 Se udregningen i Mathcad (PDF)</a><a href="euler.html">Se først: Eulers knæklast</a><a href="johnson.html">Se først: Johnson: korte og mellemlange søjler</a><a href="../../../../lab/mem1/soejleknaekning.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel09_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l09">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// MEM1 mundtlig eksamen (ny liste) · Spm. 1a: søjleknækning, Euler og Johnson. Hamrock kap. 9: (9.12), (9.13), (9.15), (9.16).
+// Kurver: E = 200 GPa, S_y = 400 MPa: Euler σ = π²E/λ², Johnson σ = S_y − S_y²/(4π²E)·λ², overgang λ = 99,3 ved σ = 200 MPa.
+BP.scene({ header: 'MEM1 · mundtlig eksamen · spm. 1a', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, dot, ring, under, ell, rect, hatch, dashed, strike, box, axes, plot, pin, PI } = B;
+  const S = (id) => L(id).start, E = (id) => L(id).end;
+  const ringet = (k, s, x, y, size, col, a, te) => { const r = text(k, s, x, y, size, col, a, te); ring(r, col, te, te + 0.5); return r; };
+  // søjle fra (x, ytop) til (x, ybund); f(s) = form med s = 0 i bunden, 1 i toppen, max 1
+  const soejle = (k, x, y0, y1, amp, f, col, a, b, w = 5) => {
+    const pts = []; for (let i = 0; i <= 40; i++) { const s = i / 40; pts.push([x + amp * f(s), y1 - s * (y1 - y0)]); }
+    line(k, pts, col, w, a, b); return pts;
+  };
+  const sinf = (s) => Math.sin(PI * s), lige = () => 0;
+  const pinOp = (k, x, y, a) => {   // charnier hængende fra loftet, spids i (x, y)
+    line(k, [[x, y], [x + 22, y - 30], [x - 22, y - 30], [x, y - 1]], 'black', 3, a, a + 0.35);
+    line(k, [[x - 34, y - 30], [x + 34, y - 30]], 'black', 2.6, a + 0.35, a + 0.45);
+    hatch(k, rect(x - 34, y - 42, 68, 12), 'black', a + 0.45, a + 0.6, { gap: 6 });
+  };
+
+  // ---------------------------------------------------------------- 0 titel
+  B.titel(0, 'Spm. 1a: søjleknækning', 'Euler, Johnson og overgangen imellem · teori og forklaring', 'titel');
+  text(0, 'P_{cr} = π² E I / L_e²', 640, 540, 48, 'red', wt('titel', 'Euler') - 0.1, we('titel', 'Johnson'), { align: 'center' });
+
+  // ---------------------------------------------------------------- 1 linealen knækker
+  B.goto('lineal', 1);
+  {
+    const t0 = S('lineal'), ts = wt('lineal', 'slår');
+    soejle(1, 330, 190, 600, 0, lige, 'black', t0 + 0.2, t0 + 1.0, 6);
+    arrow(1, [[330, 110], [330, 178]], 'red', 3.6, t0 + 0.8, t0 + 1.3, 16);
+    arrow(1, [[330, 680], [330, 612]], 'red', 3.6, t0 + 0.9, t0 + 1.4, 16);
+    text(1, 'P', 352, 140, 40, 'red', t0 + 1.0, t0 + 1.4);
+    soejle(1, 330, 190, 600, 95, sinf, 'blue', ts - 0.1, ts + 0.9, 6);
+    arrow(1, [[380, 395], [450, 395]], 'blue', 3, ts + 0.6, ts + 1.0, 14);
+  }
+  bubble(1, 'Knækning', 620, 210, 56, 'blue', wt('lineal', 'knækker') - 0.2, we('lineal', 'knækker') + 0.6);
+  text(1, 'den brækker ikke: den knækker ud', 620, 300, 34, 'black', wt('lineal', 'brækker') - 0.1, we('lineal', 'knækker'));
+  ringet(1, 'stabilitetsfejl, ikke styrkefejl', 620, 420, 40, 'red', wt('stabil', 'stabilitetsfejl') - 0.1, we('stabil', 'styrkefejl'));
+  text(1, 'materialet holder, formen bliver ustabil', 620, 520, 32, 'green', wt('stabil', 'Materialet') - 0.1, we('stabil', 'ustabil'));
+
+  // ---------------------------------------------------------------- 2 momentet fodrer sig selv
+  B.goto('moment', 2);
+  {
+    const t0 = S('moment');
+    soejle(2, 300, 170, 610, 70, sinf, 'blue', t0, t0 + 0.9, 6);
+    pinOp(2, 300, 166, t0 + 0.2); pin(2, 300, 614, t0 + 0.3);
+    arrow(2, [[300, 92], [300, 120]], 'red', 3.6, t0 + 0.5, t0 + 0.9, 14);
+    text(2, 'P', 322, 112, 38, 'red', t0 + 0.6, t0 + 1.0);
+    const ty = wt('moment', 'udbøjningen');
+    dashed(2, [[300, 390], [370, 390]], 'black', ty, ty + 0.4, 8);
+    B.dobbeltpil(2, [304, 360], [366, 360], 'green', ty + 0.2, ty + 0.6);
+    text(2, 'y', 326, 346, 34, 'green', ty + 0.4, ty + 0.8);
+  }
+  text(2, 'M = − P · y', 520, 230, 44, 'red', wt('moment', 'M') - 0.1, we('moment', 'y', 2));
+  text(2, 'y ↑   ⇒   M ↑   ⇒   y ↑', 520, 310, 38, 'black', wt('moment2', 'Momentet') - 0.1, we('moment2', 'selv'));
+  text(2, 'P < P_{cr}:  retter sig op', 520, 380, 32, 'green', wt('moment2', 'Under') - 0.1, we('moment2', 'igen'));
+  text(2, 'P > P_{cr}:  kollaps', 520, 435, 32, 'red', wt('moment2', 'Over') - 0.1, we('moment2', 'kollapser'));
+  B.formel(2, 'bjælketeori', 'E I y″ = M = − P y', 540, 530, 36, wt('dgl', 'Bjælketeorien') - 0.1, we('dgl', 'y', 1), 'blue');
+  text(2, 'y″ + λ² y = 0,   λ² = P / (E I)', 520, 605, 32, 'black', wt('dgl', 'differentialligning') - 0.1, we('dgl', 'svingningsligning'));
+  text(2, 'y = A sin λx + B cos λx', 520, 660, 32, 'black', wt('dgl', 'løsningen') - 0.1, we('dgl', 'cosinus'));
+
+  // ---------------------------------------------------------------- 3 randbetingelser -> Euler
+  B.goto('rand', 3);
+  bubble(3, 'Randbetingelser', 130, 135, 48, 'blue', S('rand') - 0.1, S('rand') + 0.8);
+  text(3, 'y(0) = 0   og   y(L) = 0', 160, 230, 38, 'black', wt('rand', 'udbøjningen') - 0.1, we('rand', 'ender', 1));
+  text(3, '⇒  B = 0', 160, 300, 38, 'black', wt('rand', 'forsvinder') - 0.4, we('rand', 'forsvinder'));
+  text(3, 'A sin λL = 0   (A ≠ 0)', 160, 370, 38, 'black', wt('rand', 'sinus') - 0.1, we('rand', 'nul', 2));
+  ringet(3, 'λL = π', 160, 450, 44, 'red', wt('rand', 'mindste') - 0.1, we('rand', 'pi'));
+  B.formel(3, '9.12', 'P_{cr} = π² E I / L_e²', 200, 590, 52, wt('euler', 'Eulers') - 0.1, we('euler', 'anden', 1), 'red');
+  {
+    const t0 = wt('rand', 'mindste');
+    soejle(3, 1020, 190, 560, 60, sinf, 'blue', t0, t0 + 0.8, 5);
+    pinOp(3, 1020, 186, t0); pin(3, 1020, 564, t0 + 0.1);
+    text(3, 'halv sinusbølge', 1020, 640, 28, 'green', t0 + 0.6, t0 + 1.2, { align: 'center' });
+  }
+
+  // ---------------------------------------------------------------- 4 E, I, L_e
+  B.goto('led', 4);
+  B.formel(4, '9.12', 'P_{cr} = π² E I / L_e²', 160, 200, 40, S('led') - 0.1, S('led') + 0.8, 'red');
+  text(4, 'E:  stivhed (materialet)', 160, 290, 32, 'blue', wt('led', 'elasticitetsmodulet') - 0.3, we('led', 'stivhed'));
+  text(4, 'I:  tværsnittets inertimoment', 160, 345, 32, 'blue', wt('led', 'inertimoment') - 0.5, we('led', 'bøjning'));
+  { const s = text(4, 'S_y:  findes ikke i formlen!', 160, 400, 32, 'red', wt('led', 'Flydespændingen') - 0.1, we('led', 'slet'));
+    under(s, 'red', we('led', 'slet'), we('led', 'slet') + 0.4); }
+  text(4, 'L_e = K · L   (vendepunkt til vendepunkt)', 160, 470, 32, 'black', wt('leff', 'effektive') - 0.1, we('leff', 'L', 2));
+  ringet(4, '2 L_e   ⇒   P_{cr} / 4', 160, 590, 40, 'red', S('leff2') + 0.1, we('leff2', 'fjerdedel'));
+  {
+    // tre understøtninger: charnier-charnier, fast-fri, fast-fast
+    const y0 = 250, y1 = 560, tk = [wt('leff', 'Charnier'), wt('leff', 'Fast'), wt('leff', 'Fast', 1)];
+    const typer = [[790, sinf, 'K = 1'], [960, (s) => 1 - Math.cos(PI * s / 2), 'K = 2'], [1130, (s) => (1 - Math.cos(2 * PI * s)) / 2, 'K = 0,5']];
+    typer.forEach(([x, f, et], i) => {
+      const a = tk[i] - 0.1;
+      soejle(4, x, y0, y1, 40, f, 'blue', a, a + 0.8, 4);
+      line(4, [[x - 26, y1 + 4], [x + 26, y1 + 4]], 'black', 3.4, a, a + 0.2);
+      if (i !== 1) line(4, [[x - 26, y0 - 4], [x + 26, y0 - 4]], 'black', 3.4, a, a + 0.2);
+      if (i === 1) hatch(4, rect(x - 26, y1 + 4, 52, 12), 'black', a + 0.2, a + 0.4, { gap: 6 });
+      if (i === 2) { hatch(4, rect(x - 26, y1 + 4, 52, 12), 'black', a + 0.2, a + 0.4, { gap: 6 }); hatch(4, rect(x - 26, y0 - 16, 52, 12), 'black', a + 0.2, a + 0.4, { gap: 6 }); }
+      text(4, et, x, 620, 30, 'red', a + 0.4, a + 0.9, { align: 'center' });
+    });
+  }
+
+  // ---------------------------------------------------------------- 5 spænding og slankhed, Euler går mod uendelig
+  B.goto('spaend', 5);
+  bubble(5, 'Fra kraft til spænding', 130, 135, 46, 'blue', S('spaend') - 0.1, S('spaend') + 0.8);
+  text(5, 'I = A k²,     k = √(I / A)', 160, 230, 36, 'black', wt('spaend', 'skriver') - 0.1, we('spaend', 'A', 1));
+  B.formel(5, '9.13', 'σ_{cr} = π² E / (L_e / k)²', 180, 340, 40, wt('spaend2', 'ligning') - 0.1, we('spaend2', 'anden', 1), 'red');
+  ringet(5, 'L_e / k = slankhedsforholdet', 160, 440, 34, 'blue', wt('spaend2', 'Brøken') - 0.1, we('spaend2', 'slankhedsforholdet'));
+  text(5, 'massiv cirkel:  k = d / 4', 160, 520, 34, 'green', wt('spaend2', 'cirkel') - 0.4, we('spaend2', 'fire'));
+  {
+    const x0 = 780, y0 = 620, w = 400, h = 380, ta = S('problem');
+    const P = (lam, s) => [x0 + lam / 250 * w, y0 - Math.min(s, 520) / 500 * h];
+    axes(5, x0, y0, x0 + w + 10, y0 - h - 20, 'L_e/k', 'σ', ta);
+    const pts = []; for (let l = 61.5; l <= 250; l += 2) pts.push(P(l, 1.974e6 / (l * l)));
+    plot(5, pts.reverse(), 'blue', ta + 0.6, ta + 2.0);
+    const tu = wt('problem', 'uendelig');
+    arrow(5, [P(66, 480), [P(66, 480)[0], y0 - h - 40]], 'red', 3, tu, tu + 0.5, 14);
+    text(5, '→ ∞', P(66, 480)[0] + 14, y0 - h - 16, 32, 'red', tu + 0.2, tu + 0.7);
+    const tf = wt('problem', 'flydespændingen');
+    dashed(5, P(0, 400), P(250, 400), 'red', tf, tf + 0.6);
+    text(5, 'S_y', x0 + w - 20, P(0, 400)[1] - 12, 30, 'red', tf + 0.3, tf + 0.8);
+    text(5, 'umuligt!', P(30, 300)[0], P(30, 300)[1] + 120, 34, 'red', wt('problem', 'passe') - 0.4, we('problem', 'passe'));
+  }
+
+  // ---------------------------------------------------------------- 6 Johnson og overgangen
+  B.goto('johnson', 6);
+  B.formel(6, '9.16', 'σ_{cr} = S_y − S_y² / (4π² E) · (L_e / k)²', 160, 160, 32, wt('johnson', 'ligning') - 0.1, we('johnson', 'anden', 2), 'green');
+  {
+    const x0 = 180, y0 = 640, w = 520, h = 380, ta = S('johnson') + 0.2;
+    const P = (lam, s) => [x0 + lam / 250 * w, y0 - s / 450 * h];
+    axes(6, x0, y0, x0 + w + 10, y0 - h - 20, 'L_e/k', 'σ_cr', ta);
+    dashed(6, P(0, 400), P(250, 400), 'red', ta + 0.6, ta + 1.2);
+    text(6, 'S_y', x0 - 12, P(0, 400)[1] + 10, 28, 'red', ta + 0.9, ta + 1.3, { align: 'right' });
+    const lc = 99.35, tj = wt('johnson', 'parabel'), te = wt('tangent', 'Euler-kurven');
+    const jo = []; for (let l = 0; l <= lc; l += 2) jo.push(P(l, 400 - 0.020264 * l * l)); jo.push(P(lc, 200));
+    plot(6, jo, 'green', tj, tj + 1.4);
+    const eu = []; for (let l = lc; l <= 250; l += 2) eu.push(P(l, 1.974e6 / (l * l)));
+    plot(6, eu, 'blue', te - 0.1, te + 1.0);
+    const eud = []; for (let l = 66.3; l <= lc; l += 2) eud.push(P(l, 1.974e6 / (l * l)));
+    line(6, eud, 'blue', 2.2, te + 0.6, te + 1.2, { alpha: 0.45 });
+    text(6, 'Johnson', P(20, 330)[0], P(20, 330)[1] - 10, 30, 'green', tj + 0.6, tj + 1.2);
+    text(6, 'Euler', P(170, 120)[0], P(170, 120)[1] - 10, 30, 'blue', te + 0.4, te + 0.9);
+    const th = wt('tangent', 'halve');
+    dashed(6, P(0, 200), P(lc, 200), 'black', th, th + 0.6);
+    text(6, 'S_y / 2', x0 - 12, P(0, 200)[1] + 10, 28, 'black', th + 0.3, th + 0.8, { align: 'right' });
+    dot(6, P(lc, 200)[0], P(lc, 200)[1], 9, 'red', th + 0.2);
+    const tc = S('cr') + 0.2;
+    dashed(6, P(lc, 200), P(lc, 0), 'red', tc, tc + 0.6);
+    text(6, '(L_e/k)_{cr}', P(lc, 0)[0], y0 + 44, 28, 'red', tc + 0.4, tc + 1.0, { align: 'center' });
+  }
+  text(6, 'parablen rører Euler', 790, 300, 32, 'black', wt('tangent', 'rører') - 0.1, we('tangent', 'Euler-kurven'));
+  text(6, 'netop i  S_y / 2', 790, 350, 32, 'black', wt('tangent', 'halve') - 0.3, we('tangent', 'S', 0) + 0.3);
+  text(6, 'π² E / (L_e/k)² = S_y / 2', 790, 450, 30, 'black', wt('cr', 'Sæt') - 0.1, we('cr', 'slankheden'));
+  B.formel(6, '9.15', '(L_e/k)_{cr} = √(2π² E / S_y)', 810, 560, 30, wt('cr', 'ligning') - 0.1, we('cr', 'y', 1), 'red');
+
+  // ---------------------------------------------------------------- 7 reglen og advarslen om slides
+  B.goto('regel', 7);
+  bubble(7, 'Reglen', 130, 135, 50, 'blue', S('regel') - 0.1, S('regel') + 0.8);
+  ringet(7, 'L_e/k > (L_e/k)_{cr}   ⇒   lang   ⇒   Euler', 160, 240, 36, 'blue', wt('regel', 'større') - 0.3, we('regel', 'gælder'));
+  ringet(7, 'L_e/k < (L_e/k)_{cr}   ⇒   kort   ⇒   Johnson', 160, 330, 36, 'green', wt('regel', 'mindre') - 0.3, we('regel', 'Johnson'));
+  { const s = text(7, 'slides:  √(π² E / S_y)   = overgang ved hele S_y', 160, 470, 32, 'red', wt('slides', 'Slides') - 0.1, we('slides', 'halve'));
+    strike(s, we('slides', 'halve') + 0.2, we('slides', 'halve') + 0.7); }
+  ringet(7, 'spørgsmålet:  S_y / 2   ⇒   √(2π² E / S_y)', 160, 570, 34, 'green', wt('slides', 'Spørgsmålet') - 0.1, we('slides', 'totallet', 1));
+
+  // ---------------------------------------------------------------- 8 femten minutter
+  B.goto('tavle', 8);
+  bubble(8, 'Dine 15 minutter', 130, 135, 50, 'blue', S('tavle') - 0.1, S('tavle') + 0.8);
+  {
+    const x0 = 160, x1 = 1120, y = 230, hh = 60, m = (x1 - x0) / 15;
+    const seg = [[0, 7, 'blue', 'del a', wt('tavle', 'syv')], [7, 13, 'red', 'del b', wt('tavle', 'seks')], [13, 15, 'green', 'vurdér', wt('tavle', 'to', 0)]];
+    seg.forEach(([a, b2, col, et, t]) => {
+      line(8, rect(x0 + a * m, y, (b2 - a) * m, hh).concat([[x0 + a * m, y]]), col, 3, t - 0.1, t + 0.4);
+      hatch(8, rect(x0 + a * m, y, (b2 - a) * m, hh), col, t + 0.2, t + 0.7, { gap: 12 });
+      text(8, et, x0 + (a + b2) / 2 * m, y + hh + 40, 30, col, t, t + 0.4, { align: 'center' });
+      text(8, a + '', x0 + a * m, y - 12, 24, 'black', t, t + 0.3, { align: 'center' });
+    });
+    text(8, '15 min', x1, y - 12, 24, 'black', wt('tavle', 'to', 0), wt('tavle', 'to', 0) + 0.3, { align: 'center' });
+  }
+  text(8, '1.  tegn den udbøjede søjle', 200, 420, 32, 'black', wt('tavle', 'tegn') - 0.1, we('tavle', 'søjle'));
+  text(8, '2.  udled Euler', 200, 470, 32, 'black', wt('tavle', 'udled') - 0.1, we('tavle', 'Euler'));
+  text(8, '3.  forklar E, I og L_e', 200, 520, 32, 'black', wt('tavle', 'forklar') - 0.1, we('tavle', 'e', 1));
+  text(8, '4.  tegn kurven: Euler, Johnson, overgang', 200, 570, 32, 'black', wt('tavle', 'kurven') - 0.4, we('tavle', 'overgangen'));
+  text(8, '5.  del b, og vurdér om tallet er rimeligt', 200, 620, 32, 'red', wt('tavle', 'seks') - 0.4, we('tavle', 'rimeligt'));
+
+  // ---------------------------------------------------------------- 9 tjek + to søjler med samme E
+  B.goto('tjek_q', 9);
+  B.tjek(9, ['Hvorfor hjælper et stærkere stål', 'ikke en lang søjle?'], ['S_y står ikke i Eulers formel', 'samme E  ⇒  samme P_{cr}'], 'tjek_q', 'tjek_a');
+  {
+    const ta = wt('tjek_a', 'Alle');
+    [[820, 'S_y = 235'], [1060, 'S_y = 690']].forEach(([x, et], i) => {
+      soejle(9, x, 470, 640, 30, sinf, 'blue', ta + 0.3 * i, ta + 0.3 * i + 0.8, 4);
+      text(9, et, x, 680, 26, 'black', ta + 0.3 * i, ta + 0.3 * i + 0.5, { align: 'center' });
+    });
+    text(9, 'samme P_{cr}', 940, 450, 30, 'red', wt('tjek_a', 'ændrer') - 0.1, we('tjek_a', 'sig'), { align: 'center' });
+  }
+
+  // ---------------------------------------------------------------- 10 slut
+  B.goto('slut', 10);
+  B.slut(10, 'MEM1 mundtlig eksamen, ny liste, spm. 1 · Hamrock m.fl., kap. 9, lign. (9.12), (9.13), (9.15), (9.16)', 'spm. 1b: designopgaven', 'slut');
+  text(10, 'knækning = ustabilitet', 200, 240, 36, 'black', wt('slut', 'knækning') - 0.1, we('slut', 'ustabilitet'));
+  text(10, 'P_{cr} = π² E I / L_e²', 200, 310, 38, 'red', wt('slut', 'Euler') - 0.1, we('slut', 'anden', 1));
+  text(10, 'L_e/k afgør lang eller kort', 200, 380, 36, 'blue', wt('slut', 'Slankheden') - 0.1, we('slut', 'kort'));
+  text(10, '(L_e/k)_{cr} = √(2π² E / S_y)', 200, 450, 36, 'green', wt('slut', 'overgangen') - 0.1, we('slut', 'y', 1));
+});
+
+</script>
+<script>BP.live({"duration":303.66,"audio":"eks-spm1-a.mp3","order":["titel","lineal","stabil","moment","moment2","dgl","rand","euler","led","leff","leff2","spaend","spaend2","problem","johnson","tangent","cr","regel","slides","tavle","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":12.181,"words":[["Spørgsmål",0.54,1.06],["et",1.18,1.32],["del",1.82,2.0],["a",2.16,2.18],["Søjleknækning",3.46,4.36],["og",4.56,4.64],["overgangen",4.72,5.28],["mellem",5.34,5.56],["Euler",5.74,6.0],["og",6.22,6.3],["Johnson",6.34,6.74],["Vi",7.861,7.921],["bygger",7.981,8.221],["det",8.241,8.321],["hele",8.401,8.721],["op",8.821,8.921],["fra",8.981,9.061],["bunden",9.181,9.501],["så",9.621,9.741],["du",9.801,9.881],["kan",9.961,10.081],["forklare",10.101,10.521],["det",10.561,10.641],["ved",10.661,10.761],["tavlen",10.781,11.221],["uden",11.361,11.521],["at",11.541,11.601],["have",11.641,11.761],["det",11.761,11.841],["udenad",11.881,12.181]],"text":"Spørgsmål et, del a. Søjleknækning og overgangen mellem Euler og Johnson. Vi bygger det hele op fra bunden, så du kan forklare det ved tavlen uden at have det udenad."},"lineal":{"start":14.001,"end":23.922,"words":[["Tryk",14.041,14.301],["på",14.341,14.461],["en",14.481,14.561],["lang",14.661,14.861],["tynd",15.101,15.421],["lineal",15.541,15.981],["fra",16.041,16.121],["enderne",16.241,16.501],["Den",17.781,17.901],["holder",17.941,18.161],["sig",18.201,18.321],["lige",18.381,18.561],["et",18.621,18.701],["stykke",18.741,18.981],["tid",19.101,19.261],["og",19.861,19.921],["så",19.961,20.061],["slår",20.081,20.221],["den",20.241,20.321],["pludselig",20.341,20.681],["ud",20.761,20.841],["til",20.881,21.001],["siden",21.041,21.301],["Den",22.161,22.281],["brækker",22.321,22.662],["ikke",22.702,22.862],["Den",23.122,23.242],["knækker",23.362,23.722],["ud",23.802,23.922]],"text":"Tryk på en lang, tynd lineal fra enderne. Den holder sig lige et stykke tid, og så slår den pludselig ud til siden. Den brækker ikke. Den knækker ud."},"stabil":{"start":25.042,"end":32.842,"words":[["Det",25.082,25.182],["kaldes",25.202,25.442],["knækning",25.502,25.962],["og",26.462,26.522],["det",26.562,26.642],["er",26.642,26.682],["en",26.682,26.742],["stabilitetsfejl",26.782,27.782],["ikke",28.202,28.322],["en",28.362,28.402],["styrkefejl",28.482,29.122],["Materialet",29.742,30.322],["giver",30.362,30.522],["ikke",30.542,30.642],["op",30.662,30.782],["Det",31.322,31.422],["er",31.422,31.482],["formen",31.562,31.902],["der",32.122,32.202],["bliver",32.222,32.402],["ustabil",32.442,32.842]],"text":"Det kaldes knækning, og det er en stabilitetsfejl, ikke en styrkefejl. Materialet giver ikke op. Det er formen, der bliver ustabil."},"moment":{"start":34.662,"end":48.283,"words":[["Hvorfor",34.702,34.922],["sker",34.942,35.182],["det",35.222,35.342],["Forestil",36.242,36.622],["dig",36.662,36.742],["søjlen",36.842,37.222],["let",37.302,37.442],["bøjet",37.563,37.903],["med",38.283,38.403],["udbøjningen",38.503,39.083],["y",39.203,39.223],["Lasten",40.363,40.723],["P",40.803,40.823],["har",41.283,41.443],["nu",41.503,41.583],["en",41.683,41.763],["arm",41.883,42.063],["y",42.283,42.303],["til",42.523,42.643],["hvert",42.643,42.843],["snit",42.923,43.163],["så",43.803,43.903],["der",43.923,44.003],["opstår",44.043,44.383],["et",44.463,44.543],["bøjningsmoment",44.583,45.343],["M",46.063,46.083],["er",46.383,46.463],["lig",46.523,46.663],["minus",46.943,47.283],["P",47.423,47.443],["gange",47.923,48.143],["y",48.263,48.283]],"text":"Hvorfor sker det? Forestil dig søjlen let bøjet, med udbøjningen y. Lasten P har nu en arm y til hvert snit, så der opstår et bøjningsmoment: M er lig minus P gange y."},"moment2":{"start":49.383,"end":61.444,"words":[["Momentet",49.423,49.803],["bøjer",49.863,50.123],["søjlen",50.203,50.543],["mere",50.583,50.823],["og",51.183,51.243],["så",51.283,51.403],["bliver",51.403,51.603],["armen",51.683,51.923],["større",51.983,52.304],["Deformationen",53.064,53.704],["fodrer",53.784,54.064],["sig",54.084,54.184],["selv",54.224,54.424],["Under",55.684,55.864],["en",55.884,55.944],["bestemt",55.984,56.424],["last",56.504,56.744],["retter",56.844,57.064],["søjlen",57.124,57.424],["sig",57.444,57.524],["op",57.564,57.664],["igen",57.724,57.924],["Over",58.824,59.024],["den",59.084,59.244],["vokser",59.364,59.684],["udbøjningen",59.784,60.344],["og",60.604,60.664],["søjlen",60.724,60.984],["kollapser",61.024,61.444]],"text":"Momentet bøjer søjlen mere, og så bliver armen større. Deformationen fodrer sig selv. Under en bestemt last retter søjlen sig op igen. Over den vokser udbøjningen, og søjlen kollapser."},"dgl":{"start":62.864,"end":78.045,"words":[["Bjælketeorien",62.904,63.664],["siger",63.764,64.024],["at",64.404,64.504],["E",64.704,64.724],["I",64.984,65.004],["gange",65.224,65.464],["krumningen",65.544,66.104],["er",66.364,66.444],["lig",66.504,66.624],["momentet",66.705,67.105],["Altså",67.905,68.145],["E",68.365,68.385],["I",68.625,68.645],["gange",68.945,69.225],["y",69.485,69.505],["dobbeltmærke",69.705,70.405],["er",70.785,70.845],["lig",70.905,71.025],["minus",71.145,71.465],["P",71.545,71.565],["gange",71.905,72.105],["y",72.185,72.205],["Det",73.405,73.505],["er",73.545,73.585],["en",73.605,73.645],["differentialligning",73.685,74.505],["der",74.545,74.625],["ligner",74.665,74.905],["en",74.925,74.965],["svingningsligning",75.025,75.725],["og",76.225,76.285],["løsningen",76.345,76.805],["er",76.865,76.945],["sinus",77.005,77.345],["og",77.445,77.525],["cosinus",77.545,78.045]],"text":"Bjælketeorien siger, at E I gange krumningen er lig momentet. Altså E I gange y dobbeltmærke er lig minus P gange y. Det er en differentialligning, der ligner en svingningsligning, og løsningen er sinus og cosinus."},"rand":{"start":79.865,"end":92.686,"words":[["Med",79.905,80.045],["charnier",80.085,80.525],["i",80.605,80.625],["begge",80.685,80.885],["ender",80.965,81.165],["skal",81.245,81.385],["udbøjningen",81.465,81.966],["være",81.986,82.126],["nul",82.186,82.386],["i",82.546,82.566],["begge",82.626,82.826],["ender",82.886,83.046],["Cosinus-delen",83.706,84.406],["forsvinder",84.446,84.846],["Og",85.626,85.686],["for",85.726,85.846],["at",85.846,85.926],["sinus-delen",86.006,86.666],["ikke",86.766,86.906],["også",86.986,87.206],["er",87.226,87.286],["nul",87.326,87.486],["skal",87.866,88.026],["sinus",88.086,88.426],["til",88.466,88.606],["lambda",88.666,88.966],["L",89.186,89.206],["være",89.346,89.506],["nul",89.546,89.706],["Den",90.566,90.686],["mindste",90.746,91.026],["løsning",91.086,91.486],["er",91.626,91.706],["lambda",91.746,92.006],["L",92.186,92.206],["lig",92.386,92.506],["pi",92.586,92.686]],"text":"Med charnier i begge ender skal udbøjningen være nul i begge ender. Cosinus-delen forsvinder. Og for at sinus-delen ikke også er nul, skal sinus til lambda L være nul. Den mindste løsning er lambda L lig pi."},"euler":{"start":93.266,"end":103.287,"words":[["Det",93.306,93.386],["giver",93.426,93.626],["Eulers",93.806,94.086],["knæklast",94.126,94.686],["ligning",94.966,95.326],["ni",95.546,95.626],["tolv",95.786,96.006],["i",96.066,96.086],["bogen",96.146,96.406],["P",96.887,96.907],["c",97.147,97.167],["r",97.507,97.527],["er",97.887,97.947],["lig",97.987,98.127],["pi",98.467,98.607],["i",98.767,98.787],["anden",98.907,99.127],["gange",99.347,99.607],["E",99.747,99.767],["gange",100.167,100.427],["I",100.567,100.587],["divideret",101.287,101.707],["med",101.747,101.847],["den",101.867,101.987],["effektive",102.107,102.527],["længde",102.587,102.847],["i",102.967,102.987],["anden",103.067,103.287]],"text":"Det giver Eulers knæklast, ligning ni tolv i bogen: P c r er lig pi i anden gange E gange I, divideret med den effektive længde i anden."},"led":{"start":105.107,"end":117.928,"words":[["Læg",105.147,105.247],["mærke",105.307,105.487],["til",105.507,105.607],["hvad",105.607,105.707],["der",105.727,105.807],["står",105.807,105.967],["i",106.007,106.027],["formlen",106.087,106.447],["E",107.127,107.147],["er",107.547,107.647],["elasticitetsmodulet",107.827,108.887],["materialets",109.187,109.747],["stivhed",109.767,110.167],["I",110.807,110.827],["er",111.247,111.347],["tværsnittets",111.467,112.047],["inertimoment",112.128,112.748],["altså",113.088,113.288],["hvor",113.288,113.388],["godt",113.408,113.568],["tværsnittet",113.608,114.128],["modstår",114.188,114.568],["bøjning",114.628,114.948],["Flydespændingen",115.768,116.448],["S",116.688,116.708],["y",116.848,116.868],["står",117.228,117.428],["der",117.448,117.528],["slet",117.568,117.748],["ikke",117.788,117.928]],"text":"Læg mærke til, hvad der står i formlen. E er elasticitetsmodulet, materialets stivhed. I er tværsnittets inertimoment, altså hvor godt tværsnittet modstår bøjning. Flydespændingen S y står der slet ikke."},"leff":{"start":119.128,"end":135.549,"words":[["L",119.168,119.188],["e",119.228,119.248],["er",119.668,119.788],["den",119.868,120.008],["effektive",120.128,120.548],["længde",120.588,120.828],["afstanden",121.268,121.708],["mellem",121.748,121.928],["to",121.988,122.088],["vendepunkter",122.228,122.788],["i",122.848,122.868],["den",122.928,123.048],["udbøjede",123.188,123.628],["form",123.688,123.888],["Her",124.548,124.668],["kommer",124.728,124.928],["understøtningerne",125.008,125.568],["ind",125.648,125.768],["L",126.308,126.328],["e",126.528,126.548],["er",126.809,126.909],["K",127.129,127.149],["gange",127.389,127.689],["L",127.749,127.769],["Charnier",128.829,129.269],["i",129.349,129.369],["begge",129.449,129.689],["ender",129.769,129.969],["giver",130.009,130.209],["K",130.309,130.329],["lig",130.569,130.709],["et",130.789,130.889],["Fast",131.369,131.609],["og",131.609,131.669],["fri",131.709,131.829],["giver",132.009,132.229],["K",132.349,132.369],["lig",132.589,132.689],["to",132.789,132.909],["Fast",133.589,133.829],["i",133.869,133.889],["begge",133.949,134.169],["ender",134.229,134.429],["giver",134.469,134.669],["K",134.769,134.789],["lig",135.049,135.149],["et",135.209,135.289],["halvt",135.329,135.549]],"text":"L e er den effektive længde, afstanden mellem to vendepunkter i den udbøjede form. Her kommer understøtningerne ind: L e er K gange L. Charnier i begge ender giver K lig et. Fast og fri giver K lig to. Fast i begge ender giver K lig et halvt."},"leff2":{"start":136.409,"end":142.47,"words":[["Længden",136.449,136.749],["står",136.829,137.009],["i",137.049,137.069],["anden",137.169,137.409],["og",137.729,137.789],["det",137.829,137.969],["er",138.029,138.089],["dramatisk",138.109,138.609],["Fordobler",139.009,139.449],["du",139.469,139.509],["den",139.569,139.689],["effektive",139.789,140.189],["længde",140.229,140.469],["falder",140.689,140.909],["knæklasten",140.949,141.55],["til",141.61,141.73],["en",141.81,141.91],["fjerdedel",141.99,142.47]],"text":"Længden står i anden, og det er dramatisk. Fordobler du den effektive længde, falder knæklasten til en fjerdedel."},"spaend":{"start":144.29,"end":153.51,"words":[["Nu",144.33,144.39],["dividerer",144.47,144.87],["vi",144.91,144.95],["med",144.99,145.09],["arealet",145.17,145.61],["for",145.67,145.75],["at",145.77,145.81],["få",145.83,145.95],["en",145.97,146.03],["spænding",146.05,146.37],["Vi",147.15,147.19],["skriver",147.25,147.51],["I",147.67,147.69],["som",147.93,148.09],["A",148.33,148.35],["gange",148.53,148.79],["k",148.87,148.89],["i",149.15,149.17],["anden",149.27,149.49],["hvor",149.83,149.99],["k",150.09,150.11],["er",150.45,150.55],["inertiradius",150.77,151.57],["kvadratroden",151.95,152.57],["af",152.65,152.73],["I",152.95,152.97],["over",153.19,153.39],["A",153.49,153.51]],"text":"Nu dividerer vi med arealet for at få en spænding. Vi skriver I som A gange k i anden, hvor k er inertiradius, kvadratroden af I over A."},"spaend2":{"start":154.47,"end":168.751,"words":[["Så",154.51,154.65],["får",154.67,154.81],["vi",154.85,154.93],["ligning",155.11,155.43],["ni",155.59,155.67],["tretten",155.81,156.13],["sigma",156.731,156.991],["c",157.071,157.091],["r",157.371,157.391],["er",157.711,157.811],["pi",158.031,158.171],["i",158.311,158.331],["anden",158.451,158.671],["gange",158.751,158.971],["E",159.091,159.111],["divideret",159.631,160.091],["med",160.131,160.251],["L",160.491,160.511],["e",160.671,160.691],["over",160.871,161.051],["k",161.111,161.131],["i",161.431,161.451],["anden",161.551,161.751],["Brøken",162.551,162.891],["L",163.191,163.211],["e",163.211,163.231],["over",163.371,163.551],["k",163.591,163.611],["hedder",163.931,164.191],["slankhedsforholdet",164.411,165.331],["For",165.971,166.071],["en",166.091,166.151],["massiv",166.171,166.491],["cirkel",166.591,166.931],["er",167.051,167.131],["k",167.211,167.231],["lig",167.551,167.691],["d",167.951,167.971],["over",168.231,168.411],["fire",168.491,168.751]],"text":"Så får vi ligning ni tretten: sigma c r er pi i anden gange E, divideret med L e over k i anden. Brøken L e over k hedder slankhedsforholdet. For en massiv cirkel er k lig d over fire."},"problem":{"start":170.111,"end":182.532,"words":[["Men",170.151,170.291],["se",170.611,170.671],["på",170.751,170.871],["kurven",170.891,171.212],["Når",171.832,171.952],["søjlen",171.992,172.312],["bliver",172.352,172.512],["kort",172.552,172.852],["går",173.032,173.192],["Eulers",173.332,173.612],["spænding",173.652,173.972],["mod",174.012,174.152],["uendelig",174.252,174.652],["Det",175.212,175.292],["kan",175.312,175.392],["ikke",175.412,175.512],["passe",175.532,175.792],["Ingen",176.532,176.732],["søjle",176.792,177.112],["tåler",177.172,177.412],["mere",177.432,177.632],["end",177.652,177.732],["flydespændingen",177.752,178.372],["og",179.052,179.132],["rigtige",179.312,179.632],["søjler",179.712,180.032],["har",180.052,180.132],["krumhed",180.192,180.672],["og",180.792,180.892],["restspændinger",181.032,181.632],["så",181.712,181.812],["de",181.812,181.872],["giver",181.912,182.052],["efter",182.092,182.312],["før",182.372,182.532]],"text":"Men se på kurven. Når søjlen bliver kort, går Eulers spænding mod uendelig. Det kan ikke passe. Ingen søjle tåler mere end flydespændingen, og rigtige søjler har krumhed og restspændinger, så de giver efter før."},"johnson":{"start":184.352,"end":199.813,"words":[["Derfor",184.392,184.752],["bruger",184.872,185.072],["man",185.072,185.172],["Johnsons",185.232,185.652],["parabel",185.692,186.092],["for",186.192,186.312],["korte",186.372,186.712],["og",186.792,186.852],["mellemlange",186.893,187.333],["søjler",187.393,187.693],["ligning",188.153,188.433],["ni",188.493,188.573],["seksten",188.713,189.133],["sigma",189.933,190.153],["c",190.213,190.233],["r",190.493,190.513],["er",190.773,190.873],["S",191.253,191.273],["y",191.393,191.413],["minus",191.913,192.233],["S",192.553,192.573],["y",192.713,192.733],["i",192.853,192.873],["anden",192.993,193.233],["over",193.373,193.553],["fire",193.693,193.953],["pi",194.013,194.113],["i",194.233,194.253],["anden",194.333,194.533],["E",194.673,194.693],["gange",195.213,195.473],["slankheden",195.693,196.233],["i",196.393,196.413],["anden",196.513,196.713],["Den",197.553,197.653],["starter",197.713,198.033],["i",198.113,198.133],["S",198.373,198.393],["y",198.533,198.553],["når",198.833,198.953],["søjlen",198.993,199.273],["er",199.293,199.373],["helt",199.393,199.553],["kort",199.573,199.813]],"text":"Derfor bruger man Johnsons parabel for korte og mellemlange søjler, ligning ni seksten: sigma c r er S y minus S y i anden over fire pi i anden E, gange slankheden i anden. Den starter i S y, når søjlen er helt kort."},"tangent":{"start":201.193,"end":208.094,"words":[["Parablen",201.233,201.634],["er",201.654,201.714],["valgt",201.754,201.954],["så",202.074,202.174],["den",202.174,202.254],["rører",202.314,202.534],["Euler-kurven",202.634,203.154],["netop",203.294,203.514],["der",203.614,203.774],["hvor",204.034,204.174],["spændingen",204.234,204.634],["er",204.694,204.774],["det",204.794,204.874],["halve",204.954,205.254],["af",205.394,205.454],["S",205.634,205.654],["y",205.774,205.794],["Det",206.454,206.574],["er",206.574,206.614],["overgangskriteriet",206.654,207.474],["i",207.514,207.534],["spørgsmålet",207.594,208.094]],"text":"Parablen er valgt, så den rører Euler-kurven netop der, hvor spændingen er det halve af S y. Det er overgangskriteriet i spørgsmålet."},"cr":{"start":208.774,"end":219.475,"words":[["Sæt",208.814,208.974],["Euler",209.134,209.394],["lig",209.594,209.714],["det",209.774,209.854],["halve",209.954,210.234],["af",210.294,210.334],["S",210.514,210.534],["y",210.654,210.674],["og",211.074,211.154],["isolér",211.234,211.534],["slankheden",211.614,212.054],["Du",212.654,212.714],["får",212.774,212.914],["det",212.954,213.034],["kritiske",213.114,213.514],["slankhedsforhold",213.554,214.314],["ligning",214.654,214.914],["ni",214.974,215.034],["femten",215.154,215.474],["kvadratroden",215.994,216.655],["af",216.795,216.855],["to",216.955,217.095],["pi",217.235,217.355],["i",217.475,217.495],["anden",217.575,217.775],["E",217.915,217.935],["divideret",218.475,218.935],["med",219.055,219.135],["S",219.315,219.335],["y",219.455,219.475]],"text":"Sæt Euler lig det halve af S y, og isolér slankheden. Du får det kritiske slankhedsforhold, ligning ni femten: kvadratroden af to pi i anden E divideret med S y."},"regel":{"start":221.295,"end":229.295,"words":[["Reglen",221.335,221.575],["er",221.575,221.635],["enkel",221.695,221.895],["Er",222.575,222.655],["slankheden",222.755,223.215],["større",223.295,223.615],["end",223.655,223.715],["den",223.735,223.855],["kritiske",223.895,224.315],["er",224.615,224.695],["søjlen",224.735,225.055],["lang",225.155,225.335],["og",225.495,225.575],["Euler",225.695,225.915],["gælder",225.935,226.175],["Er",226.695,226.755],["den",226.755,226.855],["mindre",226.895,227.155],["er",227.495,227.575],["søjlen",227.615,227.895],["kort",227.955,228.215],["og",228.515,228.575],["du",228.615,228.655],["bruger",228.695,228.875],["Johnson",228.915,229.295]],"text":"Reglen er enkel. Er slankheden større end den kritiske, er søjlen lang, og Euler gælder. Er den mindre, er søjlen kort, og du bruger Johnson."},"slides":{"start":229.975,"end":244.296,"words":[["En",230.015,230.095],["advarsel",230.115,230.535],["Slides",231.295,231.716],["skriver",231.876,232.196],["den",232.216,232.336],["kritiske",232.396,232.776],["slankhed",232.816,233.236],["uden",233.556,233.876],["totallet",233.976,234.496],["under",234.576,234.736],["kvadratroden",234.756,235.376],["Det",236.136,236.236],["er",236.296,236.356],["overgangen",236.436,236.876],["ved",236.936,237.056],["hele",237.276,237.656],["S",237.956,237.976],["y",238.096,238.116],["ikke",238.576,238.736],["ved",238.776,238.856],["det",238.876,238.956],["halve",238.996,239.256],["Spørgsmålet",240.076,240.596],["beder",240.636,240.816],["om",240.936,241.016],["det",241.076,241.176],["halve",241.296,241.616],["af",241.716,241.796],["S",241.996,242.016],["y",242.116,242.136],["og",242.416,242.476],["så",242.496,242.616],["skal",242.616,242.756],["du",242.756,242.816],["bruge",242.836,243.016],["bogens",243.076,243.356],["formel",243.396,243.676],["med",243.776,243.876],["totallet",243.896,244.296]],"text":"En advarsel. Slides skriver den kritiske slankhed uden totallet under kvadratroden. Det er overgangen ved hele S y, ikke ved det halve. Spørgsmålet beder om det halve af S y, og så skal du bruge bogens formel med totallet."},"tavle":{"start":246.116,"end":262.918,"words":[["Sådan",246.156,246.376],["bruger",246.396,246.536],["du",246.556,246.596],["dine",246.636,246.776],["femten",246.816,247.056],["minutter",247.077,247.357],["Cirka",248.197,248.417],["syv",248.517,248.637],["minutter",248.697,248.977],["på",248.997,249.117],["del",249.137,249.277],["a",249.397,249.417],["tegn",250.137,250.377],["den",250.417,250.537],["udbøjede",250.677,251.077],["søjle",251.137,251.437],["udled",251.817,252.077],["Euler",252.257,252.497],["forklar",252.897,253.217],["E",253.217,253.237],["I",253.977,253.997],["og",254.377,254.437],["L",254.597,254.617],["e",254.737,254.757],["og",255.337,255.417],["tegn",255.437,255.657],["kurven",255.717,256.057],["med",256.137,256.237],["Johnson",256.317,256.717],["og",256.817,256.877],["overgangen",256.957,257.377],["Så",258.177,258.317],["cirka",258.557,258.837],["seks",259.017,259.197],["minutter",259.257,259.537],["på",259.557,259.657],["del",259.677,259.817],["b",259.857,259.877],["og",260.637,260.697],["to",260.757,260.857],["minutter",260.937,261.237],["til",261.277,261.377],["at",261.377,261.437],["vurdere",261.457,261.738],["om",261.798,261.858],["resultatet",261.898,262.438],["er",262.478,262.538],["rimeligt",262.578,262.918]],"text":"Sådan bruger du dine femten minutter. Cirka syv minutter på del a: tegn den udbøjede søjle, udled Euler, forklar E, I og L e, og tegn kurven med Johnson og overgangen. Så cirka seks minutter på del b, og to minutter til at vurdere, om resultatet er rimeligt."},"tjek_q":{"start":264.738,"end":268.938,"words":[["Tjek",264.778,264.938],["dig",264.958,265.038],["selv",265.078,265.258],["Hvorfor",265.818,266.078],["hjælper",266.098,266.358],["det",266.378,266.458],["ikke",266.478,266.618],["at",266.618,266.678],["vælge",266.718,266.958],["et",266.998,267.098],["stærkere",267.198,267.658],["stål",267.758,268.058],["til",268.198,268.318],["en",268.318,268.398],["lang",268.438,268.618],["søjle",268.678,268.938]],"text":"Tjek dig selv. Hvorfor hjælper det ikke at vælge et stærkere stål til en lang søjle?"},"tjek_a":{"start":272.558,"end":281.959,"words":[["Fordi",272.598,272.838],["S",273.158,273.178],["y",273.318,273.338],["ikke",273.598,273.758],["indgår",273.818,274.138],["i",274.198,274.218],["Eulers",274.318,274.578],["formel",274.618,274.918],["Alle",275.498,275.658],["stål",275.718,275.958],["har",276.018,276.118],["cirka",276.158,276.418],["samme",276.538,276.758],["E",276.878,276.898],["så",277.358,277.478],["knæklasten",277.538,278.138],["ændrer",278.238,278.498],["sig",278.518,278.618],["ikke",278.658,278.818],["Kun",279.458,279.598],["et",279.658,279.738],["større",279.799,280.039],["I",280.199,280.219],["eller",280.519,280.679],["en",280.699,280.759],["kortere",280.799,281.199],["L",281.259,281.279],["e",281.419,281.439],["hjælper",281.659,281.959]],"text":"Fordi S y ikke indgår i Eulers formel. Alle stål har cirka samme E, så knæklasten ændrer sig ikke. Kun et større I eller en kortere L e hjælper."},"slut":{"start":283.779,"end":302.02,"words":[["Kort",283.819,283.979],["sagt",284.039,284.239],["knækning",284.739,285.179],["er",285.299,285.399],["ustabilitet",285.599,286.359],["Euler",287.359,287.619],["giver",287.659,287.839],["P",287.959,287.979],["c",288.199,288.219],["r",288.499,288.519],["lig",288.779,288.939],["pi",289.099,289.219],["i",289.379,289.399],["anden",289.499,289.719],["E",289.899,289.919],["I",290.119,290.139],["over",290.379,290.599],["L",290.979,290.999],["e",291.119,291.139],["i",291.319,291.339],["anden",291.479,291.679],["Slankheden",292.399,292.919],["L",293.119,293.139],["e",293.279,293.299],["over",293.459,293.639],["k",293.679,293.699],["afgør",294.079,294.399],["om",294.439,294.499],["søjlen",294.559,294.899],["er",294.939,295.019],["lang",295.059,295.24],["eller",295.28,295.42],["kort",295.46,295.68],["og",296.36,296.42],["overgangen",296.5,296.94],["ved",296.98,297.06],["det",297.08,297.16],["halve",297.2,297.5],["af",297.62,297.7],["S",297.96,297.98],["y",298.16,298.18],["giver",298.4,298.6],["kvadratroden",298.94,299.58],["af",299.66,299.74],["to",299.86,300.02],["pi",300.22,300.34],["i",300.46,300.48],["anden",300.6,300.84],["E",301.1,301.12],["over",301.5,301.7],["S",301.88,301.9],["y",302.0,302.02]],"text":"Kort sagt: knækning er ustabilitet. Euler giver P c r lig pi i anden E I over L e i anden. Slankheden L e over k afgør, om søjlen er lang eller kort, og overgangen ved det halve af S y giver kvadratroden af to pi i anden E over S y."}}}, { audio: 'eks-spm1-a.mp3', id: 'eks-spm1-a' });</script>
+</body>
+</html>

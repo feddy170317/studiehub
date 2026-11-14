@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spm. 1b: stålsøjle, knæklast og Euler eller Johnson · video</title>
+<meta name="description" content="Ny liste, spm. 1b: P_cr = 15,5 kN, σ_cr = 49,3 MPa, L_e/k = 200 &gt; 99,3, så Euler. Knækker ved 12 % af flydelasten.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 9: videoer</a><h1>Spm. 1b: stålsøjle, knæklast og Euler eller Johnson</h1><span class="meta">MEM1 · kapitel 9 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Spm. 1b: stålsøjle, knæklast og Euler eller Johnson"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Ny liste, spm. 1b: P_cr = 15,5 kN, σ_cr = 49,3 MPa, L_e/k = 200 &gt; 99,3, så Euler. Knækker ved 12 % af flydelasten.</p><div class="chips"><a href="../../opgaver/l09/eksamen-spm-01-soejleknaekning.pdf">📐 Se udregningen i Mathcad (PDF)</a><a href="eks-spm1-a.html">Se først: Spm. 1a: søjleknækning, Euler og Johnson (teori)</a><a href="../../../../lab/mem1/soejleknaekning.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel09_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l09">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// MEM1 mundtlig eksamen (ny liste) · Spm. 1b: stålsøjle d = 20 mm, L_e = 1 m, E = 200 GPa, S_y = 400 MPa.
+// I = 2500π = 7854 mm⁴, A = 314,2 mm², P_cr = 15 503 N, σ_cr = 49,3 MPa, k = 5 mm, L_e/k = 200, (L_e/k)_cr = 99,3,
+// P_y = 125,7 kN (12 %), Johnson under L_e = 497 mm, fast-fri: 3,9 kN. Mathcad: Lektion 9/Opgaver/Eksamen spm 01 Soejleknaekning.
+BP.scene({ header: 'MEM1 · mundtlig eksamen · spm. 1b', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, dot, ring, under, ell, rect, hatch, dashed, strike, axes, plot, pin, PI } = B;
+  const S = (id) => L(id).start;
+  const ringet = (k, s, x, y, size, col, a, te) => { const r = text(k, s, x, y, size, col, a, te); ring(r, col, te, te + 0.5); return r; };
+  const soejle = (k, x, y0, y1, amp, f, col, a, b, w = 5) => {
+    const pts = []; for (let i = 0; i <= 40; i++) { const s = i / 40; pts.push([x + amp * f(s), y1 - s * (y1 - y0)]); }
+    line(k, pts, col, w, a, b); return pts;
+  };
+  const sinf = (s) => Math.sin(PI * s);
+  const pinOp = (k, x, y, a) => {
+    line(k, [[x, y], [x + 22, y - 30], [x - 22, y - 30], [x, y - 1]], 'black', 3, a, a + 0.35);
+    line(k, [[x - 34, y - 30], [x + 34, y - 30]], 'black', 2.6, a + 0.35, a + 0.45);
+    hatch(k, rect(x - 34, y - 42, 68, 12), 'black', a + 0.45, a + 0.6, { gap: 6 });
+  };
+  const soejl = (k, x0, y0, w, h, ta) => {   // σ_cr mod L_e/k-graf (E = 200 GPa, S_y = 400 MPa)
+    const P = (lam, s) => [x0 + lam / 250 * w, y0 - s / 450 * h];
+    axes(k, x0, y0, x0 + w + 10, y0 - h - 20, 'L_e/k', 'σ_cr', ta);
+    dashed(k, P(0, 400), P(250, 400), 'red', ta + 0.5, ta + 1.0);
+    text(k, 'S_y', x0 - 12, P(0, 400)[1] + 10, 26, 'red', ta + 0.6, ta + 1.0, { align: 'right' });
+    const jo = []; for (let l = 0; l <= 99.35; l += 2) jo.push(P(l, 400 - 0.020264 * l * l)); jo.push(P(99.35, 200));
+    plot(k, jo, 'green', ta + 0.6, ta + 1.4);
+    const eu = []; for (let l = 99.35; l <= 250; l += 2) eu.push(P(l, 1.974e6 / (l * l)));
+    plot(k, eu, 'blue', ta + 1.0, ta + 1.8);
+    return P;
+  };
+
+  // ---------------------------------------------------------------- 0 titel
+  B.titel(0, 'Spm. 1b: stålsøjlen', 'designopgaven: P_cr, σ_cr, og Euler eller Johnson?', 'titel');
+  text(0, 'd = 20 mm,   L_e = 1 m,   charnier–charnier', 640, 540, 40, 'red', wt('titel', 'massiv') - 0.1, we('titel', 'ender'), { align: 'center' });
+
+  // ---------------------------------------------------------------- 1 data og enheder
+  B.goto('data', 1);
+  {
+    const t0 = S('data');
+    soejle(1, 1040, 170, 600, 0, () => 0, 'blue', t0, t0 + 0.8, 7);
+    pinOp(1, 1040, 166, t0 + 0.2); pin(1, 1040, 604, t0 + 0.3);
+    arrow(1, [[1040, 92], [1040, 120]], 'red', 3.6, t0 + 0.6, t0 + 1.0, 14);
+    const tl = wt('data', 'effektive');
+    B.dobbeltpil(1, [1150, 170], [1150, 600], 'green', tl, tl + 0.6);
+    text(1, 'L_e = 1 m', 1165, 395, 30, 'green', tl + 0.3, tl + 0.8);
+    const td = wt('data', 'Diameteren');
+    line(1, ell(890, 640, 28, 28, 0, 2 * PI), 'blue', 3, td, td + 0.5); hatch(1, ell(890, 640, 28, 28, 0, 2 * PI), 'blue', td + 0.3, td + 0.8, { gap: 7 });
+    text(1, 'd = 20', 830, 600, 26, 'blue', td + 0.3, td + 0.7);
+  }
+  bubble(1, 'Givet', 130, 135, 50, 'blue', S('data') - 0.1, S('data') + 0.8);
+  text(1, 'E = 200 GPa,   S_y = 400 MPa', 160, 230, 36, 'black', wt('data', 'E') - 0.1, we('data', 'megapascal'));
+  text(1, 'd = 20 mm,   L_e = 1 m   (K = 1)', 160, 300, 36, 'black', wt('data', 'Diameteren') - 0.1, we('data', 'et'));
+  bubble(1, 'Enheder: N og mm', 160, 410, 40, 'red', S('enheder') - 0.1, we('enheder', 'megapascal'));
+  ringet(1, 'E = 200 000 N/mm²', 160, 500, 38, 'red', wt('enheder', 'E') - 0.1, we('enheder', 'kvadratmillimeter'));
+  ringet(1, 'L_e = 1000 mm', 160, 580, 38, 'red', wt('enheder', 'L') - 0.1, we('enheder', 'millimeter', 1));
+  text(1, '(N/mm² = MPa)', 160, 650, 30, 'green', wt('enheder', 'fejl') - 0.6, we('enheder', 'fejl'));
+
+  // ---------------------------------------------------------------- 2 I og A
+  B.goto('inerti', 2);
+  bubble(2, 'Tværsnittet', 130, 135, 50, 'blue', S('inerti') - 0.1, S('inerti') + 0.8);
+  B.formel(2, 'cirkel', 'I = π d⁴ / 64', 180, 240, 40, wt('inerti', 'Inertimomentet') - 0.1, we('inerti', 'fjerde'), 'blue');
+  text(2, '20⁴ = 160 000', 160, 330, 36, 'black', wt('inerti', 'Tyve') - 0.1, we('inerti', 'tusind'));
+  ringet(2, 'I = 2500 π ≈ 7854 mm⁴', 160, 410, 40, 'red', wt('inerti', 'så') - 0.1, we('inerti', 'fjerde', 2));
+  ringet(2, 'A = π d² / 4 = 100 π ≈ 314 mm²', 160, 540, 40, 'blue', S('areal') + 0.1, we('areal', 'kvadratmillimeter'));
+  {
+    const t0 = S('inerti') + 0.4, c = [1000, 380];
+    line(2, ell(c[0], c[1], 130, 130, 0, 2 * PI), 'blue', 3.4, t0, t0 + 0.8);
+    hatch(2, ell(c[0], c[1], 130, 130, 0, 2 * PI), 'blue', t0 + 0.6, t0 + 1.4, { gap: 14 });
+    B.dobbeltpil(2, [870, 560], [1130, 560], 'black', t0 + 0.8, t0 + 1.2);
+    text(2, 'd = 20 mm', 1000, 600, 30, 'black', t0 + 1.0, t0 + 1.4, { align: 'center' });
+  }
+
+  // ---------------------------------------------------------------- 3 Euler
+  B.goto('pcr', 3);
+  B.formel(3, '9.12', 'P_{cr} = π² E I / L_e²', 180, 200, 44, wt('pcr', 'Eulers') - 0.1, we('pcr', 'tolv'), 'red');
+  text(3, 'P_{cr} = π² · 200 000 · 7854 / 1000²', 160, 320, 38, 'black', wt('pcr', 'P') - 0.1, we('pcr', 'anden', 1));
+  text(3, '≈ 15,5 · 10⁹ / 10⁶  N', 160, 410, 38, 'black', S('pcr2') + 0.1, we('pcr2', 'million'));
+  ringet(3, 'P_{cr} = 15 500 N = 15,5 kN', 160, 520, 46, 'red', wt('pcr2', 'giver') - 0.1, we('pcr2', 'kilonewton'));
+  text(3, 'enhed:  N/mm² · mm⁴ / mm² = N', 160, 620, 30, 'green', wt('pcr2', 'Tælleren') - 0.1, we('pcr2', 'million'));
+
+  // ---------------------------------------------------------------- 4 den kritiske spænding
+  B.goto('sigma', 4);
+  bubble(4, 'Kritisk spænding', 130, 135, 50, 'blue', S('sigma') - 0.1, S('sigma') + 0.8);
+  text(4, 'σ_{cr} = P_{cr} / A = 15 500 / 314', 160, 270, 40, 'black', wt('sigma', 'knæklasten') - 0.1, we('sigma', 'fjorten'));
+  ringet(4, 'σ_{cr} = 49,3 MPa', 160, 390, 48, 'red', wt('sigma', 'giver') - 0.1, we('sigma', 'megapascal'));
+  {
+    const t0 = wt('sigma', 'giver'), y0 = 600, sc = 0.55;
+    [[820, 49.3, 'red', 'σ_cr = 49'], [1020, 400, 'black', 'S_y = 400']].forEach(([x, v, col, et], i) => {
+      const h = v * sc, a = t0 + 0.3 * i;
+      line(4, rect(x, y0 - h, 110, h).concat([[x, y0 - h]]), col, 3, a, a + 0.5);
+      hatch(4, rect(x, y0 - h, 110, h), col, a + 0.3, a + 0.8, { gap: 10 });
+      text(4, et, x + 55, y0 + 40, 28, col, a + 0.3, a + 0.8, { align: 'center' });
+    });
+    line(4, [[780, y0], [1170, y0]], 'black', 2.4, t0, t0 + 0.4);
+  }
+
+  // ---------------------------------------------------------------- 5 slankhed
+  B.goto('slank', 5);
+  bubble(5, 'Euler eller Johnson?', 130, 135, 48, 'blue', S('slank') - 0.1, S('slank') + 0.8);
+  text(5, 'k = d / 4 = 5 mm', 160, 250, 40, 'black', wt('slank', 'Inertiradius') - 0.1, we('slank', 'millimeter'));
+  ringet(5, 'L_e / k = 1000 / 5 = 200', 160, 340, 44, 'blue', wt('slank', 'Slankheden') - 0.1, we('slank', 'hundrede'));
+  B.formel(5, '9.15', '(L_e/k)_{cr} = √(2π² · 200 000 / 400)', 180, 470, 36, S('kritisk') + 0.1, we('kritisk', 'hundrede', 1), 'red');
+  ringet(5, '(L_e/k)_{cr} = 99,3', 160, 580, 44, 'red', wt('kritisk', 'giver') - 0.1, we('kritisk', 'tre'));
+
+  // ---------------------------------------------------------------- 6 punktet på kurven
+  B.goto('konkl', 6);
+  {
+    const P = soejl(6, 200, 640, 560, 400, S('konkl'));
+    const tp = wt('konkl', 'Euler');
+    dashed(6, P(99.35, 200), P(99.35, 0), 'red', tp - 0.6, tp);
+    text(6, '99,3', P(99.35, 0)[0], 684, 26, 'red', tp - 0.4, tp, { align: 'center' });
+    dashed(6, P(200, 49.3), P(200, 0), 'blue', tp - 0.3, tp + 0.2);
+    text(6, '200', P(200, 0)[0], 684, 26, 'blue', tp - 0.2, tp + 0.2, { align: 'center' });
+    dot(6, P(200, 49.3)[0], P(200, 49.3)[1], 11, 'red', wt('konkl2', 'Punktet') - 0.1);
+    text(6, 'søjlen', P(200, 49.3)[0] - 10, P(200, 49.3)[1] - 26, 28, 'red', wt('konkl2', 'Punktet'), we('konkl2', 'kurven'), { align: 'center' });
+    dashed(6, P(0, 200), P(99.35, 200), 'black', wt('konkl2', 'halve') - 0.2, we('konkl2', 'megapascal', 1));
+    text(6, 'S_y/2', 188, P(0, 200)[1] + 10, 26, 'black', wt('konkl2', 'halve'), we('konkl2', 'megapascal', 1), { align: 'right' });
+  }
+  ringet(6, '200 > 99,3', 840, 230, 44, 'blue', S('konkl') + 0.1, we('konkl', 'nioghalvfems'));
+  text(6, 'lang og slank', 840, 310, 36, 'black', wt('konkl', 'lang') - 0.1, we('konkl', 'slank'));
+  ringet(6, '⇒  Euler gælder', 840, 390, 40, 'red', wt('konkl', 'Euler') - 0.1, we('konkl', 'gælder'));
+  text(6, '49,3  ≪  S_y / 2 = 200', 840, 500, 34, 'black', wt('konkl2', 'Niogfyrre') - 0.1, we('konkl2', 'megapascal', 1));
+
+  // ---------------------------------------------------------------- 7 rimeligt? + antagelser
+  B.goto('flyde', 7);
+  bubble(7, 'Er det rimeligt?', 130, 135, 50, 'blue', S('flyde') - 0.1, S('flyde') + 0.8);
+  text(7, 'P_y = S_y · A = 400 · 314 = 125,7 kN', 160, 230, 34, 'black', wt('flyde', 'flydelasten') - 0.1, we('flyde', 'kilonewton'));
+  {
+    const t0 = wt('flyde', 'kilonewton'), x0 = 160, sc = 4.2;
+    [[260, 15.5, 'red', 'P_cr = 15,5 kN'], [320, 125.7, 'black', 'P_y = 125,7 kN']].forEach(([y, v, col, et], i) => {
+      const a = t0 + 0.3 * i, w = v * sc;
+      line(7, rect(x0, y + 12, w, 40).concat([[x0, y + 12]]), col, 3, a, a + 0.5);
+      hatch(7, rect(x0, y + 12, w, 40), col, a + 0.3, a + 0.8, { gap: 10 });
+      text(7, et, x0 + w + 20, y + 44, 28, col, a + 0.3, a + 0.8);
+    });
+    ringet(7, '= 12 %', 720, 300, 40, 'red', wt('flyde', 'tolv') - 0.1, we('flyde', 'procent'));
+  }
+  text(7, 'Antagelser:', 160, 470, 34, 'blue', S('antag') + 0.1, we('antag', 'højt'));
+  text(7, '•  helt lige søjle', 190, 520, 30, 'black', wt('antag', 'lige') - 0.4, we('antag', 'lige'));
+  text(7, '•  last i centerlinjen', 190, 565, 30, 'black', wt('antag', 'centerlinjen') - 0.6, we('antag', 'centerlinjen'));
+  text(7, '•  lineært elastisk', 610, 520, 30, 'black', wt('antag', 'lineært') - 0.1, we('antag', 'elastisk'));
+  text(7, '•  friktionsfri charnierer', 610, 565, 30, 'black', wt('antag', 'charniererne') - 0.1, we('antag', 'friktionsfrie'));
+  ringet(7, 'praksis:  n ≥ 2 mod knækning', 190, 640, 32, 'red', wt('antag', 'praksis') - 0.1, we('antag', 'knækning'));
+
+  // ---------------------------------------------------------------- 8 hvornår bliver den til Johnson?
+  B.goto('graense', 8);
+  bubble(8, 'Grænsen til Johnson', 130, 135, 48, 'blue', S('graense') - 0.1, S('graense') + 0.8);
+  text(8, 'L_e / k < 99,3', 160, 260, 40, 'black', wt('graense', 'Slankheden') - 0.1, we('graense', 'tre'));
+  text(8, 'L_e < 99,3 · 5 = 497 mm', 160, 350, 40, 'black', wt('graense', 'L') - 0.1, we('graense', 'millimeter'));
+  ringet(8, '≈ en halv meter', 160, 440, 44, 'red', wt('graense', 'Altså') - 0.1, we('graense', 'meter'));
+  {
+    const t0 = wt('graense', 'Altså'), y1 = 640;
+    soejle(8, 860, y1 - 400, y1, 0, () => 0, 'blue', t0, t0 + 0.6, 6);
+    text(8, '1 m: Euler', 860, y1 + 34, 26, 'blue', t0 + 0.3, t0 + 0.7, { align: 'center' });
+    soejle(8, 1060, y1 - 200, y1, 0, () => 0, 'green', t0 + 0.4, t0 + 0.9, 6);
+    text(8, '< 0,5 m: Johnson', 1060, y1 + 34, 26, 'green', t0 + 0.6, t0 + 1.0, { align: 'center' });
+  }
+
+  // ---------------------------------------------------------------- 9 tjek: fast-fri
+  B.goto('tjek_q', 9);
+  B.tjek(9, ['Fast i bunden og fri i toppen:', 'hvad bliver P_cr?'], ['K = 2  ⇒  L_e = 2 m', 'P_{cr} = 15,5 / 4 ≈ 3,9 kN'], 'tjek_q', 'tjek_a');
+  {
+    const ta = wt('tjek_a', 'Længden'), y1 = 650;
+    soejle(9, 850, y1 - 180, y1, 28, sinf, 'blue', ta, ta + 0.6, 4);
+    text(9, '15,5 kN', 850, y1 - 196, 26, 'blue', ta + 0.3, ta + 0.7, { align: 'center' });
+    soejle(9, 1060, y1 - 180, y1, 40, (s) => 1 - Math.cos(PI * s / 2), 'red', ta + 0.4, ta + 1.0, 4);
+    line(9, [[1034, y1 + 4], [1086, y1 + 4]], 'black', 3.4, ta + 0.4, ta + 0.6); hatch(9, rect(1034, y1 + 4, 52, 12), 'black', ta + 0.5, ta + 0.7, { gap: 6 });
+    text(9, '3,9 kN', 1100, y1 - 196, 26, 'red', ta + 0.8, ta + 1.2, { align: 'center' });
+  }
+
+  // ---------------------------------------------------------------- 10 slut
+  B.goto('slut', 10);
+  B.slut(10, 'MEM1 mundtlig eksamen, ny liste, spm. 1b · Hamrock m.fl., kap. 9, lign. (9.12), (9.13), (9.15) · Mathcad: Eksamen spm 01 Søjleknækning', 'spm. 2: tykvæggede trykbeholdere', 'slut');
+  text(10, 'P_{cr} = 15,5 kN', 200, 240, 38, 'red', wt('slut', 'P') - 0.1, we('slut', 'kilonewton'));
+  text(10, 'σ_{cr} = 49,3 MPa', 200, 310, 38, 'black', wt('slut', 'sigma') - 0.1, we('slut', 'megapascal'));
+  text(10, 'L_e/k = 200 > 99,3  ⇒  Euler', 200, 380, 38, 'blue', wt('slut', 'Slankheden') - 0.1, we('slut', 'gælder'));
+  text(10, 'knækker ved 12 % af flydelasten', 200, 450, 36, 'green', wt('slut', 'knækker') - 0.1, we('slut', 'flyder'));
+});
+
+</script>
+<script>BP.live({"duration":216.429,"audio":"eks-spm1-b.mp3","order":["titel","data","enheder","inerti","areal","pcr","pcr2","sigma","slank","kritisk","konkl","konkl2","flyde","antag","graense","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":12.761,"words":[["Spørgsmål",0.54,1.06],["et",1.18,1.3],["del",1.76,1.96],["b",2.04,2.06],["En",3.22,3.3],["massiv",3.34,3.68],["rund",3.78,3.98],["stålsøjle",4.08,4.72],["med",4.8,4.9],["charnier",4.94,5.28],["i",5.421,5.441],["begge",5.541,5.781],["ender",5.881,6.081],["Vi",7.101,7.161],["finder",7.241,7.461],["knæklasten",7.501,8.121],["og",8.241,8.301],["den",8.341,8.441],["kritiske",8.501,8.921],["spænding",8.961,9.301],["og",9.781,9.841],["afgør",9.901,10.201],["om",10.301,10.381],["søjlen",10.481,10.801],["skal",10.861,10.981],["regnes",11.021,11.341],["efter",11.401,11.601],["Euler",11.721,11.961],["eller",12.181,12.341],["Johnson",12.381,12.761]],"text":"Spørgsmål et, del b. En massiv rund stålsøjle med charnier i begge ender. Vi finder knæklasten og den kritiske spænding og afgør, om søjlen skal regnes efter Euler eller Johnson."},"data":{"start":14.581,"end":27.883,"words":[["Søjlen",14.621,14.961],["er",15.041,15.121],["af",15.121,15.161],["stål",15.221,15.521],["med",15.681,15.781],["E",15.901,15.921],["lig",16.141,16.302],["to",16.422,16.542],["hundrede",16.642,16.902],["gigapascal",16.942,17.582],["og",18.102,18.182],["S",18.402,18.422],["y",18.602,18.622],["lig",18.942,19.082],["fire",19.262,19.482],["hundrede",19.542,19.842],["megapascal",19.882,20.462],["Diameteren",21.342,21.882],["er",21.942,22.022],["tyve",22.082,22.342],["millimeter",22.342,22.782],["og",23.222,23.282],["den",23.302,23.382],["effektive",23.462,23.902],["længde",23.942,24.202],["er",24.382,24.462],["en",24.602,24.742],["meter",24.802,25.082],["fordi",25.522,25.702],["charnier",25.822,26.162],["i",26.242,26.262],["begge",26.342,26.543],["ender",26.623,26.823],["giver",26.963,27.143],["K",27.163,27.183],["lig",27.463,27.603],["et",27.763,27.883]],"text":"Søjlen er af stål med E lig to hundrede gigapascal og S y lig fire hundrede megapascal. Diameteren er tyve millimeter, og den effektive længde er en meter, fordi charnier i begge ender giver K lig et."},"enheder":{"start":28.883,"end":42.644,"words":[["Først",28.923,29.183],["enhederne",29.263,29.703],["Vi",30.463,30.523],["regner",30.623,30.883],["i",30.943,30.963],["newton",31.043,31.423],["og",31.543,31.603],["millimeter",31.643,32.103],["så",32.543,32.663],["spændinger",32.703,33.083],["kommer",33.123,33.363],["ud",33.443,33.563],["i",33.663,33.683],["megapascal",33.763,34.323],["E",35.223,35.243],["bliver",35.503,35.723],["to",35.903,36.003],["hundrede",36.123,36.403],["tusind",36.483,36.824],["newton",36.844,37.204],["pr",37.304,37.424],["kvadratmillimeter",37.464,38.264],["og",38.724,38.784],["L",38.964,38.984],["e",39.104,39.124],["bliver",39.404,39.584],["tusind",39.644,40.044],["millimeter",40.084,40.524],["Det",41.284,41.384],["er",41.384,41.444],["her",41.464,41.644],["de",41.704,41.764],["fleste",41.844,42.144],["laver",42.184,42.384],["fejl",42.424,42.644]],"text":"Først enhederne. Vi regner i newton og millimeter, så spændinger kommer ud i megapascal. E bliver to hundrede tusind newton pr. kvadratmillimeter, og L e bliver tusind millimeter. Det er her, de fleste laver fejl."},"inerti":{"start":44.464,"end":59.126,"words":[["Inertimomentet",44.504,45.284],["for",45.324,45.424],["en",45.464,45.524],["massiv",45.564,45.884],["cirkel",46.004,46.344],["er",46.544,46.604],["pi",46.684,46.824],["over",47.084,47.284],["fireogtres",47.364,47.905],["gange",48.285,48.485],["d",48.565,48.585],["i",48.885,48.905],["fjerde",48.985,49.265],["Tyve",50.045,50.325],["i",50.425,50.445],["fjerde",50.525,50.805],["er",51.065,51.165],["hundrede",51.385,51.685],["og",51.705,51.765],["tres",51.805,52.005],["tusind",52.065,52.425],["så",52.965,53.085],["I",53.205,53.225],["er",53.505,53.585],["to",53.685,53.805],["tusind",53.945,54.285],["fem",54.405,54.525],["hundrede",54.605,54.925],["pi",54.925,55.045],["cirka",55.485,55.745],["syv",56.065,56.225],["tusind",56.325,56.665],["otte",56.805,57.005],["hundrede",57.025,57.305],["og",57.365,57.425],["fireoghalvtreds",57.505,58.166],["millimeter",58.266,58.706],["i",58.786,58.806],["fjerde",58.866,59.126]],"text":"Inertimomentet for en massiv cirkel er pi over fireogtres gange d i fjerde. Tyve i fjerde er hundrede og tres tusind, så I er to tusind fem hundrede pi, cirka syv tusind otte hundrede og fireoghalvtreds millimeter i fjerde."},"areal":{"start":60.166,"end":67.046,"words":[["Arealet",60.206,60.686],["er",60.766,60.846],["pi",60.906,61.046],["over",61.246,61.426],["fire",61.506,61.746],["gange",62.146,62.326],["d",62.426,62.446],["i",62.726,62.746],["anden",62.906,63.166],["altså",63.586,63.826],["hundrede",63.926,64.246],["pi",64.306,64.426],["cirka",64.986,65.246],["tre",65.386,65.506],["hundrede",65.606,65.846],["og",65.846,65.886],["fjorten",65.906,66.246],["kvadratmillimeter",66.286,67.046]],"text":"Arealet er pi over fire gange d i anden, altså hundrede pi, cirka tre hundrede og fjorten kvadratmillimeter."},"pcr":{"start":68.866,"end":80.207,"words":[["Nu",68.906,68.986],["Eulers",69.226,69.526],["formel",69.586,69.886],["ligning",70.266,70.586],["ni",70.646,70.726],["tolv",70.846,71.086],["P",72.026,72.046],["c",72.286,72.306],["r",72.606,72.626],["er",72.826,72.926],["pi",73.046,73.166],["i",73.326,73.346],["anden",73.466,73.726],["gange",74.126,74.346],["to",74.486,74.606],["hundrede",74.726,75.006],["tusind",75.086,75.446],["gange",75.706,75.966],["syv",76.206,76.366],["tusind",76.446,76.766],["otte",76.906,77.106],["hundrede",77.126,77.406],["og",77.446,77.506],["fireoghalvtreds",77.546,78.186],["divideret",78.686,79.167],["med",79.227,79.307],["tusind",79.367,79.747],["i",79.827,79.847],["anden",79.967,80.207]],"text":"Nu Eulers formel, ligning ni tolv. P c r er pi i anden gange to hundrede tusind gange syv tusind otte hundrede og fireoghalvtreds, divideret med tusind i anden."},"pcr2":{"start":81.047,"end":90.228,"words":[["Tælleren",81.087,81.467],["er",81.527,81.587],["cirka",81.627,81.867],["femten",82.007,82.327],["komma",82.407,82.607],["fem",82.707,82.827],["milliarder",82.867,83.327],["og",83.787,83.847],["nævneren",83.907,84.287],["er",84.407,84.467],["en",84.487,84.547],["million",84.567,84.907],["Det",85.627,85.727],["giver",85.747,85.907],["femten",85.987,86.327],["tusind",86.387,86.727],["fem",86.827,86.947],["hundrede",87.027,87.247],["newton",87.287,87.647],["altså",88.127,88.367],["femten",88.527,88.847],["komma",88.927,89.128],["fem",89.208,89.348],["kilonewton",89.608,90.228]],"text":"Tælleren er cirka femten komma fem milliarder, og nævneren er en million. Det giver femten tusind fem hundrede newton, altså femten komma fem kilonewton."},"sigma":{"start":92.048,"end":101.569,"words":[["Den",92.088,92.228],["kritiske",92.268,92.688],["spænding",92.748,93.108],["er",93.248,93.328],["knæklasten",93.408,94.108],["divideret",94.208,94.708],["med",94.748,94.828],["arealet",94.888,95.348],["femten",95.948,96.248],["tusind",96.308,96.648],["fem",96.728,96.868],["hundrede",96.968,97.248],["divideret",97.348,97.788],["med",97.828,97.908],["tre",97.948,98.068],["hundrede",98.188,98.408],["og",98.408,98.448],["fjorten",98.448,98.788],["Det",99.348,99.448],["giver",99.468,99.608],["niogfyrre",99.668,100.188],["komma",100.288,100.469],["tre",100.569,100.729],["megapascal",100.989,101.569]],"text":"Den kritiske spænding er knæklasten divideret med arealet: femten tusind fem hundrede divideret med tre hundrede og fjorten. Det giver niogfyrre komma tre megapascal."},"slank":{"start":103.389,"end":114.03,"words":[["Nu",103.429,103.489],["afgør",103.589,103.909],["vi",103.929,103.969],["hvilken",104.049,104.369],["formel",104.489,104.809],["der",104.829,104.929],["gælder",104.949,105.189],["Inertiradius",105.849,106.689],["for",106.749,106.849],["en",106.889,106.949],["massiv",106.989,107.309],["cirkel",107.409,107.769],["er",107.909,107.989],["d",108.149,108.169],["over",108.429,108.589],["fire",108.689,108.949],["altså",109.209,109.429],["fem",109.509,109.649],["millimeter",109.729,110.189],["Slankheden",110.829,111.389],["er",111.489,111.549],["tusind",111.65,112.07],["divideret",112.11,112.61],["med",112.65,112.75],["fem",112.81,112.97],["altså",113.27,113.49],["to",113.57,113.69],["hundrede",113.77,114.03]],"text":"Nu afgør vi, hvilken formel der gælder. Inertiradius for en massiv cirkel er d over fire, altså fem millimeter. Slankheden er tusind divideret med fem, altså to hundrede."},"kritisk":{"start":114.85,"end":123.251,"words":[["Det",114.89,114.99],["kritiske",115.01,115.41],["slankhedsforhold",115.45,116.35],["er",116.45,116.49],["kvadratroden",116.51,117.25],["af",117.31,117.39],["to",117.47,117.57],["pi",117.71,117.83],["i",117.99,118.01],["anden",118.11,118.35],["gange",118.49,118.71],["to",118.79,118.89],["hundrede",119.01,119.25],["tusind",119.33,119.69],["divideret",120.03,120.53],["med",120.57,120.65],["fire",120.71,120.95],["hundrede",121.01,121.27],["Det",121.751,121.851],["giver",121.871,122.051],["nioghalvfems",122.171,122.871],["komma",122.911,123.051],["tre",123.111,123.251]],"text":"Det kritiske slankhedsforhold er kvadratroden af to pi i anden gange to hundrede tusind, divideret med fire hundrede. Det giver nioghalvfems komma tre."},"konkl":{"start":125.071,"end":130.011,"words":[["To",125.111,125.211],["hundrede",125.331,125.611],["er",125.691,125.771],["cirka",125.791,126.011],["dobbelt",126.151,126.471],["så",126.491,126.611],["meget",126.631,126.891],["som",126.931,127.051],["nioghalvfems",127.091,127.651],["Søjlen",128.051,128.351],["er",128.391,128.451],["lang",128.491,128.691],["og",128.751,128.811],["slank",128.851,129.151],["og",129.311,129.391],["Euler",129.531,129.751],["gælder",129.771,130.011]],"text":"To hundrede er cirka dobbelt så meget som nioghalvfems. Søjlen er lang og slank, og Euler gælder."},"konkl2":{"start":130.731,"end":139.312,"words":[["Vi",130.771,130.811],["kan",130.851,130.931],["også",130.931,131.051],["se",131.051,131.111],["det",131.191,131.271],["på",131.271,131.371],["spændingen",131.371,131.791],["Niogfyrre",132.231,132.691],["megapascal",132.731,133.312],["er",133.392,133.452],["langt",133.572,133.812],["under",133.912,134.092],["det",134.112,134.212],["halve",134.252,134.552],["af",134.632,134.712],["S",134.912,134.932],["y",135.052,135.072],["som",135.452,135.552],["er",135.592,135.652],["to",135.712,135.812],["hundrede",135.932,136.172],["megapascal",136.192,136.752],["Punktet",137.432,137.772],["ligger",137.832,138.052],["på",138.092,138.212],["Euler-delen",138.332,138.872],["af",138.912,138.972],["kurven",138.992,139.312]],"text":"Vi kan også se det på spændingen. Niogfyrre megapascal er langt under det halve af S y, som er to hundrede megapascal. Punktet ligger på Euler-delen af kurven."},"flyde":{"start":141.132,"end":154.414,"words":[["Er",141.172,141.252],["resultatet",141.272,141.772],["rimeligt",141.812,142.132],["Sammenlign",142.732,143.152],["med",143.192,143.272],["flydelasten",143.312,143.913],["S",144.713,144.733],["y",144.813,144.833],["gange",144.973,145.193],["arealet",145.273,145.773],["er",145.913,145.973],["hundrede",146.233,146.513],["og",146.593,146.653],["femogtyve",146.653,147.153],["komma",147.193,147.353],["syv",147.433,147.573],["kilonewton",147.673,148.213],["Søjlen",148.893,149.233],["knækker",149.273,149.573],["altså",149.633,149.853],["ved",149.873,149.973],["kun",150.013,150.173],["tolv",150.333,150.593],["procent",150.633,150.993],["af",151.053,151.113],["den",151.133,151.253],["last",151.333,151.573],["hvor",151.793,151.933],["den",151.953,152.053],["ville",152.053,152.213],["flyde",152.233,152.533],["Det",152.953,153.033],["er",153.073,153.153],["typisk",153.193,153.513],["for",153.533,153.613],["en",153.633,153.714],["slank",153.774,154.054],["søjle",154.114,154.414]],"text":"Er resultatet rimeligt? Sammenlign med flydelasten: S y gange arealet er hundrede og femogtyve komma syv kilonewton. Søjlen knækker altså ved kun tolv procent af den last, hvor den ville flyde. Det er typisk for en slank søjle."},"antag":{"start":155.414,"end":168.135,"words":[["Antagelserne",155.454,156.054],["skal",156.094,156.214],["du",156.214,156.254],["sige",156.294,156.434],["højt",156.474,156.674],["søjlen",157.234,157.534],["er",157.554,157.614],["helt",157.634,157.834],["lige",157.874,158.094],["lasten",158.454,158.754],["virker",158.814,159.114],["præcis",159.154,159.554],["i",159.634,159.654],["centerlinjen",159.734,160.274],["materialet",160.714,161.354],["er",161.394,161.454],["lineært",161.494,161.854],["elastisk",161.874,162.334],["og",162.674,162.734],["charniererne",162.774,163.274],["er",163.354,163.414],["friktionsfrie",163.454,164.115],["I",164.775,164.795],["praksis",164.875,165.235],["bruger",165.275,165.475],["man",165.495,165.575],["derfor",165.595,165.855],["en",165.875,165.935],["sikkerhedsfaktor",165.995,166.675],["på",166.715,166.815],["mindst",166.835,167.075],["to",167.215,167.355],["mod",167.575,167.715],["knækning",167.755,168.135]],"text":"Antagelserne skal du sige højt: søjlen er helt lige, lasten virker præcis i centerlinjen, materialet er lineært elastisk, og charniererne er friktionsfrie. I praksis bruger man derfor en sikkerhedsfaktor på mindst to mod knækning."},"graense":{"start":169.955,"end":182.056,"words":[["En",169.995,170.075],["sidste",170.135,170.375],["ting",170.415,170.595],["censor",170.655,170.915],["kan",170.935,171.015],["spørge",171.035,171.275],["om",171.315,171.415],["Hvor",171.935,172.055],["kort",172.095,172.335],["skal",172.375,172.515],["søjlen",172.555,172.875],["være",172.915,173.135],["for",173.195,173.315],["at",173.315,173.355],["blive",173.375,173.515],["en",173.535,173.595],["Johnson-søjle",173.655,174.335],["Slankheden",175.116,175.636],["skal",175.696,175.836],["under",175.936,176.136],["nioghalvfems",176.196,176.756],["komma",176.796,176.936],["tre",176.996,177.136],["så",177.516,177.636],["L",177.856,177.876],["e",178.036,178.056],["skal",178.216,178.376],["under",178.436,178.636],["cirka",178.716,178.996],["fire",179.116,179.316],["hundrede",179.356,179.656],["og",179.656,179.736],["syvoghalvfems",179.756,180.276],["millimeter",180.336,180.776],["Altså",181.196,181.436],["en",181.556,181.636],["halv",181.676,181.816],["meter",181.856,182.056]],"text":"En sidste ting, censor kan spørge om. Hvor kort skal søjlen være for at blive en Johnson-søjle? Slankheden skal under nioghalvfems komma tre, så L e skal under cirka fire hundrede og syvoghalvfems millimeter. Altså en halv meter."},"tjek_q":{"start":183.876,"end":188.777,"words":[["Tjek",183.916,184.076],["dig",184.096,184.156],["selv",184.196,184.356],["Hvad",185.056,185.196],["bliver",185.216,185.396],["knæklasten",185.436,186.157],["hvis",186.217,186.357],["søjlen",186.397,186.737],["i",186.797,186.817],["stedet",186.877,187.157],["er",187.197,187.257],["fast",187.357,187.597],["i",187.637,187.657],["bunden",187.717,187.977],["og",188.057,188.117],["fri",188.197,188.337],["i",188.437,188.457],["toppen",188.517,188.777]],"text":"Tjek dig selv. Hvad bliver knæklasten, hvis søjlen i stedet er fast i bunden og fri i toppen?"},"tjek_a":{"start":192.397,"end":200.518,"words":[["Så",192.437,192.557],["er",192.597,192.657],["K",192.717,192.737],["lig",193.077,193.217],["to",193.357,193.477],["og",193.917,193.977],["L",194.157,194.177],["e",194.337,194.357],["bliver",194.537,194.717],["to",194.777,194.877],["meter",194.977,195.217],["Længden",195.877,196.157],["står",196.217,196.377],["i",196.417,196.437],["anden",196.537,196.757],["så",196.977,197.097],["knæklasten",197.117,197.697],["falder",197.777,197.997],["til",198.017,198.117],["en",198.117,198.177],["fjerdedel",198.257,198.737],["cirka",199.018,199.238],["tre",199.318,199.438],["komma",199.558,199.698],["ni",199.778,199.838],["kilonewton",199.978,200.518]],"text":"Så er K lig to, og L e bliver to meter. Længden står i anden, så knæklasten falder til en fjerdedel: cirka tre komma ni kilonewton."},"slut":{"start":202.338,"end":214.959,"words":[["Kort",202.378,202.558],["sagt",202.618,202.818],["P",203.258,203.278],["c",203.538,203.558],["r",203.878,203.898],["er",204.118,204.178],["femten",204.258,204.558],["komma",204.618,204.778],["fem",204.838,204.978],["kilonewton",205.058,205.578],["og",206.038,206.098],["sigma",206.178,206.478],["c",206.558,206.578],["r",206.858,206.878],["er",207.138,207.198],["niogfyrre",207.258,207.738],["komma",207.758,207.918],["tre",207.978,208.118],["megapascal",208.258,208.778],["Slankheden",209.418,209.918],["to",209.998,210.098],["hundrede",210.219,210.499],["er",210.579,210.639],["over",210.719,210.919],["nioghalvfems",210.979,211.519],["komma",211.539,211.679],["tre",211.719,211.859],["så",212.239,212.339],["Euler",212.439,212.659],["gælder",212.719,212.959],["og",213.119,213.179],["søjlen",213.259,213.559],["knækker",213.599,213.899],["længe",214.139,214.359],["før",214.419,214.559],["den",214.579,214.659],["flyder",214.699,214.959]],"text":"Kort sagt: P c r er femten komma fem kilonewton, og sigma c r er niogfyrre komma tre megapascal. Slankheden to hundrede er over nioghalvfems komma tre, så Euler gælder, og søjlen knækker længe før den flyder."}}}, { audio: 'eks-spm1-b.mp3', id: 'eks-spm1-b' });</script>
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spm. 2a: tykvæggede cylindre og Lamés ligninger (teori) · video</title>
+<meta name="description" content="Ny liste, spm. 2a: tynd mod tyk, σ_θ og σ_r, Lamés ligninger, fortegn og hvorfor maksimum sidder på indersiden.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 10: videoer</a><h1>Spm. 2a: tykvæggede cylindre og Lamés ligninger (teori)</h1><span class="meta">MEM1 · kapitel 10 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Spm. 2a: tykvæggede cylindre og Lamés ligninger (teori)"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Ny liste, spm. 2a: tynd mod tyk, σ_θ og σ_r, Lamés ligninger, fortegn og hvorfor maksimum sidder på indersiden.</p><div class="chips"><a href="../../opgaver/l10/eksamen-spm-02-tykvaegget-trykbeholder.pdf">📐 Se udregningen i Mathcad (PDF)</a><a href="tykvaeggede-lame.html">Se først: Tykvæggede cylindre: Lamé</a><a href="../../../../lab/mem1/trykbeholder.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel10_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l10">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// MEM1 mundtlig eksamen (ny liste) · Spm. 2a: tykvæggede cylindre, Lamé. Hamrock kap. 10: (10.1), (10.2), (10.19), (10.23)-(10.26).
+// Fordelingen tegnes med opgavens tal (r_i = 40, r_o = 60, p_i = 50): σ_θ = 40(1 + 3600/r²): 130 -> 80, σ_r = 40(1 − 3600/r²): −50 -> 0.
+BP.scene({ header: 'MEM1 · mundtlig eksamen · spm. 2a', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, dot, ring, under, ell, rect, hatch, dashed, axes, plot, PI } = B;
+  const S = (id) => L(id).start;
+  const ringet = (k, s, x, y, size, col, a, te) => { const r = text(k, s, x, y, size, col, a, te); ring(r, col, te, te + 0.5); return r; };
+  // cylindertværsnit: to cirkler og radiale skraveringsstreger i væggen
+  const roer = (k, cx, cy, ri, ro, col, a, b) => {
+    line(k, ell(cx, cy, ro, ro, 0, 2 * PI), col, 3.4, a, a + (b - a) * 0.4);
+    line(k, ell(cx, cy, ri, ri, 0, 2 * PI), col, 3.4, a + (b - a) * 0.2, a + (b - a) * 0.6);
+    for (let i = 0; i < 36; i++) {
+      const v = i / 36 * 2 * PI + 0.3, t = a + (b - a) * (0.5 + 0.5 * i / 36);
+      line(k, [[cx + (ri + 4) * Math.cos(v), cy + (ri + 4) * Math.sin(v)], [cx + (ro - 4) * Math.cos(v + 0.12), cy + (ro - 4) * Math.sin(v + 0.12)]], col, 1.4, t, t + 0.05, { alpha: 0.5 });
+    }
+  };
+
+  // ---------------------------------------------------------------- 0 titel
+  B.titel(0, 'Spm. 2a: tykvæggede cylindre', 'Lamés ligninger · teori og forklaring', 'titel');
+  text(0, 'σ_θ  og  σ_r  gennem væggen', 640, 540, 46, 'red', wt('titel', 'spændingerne') - 0.1, we('titel', 'størst'), { align: 'center' });
+
+  // ---------------------------------------------------------------- 1 tynd eller tyk
+  B.goto('tynd', 1);
+  bubble(1, 'Tynd eller tyk?', 130, 135, 50, 'blue', S('tynd') - 0.1, S('tynd') + 0.8);
+  {
+    const t1 = wt('tynd', 'tyndvægget'), t2 = S('tyk');
+    roer(1, 330, 400, 140, 152, 'blue', t1 - 0.2, t1 + 1.0);
+    text(1, 'tyndvægget', 330, 610, 32, 'blue', t1, t1 + 0.6, { align: 'center' });
+    roer(1, 900, 400, 95, 165, 'red', t2, t2 + 1.2);
+    text(1, 'tykvægget', 900, 610, 32, 'red', t2 + 0.3, t2 + 0.9, { align: 'center' });
+  }
+  B.formel(1, '10.1', 'd_i / t > 40', 220, 680, 32, wt('tynd', 'ligning') - 0.1, we('tynd', 'et'), 'blue');
+  B.formel(1, '10.2', 'd_i / t < 40', 800, 680, 32, wt('tyk', 'ligning') - 0.1, we('tyk', 'to'), 'red');
+  text(1, 'σ næsten konstant', 230, 230, 28, 'blue', wt('tynd', 'konstant') - 0.4, we('tynd', 'væggen'));
+  text(1, 'σ varierer med r', 820, 200, 28, 'red', wt('tyk', 'varierer') - 0.1, we('tyk', 'radius'));
+
+  // ---------------------------------------------------------------- 2 de to spændinger og elementet
+  B.goto('to', 2);
+  {
+    const cx = 330, cy = 400, ri = 120, ro = 200, t0 = S('to');
+    roer(2, cx, cy, ri, ro, 'black', t0, t0 + 1.2);
+    for (let i = 0; i < 8; i++) { const v = i * PI / 4 + 0.2; arrow(2, [[cx + 40 * Math.cos(v), cy + 40 * Math.sin(v)], [cx + (ri - 6) * Math.cos(v), cy + (ri - 6) * Math.sin(v)]], 'blue', 2.6, t0 + 0.6 + i * 0.05, t0 + 0.9 + i * 0.05, 12); }
+    text(2, 'p_i', cx - 18, cy + 10, 34, 'blue', t0 + 1.0, t0 + 1.3);
+    const tr = wt('element', 'radius');
+    B.dobbeltpil(2, [cx, cy + 4], [cx + ri * 0.7, cy + ri * 0.7 + 4], 'green', tr, tr + 0.5);
+    text(2, 'r_i', cx + 30, cy + 70, 28, 'green', tr + 0.3, tr + 0.7);
+    const tro = we('element', 'r', 1);
+    line(2, [[cx - ro, cy], [cx - ri, cy]], 'green', 2.4, tro, tro + 0.3);
+    text(2, 'r_o', cx - ro - 10, cy - 14, 28, 'green', tro, tro + 0.4, { align: 'right' });
+    // element på toppen af væggen
+    const te = wt('element', 'element');
+    const el = [[cx - 26, cy - 150], [cx + 26, cy - 150], [cx + 26, cy - 178], [cx - 26, cy - 178], [cx - 26, cy - 150]];
+    line(2, el, 'red', 3.4, te, te + 0.4);
+    const tt = wt('to', 'Omkredsspændingen');
+    arrow(2, [[cx + 28, cy - 164], [cx + 88, cy - 164]], 'red', 3, tt, tt + 0.4, 13); arrow(2, [[cx - 28, cy - 164], [cx - 88, cy - 164]], 'red', 3, tt, tt + 0.4, 13);
+    text(2, 'σ_θ', cx + 92, cy - 172, 32, 'red', tt + 0.3, tt + 0.7);
+    const trr = wt('to', 'Radialspændingen');
+    arrow(2, [[cx, cy - 238], [cx, cy - 182]], 'blue', 3, trr, trr + 0.4, 13); arrow(2, [[cx, cy - 92], [cx, cy - 146]], 'blue', 3, trr, trr + 0.4, 13);
+    text(2, 'σ_r', cx + 10, cy - 214, 32, 'blue', trr + 0.3, trr + 0.7);
+  }
+  text(2, 'σ_θ:  rundt langs omkredsen', 620, 230, 32, 'red', wt('to', 'Omkredsspændingen') - 0.1, we('to', 'omkredsen'));
+  text(2, '→ flækker cylinderen på langs', 650, 280, 30, 'red', wt('to', 'flække') - 0.1, we('to', 'langs'));
+  text(2, 'σ_r:  gennem væggen', 620, 350, 32, 'blue', wt('to', 'Radialspændingen') - 0.1, we('to', 'centrum'));
+  text(2, 'element:  r  til  r + dr', 620, 450, 32, 'black', wt('element', 'element') - 0.1, we('element', 'r', 2));
+  text(2, '1.  kraftligevægt (radialt)', 640, 520, 30, 'black', wt('element', 'kraftligevægt') - 0.1, we('element', 'retning'));
+  text(2, '2.  flytning ↔ tøjning', 640, 570, 30, 'black', wt('element', 'flytning') - 0.1, we('element', 'tøjning'));
+  text(2, '3.  Hookes lov', 640, 620, 30, 'black', wt('element', 'Hookes') - 0.1, we('element', 'lov'));
+
+  // ---------------------------------------------------------------- 3 løsning og randbetingelser
+  B.goto('dgl', 3);
+  bubble(3, 'Løsningen', 130, 135, 50, 'blue', S('dgl') - 0.1, S('dgl') + 0.8);
+  B.formel(3, '10.19', 'σ_r = − C_1 / 2 − C_2 / r²', 180, 250, 42, wt('dgl', 'Løsningen') - 0.1, we('dgl', 'nitten'), 'blue');
+  text(3, 'to konstanter  ⇒  to randbetingelser', 160, 360, 34, 'black', S('rand') + 0.1, we('rand', 'randbetingelserne'));
+  ringet(3, 'r = r_i:   σ_r = − p_i', 160, 450, 40, 'red', wt('rand', 'indersiden') - 0.1, we('rand', 'trykker'));
+  ringet(3, 'r = r_o:   σ_r = − p_o', 160, 540, 40, 'red', wt('rand', 'ydersiden') - 0.1, we('rand', 'o'));
+  text(3, 'tryk regnes negativt', 700, 450, 30, 'green', wt('rand', 'væsken') - 0.3, we('rand', 'trykker'));
+
+  // ---------------------------------------------------------------- 4 Lamés ligninger
+  B.goto('lame', 4);
+  bubble(4, 'Lamé, p_o = 0', 130, 135, 50, 'blue', S('lame') - 0.1, S('lame') + 0.8);
+  B.formel(4, '10.23', 'σ_r = p_i r_i² / (r_o² − r_i²) · (1 − r_o² / r²)', 170, 270, 34, wt('lame', 'ligning') - 0.1, we('lame', 'anden', 4), 'blue');
+  B.formel(4, '10.24', 'σ_θ = p_i r_i² / (r_o² − r_i²) · (1 + r_o² / r²)', 170, 400, 34, wt('lame2', 'ligning') - 0.1, we('lame2', 'parentesen'), 'red');
+  { const tp = wt('lame2', 'En');
+    ringet(4, '−', 978, 270, 36, 'blue', tp, tp + 0.2); ringet(4, '+', 978, 400, 36, 'red', tp + 0.3, tp + 0.5); }
+  text(4, 'eneste forskel: fortegnet i parentesen', 170, 520, 32, 'green', wt('lame2', 'samme') - 0.1, we('lame2', 'anden', 1));
+
+  // ---------------------------------------------------------------- 5 fortegn og maksimum
+  B.goto('fortegn', 5);
+  bubble(5, 'Fortegn og maksimum', 130, 135, 48, 'blue', S('fortegn') - 0.1, S('fortegn') + 0.8);
+  text(5, '(1 − r_o²/r²) < 0   ⇒   σ_r  er tryk', 160, 240, 36, 'blue', wt('fortegn', 'Parentesen') - 0.1, we('fortegn', 'tryk'));
+  text(5, '(1 + r_o²/r²) > 0   ⇒   σ_θ  er træk', 160, 310, 36, 'red', wt('fortegn', 'Parentesen', 1) - 0.1, we('fortegn', 'træk'));
+  text(5, 'r_o² / r²  er størst ved  r = r_i', 160, 400, 36, 'black', wt('max', 'Leddet') - 0.1, we('max', 'indersiden'));
+  B.formel(5, '10.26', 'σ_{θ,max} = p_i (r_o² + r_i²) / (r_o² − r_i²)', 180, 530, 38, wt('max', 'ligning') - 0.1, we('max', 'anden', 5), 'red');
+  ringet(5, 'på indersiden', 180, 630, 36, 'red', wt('max', 'Altså') - 0.1, we('max', 'indersiden'));
+
+  // ---------------------------------------------------------------- 6 σ_r på indersiden og fordelingen
+  B.goto('rmax', 6);
+  B.formel(6, '10.25', 'σ_{r,max} = − p_i', 180, 170, 40, wt('rmax', 'ligning') - 0.1, we('rmax', 'femogtyve'), 'blue');
+  text(6, 'væsken trykker med p_i', 560, 170, 30, 'green', wt('rmax', 'overfladen') - 0.3, we('rmax', 'i', 1));
+  {
+    const x0 = 200, y0 = 520, w = 520, sy = 1.75, ta = S('fordeling');
+    const P = (r, s) => [x0 + (r - 40) / 20 * w, y0 - s * sy];
+    line(6, [[x0, y0 + 50 * sy + 20], [x0, y0 - 145 * sy]], 'black', 2.6, ta, ta + 0.4);
+    arrow(6, [[x0 - 10, y0], [x0 + w + 40, y0]], 'black', 2.6, ta + 0.1, ta + 0.5, 14);
+    line(6, [[x0 + w, y0 + 50 * sy + 20], [x0 + w, y0 - 145 * sy]], 'black', 2.6, ta + 0.2, ta + 0.6);
+    text(6, 'r_i', x0, y0 + 50 * sy + 52, 28, 'black', ta + 0.3, ta + 0.6, { align: 'center' });
+    text(6, 'r_o', x0 + w, y0 + 50 * sy + 52, 28, 'black', ta + 0.3, ta + 0.6, { align: 'center' });
+    text(6, 'væg', x0 + w / 2, y0 + 50 * sy + 52, 28, 'black', ta + 0.4, ta + 0.7, { align: 'center' });
+    const tt = wt('fordeling', 'omkredsspændingen'), tr = wt('fordeling', 'Radialspændingen');
+    const th = [], rr = []; for (let r = 40; r <= 60.01; r += 0.5) { th.push(P(r, 40 * (1 + 3600 / (r * r)))); rr.push(P(r, 40 * (1 - 3600 / (r * r)))); }
+    plot(6, th, 'red', tt, tt + 1.2); plot(6, rr, 'blue', tr, tr + 1.0);
+    text(6, 'σ_θ', P(52, 104)[0], P(52, 104)[1] - 16, 32, 'red', tt + 0.8, tt + 1.2);
+    text(6, 'σ_r', P(52, -14)[0], P(52, -14)[1] + 36, 32, 'blue', tr + 0.6, tr + 1.0);
+    text(6, 'max', P(40, 130)[0] + 14, P(40, 130)[1] - 6, 26, 'red', tt + 0.3, tt + 0.6);
+    text(6, '− p_i', P(40, -50)[0] + 14, P(40, -50)[1] + 26, 26, 'blue', tr + 0.2, tr + 0.5);
+  }
+  ringet(6, 'revner starter indefra', 820, 400, 34, 'red', wt('fordeling', 'revner') - 0.1, we('fordeling', 'indefra'));
+  text(6, '(talværdier fra del b)', 820, 470, 26, 'black', wt('fordeling', 'Gennem'), wt('fordeling', 'Gennem') + 0.6);
+
+  // ---------------------------------------------------------------- 7 tykkere væg hjælper kun lidt
+  B.goto('tykkere', 7);
+  bubble(7, 'Tykkere væg?', 130, 135, 50, 'blue', S('tykkere') - 0.1, S('tykkere') + 0.8);
+  {
+    const x0 = 200, y0 = 620, w = 620, h = 400, ta = S('tykkere') + 0.4;
+    const P = (q, f) => [x0 + (q - 1) / 3 * w, y0 - f / 5 * h];
+    axes(7, x0, y0, x0 + w + 10, y0 - h - 20, 'r_o / r_i', 'σ_θ,max / p_i', ta);
+    const pts = []; for (let q = 1.21; q <= 4; q += 0.04) pts.push(P(q, (q * q + 1) / (q * q - 1)));
+    plot(7, pts, 'red', ta + 0.5, ta + 1.8);
+    const t1 = wt('tykkere', 'aldrig');
+    dashed(7, P(1, 1), P(4, 1), 'blue', t1 - 0.2, t1 + 0.6);
+    text(7, '1  (σ = p_i)', P(4, 1)[0] + 10, P(4, 1)[1] + 8, 28, 'blue', t1, t1 + 0.6);
+    const t2 = wt('tykkere', 'dobbelt');
+    dot(7, P(1.5, 2.6)[0], P(1.5, 2.6)[1], 8, 'black', t2); text(7, '2,6', P(1.5, 2.6)[0] + 14, P(1.5, 2.6)[1] - 8, 26, 'black', t2, t2 + 0.3);
+    dot(7, P(2, 1.667)[0], P(2, 1.667)[1], 8, 'black', t2 + 0.4); text(7, '1,67', P(2, 1.667)[0] + 14, P(2, 1.667)[1] - 8, 26, 'black', t2 + 0.4, t2 + 0.7);
+    text(7, 'r_o / r_i = 1,5 og 2', 900, 330, 28, 'black', t2 + 0.6, t2 + 1.0);
+  }
+  ringet(7, 'aldrig under p_i', 900, 430, 36, 'red', wt('tykkere', 'aldrig') - 0.1, we('tykkere', 'vægtykkelse'));
+
+  // ---------------------------------------------------------------- 8 antagelser
+  B.goto('antag', 8);
+  bubble(8, 'Antagelser', 130, 135, 50, 'blue', S('antag') - 0.1, S('antag') + 0.8);
+  text(8, '•  lang cylinder, langt fra enderne', 160, 250, 34, 'black', wt('antag', 'lang') - 0.3, we('antag', 'enderne'));
+  text(8, '•  lineært elastisk og homogent', 160, 330, 34, 'black', wt('antag', 'Lineært') - 0.1, we('antag', 'materiale'));
+  text(8, '•  samme tryk hele vejen rundt', 160, 410, 34, 'black', wt('antag', 'Trykket') - 0.1, we('antag', 'rundt'));
+  text(8, '•  aksialspænding fra endebunde ignoreres', 160, 490, 34, 'red', wt('antag', 'aksialspændingen') - 0.3, we('antag', 'her'));
+
+  // ---------------------------------------------------------------- 9 femten minutter
+  B.goto('tavle', 9);
+  bubble(9, 'Dine 15 minutter', 130, 135, 50, 'blue', S('tavle') - 0.1, S('tavle') + 0.8);
+  {
+    const x0 = 160, x1 = 1120, y = 230, hh = 60, m = (x1 - x0) / 15;
+    [[0, 7, 'blue', 'del a', wt('tavle', 'syv')], [7, 13, 'red', 'del b', wt('tavle', 'del', 1)], [13, 15, 'green', 'vurdér', wt('tavle', 'vurdering')]].forEach(([a, b2, col, et, t]) => {
+      line(9, rect(x0 + a * m, y, (b2 - a) * m, hh).concat([[x0 + a * m, y]]), col, 3, t - 0.1, t + 0.4);
+      hatch(9, rect(x0 + a * m, y, (b2 - a) * m, hh), col, t + 0.2, t + 0.7, { gap: 12 });
+      text(9, et, x0 + (a + b2) / 2 * m, y + hh + 40, 30, col, t, t + 0.4, { align: 'center' });
+    });
+  }
+  text(9, '1.  tegn snittet med r_i og r_o', 200, 420, 32, 'black', wt('tavle', 'snittet') - 0.4, we('tavle', 'o'));
+  text(9, '2.  element med σ_θ og σ_r', 200, 470, 32, 'black', wt('tavle', 'spændinger') - 0.6, we('tavle', 'element'));
+  text(9, '3.  Lamés ligninger og fortegn', 200, 520, 32, 'black', wt('tavle', 'ligningerne') - 0.3, we('tavle', 'fortegnene'));
+  text(9, '4.  fordelingen gennem væggen', 200, 570, 32, 'black', wt('tavle', 'fordelingen') - 0.3, we('tavle', 'væggen'));
+
+  // ---------------------------------------------------------------- 10 tjek: brøken går mod 1
+  B.goto('tjek_q', 10);
+  B.tjek(10, ['Hvorfor kommer σ_θ på indersiden', 'aldrig under p_i?'], ['(r_o² + r_i²) / (r_o² − r_i²) > 1', 'tyk væg:  brøken → 1,  σ_θ → p_i'], 'tjek_q', 'tjek_a');
+  {
+    const ta = wt('tjek_a', 'uendelig');
+    text(10, 'tæller > nævner,  altid', 760, 520, 30, 'red', wt('tjek_a', 'større') - 0.6, we('tjek_a', 'et'));
+    text(10, 'r_o → ∞:  r_o² / r_o² = 1', 760, 590, 30, 'blue', ta - 0.1, ta + 0.8);
+  }
+
+  // ---------------------------------------------------------------- 11 slut
+  B.goto('slut', 11);
+  B.slut(11, 'MEM1 mundtlig eksamen, ny liste, spm. 2 · Hamrock m.fl., kap. 10, lign. (10.1), (10.2), (10.19), (10.23)–(10.26)', 'spm. 2b: designopgaven', 'slut');
+  text(11, 'Lamé:  σ_r(r)  og  σ_θ(r)', 200, 240, 38, 'black', wt('slut', 'Lamés') - 0.1, we('slut', 'radius'));
+  text(11, 'σ_r: tryk,   σ_θ: træk', 200, 310, 38, 'blue', wt('slut', 'Radialspændingen') - 0.1, we('slut', 'træk'));
+  text(11, 'størst på indersiden:', 200, 380, 36, 'red', wt('slut', 'størst') - 0.1, we('slut', 'indersiden'));
+  text(11, 'σ_{θ,max} = p_i (r_o² + r_i²) / (r_o² − r_i²)', 200, 450, 36, 'red', wt('slut', 'max') - 0.1, we('slut', 'anden', 3));
+});
+
+</script>
+<script>BP.live({"duration":250.59,"audio":"eks-spm2-a.mp3","order":["titel","tynd","tyk","to","element","dgl","rand","lame","lame2","fortegn","max","rmax","fordeling","tykkere","antag","tavle","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":9.081,"words":[["Spørgsmål",0.54,0.96],["to",1.04,1.14],["del",1.52,1.72],["a",1.78,1.8],["Tykvæggede",2.62,3.28],["trykbeholdere",3.36,4.08],["og",4.26,4.36],["Lamés",4.62,4.94],["ligninger",5.04,5.42],["Vi",6.541,6.601],["finder",6.641,6.841],["ud",6.861,6.941],["af",6.981,7.061],["hvordan",7.101,7.361],["spændingerne",7.541,7.981],["fordeler",7.981,8.141],["sig",8.161,8.221],["gennem",8.281,8.421],["væggen",8.421,8.661],["og",8.661,8.701],["hvor",8.701,8.781],["de",8.781,8.821],["er",8.861,8.901],["størst",8.901,9.081]],"text":"Spørgsmål to, del a. Tykvæggede trykbeholdere og Lamés ligninger. Vi finder ud af, hvordan spændingerne fordeler sig gennem væggen, og hvor de er størst."},"tynd":{"start":10.781,"end":19.982,"words":[["Først",10.821,11.021],["hvornår",11.041,11.281],["er",11.281,11.321],["en",11.321,11.361],["cylinder",11.381,11.581],["tykvægget",11.581,11.801],["Er",11.801,11.841],["den",11.841,11.921],["indre",11.921,12.081],["diameter",12.161,12.681],["mere",12.861,13.121],["end",13.181,13.281],["fyrre",13.401,13.661],["gange",13.721,13.921],["vægtykkelsen",13.981,14.641],["er",15.081,15.141],["den",15.161,15.261],["tyndvægget",15.341,15.921],["og",16.461,16.521],["spændingen",16.561,16.961],["er",17.001,17.061],["næsten",17.121,17.421],["konstant",17.481,17.901],["gennem",17.981,18.201],["væggen",18.221,18.501],["Det",19.121,19.241],["er",19.241,19.281],["ligning",19.301,19.561],["ti",19.641,19.741],["et",19.881,19.982]],"text":"Først: hvornår er en cylinder tykvægget? Er den indre diameter mere end fyrre gange vægtykkelsen, er den tyndvægget, og spændingen er næsten konstant gennem væggen. Det er ligning ti et."},"tyk":{"start":21.242,"end":29.062,"words":[["Er",21.282,21.342],["forholdet",21.402,21.842],["under",21.962,22.162],["fyrre",22.202,22.482],["er",22.802,22.882],["den",22.902,23.002],["tykvægget",23.062,23.562],["ligning",24.082,24.362],["ti",24.462,24.582],["to",24.722,24.842],["Så",25.782,25.902],["varierer",25.942,26.342],["spændingen",26.382,26.802],["med",26.842,26.922],["radius",26.982,27.402],["og",27.722,27.782],["det",27.822,27.922],["er",27.922,27.962],["det",28.022,28.162],["Lamé",28.342,28.562],["beskriver",28.662,29.062]],"text":"Er forholdet under fyrre, er den tykvægget, ligning ti to. Så varierer spændingen med radius, og det er det, Lamé beskriver."},"to":{"start":30.882,"end":44.204,"words":[["I",30.922,30.942],["væggen",31.022,31.282],["er",31.342,31.402],["der",31.402,31.502],["to",31.562,31.702],["vigtige",31.862,32.223],["spændinger",32.243,32.663],["Omkredsspændingen",33.403,34.223],["sigma",34.483,34.743],["theta",34.843,35.163],["virker",35.623,35.883],["rundt",35.943,36.143],["langs",36.223,36.463],["omkredsen",36.503,37.023],["og",37.223,37.303],["prøver",37.343,37.623],["at",37.623,37.663],["flække",37.743,38.083],["cylinderen",38.143,38.563],["på",38.603,38.703],["langs",38.723,39.003],["Radialspændingen",39.943,40.843],["sigma",41.083,41.343],["r",41.563,41.583],["virker",42.123,42.383],["gennem",42.523,42.783],["væggen",42.823,43.123],["ind",43.523,43.623],["mod",43.663,43.803],["centrum",43.863,44.204]],"text":"I væggen er der to vigtige spændinger. Omkredsspændingen sigma theta virker rundt langs omkredsen og prøver at flække cylinderen på langs. Radialspændingen sigma r virker gennem væggen, ind mod centrum."},"element":{"start":45.704,"end":59.845,"words":[["Lamé",45.744,45.944],["fandt",46.044,46.244],["dem",46.284,46.404],["ved",46.464,46.564],["at",46.584,46.644],["se",46.684,46.764],["på",46.884,47.004],["et",47.024,47.104],["lille",47.224,47.464],["element",47.564,47.864],["i",47.924,47.944],["væggen",47.984,48.264],["mellem",48.764,48.964],["radius",49.024,49.404],["r",49.684,49.704],["og",49.984,50.084],["r",50.404,50.424],["plus",50.504,50.724],["d",50.784,50.804],["r",51.084,51.104],["Tre",52.104,52.224],["ting",52.324,52.504],["skal",52.544,52.684],["passe",52.704,52.944],["på",52.984,53.104],["én",53.184,53.284],["gang",53.324,53.504],["kraftligevægt",54.204,54.884],["i",55.004,55.044],["radial",55.244,55.624],["retning",55.684,56.025],["sammenhængen",56.685,57.205],["mellem",57.305,57.525],["flytning",57.625,58.045],["og",58.185,58.245],["tøjning",58.285,58.685],["og",59.245,59.305],["Hookes",59.385,59.625],["lov",59.685,59.845]],"text":"Lamé fandt dem ved at se på et lille element i væggen mellem radius r og r plus d r. Tre ting skal passe på én gang: kraftligevægt i radial retning, sammenhængen mellem flytning og tøjning, og Hookes lov."},"dgl":{"start":61.665,"end":69.446,"words":[["Det",61.705,61.805],["giver",61.825,62.005],["en",62.025,62.105],["differentialligning",62.145,62.985],["for",63.105,63.225],["sigma",63.285,63.525],["r",63.725,63.745],["Løsningen",64.645,65.085],["er",65.185,65.245],["en",65.265,65.345],["konstant",65.385,65.825],["plus",65.965,66.205],["en",66.285,66.365],["konstant",66.385,66.805],["divideret",66.945,67.385],["med",67.425,67.525],["r",67.705,67.725],["i",67.805,67.825],["anden",67.945,68.205],["ligning",68.605,68.866],["ti",68.966,69.066],["nitten",69.206,69.446]],"text":"Det giver en differentialligning for sigma r. Løsningen er en konstant plus en konstant divideret med r i anden, ligning ti nitten."},"rand":{"start":70.666,"end":80.787,"words":[["Konstanterne",70.706,71.186],["findes",71.226,71.506],["fra",71.566,71.666],["randbetingelserne",71.846,72.606],["På",73.286,73.386],["indersiden",73.426,73.886],["er",74.026,74.126],["sigma",74.246,74.486],["r",74.686,74.706],["lig",74.926,75.066],["minus",75.266,75.586],["p",75.666,75.686],["i",75.986,76.006],["fordi",76.406,76.586],["væsken",76.846,77.146],["trykker",77.186,77.486],["På",78.126,78.226],["ydersiden",78.266,78.726],["er",78.926,79.006],["sigma",79.066,79.306],["r",79.486,79.506],["lig",79.686,79.826],["minus",79.926,80.266],["p",80.426,80.446],["o",80.767,80.787]],"text":"Konstanterne findes fra randbetingelserne. På indersiden er sigma r lig minus p i, fordi væsken trykker. På ydersiden er sigma r lig minus p o."},"lame":{"start":82.607,"end":98.988,"words":[["Med",82.647,82.767],["p",82.867,82.887],["o",83.187,83.207],["lig",83.407,83.547],["nul",83.667,83.867],["altså",84.247,84.487],["kun",84.507,84.667],["indvendigt",84.807,85.207],["tryk",85.227,85.467],["giver",85.887,86.087],["det",86.107,86.187],["bogens",86.247,86.607],["ligning",86.707,87.067],["ti",87.247,87.387],["treogtyve",87.607,88.267],["sigma",89.227,89.527],["r",89.787,89.807],["er",90.227,90.327],["p",90.487,90.507],["i",90.787,90.807],["r",91.227,91.247],["i",91.387,91.407],["i",91.527,91.547],["anden",91.707,91.967],["over",92.327,92.547],["r",92.887,92.907],["o",93.067,93.087],["i",93.267,93.287],["anden",93.407,93.648],["minus",93.828,94.208],["r",94.428,94.448],["i",94.588,94.608],["i",94.788,94.808],["anden",94.928,95.168],["gange",95.788,96.048],["en",96.428,96.568],["minus",96.648,96.928],["r",97.128,97.148],["o",97.248,97.268],["i",97.388,97.408],["anden",97.488,97.708],["over",97.928,98.108],["r",98.308,98.328],["i",98.488,98.508],["anden",98.768,98.988]],"text":"Med p o lig nul, altså kun indvendigt tryk, giver det bogens ligning ti treogtyve: sigma r er p i r i i anden over r o i anden minus r i i anden, gange en minus r o i anden over r i anden."},"lame2":{"start":99.788,"end":107.529,"words":[["Og",99.828,99.908],["ligning",99.928,100.168],["ti",100.208,100.308],["fireogtyve",100.448,101.008],["sigma",101.428,101.728],["theta",101.868,102.268],["er",102.588,102.648],["det",102.668,102.748],["samme",102.808,103.048],["bare",103.268,103.468],["med",103.488,103.588],["plus",103.628,103.888],["i",103.928,103.948],["parentesen",103.988,104.528],["En",105.148,105.268],["plus",105.328,105.549],["r",105.729,105.749],["o",105.849,105.869],["i",105.989,106.009],["anden",106.109,106.309],["over",106.529,106.709],["r",106.909,106.929],["i",107.189,107.209],["anden",107.309,107.529]],"text":"Og ligning ti fireogtyve: sigma theta er det samme, bare med plus i parentesen. En plus r o i anden over r i anden."},"fortegn":{"start":109.349,"end":118.91,"words":[["Se",109.389,109.449],["på",109.529,109.629],["fortegnene",109.649,110.109],["Parentesen",110.669,111.209],["med",111.249,111.349],["minus",111.409,111.729],["er",111.849,111.929],["negativ",111.989,112.449],["overalt",112.569,112.909],["i",112.949,112.969],["væggen",113.009,113.309],["så",113.649,113.769],["radialspændingen",113.849,114.669],["er",114.769,114.829],["tryk",114.849,115.089],["Parentesen",115.769,116.229],["med",116.249,116.329],["plus",116.349,116.569],["er",116.589,116.649],["positiv",116.689,117.149],["så",117.469,117.569],["omkredsspændingen",117.609,118.43],["er",118.53,118.61],["træk",118.65,118.91]],"text":"Se på fortegnene. Parentesen med minus er negativ overalt i væggen, så radialspændingen er tryk. Parentesen med plus er positiv, så omkredsspændingen er træk."},"max":{"start":119.89,"end":139.711,"words":[["Hvor",119.93,120.05],["er",120.05,120.09],["de",120.09,120.13],["størst",120.19,120.53],["Leddet",121.41,121.71],["r",121.93,121.95],["o",122.07,122.09],["i",122.25,122.27],["anden",122.41,122.65],["over",122.81,123.01],["r",123.23,123.25],["i",123.39,123.41],["anden",123.65,123.87],["er",124.03,124.11],["størst",124.15,124.51],["når",124.69,124.83],["r",125.01,125.03],["er",125.25,125.33],["mindst",125.41,125.71],["Altså",126.21,126.41],["på",126.41,126.51],["indersiden",126.57,127.03],["Sæt",127.89,128.05],["r",128.27,128.29],["lig",128.45,128.59],["r",128.81,128.83],["i",128.99,129.01],["så",129.35,129.47],["får",129.49,129.63],["du",129.63,129.69],["ligning",129.751,129.971],["ti",130.031,130.131],["seksogtyve",130.271,130.831],["sigma",131.491,131.791],["theta",131.911,132.231],["max",132.311,132.531],["er",132.911,132.991],["p",133.311,133.331],["i",133.631,133.651],["gange",133.991,134.251],["r",134.551,134.571],["o",134.711,134.731],["i",134.891,134.911],["anden",135.011,135.231],["plus",135.391,135.671],["r",135.831,135.851],["i",135.971,135.991],["i",136.111,136.131],["anden",136.231,136.431],["divideret",136.851,137.291],["med",137.351,137.451],["r",137.691,137.711],["o",137.831,137.851],["i",137.991,138.011],["anden",138.131,138.331],["minus",138.571,138.911],["r",139.091,139.111],["i",139.231,139.251],["i",139.371,139.391],["anden",139.491,139.711]],"text":"Hvor er de størst? Leddet r o i anden over r i anden er størst, når r er mindst. Altså på indersiden. Sæt r lig r i, så får du ligning ti seksogtyve: sigma theta max er p i gange r o i anden plus r i i anden, divideret med r o i anden minus r i i anden."},"rmax":{"start":141.531,"end":150.812,"words":[["Og",141.571,141.651],["radialspændingen",141.751,142.532],["på",142.592,142.692],["indersiden",142.712,143.172],["er",143.532,143.592],["simpelthen",143.632,143.952],["minus",144.132,144.432],["p",144.532,144.552],["i",144.772,144.792],["ligning",145.412,145.672],["ti",145.732,145.832],["femogtyve",145.952,146.412],["Det",147.352,147.432],["giver",147.452,147.612],["mening",147.632,147.892],["lige",148.312,148.452],["på",148.472,148.572],["overfladen",148.612,149.032],["trykker",149.092,149.372],["væsken",149.412,149.712],["med",149.832,149.952],["netop",150.012,150.272],["p",150.552,150.572],["i",150.792,150.812]],"text":"Og radialspændingen på indersiden er simpelthen minus p i, ligning ti femogtyve. Det giver mening: lige på overfladen trykker væsken med netop p i."},"fordeling":{"start":152.112,"end":162.973,"words":[["Gennem",152.152,152.372],["væggen",152.412,152.672],["falder",152.752,152.992],["omkredsspændingen",153.072,153.832],["fra",153.872,153.932],["sin",154.012,154.132],["højeste",154.192,154.553],["værdi",154.573,154.773],["på",154.873,154.973],["indersiden",155.033,155.473],["til",155.753,155.873],["en",155.893,155.973],["lavere",156.033,156.453],["på",156.513,156.633],["ydersiden",156.673,157.113],["Radialspændingen",157.893,158.613],["går",158.653,158.793],["fra",158.853,158.973],["minus",159.153,159.513],["p",159.593,159.613],["i",159.853,159.873],["til",160.033,160.153],["nul",160.173,160.333],["Derfor",160.833,161.093],["starter",161.153,161.473],["revner",161.493,161.793],["i",161.853,161.873],["trykbeholdere",161.913,162.493],["indefra",162.693,162.973]],"text":"Gennem væggen falder omkredsspændingen fra sin højeste værdi på indersiden til en lavere på ydersiden. Radialspændingen går fra minus p i til nul. Derfor starter revner i trykbeholdere indefra."},"tykkere":{"start":164.793,"end":175.854,"words":[["Det",164.833,164.913],["har",164.953,165.033],["en",165.073,165.133],["vigtig",165.153,165.373],["konsekvens",165.393,165.893],["Gør",166.553,166.693],["du",166.713,166.753],["væggen",166.793,167.074],["dobbelt",167.234,167.534],["så",167.554,167.674],["tyk",167.714,167.914],["falder",168.154,168.354],["den",168.374,168.454],["største",168.494,168.814],["spænding",168.874,169.194],["ikke",169.394,169.594],["til",169.654,169.754],["det",169.774,169.854],["halve",169.894,170.174],["Materialet",170.794,171.294],["langt",171.374,171.594],["ude",171.674,171.794],["bærer",171.814,172.034],["kun",172.054,172.194],["lidt",172.254,172.414],["Og",173.074,173.114],["du",173.154,173.194],["kommer",173.234,173.434],["aldrig",173.514,173.794],["under",173.854,174.014],["p",174.134,174.154],["i",174.414,174.434],["uanset",174.854,175.254],["vægtykkelse",175.294,175.854]],"text":"Det har en vigtig konsekvens. Gør du væggen dobbelt så tyk, falder den største spænding ikke til det halve. Materialet langt ude bærer kun lidt. Og du kommer aldrig under p i, uanset vægtykkelse."},"antag":{"start":177.674,"end":189.055,"words":[["Antagelserne",177.714,178.234],["en",178.854,178.934],["lang",178.994,179.194],["cylinder",179.234,179.595],["langt",179.915,180.155],["fra",180.195,180.275],["enderne",180.355,180.595],["Lineært",181.395,181.855],["elastisk",181.915,182.355],["og",182.395,182.455],["homogent",182.495,182.975],["materiale",182.995,183.515],["Trykket",184.215,184.495],["er",184.515,184.555],["det",184.555,184.635],["samme",184.675,184.875],["hele",184.915,185.055],["vejen",185.075,185.215],["rundt",185.275,185.475],["Og",186.375,186.435],["aksialspændingen",186.475,187.315],["fra",187.375,187.455],["lukkede",187.555,187.875],["ender",187.975,188.175],["ser",188.255,188.375],["vi",188.395,188.435],["bort",188.495,188.675],["fra",188.695,188.795],["her",188.895,189.055]],"text":"Antagelserne: en lang cylinder, langt fra enderne. Lineært elastisk og homogent materiale. Trykket er det samme hele vejen rundt. Og aksialspændingen fra lukkede ender ser vi bort fra her."},"tavle":{"start":190.875,"end":204.057,"words":[["Ved",190.915,190.995],["tavlen",191.015,191.295],["bruger",191.335,191.515],["du",191.515,191.555],["cirka",191.615,191.836],["syv",191.976,192.116],["minutter",192.156,192.456],["på",192.496,192.596],["del",192.596,192.756],["a",192.796,192.816],["Tegn",193.516,193.796],["snittet",193.876,194.236],["med",194.296,194.396],["r",194.596,194.616],["i",194.756,194.776],["og",194.916,194.976],["r",195.116,195.136],["o",195.276,195.296],["tegn",195.796,196.036],["de",196.056,196.116],["to",196.156,196.256],["spændinger",196.376,196.816],["på",196.856,196.956],["et",196.976,197.016],["element",197.056,197.376],["skriv",197.836,198.056],["ligningerne",198.136,198.576],["vis",198.976,199.156],["fortegnene",199.216,199.756],["og",200.216,200.276],["tegn",200.336,200.516],["fordelingen",200.556,200.996],["gennem",201.036,201.236],["væggen",201.276,201.536],["Så",202.096,202.216],["del",202.236,202.396],["b",202.456,202.476],["og",202.976,203.036],["til",203.056,203.176],["sidst",203.196,203.416],["din",203.536,203.657],["vurdering",203.697,204.057]],"text":"Ved tavlen bruger du cirka syv minutter på del a. Tegn snittet med r i og r o, tegn de to spændinger på et element, skriv ligningerne, vis fortegnene, og tegn fordelingen gennem væggen. Så del b, og til sidst din vurdering."},"tjek_q":{"start":205.877,"end":212.097,"words":[["Tjek",205.917,206.077],["dig",206.117,206.197],["selv",206.217,206.397],["Hvorfor",206.937,207.277],["kan",207.337,207.457],["omkredsspændingen",207.517,208.277],["på",208.297,208.397],["indersiden",208.437,208.837],["aldrig",208.937,209.197],["blive",209.237,209.397],["mindre",209.497,209.837],["end",209.977,210.077],["p",210.117,210.137],["i",210.397,210.417],["uanset",210.877,211.317],["hvor",211.317,211.417],["tyk",211.477,211.657],["væggen",211.697,211.937],["er",212.037,212.097]],"text":"Tjek dig selv. Hvorfor kan omkredsspændingen på indersiden aldrig blive mindre end p i, uanset hvor tyk væggen er?"},"tjek_a":{"start":215.717,"end":228.418,"words":[["Fordi",215.757,215.937],["brøken",216.057,216.377],["r",216.737,216.757],["o",216.857,216.877],["i",217.017,217.037],["anden",217.137,217.337],["plus",217.377,217.577],["r",217.717,217.737],["i",217.837,217.857],["i",217.957,217.977],["anden",218.057,218.277],["over",218.577,218.797],["r",219.078,219.098],["o",219.198,219.218],["i",219.338,219.358],["anden",219.438,219.618],["minus",219.678,220.018],["r",220.178,220.198],["i",220.318,220.338],["i",220.438,220.458],["anden",220.558,220.758],["altid",221.218,221.598],["er",221.738,221.818],["større",221.858,222.138],["end",222.178,222.258],["et",222.338,222.458],["Når",223.058,223.178],["væggen",223.178,223.478],["bliver",223.518,223.718],["uendelig",223.938,224.498],["tyk",224.558,224.778],["går",224.998,225.118],["brøken",225.158,225.478],["mod",225.518,225.698],["et",225.918,226.038],["så",226.358,226.518],["sigma",226.718,226.958],["theta",227.038,227.378],["går",227.538,227.698],["mod",227.758,227.918],["p",228.058,228.078],["i",228.398,228.418]],"text":"Fordi brøken r o i anden plus r i i anden over r o i anden minus r i i anden altid er større end et. Når væggen bliver uendelig tyk, går brøken mod et, så sigma theta går mod p i."},"slut":{"start":230.238,"end":249.12,"words":[["Kort",230.278,230.458],["sagt",230.498,230.718],["Lamés",231.178,231.498],["ligninger",231.559,231.899],["giver",231.959,232.159],["sigma",232.299,232.559],["r",232.779,232.799],["og",232.979,233.059],["sigma",233.239,233.499],["theta",233.579,233.919],["som",233.999,234.139],["funktion",234.219,234.679],["af",234.739,234.799],["radius",234.859,235.259],["Radialspændingen",235.999,236.739],["er",236.779,236.839],["tryk",236.879,237.099],["omkredsspændingen",237.519,238.279],["er",238.379,238.439],["træk",238.479,238.719],["og",239.419,239.499],["begge",239.519,239.759],["er",239.799,239.859],["størst",239.879,240.139],["på",240.179,240.279],["indersiden",240.339,240.879],["hvor",241.079,241.239],["sigma",241.319,241.559],["theta",241.619,241.899],["max",241.999,242.199],["er",242.459,242.559],["p",242.759,242.779],["i",243.079,243.099],["gange",243.279,243.74],["r",243.8,243.82],["o",243.98,244.0],["i",244.16,244.18],["anden",244.28,244.48],["plus",244.52,244.78],["r",245.04,245.06],["i",245.3,245.32],["i",245.48,245.5],["anden",245.66,245.84],["over",246.5,246.72],["r",246.98,247.0],["o",247.1,247.12],["i",247.26,247.28],["anden",247.36,247.54],["minus",247.7,248.06],["r",248.38,248.4],["i",248.54,248.56],["i",248.76,248.78],["anden",248.92,249.12]],"text":"Kort sagt: Lamés ligninger giver sigma r og sigma theta som funktion af radius. Radialspændingen er tryk, omkredsspændingen er træk, og begge er størst på indersiden, hvor sigma theta max er p i gange r o i anden plus r i i anden over r o i anden minus r i i anden."}}}, { audio: 'eks-spm2-a.mp3', id: 'eks-spm2-a' });</script>
+</body>
+</html>
