@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spm. 4a: lejers levetid forklaret fra bunden · video</title>
+<meta name="description" content="Ny liste, spm. 4a forklaret fra bunden: træthed som huller i vejen, L_10 som statistik, C, L_10 = (C/P)^p, punkt mod linje.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 13: videoer</a><h1>Spm. 4a: lejers levetid forklaret fra bunden</h1><span class="meta">MEM1 · kapitel 13 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Spm. 4a: lejers levetid forklaret fra bunden"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Ny liste, spm. 4a forklaret fra bunden: træthed som huller i vejen, L_10 som statistik, C, L_10 = (C/P)^p, punkt mod linje.</p><div class="chips"><a href="../../opgaver/l13/tidligere-eksamen-spm-10-rullelejers-levetid.pdf">📐 Se udregningen i Mathcad (PDF)</a><a href="leje-levetid.html">Se først: Lejers levetid L10</a><a href="../../../../lab/mem1/rulleleje.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel13_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l13">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// MEM1 mundtlig eksamen (ny liste) · Spm. 4a v2: lejers levetid forklaret fra bunden.
+// Kasse glider/ruller → kugle klemmer ringen, træthed og afskalning, huller i vejen → 100 lejer, L_10 = 90 % klarer det
+// → C = last for 1 mio. omdr. (≈ 11 t ved 1500 omdr./min) → L_10 = (C/P)^p (13.82), 2 × last ⇒ ⅛ liv → punkt (p = 3) mod linje (p = 10/3).
+BP.scene({ header: 'MEM1 · mundtlig eksamen · spm. 4a', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, dot, ring, ell, rect, hatch, dashed, axes, plot, PI } = B;
+  const S = (id) => L(id).start;
+  const ringet = (k, s, x, y, size, col, a, te) => { const r = text(k, s, x, y, size, col, a, te); ring(r, col, te, te + 0.5); return r; };
+  const cirkel = (k, cx, cy, r, col, w, a, b) => line(k, ell(cx, cy, r, r, 0, 2 * PI), col, w, a, b);
+  const kasse = (k, x, y, a, col = 'black') => { line(k, rect(x, y, 150, 90).concat([[x, y]]), col, 3.4, a, a + 0.4); hatch(k, rect(x, y, 150, 90), col, a + 0.2, a + 0.6, { gap: 14 }); };
+  const bar = (k, x0, y, v, sc, col, a, et) => {
+    line(k, rect(x0, y, v * sc, 40).concat([[x0, y]]), col, 3, a, a + 0.5); hatch(k, rect(x0, y, v * sc, 40), col, a + 0.3, a + 0.8, { gap: 10 });
+    if (et) text(k, et, x0 + v * sc + 16, y + 31, 28, col, a + 0.4, a + 0.8);
+  };
+
+  // ---------------------------------------------------------------- 0 titel
+  B.titel(0, 'Spm. 4a: rullelejer', 'levetid og bæreevne · forklaret fra bunden', 'titel');
+
+  // ---------------------------------------------------------------- 1 hvad er et leje
+  B.goto('leje', 1);
+  bubble(1, 'Lejet lader akslen dreje', 130, 135, 50, 'blue', S('leje') - 0.1, S('leje') + 0.9);
+  text(1, 'cykel · skateboard · vaskemaskine · bil', 170, 215, 30, 'black', wt('leje', 'cykelhjulet') - 0.1, we('leje', 'bil'));
+  {
+    const cx = 340, cy = 450, ti = wt('inde', 'kugler');
+    cirkel(1, cx, cy, 165, 'black', 4.5, ti - 0.8, ti - 0.3); cirkel(1, cx, cy, 140, 'black', 3, ti - 0.7, ti - 0.2);
+    cirkel(1, cx, cy, 70, 'black', 4.5, ti - 0.6, ti - 0.1); cirkel(1, cx, cy, 95, 'black', 3, ti - 0.5, ti);
+    for (let i = 0; i < 9; i++) { const v = i * 2 * PI / 9; cirkel(1, cx + 117 * Math.cos(v), cy + 117 * Math.sin(v), 20, 'red', 3, ti + i * 0.06, ti + 0.3 + i * 0.06); }
+    cirkel(1, cx, cy, 34, 'blue', 4, ti + 0.6, ti + 0.9);
+    text(1, 'aksel', cx, cy + 10, 24, 'blue', ti + 0.7, ti + 1.0, { align: 'center' });
+  }
+  {
+    const tg = wt('inde', 'skubbe'), tr = wt('inde', 'rulle');
+    kasse(1, 760, 280, tg - 0.2); line(1, [[700, 372], [1180, 372]], 'black', 3, tg - 0.3, tg);
+    arrow(1, [[640, 325], [750, 325]], 'red', 4, tg, tg + 0.4, 16);
+    text(1, 'glider: tungt', 940, 340, 30, 'red', tg + 0.2, tg + 0.7);
+    kasse(1, 760, 480, tr - 0.3); [790, 860, 930].forEach((x, i) => cirkel(1, x, 590, 19, 'green', 3, tr - 0.1 + i * 0.1, tr + 0.2 + i * 0.1));
+    line(1, [[700, 610], [1180, 610]], 'black', 3, tr - 0.4, tr - 0.1);
+    arrow(1, [[640, 525], [750, 525]], 'green', 4, tr + 0.2, tr + 0.5, 16);
+    text(1, 'ruller: let', 940, 540, 30, 'green', tr + 0.3, we('inde', 'stokke'));
+  }
+
+  // ---------------------------------------------------------------- 2 træthed og vejen
+  B.goto('slid', 2);
+  bubble(2, 'Hvorfor dør et leje?', 130, 135, 50, 'blue', S('slid') - 0.1, S('slid') + 0.9);
+  {
+    const ts = wt('slid', 'kugle');
+    cirkel(2, 330, 330, 100, 'black', 4, ts - 0.1, ts + 0.5);
+    line(2, [[150, 432], [510, 432]], 'black', 4, ts + 0.1, ts + 0.5); hatch(2, rect(150, 432, 360, 40), 'black', ts + 0.3, ts + 0.7, { gap: 12 });
+    const tk = wt('slid', 'klemt');
+    dot(2, 330, 432, 10, 'red', tk - 0.1);
+    arrow(2, [[330, 190], [330, 225]], 'red', 4, tk, tk + 0.3, 14);
+    text(2, 'bitte lille flade, enormt tryk', 170, 530, 30, 'red', wt('slid', 'bitte') - 0.1, we('slid', 'enormt'));
+    const tt = wt('traet', 'revne');
+    line(2, [[300, 452], [318, 460], [334, 450], [352, 458]], 'red', 3.4, tt - 0.2, tt + 0.3);
+    const ta = wt('traet', 'afskalning');
+    line(2, [[300, 432], [312, 448], [345, 450], [360, 432]], 'green', 3.4, ta - 0.4, ta);
+    text(2, 'træthed under overfladen → afskalning', 170, 590, 30, 'black', wt('traet', 'træt') - 0.1, we('traet', 'afskalning'));
+  }
+  {
+    const tv = wt('vej', 'hullerne'), y = 470;
+    line(2, rect(640, y - 60, 560, 120).concat([[640, y - 60]]), 'black', 3, tv - 0.2, tv + 0.3);
+    dashed(2, [650, y], [1190, y], 'black', tv, tv + 0.4);
+    [[760, 440], [930, 500], [1100, 430]].forEach(([x, yy], i) => line(2, ell(x, yy, 30, 12, 0, 2 * PI), 'red', 3, tv + 0.2 + i * 0.15, tv + 0.5 + i * 0.15));
+    const tl = wt('vej', 'lastbiler');
+    line(2, rect(700, 300, 150, 70).concat([[700, 300]]), 'blue', 3.4, tl - 0.2, tl + 0.2); line(2, rect(850, 320, 50, 50).concat([[850, 320]]), 'blue', 3.4, tl, tl + 0.3);
+    cirkel(2, 735, 378, 12, 'blue', 3, tl + 0.1, tl + 0.3); cirkel(2, 870, 378, 12, 'blue', 3, tl + 0.2, tl + 0.4);
+    text(2, 'millioner af overkørsler', 760, 650, 30, 'black', wt('vej', 'millioner') - 0.1, we('vej', 'op'));
+  }
+
+  // ---------------------------------------------------------------- 3 statistik og L_10
+  B.goto('statistik', 3);
+  bubble(3, 'Levetid er statistik', 130, 135, 50, 'blue', S('statistik') - 0.1, S('statistik') + 0.9);
+  {
+    const th = wt('statistik', 'Hundrede'), tl = wt('l10', 'L');
+    for (let i = 0; i < 100; i++) {
+      const r = Math.floor(i / 10), c = i % 10, x = 200 + c * 38, y = 240 + r * 38, fejl = [3, 17, 28, 41, 55, 62, 74, 86, 90, 99].includes(i);
+      dot(3, x, y, 9, 'black', th + i * 0.012);
+      if (fejl) dot(3, x, y, 12, 'red', tl + 0.6 + i * 0.004);
+    }
+    text(3, '100 ens lejer, samme last', 190, 650, 30, 'black', th, we('statistik', 'last'));
+  }
+  text(3, 'nogle holder dobbelt så længe', 680, 230, 30, 'black', wt('statistik', 'Nogle') - 0.1, we('statistik', 'pakke'));
+  ringet(3, 'L_{10}: 90 % klarer det', 680, 330, 42, 'red', wt('l10', 'L') - 0.1, we('l10', 'klarer'));
+  text(3, '10 ud af 100 er gået i stykker forinden', 690, 400, 28, 'red', wt('l10', 'ti', 1) - 0.1, we('l10', 'forinden'));
+  text(3, 'måles i millioner omdrejninger', 690, 460, 30, 'blue', wt('l10', 'måles') - 0.1, we('l10', 'omdrejninger', 1));
+
+  // ---------------------------------------------------------------- 4 bæreevnen C
+  B.goto('c', 4);
+  bubble(4, 'Bæreevnen C', 130, 135, 50, 'blue', S('c') - 0.1, S('c') + 0.8);
+  {
+    const tk = wt('c', 'katalogets');
+    line(4, rect(920, 500, 260, 140).concat([[920, 500]]), 'black', 3, tk - 0.1, tk + 0.4);
+    for (let i = 1; i < 4; i++) line(4, [[920, 500 + i * 35], [1180, 500 + i * 35]], 'black', 1.8, tk + 0.2 + i * 0.05, tk + 0.4 + i * 0.05);
+    line(4, [[1080, 500], [1080, 640]], 'black', 1.8, tk + 0.3, tk + 0.5);
+    text(4, 'C (kN)', 1130, 527, 22, 'red', tk + 0.4, tk + 0.7, { align: 'center' });
+    text(4, 'katalog', 1050, 680, 28, 'black', tk, tk + 0.4, { align: 'center' });
+  }
+  text(4, 'C står i kataloget for hvert leje', 170, 230, 32, 'black', wt('c', 'katalogets') - 0.1, we('c', 'leje'));
+  ringet(4, 'C = last, hvor 90 % holder 1 mio. omdr.', 170, 310, 34, 'red', wt('c', 'C', 1) - 0.1, we('c', 'omdrejninger'));
+  text(4, '1 mio. omdr. ved 1500 omdr./min ≈ 11 timer', 170, 400, 32, 'green', wt('c2', 'femten') - 0.4, we('c2', 'timer'));
+  text(4, '⇒ C er en meget hård last', 190, 460, 32, 'green', wt('c2', 'hård') - 0.6, we('c2', 'last'));
+  {
+    const tp = wt('c2', 'P');
+    bar(4, 230, 540, 500, 1.1, 'red', tp - 0.6, 'C');
+    bar(4, 230, 600, 50, 1.1, 'blue', tp - 0.1, 'P: den rigtige last');
+  }
+
+  // ---------------------------------------------------------------- 5 formlen
+  B.goto('formel', 5);
+  bubble(5, 'Formlen', 130, 135, 50, 'blue', S('formel') - 0.1, S('formel') + 0.7);
+  B.formel(5, '13.82', 'L_{10} = (C / P)^p', 200, 270, 56, wt('formel', 'L') - 0.1, we('formel', 'p'), 'red');
+  text(5, 'C / P: hvor mange gange stærkere end nødvendigt', 170, 370, 30, 'blue', wt('saetning', 'C') - 0.1, we('saetning', 'behøver'));
+  text(5, 'p: hvor hårdt mere last straffes', 170, 425, 30, 'green', wt('saetning', 'Potensen') - 0.1, we('saetning', 'mere'));
+  {
+    const t1 = wt('tredje', 'Fordobler'), t2 = wt('tredje', 'Halverer');
+    text(5, 'kugleleje: p = 3', 170, 510, 32, 'black', wt('tredje', 'kugleleje') - 0.1, we('tredje', 'tre'));
+    text(5, 'last × 2  ⇒  liv ÷ 8', 170, 570, 36, 'red', t1 - 0.1, we('tredje', 'ottendedel'));
+    text(5, 'last ÷ 2  ⇒  liv × 8', 170, 635, 36, 'green', t2 - 0.1, we('tredje', 'længe'));
+    const tl = wt('lastbil', 'lastbil');
+    line(5, rect(820, 520, 190, 80).concat([[820, 520]]), 'blue', 3.4, tl - 0.2, tl + 0.2); line(5, rect(1010, 540, 60, 60).concat([[1010, 540]]), 'blue', 3.4, tl, tl + 0.3);
+    cirkel(5, 860, 610, 14, 'blue', 3, tl + 0.1, tl + 0.3); cirkel(5, 1035, 610, 14, 'blue', 3, tl + 0.2, tl + 0.4);
+    text(5, 'lidt mere last ⇒ meget kortere liv', 760, 670, 28, 'red', wt('lastbil', 'Små') - 0.1, we('lastbil', 'levetid'));
+  }
+
+  // ---------------------------------------------------------------- 6 kugle mod rulle
+  B.goto('kugle', 6);
+  bubble(6, 'Punkt eller linje?', 130, 135, 50, 'blue', S('kugle') - 0.1, S('kugle') + 0.9);
+  {
+    const tp = wt('punkt', 'glaskugle');
+    cirkel(6, 330, 360, 90, 'black', 4, tp - 0.2, tp + 0.4);
+    line(6, [[170, 452], [490, 452]], 'black', 4, tp, tp + 0.3);
+    dot(6, 330, 452, 10, 'red', tp + 0.3);
+    text(6, 'punkt', 330, 510, 32, 'red', tp + 0.3, tp + 0.7, { align: 'center' });
+    ringet(6, 'kugleleje: p = 3', 200, 600, 38, 'red', wt('linje', 'Linjen') - 0.4, we('linje', 'lasten', 1));
+    const tk = wt('punkt', 'kagerulle');
+    line(6, rect(720, 290, 380, 120).concat([[720, 290]]), 'black', 4, tk - 0.2, tk + 0.4);
+    line(6, [[680, 412], [1140, 412]], 'black', 4, tk, tk + 0.3);
+    line(6, [[730, 411], [1090, 411]], 'red', 7, tk + 0.3, tk + 0.7);
+    text(6, 'linje', 910, 470, 32, 'red', tk + 0.5, tk + 0.9, { align: 'center' });
+    ringet(6, 'rulleleje: p = 10/3 ≈ 3,3', 720, 600, 38, 'blue', wt('linje', 'Ti') - 0.1, we('linje', 'tre', 1));
+    text(6, 'bærer mere', 920, 530, 28, 'green', wt('linje', 'bærer') - 0.1, we('linje', 'rulleleje'), { align: 'center' });
+  }
+
+  // ---------------------------------------------------------------- 7 fra omdrejninger til timer
+  B.goto('timer', 7);
+  bubble(7, 'Til timer', 130, 135, 50, 'blue', S('timer') - 0.1, S('timer') + 0.7);
+  text(7, 'timer = L_{10} · 10^6 / (n · 60)', 200, 300, 44, 'red', wt('timer', 'Del') - 0.1, we('timer', 'timerne'));
+  text(7, 'n i omdrejninger pr. minut', 220, 370, 30, 'black', wt('timer', 'minuttet') - 0.6, we('timer', 'minuttet'));
+
+  // ---------------------------------------------------------------- 8 sådan siger du det + 15 minutter
+  B.goto('censor', 8);
+  bubble(8, 'Sådan siger du det', 130, 135, 50, 'blue', S('censor') - 0.1, S('censor') + 0.9);
+  text(8, '1.  vejen: lejet dør af træthed under overfladen', 170, 220, 32, 'black', wt('censor', 'vejen') - 0.1, we('censor', 'overfladen'));
+  text(8, '2.  L_{10}: statistik, 90 % overlever', 170, 275, 32, 'black', wt('censor', 'statistik') - 0.6, we('censor', 'overlever'));
+  text(8, '3.  C: lasten for 1 mio. omgange', 170, 330, 32, 'black', wt('censor', 'C') - 0.1, we('censor', 'omgange'));
+  text(8, '4.  L_{10} = (C/P)^p · punkt (3) mod linje (10/3)', 170, 385, 32, 'red', wt('censor', 'Formlen') - 0.1, we('censor', 'linje'));
+  {
+    const x0 = 170, x1 = 1110, y = 470, hh = 56, m = (x1 - x0) / 15;
+    const seg = [[0, 7, 'blue', 'del a', wt('tavle', 'syv')], [7, 13, 'red', 'del b', wt('tavle', 'seks')], [13, 15, 'green', 'vurdér', wt('tavle', 'to', 0)]];
+    seg.forEach(([a, b2, col, et, t]) => {
+      line(8, rect(x0 + a * m, y, (b2 - a) * m, hh).concat([[x0 + a * m, y]]), col, 3, t - 0.1, t + 0.4);
+      hatch(8, rect(x0 + a * m, y, (b2 - a) * m, hh), col, t + 0.2, t + 0.7, { gap: 12 });
+      text(8, et, x0 + (a + b2) / 2 * m, y + hh + 40, 30, col, t, t + 0.4, { align: 'center' });
+      text(8, a + '', x0 + a * m, y - 12, 24, 'black', t, t + 0.3, { align: 'center' });
+    });
+    text(8, '15 min', x1, y - 12, 24, 'black', wt('tavle', 'to', 0), wt('tavle', 'to', 0) + 0.3, { align: 'center' });
+  }
+
+  // ---------------------------------------------------------------- 9 tjek: dobbelt last
+  B.goto('tjek_q', 9);
+  B.tjek(9, ['Lasten stiger fra 5 til 10 kN:', 'hvad sker der med levetiden?'], ['⅛: to i tredje er otte', '4 år  →  et halvt år'], 'tjek_q', 'tjek_a');
+  {
+    const t1 = wt('tjek_a', 'fire'), x0 = 420, sc = 120;
+    text(9, '5 kN', 200, 590, 30, 'black', t1 - 0.2, t1 + 0.2); bar(9, x0, 560, 4, sc, 'green', t1 - 0.1, '4 år');
+    text(9, '10 kN', 200, 655, 30, 'black', t1 + 0.2, t1 + 0.5); bar(9, x0, 625, 0.5, sc, 'red', wt('tjek_a', 'halvt') - 0.2, '½ år');
+  }
+
+  // ---------------------------------------------------------------- 10 slut
+  B.goto('slut', 10);
+  B.slut(10, 'MEM1 mundtlig eksamen, ny liste, spm. 4 · Hamrock m.fl., kap. 13, lign. (13.82) · slides kap. 13', 'spm. 4b: hvor længe holder lejet?', 'slut');
+  text(10, 'lejer dør af træthed: levetid er statistik', 200, 240, 34, 'black', wt('slut', 'træthed') - 0.6, we('slut', 'statistik'));
+  text(10, 'L_{10}: det, 90 % klarer', 200, 310, 34, 'blue', wt('slut', 'halvfems') - 0.6, we('slut', 'klarer'));
+  text(10, 'L_{10} = (C/P)^p:  p = 3 kugler, 10/3 ruller', 200, 380, 34, 'red', wt('slut', 'opløftet') - 0.6, we('slut', 'ruller'));
+  text(10, 'lidt mere last ⇒ meget kortere liv', 200, 450, 34, 'green', wt('slut', 'Lidt') - 0.1, we('slut', 'liv'));
+});
+
+</script>
+<script>BP.live({"duration":241.04,"audio":"eks-spm4-a.mp3","order":["titel","leje","inde","slid","traet","vej","statistik","l10","c","c2","formel","saetning","tredje","lastbil","kugle","punkt","linje","timer","censor","tavle","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":9.021,"words":[["Spørgsmål",0.54,1.06],["fire",1.28,1.54],["del",1.8,1.96],["a",2.04,2.06],["Levetid",3.16,3.64],["og",3.86,3.94],["bæreevne",4.06,4.56],["for",4.64,4.76],["rullelejer",4.84,5.32],["Vi",6.081,6.121],["starter",6.141,6.481],["med",6.501,6.621],["hverdagen",6.781,7.261],["og",7.381,7.441],["formlen",7.501,7.841],["kommer",7.901,8.161],["når",8.181,8.301],["du",8.301,8.361],["ved",8.401,8.541],["hvad",8.561,8.661],["den",8.681,8.761],["siger",8.821,9.021]],"text":"Spørgsmål fire, del a. Levetid og bæreevne for rullelejer. Vi starter med hverdagen, og formlen kommer, når du ved, hvad den siger."},"leje":{"start":10.841,"end":19.142,"words":[["Et",10.881,10.981],["leje",11.061,11.361],["er",11.481,11.561],["det",11.601,11.741],["der",11.761,11.861],["lader",11.881,12.041],["en",12.041,12.081],["aksel",12.281,12.561],["dreje",12.761,13.021],["let",13.081,13.221],["Du",13.841,13.901],["finder",13.941,14.181],["dem",14.181,14.301],["i",14.341,14.361],["cykelhjulet",14.701,15.301],["i",15.601,15.621],["et",15.761,15.881],["skateboardhjul",16.001,16.661],["i",17.161,17.181],["vaskemaskinen",17.241,17.901],["og",18.282,18.342],["i",18.382,18.402],["hjulet",18.442,18.722],["på",18.742,18.842],["en",18.862,18.922],["bil",18.962,19.142]],"text":"Et leje er det, der lader en aksel dreje let. Du finder dem i cykelhjulet, i et skateboardhjul, i vaskemaskinen og i hjulet på en bil."},"inde":{"start":20.082,"end":30.403,"words":[["Indeni",20.122,20.322],["ruller",20.462,20.702],["kugler",20.762,21.182],["eller",21.282,21.462],["ruller",21.542,21.822],["mellem",21.862,22.102],["en",22.122,22.222],["indre",22.362,22.622],["og",22.762,22.822],["en",22.862,22.922],["ydre",23.002,23.242],["ring",23.302,23.482],["Rullende",24.242,24.542],["friktion",24.602,25.002],["er",25.102,25.182],["meget",25.322,25.562],["mindre",25.602,25.902],["end",26.002,26.102],["glidende",26.142,26.482],["Prøv",27.362,27.502],["at",27.502,27.542],["skubbe",27.562,27.762],["en",27.782,27.822],["kasse",27.842,28.142],["og",28.542,28.602],["prøv",28.622,28.762],["så",28.842,28.942],["at",28.962,29.022],["rulle",29.042,29.262],["den",29.262,29.362],["på",29.542,29.662],["nogle",29.682,29.823],["runde",29.863,30.043],["stokke",30.123,30.403]],"text":"Indeni ruller kugler eller ruller mellem en indre og en ydre ring. Rullende friktion er meget mindre end glidende. Prøv at skubbe en kasse, og prøv så at rulle den på nogle runde stokke."},"slid":{"start":32.223,"end":40.943,"words":[["Men",32.263,32.383],["et",32.423,32.503],["leje",32.543,32.743],["holder",32.803,33.003],["ikke",33.043,33.163],["evigt",33.223,33.443],["Hver",34.143,34.303],["gang",34.383,34.543],["en",34.643,34.723],["kugle",34.783,35.063],["ruller",35.123,35.343],["hen",35.363,35.483],["over",35.543,35.703],["et",35.723,35.763],["punkt",35.803,36.023],["bliver",36.183,36.343],["det",36.343,36.423],["punkt",36.463,36.683],["klemt",36.803,37.043],["hårdt",37.083,37.303],["Kontaktfladen",37.943,38.563],["er",38.703,38.803],["bitte",39.063,39.263],["lille",39.323,39.503],["så",39.763,39.863],["trykket",39.883,40.203],["er",40.263,40.343],["enormt",40.543,40.943]],"text":"Men et leje holder ikke evigt. Hver gang en kugle ruller hen over et punkt, bliver det punkt klemt hårdt. Kontaktfladen er bitte lille, så trykket er enormt."},"traet":{"start":42.144,"end":52.084,"words":[["Efter",42.184,42.384],["mange",42.404,42.604],["millioner",42.644,42.984],["gange",43.004,43.264],["bliver",43.564,43.764],["materialet",43.824,44.364],["træt",44.444,44.664],["lige",44.924,45.084],["under",45.124,45.284],["overfladen",45.284,45.724],["Der",46.204,46.304],["kommer",46.324,46.504],["en",46.524,46.584],["lille",46.604,46.764],["revne",46.824,47.144],["og",47.624,47.684],["til",47.724,47.824],["sidst",47.864,48.064],["springer",48.204,48.464],["et",48.464,48.524],["stykke",48.544,48.764],["af",48.804,48.904],["Det",49.544,49.624],["kaldes",49.644,49.884],["afskalning",50.084,50.604],["og",50.924,50.984],["så",51.024,51.124],["begynder",51.144,51.424],["lejet",51.484,51.724],["at",51.744,51.804],["larme",51.824,52.084]],"text":"Efter mange millioner gange bliver materialet træt lige under overfladen. Der kommer en lille revne, og til sidst springer et stykke af. Det kaldes afskalning, og så begynder lejet at larme."},"vej":{"start":53.044,"end":60.185,"words":[["Det",53.084,53.164],["er",53.164,53.204],["ligesom",53.204,53.404],["hullerne",53.444,53.765],["i",53.845,53.865],["en",53.905,53.965],["vej",54.005,54.165],["Én",54.825,54.945],["bil",55.005,55.185],["gør",55.245,55.365],["ingenting",55.405,55.725],["Men",56.265,56.385],["millioner",56.545,57.065],["af",57.085,57.145],["biler",57.165,57.465],["og",57.765,57.825],["især",57.865,58.065],["tunge",58.145,58.365],["lastbiler",58.405,58.905],["æder",59.285,59.485],["til",59.525,59.625],["sidst",59.665,59.845],["vejen",59.865,60.065],["op",60.085,60.185]],"text":"Det er ligesom hullerne i en vej. Én bil gør ingenting. Men millioner af biler, og især tunge lastbiler, æder til sidst vejen op."},"statistik":{"start":62.005,"end":71.306,"words":[["Nu",62.045,62.105],["kommer",62.165,62.345],["det",62.345,62.405],["overraskende",62.425,62.865],["Hundrede",63.665,64.065],["ens",64.265,64.485],["lejer",64.545,64.845],["under",64.985,65.165],["præcis",65.205,65.646],["samme",65.826,66.046],["last",66.106,66.346],["holder",66.546,66.746],["ikke",66.766,66.886],["lige",66.926,67.066],["længe",67.086,67.306],["Nogle",67.986,68.146],["holder",68.166,68.366],["dobbelt",68.426,68.666],["så",68.666,68.766],["længe",68.786,68.946],["som",68.966,69.046],["andre",69.106,69.306],["Ligesom",70.126,70.346],["pærer",70.426,70.726],["i",70.866,70.886],["en",70.926,70.986],["pakke",71.026,71.306]],"text":"Nu kommer det overraskende. Hundrede ens lejer under præcis samme last holder ikke lige længe. Nogle holder dobbelt så længe som andre. Ligesom pærer i en pakke."},"l10":{"start":72.366,"end":82.607,"words":[["Derfor",72.406,72.686],["bruger",72.726,72.926],["man",72.926,73.046],["L",73.326,73.346],["ti",73.446,73.566],["Det",74.326,74.446],["er",74.446,74.486],["det",74.486,74.546],["antal",74.546,74.766],["omdrejninger",74.806,75.386],["som",75.486,75.626],["halvfems",75.746,76.186],["procent",76.226,76.546],["af",76.566,76.626],["lejerne",76.666,76.926],["klarer",76.966,77.247],["Kun",77.787,77.927],["ti",78.067,78.187],["ud",78.307,78.387],["af",78.407,78.467],["hundrede",78.487,78.787],["er",78.867,78.927],["gået",78.967,79.147],["i",79.167,79.187],["stykker",79.187,79.447],["forinden",79.467,79.787],["L",80.607,80.627],["ti",80.687,80.787],["måles",80.927,81.267],["i",81.447,81.467],["millioner",81.567,82.067],["omdrejninger",82.127,82.607]],"text":"Derfor bruger man L ti. Det er det antal omdrejninger, som halvfems procent af lejerne klarer. Kun ti ud af hundrede er gået i stykker forinden. L ti måles i millioner omdrejninger."},"c":{"start":84.427,"end":93.568,"words":[["Så",84.467,84.587],["kommer",84.607,84.807],["bæreevnen",84.827,85.327],["C",85.627,85.647],["Den",86.287,86.407],["står",86.427,86.627],["i",86.687,86.707],["katalogets",86.787,87.327],["tabel",87.367,87.667],["for",87.747,87.827],["hvert",87.827,88.027],["leje",88.087,88.347],["C",89.127,89.147],["er",89.187,89.447],["den",89.487,89.607],["last",89.707,89.988],["hvor",90.048,90.208],["halvfems",90.348,90.728],["procent",90.788,91.088],["af",91.148,91.208],["lejerne",91.248,91.588],["holder",91.648,91.908],["netop",92.108,92.368],["en",92.508,92.648],["million",92.688,92.988],["omdrejninger",93.048,93.568]],"text":"Så kommer bæreevnen C. Den står i katalogets tabel for hvert leje. C er den last, hvor halvfems procent af lejerne holder netop en million omdrejninger."},"c2":{"start":94.408,"end":105.469,"words":[["En",94.448,94.528],["million",94.548,94.848],["omdrejninger",94.908,95.408],["lyder",95.448,95.628],["af",95.648,95.708],["meget",95.728,96.008],["men",96.368,96.468],["ved",96.508,96.608],["femten",96.728,97.008],["hundrede",97.068,97.348],["omdrejninger",97.388,97.828],["i",97.848,97.868],["minuttet",97.888,98.208],["er",98.408,98.468],["det",98.488,98.548],["kun",98.588,98.748],["cirka",98.808,99.088],["elleve",99.288,99.528],["timer",99.608,99.908],["C",100.668,100.688],["er",100.928,100.988],["altså",101.008,101.229],["en",101.289,101.369],["meget",101.469,101.729],["hård",101.769,101.929],["last",101.989,102.249],["Et",102.689,102.789],["rigtigt",102.829,103.109],["leje",103.129,103.369],["kører",103.509,103.729],["med",103.749,103.809],["en",103.829,103.889],["last",103.909,104.109],["P",104.209,104.229],["der",104.529,104.629],["er",104.669,104.729],["langt",104.769,104.969],["mindre",105.029,105.249],["end",105.309,105.389],["C",105.449,105.469]],"text":"En million omdrejninger lyder af meget, men ved femten hundrede omdrejninger i minuttet er det kun cirka elleve timer. C er altså en meget hård last. Et rigtigt leje kører med en last P, der er langt mindre end C."},"formel":{"start":107.289,"end":113.15,"words":[["Nu",107.329,107.389],["formlen",107.489,107.809],["ligning",108.229,108.529],["tretten",108.649,108.889],["toogfirs",108.929,109.409],["i",109.449,109.469],["bogen",109.529,109.769],["L",110.609,110.629],["ti",110.729,110.869],["er",111.269,111.369],["C",111.629,111.649],["over",111.849,112.009],["P",112.049,112.069],["opløftet",112.489,112.949],["til",112.989,113.109],["p",113.129,113.15]],"text":"Nu formlen, ligning tretten toogfirs i bogen. L ti er C over P, opløftet til p."},"saetning":{"start":114.23,"end":122.87,"words":[["Læs",114.27,114.41],["den",114.43,114.51],["som",114.55,114.63],["en",114.67,114.73],["sætning",114.77,115.09],["C",115.81,115.83],["over",116.03,116.21],["P",116.25,116.27],["siger",116.67,116.89],["hvor",116.91,117.01],["mange",117.09,117.31],["gange",117.37,117.57],["lejet",117.63,117.89],["er",117.93,117.99],["stærkere",118.03,118.47],["end",118.57,118.63],["det",118.65,118.71],["behøver",118.73,119.09],["Potensen",119.61,120.07],["p",120.13,120.15],["siger",120.69,120.91],["hvor",120.93,121.03],["hårdt",121.09,121.31],["det",121.33,121.43],["straffes",121.47,121.85],["hvis",121.93,122.03],["du",122.07,122.11],["belaster",122.17,122.53],["det",122.55,122.63],["mere",122.67,122.87]],"text":"Læs den som en sætning. C over P siger, hvor mange gange lejet er stærkere, end det behøver. Potensen p siger, hvor hårdt det straffes, hvis du belaster det mere."},"tredje":{"start":123.83,"end":133.351,"words":[["For",123.87,123.95],["et",123.97,124.03],["kugleleje",124.07,124.53],["er",124.631,124.691],["p",124.731,124.751],["tre",125.291,125.451],["Fordobler",126.271,126.671],["du",126.691,126.731],["lasten",126.791,127.131],["falder",127.391,127.611],["levetiden",127.651,128.051],["ikke",128.091,128.191],["til",128.191,128.291],["det",128.291,128.371],["halve",128.391,128.671],["Den",129.031,129.131],["falder",129.151,129.391],["til",129.411,129.511],["en",129.531,129.611],["ottendedel",129.731,130.171],["Halverer",130.771,131.131],["du",131.151,131.191],["lasten",131.271,131.571],["holder",131.871,132.071],["lejet",132.111,132.351],["otte",132.531,132.711],["gange",132.771,132.971],["så",133.011,133.111],["længe",133.131,133.351]],"text":"For et kugleleje er p tre. Fordobler du lasten, falder levetiden ikke til det halve. Den falder til en ottendedel. Halverer du lasten, holder lejet otte gange så længe."},"lastbil":{"start":135.171,"end":143.292,"words":[["Det",135.211,135.291],["er",135.291,135.331],["det",135.331,135.391],["samme",135.431,135.611],["som",135.651,135.731],["med",135.751,135.851],["vejen",135.871,136.151],["En",136.671,136.771],["tung",136.911,137.132],["lastbil",137.192,137.612],["slider",137.692,137.952],["meget",137.992,138.212],["mere",138.252,138.452],["end",138.532,138.632],["to",138.672,138.792],["halvt",138.992,139.192],["så",139.232,139.332],["tunge",139.352,139.552],["biler",139.592,139.852],["Små",140.472,140.672],["forskelle",140.752,141.152],["i",141.152,141.172],["last",141.272,141.512],["giver",141.692,141.872],["store",141.932,142.252],["forskelle",142.312,142.752],["i",142.812,142.832],["levetid",142.892,143.292]],"text":"Det er det samme som med vejen. En tung lastbil slider meget mere end to halvt så tunge biler. Små forskelle i last giver store forskelle i levetid."},"kugle":{"start":145.112,"end":150.613,"words":[["Hvorfor",145.152,145.392],["er",145.432,145.492],["p",145.532,145.552],["tre",145.872,146.032],["for",146.192,146.292],["kuglelejer",146.312,146.872],["og",146.992,147.072],["ti",147.192,147.292],["tredjedele",147.412,147.912],["for",147.952,148.052],["rullelejer",148.092,148.572],["Det",149.173,149.253],["handler",149.273,149.453],["om",149.493,149.533],["formen",149.653,149.993],["på",150.033,150.133],["kontakten",150.153,150.613]],"text":"Hvorfor er p tre for kuglelejer og ti tredjedele for rullelejer? Det handler om formen på kontakten."},"punkt":{"start":151.473,"end":159.113,"words":[["En",151.513,151.593],["kugle",151.673,151.973],["rører",152.033,152.213],["ringen",152.253,152.513],["i",152.593,152.613],["et",152.653,152.693],["lille",152.693,152.893],["punkt",152.973,153.273],["ligesom",153.633,153.853],["en",153.893,153.973],["glaskugle",154.053,154.613],["på",154.633,154.733],["et",154.733,154.793],["bord",154.813,155.013],["En",155.813,155.893],["rulle",155.973,156.233],["rører",156.313,156.533],["i",156.593,156.613],["en",156.673,156.753],["linje",156.813,157.113],["ligesom",157.433,157.673],["en",157.713,157.793],["kagerulle",157.873,158.433],["på",158.453,158.553],["en",158.573,158.613],["dejplade",158.653,159.113]],"text":"En kugle rører ringen i et lille punkt, ligesom en glaskugle på et bord. En rulle rører i en linje, ligesom en kagerulle på en dejplade."},"linje":{"start":159.853,"end":167.874,"words":[["Linjen",159.893,160.193],["fordeler",160.273,160.674],["lasten",160.714,161.014],["bedre",161.054,161.314],["Derfor",161.834,162.094],["bærer",162.134,162.334],["et",162.354,162.414],["rulleleje",162.454,162.894],["mere",162.954,163.214],["og",163.594,163.674],["levetiden",163.714,164.114],["afhænger",164.194,164.514],["lidt",164.574,164.714],["kraftigere",164.794,165.274],["af",165.274,165.334],["lasten",165.354,165.654],["Ti",166.134,166.234],["tredjedele",166.334,166.794],["er",166.834,166.894],["cirka",166.934,167.154],["tre",167.354,167.474],["komma",167.554,167.714],["tre",167.774,167.874]],"text":"Linjen fordeler lasten bedre. Derfor bærer et rulleleje mere, og levetiden afhænger lidt kraftigere af lasten. Ti tredjedele er cirka tre komma tre."},"timer":{"start":169.694,"end":177.015,"words":[["Til",169.734,169.854],["sidst",169.874,170.074],["skal",170.094,170.234],["millioner",170.254,170.674],["af",170.694,170.734],["omdrejninger",170.774,171.274],["laves",171.314,171.514],["om",171.574,171.654],["til",171.714,171.834],["timer",171.874,172.194],["Del",173.255,173.435],["omdrejningerne",173.495,174.055],["med",174.095,174.175],["omdrejninger",174.235,174.695],["i",174.715,174.735],["minuttet",174.775,175.115],["og",175.375,175.415],["del",175.455,175.555],["med",175.615,175.695],["tres",175.715,175.955],["Så",176.355,176.435],["har",176.455,176.555],["du",176.575,176.615],["timerne",176.675,177.015]],"text":"Til sidst skal millioner af omdrejninger laves om til timer. Del omdrejningerne med omdrejninger i minuttet, og del med tres. Så har du timerne."},"censor":{"start":178.235,"end":197.297,"words":[["Hvordan",178.275,178.515],["siger",178.595,178.795],["du",178.815,178.855],["det",178.895,178.995],["til",179.015,179.115],["censor",179.135,179.415],["Start",180.275,180.495],["med",180.535,180.635],["vejen",180.675,180.935],["og",181.015,181.095],["lastbilerne",181.115,181.615],["lejet",182.135,182.355],["dør",182.435,182.635],["af",182.735,182.815],["træthed",182.835,183.215],["under",183.275,183.435],["overfladen",183.475,183.876],["Så",184.456,184.576],["L",184.736,184.756],["ti",184.836,184.956],["det",185.416,185.516],["er",185.516,185.556],["statistik",185.556,185.976],["halvfems",186.296,186.656],["procent",186.696,187.016],["overlever",187.096,187.496],["Så",188.176,188.276],["C",188.336,188.356],["lasten",189.036,189.396],["hvor",189.436,189.596],["lejet",189.636,189.916],["kun",189.976,190.136],["holder",190.196,190.396],["en",190.476,190.576],["million",190.596,190.856],["omgange",190.916,191.256],["Formlen",191.996,192.356],["L",192.896,192.916],["ti",193.016,193.116],["lig",193.316,193.456],["C",193.696,193.716],["over",193.916,194.076],["P",194.136,194.156],["opløftet",194.436,194.816],["til",194.856,194.956],["p",194.976,194.996],["Og",195.877,195.937],["forskellen",195.977,196.397],["på",196.477,196.577],["punkt",196.617,196.857],["og",196.937,196.997],["linje",197.037,197.297]],"text":"Hvordan siger du det til censor? Start med vejen og lastbilerne: lejet dør af træthed under overfladen. Så L ti: det er statistik, halvfems procent overlever. Så C: lasten, hvor lejet kun holder en million omgange. Formlen L ti lig C over P opløftet til p. Og forskellen på punkt og linje."},"tavle":{"start":198.077,"end":203.077,"words":[["Brug",198.117,198.277],["cirka",198.377,198.597],["syv",198.657,198.777],["minutter",198.817,199.037],["på",199.057,199.137],["det",199.157,199.277],["Så",199.757,199.857],["seks",199.917,200.097],["minutter",200.157,200.397],["på",200.417,200.517],["del",200.517,200.657],["b",200.717,200.737],["og",201.257,201.317],["to",201.357,201.437],["minutter",201.517,201.797],["til",201.817,201.897],["at",201.897,201.957],["vurdere",201.977,202.257],["om",202.317,202.377],["tallet",202.437,202.697],["er",202.717,202.757],["rimeligt",202.797,203.077]],"text":"Brug cirka syv minutter på det. Så seks minutter på del b, og to minutter til at vurdere, om tallet er rimeligt."},"tjek_q":{"start":204.897,"end":210.978,"words":[["Tjek",204.937,205.077],["dig",205.097,205.177],["selv",205.217,205.377],["Lasten",206.097,206.377],["på",206.417,206.497],["et",206.497,206.557],["kugleleje",206.577,207.057],["stiger",207.137,207.417],["fra",207.457,207.537],["fem",207.818,207.958],["til",208.118,208.218],["ti",208.258,208.358],["kilonewton",208.518,209.058],["Hvad",209.838,209.958],["sker",209.998,210.198],["der",210.218,210.298],["med",210.318,210.418],["levetiden",210.458,210.978]],"text":"Tjek dig selv. Lasten på et kugleleje stiger fra fem til ti kilonewton. Hvad sker der med levetiden?"},"tjek_a":{"start":214.598,"end":222.199,"words":[["Den",214.638,214.738],["falder",214.778,214.998],["til",215.018,215.098],["en",215.118,215.178],["ottendedel",215.258,215.678],["Lasten",216.218,216.578],["er",216.638,216.698],["dobbelt",216.798,217.078],["så",217.078,217.178],["stor",217.218,217.418],["og",217.798,217.878],["to",217.918,218.038],["i",218.138,218.158],["tredje",218.218,218.558],["er",218.778,218.838],["otte",218.958,219.178],["Et",219.838,219.918],["leje",219.978,220.178],["der",220.198,220.278],["holdt",220.318,220.478],["fire",220.558,220.798],["år",220.878,220.978],["holder",221.118,221.298],["nu",221.318,221.378],["kun",221.458,221.618],["et",221.719,221.799],["halvt",221.859,222.059],["år",222.099,222.199]],"text":"Den falder til en ottendedel. Lasten er dobbelt så stor, og to i tredje er otte. Et leje, der holdt fire år, holder nu kun et halvt år."},"slut":{"start":224.019,"end":239.56,"words":[["Kort",224.059,224.239],["sagt",224.279,224.499],["lejer",224.939,225.219],["dør",225.319,225.459],["af",225.499,225.559],["træthed",225.599,225.999],["og",226.359,226.419],["levetiden",226.479,226.939],["er",226.999,227.059],["statistik",227.079,227.479],["L",228.399,228.419],["ti",228.499,228.619],["er",229.039,229.119],["det",229.159,229.239],["halvfems",229.259,229.599],["procent",229.639,229.959],["klarer",230.019,230.319],["L",231.259,231.279],["ti",231.359,231.459],["er",231.639,231.739],["C",231.939,231.959],["over",232.179,232.359],["P",232.419,232.439],["opløftet",232.759,233.159],["til",233.199,233.319],["p",233.339,233.359],["med",233.899,233.999],["p",234.039,234.059],["lig",234.32,234.44],["tre",234.5,234.64],["for",234.74,234.84],["kugler",234.86,235.16],["og",235.46,235.52],["ti",235.62,235.72],["tredjedele",235.84,236.3],["for",236.36,236.46],["ruller",236.48,236.72],["Lidt",237.5,237.64],["mere",237.7,237.84],["last",237.9,238.16],["giver",238.48,238.66],["meget",238.74,239.0],["kortere",239.04,239.36],["liv",239.4,239.56]],"text":"Kort sagt: lejer dør af træthed, og levetiden er statistik. L ti er det, halvfems procent klarer. L ti er C over P opløftet til p, med p lig tre for kugler og ti tredjedele for ruller. Lidt mere last giver meget kortere liv."}}}, { audio: 'eks-spm4-a.mp3', id: 'eks-spm4-a' });</script>
+</body>
+</html>
