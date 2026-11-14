@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spm. 3a: bøjning og vridning forklaret fra bunden · video</title>
+<meta name="description" content="Ny liste, spm. 3a forklaret fra bunden: håndklædet, σ og τ i overfladen, Mohr, T_e som Pythagoras (gåtur 4-3-5), M_e, kridt mod stål.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 11: videoer</a><h1>Spm. 3a: bøjning og vridning forklaret fra bunden</h1><span class="meta">MEM1 · kapitel 11 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Spm. 3a: bøjning og vridning forklaret fra bunden"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Ny liste, spm. 3a forklaret fra bunden: håndklædet, σ og τ i overfladen, Mohr, T_e som Pythagoras (gåtur 4-3-5), M_e, kridt mod stål.</p><div class="chips"><a href="../../opgaver/l11/tidligere-eksamen-spm-09-akseldesign.pdf">📐 Se udregningen i Mathcad (PDF)</a><a href="aksel-statisk.html">Se først: Aksler: statisk dimensionering</a><a href="../../../../lab/mem1/aksel.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel11_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l11">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// MEM1 mundtlig eksamen (ny liste) · Spm. 3a v2: aksel med bøjning og vridning forklaret fra bunden.
+// Aksler i hverdagen → vådt håndklæde (vrid + bøj) → lineal (σ) og gummislange (τ), (11.4)/(11.5) → Mohr (11.9): radius = τ_max
+// → Pythagoras som gåtur 4 + 3 = 5 → T_e = √(M² + T²) → M_e = ½(M + T_e) = midten + radius (11.7) → kridt (sprødt, M_e) / stål (sejt, T_e, Tresca)
+// → d³ = 16 T_e/(π τ_till) = (11.16) med S_y/n_s = 2τ_till → udmattelse (DE-Goodman i slides). Mohr-skitser i forholdet σ = 80, τ = 30.
+BP.scene({ header: 'MEM1 · mundtlig eksamen · spm. 3a', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, dot, ring, ell, rect, hatch, dashed, strike, moment, PI } = B;
+  const S = (id) => L(id).start;
+  const ringet = (k, s, x, y, size, col, a, te) => { const r = text(k, s, x, y, size, col, a, te); ring(r, col, te, te + 0.5); return r; };
+  const cirkel = (k, cx, cy, r, col, w, a, b) => line(k, ell(cx, cy, r, r, 0, 2 * PI), col, w, a, b);
+  const haand = (k, x, y, a) => line(k, ell(x, y, 22, 40, 0, 2 * PI), 'black', 2.6, a, a + 0.4);
+  // Mohrs cirkel i forholdet σ = 80, τ = 30 (R = 50): sigma-akse i højde y, τ-akse ved x0, s px pr. MPa
+  const mohr = (k, x0, y, s, a) => {
+    arrow(k, [[x0 - 40, y], [x0 + 110 * s, y]], 'black', 2.4, a, a + 0.4, 12);
+    arrow(k, [[x0, y + 62 * s], [x0, y - 62 * s]], 'black', 2.4, a + 0.1, a + 0.5, 12);
+    text(k, 'σ', x0 + 110 * s + 10, y + 10, 28, 'black', a + 0.3, a + 0.6);
+    text(k, 'τ', x0 + 12, y - 62 * s + 6, 28, 'black', a + 0.3, a + 0.6);
+    cirkel(k, x0 + 40 * s, y, 50 * s, 'blue', 3.4, a + 0.5, a + 1.3);
+    const X = [x0 + 80 * s, y - 30 * s], Y = [x0, y + 30 * s];
+    dot(k, X[0], X[1], 8, 'black', a + 0.6); dot(k, Y[0], Y[1], 8, 'black', a + 0.7);
+    line(k, [X, Y], 'black', 2.4, a + 0.7, a + 1.0);
+    return { cx: x0 + 40 * s, R: 50 * s };
+  };
+
+  // ---------------------------------------------------------------- 0 titel
+  B.titel(0, 'Spm. 3a: akslen', 'bøjet og vredet på én gang · forklaret fra bunden', 'titel');
+
+  // ---------------------------------------------------------------- 1 aksler, T og M, håndklædet
+  B.goto('aksel', 1);
+  bubble(1, 'Akslen: bøjet og vredet', 130, 135, 50, 'blue', S('aksel') - 0.1, S('aksel') + 0.9);
+  text(1, 'bil · boremaskine · cykelpedal · transportbånd', 170, 215, 30, 'black', wt('aksel', 'Drivakslen') - 0.1, we('aksel', 'transportbånd'));
+  {
+    const y = 330, tm = wt('to', 'Motoren');
+    line(1, rect(160, y - 40, 100, 80).concat([[160, y - 40]]), 'black', 3.4, tm - 0.1, tm + 0.3);
+    text(1, 'motor', 210, y + 10, 26, 'black', tm, tm + 0.3, { align: 'center' });
+    line(1, [[260, y], [1080, y]], 'black', 9, tm + 0.1, tm + 0.6);
+    [420, 980].forEach((x, i) => line(1, [[x, y + 8], [x - 22, y + 44], [x + 22, y + 44], [x, y + 8]], 'black', 3, tm + 0.4 + i * 0.1, tm + 0.7 + i * 0.1));
+    const tt = wt('to', 'torsionsmomentet');
+    moment(1, 320, y, 44, -2.6, 2.2, 'red', tt - 0.2, tt + 0.4);
+    text(1, 'T', 320, y - 58, 34, 'red', tt, tt + 0.3, { align: 'center' });
+    const tg = wt('to', 'tandhjul');
+    cirkel(1, 700, y, 55, 'black', 3.4, tg - 0.1, tg + 0.4);
+    arrow(1, [[700, y + 62], [700, y + 130]], 'blue', 4, wt('to', 'siden') - 0.2, wt('to', 'siden') + 0.3, 14);
+    const tb = wt('to', 'bøjningsmomentet');
+    const sag = []; for (let i = 0; i <= 30; i++) { const s = i / 30; sag.push([420 + s * 560, y + 70 + 28 * Math.sin(PI * s)]); }
+    dashed(1, sag[0], sag[15], 'blue', tb - 0.3, tb); dashed(1, sag[15], sag[30], 'blue', tb - 0.1, tb + 0.2);
+    text(1, 'M', 760, y + 140, 34, 'blue', tb, tb + 0.3);
+  }
+  {
+    const y = 590, x0 = 360, x1 = 880, th = wt('haandklaede', 'håndklæde');
+    const bø = (s) => 26 * Math.sin(PI * s);
+    const a1 = [], a2 = []; for (let i = 0; i <= 60; i++) { const s = i / 60, x = x0 + s * (x1 - x0); a1.push([x, y + bø(s) + 20 * Math.sin(6 * PI * s)]); a2.push([x, y + bø(s) - 20 * Math.sin(6 * PI * s)]); }
+    line(1, [[x0, y - 20], [x1, y - 20]], 'black', 2.6, th - 0.1, th + 0.4); line(1, [[x0, y + 20], [x1, y + 20]], 'black', 2.6, th, th + 0.5);
+    const tv = wt('haandklaede', 'Vrid');
+    line(1, a1, 'red', 3.2, tv - 0.1, tv + 0.6); line(1, a2, 'red', 3.2, tv, tv + 0.7);
+    haand(1, x0 - 26, y, tv - 0.2); haand(1, x1 + 26, y, tv - 0.1);
+    text(1, 'vrid = T', 960, 570, 32, 'red', tv, we('haandklaede', 'torsion'));
+    text(1, 'bøj = M', 960, 625, 32, 'blue', wt('haandklaede', 'Bøj') - 0.1, we('haandklaede', 'bøjning'));
+    text(1, 'begge på én gang', 960, 675, 28, 'black', wt('haandklaede', 'begge') - 0.1, we('haandklaede', 'gang'));
+  }
+
+  // ---------------------------------------------------------------- 2 lineal (σ) og gummislange (τ)
+  B.goto('boej', 2);
+  bubble(2, 'To spændinger i overfladen', 130, 135, 46, 'blue', S('boej') - 0.1, S('boej') + 0.9);
+  {
+    const tl = wt('boej', 'lineal');
+    line(2, ell(370, 560, 230, 230, -2.45, -0.69), 'black', 3.6, tl - 0.1, tl + 0.5);
+    line(2, ell(370, 560, 200, 200, -2.45, -0.69), 'black', 3.6, tl, tl + 0.6);
+    text(2, 'strakt', 370, 315, 30, 'red', wt('boej', 'strakt') - 0.3, we('boej', 'strakt'), { align: 'center' });
+    text(2, 'klemt', 370, 395, 30, 'green', wt('boej', 'klemt') - 0.3, we('boej', 'klemt'), { align: 'center' });
+    text(2, 'σ: størst i overfladen', 170, 470, 32, 'red', wt('boej', 'normalspænding') - 0.1, we('boej', 'overfladen'));
+  }
+  {
+    const x0 = 720, x1 = 1150, tg = wt('vrid', 'gummislange');
+    line(2, [[x0, 290], [x1, 290]], 'black', 3.6, tg - 0.1, tg + 0.4); line(2, [[x0, 390], [x1, 390]], 'black', 3.6, tg, tg + 0.5);
+    line(2, ell(x0, 340, 18, 50, 0, 2 * PI), 'black', 2.6, tg + 0.2, tg + 0.5);
+    const ts = wt('vrid', 'streg');
+    line(2, [[x0, 340], [x1, 340]], 'black', 2.4, ts - 0.1, ts + 0.4);
+    const tk = wt('vrid', 'skruelinje');
+    const hx = []; for (let i = 0; i <= 80; i++) { const x = x0 + i / 80 * (x1 - x0); hx.push([x, 340 + 40 * Math.sin(2 * PI * (x - x0) / 215)]); }
+    line(2, hx, 'red', 3.4, tk - 0.2, tk + 0.6);
+    text(2, 'τ: forskydning, størst i overfladen', 720, 470, 30, 'green', wt('vrid', 'forskydningsspænding') - 0.1, we('vrid', 'overfladen'));
+  }
+  B.formel(2, '11.4', 'σ = 32 M / (π d³)', 190, 565, 36, wt('formler', 'Sigma') - 0.1, we('formler', 'tredje'), 'red');
+  B.formel(2, '11.5', 'τ = 16 T / (π d³)', 720, 565, 36, wt('formler', 'Tau') - 0.1, we('formler', 'tredje', 1), 'green');
+  ringet(2, 'd³:  2 × tykkere  ⇒  8 × mindre spænding', 190, 655, 34, 'blue', wt('formler', 'dobbelt') - 0.3, we('formler', 'spænding'));
+
+  // ---------------------------------------------------------------- 3 hvad er det farlige? Mohr og Pythagoras
+  B.goto('problem', 3);
+  bubble(3, 'Hvad er det farlige?', 130, 135, 50, 'blue', S('problem') - 0.1, S('problem') + 0.9);
+  {
+    const x = 200, y = 270, w = 120, tp = wt('problem', 'to');
+    line(3, rect(x, y, w, w).concat([[x, y]]), 'black', 3.4, tp - 0.1, tp + 0.4);
+    const ts = wt('problem', 'trækker');
+    arrow(3, [[x + w + 4, y + 60], [x + w + 60, y + 60]], 'red', 3.4, ts - 0.1, ts + 0.3, 12);
+    arrow(3, [[x - 4, y + 60], [x - 60, y + 60]], 'red', 3.4, ts, ts + 0.4, 12);
+    const tf = wt('problem', 'forskyder');
+    arrow(3, [[x + 20, y - 14], [x + w - 10, y - 14]], 'green', 3.2, tf - 0.1, tf + 0.3, 11);
+    arrow(3, [[x + w - 20, y + w + 14], [x + 10, y + w + 14]], 'green', 3.2, tf, tf + 0.4, 11);
+    arrow(3, [[x + w + 14, y + w - 20], [x + w + 14, y + 10]], 'green', 3.2, tf + 0.1, tf + 0.5, 11);
+    arrow(3, [[x - 14, y + 20], [x - 14, y + w - 10]], 'green', 3.2, tf + 0.2, tf + 0.6, 11);
+    text(3, 'σ og τ i samme punkt', 170, 470, 30, 'black', tp, we('problem', 'punkt'));
+    const tl = text(3, 'σ + τ ?', 170, 525, 34, 'red', wt('problem', 'lægge') - 0.3, we('problem', 'sammen'));
+    strike(tl, we('problem', 'sammen'), we('problem', 'sammen') + 0.4);
+  }
+  {
+    const tm = wt('mohr', 'Mohrs'), m = mohr(3, 620, 380, 3, tm);
+    const tr = wt('mohr', 'radius');
+    arrow(3, [[m.cx, 380], [m.cx, 380 - m.R + 4]], 'red', 3.6, tr - 0.1, tr + 0.4, 13);
+    text(3, 'R = τ_{max}', m.cx + 160, 245, 32, 'red', tr, tr + 0.5);
+  }
+  B.formel(3, '11.9', 'τ_{max} = 16 / (π d³) · √(M² + T²)', 190, 610, 32, wt('mohr', 'ligning') - 0.1, we('mohr', 'anden', 1), 'red');
+  ringet(3, '√(M² + T²)  =  Pythagoras', 190, 680, 32, 'blue', wt('pyth', 'Pythagoras') - 0.3, we('pyth', 'Pythagoras') + 0.4);
+  {
+    const tv = wt('pyth', 'vinkelret'), x0 = 960, y0 = 640;
+    line(3, [[x0, y0], [x0 + 200, y0]], 'blue', 4, tv - 0.1, tv + 0.3); line(3, [[x0 + 200, y0], [x0 + 200, y0 - 150]], 'green', 4, tv + 0.2, tv + 0.5);
+    line(3, [[x0, y0], [x0 + 200, y0 - 150]], 'red', 4, we('pyth', 'trekant') - 0.4, we('pyth', 'trekant'));
+    text(3, 'M', x0 + 100, y0 + 34, 28, 'blue', tv + 0.1, tv + 0.4, { align: 'center' });
+    text(3, 'T', x0 + 218, y0 - 66, 28, 'green', tv + 0.3, tv + 0.6);
+  }
+
+  // ---------------------------------------------------------------- 4 gåturen og T_e
+  B.goto('gaa', 4);
+  bubble(4, 'En gåtur:  4 og 3 giver 5', 130, 135, 48, 'blue', S('gaa') - 0.1, S('gaa') + 0.9);
+  {
+    const x0 = 200, y0 = 600, u = 85, te = wt('gaa', 'øst'), tn = wt('gaa', 'nord'), tf = wt('gaa', 'Fem');
+    dot(4, x0, y0, 10, 'black', wt('gaa', 'gåtur'));
+    text(4, 'start', x0, y0 + 40, 26, 'black', wt('gaa', 'gåtur'), wt('gaa', 'gåtur') + 0.4, { align: 'center' });
+    arrow(4, [[x0, y0], [x0 + 4 * u, y0]], 'blue', 4, te - 0.6, te + 0.1, 15);
+    text(4, '4 km øst', x0 + 2 * u, y0 + 40, 28, 'blue', te - 0.3, te + 0.2, { align: 'center' });
+    arrow(4, [[x0 + 4 * u, y0], [x0 + 4 * u, y0 - 3 * u]], 'green', 4, tn - 0.6, tn + 0.1, 15);
+    text(4, '3 km nord', x0 + 4 * u + 16, y0 - 1.5 * u, 28, 'green', tn - 0.3, tn + 0.2);
+    text(4, 'ikke 7', x0 + 20, 330, 32, 'black', wt('gaa', 'syv') - 0.3, we('gaa', 'syv'));
+    arrow(4, [[x0, y0], [x0 + 4 * u, y0 - 3 * u]], 'red', 4.5, tf - 0.2, tf + 0.4, 16);
+    text(4, '5 km', x0 + 1.6 * u, y0 - 1.75 * u, 34, 'red', tf, tf + 0.4, { align: 'right' });
+  }
+  B.formel(4, '', 'T_e = √(M² + T²)', 720, 290, 42, wt('te', 'ækvivalente') - 0.1, we('te', 'anden', 1), 'red');
+  text(4, 'det rene vrid med samme τ_{max}', 700, 370, 30, 'black', wt('te', 'rene') - 0.1, we('te', 'tilsammen'));
+  text(4, 'to belastninger  →  én', 700, 460, 34, 'blue', wt('te2', 'to') - 0.1, we('te2', 'én'));
+  B.formel(4, '', 'τ_{max} = 16 T_e / (π d³)', 720, 560, 38, wt('te2', 'tau') - 0.1, we('te2', 'tredje'), 'red');
+  text(4, 'formlen for ren vridning', 720, 640, 28, 'green', wt('te2', 'ren') - 0.1, we('te2', 'vridning'));
+
+  // ---------------------------------------------------------------- 5 M_e: midten + radius
+  B.goto('me', 5);
+  bubble(5, 'Ækvivalent bøjning', 130, 135, 50, 'blue', S('me') - 0.1, S('me') + 0.9);
+  {
+    const x0 = 300, y = 400, s = 3, tm = wt('me', 'Mohrs'), m = mohr(5, x0, y, s, tm - 0.6);
+    const tc = wt('me', 'Midten');
+    arrow(5, [[x0, y + 26], [m.cx, y + 26]], 'blue', 3.2, tc - 0.1, tc + 0.4, 12);
+    text(5, 'σ/2', (x0 + m.cx) / 2, y + 62, 28, 'blue', tc, tc + 0.4, { align: 'center' });
+    const tr = wt('me', 'Radius');
+    arrow(5, [[m.cx, y - 26], [m.cx + m.R, y - 26]], 'red', 3.2, tr - 0.1, tr + 0.4, 12);
+    text(5, 'T_e', m.cx + m.R / 2, y - 40, 28, 'red', tr, tr + 0.4, { align: 'center' });
+    const t1 = wt('me', 'plus');
+    dot(5, m.cx + m.R, y, 11, 'red', t1 - 0.1);
+    text(5, 'σ_1', m.cx + m.R + 14, y + 40, 30, 'red', t1, t1 + 0.4);
+  }
+  B.formel(5, '', 'M_e = ½ (M + T_e)', 730, 290, 42, wt('me2', 'M') - 0.1, we('me2', 'e', 1), 'red');
+  text(5, 'rene bøj, samme største træk', 710, 370, 30, 'black', wt('me2', 'rene') - 0.1, we('me2', 'trækspænding'));
+  text(5, 'midten:  16 M / (π d³)', 710, 450, 30, 'blue', wt('me', 'Midten') - 0.1, we('me', 'sigma'));
+  text(5, 'radius:  16 T_e / (π d³)', 710, 500, 30, 'red', wt('me', 'Radius') - 0.1, we('me', 'e'));
+  B.formel(5, '11.7', 'σ_1 = 16 (M + T_e) / (π d³) = 32 M_e / (π d³)', 190, 640, 30, wt('me2', 'sigma') - 0.1, we('me2', 'tredje'), 'red');
+
+  // ---------------------------------------------------------------- 6 kridt og stål
+  B.goto('kridt', 6);
+  bubble(6, 'Sprødt eller sejt?', 130, 135, 50, 'blue', S('kridt') - 0.1, S('kridt') + 0.9);
+  {
+    const tk = wt('kridt', 'kridt');
+    line(6, rect(190, 300, 380, 70).concat([[190, 300]]), 'black', 3.4, tk - 0.1, tk + 0.5);
+    moment(6, 170, 335, 40, -2.2, 2.2, 'black', tk + 0.3, tk + 0.8); moment(6, 590, 335, 40, 0.9, 5.3, 'black', tk + 0.4, tk + 0.9);
+    const ts = wt('kridt', 'spiral');
+    line(6, [[330, 370], [350, 345], [372, 330], [400, 300]], 'red', 4, ts - 0.3, ts + 0.2);
+    line(6, [[400, 370], [420, 342], [446, 326], [470, 300]], 'red', 2.6, ts - 0.1, ts + 0.4);
+    text(6, 'kridt: skrå spiral, giver op i træk', 170, 450, 30, 'black', ts - 0.1, we('kridt', 'træk'));
+    ringet(6, 'sprødt  ⇒  M_e', 170, 520, 38, 'red', wt('kridt', 'sprøde') - 0.1, we('kridt', 'e'));
+  }
+  {
+    const tt = wt('staal', 'Stål');
+    line(6, rect(730, 300, 380, 70).concat([[730, 300]]), 'black', 3.4, tt - 0.1, tt + 0.5);
+    hatch(6, rect(730, 300, 380, 70), 'black', tt + 0.2, tt + 0.6, { gap: 14 });
+    const tf = wt('staal', 'glider');
+    line(6, [[920, 292], [920, 378]], 'green', 4.5, tf - 0.2, tf + 0.3);
+    text(6, 'stål: glider, giver op i forskydning', 710, 450, 30, 'black', wt('staal', 'forskydning') - 0.4, we('staal', 'glider'));
+    ringet(6, 'sejt  ⇒  T_e  (Tresca)', 710, 520, 38, 'blue', wt('staal', 'seje') - 0.1, we('staal', 'Tresca'));
+    text(6, 'det bruger del b', 730, 600, 30, 'green', wt('staal', 'del') - 0.1, we('staal', 'bruger'));
+  }
+
+  // ---------------------------------------------------------------- 7 én formel til design
+  B.goto('nyttig', 7);
+  bubble(7, 'Én formel til design', 130, 135, 50, 'blue', S('nyttig') - 0.1, S('nyttig') + 0.9);
+  text(7, 'sæt  τ_{max} = τ_{till}', 170, 235, 34, 'black', wt('nyttig', 'Sæt') - 0.1, we('nyttig', 'forskydning'));
+  text(7, '16 T_e / (π d³) = τ_{till}', 190, 315, 38, 'black', wt('nyttig', 'isolér') - 0.4, we('nyttig', 'd'));
+  ringet(7, 'd³ = 16 T_e / (π τ_{till})', 190, 410, 44, 'red', wt('nyttig', 'får') - 0.1, we('nyttig', 'tilladt'));
+  B.formel(7, '11.16', 'd = ∛( 32 n_s √(M² + T²) / (π S_y) )', 190, 530, 32, wt('bog', 'bogens') - 0.1, we('bog', 'seksten'), 'blue');
+  text(7, 'med  S_y / n_s = 2 τ_{till}  ⇒  samme formel', 190, 615, 32, 'green', wt('bog', 'S') - 0.1, we('bog', 'forskydning'));
+
+  // ---------------------------------------------------------------- 8 advarsel: udmattelse
+  B.goto('udmat', 8);
+  bubble(8, 'En advarsel', 130, 135, 50, 'red', S('udmat') - 0.1, S('udmat') + 0.8);
+  {
+    const cx = 300, cy = 370, td = wt('udmat', 'drejer');
+    cirkel(8, cx, cy, 90, 'black', 3.6, td - 0.2, td + 0.4);
+    line(8, ell(cx, cy, 120, 120, -2.4, -0.8), 'blue', 3, td + 0.2, td + 0.6);
+    arrow(8, ell(cx, cy, 120, 120, -1.2, -0.75), 'blue', 3, td + 0.4, td + 0.6, 12);
+    dot(8, cx, cy - 90, 10, 'red', td);
+    text(8, 'strakt', cx + 110, cy - 70, 26, 'red', wt('udmat', 'frem') - 0.1, wt('udmat', 'frem') + 0.3);
+    text(8, 'klemt', cx + 110, cy + 90, 26, 'green', wt('udmat', 'tilbage') - 0.1, wt('udmat', 'tilbage') + 0.3);
+    const ta = wt('udmat', 'omgang');
+    B.graf(8, { x: 560, y: 250, w: 560, h: 220, tmax: 2, ymax: 1.2, a: ta - 0.6, tl: 't', yl: 'σ',
+      kurver: [{ f: (t) => Math.sin(2 * PI * t), col: 'red', a: ta - 0.2, b: ta + 1.2 }] });
+  }
+  text(8, 'frem og tilbage hver omgang  ⇒  udmattelse', 170, 560, 32, 'black', wt('udmat', 'udmattelse') - 0.6, we('udmat', 'udmattelse'));
+  ringet(8, 'rigtige aksler: DE-Goodman (slides)', 170, 620, 32, 'red', wt('udmat', 'slides') - 0.1, we('udmat', 'Goodman'));
+  text(8, 'T_e og M_e: den statiske første skitse', 170, 680, 30, 'blue', wt('udmat', 'statiske') - 0.6, we('udmat', 'skitse'));
+
+  // ---------------------------------------------------------------- 9 sådan siger du det + 15 minutter
+  B.goto('censor', 9);
+  bubble(9, 'Sådan siger du det', 130, 135, 50, 'blue', S('censor') - 0.1, S('censor') + 0.9);
+  text(9, '1.  håndklædet: bøjning og vridning på én gang', 170, 220, 32, 'black', wt('censor', 'håndklædet') - 0.1, we('censor', 'gang'));
+  text(9, '2.  σ og τ i overfladen', 170, 275, 32, 'black', wt('censor', 'spændinger') - 0.3, we('censor', 'overfladen'));
+  text(9, '3.  Mohr: radius → T_e,  midten + radius → M_e', 170, 330, 32, 'red', wt('censor', 'Tegn') - 0.1, we('censor', 'e', 1));
+  text(9, '4.  Pythagoras (gåturen) · sejt stål: T_e', 170, 385, 32, 'black', wt('censor', 'Pythagoras') - 0.3, we('censor', 'e', 2));
+  {
+    const x0 = 170, x1 = 1110, y = 470, hh = 56, m = (x1 - x0) / 15;
+    const seg = [[0, 7, 'blue', 'del a', wt('tavle', 'syv')], [7, 13, 'red', 'del b', wt('tavle', 'seks')], [13, 15, 'green', 'vurdér', wt('tavle', 'to', 0)]];
+    seg.forEach(([a, b2, col, et, t]) => {
+      line(9, rect(x0 + a * m, y, (b2 - a) * m, hh).concat([[x0 + a * m, y]]), col, 3, t - 0.1, t + 0.4);
+      hatch(9, rect(x0 + a * m, y, (b2 - a) * m, hh), col, t + 0.2, t + 0.7, { gap: 12 });
+      text(9, et, x0 + (a + b2) / 2 * m, y + hh + 40, 30, col, t, t + 0.4, { align: 'center' });
+      text(9, a + '', x0 + a * m, y - 12, 24, 'black', t, t + 0.3, { align: 'center' });
+    });
+    text(9, '15 min', x1, y - 12, 24, 'black', wt('tavle', 'to', 0), wt('tavle', 'to', 0) + 0.3, { align: 'center' });
+  }
+
+  // ---------------------------------------------------------------- 10 tjek: hvorfor ikke M + T?
+  B.goto('tjek_q', 10);
+  B.tjek(10, ['Hvorfor er T_e ikke', 'bare M + T?'], ['vinkelret  ⇒  som i en trekant', '400 og 300  ⇒  500, ikke 700'], 'tjek_q', 'tjek_a');
+  {
+    const x0 = 220, y0 = 670, u = 40, tv = wt('tjek_a', 'vinkelret');
+    line(10, [[x0, y0], [x0 + 4 * u, y0]], 'blue', 4, tv, tv + 0.3); line(10, [[x0 + 4 * u, y0], [x0 + 4 * u, y0 - 3 * u]], 'green', 4, tv + 0.2, tv + 0.5);
+    line(10, [[x0, y0], [x0 + 4 * u, y0 - 3 * u]], 'red', 4, tv + 0.5, tv + 0.9);
+    const t5 = wt('tjek_a', 'fem'), sc = 0.45, x1 = 560;
+    line(10, [[x1, 600], [x1 + 500 * sc, 600]], 'green', 8, t5 - 0.1, t5 + 0.4);
+    text(10, 'T_e = 500', x1 + 500 * sc + 20, 610, 28, 'green', t5, t5 + 0.4);
+    const t7 = wt('tjek_a', 'syv');
+    const l7 = line(10, [[x1, 655], [x1 + 700 * sc, 655]], 'red', 8, t7 - 0.1, t7 + 0.4);
+    text(10, 'M + T = 700', x1 + 700 * sc + 20, 665, 28, 'red', t7, we('tjek_a', 'aksel'));
+  }
+
+  // ---------------------------------------------------------------- 11 slut
+  B.goto('slut', 11);
+  B.slut(11, 'MEM1 mundtlig eksamen, ny liste, spm. 3 · Hamrock m.fl., kap. 11, lign. (11.4), (11.5), (11.7), (11.9), (11.16) · slides kap. 11', 'spm. 3b: hvor tyk skal akslen være?', 'slut');
+  text(11, 'T_e: det rene vrid med samme τ_{max}', 200, 240, 34, 'red', wt('slut', 'vrid') - 0.6, we('slut', 'vrid'));
+  text(11, 'M_e: det rene bøj med samme største træk', 200, 310, 34, 'blue', wt('slut', 'bøj') - 0.6, we('slut', 'sammen'));
+  text(11, 'begge fra Mohrs cirkel', 200, 380, 34, 'black', wt('slut', 'Mohrs') - 0.3, we('slut', 'cirkel'));
+  text(11, 'én simpel formel til diameteren', 200, 450, 34, 'green', wt('slut', 'simpel') - 0.3, we('slut', 'formel'));
+});
+
+</script>
+<script>BP.live({"duration":310.809,"audio":"eks-spm3-a.mp3","order":["titel","aksel","to","haandklaede","boej","vrid","formler","problem","mohr","pyth","gaa","te","te2","me","me2","kridt","staal","nyttig","bog","udmat","censor","tavle","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":9.621,"words":[["Spørgsmål",0.54,1.0],["tre",1.08,1.24],["del",1.66,1.82],["a",1.92,1.94],["En",2.68,2.76],["aksel",2.84,3.14],["der",3.22,3.32],["både",3.38,3.6],["bliver",3.64,3.84],["bøjet",3.92,4.32],["og",4.38,4.46],["vredet",4.52,4.9],["på",4.94,5.06],["samme",5.08,5.28],["tid",5.38,5.54],["Vi",6.52,6.56],["starter",6.64,6.9],["med",6.92,7.02],["hverdagen",7.04,7.54],["og",7.72,7.801],["formlerne",7.861,8.261],["kommer",8.301,8.581],["når",8.641,8.761],["du",8.781,8.821],["ved",8.901,9.021],["hvad",9.101,9.221],["de",9.241,9.301],["siger",9.381,9.621]],"text":"Spørgsmål tre, del a. En aksel, der både bliver bøjet og vredet på samme tid. Vi starter med hverdagen, og formlerne kommer, når du ved, hvad de siger."},"aksel":{"start":11.441,"end":21.741,"words":[["En",11.481,11.581],["aksel",11.681,12.041],["er",12.161,12.221],["en",12.261,12.341],["roterende",12.381,12.901],["stang",12.981,13.261],["der",13.381,13.481],["overfører",13.561,13.961],["kraft",14.001,14.301],["Drivakslen",14.881,15.541],["i",15.601,15.621],["en",15.641,15.721],["bil",15.821,16.061],["Akslen",16.681,17.081],["i",17.141,17.161],["en",17.201,17.261],["boremaskine",17.361,18.081],["Pedalakslen",18.441,19.181],["på",19.241,19.341],["en",19.361,19.421],["cykel",19.481,19.761],["Akslen",20.321,20.741],["i",20.841,20.861],["et",20.901,20.961],["transportbånd",21.021,21.741]],"text":"En aksel er en roterende stang, der overfører kraft. Drivakslen i en bil. Akslen i en boremaskine. Pedalakslen på en cykel. Akslen i et transportbånd."},"to":{"start":22.861,"end":34.442,"words":[["Akslen",22.901,23.301],["får",23.381,23.541],["to",23.641,23.761],["slags",23.902,24.142],["belastning",24.182,24.662],["Motoren",25.242,25.662],["vrider",25.722,26.022],["den",26.042,26.142],["Det",26.422,26.502],["er",26.522,26.562],["torsionsmomentet",26.582,27.462],["T",27.782,27.802],["Og",28.542,28.622],["tandhjul",28.682,29.222],["remskiver",29.422,30.062],["og",30.162,30.222],["lejer",30.282,30.602],["trækker",30.662,30.922],["til",30.962,31.082],["siden",31.162,31.482],["i",31.502,31.522],["den",31.542,31.682],["Det",32.002,32.082],["bøjer",32.142,32.402],["den",32.402,32.502],["Det",33.002,33.102],["er",33.102,33.142],["bøjningsmomentet",33.222,34.042],["M",34.422,34.442]],"text":"Akslen får to slags belastning. Motoren vrider den. Det er torsionsmomentet, T. Og tandhjul, remskiver og lejer trækker til siden i den. Det bøjer den. Det er bøjningsmomentet, M."},"haandklaede":{"start":35.482,"end":45.263,"words":[["Du",35.522,35.582],["kan",35.642,35.742],["mærke",35.762,35.962],["begge",36.022,36.182],["dele",36.222,36.462],["med",36.502,36.582],["et",36.602,36.662],["vådt",36.722,36.902],["håndklæde",36.942,37.342],["Vrid",37.902,38.082],["det",38.122,38.222],["for",38.262,38.382],["at",38.382,38.422],["få",38.442,38.542],["vandet",38.582,38.843],["ud",38.943,39.063],["Det",39.563,39.643],["er",39.663,39.703],["torsion",39.723,40.083],["Bøj",40.563,40.683],["det",40.723,40.823],["samtidig",40.883,41.343],["ned",41.383,41.503],["over",41.603,41.743],["knæet",41.783,42.103],["Det",42.483,42.563],["er",42.583,42.623],["bøjning",42.643,42.963],["Akslen",43.583,43.983],["får",44.043,44.183],["begge",44.263,44.443],["dele",44.483,44.703],["på",44.743,44.863],["én",44.923,45.023],["gang",45.083,45.263]],"text":"Du kan mærke begge dele med et vådt håndklæde. Vrid det for at få vandet ud. Det er torsion. Bøj det samtidig ned over knæet. Det er bøjning. Akslen får begge dele på én gang."},"boej":{"start":47.083,"end":56.184,"words":[["Hvad",47.123,47.263],["gør",47.283,47.423],["bøjningen",47.483,47.863],["Bøj",48.423,48.563],["en",48.583,48.643],["lineal",48.683,49.103],["Oversiden",49.723,50.183],["bliver",50.203,50.383],["strakt",50.443,50.783],["og",51.043,51.103],["undersiden",51.183,51.603],["bliver",51.623,51.783],["klemt",51.823,52.083],["Det",52.623,52.723],["er",52.723,52.763],["normalspænding",52.783,53.463],["sigma",53.783,54.063],["og",54.584,54.664],["den",54.684,54.784],["er",54.804,54.864],["størst",54.904,55.204],["helt",55.264,55.484],["ude",55.544,55.644],["i",55.664,55.684],["overfladen",55.744,56.184]],"text":"Hvad gør bøjningen? Bøj en lineal. Oversiden bliver strakt, og undersiden bliver klemt. Det er normalspænding, sigma, og den er størst helt ude i overfladen."},"vrid":{"start":56.944,"end":70.385,"words":[["Hvad",56.984,57.104],["gør",57.144,57.264],["vridningen",57.324,57.724],["Tegn",58.524,58.724],["en",58.744,58.824],["lige",58.884,59.044],["streg",59.084,59.324],["på",59.364,59.464],["en",59.484,59.544],["gummislange",59.564,60.184],["og",60.284,60.344],["vrid",60.404,60.584],["den",60.644,60.744],["Stregen",61.164,61.444],["bliver",61.484,61.644],["til",61.664,61.764],["en",61.784,61.844],["skruelinje",61.884,62.464],["Overfladen",62.964,63.384],["bliver",63.404,63.564],["forskudt",63.564,63.924],["som",64.384,64.484],["når",64.524,64.624],["du",64.644,64.684],["gnider",64.744,65.104],["håndfladerne",65.164,65.684],["mod",65.744,65.884],["hinanden",65.924,66.264],["Det",66.904,67.004],["er",67.004,67.044],["forskydningsspænding",67.064,67.844],["tau",68.164,68.404],["og",68.944,69.024],["også",69.064,69.244],["den",69.244,69.384],["er",69.465,69.545],["størst",69.565,69.845],["i",69.885,69.905],["overfladen",69.965,70.385]],"text":"Hvad gør vridningen? Tegn en lige streg på en gummislange, og vrid den. Stregen bliver til en skruelinje. Overfladen bliver forskudt, som når du gnider håndfladerne mod hinanden. Det er forskydningsspænding, tau, og også den er størst i overfladen."},"formler":{"start":71.165,"end":85.726,"words":[["Bogen",71.205,71.425],["giver",71.465,71.625],["dem",71.645,71.745],["i",71.845,71.865],["ligning",71.965,72.245],["elleve",72.365,72.565],["fire",72.665,72.965],["og",73.125,73.185],["elleve",73.305,73.505],["fem",73.625,73.765],["Sigma",74.565,74.885],["er",75.045,75.105],["toogtredive",75.285,75.965],["M",76.045,76.065],["over",76.205,76.405],["pi",76.585,76.725],["d",76.865,76.885],["i",77.085,77.105],["tredje",77.165,77.545],["Tau",78.085,78.305],["er",78.445,78.505],["seksten",78.625,79.025],["T",79.145,79.165],["over",79.465,79.645],["pi",79.705,79.825],["d",79.965,79.985],["i",80.145,80.165],["tredje",80.225,80.545],["Læg",81.265,81.385],["mærke",81.425,81.585],["til",81.625,81.725],["d",81.765,81.785],["i",81.945,81.965],["tredje",82.025,82.385],["En",82.905,82.985],["dobbelt",83.025,83.285],["så",83.305,83.405],["tyk",83.425,83.605],["aksel",83.705,84.005],["giver",84.085,84.285],["otte",84.546,84.766],["gange",84.826,85.026],["mindre",85.106,85.366],["spænding",85.426,85.726]],"text":"Bogen giver dem i ligning elleve fire og elleve fem. Sigma er toogtredive M over pi d i tredje. Tau er seksten T over pi d i tredje. Læg mærke til d i tredje. En dobbelt så tyk aksel giver otte gange mindre spænding."},"problem":{"start":87.546,"end":97.626,"words":[["Nu",87.586,87.646],["kommer",87.706,87.906],["problemet",87.926,88.346],["Vi",88.826,88.886],["har",88.946,89.086],["to",89.166,89.266],["forskellige",89.366,89.826],["spændinger",89.866,90.286],["i",90.446,90.466],["samme",90.686,90.946],["punkt",91.026,91.266],["Den",91.746,91.866],["ene",91.906,92.066],["trækker",92.106,92.386],["på",92.406,92.506],["langs",92.526,92.786],["den",93.286,93.406],["anden",93.426,93.566],["forskyder",93.566,93.946],["Man",94.926,95.026],["kan",95.026,95.106],["ikke",95.106,95.206],["bare",95.206,95.326],["lægge",95.326,95.466],["dem",95.486,95.566],["sammen",95.666,95.966],["Så",96.946,97.026],["hvad",97.026,97.146],["er",97.146,97.186],["det",97.186,97.246],["farlige",97.266,97.626]],"text":"Nu kommer problemet. Vi har to forskellige spændinger i samme punkt. Den ene trækker på langs, den anden forskyder. Man kan ikke bare lægge dem sammen. Så hvad er det farlige?"},"mohr":{"start":98.526,"end":113.947,"words":[["Svaret",98.566,98.826],["kommer",98.866,99.126],["fra",99.166,99.246],["Mohrs",99.426,99.746],["cirkel",100.046,100.366],["som",100.526,100.626],["du",100.667,100.707],["kender",100.747,100.967],["fra",100.987,101.067],["kapitel",101.107,101.427],["to",101.467,101.587],["Sæt",102.327,102.487],["sigma",102.567,102.867],["og",103.027,103.087],["tau",103.147,103.347],["ind",103.447,103.547],["og",103.867,103.947],["cirklens",103.987,104.307],["radius",104.367,104.747],["er",104.827,104.907],["den",104.927,105.047],["største",105.147,105.527],["forskydningsspænding",105.567,106.307],["Bogen",106.947,107.167],["giver",107.207,107.387],["den",107.407,107.487],["i",107.587,107.607],["ligning",107.707,107.987],["elleve",108.087,108.307],["ni",108.407,108.487],["seksten",109.387,109.807],["over",109.907,110.107],["pi",110.187,110.307],["d",110.527,110.547],["i",110.747,110.767],["tredje",110.827,111.167],["gange",111.587,111.787],["kvadratroden",111.827,112.467],["af",112.507,112.567],["M",112.767,112.787],["i",112.827,112.847],["anden",112.947,113.127],["plus",113.207,113.387],["T",113.447,113.467],["i",113.647,113.667],["anden",113.747,113.947]],"text":"Svaret kommer fra Mohrs cirkel, som du kender fra kapitel to. Sæt sigma og tau ind, og cirklens radius er den største forskydningsspænding. Bogen giver den i ligning elleve ni: seksten over pi d i tredje, gange kvadratroden af M i anden plus T i anden."},"pyth":{"start":115.247,"end":123.928,"words":[["Kvadratroden",115.287,115.888],["af",115.908,115.968],["M",116.128,116.148],["i",116.208,116.228],["anden",116.308,116.468],["plus",116.508,116.648],["T",116.688,116.708],["i",116.888,116.908],["anden",116.968,117.168],["Det",117.728,117.808],["er",117.808,117.848],["Pythagoras",117.848,118.388],["Bøjning",119.248,119.588],["og",119.728,119.788],["vridning",119.828,120.208],["virker",120.288,120.548],["vinkelret",120.688,121.148],["på",121.168,121.268],["hinanden",121.288,121.588],["som",121.688,121.788],["de",121.848,121.888],["to",121.948,122.048],["korte",122.148,122.448],["sider",122.528,122.828],["i",122.908,122.928],["en",122.968,123.048],["retvinklet",123.108,123.528],["trekant",123.568,123.928]],"text":"Kvadratroden af M i anden plus T i anden. Det er Pythagoras. Bøjning og vridning virker vinkelret på hinanden, som de to korte sider i en retvinklet trekant."},"gaa":{"start":125.748,"end":137.709,"words":[["Tænk",125.788,125.928],["på",125.948,126.028],["det",126.028,126.088],["som",126.088,126.168],["en",126.188,126.248],["gåtur",126.268,126.608],["Du",127.388,127.448],["går",127.508,127.628],["fire",127.768,127.928],["kilometer",127.948,128.308],["mod",128.348,128.468],["øst",128.548,128.748],["og",129.108,129.188],["tre",129.268,129.408],["kilometer",129.488,129.868],["mod",129.908,130.008],["nord",130.108,130.288],["Hvor",130.928,131.028],["langt",131.048,131.188],["er",131.228,131.288],["du",131.288,131.329],["fra",131.369,131.469],["start",131.469,131.689],["Ikke",132.829,132.949],["syv",132.989,133.149],["Fem",134.089,134.229],["Den",135.209,135.309],["skrå",135.349,135.529],["side",135.609,135.789],["er",135.869,135.929],["kortere",135.969,136.429],["end",136.649,136.729],["de",136.749,136.789],["to",136.829,136.909],["sider",137.029,137.249],["lagt",137.289,137.449],["sammen",137.489,137.709]],"text":"Tænk på det som en gåtur. Du går fire kilometer mod øst og tre kilometer mod nord. Hvor langt er du fra start? Ikke syv. Fem. Den skrå side er kortere end de to sider lagt sammen."},"te":{"start":139.129,"end":149.81,"words":[["Det",139.169,139.269],["er",139.349,139.409],["det",139.429,139.509],["ækvivalente",139.529,140.149],["torsionsmoment",140.209,140.929],["T",141.289,141.309],["e",141.589,141.609],["kvadratroden",142.229,142.889],["af",142.949,143.029],["M",143.189,143.209],["i",143.269,143.289],["anden",143.369,143.569],["plus",143.649,143.869],["T",143.969,143.989],["i",144.209,144.229],["anden",144.329,144.509],["Det",145.269,145.349],["er",145.349,145.389],["det",145.389,145.449],["rene",145.489,145.689],["vrid",145.729,145.909],["der",146.029,146.109],["ville",146.129,146.249],["give",146.269,146.41],["præcis",146.45,146.91],["samme",147.03,147.29],["største",147.41,147.75],["forskydning",147.79,148.27],["som",148.31,148.43],["bøjning",148.53,148.89],["og",148.95,149.03],["vridning",149.07,149.39],["tilsammen",149.41,149.81]],"text":"Det er det ækvivalente torsionsmoment, T e, kvadratroden af M i anden plus T i anden. Det er det rene vrid, der ville give præcis samme største forskydning som bøjning og vridning tilsammen."},"te2":{"start":151.17,"end":160.67,"words":[["Det",151.21,151.31],["er",151.31,151.35],["det",151.35,151.41],["smarte",151.41,151.69],["I",152.43,152.45],["stedet",152.49,152.73],["for",152.73,152.81],["to",152.87,152.95],["belastninger",153.03,153.49],["har",153.67,153.77],["du",153.79,153.85],["én",153.97,154.09],["Så",155.09,155.17],["kan",155.19,155.27],["du",155.29,155.33],["bruge",155.35,155.49],["den",155.49,155.59],["simple",155.65,155.85],["formel",155.89,156.15],["for",156.19,156.29],["ren",156.33,156.49],["vridning",156.53,156.83],["tau",157.55,157.71],["max",157.77,157.93],["er",158.17,158.25],["seksten",158.39,158.83],["T",158.97,158.99],["e",159.27,159.29],["over",159.49,159.71],["pi",159.75,159.87],["d",160.03,160.05],["i",160.23,160.25],["tredje",160.33,160.67]],"text":"Det er det smarte. I stedet for to belastninger har du én. Så kan du bruge den simple formel for ren vridning: tau max er seksten T e over pi d i tredje."},"me":{"start":162.49,"end":174.35,"words":[["Det",162.53,162.61],["ækvivalente",162.63,163.13],["bøjningsmoment",163.25,163.89],["M",164.21,164.23],["e",164.29,164.31],["gør",164.67,164.81],["det",164.83,164.91],["samme",164.95,165.13],["for",165.21,165.31],["den",165.33,165.43],["største",165.51,165.81],["normalspænding",165.83,166.39],["På",167.19,167.29],["Mohrs",167.31,167.49],["cirkel",167.53,167.85],["er",167.91,167.97],["den",167.99,168.11],["midten",168.35,168.61],["plus",168.69,168.91],["radius",168.97,169.33],["Midten",170.09,170.33],["kommer",170.37,170.57],["kun",170.61,170.71],["fra",170.77,170.83],["bøjningen",170.89,171.29],["den",171.73,171.85],["halve",171.87,172.09],["sigma",172.15,172.41],["Radius",173.35,173.63],["kommer",173.67,173.87],["fra",173.89,173.97],["T",174.07,174.09],["e",174.33,174.35]],"text":"Det ækvivalente bøjningsmoment, M e, gør det samme for den største normalspænding. På Mohrs cirkel er den midten plus radius. Midten kommer kun fra bøjningen, den halve sigma. Radius kommer fra T e."},"me2":{"start":175.35,"end":187.891,"words":[["Derfor",175.39,175.65],["er",175.75,175.81],["M",175.83,175.85],["e",175.91,175.93],["en",176.05,176.13],["halv",176.21,176.431],["gange",176.691,176.911],["M",177.111,177.131],["plus",177.291,177.551],["T",177.691,177.711],["e",177.911,177.931],["Det",179.191,179.251],["er",179.251,179.291],["det",179.291,179.351],["rene",179.391,179.591],["bøj",179.631,179.791],["der",179.871,179.951],["giver",179.991,180.171],["samme",180.371,180.631],["største",180.751,181.091],["trækspænding",181.131,181.651],["Så",182.451,182.551],["kan",182.551,182.651],["du",182.651,182.711],["bruge",182.711,182.871],["formlen",182.891,183.191],["for",183.231,183.331],["ren",183.371,183.531],["bøjning",183.551,183.851],["sigma",184.591,184.851],["max",184.911,185.071],["er",185.371,185.451],["toogtredive",185.551,186.271],["M",186.331,186.351],["e",186.471,186.491],["over",186.771,186.951],["pi",187.011,187.131],["d",187.291,187.311],["i",187.491,187.511],["tredje",187.571,187.891]],"text":"Derfor er M e en halv gange M plus T e. Det er det rene bøj, der giver samme største trækspænding. Så kan du bruge formlen for ren bøjning: sigma max er toogtredive M e over pi d i tredje."},"kridt":{"start":189.711,"end":201.732,"words":[["Hvorfor",189.751,189.971],["har",189.991,190.091],["vi",190.111,190.151],["to",190.211,190.331],["Det",191.211,191.291],["afhænger",191.351,191.692],["af",191.732,191.772],["hvordan",191.812,192.052],["materialet",192.092,192.632],["går",192.652,192.772],["i",192.772,192.792],["stykker",192.852,193.152],["Vrid",194.072,194.232],["et",194.272,194.332],["stykke",194.372,194.632],["kridt",194.772,194.992],["over",195.072,195.292],["Det",195.992,196.072],["knækker",196.092,196.392],["i",196.432,196.452],["en",196.472,196.512],["skrå",196.592,196.832],["spiral",196.892,197.312],["fordi",197.352,197.532],["kridt",197.652,197.872],["er",197.912,197.992],["sprødt",198.072,198.392],["og",198.672,198.752],["giver",198.792,198.932],["op",198.952,199.032],["i",199.052,199.072],["træk",199.112,199.352],["Til",200.172,200.292],["sprøde",200.312,200.512],["materialer",200.532,200.952],["bruger",200.992,201.152],["man",201.152,201.272],["M",201.572,201.592],["e",201.712,201.732]],"text":"Hvorfor har vi to? Det afhænger af, hvordan materialet går i stykker. Vrid et stykke kridt over. Det knækker i en skrå spiral, fordi kridt er sprødt og giver op i træk. Til sprøde materialer bruger man M e."},"staal":{"start":202.932,"end":212.553,"words":[["Stål",202.972,203.192],["er",203.232,203.292],["sejt",203.332,203.572],["Det",204.232,204.312],["giver",204.352,204.472],["op",204.472,204.552],["ved",204.572,204.652],["forskydning",204.692,205.172],["når",205.332,205.432],["krystallerne",205.452,205.892],["glider",205.952,206.272],["Til",206.933,207.053],["seje",207.093,207.313],["materialer",207.353,207.793],["bruger",207.833,207.993],["man",207.993,208.113],["T",208.253,208.273],["e",208.493,208.513],["og",208.733,208.813],["kriteriet",208.833,209.233],["for",209.253,209.353],["største",209.393,209.693],["forskydning",209.713,210.153],["Tresca",210.413,210.713],["Det",211.473,211.573],["er",211.573,211.613],["det",211.613,211.713],["del",211.913,212.073],["b",212.113,212.133],["bruger",212.313,212.553]],"text":"Stål er sejt. Det giver op ved forskydning, når krystallerne glider. Til seje materialer bruger man T e og kriteriet for største forskydning, Tresca. Det er det, del b bruger."},"nyttig":{"start":214.373,"end":227.414,"words":[["Hvorfor",214.413,214.613],["er",214.633,214.673],["det",214.673,214.753],["så",214.773,214.873],["nyttigt",214.893,215.153],["Fordi",215.873,216.053],["du",216.113,216.173],["kan",216.213,216.353],["dimensionere",216.373,216.953],["med",217.013,217.093],["én",217.193,217.313],["formel",217.393,217.733],["Sæt",218.653,218.813],["tau",218.973,219.213],["max",219.293,219.493],["lig",219.793,219.913],["den",219.953,220.033],["tilladte",220.093,220.393],["forskydning",220.433,220.933],["og",221.253,221.313],["isolér",221.393,221.793],["d",222.014,222.034],["Så",222.934,223.054],["får",223.094,223.234],["du",223.274,223.334],["d",223.474,223.494],["i",223.654,223.674],["tredje",223.754,224.114],["lig",224.434,224.574],["seksten",224.574,225.254],["T",225.314,225.334],["e",225.594,225.614],["over",225.954,226.154],["pi",226.314,226.454],["gange",226.614,226.814],["tau",226.854,227.034],["tilladt",227.114,227.414]],"text":"Hvorfor er det så nyttigt? Fordi du kan dimensionere med én formel. Sæt tau max lig den tilladte forskydning, og isolér d. Så får du d i tredje lig seksten T e over pi gange tau tilladt."},"bog":{"start":228.134,"end":233.654,"words":[["Det",228.174,228.274],["er",228.274,228.314],["bogens",228.334,228.674],["ligning",228.754,229.074],["elleve",229.174,229.374],["seksten",229.434,229.854],["hvor",230.174,230.334],["S",230.654,230.674],["y",230.834,230.854],["over",230.994,231.154],["n",231.274,231.294],["s",231.534,231.554],["er",231.854,231.934],["lig",231.974,232.074],["to",232.254,232.374],["gange",232.494,232.694],["den",232.714,232.814],["tilladte",232.874,233.174],["forskydning",233.194,233.654]],"text":"Det er bogens ligning elleve seksten, hvor S y over n s er lig to gange den tilladte forskydning."},"udmat":{"start":235.474,"end":249.575,"words":[["En",235.514,235.614],["lille",235.654,235.834],["advarsel",235.874,236.354],["En",236.994,237.074],["aksel",237.154,237.454],["der",237.474,237.574],["drejer",237.594,237.955],["bliver",238.015,238.175],["bøjet",238.215,238.455],["frem",238.475,238.655],["og",238.695,238.755],["tilbage",238.775,239.135],["én",239.335,239.455],["gang",239.495,239.655],["hver",239.695,239.835],["omgang",239.915,240.235],["Det",240.775,240.855],["giver",240.895,241.055],["udmattelse",241.115,241.595],["Derfor",242.355,242.635],["siger",242.695,242.875],["slides",242.915,243.295],["at",243.395,243.475],["rigtige",243.795,244.115],["aksler",244.215,244.555],["skal",244.755,244.895],["regnes",244.935,245.235],["med",245.275,245.375],["D",245.435,245.455],["E",245.715,245.735],["Goodman",245.935,246.255],["T",246.955,246.975],["e",247.235,247.255],["og",247.415,247.475],["M",247.655,247.675],["e",247.735,247.755],["er",247.935,248.015],["den",248.035,248.135],["statiske",248.215,248.735],["første",248.935,249.215],["skitse",249.255,249.575]],"text":"En lille advarsel. En aksel, der drejer, bliver bøjet frem og tilbage én gang hver omgang. Det giver udmattelse. Derfor siger slides, at rigtige aksler skal regnes med D E Goodman. T e og M e er den statiske første skitse."},"censor":{"start":251.395,"end":268.356,"words":[["Hvordan",251.435,251.675],["siger",251.795,251.975],["du",251.975,252.035],["det",252.075,252.175],["til",252.195,252.295],["censor",252.335,252.655],["Start",253.656,253.876],["med",253.896,253.976],["håndklædet",253.996,254.436],["bøjning",254.976,255.316],["og",255.376,255.456],["vridning",255.476,255.796],["på",255.816,255.916],["én",255.956,256.056],["gang",256.096,256.256],["Vis",257.196,257.356],["de",257.396,257.456],["to",257.516,257.596],["spændinger",257.676,258.056],["i",258.076,258.096],["overfladen",258.176,258.596],["Tegn",259.436,259.616],["Mohrs",259.636,259.816],["cirkel",259.876,260.176],["og",260.436,260.496],["vis",260.536,260.716],["at",260.776,260.836],["radius",260.896,261.216],["giver",261.256,261.416],["T",261.516,261.536],["e",261.776,261.796],["og",262.176,262.236],["midten",262.296,262.496],["plus",262.556,262.756],["radius",262.816,263.156],["giver",263.196,263.356],["M",263.516,263.536],["e",263.596,263.616],["Forklar",264.636,264.896],["Pythagoras",264.936,265.396],["med",265.416,265.496],["gåturen",265.536,265.956],["Og",266.676,266.736],["sig",266.776,266.936],["hvorfor",266.936,267.176],["sejt",267.236,267.456],["stål",267.536,267.756],["bruger",267.796,267.956],["T",268.016,268.036],["e",268.336,268.356]],"text":"Hvordan siger du det til censor? Start med håndklædet: bøjning og vridning på én gang. Vis de to spændinger i overfladen. Tegn Mohrs cirkel, og vis, at radius giver T e, og midten plus radius giver M e. Forklar Pythagoras med gåturen. Og sig, hvorfor sejt stål bruger T e."},"tavle":{"start":269.497,"end":275.277,"words":[["Brug",269.537,269.657],["cirka",269.737,269.957],["syv",270.057,270.197],["minutter",270.257,270.517],["på",270.537,270.637],["det",270.657,270.777],["Så",271.457,271.597],["seks",271.737,271.897],["minutter",271.937,272.197],["på",272.217,272.297],["del",272.317,272.437],["b",272.497,272.517],["og",273.197,273.277],["to",273.397,273.497],["minutter",273.577,273.877],["til",273.897,273.977],["at",273.977,274.017],["vurdere",274.037,274.377],["om",274.457,274.517],["tallet",274.557,274.837],["er",274.857,274.917],["rimeligt",274.957,275.277]],"text":"Brug cirka syv minutter på det. Så seks minutter på del b, og to minutter til at vurdere, om tallet er rimeligt."},"tjek_q":{"start":277.097,"end":280.417,"words":[["Tjek",277.137,277.277],["dig",277.317,277.397],["selv",277.417,277.577],["Hvorfor",278.297,278.557],["er",278.637,278.717],["T",278.837,278.857],["e",279.137,279.157],["ikke",279.437,279.597],["bare",279.637,279.817],["M",280.057,280.077],["plus",280.117,280.337],["T",280.397,280.417]],"text":"Tjek dig selv. Hvorfor er T e ikke bare M plus T?"},"tjek_a":{"start":284.037,"end":296.278,"words":[["Fordi",284.077,284.237],["bøjning",284.497,284.837],["og",284.877,284.937],["vridning",284.977,285.317],["virker",285.397,285.677],["vinkelret",285.737,286.157],["på",286.177,286.277],["hinanden",286.297,286.618],["og",286.998,287.058],["lægges",287.078,287.258],["sammen",287.318,287.578],["som",287.638,287.758],["siderne",287.858,288.198],["i",288.298,288.318],["en",288.358,288.438],["retvinklet",288.478,288.898],["trekant",288.938,289.298],["Med",290.158,290.238],["fire",290.278,290.458],["hundrede",290.498,290.758],["og",290.818,290.858],["tre",290.898,291.018],["hundrede",291.118,291.358],["bliver",291.418,291.598],["T",291.658,291.678],["e",291.938,291.958],["fem",292.238,292.378],["hundrede",292.458,292.738],["ikke",293.158,293.298],["syv",293.378,293.518],["hundrede",293.558,294.638],["M",294.698,294.718],["plus",294.758,294.918],["T",294.978,294.998],["ville",295.198,295.338],["give",295.398,295.518],["en",295.538,295.598],["for",295.638,295.718],["tyk",295.758,295.918],["aksel",295.998,296.278]],"text":"Fordi bøjning og vridning virker vinkelret på hinanden og lægges sammen som siderne i en retvinklet trekant. Med fire hundrede og tre hundrede bliver T e fem hundrede, ikke syv hundrede. M plus T ville give en for tyk aksel."},"slut":{"start":298.098,"end":309.339,"words":[["Kort",298.138,298.318],["sagt",298.358,298.578],["T",299.138,299.158],["e",299.418,299.438],["er",299.638,299.698],["det",299.718,299.778],["rene",299.818,300.018],["vrid",300.058,300.258],["og",300.678,300.758],["M",300.938,300.958],["e",301.018,301.038],["er",301.238,301.298],["det",301.318,301.398],["rene",301.418,301.598],["bøj",301.658,301.838],["der",302.179,302.259],["giver",302.279,302.439],["samme",302.519,302.759],["farlige",302.839,303.179],["spænding",303.199,303.519],["som",303.559,303.659],["bøjning",303.719,304.019],["og",304.039,304.099],["vridning",304.119,304.399],["sammen",304.459,304.719],["De",305.619,305.659],["kommer",305.719,305.919],["fra",305.939,305.999],["Mohrs",306.059,306.219],["cirkel",306.239,306.519],["og",306.959,307.019],["de",307.059,307.119],["lader",307.179,307.279],["dig",307.279,307.359],["dimensionere",307.399,307.959],["med",308.139,308.259],["én",308.399,308.499],["simpel",308.739,309.019],["formel",309.059,309.339]],"text":"Kort sagt: T e er det rene vrid, og M e er det rene bøj, der giver samme farlige spænding som bøjning og vridning sammen. De kommer fra Mohrs cirkel, og de lader dig dimensionere med én simpel formel."}}}, { audio: 'eks-spm3-a.mp3', id: 'eks-spm3-a' });</script>
+</body>
+</html>

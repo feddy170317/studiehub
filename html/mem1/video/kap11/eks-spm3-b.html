@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spm. 3b: hvor tyk skal akslen være? · video</title>
+<meta name="description" content="Ny liste, spm. 3b trin for trin: T_e = 500 N·m, d = 37,1 mm → 38 mm, kontrol med Mohr (R = 50 MPa), hvad nu hvis.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 11: videoer</a><h1>Spm. 3b: hvor tyk skal akslen være?</h1><span class="meta">MEM1 · kapitel 11 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Spm. 3b: hvor tyk skal akslen være?"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Ny liste, spm. 3b trin for trin: T_e = 500 N·m, d = 37,1 mm → 38 mm, kontrol med Mohr (R = 50 MPa), hvad nu hvis.</p><div class="chips"><a href="../../opgaver/l11/tidligere-eksamen-spm-09-akseldesign.pdf">📐 Se udregningen i Mathcad (PDF)</a><a href="eks-spm3-a.html">Se først: Spm. 3a: bøjning og vridning forklaret fra bunden</a><a href="../../../../lab/mem1/aksel.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel11_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l11">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// MEM1 mundtlig eksamen (ny liste) · Spm. 3b v2: transmissionsakslen trin for trin, hvert tal oversat.
+// T = 300 N·m (≈ 30 kg på en 1 m nøgle, en familiebil), M = 400 N·m, τ_till = 50 MPa. T_e = 500 (4-3-5), M_e = 450 N·m.
+// d³ = 16·500 000/(π·50) = 50 930 mm³ ⇒ d = 37,07 mm (≈ 1½ kosteskaft) → 38 mm: τ = 46,4, σ_1 = 83,5 MPa. Ved d_min: σ 80, τ 30, R 50.
+// Hvad hvis: kun T 31,3; M+T 41,5; von Mises 36,5; 2d ⇒ 8×. Tjek: T = 600 ⇒ T_e 721, d 41,9 (+13 %). Mathcad: Lektion 11/Opgaver/Tidligere eksamen spm 09.
+BP.scene({ header: 'MEM1 · mundtlig eksamen · spm. 3b', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, dot, ring, ell, rect, hatch, dashed, strike, moment, PI } = B;
+  const S = (id) => L(id).start;
+  const ringet = (k, s, x, y, size, col, a, te) => { const r = text(k, s, x, y, size, col, a, te); ring(r, col, te, te + 0.5); return r; };
+  const cirkel = (k, cx, cy, r, col, w, a, b) => line(k, ell(cx, cy, r, r, 0, 2 * PI), col, w, a, b);
+  const trin = (k, s, id) => bubble(k, s, 130, 135, 48, 'blue', S(id) - 0.1, S(id) + 0.9);
+
+  // ---------------------------------------------------------------- 0 titel
+  B.titel(0, 'Spm. 3b: akslen', 'hvor tyk skal den være? · hvert tal oversat', 'titel');
+
+  // ---------------------------------------------------------------- 1 data
+  B.goto('data', 1);
+  bubble(1, 'Transmissionsakslen', 130, 135, 50, 'blue', S('data') - 0.1, S('data') + 0.8);
+  text(1, 'T = 300 N·m', 170, 230, 38, 'red', wt('data', 'tre') - 0.1, we('data', 'newtonmeter'));
+  text(1, '≈ motoren i en familiebil', 170, 285, 30, 'green', wt('data', 'motoren') - 0.1, we('data', 'familiebil'));
+  {
+    const cx = 260, cy = 440, tn = wt('data', 'nøgle');
+    cirkel(1, cx, cy, 30, 'black', 3.6, tn - 0.6, tn - 0.2);
+    line(1, [[cx + 30, cy], [600, cy]], 'black', 8, tn - 0.2, tn + 0.3);
+    B.dobbeltpil(1, [cx + 30, cy - 40], [600, cy - 40], 'green', wt('data', 'meter') - 0.2, wt('data', 'meter') + 0.3);
+    text(1, '1 m', (cx + 630) / 2, cy - 56, 28, 'green', wt('data', 'meter') - 0.1, wt('data', 'meter') + 0.4, { align: 'center' });
+    const tk = wt('data', 'kilo');
+    line(1, [[600, cy], [600, 500]], 'black', 2.4, tk - 0.2, tk + 0.1);
+    line(1, rect(560, 500, 80, 64).concat([[560, 500]]), 'red', 3.4, tk, tk + 0.4);
+    text(1, '30 kg', 600, 542, 26, 'red', tk + 0.2, tk + 0.6, { align: 'center' });
+    moment(1, cx, cy, 52, -2.8, 0.4, 'red', tk + 0.3, tk + 0.8);
+  }
+  text(1, 'M = 400 N·m', 720, 230, 38, 'blue', wt('data2', 'fire') - 0.1, we('data2', 'newtonmeter'));
+  text(1, 'τ_{till} = 50 MPa', 720, 290, 38, 'black', wt('data2', 'tilladte') - 0.1, we('data2', 'megapascal'));
+  {
+    const y = 450, tg = wt('data2', 'tandhjul');
+    line(1, [[720, y], [1160, y]], 'black', 9, tg - 0.4, tg);
+    [770, 1110].forEach((x, i) => line(1, [[x, y + 8], [x - 22, y + 44], [x + 22, y + 44], [x, y + 8]], 'black', 3, tg - 0.2 + i * 0.1, tg + 0.1 + i * 0.1));
+    cirkel(1, 940, y, 50, 'black', 3.4, tg - 0.1, tg + 0.4);
+    arrow(1, [[940, y + 58], [940, y + 130]], 'blue', 4, tg + 0.2, tg + 0.6, 14);
+    text(1, 'bøjer', 960, y + 120, 28, 'blue', tg + 0.4, tg + 0.8);
+  }
+  ringet(1, 'Hvor tyk skal akslen mindst være?', 170, 660, 38, 'red', wt('spm', 'tyk') - 0.4, we('spm', 'være'));
+
+  // ---------------------------------------------------------------- 2 trin 1: saml til én
+  B.goto('trin1', 2);
+  trin(2, 'Trin 1:  saml til én', 'trin1');
+  B.formel(2, '', 'T_e = √(M² + T²) = √(400² + 300²)', 190, 240, 34, wt('trin1', 'T') - 0.1, we('trin1', 'anden', 1), 'red');
+  text(2, '400² = 160 000,    300² = 90 000', 170, 320, 34, 'black', wt('te', 'Fire') - 0.1, we('te', 'tusind', 1));
+  text(2, 'sum = 250 000', 170, 380, 34, 'black', wt('te', 'Tilsammen') - 0.1, we('te', 'tusind', 2));
+  ringet(2, 'T_e = 500 N·m', 170, 460, 44, 'red', wt('te', 'kvadratroden') - 0.1, we('te', 'newtonmeter'));
+  {
+    const x0 = 780, y0 = 540, u = 0.8, tg = wt('gaa', 'gåturen');
+    line(2, [[x0, y0], [x0 + 400 * u, y0]], 'blue', 4.5, tg - 0.1, tg + 0.4);
+    line(2, [[x0 + 400 * u, y0], [x0 + 400 * u, y0 - 300 * u]], 'green', 4.5, tg + 0.2, tg + 0.6);
+    const tf = wt('gaa', 'fem');
+    line(2, [[x0, y0], [x0 + 400 * u, y0 - 300 * u]], 'red', 4.5, tf - 0.3, tf + 0.3);
+    text(2, 'M = 400', x0 + 200 * u, y0 + 36, 28, 'blue', tg + 0.1, tg + 0.5, { align: 'center' });
+    text(2, 'T = 300', x0 + 400 * u + 14, y0 - 150 * u, 28, 'green', tg + 0.3, tg + 0.7);
+    text(2, '500', x0 + 150 * u, y0 - 150 * u - 10, 32, 'red', tf, tf + 0.4, { align: 'right' });
+    text(2, 'som gåturen: 4, 3 → 5', x0, y0 + 90, 30, 'green', wt('gaa', 'Fire') - 0.1, we('gaa', 'fem'));
+  }
+  B.formel(2, '', 'M_e = ½ (400 + 500) = 450 N·m', 190, 650, 34, wt('me', 'M') - 0.1, we('me', 'newtonmeter'), 'blue');
+
+  // ---------------------------------------------------------------- 3 trin 2: find diameteren
+  B.goto('trin2', 3);
+  trin(3, 'Trin 2:  find diameteren', 'trin2');
+  B.formel(3, '', 'τ_{max} = 16 T_e / (π d³) = 50 MPa', 190, 240, 36, wt('trin2', 'Seksten') - 0.1, we('trin2', 'halvtreds'), 'red');
+  text(3, 'N og mm:  500 N·m = 500 000 N·mm', 170, 320, 32, 'green', wt('enheder', 'newton') - 0.1, we('enheder', 'newtonmillimeter'));
+  text(3, 'd³ = 16 · 500 000 / (π · 50) ≈ 50 900 mm³', 170, 400, 36, 'black', wt('d3', 'd') - 0.1, we('d3', 'kubikmillimeter'));
+  ringet(3, 'd = ∛50 900 = 37,1 mm', 170, 485, 42, 'red', wt('dmin', 'Kubikroden') - 0.1, we('dmin', 'millimeter'));
+  {
+    const tk = wt('dmin', 'kosteskaft'), s = 2.4;
+    cirkel(3, 880, 520, 12.5 * s * 2, 'black', 3.4, tk - 0.2, tk + 0.3);
+    text(3, 'kosteskaft', 880, 650, 28, 'black', tk, tk + 0.4, { align: 'center' });
+    cirkel(3, 1080, 520, 18.5 * s * 2, 'red', 3.4, tk + 0.2, tk + 0.6);
+    text(3, '37,1 mm', 1080, 650, 28, 'red', tk + 0.3, tk + 0.7, { align: 'center' });
+  }
+  ringet(3, 'vælg 38 mm:  rund altid op', 170, 610, 38, 'blue', wt('rund', 'otteogtredive') - 0.3, we('rund', 'ned'));
+
+  // ---------------------------------------------------------------- 4 trin 3: kontrol
+  B.goto('trin3', 4);
+  trin(4, 'Trin 3:  kontrol', 'trin3');
+  text(4, 'τ = 16 · 500 000 / (π · 38³) = 46,4 MPa', 170, 235, 34, 'black', wt('trin3', 'seksten') - 0.1, we('trin3', 'megapascal'));
+  text(4, 'under 50:  godt', 200, 290, 32, 'green', wt('trin3', 'Under') - 0.1, we('trin3', 'Godt'));
+  text(4, 'σ_1 = 32 · 450 000 / (π · 38³) = 83,5 MPa', 170, 365, 34, 'black', wt('sigma', 'toogtredive') - 0.1, we('sigma', 'megapascal'));
+  {
+    const x0 = 220, y = 560, s = 2.2, tm = wt('mohr', 'bøjningen');
+    arrow(4, [[x0 - 30, y], [x0 + 110 * s, y]], 'black', 2.4, tm - 0.4, tm, 12);
+    arrow(4, [[x0, y + 60 * s], [x0, y - 60 * s]], 'black', 2.4, tm - 0.3, tm + 0.1, 12);
+    const X = [x0 + 80 * s, y - 30 * s], Y = [x0, y + 30 * s];
+    dot(4, X[0], X[1], 8, 'black', tm); dot(4, Y[0], Y[1], 8, 'black', tm + 0.3);
+    line(4, [X, Y], 'black', 2.4, tm + 0.3, tm + 0.6);
+    const tc = wt('mohr', 'Mohrs');
+    cirkel(4, x0 + 40 * s, y, 50 * s, 'blue', 3.4, tc - 0.1, tc + 0.8);
+    arrow(4, [[x0 + 40 * s, y], [x0 + 40 * s, y - 50 * s + 4]], 'red', 3.4, tc + 0.6, tc + 1.0, 12);
+    text(4, 'σ = 80,  τ = 30', 560, 470, 32, 'black', tm - 0.1, we('mohr', 'tredive'));
+    ringet(4, 'R = 50 = τ_{till}', 560, 540, 36, 'red', wt('mohr', 'radius') - 0.1, we('mohr', 'tilladte'));
+    text(4, '40 og 30 → 50:  igen 3, 4, 5', 560, 615, 32, 'green', wt('mohr', 'Fyrre') - 0.1, we('mohr', 'fem'));
+  }
+
+  // ---------------------------------------------------------------- 5 trin 4: hvad nu hvis?
+  B.goto('trin4', 5);
+  trin(5, 'Trin 4:  hvad nu hvis?', 'trin4');
+  text(5, 'her viser du, at du har forstået det', 720, 140, 28, 'green', wt('trin4', 'viser') - 0.1, we('trin4', 'det'));
+  {
+    const rows = [
+      ['kunT', 'kun vridning  (M = 0)', '31,3 mm', 'green', 'kun', 'ekstra'],
+      ['plus', 'M + T = 700  (forkert)', '41,5 mm: for tyk', 'red', 'Lagde', 'dyrt'],
+      ['vm', 'von Mises  (11.12)', '36,5 mm', 'blue', 'von', 'side'],
+      ['dobbel', 'dobbelt diameter', '8 × så stærk  (d³)', 'black', 'fordobler', 'potens'],
+    ];
+    rows.forEach(([id, a1, a2, col, w1, w2], i) => {
+      const y = 250 + i * 105, t1 = wt(id, w1) - 0.2, t2 = wt(id, w2) - 0.6;
+      dot(5, 220, y - 12, 10, col, t1);
+      text(5, a1, 260, y, 34, 'black', t1, t1 + 0.6);
+      text(5, '→  ' + a2, 760, y, 34, col, t2, t2 + 0.6);
+    });
+    text(5, 'bøjningen koster 6 mm', 300, 290, 26, 'green', wt('kunT', 'Bøjningen') - 0.1, we('kunT', 'ekstra'));
+    text(5, 'Tresca: lidt tykkere, sikker side', 300, 500, 26, 'blue', wt('vm', 'Tresca') - 0.1, we('vm', 'side'));
+  }
+
+  // ---------------------------------------------------------------- 6 antagelser og censor-sætningen
+  B.goto('antag', 6);
+  bubble(6, 'Sig dine antagelser højt', 130, 135, 46, 'blue', S('antag') - 0.1, S('antag') + 0.9);
+  text(6, '•  massiv rund aksel', 170, 220, 30, 'black', wt('antag', 'Massiv') - 0.1, we('antag', 'aksel'));
+  text(6, '•  statisk last', 170, 265, 30, 'black', wt('antag', 'Statisk') - 0.1, we('antag', 'belastning'));
+  text(6, '•  ingen kærve eller kilespor', 640, 220, 30, 'black', wt('antag', 'Ingen') - 0.1, we('antag', 'kilespor'));
+  text(6, '•  sejt materiale  ⇒  Tresca', 640, 265, 30, 'black', wt('antag', 'sejt') - 0.1, we('antag', 'gælder'));
+  text(6, 'virkelighed: bøjningen skifter fortegn  ⇒  tjek udmattelse', 170, 320, 30, 'red', wt('antag', 'virkeligheden') - 0.1, we('antag', 'udmattelse'));
+  bubble(6, 'Til censor', 130, 400, 42, 'red', S('censor') - 0.1, S('censor') + 0.8);
+  {
+    const r = [
+      ['T_e = 500 N·m, lagt sammen som Pythagoras', 'fem', 'Pythagoras'],
+      ['τ_{till} = 50 MPa  ⇒  d ≥ 37,1 mm, vælg 38', 'tilladt', 'otteogtredive'],
+      ['kontrol: 46,4 MPa < 50', 'Kontrollen', 'tilladte'],
+    ];
+    r.forEach(([s, w1, w2], i) => text(6, s, 170, 480 + i * 60, 32, i === 1 ? 'red' : 'black', wt('censor', w1) - 0.2, we('censor', w2)));
+  }
+
+  // ---------------------------------------------------------------- 7 tjek: dobbelt moment
+  B.goto('tjek_q', 7);
+  B.tjek(7, ['Torsionsmomentet fordobles (600 N·m):', 'dobbelt så tyk aksel?'], ['nej: T_e ≈ 721 N·m  ⇒  d = 41,9 mm', 'kun 13 % tykkere (d står i tredje)'], 'tjek_q', 'tjek_a');
+  {
+    const s = 2, y = 600, t1 = wt('tjek_a', 'Diameteren');
+    cirkel(7, 300, y, 37.1 / 2 * s, 'black', 3, t1 - 0.2, t1 + 0.2);
+    text(7, '37,1 mm', 300, y - 52, 26, 'black', t1 - 0.1, t1 + 0.3, { align: 'center' });
+    cirkel(7, 460, y, 41.9 / 2 * s, 'green', 3.4, t1, t1 + 0.4);
+    text(7, '41,9 mm', 460, y - 56, 26, 'green', t1 + 0.2, t1 + 0.5, { align: 'center' });
+    const t2 = wt('tjek_a', 'tretten');
+    line(7, ell(720, y, 74.2 / 2 * s, 74.2 / 2 * s, 0, 2 * PI), 'red', 2.4, t2 - 0.3, t2 + 0.2, { alpha: 0.5 });
+    const ik = text(7, 'ikke 74 mm', 810, y + 10, 28, 'red', t2, t2 + 0.4);
+    strike(ik, t2 + 0.5, t2 + 0.8);
+  }
+
+  // ---------------------------------------------------------------- 8 slut
+  B.goto('slut', 8);
+  B.slut(8, 'MEM1 mundtlig eksamen, ny liste, spm. 3b · Hamrock m.fl., kap. 11, lign. (11.9), (11.12), (11.16) · Mathcad: Tidligere eksamen spm 09 Akseldesign', 'spm. 4: rullelejer', 'slut');
+  text(8, '1.  T_e = √(400² + 300²) = 500 N·m', 200, 240, 36, 'red', wt('slut', 'saml') - 0.1, we('slut', 'newtonmeter'));
+  text(8, '2.  16 T_e / (π d³) = 50 MPa', 200, 310, 36, 'black', wt('slut', 'Sæt') - 0.1, we('slut', 'megapascal'));
+  text(8, '3.  d ≥ 37,1 mm  ⇒  vælg 38 mm', 200, 380, 36, 'blue', wt('slut', 'mindst') - 0.1, we('slut', 'otteogtredive'));
+});
+
+</script>
+<script>BP.live({"duration":271.599,"audio":"eks-spm3-b.mp3","order":["titel","data","data2","spm","trin1","te","gaa","me","trin2","enheder","d3","dmin","rund","trin3","sigma","mohr","trin4","kunT","plus","vm","dobbel","antag","censor","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.681,"words":[["Spørgsmål",0.54,1.06],["tre",1.16,1.32],["del",1.88,2.06],["b",2.12,2.14],["Nu",3.14,3.24],["dimensionerer",3.4,4.12],["vi",4.16,4.22],["en",4.34,4.44],["rigtig",4.52,4.84],["transmissionsaksel",4.9,5.86],["og",6.3,6.36],["vi",6.4,6.46],["oversætter",6.52,6.921],["tallene",6.961,7.241],["undervejs",7.241,7.681]],"text":"Spørgsmål tre, del b. Nu dimensionerer vi en rigtig transmissionsaksel, og vi oversætter tallene undervejs."},"data":{"start":9.501,"end":21.142,"words":[["Akslen",9.541,9.921],["overfører",10.121,10.621],["et",10.741,10.841],["torsionsmoment",11.021,11.821],["på",11.921,12.101],["tre",12.301,12.461],["hundrede",12.601,12.981],["newtonmeter",12.981,13.561],["Det",14.401,14.521],["er",14.541,14.581],["som",14.601,14.721],["at",14.741,14.801],["hænge",14.821,15.041],["tredive",15.421,15.761],["kilo",15.821,16.101],["for",16.201,16.301],["enden",16.361,16.541],["af",16.581,16.661],["en",16.661,16.701],["nøgle",16.741,17.061],["der",17.121,17.241],["er",17.241,17.281],["en",17.281,17.361],["meter",17.421,17.681],["lang",17.721,17.881],["Det",18.681,18.761],["er",18.761,18.801],["cirka",18.821,19.041],["hvad",19.061,19.181],["motoren",19.201,19.581],["i",19.661,19.681],["en",19.741,19.801],["almindelig",19.821,20.201],["familiebil",20.241,20.762],["kan",20.842,20.942],["give",20.982,21.142]],"text":"Akslen overfører et torsionsmoment på tre hundrede newtonmeter. Det er som at hænge tredive kilo for enden af en nøgle, der er en meter lang. Det er cirka, hvad motoren i en almindelig familiebil kan give."},"data2":{"start":22.502,"end":30.982,"words":[["Samtidig",22.542,22.982],["bliver",23.022,23.182],["den",23.182,23.262],["bøjet",23.302,23.562],["med",23.602,23.722],["fire",23.902,24.122],["hundrede",24.182,24.422],["newtonmeter",24.482,25.082],["fra",25.562,25.642],["et",25.702,25.762],["tandhjul",25.782,26.242],["eller",26.302,26.462],["en",26.482,26.542],["remskive",26.602,27.102],["Den",27.962,28.082],["tilladte",28.142,28.502],["forskydningsspænding",28.542,29.362],["er",29.522,29.602],["halvtreds",29.782,30.242],["megapascal",30.422,30.982]],"text":"Samtidig bliver den bøjet med fire hundrede newtonmeter, fra et tandhjul eller en remskive. Den tilladte forskydningsspænding er halvtreds megapascal."},"spm":{"start":31.742,"end":34.683,"words":[["Spørgsmålet",31.782,32.242],["er",32.302,32.362],["hvor",32.822,32.942],["tyk",33.002,33.202],["skal",33.262,33.423],["akslen",33.483,33.843],["mindst",34.103,34.383],["være",34.403,34.683]],"text":"Spørgsmålet er: hvor tyk skal akslen mindst være?"},"trin1":{"start":36.503,"end":44.463,"words":[["Trin",36.543,36.743],["et",36.803,36.903],["saml",37.543,37.843],["de",37.903,37.963],["to",38.043,38.123],["belastninger",38.243,38.743],["til",38.783,38.883],["én",38.983,39.123],["T",40.083,40.103],["e",40.423,40.443],["er",40.823,40.923],["kvadratroden",41.123,41.863],["af",41.983,42.083],["fire",42.223,42.443],["hundrede",42.503,42.803],["i",42.803,42.823],["anden",42.863,43.063],["plus",43.203,43.443],["tre",43.663,43.803],["hundrede",43.903,44.163],["i",44.203,44.223],["anden",44.263,44.463]],"text":"Trin et: saml de to belastninger til én. T e er kvadratroden af fire hundrede i anden plus tre hundrede i anden."},"te":{"start":45.843,"end":55.684,"words":[["Fire",45.883,46.083],["hundrede",46.143,46.383],["i",46.403,46.423],["anden",46.463,46.663],["er",46.784,46.864],["hundrede",47.064,47.364],["og",47.364,47.404],["tres",47.404,47.604],["tusind",47.664,48.004],["Tre",48.544,48.684],["hundrede",48.784,49.064],["i",49.084,49.104],["anden",49.124,49.344],["er",49.564,49.624],["halvfems",49.644,50.084],["tusind",50.124,50.464],["Tilsammen",51.084,51.484],["to",51.904,52.004],["hundrede",52.104,52.364],["og",52.364,52.404],["halvtreds",52.404,52.724],["tusind",52.784,53.124],["og",53.504,53.564],["kvadratroden",53.604,54.224],["er",54.384,54.464],["fem",54.604,54.744],["hundrede",54.824,55.124],["newtonmeter",55.124,55.684]],"text":"Fire hundrede i anden er hundrede og tres tusind. Tre hundrede i anden er halvfems tusind. Tilsammen to hundrede og halvtreds tusind, og kvadratroden er fem hundrede newtonmeter."},"gaa":{"start":56.904,"end":64.725,"words":[["Det",56.944,57.064],["er",57.144,57.224],["gåturen",57.284,57.804],["fra",57.864,57.944],["del",58.044,58.184],["a",58.284,58.304],["Fire",58.384,59.364],["og",59.444,59.524],["tre",59.564,59.704],["giver",60.065,60.225],["fem",60.285,60.445],["Akslen",61.665,61.985],["har",62.025,62.145],["det",62.205,62.285],["som",62.325,62.445],["om",62.505,62.585],["den",62.645,62.765],["kun",62.865,63.025],["blev",63.045,63.185],["vredet",63.225,63.485],["med",63.545,63.625],["fem",63.745,63.925],["hundrede",63.925,64.145],["newtonmeter",64.165,64.725]],"text":"Det er gåturen fra del a. Fire og tre giver fem. Akslen har det, som om den kun blev vredet med fem hundrede newtonmeter."},"me":{"start":66.265,"end":74.066,"words":[["M",66.305,66.345],["e",66.485,66.505],["er",66.885,66.985],["en",67.225,67.325],["halv",67.385,67.585],["gange",67.785,68.025],["fire",68.325,68.525],["hundrede",68.565,68.865],["plus",68.985,69.205],["fem",69.425,69.585],["hundrede",69.625,69.905],["altså",70.345,70.585],["fire",70.885,71.065],["hundrede",71.125,71.365],["og",71.365,71.405],["halvtreds",71.405,71.805],["newtonmeter",71.845,72.385],["Den",72.966,73.086],["skal",73.106,73.246],["vi",73.246,73.306],["bruge",73.326,73.526],["til",73.546,73.626],["kontrollen",73.646,74.066]],"text":"M e er en halv gange fire hundrede plus fem hundrede, altså fire hundrede og halvtreds newtonmeter. Den skal vi bruge til kontrollen."},"trin2":{"start":75.886,"end":84.406,"words":[["Trin",75.926,76.106],["to",76.126,76.226],["find",76.766,76.966],["diameteren",77.046,77.646],["Vi",78.506,78.566],["sætter",78.646,78.886],["tau",78.986,79.146],["max",79.206,79.386],["lig",79.746,79.866],["den",79.946,80.086],["tilladte",80.126,80.486],["Seksten",81.046,81.486],["T",81.606,81.626],["e",81.866,81.886],["over",82.186,82.386],["pi",82.486,82.626],["d",82.906,82.926],["i",83.126,83.146],["tredje",83.226,83.586],["er",83.766,83.846],["lig",83.886,83.966],["halvtreds",84.026,84.406]],"text":"Trin to: find diameteren. Vi sætter tau max lig den tilladte. Seksten T e over pi d i tredje er lig halvtreds."},"enheder":{"start":85.806,"end":91.907,"words":[["Regn",85.846,85.986],["igen",86.026,86.226],["i",86.446,86.467],["newton",86.547,86.927],["og",86.987,87.047],["millimeter",87.087,87.507],["Fem",88.487,88.627],["hundrede",88.687,88.947],["newtonmeter",88.947,89.507],["er",89.667,89.747],["fem",90.047,90.167],["hundrede",90.227,90.467],["tusind",90.547,90.967],["newtonmillimeter",91.147,91.907]],"text":"Regn igen i newton og millimeter. Fem hundrede newtonmeter er fem hundrede tusind newtonmillimeter."},"d3":{"start":92.487,"end":100.088,"words":[["d",92.527,92.547],["i",92.807,92.827],["tredje",92.887,93.247],["er",93.387,93.467],["seksten",93.727,94.107],["gange",94.167,94.387],["fem",94.467,94.567],["hundrede",94.627,94.807],["tusind",94.867,95.247],["over",95.587,95.767],["pi",95.847,95.967],["gange",96.127,96.327],["halvtreds",96.347,96.747],["Det",97.447,97.567],["er",97.567,97.607],["cirka",97.647,97.927],["halvtreds",97.967,98.487],["tusind",98.527,98.827],["ni",98.867,98.927],["hundrede",99.027,99.287],["kubikmillimeter",99.347,100.088]],"text":"d i tredje er seksten gange fem hundrede tusind, over pi gange halvtreds. Det er cirka halvtreds tusind ni hundrede kubikmillimeter."},"dmin":{"start":101.468,"end":108.928,"words":[["Kubikroden",101.508,102.088],["giver",102.168,102.348],["syvogtredive",102.548,103.088],["komma",103.128,103.308],["et",103.428,103.508],["millimeter",103.608,104.008],["Akslen",104.568,104.888],["skal",104.928,105.068],["være",105.068,105.208],["mindst",105.448,105.748],["så",105.868,105.988],["tyk",106.008,106.188],["Det",106.928,106.988],["er",107.008,107.048],["cirka",107.048,107.208],["halvanden",107.288,107.588],["gang",107.608,107.748],["så",107.788,107.888],["tykt",107.908,108.088],["som",108.128,108.248],["et",108.288,108.368],["kosteskaft",108.408,108.928]],"text":"Kubikroden giver syvogtredive komma et millimeter. Akslen skal være mindst så tyk. Det er cirka halvanden gang så tykt som et kosteskaft."},"rund":{"start":109.988,"end":114.369,"words":[["Vi",110.028,110.088],["runder",110.148,110.348],["op",110.368,110.448],["til",110.508,110.608],["et",110.628,110.668],["standardmål",110.688,111.228],["otteogtredive",111.448,111.928],["millimeter",111.968,112.368],["Man",112.889,112.989],["runder",113.009,113.189],["altid",113.289,113.569],["op",113.649,113.729],["aldrig",114.009,114.249],["ned",114.269,114.369]],"text":"Vi runder op til et standardmål, otteogtredive millimeter. Man runder altid op, aldrig ned."},"trin3":{"start":116.189,"end":128.67,"words":[["Trin",116.229,116.409],["tre",116.429,116.509],["kontrol",116.909,117.209],["Ved",118.169,118.249],["otteogtredive",118.289,118.709],["millimeter",118.769,119.189],["er",119.309,119.389],["tau",119.569,119.769],["max",119.829,119.989],["seksten",120.069,121.029],["gange",121.089,121.249],["fem",121.309,121.409],["hundrede",121.449,121.649],["tusind",121.669,122.009],["over",122.209,122.409],["pi",122.469,122.609],["gange",122.769,122.969],["otteogtredive",123.049,123.529],["i",123.609,123.629],["tredje",123.669,123.969],["Det",124.629,124.709],["giver",124.749,124.889],["seksogfyrre",124.989,125.509],["komma",125.569,125.729],["fire",125.849,126.069],["megapascal",126.149,126.67],["Under",127.53,127.69],["halvtreds",127.71,128.01],["Godt",128.53,128.67]],"text":"Trin tre: kontrol. Ved otteogtredive millimeter er tau max seksten gange fem hundrede tusind over pi gange otteogtredive i tredje. Det giver seksogfyrre komma fire megapascal. Under halvtreds. Godt."},"sigma":{"start":129.77,"end":139.19,"words":[["Den",129.81,129.91],["største",129.95,130.19],["normalspænding",130.23,130.81],["med",130.99,131.11],["M",131.37,131.39],["e",131.51,131.53],["er",132.17,132.27],["toogtredive",132.43,133.03],["gange",133.13,133.33],["fire",133.41,133.53],["hundrede",133.53,133.69],["og",133.69,133.73],["halvtreds",133.73,134.03],["tusind",134.09,134.41],["over",134.97,135.15],["pi",135.23,135.33],["gange",135.45,135.65],["otteogtredive",135.73,136.23],["i",136.27,136.29],["tredje",136.33,136.61],["Det",137.23,137.31],["giver",137.35,137.51],["treogfirs",137.59,138.11],["komma",138.17,138.35],["fem",138.45,138.69],["megapascal",138.71,139.19]],"text":"Den største normalspænding, med M e, er toogtredive gange fire hundrede og halvtreds tusind over pi gange otteogtredive i tredje. Det giver treogfirs komma fem megapascal."},"mohr":{"start":140.571,"end":153.072,"words":[["Og",140.611,140.671],["ved",140.711,140.771],["præcis",140.791,141.131],["syvogtredive",141.211,141.711],["komma",141.751,141.911],["et",141.991,142.051],["millimeter",142.131,142.551],["giver",142.731,142.911],["bøjningen",142.971,143.431],["firs",143.571,143.851],["megapascal",143.911,144.431],["og",144.791,144.851],["vridningen",144.891,145.331],["tredive",145.371,145.751],["Mohrs",146.551,146.751],["cirkel",146.791,147.071],["får",147.131,147.251],["radius",147.311,147.651],["halvtreds",147.691,148.031],["præcis",148.531,149.011],["den",149.051,149.151],["tilladte",149.191,149.511],["Fyrre",150.311,150.551],["og",150.611,150.671],["tredive",150.711,151.011],["giver",151.111,151.251],["halvtreds",151.251,151.571],["Igen",152.171,152.351],["tre",152.572,152.672],["fire",152.772,152.932],["fem",152.952,153.072]],"text":"Og ved præcis syvogtredive komma et millimeter giver bøjningen firs megapascal og vridningen tredive. Mohrs cirkel får radius halvtreds, præcis den tilladte. Fyrre og tredive giver halvtreds. Igen tre, fire, fem."},"trin4":{"start":154.892,"end":158.592,"words":[["Trin",154.932,155.112],["fire",155.152,155.332],["hvad",155.692,155.832],["nu",155.852,155.912],["hvis",155.952,156.132],["Her",156.852,156.992],["viser",157.072,157.292],["du",157.332,157.372],["censor",157.432,157.712],["at",157.812,157.872],["du",157.892,157.952],["har",157.972,158.052],["forstået",158.072,158.472],["det",158.512,158.592]],"text":"Trin fire: hvad nu hvis? Her viser du censor, at du har forstået det."},"kunT":{"start":159.552,"end":165.012,"words":[["Var",159.592,159.692],["der",159.692,159.772],["kun",159.772,159.892],["vridning",159.952,160.292],["skulle",160.392,160.572],["akslen",160.612,160.892],["være",160.912,161.052],["enogtredive",161.112,161.592],["komma",161.632,161.792],["tre",161.832,161.952],["millimeter",162.052,162.432],["Bøjningen",163.052,163.392],["koster",163.412,163.652],["altså",163.672,163.872],["seks",164.112,164.292],["millimeter",164.352,164.732],["ekstra",164.812,165.012]],"text":"Var der kun vridning, skulle akslen være enogtredive komma tre millimeter. Bøjningen koster altså seks millimeter ekstra."},"plus":{"start":166.252,"end":173.233,"words":[["Lagde",166.292,166.392],["du",166.412,166.453],["bare",166.493,166.653],["M",166.873,166.893],["og",166.953,167.013],["T",167.053,167.073],["sammen",167.273,167.493],["til",167.533,167.633],["syv",167.673,167.793],["hundrede",167.853,168.113],["fik",168.313,168.453],["du",168.493,168.553],["enogfyrre",168.753,169.173],["komma",169.213,169.373],["fem",169.433,169.633],["millimeter",169.653,170.033],["For",170.573,170.673],["tykt",170.693,170.893],["og",171.253,171.333],["for",171.393,171.493],["dyrt",171.513,171.713],["fordi",172.153,172.333],["det",172.393,172.473],["ikke",172.513,172.633],["er",172.653,172.693],["Pythagoras",172.713,173.233]],"text":"Lagde du bare M og T sammen til syv hundrede, fik du enogfyrre komma fem millimeter. For tykt og for dyrt, fordi det ikke er Pythagoras."},"vm":{"start":174.613,"end":183.094,"words":[["Bruger",174.653,174.833],["du",174.833,174.873],["von",174.913,175.033],["Mises",175.053,175.393],["ligning",175.693,175.973],["elleve",176.093,176.253],["tolv",176.313,176.493],["med",176.893,176.993],["samme",177.133,177.313],["materiale",177.353,177.773],["får",178.253,178.393],["du",178.393,178.453],["seksogtredive",178.653,179.193],["komma",179.233,179.373],["fem",179.433,179.574],["millimeter",179.614,180.054],["Tresca",180.774,181.034],["giver",181.114,181.274],["lidt",181.354,181.494],["tykkere",181.554,181.874],["så",182.154,182.274],["den",182.274,182.354],["er",182.374,182.434],["på",182.434,182.534],["den",182.534,182.614],["sikre",182.654,182.874],["side",182.934,183.094]],"text":"Bruger du von Mises, ligning elleve tolv, med samme materiale, får du seksogtredive komma fem millimeter. Tresca giver lidt tykkere, så den er på den sikre side."},"dobbel":{"start":184.054,"end":189.314,"words":[["Og",184.094,184.154],["fordobler",184.194,184.514],["du",184.534,184.574],["diameteren",184.634,185.114],["kan",185.394,185.514],["akslen",185.574,185.854],["tåle",185.894,186.154],["otte",186.334,186.554],["gange",186.594,186.794],["så",186.834,186.934],["meget",186.954,187.154],["Diameteren",187.734,188.194],["tæller",188.234,188.494],["i",188.614,188.634],["tredje",188.714,188.954],["potens",188.994,189.314]],"text":"Og fordobler du diameteren, kan akslen tåle otte gange så meget. Diameteren tæller i tredje potens."},"antag":{"start":191.134,"end":205.715,"words":[["Sig",191.174,191.274],["antagelserne",191.334,191.794],["højt",191.834,192.014],["Massiv",192.834,193.135],["rund",193.195,193.335],["aksel",193.395,193.635],["Statisk",194.495,194.915],["belastning",194.955,195.335],["Ingen",196.115,196.295],["kærve",196.315,196.575],["eller",196.635,196.795],["kilespor",196.835,197.275],["Og",198.115,198.175],["et",198.195,198.275],["sejt",198.415,198.615],["materiale",198.655,199.115],["så",199.295,199.395],["Tresca",199.415,199.675],["gælder",199.735,199.935],["I",201.115,201.135],["virkeligheden",201.195,201.515],["drejer",201.535,201.775],["akslen",201.815,202.135],["så",202.315,202.415],["bøjningen",202.435,202.755],["skifter",202.755,202.995],["fortegn",203.035,203.415],["hver",203.415,203.555],["omgang",203.615,203.895],["Så",204.475,204.575],["skal",204.595,204.715],["den",204.715,204.795],["også",204.815,204.935],["tjekkes",204.935,205.175],["for",205.195,205.295],["udmattelse",205.315,205.715]],"text":"Sig antagelserne højt. Massiv rund aksel. Statisk belastning. Ingen kærve eller kilespor. Og et sejt materiale, så Tresca gælder. I virkeligheden drejer akslen, så bøjningen skifter fortegn hver omgang. Så skal den også tjekkes for udmattelse."},"censor":{"start":207.535,"end":226.356,"words":[["Det",207.575,207.655],["du",207.695,207.735],["siger",207.795,207.955],["til",207.975,208.055],["censor",208.075,208.355],["er",208.455,208.535],["T",209.175,209.195],["e",209.435,209.455],["er",209.755,209.835],["fem",209.995,210.135],["hundrede",210.175,210.395],["newtonmeter",210.395,210.915],["fordi",211.155,211.335],["bøjning",211.515,211.835],["og",211.895,211.955],["vridning",211.995,212.315],["lægges",212.355,212.535],["sammen",212.595,212.835],["som",212.935,213.035],["i",213.095,213.115],["Pythagoras",213.155,213.715],["Med",214.375,214.455],["en",214.495,214.535],["tilladt",214.635,214.995],["forskydning",215.115,215.655],["på",215.715,215.815],["halvtreds",215.855,216.295],["megapascal",216.515,217.095],["skal",217.335,217.495],["akslen",217.555,217.895],["være",217.935,218.075],["mindst",218.155,218.435],["syvogtredive",218.635,219.195],["komma",219.255,219.416],["et",219.496,219.596],["millimeter",219.756,220.176],["og",220.696,220.756],["jeg",220.776,220.856],["vælger",220.876,221.096],["otteogtredive",221.156,221.616],["Kontrollen",222.376,222.896],["giver",222.956,223.136],["seksogfyrre",223.376,223.936],["komma",223.996,224.156],["fire",224.256,224.476],["megapascal",224.636,225.116],["under",225.576,225.796],["det",225.916,226.016],["tilladte",226.036,226.356]],"text":"Det, du siger til censor, er: T e er fem hundrede newtonmeter, fordi bøjning og vridning lægges sammen som i Pythagoras. Med en tilladt forskydning på halvtreds megapascal skal akslen være mindst syvogtredive komma et millimeter, og jeg vælger otteogtredive. Kontrollen giver seksogfyrre komma fire megapascal, under det tilladte."},"tjek_q":{"start":228.056,"end":236.417,"words":[["Tjek",228.096,229.096],["dig",229.116,229.196],["selv",229.216,229.396],["Motoren",230.156,230.536],["bliver",230.556,230.696],["skiftet",230.716,230.996],["ud",231.076,231.196],["så",231.436,231.556],["torsionsmomentet",231.656,232.416],["fordobles",232.436,232.916],["til",232.996,233.136],["seks",233.376,233.576],["hundrede",233.616,233.876],["newtonmeter",233.916,234.477],["Skal",234.977,235.117],["akslen",235.157,235.457],["så",235.517,235.637],["være",235.677,235.797],["dobbelt",235.877,236.117],["så",236.137,236.217],["tyk",236.257,236.417]],"text":"Tjek dig selv. Motoren bliver skiftet ud, så torsionsmomentet fordobles til seks hundrede newtonmeter. Skal akslen så være dobbelt så tyk?"},"tjek_a":{"start":240.037,"end":254.138,"words":[["Nej",240.077,240.237],["T",241.057,241.077],["e",241.377,241.397],["bliver",241.677,241.897],["kvadratroden",241.957,242.637],["af",242.837,242.937],["fire",243.097,243.297],["hundrede",243.357,243.637],["i",243.657,243.677],["anden",243.717,243.917],["plus",243.997,244.197],["seks",244.417,244.597],["hundrede",244.617,244.837],["i",244.857,244.877],["anden",244.897,245.077],["cirka",245.457,245.757],["syv",246.057,246.197],["hundrede",246.257,246.557],["og",246.677,246.737],["enogtyve",246.817,247.277],["Diameteren",247.977,248.497],["bliver",248.557,248.757],["enogfyrre",248.937,249.337],["komma",249.377,249.517],["ni",249.557,249.617],["millimeter",249.697,250.098],["Kun",250.418,250.578],["tretten",250.778,250.998],["procent",251.018,251.278],["tykkere",251.338,251.638],["fordi",251.958,252.218],["diameteren",252.438,253.038],["står",253.078,253.278],["i",253.458,253.478],["tredje",253.538,253.778],["potens",253.818,254.138]],"text":"Nej. T e bliver kvadratroden af fire hundrede i anden plus seks hundrede i anden, cirka syv hundrede og enogtyve. Diameteren bliver enogfyrre komma ni millimeter. Kun tretten procent tykkere, fordi diameteren står i tredje potens."},"slut":{"start":255.958,"end":270.119,"words":[["Kort",255.998,256.138],["sagt",256.178,256.378],["saml",256.998,257.298],["bøjning",257.378,257.758],["og",257.838,257.918],["vridning",257.938,258.318],["til",258.398,258.558],["T",258.718,258.738],["e",258.998,259.018],["lig",259.318,259.458],["fem",259.458,259.878],["hundrede",259.918,260.158],["newtonmeter",260.198,260.738],["Sæt",261.418,261.578],["seksten",261.838,262.238],["T",262.318,262.338],["e",262.618,262.638],["over",262.938,263.138],["pi",263.218,263.338],["d",263.418,263.438],["i",263.578,263.598],["tredje",263.658,264.019],["lig",264.259,264.399],["halvtreds",264.519,264.879],["megapascal",265.039,265.499],["Så",266.219,266.339],["skal",266.359,266.499],["akslen",266.539,266.799],["være",266.819,266.939],["mindst",266.999,267.259],["syvogtredive",267.479,267.979],["komma",268.019,268.159],["et",268.239,268.339],["millimeter",268.519,268.899],["og",269.139,269.199],["vi",269.219,269.279],["vælger",269.339,269.579],["otteogtredive",269.659,270.119]],"text":"Kort sagt: saml bøjning og vridning til T e lig fem hundrede newtonmeter. Sæt seksten T e over pi d i tredje lig halvtreds megapascal. Så skal akslen være mindst syvogtredive komma et millimeter, og vi vælger otteogtredive."}}}, { audio: 'eks-spm3-b.mp3', id: 'eks-spm3-b' });</script>
+</body>
+</html>
