@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spm. 9a: remme og friktion forklaret fra bunden · video</title>
+<meta name="description" content="Ny liste, spm. 9a forklaret fra bunden: rebet om pælen, stram og slap part, F_1/F_2 = e^{μφ}, centrifugalkraft som sjippetov.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 19: videoer</a><h1>Spm. 9a: remme og friktion forklaret fra bunden</h1><span class="meta">MEM1 · kapitel 19 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Spm. 9a: remme og friktion forklaret fra bunden"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Ny liste, spm. 9a forklaret fra bunden: rebet om pælen, stram og slap part, F_1/F_2 = e^{μφ}, centrifugalkraft som sjippetov.</p><div class="chips"><a href="../../opgaver/l19/tidligere-eksamen-spm-15-remtraek.pdf">📐 Se udregningen i Mathcad (PDF)</a><a href="remtraek.html">Se først: Fladremme: remligningen og centrifugalkraften</a><a href="../../../../lab/mem1/remtraek.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel19_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l19">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// MEM1 mundtlig eksamen (ny liste) · Spm. 9a v2: fladremme og remfriktion forklaret fra bunden.
+// Rem i bilmotor/symaskine/løbebånd, trækker kun ved friktion → sømand med reb om pæl: ganges for hver omgang (×3 halv, ×9 hel, ×81 to)
+// → stram part F_1, slap part F_2, T = (F_1 − F_2) r → F_1/F_2 = e^{μφ} (18.64) → lille skive glider først
+// → sjippetov: F_c = m′u² (19.8), (F_1 − F_c)/(F_2 − F_c) = e^{μφ} (19.9) → kapacitet falder ved høj fart, optimal hastighed.
+BP.scene({ header: 'MEM1 · mundtlig eksamen · spm. 9a', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, dot, ring, ell, rect, hatch, dashed, axes, plot, moment, PI } = B;
+  const S = (id) => L(id).start;
+  const ringet = (k, s, x, y, size, col, a, te) => { const r = text(k, s, x, y, size, col, a, te); ring(r, col, te, te + 0.5); return r; };
+  const cirkel = (k, cx, cy, r, col, w, a, b) => line(k, ell(cx, cy, r, r, 0, 2 * PI), col, w, a, b);
+  const remtraek = (k, x1, r1, x2, r2, y, col, a, b) => {   // to skiver og en åben rem (tangenter tilnærmet vandrette)
+    cirkel(k, x1, y, r1, 'black', 3.4, a, a + 0.4); cirkel(k, x2, y, r2, 'black', 3.4, a + 0.1, a + 0.5);
+    line(k, [[x1, y - r1 - 6], [x2, y - r2 - 6]], col, 4, a + 0.3, b); line(k, [[x1, y + r1 + 6], [x2, y + r2 + 6]], col, 4, a + 0.4, b);
+  };
+
+  // ---------------------------------------------------------------- 0 titel
+  B.titel(0, 'Spm. 9a: fladremme', 'remfriktion og centrifugalkraft · fra bunden', 'titel');
+
+  // ---------------------------------------------------------------- 1 remmen
+  B.goto('rem', 1);
+  bubble(1, 'Remmen', 130, 135, 50, 'blue', S('rem') - 0.1, S('rem') + 0.6);
+  text(1, 'bilmotor · symaskine · løbebånd', 170, 215, 30, 'black', wt('rem', 'bilens') - 0.1, we('rem', 'løbebånd'));
+  remtraek(1, 360, 110, 900, 60, 430, 'blue', wt('rem', 'skiver') - 0.2, wt('rem', 'skiver') + 0.9);
+  ringet(1, 'ingen tænder: kun friktion', 170, 620, 36, 'red', wt('hvordan', 'tænder') - 0.4, we('hvordan', 'friktion'));
+  text(1, 'hvor hårdt, før den glider?', 700, 620, 32, 'black', wt('hvordan', 'hårdt') - 0.1, we('hvordan', 'glider'));
+
+  // ---------------------------------------------------------------- 2 rebet om pælen
+  B.goto('pael', 2);
+  bubble(2, 'Rebet om pælen', 130, 135, 50, 'blue', S('pael') - 0.1, S('pael') + 0.8);
+  {
+    const cx = 340, cy = 430, tp = wt('pael', 'pæl');
+    line(2, rect(cx - 40, cy - 160, 80, 300).concat([[cx - 40, cy - 160]]), 'black', 4, tp - 0.2, tp + 0.3);
+    hatch(2, rect(cx - 40, cy - 160, 80, 300), 'black', tp, tp + 0.4, { gap: 14 });
+    for (let i = 0; i < 3; i++) line(2, ell(cx, cy - 60 + i * 40, 52, 14, 0, PI), 'blue', 4, tp + 0.2 + i * 0.1, tp + 0.5 + i * 0.1);
+    const ts = wt('pael', 'skib');
+    line(2, [[cx + 50, cy - 60], [560, cy - 120]], 'blue', 4, ts - 0.1, ts + 0.3);
+    arrow(2, [[560, cy - 120], [620, cy - 136]], 'red', 5, ts, ts + 0.3, 16);
+    text(2, 'skibet: stor kraft', 520, cy - 160, 28, 'red', ts, ts + 0.4);
+    const th = wt('pael', 'let');
+    line(2, [[cx - 50, cy + 20], [160, cy + 90]], 'blue', 4, th - 0.2, th + 0.1);
+    arrow(2, [[160, cy + 90], [130, cy + 100]], 'green', 3, th, th + 0.3, 12);
+    text(2, 'holder let', 140, cy + 140, 28, 'green', th, th + 0.4);
+  }
+  {
+    const t1 = wt('pael2', 'halv'), t2 = wt('pael2', 'To'), x0 = 760;
+    text(2, 'pr. omgang: ganges med det samme tal', 760, 230, 26, 'black', wt('pael2', 'ganges') - 0.1, we('pael2', 'tal'));
+    text(2, '½ omgang:  × 3', x0, 330, 36, 'blue', t1 - 0.1, t1 + 0.6);
+    text(2, '1 omgang:  × 9', x0, 400, 36, 'blue', t1 + 0.6, t1 + 1.2);
+    text(2, '2 omgange:  × 81', x0, 470, 36, 'red', t2 - 0.1, we('pael2', 'større', 1));
+    ringet(2, 'ganget, ikke lagt sammen ⇒ e^x', 640, 590, 30, 'red', wt('pael3', 'ganget') - 0.1, we('pael3', 'formlen'));
+  }
+
+  // ---------------------------------------------------------------- 3 stram og slap part
+  B.goto('parter', 3);
+  bubble(3, 'Stram og slap part', 130, 135, 50, 'blue', S('parter') - 0.1, S('parter') + 0.9);
+  {
+    const cx = 420, cy = 430, r = 140, ts = wt('parter', 'stram');
+    cirkel(3, cx, cy, r, 'black', 4, ts - 0.6, ts - 0.2);
+    line(3, ell(cx, cy, r + 8, r + 8, PI / 2, 3 * PI / 2), 'blue', 5, ts - 0.4, ts);
+    line(3, [[cx, cy - r - 8], [cx + 500, cy - r - 8]], 'red', 6, ts - 0.1, ts + 0.3);
+    arrow(3, [[cx + 420, cy - r - 8], [cx + 560, cy - r - 8]], 'red', 4.5, ts + 0.2, ts + 0.5, 16);
+    text(3, 'F_1  stram', cx + 440, cy - r - 30, 32, 'red', ts + 0.2, ts + 0.6);
+    const tl = wt('parter', 'slap');
+    line(3, [[cx, cy + r + 8], [cx + 500, cy + r + 8]], 'green', 3, tl - 0.1, tl + 0.3);
+    arrow(3, [[cx + 420, cy + r + 8], [cx + 500, cy + r + 8]], 'green', 3, tl + 0.2, tl + 0.5, 12);
+    text(3, 'F_2  slap', cx + 440, cy + r + 50, 32, 'green', tl + 0.2, tl + 0.6);
+    const tf = wt('forskel', 'Forskellen');
+    moment(3, cx, cy, 60, -2.2, 1.8, 'blue', tf, tf + 0.5);
+    ringet(3, 'T = (F_1 − F_2) · r', 170, 680, 38, 'blue', wt('forskel', 'Momentet') - 0.1, we('forskel', 'radius'));
+  }
+
+  // ---------------------------------------------------------------- 4 remligningen
+  B.goto('euler', 4);
+  bubble(4, 'Remligningen', 130, 135, 50, 'blue', S('euler') - 0.1, S('euler') + 0.8);
+  B.formel(4, '18.64', 'F_1 / F_2 = e^{μφ}', 200, 280, 56, wt('euler', 'F') - 0.1, we('euler', 'phi'), 'red');
+  text(4, 'μ: friktion mellem rem og skive', 170, 380, 32, 'green', wt('mu', 'Mu') - 0.1, we('mu', 'skive'));
+  text(4, 'φ: omslutning i radianer, ½ omgang = π', 170, 440, 32, 'blue', wt('mu', 'Phi') - 0.1, we('mu', 'pi'));
+  text(4, 'stram ≤ e^{μφ} · slap', 170, 520, 34, 'red', wt('saetning', 'stramme') - 0.3, we('saetning', 'slappe'));
+  text(4, 'mere μ eller φ ⇒ eksponentielt mere', 170, 580, 32, 'black', wt('saetning', 'Mere') - 0.1, we('saetning', 'pælen'));
+  {
+    const cx = 960, cy = 420, r = 100, tp = wt('mu', 'omslutningsvinklen');
+    cirkel(4, cx, cy, r, 'black', 3.4, tp - 0.4, tp);
+    line(4, ell(cx, cy, r + 8, r + 8, PI / 2, 3 * PI / 2), 'blue', 6, tp, tp + 0.6);
+    text(4, 'φ', cx - r - 50, cy + 10, 36, 'blue', tp + 0.3, tp + 0.7);
+  }
+
+  // ---------------------------------------------------------------- 5 lille skive og centrifugalkraft
+  B.goto('lille', 5);
+  bubble(5, 'Hvor glider den?', 130, 135, 50, 'blue', S('lille') - 0.1, S('lille') + 0.8);
+  {
+    const tl = wt('lille', 'lille');
+    remtraek(5, 300, 110, 640, 50, 330, 'blue', tl - 0.6, tl);
+    line(5, ell(640, 330, 62, 62, -PI / 2, PI / 2), 'red', 6, tl, tl + 0.5);
+    text(5, 'lille skive: mindst φ ⇒ glider først', 170, 490, 30, 'red', tl, we('lille', 'først'));
+  }
+  {
+    const ts = wt('cent', 'sjippetov'), cx = 1000, cy = 330;
+    line(5, ell(cx, cy, 150, 110, PI * 0.1, PI * 0.9), 'black', 4, ts - 0.2, ts + 0.5);
+    line(5, ell(cx, cy, 175, 135, PI * 0.15, PI * 0.85), 'green', 2.4, ts + 0.3, ts + 0.7, { alpha: 0.5 });
+    arrow(5, [[cx, cy + 112], [cx, cy + 170]], 'green', 3.4, ts + 0.4, ts + 0.8, 12);
+    text(5, 'sjippetov: flyver udad', 870, 250, 28, 'green', ts, ts + 0.6);
+  }
+  B.formel(5, '19.8', 'F_c = m′ u²', 190, 580, 38, wt('cent2', 'F') - 0.1, we('cent2', 'otte'), 'green');
+  B.formel(5, '19.9', '(F_1 − F_c) / (F_2 − F_c) = e^{μφ}', 560, 580, 36, wt('cent3', 'F') - 0.1, we('cent3', 'ni'), 'red');
+  text(5, 'trækker i begge parter, presser ikke ⇒ intet greb', 170, 660, 30, 'black', wt('cent2', 'trækker') - 0.1, we('cent2', 'skiven'));
+
+  // ---------------------------------------------------------------- 6 høj hastighed
+  B.goto('hurtig', 6);
+  bubble(6, 'Høj hastighed', 130, 135, 50, 'blue', S('hurtig') - 0.1, S('hurtig') + 0.7);
+  text(6, 'remmen bruger styrke på at holde sig selv på skiven', 170, 215, 30, 'black', wt('hurtig', 'styrke') - 0.4, we('hurtig', 'skiven'));
+  {
+    const x0 = 220, y0 = 640, w = 560, h = 330, P = (u, v) => [x0 + u * w, y0 - v * h];
+    const ta = wt('hurtig2', 'F');
+    axes(6, x0, y0, x0 + w + 20, y0 - h - 30, 'u', '', ta - 0.4);
+    text(6, 'effekt', x0 + 16, y0 - h - 20, 28, 'black', ta - 0.1, ta + 0.3);
+    const fc = []; for (let u = 0; u <= 1; u += 0.04) fc.push(P(u, 0.9 * u * u));
+    plot(6, fc, 'green', ta, ta + 0.8);
+    text(6, 'F_c ∝ u²', P(0.9, 0.78)[0] + 10, P(0.9, 0.78)[1] - 10, 28, 'green', ta + 0.4, ta + 0.8);
+    const tp = wt('hurtig2', 'hastighed', 1);
+    const pw = []; for (let u = 0; u <= 1; u += 0.02) pw.push(P(u, 2.6 * u * (1 - u * u)));
+    plot(6, pw, 'red', tp - 0.4, tp + 1.0);
+    const um = 1 / Math.sqrt(3);
+    dot(6, P(um, 2.6 * um * (1 - um * um))[0], P(um, 2.6 * um * (1 - um * um))[1], 11, 'red', tp + 0.6);
+    text(6, 'bedste hastighed', P(um, 1)[0] - 60, P(um, 1)[1] - 20, 28, 'red', tp + 0.6, tp + 1.0);
+  }
+  text(6, 'dobbelt fart ⇒ 4 × F_c', 860, 380, 32, 'green', wt('hurtig2', 'Dobbelt') - 0.1, we('hurtig2', 'F', 1) + 0.3);
+  text(6, 'derover falder effekten', 860, 450, 28, 'red', wt('hurtig2', 'Over') - 0.1, we('hurtig2', 'igen'));
+
+  // ---------------------------------------------------------------- 7 sådan siger du det + 15 minutter
+  B.goto('censor', 7);
+  bubble(7, 'Sådan siger du det', 130, 135, 50, 'blue', S('censor') - 0.1, S('censor') + 0.9);
+  text(7, '1.  rebet om pælen: ganges for hver omgang', 170, 220, 32, 'black', wt('censor', 'rebet') - 0.1, we('censor', 'omgang'));
+  text(7, '2.  stram og slap part: forskellen trækker', 170, 275, 32, 'black', wt('censor', 'parter') - 0.4, we('censor', 'trækker'));
+  text(7, '3.  F_1 / F_2 = e^{μφ}', 170, 330, 32, 'red', wt('censor', 'formlen') - 0.1, we('censor', 'phi'));
+  text(7, '4.  sjippetovet: F_c trækkes fra ⇒ mindre ved høj fart', 170, 385, 32, 'black', wt('censor', 'sjippetovet') - 0.1, we('censor', 'hastighed'));
+  {
+    const x0 = 170, x1 = 1110, y = 470, hh = 56, m = (x1 - x0) / 15;
+    const seg = [[0, 7, 'blue', 'del a', wt('tavle', 'syv')], [7, 13, 'red', 'del b', wt('tavle', 'seks')], [13, 15, 'green', 'vurdér', wt('tavle', 'to', 0)]];
+    seg.forEach(([a, b2, col, et, t]) => {
+      line(7, rect(x0 + a * m, y, (b2 - a) * m, hh).concat([[x0 + a * m, y]]), col, 3, t - 0.1, t + 0.4);
+      hatch(7, rect(x0 + a * m, y, (b2 - a) * m, hh), col, t + 0.2, t + 0.7, { gap: 12 });
+      text(7, et, x0 + (a + b2) / 2 * m, y + hh + 40, 30, col, t, t + 0.4, { align: 'center' });
+      text(7, a + '', x0 + a * m, y - 12, 24, 'black', t, t + 0.3, { align: 'center' });
+    });
+    text(7, '15 min', x1, y - 12, 24, 'black', wt('tavle', 'to', 0), wt('tavle', 'to', 0) + 0.3, { align: 'center' });
+  }
+
+  // ---------------------------------------------------------------- 8 tjek
+  B.goto('tjek_q', 8);
+  B.tjek(8, ['Hel omgang i stedet for halv:', 'hvor meget større bliver F_1/F_2?'], ['sat i anden: 3 → 9', 'eksponentialfunktionen'], 'tjek_q', 'tjek_a');
+  {
+    const t1 = wt('tjek_a', 'tre'), t2 = wt('tjek_a', 'ni'), x0 = 420, sc = 60;
+    text(8, '½ omgang', 180, 590, 30, 'black', t1 - 0.2, t1 + 0.2);
+    line(8, rect(x0, 560, 3 * sc, 40).concat([[x0, 560]]), 'blue', 3, t1, t1 + 0.4); text(8, '3', x0 + 3 * sc + 16, 592, 28, 'blue', t1 + 0.2, t1 + 0.5);
+    text(8, '1 omgang', 180, 655, 30, 'black', t2 - 0.2, t2 + 0.2);
+    line(8, rect(x0, 625, 9 * sc, 40).concat([[x0, 625]]), 'red', 3, t2, t2 + 0.4); text(8, '9', x0 + 9 * sc + 16, 657, 28, 'red', t2 + 0.2, t2 + 0.5);
+  }
+
+  // ---------------------------------------------------------------- 9 slut
+  B.goto('slut', 9);
+  B.slut(9, 'MEM1 mundtlig eksamen, ny liste, spm. 9 · Hamrock m.fl., lign. (18.64), (19.8), (19.9) · slides kap. 19', 'spm. 9b: hvor meget kan remmen trække?', 'slut');
+  text(9, 'friktion som rebet om pælen', 200, 240, 34, 'black', wt('slut', 'rebet') - 0.3, we('slut', 'pælen'));
+  text(9, 'F_1 / F_2 = e^{μφ},  T = (F_1 − F_2) r', 200, 310, 34, 'red', wt('slut', 'F') - 0.1, we('slut', 'momentet'));
+  text(9, 'høj fart: F_c spiser af kapaciteten', 200, 380, 34, 'green', wt('slut', 'hastighed') - 0.6, we('slut', 'falder'));
+});
+
+</script>
+<script>BP.live({"duration":236.589,"audio":"eks-spm9-a.mp3","order":["titel","rem","hvordan","pael","pael2","pael3","parter","forskel","euler","mu","saetning","lille","cent","cent2","cent3","hurtig","hurtig2","censor","tavle","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.481,"words":[["Spørgsmål",0.54,1.04],["ni",1.2,1.26],["del",1.68,1.9],["a",2.1,2.12],["Fladremme",2.9,3.4],["og",3.62,3.68],["remfriktion",3.72,4.3],["Vi",5.3,5.34],["starter",5.4,5.66],["med",5.68,5.76],["hverdagen",5.76,6.221],["og",6.381,6.441],["formlen",6.481,6.781],["kommer",6.841,7.061],["bagefter",7.101,7.481]],"text":"Spørgsmål ni, del a. Fladremme og remfriktion. Vi starter med hverdagen, og formlen kommer bagefter."},"rem":{"start":9.301,"end":17.581,"words":[["En",9.341,9.461],["rem",9.541,9.741],["overfører",9.921,10.421],["drejning",10.481,10.921],["mellem",10.981,11.201],["to",11.281,11.381],["skiver",11.541,11.901],["der",12.041,12.141],["sidder",12.181,12.381],["langt",12.421,12.601],["fra",12.641,12.701],["hinanden",12.761,13.081],["Du",13.741,13.821],["kender",13.861,14.061],["den",14.061,14.141],["fra",14.181,14.241],["bilens",14.321,14.641],["motor",14.721,15.121],["fra",15.321,15.421],["en",15.501,15.561],["gammel",15.641,15.881],["symaskine",15.961,16.561],["og",16.801,16.861],["fra",16.881,16.961],["et",17.021,17.081],["løbebånd",17.121,17.581]],"text":"En rem overfører drejning mellem to skiver, der sidder langt fra hinanden. Du kender den fra bilens motor, fra en gammel symaskine og fra et løbebånd."},"hvordan":{"start":18.882,"end":25.902,"words":[["Remmen",18.922,19.222],["har",19.322,19.422],["ingen",19.462,19.622],["tænder",19.702,19.982],["Den",20.502,20.622],["trækker",20.662,20.962],["kun",21.002,21.122],["ved",21.182,21.262],["friktion",21.302,21.782],["Så",22.762,22.882],["spørgsmålet",22.902,23.382],["er",23.442,23.522],["hvor",23.922,24.062],["hårdt",24.102,24.342],["kan",24.382,24.502],["den",24.522,24.602],["trække",24.662,25.022],["før",25.282,25.462],["den",25.482,25.582],["glider",25.622,25.902]],"text":"Remmen har ingen tænder. Den trækker kun ved friktion. Så spørgsmålet er: hvor hårdt kan den trække, før den glider?"},"pael":{"start":27.722,"end":38.243,"words":[["Først",27.762,27.962],["et",27.982,28.042],["billede",28.082,28.322],["Har",29.322,29.422],["du",29.442,29.482],["set",29.562,29.742],["en",29.742,29.823],["sømand",29.963,30.343],["holde",30.503,30.763],["et",30.823,30.903],["stort",31.023,31.343],["skib",31.503,31.803],["med",32.043,32.143],["et",32.163,32.223],["reb",32.303,32.563],["der",32.743,32.843],["er",32.883,32.943],["slået",33.003,33.243],["et",33.243,33.283],["par",33.283,33.383],["gange",33.403,33.623],["rundt",33.723,33.883],["om",33.923,34.003],["en",34.023,34.103],["pæl",34.143,34.383],["Han",35.403,35.523],["holder",35.563,35.763],["kun",35.783,35.923],["let",35.983,36.143],["i",36.183,36.203],["enden",36.303,36.543],["og",36.983,37.063],["skibet",37.123,37.423],["kan",37.463,37.583],["ikke",37.583,37.703],["rive",37.703,37.843],["sig",37.863,37.983],["løs",38.003,38.243]],"text":"Først et billede. Har du set en sømand holde et stort skib med et reb, der er slået et par gange rundt om en pæl? Han holder kun let i enden, og skibet kan ikke rive sig løs."},"pael2":{"start":39.943,"end":52.445,"words":[["Med",39.983,40.063],["den",40.103,40.203],["friktion",40.243,40.603],["vi",40.643,40.703],["har",40.763,40.883],["i",40.943,40.963],["opgaven",41.023,41.444],["hver",42.264,42.444],["gang",42.504,42.704],["rebet",42.824,43.144],["går",43.184,43.324],["rundt",43.344,43.524],["om",43.564,43.644],["pælen",43.664,44.024],["ganges",44.384,44.704],["den",44.764,44.884],["kraft",44.944,45.184],["han",45.224,45.304],["kan",45.324,45.424],["holde",45.444,45.664],["med",45.704,45.764],["det",45.784,45.864],["samme",45.904,46.084],["tal",46.144,46.304],["En",47.264,47.344],["halv",47.404,47.584],["omgang",47.624,47.944],["og",48.284,48.344],["kraften",48.384,48.684],["bliver",48.684,48.824],["tre",48.864,48.984],["gange",49.084,49.264],["større",49.284,49.544],["To",50.164,50.284],["omgange",50.404,50.764],["og",50.924,50.964],["den",50.984,51.084],["bliver",51.104,51.264],["over",51.284,51.444],["firs",51.604,51.884],["gange",51.924,52.124],["større",52.184,52.445]],"text":"Med den friktion, vi har i opgaven: hver gang rebet går rundt om pælen, ganges den kraft, han kan holde, med det samme tal. En halv omgang, og kraften bliver tre gange større. To omgange, og den bliver over firs gange større."},"pael3":{"start":53.325,"end":58.405,"words":[["Det",53.365,53.425],["er",53.425,53.465],["ikke",53.465,53.585],["lagt",53.605,53.745],["sammen",53.825,54.125],["Det",54.525,54.625],["er",54.625,54.665],["ganget",54.785,55.085],["Derfor",56.105,56.425],["er",56.505,56.565],["der",56.585,56.665],["en",56.685,56.745],["eksponentialfunktion",56.785,57.865],["i",57.985,58.005],["formlen",58.065,58.405]],"text":"Det er ikke lagt sammen. Det er ganget. Derfor er der en eksponentialfunktion i formlen."},"parter":{"start":60.225,"end":68.586,"words":[["På",60.265,60.365],["en",60.365,60.445],["remskive",60.465,60.945],["er",61.005,61.065],["det",61.085,61.145],["præcis",61.165,61.505],["det",61.525,61.625],["samme",61.645,61.865],["Remmen",62.525,62.825],["har",62.885,63.005],["en",63.045,63.125],["stram",63.205,63.465],["part",63.545,63.865],["med",63.965,64.066],["kraften",64.086,64.446],["F",64.686,64.706],["et",64.826,64.926],["der",65.106,65.206],["trækker",65.226,65.526],["Og",66.106,66.166],["en",66.206,66.266],["slap",66.346,66.586],["part",66.666,66.906],["med",66.946,67.026],["kraften",67.046,67.366],["F",67.506,67.526],["to",67.626,67.766],["der",68.006,68.106],["kommer",68.126,68.286],["tilbage",68.306,68.586]],"text":"På en remskive er det præcis det samme. Remmen har en stram part med kraften F et, der trækker. Og en slap part med kraften F to, der kommer tilbage."},"forskel":{"start":69.606,"end":76.687,"words":[["Forskellen",69.646,70.126],["mellem",70.166,70.366],["dem",70.406,70.526],["F",70.966,70.986],["et",71.126,71.226],["minus",71.386,71.666],["F",71.846,71.866],["to",71.926,72.046],["er",72.646,72.726],["det",72.766,72.846],["der",72.866,72.946],["trækker",72.966,73.226],["skiven",73.266,73.566],["rundt",73.646,73.846],["Momentet",74.786,75.227],["er",75.347,75.427],["forskellen",75.467,75.927],["gange",76.007,76.227],["radius",76.287,76.687]],"text":"Forskellen mellem dem, F et minus F to, er det, der trækker skiven rundt. Momentet er forskellen gange radius."},"euler":{"start":78.507,"end":87.968,"words":[["Hvor",78.547,78.667],["stor",78.687,78.867],["kan",78.887,78.987],["forskellen",79.027,79.427],["blive",79.467,79.707],["Det",80.687,80.787],["siger",80.827,80.987],["remligningen",81.027,81.567],["F",82.327,82.347],["et",82.467,82.567],["over",82.727,82.907],["F",83.067,83.087],["to",83.187,83.307],["er",83.687,83.767],["e",83.907,83.927],["i",84.287,84.307],["mu",84.507,84.587],["phi",84.887,84.987],["Bogen",85.947,86.167],["udleder",86.227,86.567],["den",86.587,86.667],["i",86.767,86.787],["ligning",86.847,87.108],["atten",87.228,87.428],["fireogtres",87.508,87.968]],"text":"Hvor stor kan forskellen blive? Det siger remligningen. F et over F to er e i mu phi. Bogen udleder den i ligning atten fireogtres."},"mu":{"start":89.408,"end":99.249,"words":[["Mu",89.448,89.528],["er",89.848,89.928],["friktionskoefficienten",90.008,91.068],["mellem",91.188,91.388],["rem",91.448,91.608],["og",91.788,91.848],["skive",91.888,92.148],["Phi",92.808,92.908],["er",93.148,93.248],["omslutningsvinklen",93.468,94.388],["hvor",94.748,94.868],["langt",94.908,95.148],["remmen",95.188,95.428],["ligger",95.528,95.768],["rundt",95.828,96.028],["om",96.068,96.148],["skiven",96.208,96.548],["målt",96.808,97.028],["i",97.048,97.068],["radianer",97.128,97.588],["En",98.128,98.209],["halv",98.249,98.409],["omgang",98.449,98.789],["er",99.049,99.109],["pi",99.149,99.249]],"text":"Mu er friktionskoefficienten mellem rem og skive. Phi er omslutningsvinklen, hvor langt remmen ligger rundt om skiven, målt i radianer. En halv omgang er pi."},"saetning":{"start":100.229,"end":112.73,"words":[["Læs",100.269,100.449],["den",100.469,100.569],["som",100.609,100.729],["en",100.749,100.829],["sætning",100.909,101.249],["Den",101.929,102.049],["stramme",102.189,102.549],["part",102.609,102.929],["kan",103.069,103.189],["højst",103.229,103.509],["være",103.569,103.769],["e",103.989,104.009],["i",104.289,104.309],["mu",104.409,104.489],["phi",104.689,104.789],["gange",105.289,105.589],["den",105.669,105.809],["slappe",105.909,106.209],["Mere",106.889,107.089],["friktion",107.129,107.609],["eller",107.649,107.809],["mere",107.849,108.049],["omslutning",108.129,108.689],["giver",108.729,108.889],["et",108.909,108.969],["større",109.029,109.329],["forhold",109.39,109.77],["Og",110.25,110.31],["det",110.33,110.41],["vokser",110.41,110.69],["eksponentielt",110.73,111.41],["ligesom",111.81,112.03],["rebet",112.09,112.31],["om",112.33,112.39],["pælen",112.43,112.73]],"text":"Læs den som en sætning. Den stramme part kan højst være e i mu phi gange den slappe. Mere friktion eller mere omslutning giver et større forhold. Og det vokser eksponentielt, ligesom rebet om pælen."},"lille":{"start":114.55,"end":119.37,"words":[["Derfor",114.59,114.81],["er",114.81,114.85],["det",114.85,114.93],["den",114.95,115.05],["lille",115.13,115.33],["skive",115.39,115.63],["der",115.65,115.75],["bestemmer",115.75,116.09],["Den",116.67,116.77],["har",116.81,116.89],["mindst",116.93,117.13],["omslutning",117.17,117.73],["og",117.93,117.99],["det",118.03,118.13],["er",118.13,118.17],["der",118.21,118.39],["remmen",118.49,118.73],["glider",118.79,119.05],["først",119.09,119.37]],"text":"Derfor er det den lille skive, der bestemmer. Den har mindst omslutning, og det er der, remmen glider først."},"cent":{"start":120.31,"end":127.751,"words":[["Så",120.35,120.49],["centrifugalkraften",120.71,121.67],["Kører",122.291,122.491],["remmen",122.531,122.751],["hurtigt",122.831,123.211],["vil",123.471,123.531],["den",123.551,123.631],["flyve",123.671,123.891],["udad",124.031,124.291],["når",124.431,124.531],["den",124.551,124.611],["går",124.631,124.731],["rundt",124.751,124.891],["om",124.931,124.991],["skiven",125.051,125.371],["Ligesom",125.831,126.031],["et",126.071,126.151],["sjippetov",126.231,126.731],["der",126.791,126.871],["svinges",126.891,127.171],["hurtigt",127.231,127.531],["rundt",127.551,127.751]],"text":"Så centrifugalkraften. Kører remmen hurtigt, vil den flyve udad, når den går rundt om skiven. Ligesom et sjippetov, der svinges hurtigt rundt."},"cent2":{"start":128.591,"end":139.892,"words":[["Den",128.631,128.731],["kraft",128.771,129.031],["hedder",129.071,129.271],["F",129.531,129.551],["c",129.851,129.871],["Den",130.691,130.811],["er",130.831,130.891],["remmens",130.931,131.211],["masse",131.331,131.631],["pr",131.671,131.791],["meter",131.831,132.111],["gange",132.291,132.471],["hastigheden",132.551,133.092],["i",133.172,133.192],["anden",133.352,133.592],["ligning",134.052,134.332],["nitten",134.532,134.732],["otte",134.832,135.032],["Den",135.912,136.032],["trækker",136.072,136.412],["i",136.492,136.512],["begge",136.652,136.872],["parter",136.912,137.252],["lige",137.432,137.592],["meget",137.612,137.892],["men",138.212,138.312],["den",138.332,138.432],["presser",138.472,138.832],["ikke",138.892,139.032],["remmen",139.072,139.312],["mod",139.352,139.472],["skiven",139.532,139.892]],"text":"Den kraft hedder F c. Den er remmens masse pr. meter gange hastigheden i anden, ligning nitten otte. Den trækker i begge parter lige meget, men den presser ikke remmen mod skiven."},"cent3":{"start":140.412,"end":152.613,"words":[["Derfor",140.452,140.672],["trækkes",140.712,140.972],["den",140.992,141.072],["fra",141.132,141.252],["i",141.412,141.432],["begge",141.472,141.692],["parter",141.732,142.032],["F",142.692,142.712],["et",142.792,142.892],["minus",142.992,143.252],["F",143.412,143.432],["c",143.552,143.572],["over",144.112,144.333],["F",144.553,144.573],["to",144.673,144.793],["minus",144.933,145.153],["F",145.293,145.313],["c",145.413,145.433],["er",145.893,145.993],["e",146.173,146.193],["i",146.373,146.393],["mu",146.493,146.573],["phi",146.753,146.853],["ligning",147.333,147.613],["nitten",147.833,148.033],["ni",148.073,148.133],["Den",149.113,149.253],["del",149.293,149.453],["af",149.473,149.533],["remkraften",149.573,150.113],["der",150.133,150.213],["går",150.253,150.393],["til",150.433,150.553],["centrifugalkraften",150.593,151.593],["giver",151.773,151.933],["intet",152.093,152.333],["greb",152.373,152.613]],"text":"Derfor trækkes den fra i begge parter: F et minus F c over F to minus F c er e i mu phi, ligning nitten ni. Den del af remkraften, der går til centrifugalkraften, giver intet greb."},"hurtig":{"start":154.433,"end":161.994,"words":[["Hvad",154.473,154.593],["betyder",154.613,154.893],["det",154.913,154.993],["Ved",155.733,155.833],["høj",155.893,156.053],["hastighed",156.153,156.594],["bruger",156.714,156.954],["remmen",157.014,157.234],["en",157.234,157.294],["stor",157.394,157.654],["del",157.734,157.894],["af",157.914,157.974],["sin",157.994,158.114],["styrke",158.174,158.514],["bare",158.814,158.974],["på",158.994,159.094],["at",159.134,159.174],["holde",159.214,159.374],["sig",159.374,159.494],["selv",159.554,159.734],["på",159.774,159.874],["skiven",159.894,160.214],["Der",160.814,160.894],["er",160.894,160.954],["mindre",160.974,161.194],["tilbage",161.214,161.494],["til",161.514,161.614],["at",161.614,161.654],["trække",161.694,161.994]],"text":"Hvad betyder det? Ved høj hastighed bruger remmen en stor del af sin styrke bare på at holde sig selv på skiven. Der er mindre tilbage til at trække."},"hurtig2":{"start":162.654,"end":174.495,"words":[["Og",162.694,162.754],["fordi",162.774,162.954],["F",163.194,163.214],["c",163.354,163.374],["vokser",163.594,163.874],["med",163.874,163.974],["hastigheden",164.014,164.474],["i",164.514,164.534],["anden",164.694,164.954],["går",165.234,165.354],["det",165.374,165.434],["hurtigt",165.474,165.854],["Dobbelt",166.354,166.594],["hastighed",166.614,167.014],["fire",167.474,167.734],["gange",167.835,168.035],["så",168.095,168.195],["stor",168.215,168.375],["F",168.495,168.515],["c",168.595,168.615],["Derfor",169.495,169.755],["findes",169.795,169.995],["der",170.015,170.095],["en",170.135,170.195],["hastighed",170.255,170.735],["hvor",170.975,171.075],["remmen",171.135,171.335],["overfører",171.415,171.815],["mest",171.895,172.135],["effekt",172.175,172.455],["Over",173.095,173.275],["den",173.315,173.435],["falder",173.695,173.935],["effekten",173.955,174.275],["igen",174.295,174.495]],"text":"Og fordi F c vokser med hastigheden i anden, går det hurtigt. Dobbelt hastighed, fire gange så stor F c. Derfor findes der en hastighed, hvor remmen overfører mest effekt. Over den falder effekten igen."},"censor":{"start":176.315,"end":195.717,"words":[["Hvordan",176.355,176.555],["siger",176.615,176.775],["du",176.795,176.835],["det",176.895,176.975],["til",177.015,177.095],["censor",177.155,177.435],["Start",178.155,178.375],["med",178.435,178.515],["rebet",178.575,178.855],["om",178.895,178.955],["pælen",178.995,179.335],["kraften",179.815,180.136],["ganges",180.196,180.496],["for",180.556,180.656],["hver",180.656,180.796],["omgang",180.856,181.176],["Så",181.776,181.896],["de",181.916,181.976],["to",182.056,182.156],["parter",182.276,182.636],["stram",182.936,183.176],["og",183.176,183.236],["slap",183.276,183.496],["og",183.856,183.896],["at",183.936,184.016],["forskellen",184.056,184.516],["trækker",184.556,184.916],["Så",185.616,185.736],["formlen",185.776,186.136],["F",186.596,186.616],["et",186.696,186.796],["over",186.876,187.056],["F",187.196,187.216],["to",187.296,187.416],["lig",187.596,187.736],["e",187.936,187.956],["i",188.136,188.156],["mu",188.256,188.336],["phi",188.516,188.616],["Og",189.336,189.396],["til",189.416,189.536],["sidst",189.556,189.756],["sjippetovet",190.056,190.616],["centrifugalkraften",191.197,192.137],["trækkes",192.177,192.477],["fra",192.517,192.617],["i",192.717,192.737],["begge",192.837,193.077],["parter",193.117,193.457],["og",193.697,193.757],["giver",193.797,193.937],["mindre",193.977,194.237],["kapacitet",194.297,194.857],["ved",194.917,194.997],["høj",195.057,195.217],["hastighed",195.297,195.717]],"text":"Hvordan siger du det til censor? Start med rebet om pælen: kraften ganges for hver omgang. Så de to parter, stram og slap, og at forskellen trækker. Så formlen F et over F to lig e i mu phi. Og til sidst sjippetovet: centrifugalkraften trækkes fra i begge parter og giver mindre kapacitet ved høj hastighed."},"tavle":{"start":196.357,"end":201.737,"words":[["Brug",196.397,196.537],["cirka",196.557,196.797],["syv",196.937,197.077],["minutter",197.137,197.377],["på",197.377,197.477],["det",197.477,197.597],["Så",197.997,198.117],["seks",198.417,198.597],["minutter",198.657,198.957],["på",198.977,199.077],["del",199.077,199.237],["b",199.357,199.377],["og",199.657,199.737],["to",199.857,199.957],["minutter",200.037,200.297],["til",200.317,200.437],["at",200.457,200.497],["vurdere",200.517,200.877],["om",200.937,200.997],["tallet",201.057,201.337],["er",201.337,201.397],["rimeligt",201.437,201.737]],"text":"Brug cirka syv minutter på det. Så seks minutter på del b, og to minutter til at vurdere, om tallet er rimeligt."},"tjek_q":{"start":203.557,"end":209.537,"words":[["Tjek",203.597,203.757],["dig",203.797,203.877],["selv",203.917,204.077],["Remmen",204.817,205.017],["går",205.077,205.197],["en",205.237,205.297],["hel",205.397,205.637],["omgang",205.697,205.997],["rundt",206.057,206.217],["i",206.297,206.317],["stedet",206.357,206.557],["for",206.577,206.637],["en",206.657,206.737],["halv",206.757,206.957],["Hvor",207.477,207.577],["meget",207.597,207.757],["større",207.797,208.017],["bliver",208.057,208.217],["forholdet",208.257,208.677],["F",208.877,208.897],["et",208.957,209.057],["over",209.117,209.257],["F",209.357,209.377],["to",209.437,209.537]],"text":"Tjek dig selv. Remmen går en hel omgang rundt i stedet for en halv. Hvor meget større bliver forholdet F et over F to?"},"tjek_a":{"start":213.157,"end":219.758,"words":[["Det",213.197,213.277],["bliver",213.297,213.437],["sat",213.437,213.557],["i",213.577,213.597],["anden",213.717,213.937],["En",214.517,214.597],["halv",214.637,214.777],["omgang",214.817,215.117],["gav",215.177,215.277],["cirka",215.377,215.577],["tre",215.637,215.777],["En",216.377,216.457],["hel",216.517,216.697],["omgang",216.737,217.037],["giver",217.217,217.357],["cirka",217.357,217.558],["ni",217.618,217.678],["Det",218.458,218.598],["er",218.758,218.838],["eksponentialfunktionen",218.858,219.758]],"text":"Det bliver sat i anden. En halv omgang gav cirka tre. En hel omgang giver cirka ni. Det er eksponentialfunktionen."},"slut":{"start":221.578,"end":235.119,"words":[["Kort",221.618,221.818],["sagt",221.878,222.118],["remmen",222.298,222.518],["trækker",222.558,222.858],["ved",222.878,222.958],["friktion",222.978,223.378],["ligesom",223.738,223.958],["rebet",224.018,224.278],["om",224.318,224.378],["pælen",224.418,224.758],["F",225.598,225.618],["et",225.738,225.838],["over",225.878,226.018],["F",226.158,226.178],["to",226.238,226.358],["er",226.598,226.698],["e",226.838,226.858],["i",226.978,226.998],["mu",227.078,227.158],["phi",227.318,227.418],["og",228.078,228.138],["forskellen",228.178,228.658],["gange",228.718,228.898],["radius",228.958,229.378],["er",229.478,229.538],["momentet",229.578,229.959],["Ved",230.819,230.919],["høj",230.959,231.099],["hastighed",231.199,231.579],["spiser",231.619,231.919],["centrifugalkraften",231.959,232.919],["en",232.959,233.019],["del",233.059,233.179],["af",233.199,233.259],["remkraften",233.299,233.799],["så",234.059,234.159],["kapaciteten",234.179,234.819],["falder",234.879,235.119]],"text":"Kort sagt: remmen trækker ved friktion, ligesom rebet om pælen. F et over F to er e i mu phi, og forskellen gange radius er momentet. Ved høj hastighed spiser centrifugalkraften en del af remkraften, så kapaciteten falder."}}}, { audio: 'eks-spm9-a.mp3', id: 'eks-spm9-a' });</script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spm. 8b: hvor meget kan koblingen trække? · video</title>
+<meta name="description" content="Ny liste, spm. 8b trin for trin: r_m = 75 mm, T = 180 N·m (konstant tryk 186,7), hvad nu hvis.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 18: videoer</a><h1>Spm. 8b: hvor meget kan koblingen trække?</h1><span class="meta">MEM1 · kapitel 18 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Spm. 8b: hvor meget kan koblingen trække?"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Ny liste, spm. 8b trin for trin: r_m = 75 mm, T = 180 N·m (konstant tryk 186,7), hvad nu hvis.</p><div class="chips"><a href="../../opgaver/l18/tidligere-eksamen-spm-14-lamelkobling.pdf">📐 Se udregningen i Mathcad (PDF)</a><a href="eks-spm8-a.html">Se først: Spm. 8a: lamelkoblinger forklaret fra bunden</a><a href="../../../../lab/mem1/lamelkobling.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel18_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l18">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// MEM1 mundtlig eksamen (ny liste) · Spm. 8b v2: flerskivekoblingen trin for trin, hvert tal oversat.
+// N = 4, r_i = 50, r_o = 100 mm (Ø 200 ≈ tallerken), μ = 0,30, F = 2000 N (≈ 200 kg): r_m = 75 mm, μF = 600 N, én flade 45 N·m, T = 180 N·m.
+// Konstant tryk 186,7 N·m (+3,7 %). Hvad hvis: olie μ = 0,1 ⇒ 60; N = 8 ⇒ 360; r_o = 120 ⇒ 204 N·m. Tjek: 360 N·m ⇒ F = 4000 N.
+BP.scene({ header: 'MEM1 · mundtlig eksamen · spm. 8b', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, dot, ring, ell, rect, hatch, PI } = B;
+  const S = (id) => L(id).start;
+  const ringet = (k, s, x, y, size, col, a, te) => { const r = text(k, s, x, y, size, col, a, te); ring(r, col, te, te + 0.5); return r; };
+  const cirkel = (k, cx, cy, r, col, w, a, b) => line(k, ell(cx, cy, r, r, 0, 2 * PI), col, w, a, b);
+  const trin = (k, s, id) => bubble(k, s, 130, 135, 48, 'blue', S(id) - 0.1, S(id) + 0.9);
+  const bar = (k, x0, y, v, sc, col, a, et) => {
+    line(k, rect(x0, y, v * sc, 40).concat([[x0, y]]), col, 3, a, a + 0.5); hatch(k, rect(x0, y, v * sc, 40), col, a + 0.3, a + 0.8, { gap: 10 });
+    if (et) text(k, et, x0 + v * sc + 16, y + 31, 28, col, a + 0.4, a + 0.8);
+  };
+
+  // ---------------------------------------------------------------- 0 titel
+  B.titel(0, 'Spm. 8b: koblingen', 'hvor meget kan den trække? · hvert tal oversat', 'titel');
+
+  // ---------------------------------------------------------------- 1 data
+  B.goto('data', 1);
+  bubble(1, 'Flerskivekoblingen', 130, 135, 50, 'blue', S('data') - 0.1, S('data') + 0.8);
+  text(1, 'N = 4 friktionsflader', 170, 230, 36, 'black', wt('data', 'fire') - 0.1, we('data', 'friktionsflader'));
+  text(1, 'r_i = 50 mm,  r_o = 100 mm', 170, 300, 36, 'black', wt('data', 'indre') - 0.1, we('data', 'millimeter', 1));
+  text(1, 'Ø 200 mm ≈ en tallerken', 190, 355, 30, 'green', wt('data', 'tallerken') - 0.6, we('data', 'tallerken'));
+  text(1, 'μ = 0,30', 170, 425, 36, 'black', wt('data2', 'Friktionskoefficienten') - 0.1, we('data2', 'tre'));
+  text(1, 'F = 2000 N  ≈  200 kg', 170, 495, 36, 'red', wt('data2', 'Klemkraften') - 0.1, we('data2', 'skivestakken'));
+  ringet(1, 'moment T ved konstant slid?', 170, 600, 38, 'red', wt('spm', 'moment') - 0.3, we('spm', 'slid'));
+  {
+    const cx = 960, cy = 420, ta = wt('data', 'indre');
+    cirkel(1, cx, cy, 180, 'black', 4, ta - 0.1, ta + 0.4); cirkel(1, cx, cy, 90, 'black', 4, ta, ta + 0.5);
+    arrow(1, [[cx, cy], [cx + 88, cy]], 'blue', 3, ta + 0.2, ta + 0.5, 12); text(1, '50', cx + 44, cy - 12, 26, 'blue', ta + 0.3, ta + 0.6, { align: 'center' });
+    arrow(1, [[cx, cy], [cx, cy + 178]], 'green', 3, ta + 0.4, ta + 0.7, 12); text(1, '100', cx + 14, cy + 130, 26, 'green', ta + 0.5, ta + 0.8);
+  }
+
+  // ---------------------------------------------------------------- 2 trin 1: middelradius
+  B.goto('trin1', 2);
+  trin(2, 'Trin 1:  armen', 'trin1');
+  ringet(2, 'r_m = (100 + 50) / 2 = 75 mm = 0,075 m', 170, 270, 40, 'blue', wt('trin1', 'Hundrede') - 0.1, we('trin1', 'meter'));
+  {
+    const cx = 640, cy = 500, ta = wt('arm', 'gennemsnit');
+    cirkel(2, cx, cy, 160, 'black', 3.4, ta - 0.6, ta - 0.2); cirkel(2, cx, cy, 80, 'black', 3.4, ta - 0.5, ta - 0.1);
+    line(2, ell(cx, cy, 120, 120, 0, 2 * PI), 'blue', 3, ta, ta + 0.6, { alpha: 0.7 });
+    arrow(2, [[cx, cy], [cx + 118, cy]], 'blue', 3.4, ta + 0.2, ta + 0.6, 12);
+    text(2, '75 mm', cx + 60, cy - 14, 26, 'blue', ta + 0.3, ta + 0.7, { align: 'center' });
+    text(2, 'friktionens arm', 830, 520, 28, 'blue', ta, we('arm', 'centrum'));
+  }
+
+  // ---------------------------------------------------------------- 3 trin 2: momentet
+  B.goto('trin2', 3);
+  trin(3, 'Trin 2:  momentet', 'trin2');
+  text(3, 'friktionskraft pr. flade:  μ F = 0,3 · 2000 = 600 N', 170, 240, 34, 'black', wt('trin2', 'Mu') - 0.1, we('trin2', 'newton'));
+  text(3, 'én flade:  600 N · 0,075 m = 45 N·m', 170, 310, 34, 'black', wt('en', 'Moment') - 0.1, we('en', 'newtonmeter'));
+  B.formel(3, '18.15 × N', 'T = 4 · 45 = 180 N·m', 190, 410, 44, wt('fire', 'Med') - 0.1, we('fire', 'newtonmeter'), 'red');
+  {
+    const t1 = wt('fire', 'fire'), x0 = 200;
+    for (let i = 0; i < 4; i++) bar(3, x0 + i * 140, 500, 45, 2.8, 'green', t1 + i * 0.15, '');
+    text(3, '45 + 45 + 45 + 45', x0, 580, 28, 'green', t1 + 0.3, t1 + 0.8);
+  }
+  text(3, '≈ en almindelig familiebils motor', 170, 650, 32, 'blue', wt('bil', 'familiebil') - 0.6, we('bil', 'motor'));
+
+  // ---------------------------------------------------------------- 4 trin 3: er det rimeligt?
+  B.goto('trin3', 4);
+  trin(4, 'Trin 3:  er det rimeligt?', 'trin3');
+  {
+    const t1 = wt('trin3', 'hundrede'), x0 = 420, sc = 3;
+    text(4, 'konstant tryk', 170, 270, 30, 'blue', t1 - 0.1, t1 + 0.4); bar(4, x0, 240, 186.7, sc, 'blue', t1, '186,7 N·m');
+    text(4, 'konstant slid', 170, 340, 30, 'red', t1 + 0.5, t1 + 0.9); bar(4, x0, 310, 180, sc, 'red', t1 + 0.6, '180 N·m');
+  }
+  text(4, 'kun 4 % forskel: ringen er smal', 170, 430, 32, 'black', wt('trin3', 'fire') - 0.4, we('trin3', 'smal'));
+  ringet(4, '180 N·m: på den sikre side', 170, 520, 38, 'red', wt('sikker', 'hundrede') - 0.3, we('sikker', 'side'));
+  text(4, '+ sikkerhedsfaktor, så den ikke glider ved fuld gas', 190, 600, 30, 'green', wt('sikker', 'sikkerhedsfaktor') - 0.1, we('sikker', 'gas'));
+
+  // ---------------------------------------------------------------- 5 hvad nu hvis?
+  B.goto('hvis', 5);
+  bubble(5, 'Hvad nu hvis?', 130, 135, 50, 'blue', S('hvis') - 0.1, S('hvis') + 0.8);
+  text(5, 'her viser du, at du har forstået det', 640, 140, 28, 'green', wt('hvis', 'viser') - 0.1, we('hvis', 'det'));
+  {
+    const rows = [
+      ['olie', 'i olie: μ ≈ 0,1', '60 N·m  (vådkobling: flere skiver)', 'red', 'olie', 'skiver'],
+      ['otte', 'otte flader', '360 N·m', 'green', 'otte', 'Dobbelt'],
+      ['ro', 'r_o = 120 mm  (r_m = 85)', '204 N·m', 'blue', 'ydre', 'fire'],
+    ];
+    rows.forEach(([id, a1, a2, col, w1, w2], i) => {
+      const y = 260 + i * 120, t1 = wt(id, w1) - 0.2, t2 = wt(id, w2) - 0.6;
+      dot(5, 200, y - 12, 10, col, t1);
+      text(5, a1, 230, y, 32, 'black', t1, t1 + 0.6);
+      text(5, '→  ' + a2, 640, y, 32, col, t2, t2 + 0.6);
+    });
+  }
+
+  // ---------------------------------------------------------------- 6 antagelser og censor-sætningen
+  B.goto('antag', 6);
+  bubble(6, 'Sig dine antagelser højt', 130, 135, 46, 'blue', S('antag') - 0.1, S('antag') + 0.9);
+  text(6, '•  kørt til: ens slid', 170, 220, 30, 'black', wt('antag', 'kørt') - 0.4, we('antag', 'ens'));
+  text(6, '•  konstant μ', 170, 265, 30, 'black', wt('antag', 'Friktionskoefficienten') - 0.1, we('antag', 'konstant'));
+  text(6, '•  samme klemkraft på alle flader', 640, 220, 30, 'black', wt('antag', 'Klemkraften') - 0.1, we('antag', 'flader'));
+  text(6, '•  ingen olie eller varme', 640, 265, 30, 'red', wt('antag', 'olie') - 0.4, we('antag', 'mu'));
+  bubble(6, 'Til censor', 130, 360, 42, 'red', S('censor') - 0.1, S('censor') + 0.8);
+  {
+    const r = [
+      ['r_m = 75 mm', 'middelradius', 'millimeter'],
+      ['T = 4 · 0,3 · 2000 · 0,075 = 180 N·m', 'T', 'newtonmeter'],
+      ['konstant tryk: 186 ⇒ slid er sikker side', 'Konstant', 'side'],
+    ];
+    r.forEach(([s, w1, w2], i) => text(6, s, 170, 440 + i * 60, 32, i === 1 ? 'red' : 'black', wt('censor', w1) - 0.2, we('censor', w2)));
+  }
+
+  // ---------------------------------------------------------------- 7 tjek
+  B.goto('tjek_q', 7);
+  B.tjek(7, ['360 N·m skal overføres:', 'hvor stor klemkraft?'], ['det dobbelte: 4000 N (T ∝ F)', 'eller otte flader i stedet'], 'tjek_q', 'tjek_a');
+  {
+    const t1 = wt('tjek_a', 'fire'), x0 = 420, sc = 0.13;
+    text(7, '180 N·m', 180, 590, 30, 'black', t1 - 0.4, t1); bar(7, x0, 560, 2000, sc, 'black', t1 - 0.3, '2000 N');
+    text(7, '360 N·m', 180, 655, 30, 'green', t1, t1 + 0.4); bar(7, x0, 625, 4000, sc, 'green', t1, '4000 N');
+  }
+
+  // ---------------------------------------------------------------- 8 slut
+  B.goto('slut', 8);
+  B.slut(8, 'MEM1 mundtlig eksamen, ny liste, spm. 8b · Hamrock m.fl., kap. 18, lign. (18.7), (18.15) · Mathcad: Tidligere eksamen spm 14 Lamelkobling', 'spm. 9: fladremme', 'slut');
+  text(8, '1.  r_m = 75 mm', 200, 240, 36, 'blue', wt('slut', 'middelradius') - 0.1, we('slut', 'millimeter'));
+  text(8, '2.  T = N μ F r_m = 180 N·m', 200, 310, 36, 'red', wt('slut', 'T') - 0.1, we('slut', 'newtonmeter'));
+  text(8, '3.  konstant slid: sikker side', 200, 380, 36, 'green', wt('slut', 'Konstant') - 0.1, we('slut', 'side'));
+});
+
+</script>
+<script>BP.live({"duration":205.608,"audio":"eks-spm8-b.mp3","order":["titel","data","data2","spm","trin1","arm","trin2","en","fire","bil","trin3","sikker","hvis","olie","otte","ro","antag","censor","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.241,"words":[["Spørgsmål",0.54,0.96],["otte",1.16,1.48],["del",1.88,2.06],["b",2.14,2.16],["Nu",3.06,3.12],["regner",3.18,3.44],["vi",3.46,3.52],["på",3.62,3.74],["en",3.78,3.86],["rigtig",3.94,4.28],["flerskivekobling",4.46,5.341],["og",5.681,5.741],["vi",5.761,5.821],["oversætter",5.921,6.401],["tallene",6.441,6.741],["undervejs",6.781,7.241]],"text":"Spørgsmål otte, del b. Nu regner vi på en rigtig flerskivekobling, og vi oversætter tallene undervejs."},"data":{"start":9.061,"end":22.022,"words":[["Koblingen",9.101,9.561],["har",9.661,9.821],["fire",10.041,10.381],["aktive",10.741,11.181],["friktionsflader",11.241,12.041],["Den",12.681,12.781],["indre",12.861,13.061],["radius",13.121,13.541],["er",13.661,13.721],["halvtreds",13.741,14.101],["millimeter",14.181,14.661],["og",15.201,15.261],["den",15.301,15.401],["ydre",15.461,15.702],["er",15.882,15.962],["hundrede",16.202,16.542],["millimeter",16.542,17.022],["Skiverne",18.122,18.482],["er",18.542,18.582],["altså",18.642,18.942],["tyve",19.202,19.402],["centimeter",19.442,19.962],["i",20.042,20.062],["diameter",20.142,20.622],["cirka",21.102,21.322],["som",21.362,21.482],["en",21.522,21.602],["tallerken",21.622,22.022]],"text":"Koblingen har fire aktive friktionsflader. Den indre radius er halvtreds millimeter, og den ydre er hundrede millimeter. Skiverne er altså tyve centimeter i diameter, cirka som en tallerken."},"data2":{"start":23.322,"end":33.843,"words":[["Friktionskoefficienten",23.362,24.482],["er",24.602,24.702],["nul",25.022,25.162],["komma",25.222,25.383],["tre",25.463,25.583],["Klemkraften",26.643,27.283],["er",27.403,27.463],["to",27.563,27.663],["tusind",27.843,28.263],["newton",28.303,28.663],["Det",29.343,29.423],["er",29.423,29.463],["som",29.463,29.603],["at",29.623,29.683],["stille",29.703,29.943],["to",30.183,30.283],["hundrede",30.403,30.663],["kilo",30.723,30.983],["oven",31.163,31.403],["på",31.463,31.583],["skivestakken",31.603,32.243],["Det",32.743,32.843],["klarer",32.883,33.123],["en",33.123,33.163],["kraftig",33.203,33.523],["fjeder",33.563,33.843]],"text":"Friktionskoefficienten er nul komma tre. Klemkraften er to tusind newton. Det er som at stille to hundrede kilo oven på skivestakken. Det klarer en kraftig fjeder."},"spm":{"start":34.843,"end":40.464,"words":[["Spørgsmålet",34.883,35.404],["er",35.464,35.544],["hvor",36.204,36.364],["stort",36.424,36.724],["moment",36.824,37.164],["kan",37.284,37.404],["koblingen",37.444,37.904],["overføre",38.004,38.484],["når",38.844,38.964],["vi",38.984,39.024],["antager",39.104,39.484],["konstant",39.544,40.104],["slid",40.224,40.464]],"text":"Spørgsmålet er: hvor stort moment kan koblingen overføre, når vi antager konstant slid?"},"trin1":{"start":42.284,"end":52.245,"words":[["Trin",42.324,42.544],["et",42.604,42.704],["middelradius",43.324,43.984],["Hundrede",44.824,45.124],["plus",45.384,45.565],["halvtreds",45.585,45.965],["delt",46.405,46.585],["med",46.605,46.705],["to",46.745,46.825],["Det",47.725,47.825],["er",47.825,47.865],["femoghalvfjerds",47.885,48.445],["millimeter",48.525,49.005],["altså",49.705,50.005],["nul",50.365,50.505],["komma",50.565,50.765],["nul",50.865,51.045],["syv",51.265,51.425],["fem",51.625,51.985],["meter",52.005,52.245]],"text":"Trin et: middelradius. Hundrede plus halvtreds, delt med to. Det er femoghalvfjerds millimeter, altså nul komma nul syv fem meter."},"arm":{"start":53.285,"end":58.186,"words":[["Det",53.325,53.425],["er",53.425,53.525],["armen",53.525,53.765],["Friktionen",54.505,54.945],["virker",55.025,55.286],["i",55.326,55.346],["gennemsnit",55.386,55.846],["femoghalvfjerds",56.006,56.606],["millimeter",56.666,57.166],["ude",57.406,57.606],["fra",57.686,57.766],["centrum",57.846,58.186]],"text":"Det er armen. Friktionen virker i gennemsnit femoghalvfjerds millimeter ude fra centrum."},"trin2":{"start":60.006,"end":68.287,"words":[["Trin",60.046,60.246],["to",60.266,60.366],["friktionskraften",61.086,61.886],["på",61.946,62.066],["én",62.226,62.386],["flade",62.446,62.746],["Mu",63.546,63.606],["gange",63.926,64.146],["F",64.286,64.306],["er",64.906,64.966],["nul",65.006,65.126],["komma",65.166,65.346],["tre",65.406,65.526],["gange",65.987,66.187],["to",66.247,66.327],["tusind",66.447,66.787],["Det",67.267,67.367],["er",67.367,67.407],["seks",67.467,67.647],["hundrede",67.687,67.967],["newton",67.967,68.287]],"text":"Trin to: friktionskraften på én flade. Mu gange F er nul komma tre gange to tusind. Det er seks hundrede newton."},"en":{"start":69.567,"end":76.088,"words":[["Moment",69.607,70.027],["fra",70.207,70.307],["én",70.427,70.547],["flade",70.607,70.907],["er",71.467,71.527],["seks",71.587,71.767],["hundrede",71.807,72.027],["newton",72.027,72.407],["gange",72.607,72.827],["nul",72.827,73.007],["komma",73.067,73.227],["nul",73.287,73.427],["syv",73.487,73.607],["fem",73.687,73.947],["meter",73.967,74.207],["Det",74.807,74.907],["er",74.927,74.967],["femogfyrre",74.967,75.508],["newtonmeter",75.508,76.088]],"text":"Moment fra én flade er seks hundrede newton gange nul komma nul syv fem meter. Det er femogfyrre newtonmeter."},"fire":{"start":77.328,"end":82.088,"words":[["Med",77.368,77.468],["fire",77.548,77.768],["flader",77.828,78.168],["bliver",78.568,78.708],["det",78.708,78.788],["fire",78.848,79.108],["gange",79.248,79.448],["femogfyrre",79.488,79.968],["Hundrede",80.628,80.928],["og",80.968,81.008],["firs",81.008,81.308],["newtonmeter",81.528,82.088]],"text":"Med fire flader bliver det fire gange femogfyrre. Hundrede og firs newtonmeter."},"bil":{"start":83.908,"end":93.169,"words":[["Hvad",83.948,84.068],["betyder",84.088,84.388],["det",84.408,84.508],["Hundrede",85.488,85.728],["og",85.728,85.768],["firs",85.768,86.049],["newtonmeter",86.129,86.729],["er",86.869,86.949],["cirka",87.069,87.389],["hvad",87.509,87.649],["motoren",87.669,88.069],["i",88.149,88.169],["en",88.209,88.289],["almindelig",88.349,88.889],["familiebil",88.929,89.529],["giver",89.589,89.789],["Koblingen",90.589,90.989],["kan",91.029,91.149],["altså",91.169,91.389],["lige",91.409,91.589],["akkurat",91.769,92.189],["klare",92.249,92.489],["sådan",92.569,92.769],["en",92.789,92.849],["motor",92.869,93.169]],"text":"Hvad betyder det? Hundrede og firs newtonmeter er cirka, hvad motoren i en almindelig familiebil giver. Koblingen kan altså lige akkurat klare sådan en motor."},"trin3":{"start":94.989,"end":106.431,"words":[["Trin",95.029,95.229],["tre",95.249,95.369],["er",95.889,95.949],["det",95.969,96.029],["rimeligt",96.069,96.39],["Med",97.29,97.37],["konstant",97.41,97.81],["tryk",97.85,98.09],["ville",98.21,98.37],["man",98.39,98.51],["få",98.57,98.73],["hundrede",98.93,99.19],["og",99.19,99.23],["seksogfirs",99.23,99.73],["komma",99.79,99.95],["syv",100.09,100.23],["newtonmeter",100.33,100.87],["Konstant",101.41,101.81],["slid",101.87,102.09],["giver",102.19,102.39],["lidt",102.43,102.57],["mindre",102.61,102.87],["Forskellen",103.47,103.97],["er",104.03,104.09],["kun",104.13,104.29],["fire",104.43,104.67],["procent",104.71,105.07],["fordi",105.15,105.33],["ringen",105.41,105.67],["er",105.69,105.75],["forholdsvis",105.79,106.191],["smal",106.211,106.431]],"text":"Trin tre: er det rimeligt? Med konstant tryk ville man få hundrede og seksogfirs komma syv newtonmeter. Konstant slid giver lidt mindre. Forskellen er kun fire procent, fordi ringen er forholdsvis smal."},"sikker":{"start":107.171,"end":115.031,"words":[["Vi",107.211,107.271],["bruger",107.351,107.591],["hundrede",107.631,107.911],["og",107.911,107.951],["firs",107.991,108.251],["fordi",108.311,108.531],["det",108.691,108.811],["er",108.871,108.931],["på",108.971,109.091],["den",109.091,109.191],["sikre",109.311,109.531],["side",109.611,109.831],["I",111.011,111.031],["praksis",111.091,111.491],["lægger",111.591,111.771],["man",111.771,111.851],["også",111.891,112.051],["en",112.071,112.131],["sikkerhedsfaktor",112.191,112.871],["på",112.911,113.071],["så",113.171,113.291],["koblingen",113.331,113.791],["ikke",113.931,114.091],["glider",114.171,114.431],["ved",114.451,114.551],["fuld",114.591,114.771],["gas",114.811,115.031]],"text":"Vi bruger hundrede og firs, fordi det er på den sikre side. I praksis lægger man også en sikkerhedsfaktor på, så koblingen ikke glider ved fuld gas."},"hvis":{"start":116.851,"end":120.071,"words":[["Hvad",116.891,117.031],["nu",117.071,117.131],["hvis",117.231,117.471],["Her",118.511,118.631],["viser",118.691,118.911],["du",118.951,118.991],["censor",119.051,119.351],["at",119.371,119.431],["du",119.451,119.491],["har",119.511,119.571],["forstået",119.591,120.011],["det",120.011,120.071]],"text":"Hvad nu hvis? Her viser du censor, at du har forstået det."},"olie":{"start":121.171,"end":131.212,"words":[["Kører",121.211,121.471],["skiverne",121.531,121.891],["i",121.991,122.011],["olie",122.151,122.371],["som",122.571,122.691],["i",122.751,122.771],["en",122.791,122.851],["motorcykel",122.891,123.431],["er",123.811,123.891],["mu",123.951,124.031],["kun",124.271,124.431],["omkring",124.511,124.871],["nul",125.211,125.351],["komma",125.411,125.571],["et",125.671,125.771],["Så",126.492,126.592],["falder",126.632,126.852],["momentet",126.892,127.252],["til",127.312,127.452],["tres",127.512,127.752],["newtonmeter",127.812,128.352],["Derfor",129.192,129.532],["har",129.612,129.732],["vådkoblinger",129.792,130.452],["flere",130.532,130.792],["skiver",130.852,131.212]],"text":"Kører skiverne i olie, som i en motorcykel, er mu kun omkring nul komma et. Så falder momentet til tres newtonmeter. Derfor har vådkoblinger flere skiver."},"otte":{"start":131.912,"end":136.253,"words":[["Med",131.952,132.052],["otte",132.192,132.432],["flader",132.472,132.792],["i",132.892,132.912],["stedet",132.952,133.172],["for",133.192,133.272],["fire",133.352,133.592],["bliver",133.852,133.992],["det",134.012,134.092],["tre",134.152,134.272],["hundrede",134.372,134.552],["og",134.592,134.632],["tres",134.632,134.852],["newtonmeter",134.912,135.492],["Dobbelt",135.993,136.253]],"text":"Med otte flader i stedet for fire bliver det tre hundrede og tres newtonmeter. Dobbelt."},"ro":{"start":137.433,"end":143.513,"words":[["Og",137.473,137.553],["med",137.573,137.673],["en",137.713,137.793],["ydre",137.913,138.133],["radius",138.213,138.553],["på",138.593,138.713],["hundrede",138.773,139.033],["og",139.053,139.093],["tyve",139.093,139.293],["millimeter",139.313,139.773],["bliver",139.973,140.153],["middelradius",140.173,140.753],["femogfirs",140.853,141.393],["og",141.533,141.593],["momentet",141.633,142.013],["to",142.133,142.233],["hundrede",142.333,142.573],["og",142.673,142.713],["fire",142.713,142.913],["newtonmeter",142.973,143.513]],"text":"Og med en ydre radius på hundrede og tyve millimeter bliver middelradius femogfirs, og momentet to hundrede og fire newtonmeter."},"antag":{"start":145.333,"end":155.554,"words":[["Sig",145.373,145.493],["antagelserne",145.573,146.094],["højt",146.154,146.374],["Skiverne",147.134,147.514],["er",147.574,147.614],["kørt",147.654,147.834],["til",147.874,148.034],["så",148.194,148.314],["sliddet",148.354,148.594],["er",148.654,148.714],["ens",148.774,149.014],["Friktionskoefficienten",149.574,150.534],["er",150.574,150.634],["konstant",150.654,151.054],["Klemkraften",151.614,152.194],["er",152.234,152.294],["den",152.314,152.394],["samme",152.474,152.694],["på",152.754,152.854],["alle",152.874,152.994],["flader",153.034,153.334],["Og",153.814,153.854],["der",153.874,153.954],["er",153.954,153.994],["ingen",154.054,154.194],["olie",154.274,154.514],["eller",154.554,154.714],["varme",154.734,154.994],["der",155.054,155.134],["ændrer",155.194,155.434],["mu",155.474,155.554]],"text":"Sig antagelserne højt. Skiverne er kørt til, så sliddet er ens. Friktionskoefficienten er konstant. Klemkraften er den samme på alle flader. Og der er ingen olie eller varme, der ændrer mu."},"censor":{"start":157.374,"end":173.135,"words":[["Det",157.414,157.514],["du",157.554,157.594],["siger",157.674,157.854],["til",157.874,157.974],["censor",158.014,158.314],["er",158.394,158.494],["middelradius",159.354,160.014],["er",160.134,160.194],["femoghalvfjerds",160.294,160.894],["millimeter",160.954,161.394],["T",162.134,162.154],["er",162.454,162.514],["fire",162.574,162.814],["gange",162.874,163.054],["nul",163.094,163.234],["komma",163.254,163.394],["tre",163.454,163.574],["gange",163.674,163.874],["to",163.954,164.034],["tusind",164.154,164.494],["gange",164.574,164.794],["nul",164.934,165.114],["komma",165.194,165.414],["nul",165.534,165.694],["syv",165.814,165.954],["fem",166.074,166.215],["altså",166.655,166.915],["hundrede",167.095,167.395],["og",167.435,167.475],["firs",167.475,167.735],["newtonmeter",167.855,168.415],["Konstant",169.095,169.495],["tryk",169.555,169.775],["ville",169.835,169.975],["give",170.015,170.175],["hundrede",170.235,170.455],["og",170.455,170.495],["seksogfirs",170.495,171.035],["så",171.455,171.555],["konstant",171.575,171.955],["slid",172.015,172.215],["er",172.275,172.335],["på",172.355,172.455],["den",172.455,172.555],["sikre",172.615,172.855],["side",172.915,173.135]],"text":"Det, du siger til censor, er: middelradius er femoghalvfjerds millimeter. T er fire gange nul komma tre gange to tusind gange nul komma nul syv fem, altså hundrede og firs newtonmeter. Konstant tryk ville give hundrede og seksogfirs, så konstant slid er på den sikre side."},"tjek_q":{"start":174.955,"end":180.656,"words":[["Tjek",174.995,175.175],["dig",175.195,175.295],["selv",175.315,175.495],["Koblingen",176.495,176.916],["skal",176.936,177.056],["overføre",177.096,177.436],["tre",177.436,177.656],["hundrede",177.736,177.916],["og",177.916,177.956],["tres",177.976,178.196],["newtonmeter",178.296,178.836],["Hvor",179.276,179.396],["stor",179.456,179.656],["skal",179.736,179.856],["klemkraften",179.896,180.436],["være",180.456,180.656]],"text":"Tjek dig selv. Koblingen skal overføre tre hundrede og tres newtonmeter. Hvor stor skal klemkraften være?"},"tjek_a":{"start":184.276,"end":190.897,"words":[["Den",184.316,184.436],["dobbelte",184.496,184.856],["fire",185.296,185.476],["tusind",185.516,185.776],["newton",185.796,186.096],["Momentet",186.656,187.036],["er",187.096,187.176],["direkte",187.236,187.616],["proportionalt",187.676,188.276],["med",188.336,188.416],["F",188.596,188.616],["Man",189.417,189.517],["kunne",189.537,189.657],["også",189.657,189.777],["bruge",189.777,189.917],["otte",189.997,190.177],["flader",190.237,190.537],["i",190.577,190.597],["stedet",190.637,190.897]],"text":"Den dobbelte, fire tusind newton. Momentet er direkte proportionalt med F. Man kunne også bruge otte flader i stedet."},"slut":{"start":192.717,"end":204.138,"words":[["Kort",192.757,192.937],["sagt",192.997,193.197],["middelradius",193.817,194.417],["er",194.517,194.577],["femoghalvfjerds",194.657,195.197],["millimeter",195.257,195.697],["og",195.977,196.057],["T",196.117,196.137],["er",196.457,196.517],["N",196.677,196.737],["mu",196.837,196.917],["F",197.157,197.177],["gange",197.297,197.497],["r",197.617,197.637],["m",197.817,197.837],["altså",198.217,198.497],["hundrede",198.757,198.997],["og",198.997,199.037],["firs",199.057,199.317],["newtonmeter",199.397,199.918],["Konstant",200.638,201.038],["slid",201.078,201.278],["giver",201.358,201.538],["lidt",201.558,201.678],["mindre",201.738,202.018],["end",202.158,202.238],["konstant",202.258,202.638],["tryk",202.678,202.898],["og",203.178,203.238],["er",203.278,203.338],["på",203.358,203.458],["den",203.458,203.558],["sikre",203.638,203.858],["side",203.938,204.138]],"text":"Kort sagt: middelradius er femoghalvfjerds millimeter, og T er N mu F gange r m, altså hundrede og firs newtonmeter. Konstant slid giver lidt mindre end konstant tryk og er på den sikre side."}}}, { audio: 'eks-spm8-b.mp3', id: 'eks-spm8-b' });</script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spm. 8a: lamelkoblinger forklaret fra bunden · video</title>
+<meta name="description" content="Ny liste, spm. 8a forklaret fra bunden: konstant tryk mod konstant slid (karrusellen), T = NμF(r_o+r_i)/2.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 18: videoer</a><h1>Spm. 8a: lamelkoblinger forklaret fra bunden</h1><span class="meta">MEM1 · kapitel 18 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Spm. 8a: lamelkoblinger forklaret fra bunden"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Ny liste, spm. 8a forklaret fra bunden: konstant tryk mod konstant slid (karrusellen), T = NμF(r_o+r_i)/2.</p><div class="chips"><a href="../../opgaver/l18/tidligere-eksamen-spm-14-lamelkobling.pdf">📐 Se udregningen i Mathcad (PDF)</a><a href="lamelkobling.html">Se først: Lamelkoblinger: konstant tryk og konstant slid</a><a href="../../../../lab/mem1/lamelkobling.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel18_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l18">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// MEM1 mundtlig eksamen (ny liste) · Spm. 8a v2: lamelkoblinger forklaret fra bunden.
+// Koblingspedal, skiver presset sammen (håndflader) → stak med N friktionsflader → ring r_i..r_o → konstant tryk (nye, plane skiver)
+// → karrusel: yderst glider længst ⇒ slides mest ⇒ p·r = konst. (18.9), størst inderst → T = N μ F (r_o + r_i)/2 (18.15 × N)
+// → konstant tryk (18.7) giver lidt længere arm ⇒ konstant slid er på den sikre side → varme.
+BP.scene({ header: 'MEM1 · mundtlig eksamen · spm. 8a', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, dot, ring, ell, rect, hatch, dashed, axes, plot, PI } = B;
+  const S = (id) => L(id).start;
+  const ringet = (k, s, x, y, size, col, a, te) => { const r = text(k, s, x, y, size, col, a, te); ring(r, col, te, te + 0.5); return r; };
+  const cirkel = (k, cx, cy, r, col, w, a, b) => line(k, ell(cx, cy, r, r, 0, 2 * PI), col, w, a, b);
+  const skive = (k, x, yc, h, col, a, b) => { line(k, rect(x - 7, yc - h / 2, 14, h).concat([[x - 7, yc - h / 2]]), col, 3, a, b); };
+
+  // ---------------------------------------------------------------- 0 titel
+  B.titel(0, 'Spm. 8a: lamelkoblinger', 'konstant tryk mod konstant slid · fra bunden', 'titel');
+
+  // ---------------------------------------------------------------- 1 koblingen
+  B.goto('kobling', 1);
+  bubble(1, 'Koblingen', 130, 135, 50, 'blue', S('kobling') - 0.1, S('kobling') + 0.7);
+  text(1, 'forbinder og adskiller to aksler, mens de drejer', 170, 215, 30, 'black', wt('kobling', 'forbinder') - 0.1, we('kobling', 'drejer'));
+  {
+    const tp = wt('kobling', 'koblingspedalen');
+    line(1, [[220, 600], [300, 420], [340, 430]], 'black', 5, tp - 0.2, tp + 0.3);
+    line(1, rect(300, 400, 70, 26).concat([[300, 400]]), 'black', 3.4, tp, tp + 0.3);
+    text(1, 'pedal', 260, 650, 28, 'black', tp, tp + 0.4, { align: 'center' });
+    const ts = wt('skive', 'skiver');
+    line(1, [[480, 420], [620, 420]], 'black', 8, ts - 0.2, ts + 0.1); line(1, [[700, 420], [860, 420]], 'black', 8, ts - 0.1, ts + 0.2);
+    skive(1, 640, 420, 200, 'blue', ts, ts + 0.3); skive(1, 680, 420, 200, 'red', ts + 0.1, ts + 0.4);
+    text(1, 'motor', 520, 400, 26, 'black', ts, ts + 0.3); text(1, 'hjul', 790, 400, 26, 'black', ts, ts + 0.3);
+    const tf = wt('skive', 'fjeder');
+    const pts = []; for (let i = 0; i <= 60; i++) { const s = i / 60; pts.push([760 + 60 * s, 330 + 14 * Math.sin(2 * PI * 6 * s)]); }
+    line(1, pts, 'green', 3, tf - 0.2, tf + 0.3);
+    arrow(1, [[750, 330], [692, 360]], 'green', 3.4, tf, tf + 0.3, 12);
+    const th = wt('skive', 'håndflader');
+    line(1, ell(980, 420, 26, 70, 0, 2 * PI), 'black', 3, th - 0.2, th + 0.2); line(1, ell(1040, 420, 26, 70, 0, 2 * PI), 'black', 3, th, th + 0.4);
+    arrow(1, ell(1010, 420, 90, 90, -2.4, -1.4), 'red', 3, th + 0.3, th + 0.8, 12);
+    text(1, 'friktionen overfører momentet', 600, 600, 30, 'red', wt('skive', 'Friktionen') - 0.1, we('skive', 'momentet'));
+  }
+
+  // ---------------------------------------------------------------- 2 flere skiver
+  B.goto('flere', 2);
+  bubble(2, 'Mange skiver: N flader', 130, 135, 50, 'blue', S('flere') - 0.1, S('flere') + 0.9);
+  {
+    const ts = wt('flere', 'stak'), xs = [420, 460, 500, 540, 580];
+    xs.forEach((x, i) => skive(2, x, 420, i % 2 ? 160 : 220, i % 2 ? 'red' : 'blue', ts + i * 0.08, ts + 0.3 + i * 0.08));
+    const tf = wt('flere', 'friktionsflade');
+    [440, 480, 520, 560].forEach((x, i) => { dot(2, x, 420, 9, 'green', tf + i * 0.1); text(2, String(i + 1), x, 560, 28, 'green', tf + i * 0.1, tf + 0.3 + i * 0.1, { align: 'center' }); });
+    text(2, 'N = 4 friktionsflader', 360, 620, 32, 'green', wt('flere', 'Antallet') - 0.1, we('flere', 'N'));
+    text(2, 'motorcykel · automatgear', 700, 250, 30, 'black', wt('flere', 'motorcykel') - 0.1, we('flere', 'automatgear'));
+  }
+  ringet(2, 'hver flade bærer sit moment', 700, 380, 34, 'red', wt('flere2', 'hver') - 0.1, we('flere2', 'moment'));
+  text(2, '4 flader = 4 × moment', 700, 450, 30, 'blue', wt('flere2', 'Fire') - 0.1, we('flere2', 'diameter'));
+
+  // ---------------------------------------------------------------- 3 trykket over ringen: konstant tryk og konstant slid
+  B.goto('ring', 3);
+  bubble(3, 'Hvordan fordeles trykket?', 130, 135, 48, 'blue', S('ring') - 0.1, S('ring') + 0.9);
+  {
+    const cx = 300, cy = 430, tr = wt('ring', 'ringe');
+    cirkel(3, cx, cy, 170, 'black', 4, tr - 0.1, tr + 0.4); cirkel(3, cx, cy, 85, 'black', 4, tr, tr + 0.5);
+    arrow(3, [[cx, cy], [cx + 83, cy]], 'blue', 3, wt('ring', 'indre') - 0.1, wt('ring', 'indre') + 0.3, 12);
+    text(3, 'r_i', cx + 40, cy - 12, 28, 'blue', wt('ring', 'indre'), wt('ring', 'indre') + 0.3, { align: 'center' });
+    arrow(3, [[cx, cy], [cx, cy + 168]], 'green', 3, wt('ring', 'ydre') - 0.1, wt('ring', 'ydre') + 0.3, 12);
+    text(3, 'r_o', cx + 14, cy + 120, 28, 'green', wt('ring', 'ydre'), wt('ring', 'ydre') + 0.3);
+    const tk = wt('slid', 'karrusel');
+    for (let i = 0; i < 4; i++) { const v = i * PI / 2 + 0.4; dot(3, cx + 150 * Math.cos(v), cy + 150 * Math.sin(v), 10, 'red', tk + i * 0.08); dot(3, cx + 100 * Math.cos(v + 0.8), cy + 100 * Math.sin(v + 0.8), 8, 'blue', tk + 0.3 + i * 0.08); }
+    arrow(3, ell(cx, cy, 200, 200, -1.2, -0.3), 'red', 4, tk + 0.2, tk + 0.7, 14);
+    text(3, 'yderst: hurtigst', cx + 100, cy - 210, 26, 'red', tk + 0.4, we('slid', 'midten'));
+  }
+  {
+    const x0 = 660, y0 = 370, w = 440, h = 140, P = (r, p) => [x0 + (r - 40) / 70 * w, y0 - p * h];
+    const tt = wt('tryk', 'konstant');
+    axes(3, x0, y0, x0 + w + 20, y0 - h - 20, 'r', 'p', tt - 0.1);
+    plot(3, [P(50, 0.6), P(100, 0.6)], 'blue', tt + 0.3, tt + 0.8);
+    text(3, 'konstant tryk (nye skiver)', x0 + 20, y0 - h + 10, 26, 'blue', tt + 0.3, we('tryk', 'ringen'));
+    const x1 = 660, y1 = 640, P2 = (r, p) => [x1 + (r - 40) / 70 * w, y1 - p * h];
+    const ts = wt('slid3', 'konstant');
+    axes(3, x1, y1, x1 + w + 20, y1 - h - 20, 'r', 'p', ts - 0.6);
+    const pc = []; for (let r = 50; r <= 100; r += 2) pc.push(P2(r, 45 / r));
+    plot(3, pc, 'red', ts - 0.3, ts + 0.4);
+    text(3, 'konstant slid: p · r = konst. (18.9)', x1 + 20, y1 - h, 26, 'red', ts, we('slid3', 'ni'));
+    text(3, 'yderst slides mest ⇒ trykket flytter indad', 660, 450, 26, 'black', wt('slid2', 'Yderst') - 0.1, we('slid3', 'midten'));
+  }
+
+  // ---------------------------------------------------------------- 4 formlen
+  B.goto('formel', 4);
+  bubble(4, 'Momentet ved konstant slid', 130, 135, 48, 'blue', S('formel') - 0.1, S('formel') + 0.9);
+  B.formel(4, '18.15 × N', 'T = N μ F (r_o + r_i) / 2', 200, 280, 50, wt('formel', 'T') - 0.1, we('formel', 'flader'), 'red');
+  text(4, 'μF = friktionskraft', 200, 380, 32, 'green', wt('saetning', 'Klemkraften') - 0.1, we('saetning', 'friktionskraften'));
+  text(4, '(r_o + r_i)/2 = middelradius = armen', 200, 440, 32, 'blue', wt('saetning', 'middelradius') - 0.1, we('saetning', 'i'));
+  text(4, '× N flader', 200, 500, 32, 'black', wt('saetning', 'ganges') - 0.1, we('saetning', 'flader'));
+  ringet(4, 'kraft × arm, som en skruenøgle', 200, 600, 36, 'red', wt('arm', 'kraft') - 0.1, we('arm', 'skruenøgle'));
+  {
+    const cx = 950, cy = 470, ta = wt('saetning', 'middelradius');
+    cirkel(4, cx, cy, 160, 'black', 3.4, ta - 0.6, ta - 0.2); cirkel(4, cx, cy, 80, 'black', 3.4, ta - 0.5, ta - 0.1);
+    line(4, ell(cx, cy, 120, 120, 0, 2 * PI), 'blue', 3, ta, ta + 0.6, { alpha: 0.7 });
+    arrow(4, [[cx, cy], [cx + 118, cy]], 'blue', 3.4, ta + 0.2, ta + 0.6, 12);
+    text(4, 'r_m', cx + 60, cy - 14, 28, 'blue', ta + 0.3, ta + 0.7, { align: 'center' });
+    arrow(4, [[cx + 120, cy + 40], [cx + 120, cy - 50]], 'green', 3.4, wt('saetning', 'friktionskraften') - 0.2, wt('saetning', 'friktionskraften') + 0.2, 12);
+  }
+
+  // ---------------------------------------------------------------- 5 konstant tryk mod konstant slid
+  B.goto('sammen', 5);
+  bubble(5, 'Hvilken skal du bruge?', 130, 135, 50, 'blue', S('sammen') - 0.1, S('sammen') + 0.9);
+  B.formel(5, '18.7', 'konstant tryk: arm = 2(r_o³ − r_i³) / (3(r_o² − r_i²))', 190, 240, 30, wt('sammen', 'Formlen') - 0.4, we('sammen', 'anden'), 'blue');
+  text(5, 'lidt længere arm: mere tryk sidder yderst', 190, 310, 30, 'blue', wt('sammen', 'længere') - 0.3, we('sammen', 'yderst'));
+  ringet(5, 'konstant slid: lidt mindre T  ⇒  sikker side', 190, 400, 38, 'red', wt('sikker', 'mindre') - 0.4, we('sikker', 'side'));
+  text(5, 'en kobling har næsten altid kørt sig til', 210, 470, 30, 'black', wt('sikker', 'kørt') - 0.6, we('sikker', 'til'));
+  {
+    const tv = wt('varme', 'varme');
+    for (let i = 0; i < 3; i++) { const pts = []; for (let j = 0; j <= 20; j++) { const s = j / 20; pts.push([300 + i * 60 + 12 * Math.sin(4 * PI * s), 640 - s * 80]); } line(5, pts, 'red', 3, tv - 0.2 + i * 0.1, tv + 0.3 + i * 0.1); }
+    text(5, 'glidning → varme (lugter brændt op ad bakke)', 460, 620, 28, 'red', tv - 0.1, we('varme', 'bakke'));
+  }
+
+  // ---------------------------------------------------------------- 6 sådan siger du det + 15 minutter
+  B.goto('censor', 6);
+  bubble(6, 'Sådan siger du det', 130, 135, 50, 'blue', S('censor') - 0.1, S('censor') + 0.9);
+  text(6, '1.  koblingspedalen og håndfladerne', 170, 220, 32, 'black', wt('censor', 'koblingspedalen') - 0.1, we('censor', 'håndfladerne'));
+  text(6, '2.  nye: konstant tryk · tilkørte: konstant slid', 170, 275, 32, 'black', wt('censor', 'nye') - 0.1, we('censor', 'slid'));
+  text(6, '3.  karrusellen: yderst glider længst', 170, 330, 32, 'black', wt('censor', 'yderkanten') - 0.4, we('censor', 'karrusellen'));
+  text(6, '4.  T = N μ F r_m · konstant slid = sikker side', 170, 385, 32, 'red', wt('censor', 'formlen') - 0.1, we('censor', 'side'));
+  {
+    const x0 = 170, x1 = 1110, y = 470, hh = 56, m = (x1 - x0) / 15;
+    const seg = [[0, 7, 'blue', 'del a', wt('tavle', 'syv')], [7, 13, 'red', 'del b', wt('tavle', 'seks')], [13, 15, 'green', 'vurdér', wt('tavle', 'to', 0)]];
+    seg.forEach(([a, b2, col, et, t]) => {
+      line(6, rect(x0 + a * m, y, (b2 - a) * m, hh).concat([[x0 + a * m, y]]), col, 3, t - 0.1, t + 0.4);
+      hatch(6, rect(x0 + a * m, y, (b2 - a) * m, hh), col, t + 0.2, t + 0.7, { gap: 12 });
+      text(6, et, x0 + (a + b2) / 2 * m, y + hh + 40, 30, col, t, t + 0.4, { align: 'center' });
+      text(6, a + '', x0 + a * m, y - 12, 24, 'black', t, t + 0.3, { align: 'center' });
+    });
+    text(6, '15 min', x1, y - 12, 24, 'black', wt('tavle', 'to', 0), wt('tavle', 'to', 0) + 0.3, { align: 'center' });
+  }
+
+  // ---------------------------------------------------------------- 7 tjek
+  B.goto('tjek_q', 7);
+  B.tjek(7, ['Hvorfor slides en ny koblingsskive', 'mest yderst?'], ['yderst: længere vej pr. omgang', '⇒ mere slid ⇒ trykket flytter indad'], 'tjek_q', 'tjek_a');
+  {
+    const t1 = wt('tjek_a', 'længere'), cx = 420, cy = 600;
+    line(7, ell(cx, cy, 70, 70, 0, 2 * PI), 'red', 4, t1 - 0.1, t1 + 0.4);
+    line(7, ell(cx, cy, 35, 35, 0, 2 * PI), 'blue', 4, t1, t1 + 0.4);
+    text(7, '2π r_o', cx + 90, cy - 40, 28, 'red', t1 + 0.2, t1 + 0.6);
+    text(7, '2π r_i', cx + 90, cy + 40, 28, 'blue', t1 + 0.3, t1 + 0.7);
+  }
+
+  // ---------------------------------------------------------------- 8 slut
+  B.goto('slut', 8);
+  B.slut(8, 'MEM1 mundtlig eksamen, ny liste, spm. 8 · Hamrock m.fl., kap. 18, lign. (18.7), (18.9), (18.15) · slides kap. 18', 'spm. 8b: hvor meget kan koblingen trække?', 'slut');
+  text(8, 'nye skiver: konstant tryk', 200, 240, 34, 'blue', wt('slut', 'nye') - 0.1, we('slut', 'tryk'));
+  text(8, 'tilkørte: konstant slid', 200, 310, 34, 'red', wt('slut', 'tilkørte') - 0.1, we('slut', 'slid'));
+  text(8, 'T = N μ F r_m  (lidt mindre ⇒ sikker side)', 200, 380, 34, 'black', wt('slut', 'T') - 0.1, we('slut', 'side'));
+});
+
+</script>
+<script>BP.live({"duration":225.27,"audio":"eks-spm8-a.mp3","order":["titel","kobling","skive","flere","flere2","ring","tryk","slid","slid2","slid3","formel","saetning","arm","sammen","sikker","varme","censor","tavle","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":9.621,"words":[["Spørgsmål",0.54,1.04],["otte",1.22,1.56],["del",1.88,2.06],["a",2.18,2.2],["Lamelfriktionskoblinger",3.0,4.3],["konstant",4.6,5.02],["tryk",5.08,5.34],["og",5.52,5.58],["konstant",5.62,6.041],["slid",6.121,6.321],["Vi",7.321,7.361],["starter",7.441,7.721],["med",7.741,7.821],["hverdagen",7.821,8.301],["og",8.521,8.581],["formlerne",8.621,8.981],["kommer",9.021,9.221],["bagefter",9.241,9.621]],"text":"Spørgsmål otte, del a. Lamelfriktionskoblinger, konstant tryk og konstant slid. Vi starter med hverdagen, og formlerne kommer bagefter."},"kobling":{"start":11.441,"end":21.142,"words":[["En",11.481,11.561],["kobling",11.621,12.081],["forbinder",12.261,12.721],["og",12.841,12.921],["adskiller",13.021,13.481],["to",13.521,13.621],["aksler",13.801,14.121],["mens",14.181,14.361],["de",14.401,14.461],["drejer",14.521,14.841],["Du",15.661,15.721],["kender",15.781,15.981],["den",15.981,16.061],["fra",16.101,16.181],["bilen",16.261,16.581],["koblingspedalen",16.962,17.702],["Træder",18.402,18.662],["du",18.682,18.742],["den",18.782,18.862],["ned",18.902,19.042],["kører",19.382,19.622],["motoren",19.662,20.122],["men",20.222,20.362],["hjulene",20.382,20.662],["står",20.702,20.862],["stille",20.862,21.142]],"text":"En kobling forbinder og adskiller to aksler, mens de drejer. Du kender den fra bilen: koblingspedalen. Træder du den ned, kører motoren, men hjulene står stille."},"skive":{"start":22.322,"end":32.603,"words":[["Indeni",22.362,22.642],["er",22.802,22.862],["der",22.882,22.982],["skiver",23.082,23.542],["der",23.742,23.842],["presses",23.902,24.322],["mod",24.402,24.522],["hinanden",24.582,24.942],["af",24.982,25.022],["en",25.042,25.102],["kraftig",25.142,25.482],["fjeder",25.522,25.842],["Friktionen",26.602,27.102],["mellem",27.162,27.402],["dem",27.462,27.582],["overfører",27.723,28.123],["momentet",28.163,28.543],["Ligesom",29.343,29.543],["når",29.583,29.683],["du",29.703,29.743],["presser",29.783,30.043],["to",30.083,30.183],["håndflader",30.303,30.823],["mod",30.883,31.003],["hinanden",31.043,31.443],["og",31.503,31.563],["prøver",31.603,31.883],["at",31.883,31.943],["dreje",31.963,32.243],["den",32.263,32.383],["ene",32.443,32.603]],"text":"Indeni er der skiver, der presses mod hinanden af en kraftig fjeder. Friktionen mellem dem overfører momentet. Ligesom når du presser to håndflader mod hinanden og prøver at dreje den ene."},"flere":{"start":34.423,"end":45.484,"words":[["En",34.463,34.563],["lamelkobling",34.603,35.303],["har",35.563,35.663],["mange",35.783,36.043],["skiver",36.143,36.543],["i",36.603,36.623],["en",36.663,36.743],["stak",36.803,37.023],["som",37.483,37.583],["i",37.623,37.643],["en",37.703,37.783],["motorcykel",37.823,38.443],["eller",38.523,38.683],["et",38.703,38.783],["automatgear",38.804,39.424],["Hver",40.404,40.564],["flade",40.664,41.064],["hvor",41.124,41.304],["to",41.364,41.464],["skiver",41.604,41.944],["gnider",41.984,42.324],["kaldes",42.644,42.924],["en",42.944,43.044],["friktionsflade",43.084,43.824],["Antallet",44.444,44.864],["hedder",45.004,45.224],["N",45.444,45.484]],"text":"En lamelkobling har mange skiver i en stak, som i en motorcykel eller et automatgear. Hver flade, hvor to skiver gnider, kaldes en friktionsflade. Antallet hedder N."},"flere2":{"start":46.684,"end":55.645,"words":[["Hvorfor",46.724,46.984],["mange",47.024,47.224],["skiver",47.284,47.624],["Fordi",48.244,48.404],["hver",48.544,48.684],["flade",48.764,49.084],["overfører",49.204,49.645],["sit",49.685,49.805],["eget",49.905,50.085],["moment",50.125,50.445],["Fire",51.245,51.465],["flader",51.505,51.845],["giver",52.005,52.185],["fire",52.265,52.465],["gange",52.525,52.705],["så",52.725,52.825],["meget",52.845,53.005],["som",53.025,53.125],["én",53.225,53.325],["uden",53.785,53.965],["at",53.985,54.045],["koblingen",54.085,54.485],["bliver",54.525,54.665],["bredere",54.685,55.025],["i",55.105,55.125],["diameter",55.165,55.645]],"text":"Hvorfor mange skiver? Fordi hver flade overfører sit eget moment. Fire flader giver fire gange så meget som én, uden at koblingen bliver bredere i diameter."},"ring":{"start":57.465,"end":66.166,"words":[["Skiverne",57.505,57.945],["er",58.125,58.205],["ringe",58.265,58.545],["med",58.685,58.785],["en",58.805,58.885],["indre",58.965,59.185],["radius",59.265,59.665],["r",60.005,60.025],["i",60.185,60.205],["og",60.665,60.725],["en",60.765,60.825],["ydre",60.905,61.106],["radius",61.186,61.586],["r",61.826,61.846],["o",62.026,62.046],["Spørgsmålet",63.226,63.686],["er",63.766,63.826],["hvordan",64.266,64.586],["fordeler",64.666,65.006],["trykket",65.046,65.346],["sig",65.366,65.466],["hen",65.506,65.626],["over",65.686,65.886],["ringen",65.926,66.166]],"text":"Skiverne er ringe med en indre radius r i og en ydre radius r o. Spørgsmålet er: hvordan fordeler trykket sig hen over ringen?"},"tryk":{"start":67.086,"end":75.727,"words":[["Der",67.126,67.266],["er",67.286,67.366],["to",67.486,67.606],["teorier",67.726,68.126],["Den",69.306,69.406],["første",69.446,69.706],["er",69.766,69.826],["konstant",69.906,70.326],["tryk",70.406,70.626],["Når",71.426,71.546],["skiverne",71.566,71.947],["er",71.987,72.027],["helt",72.087,72.307],["nye",72.367,72.627],["og",72.827,72.907],["helt",72.967,73.147],["plane",73.207,73.587],["trykker",73.927,74.227],["de",74.247,74.307],["lige",74.387,74.567],["hårdt",74.627,74.867],["overalt",74.927,75.307],["på",75.347,75.447],["ringen",75.487,75.727]],"text":"Der er to teorier. Den første er konstant tryk. Når skiverne er helt nye og helt plane, trykker de lige hårdt overalt på ringen."},"slid":{"start":76.747,"end":84.348,"words":[["Men",76.787,76.907],["så",77.067,77.167],["begynder",77.187,77.447],["de",77.467,77.507],["at",77.567,77.627],["slide",77.707,78.027],["Og",78.687,78.727],["her",78.767,78.867],["kommer",78.887,79.087],["pointen",79.087,79.427],["Tænk",80.327,80.487],["på",80.507,80.587],["en",80.607,80.667],["karrusel",80.687,81.127],["Børnene",81.947,82.247],["yderst",82.367,82.688],["farer",82.808,83.008],["hurtigere",83.068,83.468],["rundt",83.508,83.688],["end",83.728,83.828],["dem",83.848,83.968],["i",84.008,84.028],["midten",84.108,84.348]],"text":"Men så begynder de at slide. Og her kommer pointen. Tænk på en karrusel. Børnene yderst farer hurtigere rundt end dem i midten."},"slid2":{"start":85.188,"end":91.088,"words":[["Det",85.228,85.328],["samme",85.388,85.548],["på",85.588,85.708],["skiven",85.728,86.088],["Yderst",86.888,87.208],["glider",87.268,87.548],["fladerne",87.608,87.988],["en",88.048,88.108],["længere",88.188,88.448],["vej",88.528,88.688],["på",88.768,88.868],["hver",88.868,88.988],["omgang",89.068,89.388],["Så",89.808,89.908],["slides",89.968,90.308],["de",90.368,90.408],["mest",90.488,90.688],["yderst",90.788,91.088]],"text":"Det samme på skiven. Yderst glider fladerne en længere vej på hver omgang. Så slides de mest yderst."},"slid3":{"start":91.848,"end":105.77,"words":[["Når",91.888,92.008],["yderkanten",92.068,92.628],["slides",92.708,93.008],["lidt",93.088,93.209],["ned",93.269,93.409],["trykker",93.729,93.989],["den",94.009,94.089],["mindre",94.129,94.389],["Trykket",94.809,95.129],["flytter",95.229,95.469],["ind",95.509,95.609],["mod",95.669,95.789],["midten",95.829,96.069],["Til",96.469,96.589],["sidst",96.629,96.849],["er",97.129,97.209],["sliddet",97.249,97.509],["det",97.589,97.689],["samme",97.749,97.989],["overalt",98.149,98.529],["Det",98.949,99.069],["er",99.129,99.209],["konstant",99.249,99.689],["slid",99.769,99.969],["Trykket",100.509,100.829],["gange",100.909,101.109],["radius",101.149,101.549],["er",101.649,101.729],["konstant",101.749,102.189],["ligning",102.509,102.809],["atten",102.989,103.209],["ni",103.429,103.529],["Trykket",104.33,104.63],["er",104.89,104.95],["størst",105.03,105.33],["inderst",105.45,105.77]],"text":"Når yderkanten slides lidt ned, trykker den mindre. Trykket flytter ind mod midten. Til sidst er sliddet det samme overalt. Det er konstant slid. Trykket gange radius er konstant, ligning atten ni. Trykket er størst inderst."},"formel":{"start":107.59,"end":117.431,"words":[["Under",107.63,107.81],["konstant",107.87,108.25],["slid",108.33,108.55],["er",108.65,108.73],["momentet",108.75,109.15],["T",109.31,109.33],["lig",109.63,109.77],["N",110.07,110.13],["mu",110.61,110.71],["F",111.17,111.19],["gange",111.45,111.73],["r",112.13,112.15],["o",112.31,112.33],["plus",112.51,112.71],["r",112.97,112.99],["i",113.17,113.19],["over",113.47,113.69],["to",113.77,113.89],["Bogens",114.37,114.65],["ligning",114.73,115.01],["atten",115.21,115.41],["femten",115.491,115.811],["ganget",116.151,116.431],["med",116.451,116.531],["antallet",116.611,116.991],["af",117.011,117.071],["flader",117.111,117.431]],"text":"Under konstant slid er momentet T lig N mu F gange r o plus r i over to. Bogens ligning atten femten, ganget med antallet af flader."},"saetning":{"start":118.111,"end":128.692,"words":[["Læs",118.151,118.331],["den",118.371,118.471],["som",118.631,118.731],["en",118.771,118.831],["sætning",118.871,119.151],["Klemkraften",119.891,120.431],["F",120.671,120.691],["gange",120.891,121.131],["mu",121.231,121.311],["giver",121.631,121.831],["friktionskraften",121.891,122.691],["Den",123.011,123.131],["virker",123.171,123.451],["ved",123.511,123.611],["middelradius",123.651,124.251],["gennemsnittet",124.551,125.091],["af",125.191,125.251],["r",125.451,125.471],["o",125.631,125.651],["og",125.831,125.891],["r",126.051,126.071],["i",126.212,126.232],["Og",126.672,126.732],["det",126.752,126.812],["hele",126.852,127.072],["ganges",127.372,127.672],["med",127.712,127.812],["antallet",127.892,128.292],["af",128.312,128.372],["flader",128.412,128.692]],"text":"Læs den som en sætning. Klemkraften F gange mu giver friktionskraften. Den virker ved middelradius, gennemsnittet af r o og r i. Og det hele ganges med antallet af flader."},"arm":{"start":129.172,"end":135.732,"words":[["Det",129.212,129.312],["er",129.312,129.392],["altså",129.392,129.592],["bare",129.852,130.032],["kraft",130.112,130.392],["gange",130.472,130.672],["arm",130.792,130.952],["ligesom",131.192,131.452],["med",131.592,131.692],["en",131.712,131.772],["skruenøgle",131.832,132.412],["Jo",133.092,133.152],["længere",133.212,133.452],["ude",133.572,133.712],["friktionen",133.752,134.252],["sidder",134.352,134.632],["jo",134.812,134.872],["større",134.992,135.312],["moment",135.372,135.732]],"text":"Det er altså bare kraft gange arm, ligesom med en skruenøgle. Jo længere ude friktionen sidder, jo større moment."},"sammen":{"start":137.552,"end":145.733,"words":[["Konstant",137.592,137.993],["tryk",138.053,138.293],["giver",138.473,138.653],["en",138.713,138.793],["lidt",138.913,139.053],["længere",139.113,139.373],["arm",139.493,139.633],["fordi",139.853,140.013],["mere",140.373,140.593],["af",140.633,140.693],["trykket",140.733,141.053],["sidder",141.113,141.333],["yderst",141.473,141.833],["Formlen",142.213,142.533],["er",142.773,142.833],["ligning",142.873,143.173],["atten",143.313,143.533],["syv",143.693,143.873],["med",144.153,144.253],["r",144.413,144.433],["i",144.473,144.493],["tredje",144.573,144.913],["over",145.013,145.193],["r",145.373,145.393],["i",145.453,145.473],["anden",145.533,145.733]],"text":"Konstant tryk giver en lidt længere arm, fordi mere af trykket sidder yderst. Formlen er ligning atten syv, med r i tredje over r i anden."},"sikker":{"start":146.393,"end":155.814,"words":[["Konstant",146.433,146.773],["slid",146.833,147.053],["giver",147.153,147.313],["altid",147.353,147.653],["lidt",147.753,147.893],["mindre",147.973,148.233],["moment",148.293,148.613],["Og",148.994,149.054],["en",149.094,149.174],["kobling",149.214,149.554],["har",149.814,149.914],["næsten",149.974,150.314],["altid",150.394,150.694],["kørt",150.774,150.994],["sig",151.014,151.114],["til",151.154,151.294],["Derfor",151.714,152.014],["dimensionerer",152.334,153.014],["man",153.054,153.154],["med",153.394,153.494],["konstant",153.514,153.994],["slid",154.074,154.254],["Det",154.614,154.734],["er",154.834,154.894],["på",154.954,155.054],["den",155.054,155.154],["sikre",155.274,155.534],["side",155.614,155.814]],"text":"Konstant slid giver altid lidt mindre moment. Og en kobling har næsten altid kørt sig til. Derfor dimensionerer man med konstant slid. Det er på den sikre side."},"varme":{"start":156.554,"end":163.655,"words":[["En",156.594,156.674],["sidste",156.714,156.934],["ting",156.974,157.134],["når",157.454,157.554],["skiverne",157.614,158.054],["glider",158.154,158.474],["bliver",158.634,158.794],["energien",158.814,159.214],["til",159.254,159.354],["varme",159.375,159.635],["Det",159.995,160.075],["er",160.075,160.135],["derfor",160.135,160.395],["en",160.675,160.755],["kobling",160.795,161.115],["lugter",161.175,161.415],["brændt",161.435,161.715],["hvis",161.775,161.915],["man",161.975,162.075],["slipper",162.155,162.395],["den",162.395,162.475],["for",162.515,162.595],["langsomt",162.635,162.995],["op",163.095,163.195],["ad",163.215,163.255],["en",163.275,163.355],["bakke",163.395,163.655]],"text":"En sidste ting: når skiverne glider, bliver energien til varme. Det er derfor, en kobling lugter brændt, hvis man slipper den for langsomt op ad en bakke."},"censor":{"start":165.475,"end":184.677,"words":[["Hvordan",165.515,165.735],["siger",165.815,165.955],["du",165.975,166.035],["det",166.075,166.155],["til",166.175,166.275],["censor",166.315,166.615],["Start",167.155,167.395],["med",167.435,167.535],["koblingspedalen",167.615,168.355],["og",168.475,168.535],["håndfladerne",168.575,169.135],["Så",169.735,169.835],["de",169.855,169.915],["to",169.955,170.035],["teorier",170.155,170.595],["nye",170.895,171.096],["skiver",171.156,171.516],["har",171.596,171.676],["konstant",171.716,172.096],["tryk",172.176,172.416],["tilkørte",172.836,173.256],["skiver",173.316,173.616],["har",173.696,173.796],["konstant",173.816,174.236],["slid",174.356,174.576],["fordi",174.916,175.076],["yderkanten",175.216,175.736],["glider",175.796,176.096],["længst",176.156,176.476],["ligesom",176.676,176.916],["på",176.956,177.036],["karrusellen",177.036,177.456],["Så",178.156,178.276],["formlen",178.316,178.656],["kraft",178.876,179.176],["gange",179.296,179.516],["mu",179.596,179.676],["gange",179.976,180.196],["middelradius",180.296,180.976],["gange",181.136,181.356],["N",181.596,181.616],["Og",182.197,182.277],["sig",182.337,182.477],["at",182.777,182.857],["konstant",182.917,183.377],["slid",183.457,183.657],["er",183.777,183.837],["på",183.857,183.957],["den",183.957,184.057],["sikre",184.137,184.397],["side",184.477,184.677]],"text":"Hvordan siger du det til censor? Start med koblingspedalen og håndfladerne. Så de to teorier: nye skiver har konstant tryk, tilkørte skiver har konstant slid, fordi yderkanten glider længst, ligesom på karrusellen. Så formlen: kraft gange mu gange middelradius gange N. Og sig, at konstant slid er på den sikre side."},"tavle":{"start":185.197,"end":190.837,"words":[["Brug",185.237,185.397],["cirka",185.457,185.677],["syv",185.797,185.937],["minutter",185.977,186.237],["på",186.257,186.377],["det",186.377,186.477],["Så",186.817,186.917],["seks",186.997,187.177],["minutter",187.217,187.517],["på",187.557,187.677],["del",187.697,187.857],["b",187.977,187.997],["og",188.517,188.577],["to",188.657,188.757],["minutter",188.857,189.157],["til",189.197,189.297],["at",189.317,189.357],["vurdere",189.377,189.717],["om",189.817,189.897],["tallet",189.977,190.277],["er",190.357,190.417],["rimeligt",190.477,190.837]],"text":"Brug cirka syv minutter på det. Så seks minutter på del b, og to minutter til at vurdere, om tallet er rimeligt."},"tjek_q":{"start":192.657,"end":196.518,"words":[["Tjek",192.697,192.877],["dig",192.897,192.997],["selv",193.037,193.197],["Hvorfor",193.598,193.878],["slides",194.058,194.398],["en",194.458,194.538],["koblingsskive",194.598,195.218],["mest",195.318,195.578],["yderst",195.698,196.018],["når",196.078,196.198],["den",196.198,196.298],["er",196.318,196.378],["ny",196.438,196.518]],"text":"Tjek dig selv. Hvorfor slides en koblingsskive mest yderst, når den er ny?"},"tjek_a":{"start":200.138,"end":209.739,"words":[["Fordi",200.178,200.378],["yderkanten",200.558,201.078],["glider",201.138,201.418],["en",201.498,201.578],["længere",201.658,201.938],["vej",201.998,202.138],["på",202.238,202.338],["hver",202.358,202.518],["omgang",202.598,202.898],["Med",203.458,203.558],["samme",203.598,203.778],["tryk",203.838,204.038],["overalt",204.078,204.478],["giver",204.838,205.038],["længere",205.158,205.418],["vej",205.458,205.618],["mere",205.758,205.998],["slid",206.098,206.298],["Sliddet",206.819,207.119],["flytter",207.419,207.699],["så",207.719,207.839],["trykket",207.859,208.139],["indad",208.279,208.519],["til",208.719,208.839],["sliddet",208.879,209.179],["er",209.319,209.399],["ens",209.499,209.739]],"text":"Fordi yderkanten glider en længere vej på hver omgang. Med samme tryk overalt giver længere vej mere slid. Sliddet flytter så trykket indad, til sliddet er ens."},"slut":{"start":211.559,"end":223.8,"words":[["Kort",211.599,211.779],["sagt",211.819,212.019],["nye",212.379,212.539],["skiver",212.599,212.959],["har",213.019,213.119],["konstant",213.159,213.619],["tryk",213.679,213.939],["tilkørte",214.319,214.759],["skiver",214.819,215.139],["har",215.219,215.339],["konstant",215.379,215.799],["slid",215.899,216.119],["Ved",216.519,216.599],["konstant",216.619,216.939],["slid",216.999,217.159],["er",217.239,217.319],["T",217.659,217.679],["lig",217.999,218.139],["N",218.479,218.499],["mu",218.74,218.82],["F",219.24,219.26],["gange",219.48,219.72],["middelradius",219.8,220.44],["Det",220.92,221.0],["giver",221.02,221.18],["lidt",221.2,221.32],["mindre",221.4,221.66],["moment",221.7,222.02],["og",222.32,222.38],["er",222.42,222.48],["derfor",222.5,222.8],["på",222.92,223.04],["den",223.04,223.14],["sikre",223.22,223.5],["side",223.58,223.8]],"text":"Kort sagt: nye skiver har konstant tryk, tilkørte skiver har konstant slid. Ved konstant slid er T lig N mu F gange middelradius. Det giver lidt mindre moment og er derfor på den sikre side."}}}, { audio: 'eks-spm8-a.mp3', id: 'eks-spm8-a' });</script>
+</body>
+</html>

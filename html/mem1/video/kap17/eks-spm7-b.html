@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spm. 7b: hvor meget giver fjederen efter? · video</title>
+<meta name="description" content="Ny liste, spm. 7b trin for trin: τ ≈ 300 MPa, δ = 25,6 mm, k = 7,8 N/mm, hvad nu hvis.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 17: videoer</a><h1>Spm. 7b: hvor meget giver fjederen efter?</h1><span class="meta">MEM1 · kapitel 17 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Spm. 7b: hvor meget giver fjederen efter?"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Ny liste, spm. 7b trin for trin: τ ≈ 300 MPa, δ = 25,6 mm, k = 7,8 N/mm, hvad nu hvis.</p><div class="chips"><a href="../../opgaver/l17/tidligere-eksamen-spm-13-trykfjeder.pdf">📐 Se udregningen i Mathcad (PDF)</a><a href="eks-spm7-a.html">Se først: Spm. 7a: skruefjedre forklaret fra bunden</a><a href="../../../../lab/mem1/trykfjeder.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel17_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l17">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// MEM1 mundtlig eksamen (ny liste) · Spm. 7b v2: trykfjederen trin for trin, hvert tal oversat.
+// d = 4, D = 32 mm, C = 8, N_a = 10, G = 80 GPa, F = 200 N (≈ 20 kg), K_w = 1,184 ≈ 1,18. T = F·D/2 = 3200 N·mm.
+// τ uden Wahl 254,6 MPa, med 300,5 MPa (fjedertråd S_ut ≈ 1700 MPa). δ = 8FD³N_a/(Gd⁴) = 25,6 mm, k = 7,81 N/mm (1 kg ≈ 1,26 mm).
+// Hvad hvis: d = 5 ⇒ k × 2,44; D = 40 ⇒ k = 4,0; 2F ⇒ 2τ, 2δ. Tjek: N_a = 5 ⇒ δ = 12,8 mm, τ uændret.
+BP.scene({ header: 'MEM1 · mundtlig eksamen · spm. 7b', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, dot, ring, ell, rect, hatch, PI } = B;
+  const S = (id) => L(id).start;
+  const ringet = (k, s, x, y, size, col, a, te) => { const r = text(k, s, x, y, size, col, a, te); ring(r, col, te, te + 0.5); return r; };
+  const trin = (k, s, id) => bubble(k, s, 130, 135, 48, 'blue', S(id) - 0.1, S(id) + 0.9);
+  const fjeder = (k, x, y0, y1, R, n, col, a, b, w = 3.4) => {
+    const pts = []; for (let i = 0; i <= n * 24; i++) { const s = i / (n * 24); pts.push([x + R * Math.sin(2 * PI * n * s), y1 - s * (y1 - y0) + 6 * Math.cos(2 * PI * n * s)]); }
+    line(k, pts, col, w, a, b);
+  };
+  const bar = (k, x0, y, v, sc, col, a, et) => {
+    line(k, rect(x0, y, v * sc, 40).concat([[x0, y]]), col, 3, a, a + 0.5); hatch(k, rect(x0, y, v * sc, 40), col, a + 0.3, a + 0.8, { gap: 10 });
+    if (et) text(k, et, x0 + v * sc + 16, y + 31, 28, col, a + 0.4, a + 0.8);
+  };
+
+  // ---------------------------------------------------------------- 0 titel
+  B.titel(0, 'Spm. 7b: trykfjederen', 'hvor meget giver den efter? · hvert tal oversat', 'titel');
+
+  // ---------------------------------------------------------------- 1 data
+  B.goto('data', 1);
+  bubble(1, 'Trykfjederen', 130, 135, 50, 'blue', S('data') - 0.1, S('data') + 0.7);
+  text(1, 'd = 4 mm,  D = 32 mm', 170, 230, 36, 'black', wt('data', 'Tråden') - 0.1, we('data', 'millimeter', 1));
+  text(1, 'C = D/d = 32/4 = 8', 170, 300, 36, 'blue', wt('data', 'Fjederindekset') - 0.1, we('data', 'otte'));
+  text(1, 'N_a = 10,  G = 80 GPa', 170, 370, 36, 'black', wt('data2', 'ti') - 0.1, we('data2', 'gigapascal'));
+  text(1, 'F = 200 N  ≈  20 kg ovenpå', 170, 440, 36, 'red', wt('data2', 'Kraften') - 0.1, we('data2', 'fjederen'));
+  ringet(1, 'τ i tråden og udbøjning δ?', 170, 550, 38, 'red', wt('spm', 'forskydningsspændingen') - 0.3, we('spm', 'sammen'));
+  {
+    const td = wt('data', 'Tråden');
+    fjeder(1, 950, 280, 600, 90, 6, 'black', td - 0.1, td + 1.0, 4);
+    B.dobbeltpil(1, [860, 640], [1040, 640], 'blue', wt('data', 'middeldiameteren') - 0.1, wt('data', 'middeldiameteren') + 0.4);
+    text(1, 'D', 950, 680, 28, 'blue', wt('data', 'middeldiameteren'), wt('data', 'middeldiameteren') + 0.4, { align: 'center' });
+    const tf = wt('data2', 'Kraften');
+    line(1, rect(890, 200, 120, 60).concat([[890, 200]]), 'red', 3.4, tf - 0.2, tf + 0.2);
+    text(1, '20 kg', 950, 242, 28, 'red', tf, tf + 0.4, { align: 'center' });
+  }
+
+  // ---------------------------------------------------------------- 2 trin 1: tjek Wahl
+  B.goto('trin1', 2);
+  trin(2, 'Trin 1:  tjek Wahl', 'trin1');
+  B.formel(2, '17.11', 'K_w = (4C − 1)/(4C − 4) + 0,615/C', 190, 260, 38, wt('trin1', 'Fire') - 0.1, wt('trin1', 'Fire') + 1.0, 'blue');
+  text(2, '= 31/28 + 0,615/8 = 1,107 + 0,077', 210, 350, 36, 'black', wt('trin1', 'enogtredive') - 0.1, we('trin1', 'otte', 1));
+  ringet(2, '= 1,18:  det passer', 210, 430, 40, 'red', wt('trin1', 'giver') - 0.1, we('trin1', 'opgivne'));
+
+  // ---------------------------------------------------------------- 3 trin 2: spændingen
+  B.goto('trin2', 3);
+  trin(3, 'Trin 2:  spændingen', 'trin2');
+  text(3, 'T = F · D/2 = 200 · 16 = 3200 N·mm', 170, 230, 36, 'black', wt('trin2', 'armen') - 0.3, we('trin2', 'newtonmillimeter'));
+  B.formel(3, '17.10', 'τ = 1,18 · 8 · 200 · 32 / (π · 4³)', 190, 320, 36, wt('tau', 'Tau') - 0.1, we('tau', 'fireogtres'), 'red');
+  {
+    const t1 = wt('tau2', 'Uden'), t2 = wt('tau2', 'Med'), x0 = 380, sc = 0.4;
+    text(3, 'uden Wahl', 170, 430, 30, 'black', t1 - 0.1, t1 + 0.4); bar(3, x0, 400, 254.6, sc, 'black', t1, '255 MPa');
+    text(3, 'med Wahl', 170, 500, 30, 'red', t2 - 0.1, t2 + 0.4); bar(3, x0, 470, 300.5, sc, 'red', t2, '300 MPa');
+    const t3 = wt('tau3', 'sytten');
+    text(3, 'fjedertråd', 170, 570, 30, 'green', t3 - 0.4, t3); bar(3, x0, 540, 1700, sc, 'green', t3 - 0.3, '≈ 1700');
+  }
+  text(3, '300 N på hver mm²: højt, men rimeligt for fjederstål', 170, 650, 30, 'blue', wt('tau3', 'kvadratmillimeter') - 0.6, we('tau3', 'rimeligt'));
+
+  // ---------------------------------------------------------------- 4 trin 3: udbøjning og k
+  B.goto('trin3', 4);
+  trin(4, 'Trin 3:  udbøjningen', 'trin3');
+  B.formel(4, '17.17', 'δ = 8 F D³ N_a / (G d⁴)', 190, 240, 40, wt('trin3', 'Delta') - 0.1, we('trin3', 'fjerde'), 'red');
+  text(4, '= 8 · 200 · 32³ · 10 / (80 000 · 4⁴)', 210, 320, 36, 'black', wt('delta', 'Otte') - 0.1, we('delta', 'fjerde'));
+  ringet(4, 'δ = 25,6 mm', 210, 400, 44, 'red', wt('delta', 'femogtyve') - 0.1, we('delta', 'millimeter'));
+  ringet(4, 'k = 200 / 25,6 = 7,8 N/mm', 210, 490, 40, 'blue', wt('k', 'Fjederkonstanten') - 0.1, we('k', 'millimeter'));
+  text(4, '1 kg ⇒ godt 1 mm', 230, 560, 32, 'green', wt('k', 'Ét') - 0.1, we('k', 'sammen'));
+  {
+    const tc = wt('delta', 'femogtyve');
+    fjeder(4, 960, 260, 620, 80, 7, 'black', tc - 1.0, tc - 0.3, 2.6);
+    fjeder(4, 1110, 260 + 102, 620, 80, 7, 'red', tc, tc + 0.6, 2.6);
+    B.dobbeltpil(4, [1210, 260], [1210, 362], 'red', tc + 0.4, tc + 0.8);
+    text(4, '25,6', 1190, 320, 26, 'red', tc + 0.5, tc + 0.9, { align: 'right' });
+  }
+
+  // ---------------------------------------------------------------- 5 trin 4: rimeligt?
+  B.goto('trin4', 5);
+  trin(5, 'Trin 4:  er det rimeligt?', 'trin4');
+  text(5, '20 kg trykker den ≈ 2,5 cm: almindelig fjeder', 170, 240, 32, 'black', wt('trin4', 'tyve') - 0.6, we('trin4', 'fjeder'));
+  text(5, 'C = 8: midt i det normale område 4–12', 170, 300, 32, 'green', wt('trin4', 'indekset') - 0.3, we('trin4', 'tolv'));
+  ringet(5, 'plads?  fri længde > 25,6 mm + bloklængde', 170, 400, 36, 'red', wt('lang', 'plads') - 0.1, we('lang', 'tæt'));
+  {
+    const tb = wt('lang', 'bunder');
+    line(5, rect(900, 560, 200, 100).concat([[900, 560]]), 'black', 3, tb - 0.4, tb);
+    for (let i = 0; i < 6; i++) line(5, ell(1000, 650 - i * 16, 90, 8, 0, 2 * PI), 'red', 3, tb - 0.3 + i * 0.05, tb + i * 0.05);
+    text(5, 'vindinger tæt: bunder', 880, 520, 28, 'red', tb, tb + 0.4);
+  }
+
+  // ---------------------------------------------------------------- 6 hvad nu hvis?
+  B.goto('hvis', 6);
+  bubble(6, 'Hvad nu hvis?', 130, 135, 50, 'blue', S('hvis') - 0.1, S('hvis') + 0.8);
+  text(6, 'her viser du, at du har forstået det', 640, 140, 28, 'green', wt('hvis', 'viser') - 0.1, we('hvis', 'det'));
+  {
+    const rows = [
+      ['traad', 'tråd 5 mm i stedet for 4', 'k × 2,4  (d⁴)', 'green', 'fem', 'fjerde'],
+      ['spiral', 'spiral 40 mm', 'k ≈ 4 N/mm', 'blue', 'fyrre', 'Fire'],
+      ['kraft', 'dobbelt kraft', '2 × τ og 2 × δ', 'black', 'dobbelt', 'lineært'],
+    ];
+    rows.forEach(([id, a1, a2, col, w1, w2], i) => {
+      const y = 260 + i * 120, t1 = wt(id, w1) - 0.2, t2 = wt(id, w2) - 0.6;
+      dot(6, 220, y - 12, 10, col, t1);
+      text(6, a1, 260, y, 34, 'black', t1, t1 + 0.6);
+      text(6, '→  ' + a2, 760, y, 34, col, t2, t2 + 0.6);
+    });
+  }
+
+  // ---------------------------------------------------------------- 7 antagelser og censor-sætningen
+  B.goto('antag', 7);
+  bubble(7, 'Sig dine antagelser højt', 130, 135, 46, 'blue', S('antag') - 0.1, S('antag') + 0.9);
+  text(7, '•  lineært elastisk stål', 170, 220, 30, 'black', wt('antag', 'Lineært') - 0.1, we('antag', 'stål'));
+  text(7, '•  kraften i fjederens akse', 170, 265, 30, 'black', wt('antag', 'Kraften') - 0.1, we('antag', 'akse'));
+  text(7, '•  vindinger rører ikke', 700, 220, 30, 'black', wt('antag', 'Ingen') - 0.1, we('antag', 'hinanden'));
+  text(7, '•  statisk (ellers udmattelse)', 700, 265, 30, 'red', wt('antag', 'statisk') - 0.1, we('antag', 'udmattelse'));
+  bubble(7, 'Til censor', 130, 360, 42, 'red', S('censor') - 0.1, S('censor') + 0.8);
+  {
+    const r = [
+      ['K_w = 1,18: krumning + direkte forskydning', 'Wahl', 'indersiden'],
+      ['τ ≈ 300 MPa', 'Tau', 'megapascal'],
+      ['δ = 25,6 mm,  k = 7,8 N/mm', 'Udbøjningen', 'millimeter', 2],
+    ];
+    r.forEach(([s, w1, w2, n], i) => text(7, s, 170, 440 + i * 60, 32, i === 1 ? 'red' : 'black', wt('censor', w1) - 0.2, we('censor', w2, n || 0)));
+  }
+
+  // ---------------------------------------------------------------- 8 tjek: fem vindinger
+  B.goto('tjek_q', 8);
+  B.tjek(8, ['Kun 5 aktive vindinger i stedet for 10:', 'udbøjning og spænding?'], ['δ halveres: 12,8 mm (N_a i tælleren)', 'τ uændret: N_a står ikke i formlen'], 'tjek_q', 'tjek_a');
+  {
+    const t1 = wt('tjek_a', 'tolv'), x0 = 420, sc = 12;
+    text(8, '10 vindinger', 170, 590, 30, 'black', t1 - 0.4, t1); bar(8, x0, 560, 25.6, sc, 'black', t1 - 0.3, '25,6 mm');
+    text(8, '5 vindinger', 170, 655, 30, 'green', t1, t1 + 0.4); bar(8, x0, 625, 12.8, sc, 'green', t1, '12,8 mm');
+  }
+
+  // ---------------------------------------------------------------- 9 slut
+  B.goto('slut', 9);
+  B.slut(9, 'MEM1 mundtlig eksamen, ny liste, spm. 7b · Hamrock m.fl., kap. 17, lign. (17.10), (17.11), (17.17), (17.18) · Mathcad: Tidligere eksamen spm 13 Trykfjeder', 'spm. 8: lamelkoblinger', 'slut');
+  text(9, '1.  τ = K_w 8FD/(πd³) ≈ 300 MPa', 200, 240, 36, 'red', wt('slut', 'tau') - 0.1, we('slut', 'megapascal'));
+  text(9, '2.  δ = 25,6 mm', 200, 310, 36, 'blue', wt('slut', 'Delta') - 0.1, we('slut', 'millimeter'));
+  text(9, '3.  k = 7,8 N/mm', 200, 380, 36, 'green', wt('slut', 'k') - 0.1, we('slut', 'millimeter', 1));
+});
+
+</script>
+<script>BP.live({"duration":250.918,"audio":"eks-spm7-b.mp3","order":["titel","data","data2","spm","trin1","trin2","tau","tau2","tau3","trin3","delta","k","trin4","lang","hvis","traad","spiral","kraft","antag","censor","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":6.321,"words":[["Spørgsmål",0.54,1.04],["syv",1.2,1.36],["del",1.68,1.84],["b",1.92,1.94],["Nu",2.76,2.82],["regner",2.9,3.14],["vi",3.14,3.2],["på",3.26,3.42],["en",3.5,3.58],["rigtig",3.7,4.0],["fjeder",4.06,4.42],["og",4.58,4.68],["vi",4.94,5.0],["oversætter",5.1,5.58],["tallene",5.62,5.88],["undervejs",5.92,6.321]],"text":"Spørgsmål syv, del b. Nu regner vi på en rigtig fjeder, og vi oversætter tallene undervejs."},"data":{"start":8.141,"end":20.622,"words":[["Tråden",8.181,8.581],["er",8.661,8.741],["fire",8.961,9.161],["millimeter",9.201,9.621],["tyk",9.661,9.861],["og",10.221,10.301],["middeldiameteren",10.401,11.261],["er",11.361,11.421],["toogtredive",11.541,12.181],["millimeter",12.241,12.641],["Det",13.301,13.401],["er",13.401,13.461],["cirka",13.461,13.741],["en",13.821,13.921],["fjeder",14.021,14.401],["i",14.501,14.521],["en",14.561,14.661],["lille",14.701,14.881],["støddæmper",14.901,15.301],["Fjederindekset",16.321,17.061],["C",17.201,17.221],["er",17.641,17.721],["toogtredive",18.161,18.761],["delt",18.841,19.042],["med",19.102,19.182],["fire",19.242,19.502],["altså",20.062,20.282],["otte",20.402,20.622]],"text":"Tråden er fire millimeter tyk, og middeldiameteren er toogtredive millimeter. Det er cirka en fjeder i en lille støddæmper. Fjederindekset C er toogtredive delt med fire, altså otte."},"data2":{"start":21.822,"end":31.042,"words":[["Der",21.862,21.962],["er",21.982,22.022],["ti",22.062,22.162],["aktive",22.342,22.722],["vindinger",22.762,23.102],["og",23.362,23.422],["stålet",23.462,23.802],["har",23.862,24.002],["G",24.162,24.182],["lig",24.402,24.542],["firs",24.722,24.982],["gigapascal",25.022,25.602],["Kraften",26.722,27.162],["er",27.242,27.322],["to",27.542,27.642],["hundrede",27.742,28.002],["newton",28.002,28.322],["Det",29.182,29.262],["er",29.262,29.302],["som",29.302,29.402],["at",29.422,29.482],["lægge",29.502,29.682],["tyve",29.782,30.022],["kilo",30.062,30.302],["oven",30.442,30.582],["på",30.602,30.702],["fjederen",30.722,31.042]],"text":"Der er ti aktive vindinger, og stålet har G lig firs gigapascal. Kraften er to hundrede newton. Det er som at lægge tyve kilo oven på fjederen."},"spm":{"start":32.123,"end":37.583,"words":[["Spørgsmålet",32.163,32.683],["er",32.743,32.823],["hvor",33.363,33.503],["stor",33.603,33.863],["er",34.083,34.183],["forskydningsspændingen",34.263,35.163],["i",35.203,35.223],["tråden",35.283,35.643],["og",36.003,36.063],["hvor",36.083,36.203],["meget",36.263,36.523],["trykkes",36.563,36.923],["fjederen",36.983,37.303],["sammen",37.343,37.583]],"text":"Spørgsmålet er: hvor stor er forskydningsspændingen i tråden, og hvor meget trykkes fjederen sammen?"},"trin1":{"start":39.403,"end":54.644,"words":[["Trin",39.443,39.643],["et",39.663,39.743],["tjek",40.403,40.603],["Wahl",40.703,40.963],["Fire",42.083,42.283],["C",42.403,42.423],["minus",42.763,43.023],["en",43.123,43.263],["over",43.703,43.904],["fire",44.164,44.384],["C",44.484,44.504],["minus",44.704,44.964],["fire",45.024,45.284],["er",45.884,45.984],["enogtredive",46.444,46.984],["over",47.044,47.204],["otteogtyve",47.304,47.784],["plus",48.224,48.504],["nul",48.844,49.004],["komma",49.044,49.244],["seks",49.344,49.584],["en",49.684,49.804],["fem",49.924,50.084],["over",50.204,50.384],["otte",50.524,50.744],["Det",51.424,51.504],["giver",51.544,51.724],["en",52.024,52.144],["komma",52.204,52.364],["en",52.464,52.564],["otte",52.644,52.824],["Det",53.724,53.804],["passer",53.844,54.104],["med",54.104,54.164],["det",54.184,54.244],["opgivne",54.284,54.644]],"text":"Trin et: tjek Wahl. Fire C minus en over fire C minus fire er enogtredive over otteogtyve, plus nul komma seks en fem over otte. Det giver en komma en otte. Det passer med det opgivne."},"trin2":{"start":56.464,"end":67.005,"words":[["Trin",56.504,56.684],["to",56.724,56.804],["spændingen",57.465,57.905],["Først",58.745,58.945],["armen",59.065,59.305],["Momentet",60.005,60.445],["i",60.485,60.505],["tråden",60.565,60.945],["er",61.045,61.125],["F",61.525,61.545],["gange",61.665,61.885],["D",62.005,62.025],["over",62.265,62.425],["to",62.485,62.585],["To",63.345,63.445],["hundrede",63.545,63.785],["gange",63.865,64.065],["seksten",64.125,64.545],["er",64.925,65.005],["tre",65.085,65.225],["tusind",65.345,65.665],["to",65.725,65.825],["hundrede",65.925,66.165],["newtonmillimeter",66.245,67.005]],"text":"Trin to: spændingen. Først armen. Momentet i tråden er F gange D over to. To hundrede gange seksten er tre tusind to hundrede newtonmillimeter."},"tau":{"start":68.045,"end":79.546,"words":[["Tau",68.085,68.305],["er",68.585,68.685],["K",68.845,68.865],["w",69.366,69.386],["gange",69.726,69.966],["otte",70.246,70.566],["F",70.626,70.646],["D",70.726,70.746],["over",71.306,71.506],["pi",71.606,71.746],["d",71.926,71.946],["i",72.126,72.146],["tredje",72.206,72.506],["En",73.506,73.606],["komma",73.646,73.826],["en",73.906,73.966],["otte",74.066,74.306],["gange",74.466,74.666],["otte",74.786,75.026],["gange",75.446,75.626],["to",75.706,75.806],["hundrede",75.926,76.226],["gange",76.346,76.546],["toogtredive",76.606,77.206],["delt",77.766,78.026],["med",78.086,78.206],["pi",78.426,78.546],["gange",78.746,78.966],["fireogtres",79.046,79.546]],"text":"Tau er K w gange otte F D over pi d i tredje. En komma en otte gange otte gange to hundrede gange toogtredive, delt med pi gange fireogtres."},"tau2":{"start":80.686,"end":86.047,"words":[["Uden",80.726,80.906],["Wahl",80.946,81.187],["ville",81.247,81.387],["det",81.407,81.467],["give",81.507,81.667],["to",81.967,82.067],["hundrede",82.127,82.287],["og",82.287,82.327],["femoghalvtreds",82.347,82.907],["megapascal",82.947,83.447],["Med",84.147,84.287],["Wahl",84.327,84.567],["bliver",84.687,84.847],["det",84.847,84.947],["tre",85.047,85.187],["hundrede",85.287,85.507],["megapascal",85.547,86.047]],"text":"Uden Wahl ville det give to hundrede og femoghalvtreds megapascal. Med Wahl bliver det tre hundrede megapascal."},"tau3":{"start":87.107,"end":100.428,"words":[["Hvad",87.147,87.267],["betyder",87.287,87.587],["det",87.587,87.687],["Hver",88.387,88.587],["kvadratmillimeter",88.627,89.487],["af",89.507,89.567],["tråden",89.587,89.907],["bliver",90.147,90.307],["forskudt",90.307,90.687],["med",90.727,90.827],["tre",90.907,91.067],["hundrede",91.187,91.447],["newton",91.487,91.807],["Det",92.487,92.587],["er",92.607,92.647],["højt",92.667,92.867],["Men",93.468,93.588],["fjedertråd",93.648,94.148],["er",94.268,94.328],["noget",94.348,94.488],["af",94.508,94.548],["det",94.568,94.648],["stærkeste",94.688,95.148],["stål",95.208,95.468],["der",95.508,95.588],["findes",95.648,96.008],["ofte",96.428,96.628],["omkring",96.708,97.068],["sytten",97.308,97.568],["hundrede",97.628,97.868],["megapascal",97.888,98.508],["i",98.568,98.588],["brudstyrke",98.628,99.188],["Så",99.648,99.748],["det",99.928,100.048],["er",100.048,100.088],["rimeligt",100.108,100.428]],"text":"Hvad betyder det? Hver kvadratmillimeter af tråden bliver forskudt med tre hundrede newton. Det er højt. Men fjedertråd er noget af det stærkeste stål, der findes, ofte omkring sytten hundrede megapascal i brudstyrke. Så det er rimeligt."},"trin3":{"start":102.248,"end":109.569,"words":[["Trin",102.288,102.448],["tre",102.508,102.628],["udbøjningen",103.128,103.688],["Delta",104.808,105.088],["er",105.228,105.308],["otte",105.508,106.009],["F",106.109,106.129],["D",106.349,106.369],["i",106.809,106.829],["tredje",106.889,107.249],["N",107.489,107.509],["a",107.609,107.649],["over",108.209,108.409],["G",108.529,108.549],["d",108.889,108.909],["i",109.189,109.209],["fjerde",109.269,109.569]],"text":"Trin tre: udbøjningen. Delta er otte F D i tredje N a over G d i fjerde."},"delta":{"start":110.749,"end":119.19,"words":[["Otte",110.789,111.029],["gange",111.029,111.229],["to",111.289,111.389],["hundrede",111.509,111.809],["gange",111.929,112.149],["toogtredive",112.389,112.989],["i",113.069,113.089],["tredje",113.149,113.469],["gange",113.529,113.729],["ti",113.769,113.889],["delt",114.469,114.689],["med",114.729,114.829],["firs",114.969,115.229],["tusind",115.309,115.709],["gange",115.829,116.069],["fire",116.169,116.429],["i",116.509,116.529],["fjerde",116.609,116.889],["Det",117.489,117.569],["giver",117.589,117.749],["femogtyve",117.809,118.31],["komma",118.31,118.45],["seks",118.55,118.73],["millimeter",118.79,119.19]],"text":"Otte gange to hundrede gange toogtredive i tredje gange ti, delt med firs tusind gange fire i fjerde. Det giver femogtyve komma seks millimeter."},"k":{"start":120.75,"end":129.33,"words":[["Fjederkonstanten",120.79,121.53],["er",121.67,121.75],["to",121.87,121.99],["hundrede",122.11,122.41],["delt",122.47,122.69],["med",122.73,122.81],["femogtyve",122.83,123.23],["komma",123.25,123.41],["seks",123.47,123.69],["altså",123.99,124.21],["syv",124.53,124.67],["komma",124.71,124.89],["otte",124.99,125.17],["newton",125.25,125.59],["pr",125.65,125.75],["millimeter",125.79,126.21],["Ét",126.93,127.03],["kilo",127.07,127.31],["trykker",127.59,127.83],["fjederen",127.85,128.19],["godt",128.25,128.41],["en",128.51,128.59],["millimeter",128.65,129.05],["sammen",129.09,129.33]],"text":"Fjederkonstanten er to hundrede delt med femogtyve komma seks, altså syv komma otte newton pr. millimeter. Ét kilo trykker fjederen godt en millimeter sammen."},"trin4":{"start":131.15,"end":142.33,"words":[["Trin",131.19,131.35],["fire",131.39,131.59],["er",131.93,131.99],["det",132.01,132.07],["rimeligt",132.11,132.39],["Fjederen",133.95,134.31],["trykkes",134.35,134.61],["cirka",134.65,134.87],["to",135.03,135.13],["en",135.21,135.25],["halv",135.27,135.41],["centimeter",135.45,135.91],["sammen",135.95,136.19],["af",136.29,136.35],["tyve",136.41,136.65],["kilo",136.65,136.87],["Det",137.39,137.45],["lyder",137.49,137.63],["som",137.65,137.73],["en",137.75,137.81],["almindelig",137.83,138.13],["fjeder",138.15,138.43],["Og",139.01,139.07],["indekset",139.13,139.57],["otte",139.73,139.95],["ligger",140.03,140.25],["midt",140.33,140.49],["i",140.55,140.57],["det",140.61,140.69],["normale",140.71,141.01],["område",141.09,141.45],["fra",141.51,141.61],["fire",141.71,141.93],["til",141.99,142.11],["tolv",142.13,142.33]],"text":"Trin fire: er det rimeligt? Fjederen trykkes cirka to en halv centimeter sammen af tyve kilo. Det lyder som en almindelig fjeder. Og indekset otte ligger midt i det normale område fra fire til tolv."},"lang":{"start":143.531,"end":150.971,"words":[["Husk",143.571,143.791],["også",143.811,143.951],["at",143.971,144.011],["tjekke",144.031,144.271],["at",144.271,144.311],["der",144.351,144.431],["er",144.451,144.491],["plads",144.511,144.771],["Fjederen",145.431,145.791],["skal",145.831,145.971],["være",145.971,146.091],["længere",146.131,146.391],["end",146.431,146.531],["femogtyve",146.611,147.051],["komma",147.071,147.231],["seks",147.291,147.471],["millimeter",147.551,147.971],["plus",148.211,148.411],["længden",148.511,148.831],["når",148.871,148.971],["vindingerne",149.011,149.431],["ligger",149.491,149.671],["tæt",149.711,149.891],["Ellers",150.411,150.591],["bunder",150.631,150.851],["den",150.871,150.971]],"text":"Husk også at tjekke, at der er plads. Fjederen skal være længere end femogtyve komma seks millimeter plus længden, når vindingerne ligger tæt. Ellers bunder den."},"hvis":{"start":152.791,"end":156.072,"words":[["Hvad",152.831,152.971],["nu",153.011,153.091],["hvis",153.151,153.371],["Her",154.451,154.571],["viser",154.631,154.851],["du",154.871,154.911],["censor",154.991,155.292],["at",155.352,155.412],["du",155.452,155.492],["har",155.532,155.592],["forstået",155.612,155.972],["det",155.992,156.072]],"text":"Hvad nu hvis? Her viser du censor, at du har forstået det."},"traad":{"start":157.272,"end":164.192,"words":[["Med",157.312,157.412],["fem",157.472,157.612],["millimeter",157.692,158.092],["tråd",158.112,158.352],["i",158.432,158.452],["stedet",158.472,158.692],["for",158.692,158.772],["fire",158.832,159.052],["samme",159.432,159.612],["spiral",159.672,160.032],["bliver",160.392,160.572],["fjederen",160.612,160.972],["cirka",161.012,161.272],["to",161.412,161.532],["komma",161.632,161.812],["fire",161.872,162.072],["gange",162.112,162.312],["så",162.352,162.452],["stiv",162.472,162.672],["Tykkelsen",163.212,163.612],["står",163.732,163.892],["i",163.912,163.932],["fjerde",163.952,164.192]],"text":"Med fem millimeter tråd i stedet for fire, samme spiral, bliver fjederen cirka to komma fire gange så stiv. Tykkelsen står i fjerde."},"spiral":{"start":165.552,"end":171.513,"words":[["Med",165.592,165.692],["en",165.712,165.772],["spiral",165.792,166.192],["på",166.232,166.352],["fyrre",166.412,166.652],["millimeter",166.692,167.112],["i",167.152,167.172],["stedet",167.192,167.413],["for",167.433,167.513],["toogtredive",167.593,168.173],["bliver",168.493,168.653],["den",168.653,168.733],["cirka",168.753,168.993],["halvt",169.273,169.473],["så",169.513,169.613],["stiv",169.633,169.833],["Fire",170.413,170.633],["newton",170.713,170.993],["pr",171.033,171.113],["millimeter",171.133,171.513]],"text":"Med en spiral på fyrre millimeter i stedet for toogtredive bliver den cirka halvt så stiv. Fire newton pr. millimeter."},"kraft":{"start":172.353,"end":176.893,"words":[["Og",172.393,172.453],["dobbelt",172.513,172.753],["kraft",172.773,173.053],["giver",173.333,173.473],["dobbelt",173.553,173.813],["spænding",173.833,174.153],["og",174.353,174.413],["dobbelt",174.493,174.753],["udbøjning",174.813,175.253],["Alt",175.893,176.053],["er",176.133,176.193],["lineært",176.233,176.593],["i",176.653,176.673],["F",176.873,176.893]],"text":"Og dobbelt kraft giver dobbelt spænding og dobbelt udbøjning. Alt er lineært i F."},"antag":{"start":178.913,"end":191.174,"words":[["Sig",178.953,179.073],["antagelserne",179.153,179.654],["højt",179.714,179.894],["Lineært",180.954,181.314],["elastisk",181.374,181.794],["stål",181.854,182.094],["Kraften",183.054,183.414],["præcis",183.534,183.954],["i",184.074,184.094],["fjederens",184.154,184.554],["akse",184.634,184.854],["Ingen",185.754,185.934],["vindinger",186.014,186.354],["rører",186.414,186.614],["hinanden",186.654,186.994],["Og",187.554,187.634],["statisk",187.694,188.154],["last",188.234,188.474],["Svinger",189.254,189.514],["fjederen",189.534,189.874],["skal",189.934,190.054],["den",190.074,190.134],["også",190.174,190.314],["tjekkes",190.314,190.574],["for",190.594,190.694],["udmattelse",190.754,191.174]],"text":"Sig antagelserne højt. Lineært elastisk stål. Kraften præcis i fjederens akse. Ingen vindinger rører hinanden. Og statisk last. Svinger fjederen, skal den også tjekkes for udmattelse."},"censor":{"start":192.994,"end":209.875,"words":[["Det",193.034,193.134],["du",193.154,193.194],["siger",193.274,193.454],["til",193.474,193.574],["censor",193.614,193.914],["er",193.994,194.074],["Wahl-faktoren",195.114,195.734],["er",195.834,195.914],["en",196.134,196.234],["komma",196.294,196.474],["en",196.614,196.714],["otte",196.854,197.074],["fordi",197.474,197.614],["krumning",197.714,198.134],["og",198.174,198.234],["direkte",198.314,198.654],["forskydning",198.694,199.174],["øger",199.534,199.734],["spændingen",199.774,200.154],["på",200.174,200.274],["indersiden",200.314,200.754],["Tau",201.674,201.914],["er",202.014,202.094],["cirka",202.154,202.394],["tre",202.614,202.734],["hundrede",202.834,203.074],["megapascal",203.074,203.614],["Udbøjningen",204.435,204.995],["er",205.075,205.155],["femogtyve",205.155,205.815],["komma",205.835,205.975],["seks",206.035,206.195],["millimeter",206.255,206.675],["og",207.035,207.115],["fjederkonstanten",207.155,207.915],["er",208.075,208.135],["syv",208.215,208.355],["komma",208.395,208.695],["otte",208.695,208.975],["newton",208.975,209.295],["pr",209.335,209.455],["millimeter",209.475,209.875]],"text":"Det, du siger til censor, er: Wahl-faktoren er en komma en otte, fordi krumning og direkte forskydning øger spændingen på indersiden. Tau er cirka tre hundrede megapascal. Udbøjningen er femogtyve komma seks millimeter, og fjederkonstanten er syv komma otte newton pr. millimeter."},"tjek_q":{"start":211.695,"end":218.776,"words":[["Tjek",211.735,211.895],["dig",211.935,212.015],["selv",212.055,212.215],["Fjederen",213.655,213.935],["har",213.955,214.035],["kun",214.055,214.195],["fem",214.395,214.535],["aktive",214.795,215.155],["vindinger",215.175,215.495],["i",215.595,215.615],["stedet",215.635,215.835],["for",215.835,215.915],["ti",215.955,216.055],["Hvad",216.896,217.036],["sker",217.076,217.236],["der",217.256,217.336],["med",217.356,217.456],["udbøjningen",217.556,218.116],["og",218.256,218.316],["spændingen",218.356,218.776]],"text":"Tjek dig selv. Fjederen har kun fem aktive vindinger i stedet for ti. Hvad sker der med udbøjningen og spændingen?"},"tjek_a":{"start":222.396,"end":233.497,"words":[["Udbøjningen",222.436,222.896],["halveres",222.936,223.376],["til",223.456,223.576],["tolv",223.616,223.776],["komma",223.796,223.936],["otte",224.056,224.236],["millimeter",224.296,224.676],["fordi",225.056,225.216],["N",225.496,225.516],["a",225.616,225.636],["står",225.916,226.076],["i",226.116,226.136],["tælleren",226.176,226.516],["Spændingen",227.456,227.856],["er",227.996,228.096],["uændret",228.316,228.776],["tre",229.096,229.236],["hundrede",229.356,229.616],["megapascal",229.636,230.196],["Antallet",231.017,231.397],["af",231.417,231.477],["vindinger",231.537,231.897],["står",231.977,232.157],["slet",232.217,232.377],["ikke",232.417,232.537],["i",232.637,232.657],["formlen",232.757,233.157],["for",233.177,233.277],["tau",233.317,233.497]],"text":"Udbøjningen halveres til tolv komma otte millimeter, fordi N a står i tælleren. Spændingen er uændret, tre hundrede megapascal. Antallet af vindinger står slet ikke i formlen for tau."},"slut":{"start":235.317,"end":249.438,"words":[["Kort",235.357,235.517],["sagt",235.577,235.777],["tau",236.357,236.577],["er",236.737,236.817],["K",237.017,237.037],["w",237.557,237.577],["gange",237.817,238.077],["otte",238.357,238.737],["F",238.817,238.837],["D",239.537,239.557],["over",240.117,240.357],["pi",240.517,240.637],["d",240.837,240.857],["i",241.117,241.137],["tredje",241.217,241.577],["cirka",242.017,242.217],["tre",242.337,242.457],["hundrede",242.597,242.857],["megapascal",242.897,243.457],["Delta",244.298,244.598],["er",244.798,244.878],["femogtyve",245.078,245.518],["komma",245.558,245.758],["seks",245.878,246.058],["millimeter",246.098,246.518],["og",246.918,246.978],["k",247.018,247.038],["er",247.458,247.538],["syv",247.758,247.918],["komma",247.978,248.298],["otte",248.298,248.518],["newton",248.518,248.838],["pr",248.898,249.018],["millimeter",249.038,249.438]],"text":"Kort sagt: tau er K w gange otte F D over pi d i tredje, cirka tre hundrede megapascal. Delta er femogtyve komma seks millimeter, og k er syv komma otte newton pr. millimeter."}}}, { audio: 'eks-spm7-b.mp3', id: 'eks-spm7-b' });</script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spm. 5b: hvor hårdt bliver tanden bøjet? · video</title>
+<meta name="description" content="Ny liste, spm. 5b trin for trin: d = 80 mm, σ_b = 31,25 MPa, F_r = 582 N, hvad nu hvis.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 14: videoer</a><h1>Spm. 5b: hvor hårdt bliver tanden bøjet?</h1><span class="meta">MEM1 · kapitel 14 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Spm. 5b: hvor hårdt bliver tanden bøjet?"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Ny liste, spm. 5b trin for trin: d = 80 mm, σ_b = 31,25 MPa, F_r = 582 N, hvad nu hvis.</p><div class="chips"><a href="../../opgaver/l14/tidligere-eksamen-spm-11-lewis-tandhjul.pdf">📐 Se udregningen i Mathcad (PDF)</a><a href="eks-spm5-a.html">Se først: Spm. 5a: tandhjul og Lewis forklaret fra bunden</a><a href="../../../../lab/mem1/tandhjul-lewis.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel14_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l14">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// MEM1 mundtlig eksamen (ny liste) · Spm. 5b v2: tandhjulet trin for trin, hvert tal oversat.
+// m = 4, b = 40, Z = 20, F_t = 1600 N (≈ 160 kg), Y = 0,32: d = 80 mm (en kop), p = πm = 12,6 mm, h ≈ 2,25m = 9 mm, T = 64 N·m.
+// b·m·Y = 51,2 mm² ⇒ σ_b = 31,25 MPa. F_r = F_t tan 20° = 582 N. Hvad hvis: m 5 ⇒ 25; b 20 ⇒ 62,5; 2F ⇒ 2σ. Tjek: σ ≤ 20 ⇒ b = 62,5 mm.
+BP.scene({ header: 'MEM1 · mundtlig eksamen · spm. 5b', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, dot, ring, ell, rect, hatch, dashed, PI } = B;
+  const S = (id) => L(id).start;
+  const ringet = (k, s, x, y, size, col, a, te) => { const r = text(k, s, x, y, size, col, a, te); ring(r, col, te, te + 0.5); return r; };
+  const cirkel = (k, cx, cy, r, col, w, a, b) => line(k, ell(cx, cy, r, r, 0, 2 * PI), col, w, a, b);
+  const trin = (k, s, id) => bubble(k, s, 130, 135, 48, 'blue', S(id) - 0.1, S(id) + 0.9);
+  const hjul = (k, cx, cy, r, n, h, col, a, b) => {
+    const pts = [], st = 2 * PI / n, P = (rr, v) => [cx + rr * Math.cos(v), cy + rr * Math.sin(v)];
+    for (let i = 0; i < n; i++) { const v = i * st; pts.push(P(r, v), P(r + h, v + 0.18 * st), P(r + h, v + 0.42 * st), P(r, v + 0.6 * st)); }
+    pts.push(pts[0]); line(k, pts, col, 3, a, b); cirkel(k, cx, cy, r * 0.25, col, 3, b - 0.2, b);
+  };
+  const bar = (k, x0, y, v, sc, col, a, et) => {
+    line(k, rect(x0, y, v * sc, 40).concat([[x0, y]]), col, 3, a, a + 0.5); hatch(k, rect(x0, y, v * sc, 40), col, a + 0.3, a + 0.8, { gap: 10 });
+    if (et) text(k, et, x0 + v * sc + 16, y + 31, 28, col, a + 0.4, a + 0.8);
+  };
+
+  // ---------------------------------------------------------------- 0 titel
+  B.titel(0, 'Spm. 5b: tandhjulet', 'hvor hårdt bliver tanden bøjet? · hvert tal oversat', 'titel');
+
+  // ---------------------------------------------------------------- 1 data
+  B.goto('data', 1);
+  bubble(1, 'Tandhjulet', 130, 135, 50, 'blue', S('data') - 0.1, S('data') + 0.7);
+  text(1, 'm = 4 mm,  b = 40 mm,  Z = 20', 170, 230, 36, 'black', wt('data', 'modul') - 0.1, we('data', 'tænder'));
+  text(1, 'F_t = 1600 N  ≈  160 kg på én tand', 170, 300, 36, 'red', wt('data', 'seksten') - 0.1, we('data', 'tand'));
+  text(1, 'Y = 0,32', 170, 370, 36, 'blue', wt('data2', 'formfaktor') - 0.3, we('data2', 'to'));
+  ringet(1, 'σ_b i tandroden?', 170, 470, 40, 'red', wt('data2', 'bøjespændingen') - 0.3, we('data2', 'tanden'));
+  hjul(1, 950, 430, 160, 20, 22, 'black', wt('data', 'tyve') - 0.2, wt('data', 'tyve') + 1.0);
+  {
+    const tf = wt('data', 'seksten');
+    arrow(1, [[1150, 300], [1112, 360]], 'red', 4, tf, tf + 0.4, 14);
+    text(1, 'F_t', 1150, 290, 30, 'red', tf + 0.2, tf + 0.5);
+  }
+
+  // ---------------------------------------------------------------- 2 trin 1: geometri
+  B.goto('trin1', 2);
+  trin(2, 'Trin 1:  geometrien', 'trin1');
+  B.formel(2, '14.7', 'd = m · Z = 4 · 20 = 80 mm', 190, 250, 38, wt('trin1', 'Delediameteren') - 0.1, we('trin1', 'millimeter'), 'red');
+  text(2, '≈ som en kop', 210, 320, 30, 'green', wt('trin1', 'kop') - 0.4, we('trin1', 'kop'));
+  text(2, 'deling p = π m ≈ 12,6 mm', 170, 400, 34, 'black', wt('deling', 'pi') - 0.1, we('deling', 'millimeter'));
+  text(2, 'tandhøjde ≈ 2,25 m = 9 mm', 170, 460, 34, 'black', wt('deling', 'høj') - 0.6, we('deling', 'modulet'));
+  ringet(2, 'T = F_t · d/2 = 1600 · 40 = 64 N·m', 170, 560, 36, 'blue', wt('moment', 'Momentet') - 0.1, we('moment', 'newtonmeter'));
+  {
+    const tc = wt('trin1', 'kop');
+    line(2, [[900, 300], [920, 480], [1060, 480], [1080, 300]], 'green', 3.4, tc - 0.1, tc + 0.5);
+    line(2, ell(1110, 380, 30, 45, -1.4, 1.4), 'green', 3, tc + 0.3, tc + 0.6);
+    B.dobbeltpil(2, [900, 280], [1080, 280], 'red', tc, tc + 0.4);
+    text(2, '80 mm', 990, 262, 28, 'red', tc + 0.2, tc + 0.6, { align: 'center' });
+  }
+
+  // ---------------------------------------------------------------- 3 trin 2: Lewis
+  B.goto('trin2', 3);
+  trin(3, "Trin 2:  Lewis", 'trin2');
+  B.formel(3, '14.54', 'σ_b = F_t / (b · m · Y)', 190, 250, 42, wt('trin2', 'Sigma') - 0.1, we('trin2', 'Y'), 'red');
+  text(3, 'b · m · Y = 40 · 4 · 0,32 = 51,2 mm²', 170, 340, 36, 'black', wt('naevner', 'Fyrre') - 0.1, we('naevner', 'kvadratmillimeter'));
+  text(3, '= tandens styrke regnet om til et areal', 190, 400, 30, 'green', wt('areal', 'areal') - 0.8, we('areal', 'kraften'));
+  ringet(3, 'σ_b = 1600 / 51,2 = 31,25 MPa', 170, 500, 42, 'red', wt('sigma', 'Seksten') - 0.1, we('sigma', 'megapascal'));
+
+  // ---------------------------------------------------------------- 4 trin 3: er det rimeligt?
+  B.goto('trin3', 4);
+  trin(4, 'Trin 3:  er det rimeligt?', 'trin3');
+  {
+    const t1 = wt('trin3', 'flyder'), x0 = 380, sc = 1.6;
+    text(4, 'Lewis', 170, 270, 30, 'red', wt('trin3', 'Enogtredive') - 0.3, wt('trin3', 'Enogtredive') + 0.2); bar(4, x0, 240, 31.25, sc, 'red', wt('trin3', 'Enogtredive') - 0.2, '31 MPa');
+    text(4, 'stål flyder', 170, 335, 30, 'black', t1 - 0.1, t1 + 0.4); bar(4, x0, 305, 400, sc, 'black', t1, 'flere hundrede');
+    text(4, 'god margin', 200, 410, 32, 'green', wt('trin3', 'margin') - 0.3, we('trin3', 'margin'));
+  }
+  text(4, 'Lewis mangler:  stød ved høj fart · kærv ved roden', 170, 500, 30, 'red', wt('men', 'Stødene') - 0.1, we('men', 'tandroden'));
+  ringet(4, 'kan gange spændingen med 2–3', 170, 570, 34, 'red', wt('men', 'gange') - 0.1, we('men', 'tre'));
+  text(4, '⇒ lav Lewis-spænding er et godt tegn', 190, 640, 30, 'green', wt('men', 'godt') - 0.6, we('men', 'tegn'));
+
+  // ---------------------------------------------------------------- 5 radialkraften
+  B.goto('radial', 5);
+  bubble(5, 'Og radialkraften', 130, 135, 50, 'blue', S('radial') - 0.1, S('radial') + 0.8);
+  {
+    const x = 640, y = 420, ta = wt('radial', 'tyve'), v = 20 * PI / 180;
+    arrow(5, [[x, y], [x + 220, y]], 'red', 4.5, ta - 0.2, ta + 0.3, 16);
+    text(5, 'F_t = 1600 N', x + 90, y - 18, 30, 'red', ta - 0.1, ta + 0.4);
+    arrow(5, [[x + 220, y], [x + 220, y + 80]], 'green', 4.5, ta + 0.2, ta + 0.6, 14);
+    text(5, 'F_r', x + 236, y + 60, 30, 'green', ta + 0.3, ta + 0.7);
+    dashed(5, [x, y], [x + 220, y + 80], 'blue', ta + 0.4, ta + 0.8);
+    text(5, '20°', x + 80, y + 50, 28, 'blue', ta + 0.5, ta + 0.8);
+  }
+  ringet(5, 'F_r = F_t tan 20° ≈ 582 N', 170, 600, 38, 'green', wt('radial', 'tangens') - 0.4, we('radial', 'newton'));
+  text(5, 'den skal lejerne bære', 700, 600, 32, 'black', wt('radial', 'lejerne') - 0.4, we('radial', 'bære'));
+
+  // ---------------------------------------------------------------- 6 trin 4: hvad nu hvis?
+  B.goto('hvis', 6);
+  trin(6, 'Trin 4:  hvad nu hvis?', 'hvis');
+  text(6, 'her viser du, at du har forstået det', 720, 140, 28, 'green', wt('hvis', 'viser') - 0.1, we('hvis', 'det'));
+  {
+    const rows = [
+      ['modul5', 'modul 5 i stedet for 4', '25 MPa', 'green', 'modul', 'femogtyve'],
+      ['smal', 'halv bredde (20 mm)', '62,5 MPa', 'red', 'halvt', 'toogtres'],
+      ['kraft', 'dobbelt kraft', 'dobbelt spænding', 'black', 'dobbelt', 'lineær'],
+    ];
+    rows.forEach(([id, a1, a2, col, w1, w2], i) => {
+      const y = 260 + i * 120, t1 = wt(id, w1) - 0.2, t2 = wt(id, w2) - 0.6;
+      dot(6, 220, y - 12, 10, col, t1);
+      text(6, a1, 260, y, 34, 'black', t1, t1 + 0.6);
+      text(6, '→  ' + a2, 760, y, 34, col, t2, t2 + 0.6);
+    });
+  }
+
+  // ---------------------------------------------------------------- 7 antagelser og censor-sætningen
+  B.goto('antag', 7);
+  bubble(7, 'Sig dine antagelser højt', 130, 135, 46, 'blue', S('antag') - 0.1, S('antag') + 0.9);
+  text(7, '•  hele kraften på én tand', 170, 220, 30, 'black', wt('antag', 'Hele') - 0.1, we('antag', 'tand'));
+  text(7, '•  helt ude i spidsen', 170, 265, 30, 'black', wt('antag', 'spidsen') - 0.6, we('antag', 'spidsen'));
+  text(7, '•  jævnt fordelt over bredden', 700, 220, 30, 'black', wt('antag', 'jævnt') - 0.1, we('antag', 'bredden'));
+  text(7, '•  ingen stød eller kærv', 700, 265, 30, 'red', wt('antag', 'stød') - 0.4, we('antag', 'kærvvirkning'));
+  bubble(7, 'Til censor', 130, 360, 42, 'red', S('censor') - 0.1, S('censor') + 0.8);
+  {
+    const r = [
+      ['d = m · Z = 80 mm', 'delediameteren', 'millimeter'],
+      ['σ_b = 1600 / (40 · 4 · 0,32) = 31,25 MPa', 'Lewis', 'megapascal'],
+      ['lavt for stål', 'lavt', 'stål'],
+      ['Lewis: første skitse uden stød og kærv', 'skitse', 'kærv'],
+    ];
+    r.forEach(([s, w1, w2], i) => text(7, s, 170, 440 + i * 58, 32, i === 1 ? 'red' : 'black', wt('censor', w1) - 0.2, we('censor', w2)));
+  }
+
+  // ---------------------------------------------------------------- 8 tjek
+  B.goto('tjek_q', 8);
+  B.tjek(8, ['Højst 20 MPa:', 'hvor bred skal tanden være?'], ['b = F_t / (σ · m · Y)', '= 1600 / (20 · 4 · 0,32) = 62,5 mm'], 'tjek_q', 'tjek_a');
+  {
+    const t1 = wt('tjek_a', 'toogtres');
+    line(8, rect(300, 560, 40 * 4, 40).concat([[300, 560]]), 'black', 3, t1 - 0.6, t1 - 0.2);
+    text(8, '40 mm', 300 + 160 + 16, 590, 28, 'black', t1 - 0.5, t1 - 0.1);
+    line(8, rect(300, 620, 62.5 * 4, 40).concat([[300, 620]]), 'green', 3.4, t1 - 0.1, t1 + 0.4);
+    text(8, '62,5 mm', 300 + 250 + 16, 650, 28, 'green', t1, t1 + 0.4);
+  }
+
+  // ---------------------------------------------------------------- 9 slut
+  B.goto('slut', 9);
+  B.slut(9, 'MEM1 mundtlig eksamen, ny liste, spm. 5b · Hamrock m.fl., kap. 14, lign. (14.7), (14.54) · Mathcad: Tidligere eksamen spm 11 Lewis tandhjul', 'spm. 6: kraftskruer', 'slut');
+  text(9, '1.  d = m · Z = 80 mm', 200, 240, 36, 'blue', wt('slut', 'delediameteren') - 0.1, we('slut', 'millimeter'));
+  text(9, '2.  σ_b = 31,25 MPa i tandroden', 200, 310, 36, 'red', wt('slut', 'Lewis') - 0.1, we('slut', 'tandroden'));
+  text(9, '3.  lavt for stål, men husk stød og kærv', 200, 380, 36, 'green', wt('slut', 'Lavt') - 0.1, we('slut', 'kærv'));
+});
+
+</script>
+<script>BP.live({"duration":203.229,"audio":"eks-spm5-b.mp3","order":["titel","data","data2","trin1","deling","moment","trin2","naevner","areal","sigma","trin3","men","radial","hvis","modul5","smal","kraft","antag","censor","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":6.901,"words":[["Spørgsmål",0.54,0.92],["fem",1.06,1.22],["del",1.62,1.78],["b",1.88,1.9],["Nu",3.26,3.34],["regner",3.42,3.72],["vi",3.74,3.8],["på",3.86,3.98],["et",4.02,4.08],["rigtigt",4.14,4.48],["tandhjul",4.52,4.98],["og",5.361,5.441],["vi",5.561,5.601],["oversætter",5.681,6.101],["tallene",6.141,6.441],["undervejs",6.481,6.901]],"text":"Spørgsmål fem, del b. Nu regner vi på et rigtigt tandhjul, og vi oversætter tallene undervejs."},"data":{"start":8.721,"end":21.222,"words":[["Tandhjulet",8.761,9.301],["har",9.381,9.521],["modul",9.621,9.961],["fire",10.121,10.341],["millimeter",10.381,10.821],["tandbredde",11.221,11.761],["fyrre",11.961,12.201],["millimeter",12.241,12.681],["og",13.001,13.061],["tyve",13.121,13.321],["tænder",13.361,13.601],["Det",14.661,14.761],["overfører",14.821,15.281],["en",15.381,15.461],["tangentiel",15.581,16.242],["kraft",16.322,16.642],["på",16.722,16.862],["seksten",16.962,17.342],["hundrede",17.382,17.642],["newton",17.702,18.022],["Det",18.942,19.062],["er",19.062,19.102],["som",19.102,19.242],["at",19.262,19.342],["stille",19.362,19.582],["hundrede",19.742,19.982],["og",19.982,20.022],["tres",20.062,20.262],["kilo",20.322,20.562],["på",20.622,20.742],["én",20.842,20.942],["tand",21.002,21.222]],"text":"Tandhjulet har modul fire millimeter, tandbredde fyrre millimeter og tyve tænder. Det overfører en tangentiel kraft på seksten hundrede newton. Det er som at stille hundrede og tres kilo på én tand."},"data2":{"start":22.442,"end":28.643,"words":[["Lewis'",22.482,22.882],["formfaktor",23.002,23.582],["er",23.682,23.742],["nul",23.882,24.042],["komma",24.142,24.302],["tre",24.382,24.522],["to",24.662,24.762],["Spørgsmålet",25.763,26.263],["er",26.323,26.403],["hvor",26.803,26.923],["stor",26.983,27.203],["er",27.283,27.363],["bøjespændingen",27.483,28.203],["i",28.263,28.283],["tanden",28.343,28.643]],"text":"Lewis' formfaktor er nul komma tre to. Spørgsmålet er: hvor stor er bøjespændingen i tanden?"},"trin1":{"start":30.463,"end":39.804,"words":[["Trin",30.503,30.703],["et",30.783,30.883],["geometrien",31.163,31.643],["Delediameteren",32.903,33.763],["er",33.903,33.983],["modulet",34.043,34.543],["gange",34.683,34.903],["antallet",34.983,35.404],["af",35.444,35.504],["tænder",35.544,35.804],["Fire",36.524,36.784],["gange",36.924,37.124],["tyve",37.184,37.464],["er",37.684,37.744],["firs",37.864,38.104],["millimeter",38.144,38.564],["Cirka",39.064,39.324],["som",39.404,39.504],["en",39.544,39.604],["kop",39.644,39.804]],"text":"Trin et: geometrien. Delediameteren er modulet gange antallet af tænder. Fire gange tyve er firs millimeter. Cirka som en kop."},"deling":{"start":41.204,"end":51.325,"words":[["Afstanden",41.244,41.704],["mellem",41.764,41.964],["to",42.084,42.204],["tænder",42.364,42.684],["på",42.804,42.904],["delecirklen",42.964,43.564],["er",43.944,44.004],["pi",44.124,44.264],["gange",44.444,44.644],["modulet",44.644,45.045],["cirka",45.405,45.665],["tolv",45.785,45.985],["komma",46.025,46.165],["seks",46.265,46.445],["millimeter",46.485,46.885],["Og",47.505,47.565],["tanden",47.605,47.885],["er",47.905,47.965],["omkring",47.985,48.285],["ni",48.485,48.585],["millimeter",48.805,49.185],["høj",49.225,49.345],["cirka",49.905,50.165],["to",50.265,50.365],["en",50.425,50.485],["kvart",50.525,50.765],["gange",50.805,50.965],["modulet",50.985,51.325]],"text":"Afstanden mellem to tænder på delecirklen er pi gange modulet, cirka tolv komma seks millimeter. Og tanden er omkring ni millimeter høj, cirka to en kvart gange modulet."},"moment":{"start":52.705,"end":60.326,"words":[["Momentet",52.745,53.225],["på",53.265,53.365],["hjulet",53.385,53.725],["er",53.905,53.965],["kraften",54.025,54.485],["gange",54.545,54.726],["radius",54.786,55.186],["Seksten",56.126,56.466],["hundrede",56.506,56.746],["newton",56.786,57.126],["gange",57.426,57.626],["fyrre",57.806,58.046],["millimeter",58.086,58.526],["er",59.026,59.106],["fireogtres",59.226,59.726],["newtonmeter",59.806,60.326]],"text":"Momentet på hjulet er kraften gange radius. Seksten hundrede newton gange fyrre millimeter er fireogtres newtonmeter."},"trin2":{"start":62.146,"end":67.747,"words":[["Trin",62.186,62.366],["to",62.426,62.526],["Lewis",63.206,63.466],["Sigma",64.706,65.027],["er",65.327,65.407],["F",65.647,65.667],["t",65.767,65.787],["delt",66.207,66.447],["med",66.487,66.587],["b",66.667,66.687],["gange",67.007,67.327],["m",67.387,67.407],["gange",67.487,67.667],["Y",67.727,67.747]],"text":"Trin to: Lewis. Sigma er F t delt med b gange m gange Y."},"naevner":{"start":68.827,"end":75.908,"words":[["Nævneren",68.867,69.187],["først",69.227,69.467],["Fyrre",70.447,70.727],["gange",70.867,71.067],["fire",71.167,71.407],["gange",71.667,71.867],["nul",71.947,72.087],["komma",72.167,72.327],["tre",72.387,72.507],["to",72.647,72.747],["Det",73.667,73.787],["er",73.867,73.947],["enoghalvtreds",74.127,74.648],["komma",74.688,74.828],["to",74.908,75.008],["kvadratmillimeter",75.128,75.908]],"text":"Nævneren først. Fyrre gange fire gange nul komma tre to. Det er enoghalvtreds komma to kvadratmillimeter."},"areal":{"start":77.128,"end":82.368,"words":[["Læs",77.168,77.408],["nævneren",77.548,77.928],["som",77.988,78.088],["et",78.108,78.188],["areal",78.228,78.568],["det",79.228,79.328],["er",79.328,79.368],["tandens",79.388,79.708],["styrke",79.788,80.208],["regnet",80.448,80.688],["om",80.728,80.828],["til",80.908,81.048],["et",81.048,81.088],["areal",81.148,81.528],["der",81.648,81.748],["bærer",81.788,82.008],["kraften",82.028,82.368]],"text":"Læs nævneren som et areal: det er tandens styrke, regnet om til et areal, der bærer kraften."},"sigma":{"start":83.628,"end":88.869,"words":[["Seksten",83.668,83.988],["hundrede",84.049,84.389],["delt",84.669,84.929],["med",84.969,85.069],["enoghalvtreds",85.189,85.709],["komma",85.749,85.909],["to",85.969,86.049],["er",86.629,86.709],["enogtredive",86.889,87.449],["komma",87.509,87.669],["to",87.729,87.829],["fem",87.989,88.389],["megapascal",88.409,88.869]],"text":"Seksten hundrede delt med enoghalvtreds komma to er enogtredive komma to fem megapascal."},"trin3":{"start":90.689,"end":99.25,"words":[["Trin",90.729,90.909],["tre",90.949,91.049],["er",91.669,91.729],["det",91.729,91.809],["rimeligt",91.849,92.149],["Almindeligt",93.229,93.709],["stål",93.749,93.989],["til",94.049,94.149],["tandhjul",94.189,94.59],["flyder",94.71,95.01],["ved",95.03,95.13],["flere",95.25,95.49],["hundrede",95.55,95.83],["megapascal",95.87,96.35],["Enogtredive",97.09,97.63],["er",97.69,97.73],["lavt",97.77,97.95],["Der",98.63,98.73],["er",98.75,98.81],["god",98.85,98.99],["margin",99.05,99.25]],"text":"Trin tre: er det rimeligt? Almindeligt stål til tandhjul flyder ved flere hundrede megapascal. Enogtredive er lavt. Der er god margin."},"men":{"start":99.81,"end":111.731,"words":[["Men",99.85,99.97],["husk",100.17,100.39],["hvad",100.41,100.55],["Lewis",100.57,100.83],["ikke",101.03,101.15],["tager",101.17,101.33],["med",101.33,101.45],["Stødene",102.13,102.57],["når",102.65,102.79],["tænderne",102.89,103.21],["går",103.25,103.37],["i",103.39,103.41],["indgreb",103.49,103.83],["ved",103.85,103.93],["høj",103.97,104.111],["hastighed",104.171,104.591],["og",105.151,105.251],["kærven",105.391,105.731],["ved",105.771,105.851],["tandroden",105.871,106.331],["De",107.171,107.231],["kan",107.271,107.371],["nemt",107.391,107.531],["gange",107.571,107.751],["spændingen",107.771,108.111],["op",108.131,108.231],["med",108.291,108.371],["to",108.411,108.511],["eller",108.611,108.751],["tre",108.771,108.911],["Derfor",109.531,109.851],["er",109.931,110.011],["en",110.051,110.131],["lav",110.231,110.411],["Lewis-spænding",110.611,111.111],["et",111.211,111.291],["godt",111.351,111.491],["tegn",111.551,111.731]],"text":"Men husk, hvad Lewis ikke tager med. Stødene, når tænderne går i indgreb ved høj hastighed, og kærven ved tandroden. De kan nemt gange spændingen op med to eller tre. Derfor er en lav Lewis-spænding et godt tegn."},"radial":{"start":113.551,"end":123.952,"words":[["Og",113.591,113.671],["trykvinklen",113.711,114.271],["på",114.351,114.532],["tyve",114.752,114.992],["grader",115.032,115.352],["giver",115.672,115.812],["også",115.832,115.992],["en",115.992,116.052],["kraft",116.092,116.352],["der",116.372,116.472],["skubber",116.492,116.732],["hjulene",116.752,117.052],["fra",117.092,117.192],["hinanden",117.272,117.592],["Den",118.032,118.172],["er",118.212,118.292],["F",118.572,118.592],["t",118.672,118.692],["gange",118.892,119.112],["tangens",119.212,119.672],["tyve",119.752,119.992],["grader",120.032,120.352],["cirka",120.772,121.012],["fem",121.192,121.472],["hundrede",121.552,121.812],["og",121.892,121.932],["firs",121.932,122.172],["newton",122.192,122.492],["Den",123.112,123.232],["skal",123.252,123.392],["lejerne",123.432,123.712],["bære",123.752,123.952]],"text":"Og trykvinklen på tyve grader giver også en kraft, der skubber hjulene fra hinanden. Den er F t gange tangens tyve grader, cirka fem hundrede og firs newton. Den skal lejerne bære."},"hvis":{"start":125.772,"end":129.612,"words":[["Trin",125.812,125.992],["fire",126.052,126.232],["hvad",126.812,126.952],["nu",126.972,127.032],["hvis",127.072,127.272],["Her",127.992,128.132],["viser",128.172,128.372],["du",128.392,128.432],["censor",128.532,128.812],["at",128.892,128.952],["du",128.972,129.032],["har",129.052,129.112],["forstået",129.132,129.512],["det",129.532,129.612]],"text":"Trin fire: hvad nu hvis? Her viser du censor, at du har forstået det."},"modul5":{"start":130.552,"end":134.833,"words":[["Med",130.592,130.692],["modul",130.772,131.092],["fem",131.272,131.432],["i",131.752,131.772],["stedet",131.812,131.992],["for",132.012,132.112],["fire",132.172,132.432],["falder",132.812,133.012],["spændingen",133.052,133.392],["til",133.452,133.592],["femogtyve",133.772,134.252],["megapascal",134.292,134.833]],"text":"Med modul fem i stedet for fire falder spændingen til femogtyve megapascal."},"smal":{"start":135.873,"end":140.033,"words":[["Gør",135.913,136.033],["du",136.053,136.093],["tanden",136.173,136.433],["halvt",136.553,136.733],["så",136.753,136.853],["bred",136.873,137.053],["tyve",137.593,137.833],["millimeter",137.873,138.253],["stiger",138.613,138.873],["den",138.893,138.973],["til",139.013,139.133],["toogtres",139.193,139.653],["komma",139.693,139.833],["fem",139.913,140.033]],"text":"Gør du tanden halvt så bred, tyve millimeter, stiger den til toogtres komma fem."},"kraft":{"start":140.953,"end":144.594,"words":[["Og",140.993,141.073],["dobbelt",141.233,141.493],["kraft",141.513,141.773],["giver",141.873,142.053],["dobbelt",142.213,142.493],["spænding",142.513,142.813],["Formlen",143.133,143.493],["er",143.553,143.613],["lineær",143.673,143.994],["i",144.294,144.314],["F",144.494,144.514],["t",144.574,144.594]],"text":"Og dobbelt kraft giver dobbelt spænding. Formlen er lineær i F t."},"antag":{"start":146.414,"end":155.255,"words":[["Sig",146.454,146.594],["antagelserne",146.694,147.234],["højt",147.294,147.534],["Hele",148.154,148.394],["kraften",148.434,148.774],["sidder",148.854,149.034],["på",149.054,149.174],["én",149.234,149.334],["tand",149.394,149.594],["helt",149.854,150.034],["ude",150.054,150.134],["i",150.134,150.154],["spidsen",150.194,150.514],["Kraften",150.954,151.314],["er",151.394,151.474],["jævnt",151.554,151.774],["fordelt",151.814,152.134],["over",152.154,152.294],["bredden",152.334,152.654],["Og",153.154,153.234],["vi",153.394,153.454],["ser",153.514,153.654],["bort",153.694,153.894],["fra",153.975,154.075],["stød",154.215,154.435],["og",154.595,154.675],["kærvvirkning",154.715,155.255]],"text":"Sig antagelserne højt. Hele kraften sidder på én tand, helt ude i spidsen. Kraften er jævnt fordelt over bredden. Og vi ser bort fra stød og kærvvirkning."},"censor":{"start":157.075,"end":172.676,"words":[["Det",157.115,157.215],["du",157.235,157.275],["siger",157.355,157.515],["til",157.535,157.635],["censor",157.675,157.935],["er",158.015,158.095],["delediameteren",158.815,159.535],["er",159.695,159.755],["firs",159.815,160.015],["millimeter",160.055,160.475],["Lewis",160.975,161.235],["giver",161.295,161.495],["sigma",161.595,161.895],["lig",162.035,162.155],["seksten",162.155,162.635],["hundrede",162.695,163.015],["over",163.095,163.275],["fyrre",163.375,163.615],["gange",163.675,163.895],["fire",164.015,164.276],["gange",164.376,164.596],["nul",164.736,164.876],["komma",164.916,165.056],["tre",165.116,165.216],["to",165.316,165.396],["altså",165.836,166.076],["enogtredive",166.256,166.756],["komma",166.796,166.956],["to",167.096,167.216],["fem",167.336,167.596],["megapascal",167.616,168.116],["Det",168.696,168.796],["er",168.796,168.836],["lavt",168.876,169.076],["for",169.116,169.196],["stål",169.236,169.476],["men",169.896,170.016],["Lewis",170.156,170.436],["er",170.536,170.616],["kun",170.636,170.776],["en",170.836,170.916],["første",170.996,171.276],["skitse",171.336,171.656],["uden",171.976,172.156],["stød",172.196,172.376],["og",172.416,172.456],["kærv",172.476,172.676]],"text":"Det, du siger til censor, er: delediameteren er firs millimeter. Lewis giver sigma lig seksten hundrede over fyrre gange fire gange nul komma tre to, altså enogtredive komma to fem megapascal. Det er lavt for stål, men Lewis er kun en første skitse uden stød og kærv."},"tjek_q":{"start":174.496,"end":179.037,"words":[["Tjek",174.536,174.697],["dig",174.717,174.797],["selv",174.837,174.997],["Spændingen",175.577,175.937],["må",175.937,176.017],["højst",176.057,176.277],["være",176.317,176.477],["tyve",176.477,176.937],["megapascal",177.017,177.537],["Hvor",177.977,178.097],["bred",178.117,178.297],["skal",178.357,178.477],["tanden",178.497,178.737],["så",178.757,178.857],["være",178.877,179.037]],"text":"Tjek dig selv. Spændingen må højst være tyve megapascal. Hvor bred skal tanden så være?"},"tjek_a":{"start":182.657,"end":191.238,"words":[["Bredden",182.697,183.017],["er",183.097,183.177],["F",183.477,183.497],["t",183.597,183.617],["over",183.837,184.037],["sigma",184.277,184.537],["gange",184.637,184.997],["m",185.057,185.077],["gange",185.137,185.337],["Y",185.397,185.417],["Seksten",185.957,186.277],["hundrede",186.317,186.597],["over",186.697,186.858],["tyve",186.998,187.298],["gange",187.338,187.538],["fire",187.618,187.838],["gange",187.918,188.138],["nul",188.318,188.458],["komma",188.478,188.618],["tre",188.678,188.778],["to",188.878,188.958],["Det",189.418,189.518],["giver",189.558,189.718],["toogtres",189.858,190.338],["komma",190.438,190.598],["fem",190.678,190.878],["millimeter",190.898,191.238]],"text":"Bredden er F t over sigma gange m gange Y. Seksten hundrede over tyve gange fire gange nul komma tre to. Det giver toogtres komma fem millimeter."},"slut":{"start":193.058,"end":201.759,"words":[["Kort",193.098,193.278],["sagt",193.318,193.498],["delediameteren",193.938,194.618],["er",194.678,194.738],["firs",194.818,195.038],["millimeter",195.078,195.458],["og",195.798,195.858],["Lewis",195.918,196.178],["giver",196.238,196.398],["enogtredive",196.618,197.098],["komma",197.158,197.319],["to",197.419,197.499],["fem",197.639,197.759],["megapascal",197.819,198.359],["i",198.479,198.499],["tandroden",198.559,199.019],["Lavt",199.579,199.759],["for",199.799,199.879],["stål",199.899,200.139],["men",200.519,200.639],["husk",200.799,201.059],["stød",201.159,201.359],["og",201.459,201.519],["kærv",201.559,201.759]],"text":"Kort sagt: delediameteren er firs millimeter, og Lewis giver enogtredive komma to fem megapascal i tandroden. Lavt for stål, men husk stød og kærv."}}}, { audio: 'eks-spm5-b.mp3', id: 'eks-spm5-b' });</script>
+</body>
+</html>

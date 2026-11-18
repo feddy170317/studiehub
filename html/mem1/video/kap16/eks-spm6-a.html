@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spm. 6a: kraftskruer forklaret fra bunden · video</title>
+<meta name="description" content="Ny liste, spm. 6a forklaret fra bunden: gevind som rampe, tan λ = l/(πd_m), momentet, selvlåsning μ &gt; tan λ, η &lt; 50 %.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 16: videoer</a><h1>Spm. 6a: kraftskruer forklaret fra bunden</h1><span class="meta">MEM1 · kapitel 16 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Spm. 6a: kraftskruer forklaret fra bunden"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Ny liste, spm. 6a forklaret fra bunden: gevind som rampe, tan λ = l/(πd_m), momentet, selvlåsning μ &gt; tan λ, η &lt; 50 %.</p><div class="chips"><a href="../../opgaver/l16/tidligere-eksamen-spm-12-kraftskrue.pdf">📐 Se udregningen i Mathcad (PDF)</a><a href="kraftskrue.html">Se først: Bevægelsesskruer</a><a href="../../../../lab/mem1/kraftskrue.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel16_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l16">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// MEM1 mundtlig eksamen (ny liste) · Spm. 6a v2: kraftskruer forklaret fra bunden.
+// Saksedonkraft/skruestik/drejebænk/kontorstol → papirtrekant om blyant = gevind er en rampe → tan λ = l/(π d_m) (16.3)
+// → kasse op ad rampe med friktion → T = W d_m/2 · (l + π μ d_m)/(π d_m − μ l) (16.10 uden krave) → selvlåsning μ > tan λ (16.15)
+// → pris: selvlåsende ⇒ η < 50 % (16.14), kugleskrue.
+BP.scene({ header: 'MEM1 · mundtlig eksamen · spm. 6a', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, dot, ring, under, ell, rect, hatch, dashed, PI } = B;
+  const S = (id) => L(id).start;
+  const ringet = (k, s, x, y, size, col, a, te) => { const r = text(k, s, x, y, size, col, a, te); ring(r, col, te, te + 0.5); return r; };
+  const stykker = (k, x, y, dele, size) => { let xx = x; return dele.map(([s, col, ta, tb]) => { const it = text(k, s, xx, y, size, col, ta, tb); xx = B.endX(it, 10); return it; }); };
+  const rampe = (k, x0, y0, w, h, col, a, b) => { line(k, [[x0, y0], [x0 + w, y0], [x0 + w, y0 - h], [x0, y0]], col, 3.6, a, b); };
+  const kasseP = (k, x0, y0, w, h, s, col, a) => {   // kasse på rampen ved brøkdel s
+    const v = Math.atan2(h, w), cx = x0 + s * w, cy = y0 - s * h, c = Math.cos(v), sn = Math.sin(v), q = 50;
+    const P = (u, n) => [cx + u * c + n * sn, cy - u * sn + n * c];
+    line(k, [P(-q, 0), P(q, 0), P(q, -2 * q * 0.8), P(-q, -2 * q * 0.8), P(-q, 0)], col, 3.4, a, a + 0.4);
+    return { P, c, sn };
+  };
+
+  // ---------------------------------------------------------------- 0 titel
+  B.titel(0, 'Spm. 6a: kraftskruer', 'moment og selvlåsning · forklaret fra bunden', 'titel');
+
+  // ---------------------------------------------------------------- 1 kraftskruer i hverdagen
+  B.goto('hvor', 1);
+  bubble(1, 'Drejning bliver til skub', 130, 135, 50, 'blue', S('hvor') - 0.1, S('hvor') + 0.9);
+  text(1, 'donkraft · skruestik · drejebænk · kontorstol', 170, 215, 30, 'black', wt('hvor', 'saksedonkraft') - 0.1, we('hvor', 'hæves'));
+  {
+    const td = wt('donkraft', 'donkraften'), cx = 470, y0 = 600;
+    line(1, [[300, y0], [640, y0]], 'black', 4, td - 0.2, td + 0.2);
+    line(1, [[340, y0 - 10], [cx, 470], [600, y0 - 10]], 'black', 4, td, td + 0.4);
+    line(1, [[340, 340], [cx, 470], [600, 340]], 'black', 4, td + 0.1, td + 0.5);
+    line(1, [[320, 340], [620, 340]], 'black', 5, td + 0.3, td + 0.6);
+    const th = wt('donkraft', 'håndtaget');
+    line(1, [[cx - 140, 470], [cx + 220, 470]], 'blue', 5, th - 0.2, th + 0.2);
+    line(1, ell(cx + 250, 470, 30, 30, -PI / 2, PI), 'blue', 3.4, th, th + 0.4);
+    arrow(1, ell(cx + 250, 470, 30, 30, PI * 0.7, PI), 'blue', 3.4, th + 0.2, th + 0.4, 12);
+    const tb = wt('donkraft', 'løfter');
+    line(1, rect(300, 250, 340, 70).concat([[300, 250]]), 'red', 3.4, tb - 0.2, tb + 0.3);
+    text(1, 'bil', 470, 300, 30, 'red', tb, tb + 0.3, { align: 'center' });
+    arrow(1, [[680, 320], [680, 250]], 'red', 4, tb, tb + 0.4, 14);
+  }
+  ringet(1, '1.  moment for at løfte', 740, 360, 30, 'blue', wt('donkraft', 'drejer') - 0.1, we('donkraft', 'sig'));
+  ringet(1, '2.  bliver stående: selvlåsning', 740, 450, 30, 'red', wt('donkraft', 'slipper') - 0.1, we('donkraft', 'stående'));
+
+  // ---------------------------------------------------------------- 2 gevindet er en rampe
+  B.goto('rampe', 2);
+  bubble(2, 'Gevindet er en rampe', 130, 135, 50, 'blue', S('rampe') - 0.1, S('rampe') + 0.9);
+  {
+    const tp = wt('rampe', 'trekant');
+    rampe(2, 170, 400, 300, 110, 'black', tp - 0.1, tp + 0.5);
+    text(2, 'papirtrekant', 200, 440, 28, 'black', tp, tp + 0.5);
+    const tb = wt('rampe', 'blyant');
+    line(2, rect(620, 240, 60, 200).concat([[620, 240]]), 'black', 3.4, tb - 0.2, tb + 0.2);
+    const hx = []; for (let i = 0; i <= 80; i++) { const s = i / 80; hx.push([650 + 30 * Math.sin(2 * PI * 3 * s), 430 - 180 * s]); }
+    line(2, hx, 'red', 3.4, tb, tb + 0.9);
+    text(2, 'skråkanten = gevind', 560, 490, 28, 'red', wt('rampe', 'Skråkanten') - 0.1, we('rampe', 'gevind'));
+    text(2, 'at dreje = at skubbe op ad en rampe', 720, 250, 28, 'blue', wt('rampe2', 'dreje') - 0.1, we('rampe2', 'rampe'));
+  }
+  {
+    const tr = wt('lambda', 'ud'), x0 = 200, y0 = 650, w = 470, h = 100;
+    rampe(2, x0, y0, w, h, 'blue', tr - 0.1, tr + 0.5);
+    B.dobbeltpil(2, [x0, y0 + 20], [x0 + w, y0 + 20], 'black', wt('lambda', 'omkredsen') - 0.2, wt('lambda', 'omkredsen') + 0.3);
+    text(2, 'π d_m (én omgang)', x0 + w / 2, y0 + 56, 26, 'black', wt('lambda', 'omkredsen') - 0.1, wt('lambda', 'omkredsen') + 0.5, { align: 'center' });
+    text(2, 'l', x0 + w + 16, y0 - 40, 30, 'green', wt('lambda', 'stigningen') - 0.1, wt('lambda', 'stigningen') + 0.3);
+    text(2, 'λ', x0 + 80, y0 - 8, 30, 'red', wt('lambda', 'stigningsvinklen') - 0.1, wt('lambda', 'stigningsvinklen') + 0.3);
+    B.formel(2, '16.3', 'tan λ = l / (π d_m)', 760, 600, 36, wt('lambda', 'tangens') - 0.1, we('lambda', 'tre'), 'red');
+  }
+
+  // ---------------------------------------------------------------- 3 kasse på rampen: løft + friktion
+  B.goto('trinv', 3);
+  bubble(3, 'Op ad rampen', 130, 135, 50, 'blue', S('trinv') - 0.1, S('trinv') + 0.7);
+  text(3, 'l: hvor langt lasten flytter på én omgang', 170, 220, 30, 'green', wt('trinv', 'Stigningen') - 0.1, we('trinv', 'omgang'));
+  text(3, 'd_m: middeldiameter, midt i gevindet', 170, 270, 30, 'black', wt('trinv', 'Middeldiameteren') - 0.1, we('trinv', 'gevindet'));
+  {
+    const tk = wt('friktion', 'kasse'), x0 = 200, y0 = 620, w = 620, h = 200;
+    rampe(3, x0, y0, w, h, 'black', tk - 0.3, tk + 0.2);
+    const K = kasseP(3, x0, y0, w, h, 0.5, 'blue', tk);
+    const tl = wt('friktion', 'løfte'), tf = wt('friktion', 'friktionen');
+    arrow(3, [K.P(-140, -40), K.P(-60, -40)], 'red', 4, tl - 0.3, tl + 0.2, 14);
+    text(3, 'skub', K.P(-150, -60)[0] - 30, K.P(-150, -60)[1], 28, 'red', tl - 0.2, tl + 0.3);
+    arrow(3, [K.P(60, 4), K.P(140, 4)], 'green', 3.4, tf - 0.1, tf + 0.3, 12);
+    text(3, 'friktion μ', K.P(150, 20)[0], K.P(150, 20)[1] + 20, 28, 'green', tf, we('friktion', 'gnider'));
+    text(3, 'løft + friktion: begge koster kraft', 170, 680, 30, 'black', wt('friktion', 'Begge') - 0.6, we('friktion', 'kraft'));
+  }
+
+  // ---------------------------------------------------------------- 4 momentformlen
+  B.goto('formel', 4);
+  bubble(4, 'Momentet til at løfte', 130, 135, 50, 'blue', S('formel') - 0.1, S('formel') + 0.9);
+  {
+    const t1 = wt('formel', 'T');
+    const [pA, pB, pC] = stykker(4, 170, 290, [
+      ['T = W d_m / 2', 'red', t1 - 0.1, we('formel', 'to')],
+      ['· (l + π μ d_m)', 'red', wt('formel', 'gange') - 0.1, we('formel', 'm', 1)],
+      ['/ (π d_m − μ l)', 'red', wt('formel', 'divideret') - 0.1, we('formel', 'l', 1)],
+    ], 40);
+    text(4, '(16.10)', B.endX(pC, 20), 290, 24, 'black', we('formel', 'ti') - 0.3, we('formel', 'kravefriktion'));
+    const ts = wt('saetning', 'gange');
+    under(pA, 'blue', ts - 0.4, ts);
+    text(4, 'last × arm', pA.lx + pA.x0, 350, 28, 'blue', ts - 0.2, ts + 0.4);
+    const tt = wt('taeller', 'tælleren');
+    under(pB, 'green', tt, tt + 0.4);
+    text(4, 'løft + friktion', pB.lx + pB.x0, 350, 28, 'green', tt + 0.1, we('taeller', 'gnidning'));
+    const tn = wt('naevner', 'Nævneren');
+    under(pC, 'black', tn, tn + 0.4);
+    text(4, 'omkreds − lidt', pC.lx + pC.x0, 350, 28, 'black', tn + 0.1, we('naevner', 'friktionsled'));
+  }
+  text(4, 'uden friktion:  brøken = l / (π d_m) = rampens hældning', 170, 470, 32, 'black', wt('naevner', 'Uden') - 0.1, we('naevner', 'hældning'));
+  ringet(4, 'T_0 = W l / (2π):  arbejde ind = arbejde ud', 170, 560, 36, 'blue', wt('naevner', 'momentet') - 0.1, we('naevner', 'ud'));
+
+  // ---------------------------------------------------------------- 5 selvlåsning
+  B.goto('selv', 5);
+  bubble(5, 'Selvlåsning', 130, 135, 50, 'blue', S('selv') - 0.1, S('selv') + 0.7);
+  {
+    const ts = wt('selv', 'stejl');
+    rampe(5, 170, 470, 260, 220, 'black', ts - 0.2, ts + 0.3);
+    kasseP(5, 170, 470, 260, 220, 0.6, 'red', ts);
+    arrow(5, [[310, 300], [230, 380]], 'red', 3.4, ts + 0.3, ts + 0.7, 12);
+    text(5, 'stejl og glat: glider ned', 150, 530, 28, 'red', ts, we('selv', 'ned'));
+    const tf = wt('selv', 'flad');
+    rampe(5, 620, 470, 440, 80, 'black', tf - 0.2, tf + 0.3);
+    kasseP(5, 620, 470, 440, 80, 0.5, 'green', tf);
+    text(5, 'flad og ru: bliver liggende', 640, 530, 28, 'green', tf, we('selv', 'liggende'));
+  }
+  B.formel(5, '16.15', 'selvlåsende:  μ > tan λ', 190, 630, 42, wt('betingelse', 'Betingelsen') - 0.1, we('betingelse', 'femten'), 'red');
+  text(5, 'donkraften holder bilen', 840, 640, 30, 'blue', wt('donkraft2', 'bilen') - 0.4, we('donkraft2', 'holder'));
+
+  // ---------------------------------------------------------------- 6 prisen: virkningsgrad
+  B.goto('pris', 6);
+  bubble(6, 'Prisen for selvlåsning', 130, 135, 50, 'blue', S('pris') - 0.1, S('pris') + 0.9);
+  text(6, 'friktionen, der holder, skal også overvindes ved løft', 170, 220, 28, 'black', wt('pris', 'friktion') - 0.1, we('pris', 'løfter'));
+  B.formel(6, '16.14', 'η = W l / (2π T)', 190, 310, 38, wt('pris', 'virkningsgrad') - 0.3, wt('pris', 'virkningsgrad') + 0.6, 'blue');
+  {
+    const t5 = wt('pris', 'halvtreds'), x0 = 200, y = 400, w = 800;
+    line(6, rect(x0, y, w, 40).concat([[x0, y]]), 'black', 3, t5 - 0.6, t5 - 0.2);
+    line(6, [[x0 + w / 2, y - 16], [x0 + w / 2, y + 56]], 'red', 4, t5 - 0.1, t5 + 0.2);
+    text(6, '50 %', x0 + w / 2, y + 88, 28, 'red', t5, t5 + 0.3, { align: 'center' });
+    hatch(6, rect(x0, y, w * 0.44, 40), 'green', t5 + 0.1, t5 + 0.5, { gap: 10 });
+    text(6, 'selvlåsende: η < 50 %', x0, y - 18, 28, 'green', t5 + 0.2, t5 + 0.6);
+  }
+  {
+    const tk = wt('kugle', 'kugleskrue');
+    for (let i = 0; i < 6; i++) line(6, ell(260 + i * 60, 590, 24, 24, 0, 2 * PI), 'blue', 3, tk - 0.2 + i * 0.05, tk + 0.1 + i * 0.05);
+    text(6, 'kugleskrue: η høj, men ikke selvlåsende ⇒ bremse', 170, 660, 28, 'blue', tk, we('kugle', 'bremse'));
+  }
+
+  // ---------------------------------------------------------------- 7 sådan siger du det + 15 minutter
+  B.goto('censor', 7);
+  bubble(7, 'Sådan siger du det', 130, 135, 50, 'blue', S('censor') - 0.1, S('censor') + 0.9);
+  text(7, '1.  papirtrekanten: gevindet er en rampe', 170, 220, 32, 'black', wt('censor', 'papirtrekanten') - 0.1, we('censor', 'rampe'));
+  text(7, '2.  formlen: tælleren = løft + friktion', 170, 275, 32, 'black', wt('censor', 'formlen') - 0.1, we('censor', 'friktion'));
+  text(7, '3.  tan λ = l / (π d_m)', 170, 330, 32, 'red', wt('censor', 'stigningsvinklen') - 0.1, we('censor', 'm'));
+  text(7, '4.  kassen på rampen: μ > tan λ', 170, 385, 32, 'black', wt('censor', 'kassen') - 0.1, we('censor', 'lambda', 1));
+  {
+    const x0 = 170, x1 = 1110, y = 470, hh = 56, m = (x1 - x0) / 15;
+    const seg = [[0, 7, 'blue', 'del a', wt('tavle', 'syv')], [7, 13, 'red', 'del b', wt('tavle', 'seks')], [13, 15, 'green', 'vurdér', wt('tavle', 'to', 0)]];
+    seg.forEach(([a, b2, col, et, t]) => {
+      line(7, rect(x0 + a * m, y, (b2 - a) * m, hh).concat([[x0 + a * m, y]]), col, 3, t - 0.1, t + 0.4);
+      hatch(7, rect(x0 + a * m, y, (b2 - a) * m, hh), col, t + 0.2, t + 0.7, { gap: 12 });
+      text(7, et, x0 + (a + b2) / 2 * m, y + hh + 40, 30, col, t, t + 0.4, { align: 'center' });
+      text(7, a + '', x0 + a * m, y - 12, 24, 'black', t, t + 0.3, { align: 'center' });
+    });
+    text(7, '15 min', x1, y - 12, 24, 'black', wt('tavle', 'to', 0), wt('tavle', 'to', 0) + 0.3, { align: 'center' });
+  }
+
+  // ---------------------------------------------------------------- 8 tjek
+  B.goto('tjek_q', 8);
+  B.tjek(8, ['Du smører skruen,', 'så friktionen halveres. Hvad sker der?'], ['lettere at dreje, men …', 'μ < tan λ  ⇒  lasten glider ned selv'], 'tjek_q', 'tjek_a');
+  {
+    const t1 = wt('tjek_a', 'mindre'), x0 = 300, x1 = 1000, y = 620, P = (v) => x0 + v / 0.12 * (x1 - x0);
+    line(8, [[x0, y], [x1, y]], 'black', 3, t1 - 0.4, t1);
+    line(8, [[P(0.08), y - 22], [P(0.08), y + 22]], 'red', 4, t1 - 0.2, t1);
+    text(8, 'tan λ', P(0.08), y + 50, 26, 'red', t1 - 0.2, t1 + 0.2, { align: 'center' });
+    dot(8, P(0.1), y, 10, 'green', t1 - 0.1); text(8, 'μ før', P(0.1), y - 26, 26, 'green', t1 - 0.1, t1 + 0.2, { align: 'center' });
+    dot(8, P(0.05), y, 10, 'red', t1 + 0.2); text(8, 'μ smurt', P(0.05), y - 26, 26, 'red', t1 + 0.2, t1 + 0.5, { align: 'center' });
+  }
+
+  // ---------------------------------------------------------------- 9 slut
+  B.goto('slut', 9);
+  B.slut(9, 'MEM1 mundtlig eksamen, ny liste, spm. 6 · Hamrock m.fl., kap. 16, lign. (16.3), (16.10), (16.14), (16.15) · slides kap. 16', 'spm. 6b: hvor hårdt skal du dreje?', 'slut');
+  text(9, 'gevind = rampe rundt om en stang', 200, 240, 34, 'black', wt('slut', 'rampe') - 0.3, we('slut', 'stang'));
+  text(9, 'momentet dækker løft + friktion', 200, 310, 34, 'red', wt('slut', 'Momentet') - 0.1, we('slut', 'friktion'));
+  text(9, 'selvlåsende når μ > tan λ', 200, 380, 34, 'blue', wt('slut', 'selvlåsende') - 0.1, we('slut', 'lambda'));
+});
+
+</script>
+<script>BP.live({"duration":245.22,"audio":"eks-spm6-a.mp3","order":["titel","hvor","donkraft","rampe","rampe2","lambda","trinv","friktion","formel","saetning","taeller","naevner","selv","betingelse","donkraft2","pris","kugle","censor","tavle","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":10.161,"words":[["Spørgsmål",0.54,1.0],["seks",1.14,1.44],["del",1.78,2.0],["a",2.26,2.28],["Kraftskruer",3.32,4.0],["moment",4.36,4.76],["og",5.06,5.16],["selvlåsning",5.5,6.121],["Vi",7.301,7.361],["starter",7.421,7.701],["med",7.721,7.801],["hverdagen",7.801,8.321],["og",8.461,8.541],["formlerne",8.601,9.041],["kommer",9.121,9.421],["bagefter",9.741,10.161]],"text":"Spørgsmål seks, del a. Kraftskruer, moment og selvlåsning. Vi starter med hverdagen, og formlerne kommer bagefter."},"hvor":{"start":11.981,"end":23.622,"words":[["En",12.021,12.121],["kraftskrue",12.161,12.761],["laver",12.941,13.221],["drejning",13.501,13.941],["om",14.081,14.181],["til",14.321,14.481],["et",14.581,14.661],["stort",14.821,15.081],["skub",15.141,15.381],["En",16.521,16.621],["saksedonkraft",16.761,17.541],["til",17.581,17.681],["bilen",17.721,18.081],["En",18.582,18.662],["skruestik",18.702,19.262],["på",19.302,19.402],["værkstedet",19.442,20.022],["Spindlen",20.482,20.942],["i",20.982,21.002],["en",21.082,21.142],["drejebænk",21.222,21.802],["Og",22.022,22.082],["en",22.122,22.182],["kontorstol",22.302,22.942],["der",22.982,23.062],["kan",23.102,23.202],["hæves",23.242,23.622]],"text":"En kraftskrue laver drejning om til et stort skub. En saksedonkraft til bilen. En skruestik på værkstedet. Spindlen i en drejebænk. Og en kontorstol, der kan hæves."},"donkraft":{"start":24.802,"end":35.183,"words":[["Tænk",24.842,25.022],["på",25.062,25.162],["donkraften",25.182,25.702],["Du",26.222,26.282],["drejer",26.342,26.662],["på",26.722,26.822],["håndtaget",26.842,27.342],["med",27.502,27.602],["én",27.682,27.802],["hånd",27.882,28.082],["og",28.582,28.642],["bilen",28.682,28.942],["løfter",29.002,29.262],["sig",29.302,29.402],["Og",30.523,30.583],["når",30.603,30.723],["du",30.743,30.783],["slipper",30.843,31.143],["bliver",31.503,31.663],["bilen",31.683,31.943],["stående",32.003,32.343],["Det",33.423,33.523],["er",33.523,33.583],["de",33.583,33.643],["to",33.703,33.803],["ting",33.923,34.123],["spørgsmålet",34.323,34.803],["handler",34.843,35.083],["om",35.103,35.183]],"text":"Tænk på donkraften. Du drejer på håndtaget med én hånd, og bilen løfter sig. Og når du slipper, bliver bilen stående. Det er de to ting, spørgsmålet handler om."},"rampe":{"start":37.003,"end":48.164,"words":[["Først",37.043,37.263],["et",37.303,37.363],["trick",37.403,37.623],["Et",38.543,38.623],["gevind",38.663,38.963],["er",39.243,39.323],["bare",39.403,39.603],["en",39.703,39.803],["rampe",39.883,40.203],["der",40.343,40.483],["er",40.583,40.663],["viklet",40.723,41.023],["rundt",41.063,41.283],["om",41.343,41.423],["en",41.463,41.543],["stang",41.583,41.823],["Klip",42.704,42.924],["en",42.944,43.044],["trekant",43.144,43.524],["ud",43.564,43.644],["af",43.684,43.724],["papir",43.764,44.064],["og",44.584,44.644],["rul",44.684,44.804],["den",44.864,45.004],["om",45.144,45.224],["en",45.244,45.324],["blyant",45.364,45.744],["Skråkanten",46.544,47.124],["bliver",47.344,47.564],["til",47.644,47.764],["et",47.804,47.864],["gevind",47.904,48.164]],"text":"Først et trick. Et gevind er bare en rampe, der er viklet rundt om en stang. Klip en trekant ud af papir, og rul den om en blyant. Skråkanten bliver til et gevind."},"rampe2":{"start":49.484,"end":54.345,"words":[["At",49.524,49.584],["dreje",49.624,49.864],["skruen",49.904,50.324],["er",50.444,50.524],["altså",50.604,50.824],["det",50.844,50.924],["samme",50.964,51.164],["som",51.244,51.344],["at",51.364,51.424],["skubbe",51.444,51.704],["lasten",51.764,52.064],["op",52.144,52.244],["ad",52.284,52.324],["en",52.324,52.384],["rampe",52.444,52.724],["Bare",53.124,53.324],["hele",53.704,53.884],["tiden",53.924,54.104],["rundt",54.144,54.345]],"text":"At dreje skruen er altså det samme som at skubbe lasten op ad en rampe. Bare hele tiden rundt."},"lambda":{"start":55.565,"end":72.746,"words":[["Rampens",55.605,56.025],["hældning",56.065,56.425],["hedder",56.525,56.765],["stigningsvinklen",56.925,57.765],["lambda",58.025,58.325],["Rul",59.465,59.605],["rampen",59.645,59.945],["ud",60.045,60.165],["på",60.865,61.005],["én",61.125,61.265],["omgang",61.405,61.785],["kommer",62.065,62.285],["du",62.305,62.345],["stigningen",62.425,62.905],["l",63.185,63.205],["op",63.545,63.665],["og",64.265,64.325],["du",64.365,64.425],["går",64.465,64.605],["omkredsen",64.845,65.385],["pi",65.525,65.665],["d",65.865,65.885],["m",66.226,66.246],["hen",66.486,66.646],["Derfor",67.566,67.906],["er",68.026,68.126],["tangens",68.246,68.666],["lambda",68.746,69.026],["lig",69.406,69.566],["l",69.866,69.886],["over",70.106,70.346],["pi",70.466,70.586],["d",70.826,70.846],["m",71.206,71.226],["ligning",71.746,72.026],["seksten",72.226,72.586],["tre",72.626,72.746]],"text":"Rampens hældning hedder stigningsvinklen lambda. Rul rampen ud: på én omgang kommer du stigningen l op, og du går omkredsen pi d m hen. Derfor er tangens lambda lig l over pi d m, ligning seksten tre."},"trinv":{"start":74.566,"end":81.927,"words":[["Stigningen",74.606,75.066],["l",75.326,75.346],["er",75.686,75.786],["hvor",75.826,75.926],["langt",75.966,76.146],["lasten",76.206,76.486],["flytter",76.546,76.786],["sig",76.826,76.946],["på",77.066,77.206],["én",77.306,77.426],["omgang",77.486,77.826],["Middeldiameteren",78.447,79.227],["d",79.407,79.427],["m",79.747,79.767],["er",80.227,80.307],["diameteren",80.407,80.987],["midt",81.227,81.367],["i",81.507,81.527],["gevindet",81.587,81.927]],"text":"Stigningen l er, hvor langt lasten flytter sig på én omgang. Middeldiameteren d m er diameteren midt i gevindet."},"friktion":{"start":83.247,"end":93.028,"words":[["Skubber",83.287,83.527],["du",83.547,83.587],["en",83.647,83.727],["kasse",83.747,84.067],["op",84.187,84.287],["ad",84.327,84.367],["en",84.367,84.447],["rampe",84.487,84.767],["skal",84.947,85.087],["du",85.107,85.147],["løfte",85.207,85.467],["den",85.507,85.607],["og",85.987,86.047],["overvinde",86.127,86.547],["friktionen",86.607,87.087],["Begge",87.807,88.027],["dele",88.067,88.307],["koster",88.327,88.607],["kraft",88.647,88.907],["Friktionskoefficienten",89.867,91.028],["mu",91.288,91.368],["siger",91.928,92.208],["hvor",92.328,92.448],["meget",92.468,92.648],["det",92.668,92.728],["gnider",92.748,93.028]],"text":"Skubber du en kasse op ad en rampe, skal du løfte den og overvinde friktionen. Begge dele koster kraft. Friktionskoefficienten mu siger, hvor meget det gnider."},"formel":{"start":94.848,"end":109.289,"words":[["Det",94.888,94.988],["giver",95.028,95.228],["momentet",95.448,95.928],["der",95.988,96.068],["skal",96.088,96.208],["til",96.228,96.388],["for",96.428,96.548],["at",96.548,96.608],["løfte",96.648,96.928],["lasten",96.988,97.368],["W",97.768,97.788],["T",98.448,98.468],["er",98.868,98.948],["W",99.388,99.408],["d",99.608,99.628],["m",99.928,99.968],["over",100.188,100.348],["to",100.428,100.548],["gange",101.028,101.508],["l",101.588,101.608],["plus",101.788,102.008],["pi",102.128,102.228],["mu",102.408,102.488],["d",102.629,102.649],["m",102.969,102.989],["divideret",103.469,103.889],["med",103.989,104.109],["pi",104.289,104.409],["d",104.529,104.549],["m",104.829,104.849],["minus",105.089,105.369],["mu",105.489,105.549],["l",105.829,105.849],["Bogens",106.269,106.569],["ligning",106.629,106.949],["seksten",107.149,107.529],["ti",107.629,107.729],["uden",108.229,108.509],["kravefriktion",108.649,109.289]],"text":"Det giver momentet, der skal til for at løfte lasten W. T er W d m over to, gange l plus pi mu d m, divideret med pi d m minus mu l. Bogens ligning seksten ti, uden kravefriktion."},"saetning":{"start":110.509,"end":118.89,"words":[["Læs",110.549,110.769],["den",110.809,110.929],["som",111.029,111.169],["en",111.249,111.329],["sætning",111.469,111.809],["W",112.729,112.749],["gange",112.949,113.169],["d",113.209,113.229],["m",113.489,113.509],["over",113.549,113.709],["to",113.769,113.889],["er",114.21,114.27],["lasten",114.33,114.71],["ganget",115.09,115.37],["med",115.39,115.47],["armen",115.57,115.79],["ud",116.01,116.09],["til",116.15,116.27],["gevindet",116.29,116.61],["Brøken",117.35,117.69],["er",117.85,117.91],["rampen",117.97,118.29],["med",118.41,118.51],["friktion",118.53,118.89]],"text":"Læs den som en sætning. W gange d m over to er lasten ganget med armen ud til gevindet. Brøken er rampen med friktion."},"taeller":{"start":119.71,"end":126.971,"words":[["I",119.75,119.77],["tælleren",119.85,120.27],["lægges",120.35,120.65],["l",120.93,120.95],["som",121.23,121.33],["er",121.35,121.39],["løftet",121.43,121.75],["og",122.15,122.23],["pi",122.43,122.53],["mu",122.73,122.79],["d",122.95,122.97],["m",123.27,123.29],["som",123.57,123.69],["er",123.71,123.77],["friktionen",123.79,124.29],["sammen",124.67,124.97],["Både",125.59,125.75],["løft",125.81,126.031],["og",126.171,126.231],["gnidning",126.251,126.591],["koster",126.631,126.971]],"text":"I tælleren lægges l, som er løftet, og pi mu d m, som er friktionen, sammen. Både løft og gnidning koster."},"naevner":{"start":127.691,"end":142.072,"words":[["Nævneren",127.731,128.151],["er",128.331,128.411],["omkredsen",128.491,129.031],["minus",129.271,129.591],["et",129.731,129.851],["lille",129.931,130.151],["friktionsled",130.331,130.911],["Uden",131.911,132.111],["friktion",132.151,132.531],["bliver",132.591,132.751],["brøken",132.791,133.131],["bare",133.191,133.411],["l",133.751,133.771],["over",133.931,134.091],["pi",134.151,134.251],["d",134.331,134.351],["m",134.611,134.631],["rampens",135.071,135.451],["hældning",135.491,135.811],["Så",136.711,136.811],["er",136.851,136.891],["momentet",136.931,137.291],["W",137.652,137.672],["l",137.952,137.972],["over",138.112,138.292],["to",138.352,138.472],["pi",138.592,138.692],["ren",139.192,139.352],["energi",139.412,139.652],["arbejdet",140.232,140.592],["ind",140.672,140.792],["er",141.132,141.192],["lig",141.232,141.332],["arbejdet",141.532,141.892],["ud",141.972,142.072]],"text":"Nævneren er omkredsen minus et lille friktionsled. Uden friktion bliver brøken bare l over pi d m, rampens hældning. Så er momentet W l over to pi, ren energi: arbejdet ind er lig arbejdet ud."},"selv":{"start":143.892,"end":152.413,"words":[["Nu",143.932,144.012],["selvlåsning",144.412,144.992],["Læg",145.832,145.972],["en",145.972,146.032],["kasse",146.072,146.412],["på",146.472,146.572],["en",146.572,146.632],["rampe",146.692,146.952],["og",147.072,147.132],["giv",147.172,147.272],["slip",147.292,147.472],["Er",147.992,148.052],["rampen",148.092,148.372],["stejl",148.452,148.752],["og",148.772,148.832],["glat",148.872,149.052],["glider",149.312,149.512],["kassen",149.552,149.832],["ned",149.872,150.013],["Er",150.013,150.613],["rampen",150.633,150.893],["flad",150.953,151.173],["og",151.353,151.413],["ru",151.473,151.553],["bliver",151.873,152.013],["den",152.013,152.093],["liggende",152.133,152.413]],"text":"Nu selvlåsning. Læg en kasse på en rampe, og giv slip. Er rampen stejl og glat, glider kassen ned. Er rampen flad og ru, bliver den liggende."},"betingelse":{"start":153.113,"end":163.914,"words":[["Det",153.153,153.253],["samme",153.333,153.553],["med",153.733,153.813],["skruen",153.833,154.173],["Er",154.813,154.873],["friktionen",154.893,155.313],["større",155.393,155.673],["end",155.733,155.793],["rampens",155.833,156.153],["hældning",156.173,156.473],["kan",156.713,156.813],["lasten",156.833,157.133],["ikke",157.233,157.393],["selv",157.493,157.693],["dreje",157.793,158.013],["skruen",158.033,158.313],["tilbage",158.333,158.653],["Betingelsen",159.233,159.753],["er",159.833,159.913],["mu",160.353,160.453],["større",160.853,161.213],["end",161.353,161.453],["tangens",161.513,161.994],["lambda",162.154,162.434],["ligning",162.854,163.114],["seksten",163.254,163.554],["femten",163.614,163.914]],"text":"Det samme med skruen. Er friktionen større end rampens hældning, kan lasten ikke selv dreje skruen tilbage. Betingelsen er mu større end tangens lambda, ligning seksten femten."},"donkraft2":{"start":164.774,"end":170.154,"words":[["Derfor",164.814,165.034],["bliver",165.034,165.174],["bilen",165.194,165.434],["stående",165.494,165.794],["på",165.814,165.894],["donkraften",165.894,166.454],["Gevindet",166.834,167.134],["er",167.154,167.214],["fladt",167.274,167.474],["og",167.754,167.794],["friktionen",167.834,168.234],["holder",168.294,168.554],["Det",169.174,169.254],["er",169.254,169.294],["en",169.294,169.354],["vigtig",169.434,169.734],["sikkerhed",169.794,170.154]],"text":"Derfor bliver bilen stående på donkraften. Gevindet er fladt, og friktionen holder. Det er en vigtig sikkerhed."},"pris":{"start":171.974,"end":180.555,"words":[["Men",172.014,172.114],["der",172.114,172.194],["er",172.214,172.274],["en",172.274,172.334],["pris",172.374,172.654],["Den",173.354,173.474],["friktion",173.534,173.894],["der",173.954,174.034],["holder",174.074,174.295],["lasten",174.335,174.675],["skal",174.855,174.975],["du",174.975,175.035],["også",175.075,175.235],["overvinde",175.295,175.735],["når",175.755,175.875],["du",175.875,175.935],["løfter",175.995,176.295],["En",177.075,177.155],["selvlåsende",177.215,177.695],["skrue",177.755,178.095],["har",178.175,178.295],["altid",178.395,178.675],["en",178.675,178.735],["virkningsgrad",178.775,179.335],["under",179.555,179.795],["halvtreds",179.855,180.175],["procent",180.215,180.555]],"text":"Men der er en pris. Den friktion, der holder lasten, skal du også overvinde, når du løfter. En selvlåsende skrue har altid en virkningsgrad under halvtreds procent."},"kugle":{"start":181.355,"end":187.576,"words":[["Vil",181.395,181.495],["man",181.495,181.595],["have",181.615,181.715],["høj",181.795,181.975],["virkningsgrad",182.095,182.635],["bruger",182.755,182.955],["man",182.995,183.095],["en",183.135,183.215],["kugleskrue",183.315,183.915],["med",183.955,184.035],["næsten",184.055,184.315],["ingen",184.455,184.655],["friktion",184.695,185.075],["Men",185.615,185.735],["så",185.775,185.855],["er",185.855,185.895],["den",185.895,185.956],["ikke",185.956,186.056],["selvlåsende",186.076,186.596],["og",186.816,186.876],["man",186.896,186.976],["skal",186.996,187.116],["have",187.116,187.196],["en",187.216,187.256],["bremse",187.256,187.576]],"text":"Vil man have høj virkningsgrad, bruger man en kugleskrue med næsten ingen friktion. Men så er den ikke selvlåsende, og man skal have en bremse."},"censor":{"start":189.396,"end":206.457,"words":[["Hvordan",189.436,189.636],["siger",189.676,189.816],["du",189.816,189.876],["det",189.936,190.016],["til",190.056,190.176],["censor",190.316,190.656],["Start",191.476,191.696],["med",191.776,191.856],["papirtrekanten",191.976,192.836],["om",192.876,192.936],["blyanten",192.976,193.456],["gevindet",193.816,194.136],["er",194.276,194.336],["en",194.356,194.416],["rampe",194.456,194.716],["Så",195.416,195.516],["formlen",195.556,195.936],["hvor",196.036,196.196],["tælleren",196.276,196.656],["er",196.716,196.776],["løft",196.836,197.016],["plus",197.096,197.276],["friktion",197.296,197.656],["Så",198.317,198.457],["stigningsvinklen",198.657,199.317],["tangens",199.577,199.937],["lambda",199.977,200.237],["lig",200.337,200.457],["l",200.797,200.817],["over",201.017,201.217],["pi",201.297,201.397],["d",201.457,201.477],["m",201.737,201.757],["Og",202.517,202.577],["kassen",202.637,202.937],["på",202.957,203.057],["rampen",203.077,203.377],["selvlåsende",203.897,204.477],["hvis",204.657,204.797],["mu",204.897,204.957],["er",205.137,205.197],["større",205.257,205.577],["end",205.697,205.777],["tangens",205.797,206.157],["lambda",206.197,206.457]],"text":"Hvordan siger du det til censor? Start med papirtrekanten om blyanten: gevindet er en rampe. Så formlen, hvor tælleren er løft plus friktion. Så stigningsvinklen, tangens lambda lig l over pi d m. Og kassen på rampen: selvlåsende, hvis mu er større end tangens lambda."},"tavle":{"start":207.337,"end":212.738,"words":[["Brug",207.377,207.517],["cirka",207.557,207.757],["syv",207.917,208.057],["minutter",208.117,208.397],["på",208.417,208.557],["det",208.577,208.657],["Så",208.997,209.117],["seks",209.357,209.537],["minutter",209.557,209.837],["på",209.857,209.957],["del",209.957,210.118],["b",210.158,210.178],["og",210.678,210.738],["to",210.758,210.858],["minutter",210.918,211.218],["til",211.238,211.338],["at",211.358,211.398],["vurdere",211.418,211.718],["om",211.798,211.878],["tallet",211.918,212.178],["er",212.298,212.358],["rimeligt",212.398,212.738]],"text":"Brug cirka syv minutter på det. Så seks minutter på del b, og to minutter til at vurdere, om tallet er rimeligt."},"tjek_q":{"start":214.558,"end":218.738,"words":[["Tjek",214.598,214.738],["dig",214.758,214.858],["selv",214.898,215.078],["Du",215.778,215.838],["smører",215.918,216.198],["skruen",216.238,216.578],["så",216.678,216.778],["friktionen",216.798,217.158],["bliver",217.178,217.318],["halveret",217.318,217.678],["Hvad",218.298,218.418],["sker",218.438,218.638],["der",218.658,218.738]],"text":"Tjek dig selv. Du smører skruen, så friktionen bliver halveret. Hvad sker der?"},"tjek_a":{"start":222.358,"end":229.439,"words":[["Den",222.398,222.478],["bliver",222.498,222.638],["lettere",222.638,222.818],["at",222.818,222.858],["dreje",222.878,223.118],["men",223.478,223.618],["den",223.838,223.918],["kan",223.938,224.058],["miste",224.158,224.458],["selvlåsningen",224.538,225.218],["Bliver",225.899,226.079],["mu",226.139,226.219],["mindre",226.519,226.839],["end",226.979,227.079],["tangens",227.099,227.459],["lambda",227.519,227.759],["glider",228.119,228.339],["lasten",228.359,228.659],["ned",228.739,228.899],["af",229.019,229.079],["sig",229.119,229.239],["selv",229.259,229.439]],"text":"Den bliver lettere at dreje, men den kan miste selvlåsningen. Bliver mu mindre end tangens lambda, glider lasten ned af sig selv."},"slut":{"start":231.259,"end":243.74,"words":[["Kort",231.299,231.559],["sagt",231.639,231.919],["et",232.359,232.439],["gevind",232.499,232.859],["er",232.939,233.019],["en",233.039,233.099],["rampe",233.179,233.479],["rundt",233.539,233.719],["om",233.759,233.819],["en",233.859,233.919],["stang",233.979,234.199],["Momentet",234.939,235.359],["dækker",235.419,235.659],["både",235.719,235.939],["løft",236.059,236.319],["og",236.359,236.439],["friktion",236.459,236.899],["og",237.319,237.379],["skruen",237.419,237.739],["er",237.759,237.819],["selvlåsende",237.879,238.44],["når",238.52,238.64],["mu",238.68,238.78],["er",238.94,239.0],["større",239.06,239.4],["end",239.54,239.64],["tangens",239.68,240.14],["lambda",240.2,240.48],["ligesom",241.04,241.28],["en",241.32,241.4],["kasse",241.46,241.76],["der",241.8,241.9],["bliver",241.92,242.06],["liggende",242.1,242.4],["på",242.52,242.64],["en",242.68,242.74],["flad",242.82,243.06],["ru",243.22,243.3],["rampe",243.48,243.74]],"text":"Kort sagt: et gevind er en rampe rundt om en stang. Momentet dækker både løft og friktion, og skruen er selvlåsende, når mu er større end tangens lambda, ligesom en kasse, der bliver liggende på en flad, ru rampe."}}}, { audio: 'eks-spm6-a.mp3', id: 'eks-spm6-a' });</script>
+</body>
+</html>

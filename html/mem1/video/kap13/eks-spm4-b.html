@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spm. 4b: hvor længe holder lejet? · video</title>
+<meta name="description" content="Ny liste, spm. 4b trin for trin: C/P = 10, L_10 = 1000 mio. omdr. ≈ 11 100 timer, rimelighed og hvad nu hvis.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 13: videoer</a><h1>Spm. 4b: hvor længe holder lejet?</h1><span class="meta">MEM1 · kapitel 13 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Spm. 4b: hvor længe holder lejet?"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Ny liste, spm. 4b trin for trin: C/P = 10, L_10 = 1000 mio. omdr. ≈ 11 100 timer, rimelighed og hvad nu hvis.</p><div class="chips"><a href="../../opgaver/l13/tidligere-eksamen-spm-10-rullelejers-levetid.pdf">📐 Se udregningen i Mathcad (PDF)</a><a href="eks-spm4-a.html">Se først: Spm. 4a: lejers levetid forklaret fra bunden</a><a href="../../../../lab/mem1/rulleleje.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel13_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l13">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// MEM1 mundtlig eksamen (ny liste) · Spm. 4b v2: sporkuglelejet trin for trin, hvert tal oversat.
+// P = 5 kN (≈ ½ t), C = 50 kN, 1500 omdr./min (25 pr. s), p = 3: C/P = 10, L_10 = 1000 mio. omdr. (bilhjul: 2 mio. km),
+// 90 000 omdr./t ⇒ 11 111 t (1,3 år døgndrift, 3,8 år à 8 t). Producenter: 20–30 000 t ved 8 t/dag. Hvad hvis: rulle 2154; P/2 ⇒ 8000; 2 × liv ⇒ C × 1,26.
+// Tjek: P = 10 kN ⇒ 125 mio. ⇒ 1389 t. Mathcad: Lektion 13/Opgaver/Tidligere eksamen spm 10.
+BP.scene({ header: 'MEM1 · mundtlig eksamen · spm. 4b', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, dot, ring, ell, rect, hatch, PI } = B;
+  const S = (id) => L(id).start;
+  const ringet = (k, s, x, y, size, col, a, te) => { const r = text(k, s, x, y, size, col, a, te); ring(r, col, te, te + 0.5); return r; };
+  const cirkel = (k, cx, cy, r, col, w, a, b) => line(k, ell(cx, cy, r, r, 0, 2 * PI), col, w, a, b);
+  const trin = (k, s, id) => bubble(k, s, 130, 135, 48, 'blue', S(id) - 0.1, S(id) + 0.9);
+  const bar = (k, x0, y, v, sc, col, a, et) => {
+    line(k, rect(x0, y, v * sc, 40).concat([[x0, y]]), col, 3, a, a + 0.5); hatch(k, rect(x0, y, v * sc, 40), col, a + 0.3, a + 0.8, { gap: 10 });
+    if (et) text(k, et, x0 + v * sc + 16, y + 31, 28, col, a + 0.4, a + 0.8);
+  };
+
+  // ---------------------------------------------------------------- 0 titel
+  B.titel(0, 'Spm. 4b: kuglelejet', 'hvor længe holder det? · hvert tal oversat', 'titel');
+
+  // ---------------------------------------------------------------- 1 data
+  B.goto('data', 1);
+  bubble(1, 'Sporkuglelejet', 130, 135, 50, 'blue', S('data') - 0.1, S('data') + 0.8);
+  {
+    const cx = 960, cy = 420, ti = wt('data', 'sporkugleleje');
+    cirkel(1, cx, cy, 150, 'black', 4.5, ti - 0.1, ti + 0.4); cirkel(1, cx, cy, 128, 'black', 3, ti, ti + 0.5);
+    cirkel(1, cx, cy, 64, 'black', 4.5, ti + 0.1, ti + 0.6); cirkel(1, cx, cy, 86, 'black', 3, ti + 0.2, ti + 0.7);
+    for (let i = 0; i < 9; i++) { const v = i * 2 * PI / 9; cirkel(1, cx + 107 * Math.cos(v), cy + 107 * Math.sin(v), 18, 'red', 3, ti + 0.4 + i * 0.05, ti + 0.7 + i * 0.05); }
+    const tl = wt('data', 'last');
+    arrow(1, [[cx, cy - 250], [cx, cy - 160]], 'blue', 4.5, tl - 0.1, tl + 0.4, 16);
+    text(1, 'P = 5 kN', cx + 20, cy - 205, 30, 'blue', tl, tl + 0.4);
+    const to = wt('data2', 'omdrejninger');
+    line(1, ell(cx, cy, 190, 190, 0.3, 1.3), 'green', 3, to - 0.2, to + 0.3);
+    arrow(1, ell(cx, cy, 190, 190, 1.0, 1.3), 'green', 3, to + 0.1, to + 0.3, 12);
+  }
+  text(1, 'kugleleje  ⇒  p = 3', 170, 230, 36, 'black', wt('data', 'sporkugleleje') - 0.1, we('data', 'tre'));
+  text(1, 'P = 5 kN  ≈  et halvt ton', 170, 300, 36, 'blue', wt('data', 'fem') - 0.1, we('data', 'ton'));
+  text(1, 'C = 50 kN  (katalog)', 170, 370, 36, 'red', wt('data2', 'bæreevne') - 0.3, we('data2', 'kilonewton'));
+  text(1, 'n = 1500 omdr./min = 25 pr. sekund', 170, 440, 32, 'green', wt('data2', 'femten') - 0.1, we('data2', 'sekundet'));
+  ringet(1, 'L_{10} i omdrejninger og i timer?', 170, 560, 38, 'red', wt('spm', 'millioner') - 0.3, we('spm', 'timer'));
+
+  // ---------------------------------------------------------------- 2 trin 1: C/P
+  B.goto('trin1', 2);
+  trin(2, 'Trin 1:  hvor meget stærkere?', 'trin1');
+  ringet(2, 'C / P = 50 / 5 = 10', 170, 260, 44, 'blue', wt('trin1', 'C') - 0.1, we('trin1', 'ti'));
+  {
+    const t0 = wt('ti', 'ti');
+    bar(2, 300, 360, 50, 15, 'red', t0 - 0.4, 'C = 50');
+    bar(2, 300, 430, 5, 15, 'blue', t0 - 0.2, 'P = 5');
+    text(2, 'C', 260, 390, 30, 'red', t0 - 0.4, t0, { align: 'right' }); text(2, 'P', 260, 460, 30, 'blue', t0 - 0.2, t0 + 0.2, { align: 'right' });
+  }
+  text(2, 'men husk: ved C holder lejet kun ≈ 11 timer', 170, 580, 32, 'green', wt('ti', 'husk') - 0.1, we('ti', 'timer'));
+
+  // ---------------------------------------------------------------- 3 trin 2: L_10
+  B.goto('trin2', 3);
+  trin(3, 'Trin 2:  levetid i omdrejninger', 'trin2');
+  B.formel(3, '13.82', 'L_{10} = (C/P)^3 = 10^3 = 1000', 190, 260, 40, wt('trin2', 'L') - 0.1, we('trin2', 'tusind'), 'red');
+  ringet(3, '1000 mio. omdrejninger = 1 milliard', 170, 360, 38, 'red', wt('mio', 'Tusind') - 0.1, we('mio', 'milliard'));
+  {
+    const tb = wt('mio', 'bilhjul');
+    cirkel(3, 300, 500, 60, 'black', 5, tb - 0.2, tb + 0.3); cirkel(3, 300, 500, 30, 'black', 3, tb, tb + 0.4);
+    text(3, 'som bilhjul: 2 mio. km', 400, 515, 34, 'green', tb - 0.1, we('mio', 'kilometer'));
+  }
+  {
+    const th = wt('halvfems', 'halvfems');
+    for (let i = 0; i < 10; i++) dot(3, 720 + i * 40, 640, 11, i === 6 ? 'red' : 'black', th + i * 0.04);
+    text(3, '9 af 10 klarer mindst det', 720, 600, 30, 'black', th - 0.1, we('halvfems', 'det'));
+  }
+
+  // ---------------------------------------------------------------- 4 trin 3: timer
+  B.goto('trin3', 4);
+  trin(4, 'Trin 3:  lav det om til timer', 'trin3');
+  text(4, '1500 · 60 = 90 000 omdr. i timen', 170, 240, 36, 'black', wt('trin3', 'Femten') - 0.1, we('trin3', 'timen'));
+  ringet(4, 'L_h = 10^9 / 90 000 ≈ 11 100 timer', 170, 320, 40, 'red', wt('timer', 'milliard') - 0.3, we('timer', 'timer', 1));
+  {
+    const t1 = wt('aar', 'døgnet'), t2 = wt('aar', 'otte'), x0 = 420, sc = 150;
+    text(4, 'døgnet rundt', 170, 470, 30, 'black', t1 - 0.1, t1 + 0.4); bar(4, x0, 440, 1.27, sc, 'blue', t1, '≈ 1 år og 4 mdr.');
+    text(4, '8 timer/dag', 170, 550, 30, 'black', t2 - 0.1, t2 + 0.4); bar(4, x0, 520, 3.8, sc, 'green', t2, 'knap 4 år');
+  }
+
+  // ---------------------------------------------------------------- 5 trin 4: er det rimeligt?
+  B.goto('trin4', 5);
+  trin(5, 'Trin 4:  er det rimeligt?', 'trin4');
+  {
+    const x0 = 200, x1 = 1150, y = 380, P = (h) => x0 + h / 40000 * (x1 - x0), ta = wt('trin4', 'Lejeproducenterne');
+    line(5, [[x0, y], [x1, y]], 'black', 3, ta - 0.2, ta + 0.3);
+    [0, 10000, 20000, 30000, 40000].forEach((h, i) => { line(5, [[P(h), y - 10], [P(h), y + 10]], 'black', 2.4, ta + i * 0.05, ta + 0.2 + i * 0.05); text(5, (h / 1000) + 'k', P(h), y + 44, 26, 'black', ta + i * 0.05, ta + 0.3 + i * 0.05, { align: 'center' }); });
+    const tr = wt('trin4', 'tyve');
+    line(5, rect(P(20000), y - 40, P(30000) - P(20000), 30).concat([[P(20000), y - 40]]), 'green', 3, tr - 0.1, tr + 0.4);
+    hatch(5, rect(P(20000), y - 40, P(30000) - P(20000), 30), 'green', tr + 0.2, tr + 0.6, { gap: 10 });
+    text(5, 'anbefalet, 8 t/dag', (P(20000) + P(30000)) / 2, y - 56, 26, 'green', tr, we('trin4', 'dagen'), { align: 'center' });
+    const te = wt('trin4', 'Elleve');
+    dot(5, P(11111), y, 12, 'red', te - 0.1);
+    text(5, '11 100', P(11111), y - 30, 28, 'red', te, te + 0.4, { align: 'center' });
+  }
+  text(5, 'i den lave ende', 200, 510, 34, 'red', wt('trin4', 'lave') - 0.3, we('trin4', 'ende'));
+  text(5, 'kører den meget: vælg et lidt større leje', 200, 580, 32, 'blue', wt('rimelig', 'Ellers') - 0.1, we('rimelig', 'leje'));
+
+  // ---------------------------------------------------------------- 6 hvad nu hvis?
+  B.goto('hvis', 6);
+  bubble(6, 'Hvad nu hvis?', 130, 135, 50, 'blue', S('hvis') - 0.1, S('hvis') + 0.8);
+  text(6, 'her viser du, at du har forstået det', 640, 140, 28, 'green', wt('hvis', 'viser') - 0.1, we('hvis', 'det'));
+  {
+    const rows = [
+      ['rulle', 'rulleleje (p = 10/3)', '2155 mio.  (> 2 ×)', 'blue', 'rulleleje', 'dobbelte'],
+      ['halv', 'halv last (2,5 kN)', '8000 mio.  (8 ×)', 'green', 'Halverer', 'lang'],
+      ['dobbelt', 'dobbelt levetid ønsket', 'C × 1,26  (∛2)', 'red', 'dobbelt', 'seksogtyve'],
+    ];
+    rows.forEach(([id, a1, a2, col, w1, w2], i) => {
+      const y = 260 + i * 120, t1 = wt(id, w1) - 0.2, t2 = wt(id, w2) - 0.6;
+      dot(6, 220, y - 12, 10, col, t1);
+      text(6, a1, 260, y, 34, 'black', t1, t1 + 0.6);
+      text(6, '→  ' + a2, 740, y, 34, col, t2, t2 + 0.6);
+    });
+  }
+
+  // ---------------------------------------------------------------- 7 antagelser og censor-sætningen
+  B.goto('antag', 7);
+  bubble(7, 'Sig dine antagelser højt', 130, 135, 46, 'blue', S('antag') - 0.1, S('antag') + 0.9);
+  text(7, '•  konstant, rent radial last', 170, 220, 30, 'black', wt('antag', 'konstant') - 0.1, we('antag', 'radial'));
+  text(7, '•  korrekt smurt og rent', 170, 265, 30, 'black', wt('antag', 'smurt') - 0.4, we('antag', 'rent'));
+  text(7, '•  90 % pålidelighed er nok', 700, 220, 30, 'black', wt('antag', 'halvfems') - 0.1, we('antag', 'nok'));
+  text(7, '•  mere krævet ⇒ kortere', 700, 265, 30, 'red', wt('antag', 'Kræver') - 0.1, we('antag', 'kortere'));
+  bubble(7, 'Til censor', 130, 360, 42, 'red', S('censor') - 0.1, S('censor') + 0.8);
+  {
+    const r = [
+      ['C/P = 10  ⇒  L_{10} = 10³ = 1000 mio. omdr.', 'C', 'omdrejninger'],
+      ['1500 omdr./min  ⇒  ≈ 11 000 timer', 'femten', 'timer'],
+      ['knap 4 år ved 8 timer om dagen', 'knap', 'dagen'],
+      ['90 % af lejerne klarer det', 'Halvfems', 'det'],
+    ];
+    r.forEach(([s, w1, w2], i) => text(7, s, 170, 440 + i * 58, 32, i === 1 ? 'red' : 'black', wt('censor', w1) - 0.2, we('censor', w2)));
+  }
+
+  // ---------------------------------------------------------------- 8 tjek: dobbelt last
+  B.goto('tjek_q', 8);
+  B.tjek(8, ['Lasten fordobles til 10 kN:', 'hvor mange timer holder lejet?'], ['C/P = 5:  5³ = 125 mio. omdr.', '≈ 1389 timer: en ottendedel'], 'tjek_q', 'tjek_a');
+  {
+    const t1 = wt('tjek_a', 'tretten'), x0 = 420, sc = 0.05;
+    text(8, '5 kN', 200, 590, 30, 'black', t1 - 0.6, t1 - 0.2); bar(8, x0, 560, 11111, sc, 'green', t1 - 0.5, '11 100 t');
+    text(8, '10 kN', 200, 655, 30, 'black', t1 - 0.1, t1 + 0.3); bar(8, x0, 625, 1389, sc, 'red', t1, '1389 t');
+  }
+
+  // ---------------------------------------------------------------- 9 slut
+  B.goto('slut', 9);
+  B.slut(9, 'MEM1 mundtlig eksamen, ny liste, spm. 4b · Hamrock m.fl., kap. 13, lign. (13.82) · Mathcad: Tidligere eksamen spm 10 Rullelejers levetid', 'spm. 5: tandhjul og Lewis', 'slut');
+  text(9, '1.  C/P = 10', 200, 240, 36, 'blue', wt('slut', 'C') - 0.1, we('slut', 'ti'));
+  text(9, '2.  L_{10} = 10³ = 1000 mio. omdr.', 200, 310, 36, 'red', wt('slut', 'L') - 0.1, we('slut', 'omdrejninger'));
+  text(9, '3.  ≈ 11 000 timer ved 1500 omdr./min', 200, 380, 36, 'green', wt('slut', 'femten') - 0.1, we('slut', 'timer'));
+});
+
+</script>
+<script>BP.live({"duration":221.768,"audio":"eks-spm4-b.mp3","order":["titel","data","data2","spm","trin1","ti","trin2","mio","halvfems","trin3","timer","aar","trin4","rimelig","hvis","rulle","halv","dobbelt","antag","censor","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":6.621,"words":[["Spørgsmål",0.54,0.96],["fire",1.04,1.3],["del",1.66,1.8],["b",1.86,1.88],["Nu",3.18,3.26],["regner",3.34,3.56],["vi",3.58,3.64],["på",3.72,3.84],["et",3.86,3.92],["rigtigt",3.98,4.3],["kugleleje",4.32,4.86],["og",5.24,5.3],["vi",5.36,5.4],["oversætter",5.48,5.861],["tallene",5.901,6.141],["undervejs",6.201,6.621]],"text":"Spørgsmål fire, del b. Nu regner vi på et rigtigt kugleleje, og vi oversætter tallene undervejs."},"data":{"start":8.441,"end":16.081,"words":[["Lejet",8.481,8.841],["er",9.001,9.081],["et",9.181,9.261],["sporkugleleje",9.381,10.321],["så",10.821,10.941],["p",10.981,11.001],["er",11.281,11.361],["tre",11.581,11.721],["Det",12.581,12.681],["bærer",12.721,12.921],["en",12.941,13.021],["last",13.061,13.261],["på",13.341,13.501],["fem",13.641,13.801],["kilonewton",13.901,14.501],["Det",15.141,15.241],["er",15.241,15.281],["cirka",15.281,15.501],["et",15.541,15.601],["halvt",15.641,15.821],["ton",15.881,16.081]],"text":"Lejet er et sporkugleleje, så p er tre. Det bærer en last på fem kilonewton. Det er cirka et halvt ton."},"data2":{"start":17.102,"end":26.222,"words":[["Katalogets",17.142,17.642],["bæreevne",17.702,18.222],["er",18.362,18.462],["halvtreds",18.822,19.202],["kilonewton",19.282,19.862],["og",20.442,20.522],["akslen",20.622,21.002],["kører",21.062,21.342],["femten",21.522,21.842],["hundrede",21.962,22.282],["omdrejninger",22.402,22.942],["i",23.102,23.122],["minuttet",23.202,23.542],["Det",24.442,24.542],["er",24.562,24.602],["femogtyve",24.682,25.142],["omgange",25.202,25.562],["i",25.702,25.722],["sekundet",25.782,26.222]],"text":"Katalogets bæreevne er halvtreds kilonewton, og akslen kører femten hundrede omdrejninger i minuttet. Det er femogtyve omgange i sekundet."},"spm":{"start":27.603,"end":33.063,"words":[["Spørgsmålet",27.643,28.163],["er",28.243,28.323],["hvor",28.923,29.063],["mange",29.083,29.323],["millioner",29.503,30.023],["omdrejninger",30.123,30.723],["holder",30.823,31.103],["det",31.123,31.223],["og",31.783,31.843],["hvor",31.863,31.963],["mange",31.983,32.143],["timer",32.223,32.603],["er",32.843,32.923],["det",32.943,33.063]],"text":"Spørgsmålet er: hvor mange millioner omdrejninger holder det, og hvor mange timer er det?"},"trin1":{"start":34.883,"end":43.244,"words":[["Trin",34.923,35.143],["et",35.223,35.323],["hvor",36.283,36.423],["meget",36.443,36.663],["stærkere",36.743,37.263],["er",37.443,37.523],["lejet",37.603,37.923],["end",38.163,38.243],["det",38.263,38.323],["behøver",38.344,38.724],["C",39.884,39.904],["over",40.184,40.344],["P",40.384,40.404],["er",40.724,40.824],["halvtreds",41.184,41.544],["delt",41.604,41.784],["med",41.824,41.924],["fem",41.984,42.144],["Det",42.964,43.064],["er",43.064,43.104],["ti",43.144,43.244]],"text":"Trin et: hvor meget stærkere er lejet, end det behøver? C over P er halvtreds delt med fem. Det er ti."},"ti":{"start":44.484,"end":53.125,"words":[["Lejet",44.524,44.784],["er",44.884,44.944],["altså",44.984,45.244],["ti",45.404,45.524],["gange",45.664,45.864],["stærkere",45.944,46.384],["end",46.464,46.544],["den",46.564,46.684],["last",46.764,47.004],["det",47.124,47.224],["bærer",47.264,47.504],["Det",48.504,48.584],["lyder",48.624,48.804],["af",48.804,48.844],["meget",48.884,49.105],["men",49.745,49.845],["husk",49.885,50.085],["C",50.505,50.525],["er",50.865,50.925],["lasten",50.985,51.345],["hvor",51.525,51.665],["det",51.685,51.765],["kun",51.805,51.945],["holder",52.025,52.245],["elleve",52.465,52.705],["timer",52.805,53.125]],"text":"Lejet er altså ti gange stærkere end den last, det bærer. Det lyder af meget, men husk: C er lasten, hvor det kun holder elleve timer."},"trin2":{"start":54.945,"end":63.746,"words":[["Trin",54.985,55.165],["to",55.225,55.325],["levetiden",56.265,56.785],["i",57.045,57.065],["omdrejninger",57.165,57.685],["ligning",58.125,58.365],["tretten",58.365,58.845],["toogfirs",59.045,59.605],["L",60.746,60.766],["ti",60.866,60.986],["er",61.226,61.306],["ti",61.746,61.826],["i",61.926,61.946],["tredje",62.026,62.366],["Det",63.226,63.326],["er",63.326,63.366],["tusind",63.406,63.746]],"text":"Trin to: levetiden i omdrejninger, ligning tretten toogfirs. L ti er ti i tredje. Det er tusind."},"mio":{"start":64.626,"end":72.327,"words":[["Tusind",64.666,65.026],["millioner",65.206,65.726],["omdrejninger",65.806,66.326],["Det",66.886,67.006],["er",67.006,67.066],["en",67.206,67.346],["milliard",67.526,67.966],["Hvis",68.846,68.966],["det",68.986,69.046],["var",69.066,69.146],["et",69.166,69.226],["bilhjul",69.266,69.706],["svarede",70.046,70.266],["det",70.306,70.366],["til",70.406,70.506],["at",70.546,70.586],["køre",70.626,70.847],["to",71.047,71.187],["millioner",71.367,71.827],["kilometer",71.867,72.327]],"text":"Tusind millioner omdrejninger. Det er en milliard. Hvis det var et bilhjul, svarede det til at køre to millioner kilometer."},"halvfems":{"start":73.387,"end":80.647,"words":[["Og",73.427,73.487],["husk",73.527,73.747],["hvad",74.067,74.167],["L",74.347,74.367],["ti",74.467,74.567],["betyder",74.687,75.087],["halvfems",75.847,76.347],["ud",76.547,76.647],["af",76.707,76.787],["hundrede",76.887,77.207],["lejer",77.287,77.567],["klarer",77.847,78.127],["mindst",78.347,78.607],["det",78.727,78.847],["Ti",79.707,79.827],["klarer",80.147,80.367],["det",80.367,80.447],["ikke",80.507,80.647]],"text":"Og husk, hvad L ti betyder: halvfems ud af hundrede lejer klarer mindst det. Ti klarer det ikke."},"trin3":{"start":82.467,"end":90.747,"words":[["Trin",82.507,82.687],["tre",82.727,82.867],["lav",83.767,83.887],["det",83.907,83.987],["om",84.027,84.127],["til",84.207,84.327],["timer",84.367,84.667],["Femten",85.687,86.007],["hundrede",86.067,86.307],["omdrejninger",86.387,86.887],["i",86.947,86.967],["minuttet",87.007,87.387],["gange",87.507,87.747],["tres",87.787,88.087],["er",88.587,88.647],["halvfems",88.667,89.087],["tusind",89.187,89.527],["omdrejninger",89.627,90.167],["i",90.347,90.367],["timen",90.447,90.747]],"text":"Trin tre: lav det om til timer. Femten hundrede omdrejninger i minuttet gange tres er halvfems tusind omdrejninger i timen."},"timer":{"start":91.847,"end":97.968,"words":[["En",91.887,92.007],["milliard",92.067,92.467],["delt",92.608,92.808],["med",92.848,92.908],["halvfems",92.928,93.288],["tusind",93.328,93.648],["er",93.928,94.008],["elleve",94.208,94.408],["tusind",94.468,94.808],["hundrede",94.968,95.268],["og",95.288,95.348],["elleve",95.448,95.648],["timer",95.728,96.008],["Cirka",96.668,96.908],["elleve",97.088,97.288],["tusind",97.348,97.668],["timer",97.708,97.968]],"text":"En milliard delt med halvfems tusind er elleve tusind hundrede og elleve timer. Cirka elleve tusind timer."},"aar":{"start":98.968,"end":108.189,"words":[["Hvad",99.008,99.128],["betyder",99.148,99.448],["det",99.468,99.568],["Kører",100.528,100.728],["maskinen",100.748,101.108],["døgnet",101.228,101.508],["rundt",101.548,101.728],["er",102.268,102.328],["det",102.348,102.448],["cirka",102.488,102.728],["et",102.908,102.988],["år",103.088,103.209],["og",103.349,103.429],["fire",103.489,103.729],["måneder",103.789,104.129],["Kører",104.689,104.929],["den",104.949,105.049],["otte",105.249,105.529],["timer",105.609,105.909],["om",105.949,106.029],["dagen",106.089,106.329],["holder",106.589,106.809],["lejet",106.849,107.129],["i",107.189,107.209],["knap",107.269,107.509],["fire",107.749,107.989],["år",108.069,108.189]],"text":"Hvad betyder det? Kører maskinen døgnet rundt, er det cirka et år og fire måneder. Kører den otte timer om dagen, holder lejet i knap fire år."},"trin4":{"start":110.009,"end":121.85,"words":[["Trin",110.049,110.229],["fire",110.269,110.489],["er",111.109,111.189],["det",111.209,111.289],["rimeligt",111.349,111.669],["Lejeproducenterne",112.509,113.289],["anbefaler",113.389,113.829],["typisk",113.869,114.229],["tyve",114.489,114.81],["til",114.87,114.99],["tredive",115.01,115.31],["tusind",115.37,115.65],["timer",115.71,115.99],["for",116.01,116.11],["maskiner",116.13,116.55],["der",116.57,116.65],["kører",116.69,116.93],["otte",117.09,117.29],["timer",117.33,117.59],["om",117.63,117.69],["dagen",117.75,118.03],["og",118.49,118.57],["mere",118.63,118.81],["ved",118.85,118.93],["døgndrift",118.95,119.35],["Elleve",120.09,120.31],["tusind",120.39,120.73],["er",120.79,120.87],["i",120.91,120.93],["den",120.97,121.07],["lave",121.21,121.55],["ende",121.67,121.85]],"text":"Trin fire: er det rimeligt? Lejeproducenterne anbefaler typisk tyve til tredive tusind timer for maskiner, der kører otte timer om dagen, og mere ved døgndrift. Elleve tusind er i den lave ende."},"rimelig":{"start":122.31,"end":126.331,"words":[["Til",122.35,122.45],["en",122.45,122.49],["maskine",122.51,122.83],["der",122.85,122.93],["ikke",122.95,123.05],["kører",123.07,123.27],["så",123.31,123.41],["meget",123.45,123.73],["kan",123.77,123.87],["det",123.89,123.95],["godt",123.97,124.11],["gå",124.17,124.33],["Ellers",124.73,124.91],["ville",124.93,125.07],["man",125.07,125.171],["vælge",125.211,125.431],["et",125.451,125.511],["lidt",125.531,125.691],["større",125.751,126.051],["leje",126.091,126.331]],"text":"Til en maskine, der ikke kører så meget, kan det godt gå. Ellers ville man vælge et lidt større leje."},"hvis":{"start":128.151,"end":131.291,"words":[["Hvad",128.191,128.331],["nu",128.371,128.431],["hvis",128.491,128.711],["Her",129.171,129.291],["viser",129.331,129.551],["du",129.591,129.631],["censor",129.711,130.051],["at",130.111,130.191],["du",130.211,130.271],["har",130.331,130.471],["forstået",130.671,131.171],["det",131.191,131.291]],"text":"Hvad nu hvis? Her viser du censor, at du har forstået det."},"rulle":{"start":131.971,"end":142.652,"words":[["Var",132.011,132.111],["det",132.131,132.211],["et",132.231,132.311],["rulleleje",132.351,132.891],["med",133.071,133.171],["samme",133.211,133.391],["tal",133.451,133.611],["blev",133.891,134.051],["levetiden",134.151,134.631],["ti",134.891,135.011],["opløftet",135.291,135.771],["til",135.851,135.991],["ti",136.232,136.352],["tredjedele",136.552,137.092],["cirka",137.412,137.672],["to",137.972,138.072],["tusind",138.192,138.532],["hundrede",138.812,139.152],["og",139.252,139.312],["femoghalvtreds",139.372,140.012],["millioner",140.272,140.892],["omdrejninger",140.972,141.452],["Mere",142.132,142.232],["end",142.252,142.332],["det",142.352,142.412],["dobbelte",142.412,142.652]],"text":"Var det et rulleleje med samme tal, blev levetiden ti opløftet til ti tredjedele, cirka to tusind hundrede og femoghalvtreds millioner omdrejninger. Mere end det dobbelte."},"halv":{"start":143.952,"end":152.493,"words":[["Halverer",143.992,144.452],["du",144.472,144.532],["lasten",144.592,144.912],["til",145.112,145.212],["to",145.252,145.332],["komma",145.432,145.572],["fem",145.652,145.812],["kilonewton",145.892,146.432],["bliver",146.693,146.913],["C",147.133,147.153],["over",147.373,147.513],["P",147.553,147.573],["tyve",147.913,148.253],["og",148.573,148.633],["levetiden",148.693,149.133],["otte",149.473,149.693],["tusind",149.793,150.173],["millioner",150.193,150.633],["omdrejninger",150.693,151.173],["Otte",151.813,152.033],["gange",152.033,152.213],["så",152.233,152.333],["lang",152.353,152.493]],"text":"Halverer du lasten til to komma fem kilonewton, bliver C over P tyve, og levetiden otte tusind millioner omdrejninger. Otte gange så lang."},"dobbelt":{"start":153.453,"end":160.314,"words":[["Vil",153.493,153.593],["du",153.593,153.653],["have",153.673,153.773],["dobbelt",153.833,154.133],["så",154.133,154.233],["lang",154.253,154.393],["levetid",154.453,154.833],["skal",155.313,155.493],["C",155.533,155.553],["kun",155.753,155.913],["være",155.973,156.193],["omkring",156.253,156.553],["seksogtyve",156.753,157.233],["procent",157.253,157.534],["større",157.574,157.834],["Kubikroden",158.394,158.914],["af",158.934,158.994],["to",159.014,159.114],["er",159.294,159.354],["et",159.494,159.574],["komma",159.614,159.794],["seksogtyve",159.854,160.314]],"text":"Vil du have dobbelt så lang levetid, skal C kun være omkring seksogtyve procent større. Kubikroden af to er et komma seksogtyve."},"antag":{"start":162.134,"end":172.855,"words":[["Sig",162.174,162.314],["antagelserne",162.494,163.154],["højt",163.234,163.474],["Lasten",164.334,164.654],["er",164.834,164.894],["konstant",164.934,165.354],["og",165.434,165.494],["rent",165.534,165.714],["radial",165.754,166.094],["Lejet",166.694,166.954],["er",167.034,167.114],["korrekt",167.234,167.594],["smurt",167.674,167.994],["og",168.054,168.114],["rent",168.154,168.394],["Og",169.015,169.075],["halvfems",169.095,169.455],["procent",169.495,169.755],["pålidelighed",169.795,170.275],["er",170.375,170.455],["godt",170.535,170.695],["nok",170.755,170.915],["Kræver",171.195,171.435],["man",171.455,171.535],["mere",171.575,171.795],["bliver",171.835,171.995],["levetiden",172.015,172.415],["kortere",172.455,172.855]],"text":"Sig antagelserne højt. Lasten er konstant og rent radial. Lejet er korrekt smurt og rent. Og halvfems procent pålidelighed er godt nok. Kræver man mere, bliver levetiden kortere."},"censor":{"start":174.675,"end":189.896,"words":[["Det",174.715,174.815],["du",174.835,174.875],["siger",174.935,175.095],["til",175.095,175.195],["censor",175.215,175.515],["er",175.595,175.675],["C",176.635,176.655],["over",176.875,176.995],["P",177.015,177.035],["er",177.415,177.475],["ti",177.575,177.695],["så",178.295,178.395],["L",178.575,178.595],["ti",178.675,178.775],["er",178.935,179.015],["ti",179.255,179.355],["i",179.495,179.515],["tredje",179.575,179.896],["altså",180.136,180.356],["tusind",180.436,180.836],["millioner",181.016,181.516],["omdrejninger",181.576,182.056],["Ved",182.536,182.636],["femten",182.736,183.056],["hundrede",183.116,183.356],["omdrejninger",183.416,183.876],["i",183.896,183.916],["minuttet",183.936,184.236],["er",184.276,184.336],["det",184.356,184.436],["cirka",184.476,184.736],["elleve",185.056,185.236],["tusind",185.276,185.576],["timer",185.596,185.856],["knap",186.256,186.476],["fire",186.656,186.876],["år",186.956,187.076],["på",187.116,187.216],["otte",187.256,187.416],["timer",187.456,187.656],["om",187.696,187.756],["dagen",187.776,187.976],["Halvfems",188.416,188.776],["procent",188.836,189.136],["af",189.176,189.236],["lejerne",189.256,189.536],["klarer",189.576,189.796],["det",189.816,189.896]],"text":"Det, du siger til censor, er: C over P er ti, så L ti er ti i tredje, altså tusind millioner omdrejninger. Ved femten hundrede omdrejninger i minuttet er det cirka elleve tusind timer, knap fire år på otte timer om dagen. Halvfems procent af lejerne klarer det."},"tjek_q":{"start":191.716,"end":196.696,"words":[["Tjek",191.756,191.936],["dig",191.976,192.076],["selv",192.116,192.296],["Lasten",193.056,193.336],["bliver",193.356,193.496],["fordoblet",193.496,193.976],["til",194.056,194.196],["ti",194.296,194.416],["kilonewton",194.556,195.076],["Hvor",195.536,195.636],["mange",195.656,195.816],["timer",195.876,196.096],["holder",196.116,196.316],["lejet",196.356,196.536],["så",196.576,196.696]],"text":"Tjek dig selv. Lasten bliver fordoblet til ti kilonewton. Hvor mange timer holder lejet så?"},"tjek_a":{"start":200.316,"end":209.177,"words":[["C",200.356,200.376],["over",200.556,200.656],["P",200.696,200.716],["bliver",200.876,201.076],["fem",201.256,201.416],["og",201.956,202.016],["fem",202.056,202.156],["i",202.216,202.236],["tredje",202.276,202.556],["er",202.636,202.716],["hundrede",202.976,203.296],["og",203.396,203.456],["femogtyve",203.556,203.996],["millioner",204.016,204.377],["omdrejninger",204.417,204.837],["Det",205.137,205.217],["er",205.237,205.277],["cirka",205.277,205.497],["tretten",205.877,206.217],["hundrede",206.277,206.577],["og",206.677,206.737],["niogfirs",206.817,207.417],["timer",207.497,207.797],["En",208.317,208.397],["ottendedel",208.517,208.937],["af",208.957,208.997],["før",209.017,209.177]],"text":"C over P bliver fem, og fem i tredje er hundrede og femogtyve millioner omdrejninger. Det er cirka tretten hundrede og niogfirs timer. En ottendedel af før."},"slut":{"start":210.997,"end":220.298,"words":[["Kort",211.037,211.217],["sagt",211.257,211.417],["C",212.077,212.097],["over",212.297,212.377],["P",212.397,212.417],["er",212.797,212.857],["ti",212.937,213.057],["L",213.897,213.917],["ti",213.997,214.097],["er",214.257,214.337],["tusind",214.517,214.917],["millioner",215.097,215.638],["omdrejninger",215.698,216.218],["og",216.518,216.578],["ved",216.618,216.738],["femten",216.978,217.258],["hundrede",217.298,217.518],["omdrejninger",217.558,217.998],["i",218.018,218.038],["minuttet",218.058,218.358],["holder",218.438,218.638],["lejet",218.678,218.878],["cirka",218.918,219.138],["elleve",219.498,219.658],["tusind",219.718,219.998],["timer",220.038,220.298]],"text":"Kort sagt: C over P er ti, L ti er tusind millioner omdrejninger, og ved femten hundrede omdrejninger i minuttet holder lejet cirka elleve tusind timer."}}}, { audio: 'eks-spm4-b.mp3', id: 'eks-spm4-b' });</script>
+</body>
+</html>

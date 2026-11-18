@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spm. 9b: hvor meget kan remmen trække? · video</title>
+<meta name="description" content="Ny liste, spm. 9b trin for trin: F_2 = 1000 N, T = 400 N·m, forspænding 2000 N, hvad nu hvis.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 19: videoer</a><h1>Spm. 9b: hvor meget kan remmen trække?</h1><span class="meta">MEM1 · kapitel 19 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Spm. 9b: hvor meget kan remmen trække?"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Ny liste, spm. 9b trin for trin: F_2 = 1000 N, T = 400 N·m, forspænding 2000 N, hvad nu hvis.</p><div class="chips"><a href="../../opgaver/l19/tidligere-eksamen-spm-15-remtraek.pdf">📐 Se udregningen i Mathcad (PDF)</a><a href="eks-spm9-a.html">Se først: Spm. 9a: remme og friktion forklaret fra bunden</a><a href="../../../../lab/mem1/remtraek.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel19_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l19">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// MEM1 mundtlig eksamen (ny liste) · Spm. 9b v2: fladremmen trin for trin, hvert tal oversat.
+// F_c ≈ 0, φ = π, μ = 0,35 ⇒ e^{μφ} = 3,00; F_1 = 3000 N (≈ 300 kg), r = 0,2 m (Ø 40 cm): F_2 = 1000 N, T = 2000 · 0,2 = 400 N·m.
+// F_i = (F_1 + F_2)/2 = 2000 N (19.6), aksellast ≈ 4000 N. Hvad hvis: olie e = 2 ⇒ 1500/300; hel omgang e = 9 ⇒ 333/533; 150° e = 2,5 ⇒ 1200/360.
+// Tjek: F_c = 500 ⇒ F_2 = 1333, T = 333 N·m (−⅙). Mathcad: Lektion 19/Opgaver/Tidligere eksamen spm 15 Remtraek.
+BP.scene({ header: 'MEM1 · mundtlig eksamen · spm. 9b', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, dot, ring, ell, rect, hatch, moment, PI } = B;
+  const S = (id) => L(id).start;
+  const ringet = (k, s, x, y, size, col, a, te) => { const r = text(k, s, x, y, size, col, a, te); ring(r, col, te, te + 0.5); return r; };
+  const cirkel = (k, cx, cy, r, col, w, a, b) => line(k, ell(cx, cy, r, r, 0, 2 * PI), col, w, a, b);
+  const trin = (k, s, id) => bubble(k, s, 130, 135, 48, 'blue', S(id) - 0.1, S(id) + 0.9);
+  const bar = (k, x0, y, v, sc, col, a, et) => {
+    line(k, rect(x0, y, v * sc, 40).concat([[x0, y]]), col, 3, a, a + 0.5); hatch(k, rect(x0, y, v * sc, 40), col, a + 0.3, a + 0.8, { gap: 10 });
+    if (et) text(k, et, x0 + v * sc + 16, y + 31, 28, col, a + 0.4, a + 0.8);
+  };
+  const skive = (k, cx, cy, r, a, F1, F2) => {   // skive med stram (op) og slap (ned) part mod højre
+    cirkel(k, cx, cy, r, 'black', 4, a, a + 0.4);
+    line(k, ell(cx, cy, r + 8, r + 8, PI / 2, 3 * PI / 2), 'blue', 5, a + 0.2, a + 0.6);
+    line(k, [[cx, cy - r - 8], [cx + 330, cy - r - 8]], 'red', 5, a + 0.4, a + 0.8);
+    line(k, [[cx, cy + r + 8], [cx + 330, cy + r + 8]], 'green', 3, a + 0.5, a + 0.9);
+    if (F1) text(k, F1, cx + 340, cy - r, 30, 'red', a + 0.7, a + 1.1);
+    if (F2) text(k, F2, cx + 340, cy + r + 20, 30, 'green', a + 0.8, a + 1.2);
+  };
+
+  // ---------------------------------------------------------------- 0 titel
+  B.titel(0, 'Spm. 9b: fladremmen', 'hvor meget kan den trække? · hvert tal oversat', 'titel');
+
+  // ---------------------------------------------------------------- 1 data
+  B.goto('data', 1);
+  bubble(1, 'Fladremmen', 130, 135, 50, 'blue', S('data') - 0.1, S('data') + 0.7);
+  text(1, 'lav hastighed:  F_c = 0', 170, 230, 36, 'black', wt('data', 'langsomt') - 0.1, we('data', 'nul'));
+  text(1, 'φ = π  (en halv omgang),  μ = 0,35', 170, 300, 36, 'blue', wt('data', 'halv') - 0.4, we('data', 'fem'));
+  text(1, 'F_1 ≤ 3000 N  ≈  300 kg', 170, 370, 36, 'red', wt('data2', 'tre') - 0.1, we('data2', 'kilo'));
+  text(1, 'r = 0,2 m  (Ø 40 cm)', 170, 440, 36, 'black', wt('data2', 'radius') - 0.1, we('data2', 'diameter'));
+  ringet(1, 'mindste F_2 og største T?', 170, 550, 40, 'red', wt('spm', 'lille') - 0.3, we('spm', 'overføre'));
+  skive(1, 820, 430, 110, wt('data', 'omgang') - 0.3, 'F_1', 'F_2');
+
+  // ---------------------------------------------------------------- 2 trin 1: forholdet
+  B.goto('trin1', 2);
+  trin(2, 'Trin 1:  forholdet', 'trin1');
+  text(2, 'μ φ = 0,35 · π ≈ 1,1', 170, 250, 40, 'black', wt('trin1', 'Mu') - 0.1, we('trin1', 'et', 1));
+  B.formel(2, '18.64', 'F_1 / F_2 = e^{1,1} ≈ 3', 190, 350, 46, wt('trin1', 'e') - 0.1, we('trin1', 'tre'), 'red');
+  ringet(2, 'stram ≤ 3 × slap', 170, 460, 40, 'blue', wt('tre', 'stramme') - 0.3, we('tre', 'slappe'));
+  text(2, 'som rebet en halv gang om pælen', 190, 540, 32, 'green', wt('tre', 'rebet') - 0.1, we('tre', 'pælen'));
+
+  // ---------------------------------------------------------------- 3 trin 2: den slappe part
+  B.goto('trin2', 3);
+  trin(3, 'Trin 2:  den slappe part', 'trin2');
+  ringet(3, 'F_2 = F_1 / 3 = 3000 / 3 = 1000 N', 170, 260, 42, 'green', wt('trin2', 'F') - 0.1, we('trin2', 'newton'));
+  text(3, 'mindste kraft i den slappe part', 190, 340, 32, 'black', wt('mindst', 'mindste') - 0.1, we('mindst', 'have'));
+  text(3, 'lavere ⇒ remmen glider ⇒ spænd den op', 190, 400, 32, 'red', wt('mindst', 'lavere') - 0.1, we('mindst', 'op'));
+  skive(3, 640, 560, 80, wt('trin2', 'tre') - 0.6, '3000 N', '1000 N');
+
+  // ---------------------------------------------------------------- 4 trin 3: momentet
+  B.goto('trin3', 4);
+  trin(4, 'Trin 3:  momentet', 'trin3');
+  text(4, 'F_1 − F_2 = 3000 − 1000 = 2000 N', 170, 250, 38, 'black', wt('trin3', 'Forskellen') - 0.1, we('trin3', 'newton'));
+  ringet(4, 'T = 2000 · 0,2 = 400 N·m', 170, 340, 44, 'red', wt('trin3', 'Gange') - 0.1, we('trin3', 'newtonmeter'));
+  text(4, '> en almindelig familiebils motor', 190, 430, 32, 'green', wt('bil', 'familiebil') - 0.6, we('bil', 'familiebil'));
+  {
+    const tm = wt('trin3', 'radius'), cx = 900, cy = 560;
+    cirkel(4, cx, cy, 90, 'black', 4, tm - 0.4, tm);
+    moment(4, cx, cy, 60, -2.4, 1.6, 'red', tm, tm + 0.5);
+    arrow(4, [[cx, cy], [cx + 88, cy]], 'blue', 3, tm + 0.2, tm + 0.5, 12);
+    text(4, '0,2 m', cx + 44, cy - 14, 26, 'blue', tm + 0.3, tm + 0.6, { align: 'center' });
+  }
+
+  // ---------------------------------------------------------------- 5 trin 4: er det rimeligt?
+  B.goto('trin4', 5);
+  trin(5, 'Trin 4:  er det rimeligt?', 'trin4');
+  B.formel(5, '19.6', 'F_i = (F_1 + F_2) / 2 = 2000 N', 190, 250, 40, wt('trin4', 'Forspændingen') - 0.1, we('trin4', 'newton'), 'blue');
+  {
+    const ta = wt('aksel', 'akslen'), cx = 380, cy = 480;
+    cirkel(5, cx, cy, 80, 'black', 4, ta - 0.3, ta);
+    line(5, [[cx, cy - 88], [cx + 300, cy - 88]], 'red', 4, ta, ta + 0.3); line(5, [[cx, cy + 88], [cx + 300, cy + 88]], 'green', 3, ta + 0.1, ta + 0.4);
+    arrow(5, [[cx - 10, cy], [cx - 150, cy]], 'black', 5, wt('aksel', 'summen') - 0.1, wt('aksel', 'summen') + 0.4, 16);
+    text(5, '≈ 4000 N på akslen', 140, 600, 32, 'black', wt('aksel', 'fire') - 0.3, we('aksel', 'bære'));
+    text(5, 'det overser mange!', 140, 650, 30, 'red', wt('aksel', 'overser') - 0.1, we('aksel', 'mange'));
+  }
+  text(5, '⅓ af den stramme: normalt', 740, 400, 30, 'green', wt('rimelig', 'tredjedel') - 0.6, we('rimelig', 'omgang'));
+
+  // ---------------------------------------------------------------- 6 hvad nu hvis?
+  B.goto('hvis', 6);
+  bubble(6, 'Hvad nu hvis?', 130, 135, 50, 'blue', S('hvis') - 0.1, S('hvis') + 0.8);
+  text(6, 'her viser du, at du har forstået det', 640, 140, 28, 'green', wt('hvis', 'viser') - 0.1, we('hvis', 'det'));
+  {
+    const rows = [
+      ['olie', 'olie: e^{μφ} = 2', 'F_2 = 1500,  T = 300 N·m', 'red', 'olie', 'newtonmeter'],
+      ['omgang', 'hel omgang: ≈ 9', 'F_2 = 333,  T = 533 N·m', 'green', 'hel', 'newtonmeter'],
+      ['vinkel', '150° omslutning: 2,5', 'T = 360 N·m', 'blue', 'hundrede', 'newtonmeter'],
+    ];
+    rows.forEach(([id, a1, a2, col, w1, w2], i) => {
+      const y = 260 + i * 120, t1 = wt(id, w1) - 0.2, t2 = wt(id, w2) - 0.6;
+      dot(6, 200, y - 12, 10, col, t1);
+      text(6, a1, 230, y, 32, 'black', t1, t1 + 0.6);
+      text(6, '→  ' + a2, 660, y, 32, col, t2, t2 + 0.6);
+    });
+  }
+
+  // ---------------------------------------------------------------- 7 antagelser og censor-sætningen
+  B.goto('antag', 7);
+  bubble(7, 'Sig dine antagelser højt', 130, 135, 46, 'blue', S('antag') - 0.1, S('antag') + 0.9);
+  text(7, '•  lav hastighed: F_c = 0', 170, 220, 30, 'black', wt('antag', 'Lav') - 0.1, we('antag', 'nul'));
+  text(7, '•  lige ved grænsen til glidning', 170, 265, 30, 'black', wt('antag', 'glider') - 0.1, we('antag', 'grænsen'));
+  text(7, '•  konstant μ', 700, 220, 30, 'black', wt('antag', 'Konstant') - 0.1, we('antag', 'friktionskoefficient'));
+  text(7, '•  remmen strækker sig ikke', 700, 265, 30, 'black', wt('antag', 'strækker') - 0.3, we('antag', 'ikke', 1));
+  bubble(7, 'Til censor', 130, 360, 42, 'red', S('censor') - 0.1, S('censor') + 0.8);
+  {
+    const r = [
+      ['e^{μφ} ≈ 3  ⇒  F_2 = 1000 N', 'e', 'newton'],
+      ['T = 2000 N · 0,2 m = 400 N·m', 'Momentet', 'newtonmeter'],
+      ['F_i = 2000 N, akslen bærer 4000 N', 'Forspændingen', 'tusind', 2],
+    ];
+    r.forEach(([s, w1, w2, n], i) => text(7, s, 170, 440 + i * 60, 32, i === 1 ? 'red' : 'black', wt('censor', w1) - 0.2, we('censor', w2, n || 0)));
+  }
+
+  // ---------------------------------------------------------------- 8 tjek: centrifugalkraft
+  B.goto('tjek_q', 8);
+  B.tjek(8, ['Høj fart: F_c = 500 N.', 'Hvad bliver momentet?'], ['F_2 ≈ 500 + 2500/3 ≈ 1333 N', 'T ≈ 333 N·m: F_c spiste en sjettedel'], 'tjek_q', 'tjek_a');
+  {
+    const t1 = wt('tjek_a', 'momentet'), x0 = 420, sc = 1.2;
+    text(8, 'F_c = 0', 180, 590, 30, 'black', t1 - 0.4, t1); bar(8, x0, 560, 400, sc, 'black', t1 - 0.3, '400 N·m');
+    text(8, 'F_c = 500', 180, 655, 30, 'red', t1, t1 + 0.4); bar(8, x0, 625, 333, sc, 'red', t1 + 0.1, '333 N·m');
+  }
+
+  // ---------------------------------------------------------------- 9 slut
+  B.goto('slut', 9);
+  B.slut(9, 'MEM1 mundtlig eksamen, ny liste, spm. 9b · Hamrock m.fl., lign. (18.64), (19.6), (19.9) · Mathcad: Tidligere eksamen spm 15 Remtraek', '', 'slut');
+  text(9, '1.  e^{μφ} = 3  ⇒  F_2 = 1000 N', 200, 240, 36, 'green', wt('slut', 'e') - 0.1, we('slut', 'newton'));
+  text(9, '2.  T = 400 N·m', 200, 310, 36, 'red', wt('slut', 'momentet') - 0.1, we('slut', 'newtonmeter'));
+  text(9, '3.  F_i = 2000 N,  akslen bærer 4000 N', 200, 380, 36, 'blue', wt('slut', 'forspændes') - 0.3, we('slut', 'tusind', 2));
+});
+
+</script>
+<script>BP.live({"duration":220.187,"audio":"eks-spm9-b.mp3","order":["titel","data","data2","spm","trin1","tre","trin2","mindst","trin3","bil","trin4","aksel","rimelig","hvis","olie","omgang","vinkel","antag","censor","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":7.361,"words":[["Spørgsmål",0.54,1.22],["ni",1.38,1.46],["del",1.94,2.24],["b",2.44,2.46],["Nu",3.82,3.88],["regner",3.94,4.2],["vi",4.22,4.28],["på",4.36,4.48],["en",4.5,4.58],["rigtig",4.64,4.92],["fladrem",5.02,5.5],["og",5.841,5.921],["vi",5.941,6.001],["oversætter",6.121,6.581],["tallene",6.621,6.921],["undervejs",6.941,7.361]],"text":"Spørgsmål ni, del b. Nu regner vi på en rigtig fladrem, og vi oversætter tallene undervejs."},"data":{"start":9.181,"end":20.362,"words":[["Remmen",9.221,9.501],["kører",9.581,9.881],["langsomt",9.981,10.501],["så",10.781,10.901],["centrifugalkraften",10.941,11.941],["er",12.041,12.121],["nul",12.201,12.361],["Den",13.341,13.461],["ligger",13.501,13.741],["en",13.821,13.921],["halv",14.021,14.221],["omgang",14.321,14.661],["rundt",14.741,14.921],["om",14.961,15.041],["skiven",15.101,15.461],["så",15.941,16.061],["phi",16.201,16.321],["er",16.621,16.681],["pi",16.781,16.942],["Friktionskoefficienten",18.022,19.062],["er",19.242,19.322],["nul",19.462,19.622],["komma",19.682,19.842],["tre",19.922,20.062],["fem",20.222,20.362]],"text":"Remmen kører langsomt, så centrifugalkraften er nul. Den ligger en halv omgang rundt om skiven, så phi er pi. Friktionskoefficienten er nul komma tre fem."},"data2":{"start":21.842,"end":33.123,"words":[["Remmen",21.882,22.122],["må",22.142,22.242],["højst",22.302,22.562],["trækkes",22.602,23.002],["med",23.102,23.222],["tre",23.322,23.502],["tusind",23.682,24.082],["newton",24.122,24.482],["Det",25.282,25.402],["er",25.402,25.442],["som",25.442,25.562],["at",25.582,25.642],["hænge",25.662,25.862],["tre",25.882,26.202],["hundrede",26.302,26.542],["kilo",26.542,26.762],["i",26.842,26.862],["den",26.902,27.002],["Skiven",28.123,28.503],["har",28.583,28.683],["en",28.703,28.783],["radius",28.823,29.183],["på",29.283,29.423],["nul",29.523,29.663],["komma",29.743,29.903],["to",29.983,30.083],["meter",30.263,30.583],["altså",31.003,31.223],["fyrre",31.603,31.843],["centimeter",31.943,32.463],["i",32.543,32.563],["diameter",32.643,33.123]],"text":"Remmen må højst trækkes med tre tusind newton. Det er som at hænge tre hundrede kilo i den. Skiven har en radius på nul komma to meter, altså fyrre centimeter i diameter."},"spm":{"start":34.163,"end":40.224,"words":[["Spørgsmålet",34.203,34.743],["er",34.823,34.903],["hvor",35.363,35.503],["lille",35.543,35.763],["må",35.803,35.903],["kraften",35.943,36.343],["i",36.383,36.403],["den",36.443,36.563],["slappe",36.643,36.963],["part",37.063,37.343],["være",37.383,37.623],["og",38.084,38.184],["hvor",38.384,38.504],["stort",38.604,38.864],["moment",38.924,39.284],["kan",39.404,39.544],["remmen",39.584,39.804],["overføre",39.864,40.224]],"text":"Spørgsmålet er: hvor lille må kraften i den slappe part være, og hvor stort moment kan remmen overføre?"},"trin1":{"start":42.044,"end":52.165,"words":[["Trin",42.084,42.304],["et",42.404,42.504],["forholdet",43.224,43.684],["Mu",44.724,44.804],["gange",45.024,45.224],["phi",45.324,45.424],["er",45.784,45.864],["nul",45.984,46.144],["komma",46.224,46.384],["tre",46.464,46.604],["fem",46.784,46.924],["gange",47.024,47.224],["pi",47.284,47.384],["cirka",47.964,48.224],["et",48.424,48.504],["komma",48.564,48.764],["et",48.864,48.944],["Og",49.945,50.025],["e",50.165,50.185],["i",50.585,50.605],["et",50.685,50.785],["komma",50.825,50.985],["et",51.085,51.165],["er",51.505,51.585],["cirka",51.645,51.905],["tre",52.005,52.165]],"text":"Trin et: forholdet. Mu gange phi er nul komma tre fem gange pi, cirka et komma et. Og e i et komma et er cirka tre."},"tre":{"start":53.505,"end":59.005,"words":[["Den",53.545,53.665],["stramme",53.745,54.065],["part",54.125,54.365],["kan",54.425,54.545],["altså",54.565,54.725],["højst",54.745,54.985],["være",55.005,55.185],["tre",55.285,55.485],["gange",55.625,55.845],["den",55.885,56.005],["slappe",56.065,56.385],["Ligesom",57.065,57.285],["rebet",57.345,57.665],["en",57.725,57.825],["halv",57.925,58.105],["gang",58.145,58.305],["rundt",58.365,58.545],["om",58.585,58.665],["pælen",58.685,59.005]],"text":"Den stramme part kan altså højst være tre gange den slappe. Ligesom rebet en halv gang rundt om pælen."},"trin2":{"start":60.825,"end":68.945,"words":[["Trin",60.865,61.045],["to",61.085,61.185],["den",61.685,61.805],["slappe",61.885,62.205],["part",62.265,62.505],["F",63.705,63.725],["to",63.845,63.965],["er",64.345,64.425],["F",64.645,64.665],["et",64.805,64.905],["delt",65.085,65.325],["med",65.385,65.485],["tre",65.525,65.665],["Tre",66.645,66.785],["tusind",66.905,67.245],["delt",67.305,67.505],["med",67.525,67.605],["tre",67.645,67.765],["er",68.005,68.105],["tusind",68.205,68.585],["newton",68.605,68.945]],"text":"Trin to: den slappe part. F to er F et delt med tre. Tre tusind delt med tre er tusind newton."},"mindst":{"start":69.785,"end":78.586,"words":[["Det",69.825,69.905],["er",69.905,69.945],["den",69.965,70.065],["mindste",70.225,70.626],["kraft",70.686,70.986],["den",71.206,71.306],["slappe",71.366,71.626],["part",71.686,71.906],["må",71.926,72.046],["have",72.066,72.246],["Er",72.926,72.966],["den",73.006,73.086],["lavere",73.126,73.466],["kan",73.806,73.926],["friktionen",73.946,74.406],["ikke",74.426,74.526],["holde",74.566,74.746],["forskellen",74.826,75.326],["og",75.646,75.706],["remmen",75.746,75.946],["glider",76.006,76.306],["Derfor",77.146,77.466],["skal",77.606,77.746],["remmen",77.766,78.006],["spændes",78.086,78.366],["op",78.466,78.586]],"text":"Det er den mindste kraft, den slappe part må have. Er den lavere, kan friktionen ikke holde forskellen, og remmen glider. Derfor skal remmen spændes op."},"trin3":{"start":80.406,"end":90.967,"words":[["Trin",80.446,80.626],["tre",80.686,80.826],["momentet",81.266,81.727],["Forskellen",82.547,83.107],["er",83.247,83.327],["tre",83.407,83.567],["tusind",83.687,84.047],["minus",84.107,84.387],["tusind",84.467,84.827],["altså",85.187,85.407],["to",85.567,85.687],["tusind",85.827,86.147],["newton",86.187,86.507],["Gange",87.327,87.527],["radius",87.587,87.947],["nul",88.147,88.287],["komma",88.327,88.487],["to",88.547,88.647],["meter",88.767,89.047],["giver",89.427,89.587],["det",89.587,89.667],["fire",89.827,90.027],["hundrede",90.087,90.327],["newtonmeter",90.367,90.967]],"text":"Trin tre: momentet. Forskellen er tre tusind minus tusind, altså to tusind newton. Gange radius nul komma to meter giver det fire hundrede newtonmeter."},"bil":{"start":92.027,"end":98.688,"words":[["Hvad",92.067,92.167],["betyder",92.187,92.488],["det",92.508,92.588],["Fire",93.608,93.788],["hundrede",93.848,94.088],["newtonmeter",94.088,94.688],["er",94.828,94.908],["mere",94.948,95.188],["end",95.228,95.308],["motoren",95.348,95.728],["i",95.808,95.828],["en",95.888,95.948],["almindelig",95.988,96.328],["familiebil",96.368,96.868],["En",97.548,97.648],["god",97.768,97.928],["kraftig",98.168,98.508],["rem",98.548,98.688]],"text":"Hvad betyder det? Fire hundrede newtonmeter er mere end motoren i en almindelig familiebil. En god, kraftig rem."},"trin4":{"start":100.508,"end":109.129,"words":[["Trin",100.548,100.728],["fire",100.768,100.968],["er",101.588,101.648],["det",101.668,101.748],["rimeligt",101.788,102.108],["Forspændingen",102.908,103.489],["skal",103.509,103.629],["være",103.649,103.789],["F",104.009,104.029],["et",104.129,104.229],["plus",104.289,104.469],["F",104.649,104.669],["to",104.729,104.829],["delt",104.949,105.169],["med",105.189,105.269],["to",105.289,105.389],["ligning",106.029,106.329],["nitten",106.389,106.629],["seks",106.689,106.909],["Det",107.789,107.909],["er",108.009,108.089],["to",108.249,108.369],["tusind",108.509,108.809],["newton",108.829,109.129]],"text":"Trin fire: er det rimeligt? Forspændingen skal være F et plus F to delt med to, ligning nitten seks. Det er to tusind newton."},"aksel":{"start":109.989,"end":116.69,"words":[["Og",110.029,110.089],["akslen",110.229,110.549],["bliver",110.569,110.729],["trukket",110.749,111.049],["med",111.069,111.149],["summen",111.229,111.469],["af",111.489,111.549],["de",111.569,111.609],["to",111.649,111.729],["parter",111.829,112.149],["fire",112.569,112.809],["tusind",112.869,113.189],["newton",113.209,113.529],["Det",114.09,114.19],["skal",114.25,114.39],["lejerne",114.43,114.69],["kunne",114.71,114.83],["bære",114.83,115.07],["Det",115.81,115.95],["overser",116.13,116.47],["mange",116.49,116.69]],"text":"Og akslen bliver trukket med summen af de to parter, fire tusind newton. Det skal lejerne kunne bære. Det overser mange."},"rimelig":{"start":118.39,"end":123.39,"words":[["Remmen",118.43,118.67],["bruger",118.71,118.93],["kun",118.95,119.09],["en",119.13,119.21],["tredjedel",119.25,119.75],["af",119.77,119.83],["sin",119.85,119.95],["styrke",119.99,120.29],["i",120.29,120.31],["den",120.37,120.47],["slappe",120.51,120.79],["part",120.83,121.05],["Det",121.59,121.67],["er",121.69,121.73],["normalt",121.75,122.07],["for",122.11,122.19],["en",122.21,122.27],["fladrem",122.31,122.65],["på",122.69,122.79],["en",122.81,122.87],["halv",122.89,123.05],["omgang",123.09,123.39]],"text":"Remmen bruger kun en tredjedel af sin styrke i den slappe part. Det er normalt for en fladrem på en halv omgang."},"hvis":{"start":125.21,"end":128.07,"words":[["Hvad",125.25,125.39],["nu",125.41,125.47],["hvis",125.51,125.71],["Her",126.47,126.61],["viser",126.71,126.95],["du",126.97,127.01],["censor",127.07,127.35],["at",127.37,127.41],["du",127.43,127.49],["har",127.51,127.59],["forstået",127.61,127.97],["det",127.99,128.07]],"text":"Hvad nu hvis? Her viser du censor, at du har forstået det."},"olie":{"start":129.43,"end":136.831,"words":[["Kommer",129.47,129.65],["der",129.67,129.75],["olie",129.83,130.05],["på",130.09,130.25],["så",130.61,130.79],["e",131.11,131.13],["i",131.29,131.31],["mu",131.39,131.47],["phi",131.59,131.67],["kun",131.83,131.97],["er",132.05,132.11],["to",132.25,132.37],["bliver",132.81,133.05],["F",133.19,133.21],["to",133.27,133.37],["femten",133.71,133.97],["hundrede",134.01,134.25],["newton",134.25,134.55],["og",134.85,134.91],["momentet",134.93,135.251],["falder",135.291,135.531],["til",135.571,135.691],["tre",135.771,135.931],["hundrede",136.031,136.271],["newtonmeter",136.311,136.831]],"text":"Kommer der olie på, så e i mu phi kun er to, bliver F to femten hundrede newton, og momentet falder til tre hundrede newtonmeter."},"omgang":{"start":138.211,"end":146.612,"words":[["Ligger",138.251,138.451],["remmen",138.491,138.711],["en",138.751,138.831],["hel",138.951,139.171],["omgang",139.251,139.551],["rundt",139.591,139.791],["bliver",140.031,140.171],["forholdet",140.211,140.611],["cirka",140.671,140.931],["ni",141.091,141.171],["F",142.011,142.031],["to",142.071,142.151],["falder",142.271,142.491],["til",142.531,142.651],["tre",142.691,142.851],["hundrede",142.931,143.091],["og",143.091,143.131],["treogtredive",143.131,143.691],["og",144.031,144.111],["momentet",144.151,144.451],["stiger",144.491,144.731],["til",144.771,144.891],["fem",145.051,145.191],["hundrede",145.251,145.511],["og",145.511,145.551],["treogtredive",145.571,146.032],["newtonmeter",146.092,146.612]],"text":"Ligger remmen en hel omgang rundt, bliver forholdet cirka ni. F to falder til tre hundrede og treogtredive, og momentet stiger til fem hundrede og treogtredive newtonmeter."},"vinkel":{"start":147.772,"end":155.092,"words":[["Med",147.812,147.912],["kun",147.952,148.112],["hundrede",148.172,148.412],["og",148.412,148.452],["halvtreds",148.452,148.832],["graders",148.892,149.152],["omslutning",149.212,149.672],["som",149.852,149.992],["på",150.032,150.132],["en",150.152,150.212],["lille",150.272,150.492],["skive",150.532,150.812],["er",151.152,151.232],["forholdet",151.272,151.692],["to",151.772,151.872],["en",151.992,152.032],["halv",152.072,152.252],["Så",152.892,152.992],["kan",153.012,153.112],["den",153.132,153.212],["kun",153.232,153.352],["overføre",153.392,153.712],["tre",153.772,153.892],["hundrede",153.972,154.172],["og",154.172,154.212],["tres",154.212,154.452],["newtonmeter",154.532,155.092]],"text":"Med kun hundrede og halvtreds graders omslutning, som på en lille skive, er forholdet to en halv. Så kan den kun overføre tre hundrede og tres newtonmeter."},"antag":{"start":156.912,"end":166.453,"words":[["Sig",156.952,157.093],["antagelserne",157.173,157.693],["højt",157.733,157.913],["Lav",158.593,158.733],["hastighed",158.813,159.193],["så",159.453,159.573],["F",159.793,159.813],["c",159.873,159.893],["er",160.053,160.133],["nul",160.153,160.293],["Remmen",160.993,161.213],["glider",161.233,161.493],["ikke",161.573,161.753],["den",162.033,162.133],["er",162.153,162.213],["lige",162.233,162.333],["ved",162.353,162.433],["grænsen",162.433,162.753],["Konstant",163.273,163.733],["friktionskoefficient",163.753,164.673],["Og",165.373,165.453],["remmen",165.533,165.773],["strækker",165.833,166.153],["sig",166.173,166.293],["ikke",166.333,166.453]],"text":"Sig antagelserne højt. Lav hastighed, så F c er nul. Remmen glider ikke, den er lige ved grænsen. Konstant friktionskoefficient. Og remmen strækker sig ikke."},"censor":{"start":168.273,"end":183.694,"words":[["Det",168.313,168.413],["du",168.433,168.473],["siger",168.533,168.693],["til",168.713,168.813],["censor",168.833,169.133],["er",169.253,169.313],["e",170.213,170.233],["i",170.333,170.353],["mu",170.433,170.493],["phi",170.633,170.713],["er",170.873,170.933],["cirka",170.993,171.253],["tre",171.313,171.453],["så",171.973,172.093],["F",172.253,172.273],["to",172.333,172.413],["er",172.533,172.613],["tusind",172.673,172.993],["newton",173.013,173.313],["Momentet",173.953,174.293],["er",174.333,174.393],["forskellen",174.433,174.873],["to",175.233,175.333],["tusind",175.473,175.813],["newton",175.833,176.173],["gange",176.453,176.693],["nul",176.753,176.893],["komma",176.933,177.073],["to",177.113,177.193],["meter",177.273,177.513],["altså",177.933,178.133],["fire",178.273,178.494],["hundrede",178.554,178.834],["newtonmeter",178.834,179.374],["Forspændingen",180.174,180.694],["er",180.734,180.794],["to",180.854,180.954],["tusind",181.074,181.354],["newton",181.354,181.654],["og",182.034,182.094],["akslen",182.174,182.474],["belastes",182.514,182.914],["med",182.954,183.054],["fire",183.134,183.334],["tusind",183.394,183.694]],"text":"Det, du siger til censor, er: e i mu phi er cirka tre, så F to er tusind newton. Momentet er forskellen, to tusind newton, gange nul komma to meter, altså fire hundrede newtonmeter. Forspændingen er to tusind newton, og akslen belastes med fire tusind."},"tjek_q":{"start":185.514,"end":191.555,"words":[["Tjek",185.554,185.714],["dig",185.754,185.834],["selv",185.854,186.014],["Remmen",186.814,187.034],["kører",187.094,187.314],["hurtigt",187.374,187.734],["så",188.054,188.174],["centrifugalkraften",188.254,189.134],["er",189.234,189.294],["fem",189.434,189.594],["hundrede",189.654,189.895],["newton",189.915,190.215],["Hvad",190.875,190.995],["bliver",191.015,191.195],["momentet",191.215,191.555]],"text":"Tjek dig selv. Remmen kører hurtigt, så centrifugalkraften er fem hundrede newton. Hvad bliver momentet?"},"tjek_a":{"start":195.175,"end":206.876,"words":[["F",195.215,195.235],["to",195.295,195.375],["minus",195.515,195.775],["fem",195.855,195.975],["hundrede",196.035,196.315],["er",196.435,196.515],["to",196.655,196.755],["tusind",196.875,197.175],["fem",197.215,197.355],["hundrede",197.415,197.955],["delt",197.955,198.075],["med",198.095,198.175],["tre",198.215,198.315],["Så",198.875,199.015],["F",199.215,199.235],["to",199.295,199.375],["er",199.475,199.555],["cirka",199.575,199.815],["tretten",199.815,200.075],["hundrede",200.175,200.375],["og",200.375,200.415],["treogtredive",200.435,200.935],["newton",200.975,201.275],["og",201.795,201.875],["momentet",201.895,202.195],["falder",202.235,202.476],["til",202.496,202.616],["tre",202.736,202.876],["hundrede",202.976,203.176],["og",203.176,203.216],["treogtredive",203.216,203.716],["newtonmeter",203.756,204.276],["Centrifugalkraften",204.856,205.736],["har",205.736,205.816],["spist",205.836,206.136],["en",206.236,206.316],["sjettedel",206.436,206.876]],"text":"F to minus fem hundrede er to tusind fem hundrede delt med tre. Så F to er cirka tretten hundrede og treogtredive newton, og momentet falder til tre hundrede og treogtredive newtonmeter. Centrifugalkraften har spist en sjettedel."},"slut":{"start":208.696,"end":218.717,"words":[["Kort",208.736,208.916],["sagt",208.936,209.116],["e",209.616,209.636],["i",209.756,209.776],["mu",209.836,209.916],["phi",210.036,210.136],["er",210.336,210.416],["tre",210.476,211.376],["F",211.436,211.456],["to",211.516,211.596],["er",211.736,211.816],["tusind",211.856,212.156],["newton",212.156,212.456],["og",212.836,212.896],["momentet",212.936,213.276],["er",213.316,213.376],["fire",213.476,213.676],["hundrede",213.737,213.977],["newtonmeter",213.977,214.497],["Remmen",215.057,215.277],["skal",215.297,215.437],["forspændes",215.437,215.857],["med",215.897,215.977],["to",216.017,216.117],["tusind",216.217,216.517],["newton",216.537,216.857],["og",217.217,217.297],["akslen",217.377,217.677],["bærer",217.717,217.977],["fire",218.137,218.377],["tusind",218.437,218.717]],"text":"Kort sagt: e i mu phi er tre, F to er tusind newton, og momentet er fire hundrede newtonmeter. Remmen skal forspændes med to tusind newton, og akslen bærer fire tusind."}}}, { audio: 'eks-spm9-b.mp3', id: 'eks-spm9-b' });</script>
+</body>
+</html>

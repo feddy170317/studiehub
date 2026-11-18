@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spm. 6b: hvor hårdt skal du dreje? · video</title>
+<meta name="description" content="Ny liste, spm. 6b trin for trin: T = 18,1 N·m, selvlåsende, η = 44 %, hvad nu hvis.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;600;800&display=block">
+<link rel="stylesheet" href="../../../video-motor/afspiller.css">
+</head>
+<body>
+<div class="top"><a href="index.html">← Kapitel 16: videoer</a><h1>Spm. 6b: hvor hårdt skal du dreje?</h1><span class="meta">MEM1 · kapitel 16 · AI-stemme (Google Gemini)</span></div>
+<div id="vid">
+  <div id="scr"><canvas id="cv" width="1280" height="720" aria-label="Video: Spm. 6b: hvor hårdt skal du dreje?"></canvas><div id="cap" aria-live="polite"></div>
+    <button id="big" aria-label="Afspil" hidden>▶</button><div id="load">Indlæser …</div></div>
+  <div id="bar">
+    <button id="play" aria-label="Afspil">▶</button>
+    <button id="back" title="10 sekunder tilbage">↺ 10</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Tidslinje">
+    <span id="time">0:00</span>
+    <select id="rate" aria-label="Hastighed"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option><option value="1.5">1,5×</option><option value="2">2×</option></select>
+    <button id="cc" title="Undertekster (c)">CC</button>
+    <button id="fs" title="Fuld skærm (f)">⛶</button>
+  </div>
+</div>
+<div class="under"><p>Ny liste, spm. 6b trin for trin: T = 18,1 N·m, selvlåsende, η = 44 %, hvad nu hvis.</p><div class="chips"><a href="../../opgaver/l16/tidligere-eksamen-spm-12-kraftskrue.pdf">📐 Se udregningen i Mathcad (PDF)</a><a href="eks-spm6-a.html">Se først: Spm. 6a: kraftskruer forklaret fra bunden</a><a href="../../../../lab/mem1/kraftskrue.html">🧪 Prøv det selv i 3D-labbet</a><a href="../../Kapitel16_Studienote.pdf">📄 Studienote (PDF)</a><a href="../../../../index.html#edu/maskiningenioer/sem3/mem1/l16">← Studiehub</a></div><p style="color:#8a8a95;font-size:13px;margin-top:12px">Tryk på billedet for pause · mellemrum = afspil/pause · ← → = spol 5 s · c = undertekster · f = fuld skærm</p></div>
+<script src="../../../video-motor/harness.js"></script>
+<script src="../../../video-motor/motor.js"></script>
+<script src="../../../video-motor/afspiller.js"></script>
+<script>
+// MEM1 mundtlig eksamen (ny liste) · Spm. 6b v2: kraftskruen trin for trin, hvert tal oversat.
+// d_m = 20, l = 5 mm, μ = 0,10, W = 10 kN (≈ 1 t): π d_m = 62,83, tan λ = 0,0796 (λ = 4,5°), T = 100 000 · 11,83/63,33 = 18 102 N·mm = 18,1 N·m
+// (håndtag 20 cm ⇒ 90 N ≈ 9 kg). μ > tan λ ⇒ selvlåsende. T_0 = Wl/2π = 8,0 N·m, η = 44 % (16.14), T_sænk = 2,0 N·m.
+// Hvad hvis: μ = 0,05 ⇒ 13,0 N·m, ikke selvlåsende; l = 10 ⇒ 26,3 N·m, tan λ = 0,16 > μ. Tjek: μ = 0 ⇒ 8 N·m.
+BP.scene({ header: 'MEM1 · mundtlig eksamen · spm. 6b', graesk: true }, (B) => {
+  const { wt, we, L, text, bubble, line, arrow, dot, ring, ell, rect, hatch, PI } = B;
+  const S = (id) => L(id).start;
+  const ringet = (k, s, x, y, size, col, a, te) => { const r = text(k, s, x, y, size, col, a, te); ring(r, col, te, te + 0.5); return r; };
+  const trin = (k, s, id) => bubble(k, s, 130, 135, 48, 'blue', S(id) - 0.1, S(id) + 0.9);
+  const bar = (k, x0, y, v, sc, col, a, et) => {
+    line(k, rect(x0, y, v * sc, 40).concat([[x0, y]]), col, 3, a, a + 0.5); hatch(k, rect(x0, y, v * sc, 40), col, a + 0.3, a + 0.8, { gap: 10 });
+    if (et) text(k, et, x0 + v * sc + 16, y + 31, 28, col, a + 0.4, a + 0.8);
+  };
+
+  // ---------------------------------------------------------------- 0 titel
+  B.titel(0, 'Spm. 6b: kraftskruen', 'hvor hårdt skal du dreje? · hvert tal oversat', 'titel');
+
+  // ---------------------------------------------------------------- 1 data
+  B.goto('data', 1);
+  bubble(1, 'Kraftskruen', 130, 135, 50, 'blue', S('data') - 0.1, S('data') + 0.7);
+  text(1, 'firkantgevind,  d_m = 20 mm', 170, 230, 36, 'black', wt('data', 'firkantgevind') - 0.1, we('data', 'millimeter'));
+  text(1, 'l = p = 5 mm  (ét løb)', 170, 300, 36, 'black', wt('data', 'Stigningen') - 0.1, we('data', 'millimeter', 2));
+  text(1, 'μ = 0,10', 170, 370, 36, 'green', wt('data', 'Friktionskoefficienten') - 0.1, we('data', 'et'));
+  text(1, 'W = 10 kN  ≈  1 ton (en lille bil)', 170, 440, 36, 'red', wt('last', 'Lasten') - 0.1, we('last', 'bil'));
+  ringet(1, 'moment T for at løfte?', 170, 540, 40, 'red', wt('last', 'moment') - 0.3, we('last', 'den'));
+  {
+    const x = 980, td = wt('data', 'firkantgevind');
+    line(1, rect(x - 40, 220, 80, 380).concat([[x - 40, 220]]), 'black', 3.4, td - 0.1, td + 0.4);
+    for (let i = 0; i < 9; i++) line(1, [[x - 40, 250 + i * 38], [x + 40, 270 + i * 38]], 'black', 3, td + 0.2 + i * 0.04, td + 0.4 + i * 0.04);
+    const tw = wt('last', 'ton');
+    line(1, rect(x - 100, 150, 200, 60).concat([[x - 100, 150]]), 'red', 3.4, tw - 0.2, tw + 0.2);
+    text(1, '1 t', x, 192, 30, 'red', tw, tw + 0.3, { align: 'center' });
+  }
+
+  // ---------------------------------------------------------------- 2 trin 1: rampen
+  B.goto('trin1', 2);
+  trin(2, 'Trin 1:  rampen', 'trin1');
+  {
+    const x0 = 200, y0 = 520, w = 628, h = 50, ta = wt('trin1', 'Pi');
+    line(2, [[x0, y0], [x0 + w, y0], [x0 + w, y0 - h], [x0, y0]], 'blue', 3.6, ta - 0.1, ta + 0.6);
+    B.dobbeltpil(2, [x0, y0 + 24], [x0 + w, y0 + 24], 'black', ta, ta + 0.4);
+    text(2, 'π d_m = 62,83 mm (én omgang)', x0 + w / 2, y0 + 64, 30, 'black', ta, we('trin1', 'omgang'), { align: 'center' });
+    const tl = wt('tan', 'fem');
+    text(2, 'l = 5', x0 + w + 16, y0 - 16, 30, 'green', tl - 0.1, tl + 0.4);
+  }
+  ringet(2, 'tan λ = 5 / 62,83 = 0,08', 170, 260, 42, 'red', wt('tan', 'Tangens') - 0.1, we('tan', 'otte'));
+  text(2, 'λ ≈ 4,5°: en meget flad rampe', 170, 340, 34, 'blue', wt('tan', 'Stigningsvinklen') - 0.1, we('tan', 'rampe'));
+
+  // ---------------------------------------------------------------- 3 trin 2: momentet
+  B.goto('trin2', 3);
+  trin(3, 'Trin 2:  momentet', 'trin2');
+  B.formel(3, '16.10', 'T = W d_m/2 · (l + π μ d_m) / (π d_m − μ l)', 190, 225, 30, wt('trin2', 'momentet') - 0.1, wt('trin2', 'momentet') + 0.9, 'red');
+  text(3, 'tæller:  5 + 0,1 · 62,83 = 11,83', 170, 300, 34, 'black', wt('trin2', 'Tælleren') - 0.1, we('trin2', 'tre', 1));
+  text(3, 'nævner:  62,83 − 0,1 · 5 = 62,33', 170, 360, 34, 'black', wt('naevner', 'Nævneren') - 0.1, we('naevner', 'tre', 1));
+  text(3, 'W d_m / 2 = 10 000 · 10 = 100 000 N·mm', 170, 420, 34, 'black', wt('arm', 'W') - 0.1, we('arm', 'newtonmillimeter'));
+  ringet(3, 'T = 100 000 · 11,83 / 62,33 ≈ 18,1 N·m', 170, 500, 38, 'red', wt('T', 'Momentet') - 0.1, we('T', 'newtonmeter'));
+  {
+    const th = wt('haand', 'håndtag'), cx = 1000, cy = 610;
+    line(3, ell(cx, cy, 20, 20, 0, 2 * PI), 'black', 3.4, th - 0.2, th);
+    line(3, [[cx + 20, cy], [cx + 200, cy]], 'blue', 6, th, th + 0.4);
+    text(3, '20 cm', cx + 110, cy - 16, 26, 'blue', th + 0.2, th + 0.5, { align: 'center' });
+    const tn = wt('haand', 'halvfems');
+    arrow(3, [[cx + 200, cy - 80], [cx + 200, cy - 6]], 'green', 4, tn - 0.1, tn + 0.3, 14);
+    text(3, '90 N ≈ 9 kg', cx + 30, cy - 88, 28, 'green', tn, we('haand', 'kilo'));
+  }
+  text(3, 'med én hånd løfter du et ton', 170, 600, 32, 'green', wt('haand', 'hånd') - 0.4, we('haand', 'ton'));
+
+  // ---------------------------------------------------------------- 4 trin 3: selvlåsende?
+  B.goto('trin3', 4);
+  trin(4, 'Trin 3:  selvlåsende?', 'trin3');
+  {
+    const ta = wt('trin3', 'Mu'), x0 = 240, x1 = 1060, y = 400, P = (v) => x0 + v / 0.12 * (x1 - x0);
+    line(4, [[x0, y], [x1, y]], 'black', 3, ta - 0.3, ta + 0.1);
+    [0, 0.04, 0.08, 0.12].forEach((v, i) => text(4, String(v).replace('.', ','), P(v), y + 50, 24, 'black', ta + i * 0.05, ta + 0.3 + i * 0.05, { align: 'center' }));
+    const tl = wt('trin3', 'tangens');
+    line(4, [[P(0.0796), y - 26], [P(0.0796), y + 26]], 'red', 4, tl - 0.1, tl + 0.2);
+    text(4, 'tan λ = 0,08', P(0.0796), y - 40, 28, 'red', tl, tl + 0.4, { align: 'center' });
+    dot(4, P(0.1), y, 12, 'green', ta);
+    text(4, 'μ = 0,10', P(0.1) + 10, y + 90, 28, 'green', ta, ta + 0.4);
+  }
+  B.formel(4, '16.15', 'μ = 0,10  >  tan λ = 0,08', 190, 560, 38, wt('trin3', 'størst') - 0.6, we('trin3', 'størst'), 'green');
+  ringet(4, 'ja: lasten bliver stående', 190, 650, 36, 'red', wt('ja', 'Ja') - 0.1, we('ja', 'stående'));
+
+  // ---------------------------------------------------------------- 5 trin 4: rimeligt? virkningsgrad og sænkning
+  B.goto('trin4', 5);
+  trin(5, 'Trin 4:  er det rimeligt?', 'trin4');
+  {
+    const t0 = wt('trin4', 'otte'), t1 = wt('trin4', 'atten'), x0 = 420, sc = 30;
+    text(5, 'uden friktion', 170, 270, 30, 'black', t0 - 0.6, t0); bar(5, x0, 240, 8.0, sc, 'green', t0 - 0.2, '8 N·m');
+    text(5, 'med friktion', 170, 340, 30, 'black', t1 - 0.4, t1); bar(5, x0, 310, 18.1, sc, 'red', t1 - 0.2, '18,1 N·m');
+  }
+  B.formel(5, '16.14', 'η = W l / (2π T) = 44 %  < 50 %', 190, 450, 36, wt('eta', 'Virkningsgraden') - 0.1, we('eta', 'have'), 'blue');
+  ringet(5, 'sænkemoment ≈ +2 N·m  ⇒  bekræfter selvlåsning', 170, 570, 34, 'red', wt('saenk', 'Sænkemomentet') - 0.1, we('saenk', 'selvlåsningen'));
+
+  // ---------------------------------------------------------------- 6 hvad nu hvis?
+  B.goto('hvis', 6);
+  bubble(6, 'Hvad nu hvis?', 130, 135, 50, 'blue', S('hvis') - 0.1, S('hvis') + 0.8);
+  text(6, 'her viser du, at du har forstået det', 640, 140, 28, 'green', wt('hvis', 'viser') - 0.1, we('hvis', 'det'));
+  {
+    const rows = [
+      ['smurt', 'smurt: μ = 0,05', '13,0 N·m', 'green', 'Smører', 'tretten'],
+      ['smurt', '0,05 < 0,08', 'ikke selvlåsende!', 'red', 'mindre', 'selvlåsende'],
+      ['stig', 'dobbelt stigning (l = 10)', '26,3 N·m', 'blue', 'Dobbelt', 'seksogtyve'],
+      ['stig', 'tan λ = 0,16 > μ', 'ikke selvlåsende!', 'red', 'tangens', 'selvlåsende'],
+    ];
+    rows.forEach(([id, a1, a2, col, w1, w2], i) => {
+      const y = 250 + i * 100, t1 = wt(id, w1) - 0.2, t2 = wt(id, w2) - 0.6;
+      dot(6, 220, y - 12, 10, col, t1);
+      text(6, a1, 260, y, 34, 'black', t1, t1 + 0.6);
+      text(6, '→  ' + a2, 760, y, 34, col, t2, t2 + 0.6);
+    });
+  }
+
+  // ---------------------------------------------------------------- 7 antagelser og censor-sætningen
+  B.goto('antag', 7);
+  bubble(7, 'Sig dine antagelser højt', 130, 135, 46, 'blue', S('antag') - 0.1, S('antag') + 0.9);
+  text(7, '•  firkantgevind', 170, 220, 30, 'black', wt('antag', 'Firkantgevind') - 0.1, we('antag', 'Firkantgevind'));
+  text(7, '•  ingen kravefriktion', 170, 265, 30, 'black', wt('antag', 'Ingen') - 0.1, we('antag', 'kraven'));
+  text(7, '•  konstant μ', 700, 220, 30, 'black', wt('antag', 'Konstant') - 0.1, we('antag', 'friktionskoefficient'));
+  text(7, '•  statisk last, ingen rystelser', 700, 265, 30, 'red', wt('antag', 'statisk') - 0.1, we('antag', 'kravle'));
+  bubble(7, 'Til censor', 130, 360, 42, 'red', S('censor') - 0.1, S('censor') + 0.8);
+  {
+    const r = [
+      ['T = 18,1 N·m for at løfte 10 kN', 'hævemomentet', 'newtonmeter'],
+      ['tan λ = 0,08 < μ = 0,1  ⇒  selvlåsende', 'Tangens', 'selvlåsende'],
+      ['η = 44 % < 50 %: som det skal være', 'Virkningsgraden', 'skrue'],
+    ];
+    r.forEach(([s, w1, w2], i) => text(7, s, 170, 440 + i * 60, 32, i === 1 ? 'red' : 'black', wt('censor', w1) - 0.2, we('censor', w2)));
+  }
+
+  // ---------------------------------------------------------------- 8 tjek: uden friktion
+  B.goto('tjek_q', 8);
+  B.tjek(8, ['Ingen friktion overhovedet:', 'hvad er momentet?'], ['T_0 = W l / (2π) ≈ 8 N·m', 'friktionen koster mere end løftet'], 'tjek_q', 'tjek_a');
+  {
+    const t1 = wt('tjek_a', 'otte'), x0 = 420, sc = 30;
+    text(8, 'løft', 200, 590, 30, 'green', t1 - 0.1, t1 + 0.3); bar(8, x0, 560, 8.0, sc, 'green', t1, '8');
+    text(8, 'friktion', 200, 655, 30, 'red', t1 + 0.4, t1 + 0.8); bar(8, x0, 625, 10.1, sc, 'red', wt('tjek_a', 'koster') - 0.2, '10,1');
+  }
+
+  // ---------------------------------------------------------------- 9 slut
+  B.goto('slut', 9);
+  B.slut(9, 'MEM1 mundtlig eksamen, ny liste, spm. 6b · Hamrock m.fl., kap. 16, lign. (16.3), (16.10), (16.14), (16.15) · Mathcad: Tidligere eksamen spm 12 Kraftskrue', 'spm. 7: skruefjedre', 'slut');
+  text(9, '1.  T = 18,1 N·m', 200, 240, 36, 'red', wt('slut', 'hævemomentet') - 0.1, we('slut', 'newtonmeter'));
+  text(9, '2.  μ > tan λ  ⇒  selvlåsende', 200, 310, 36, 'blue', wt('slut', 'selvlåsende') - 0.1, we('slut', 'lambda'));
+  text(9, '3.  η = 44 %', 200, 380, 36, 'green', wt('slut', 'virkningsgraden') - 0.1, we('slut', 'procent'));
+});
+
+</script>
+<script>BP.live({"duration":234.278,"audio":"eks-spm6-b.mp3","order":["titel","data","last","trin1","tan","trin2","naevner","arm","T","haand","trin3","ja","trin4","eta","saenk","hvis","smurt","stig","antag","censor","tjek_q","tjek_a","slut"],"lines":{"titel":{"start":0.5,"end":6.661,"words":[["Spørgsmål",0.54,0.98],["seks",1.16,1.42],["del",1.82,2.0],["b",2.06,2.08],["Nu",3.3,3.36],["regner",3.42,3.66],["vi",3.68,3.72],["på",3.78,3.9],["en",3.94,4.02],["rigtig",4.06,4.3],["kraftskrue",4.36,4.96],["og",5.34,5.4],["vi",5.44,5.48],["oversætter",5.56,5.921],["tallene",5.961,6.261],["undervejs",6.281,6.661]],"text":"Spørgsmål seks, del b. Nu regner vi på en rigtig kraftskrue, og vi oversætter tallene undervejs."},"data":{"start":8.481,"end":21.522,"words":[["Skruen",8.521,8.901],["har",8.981,9.121],["firkantgevind",9.241,10.001],["med",10.501,10.641],["middeldiameter",10.781,11.481],["tyve",11.581,11.861],["millimeter",11.921,12.321],["Stigningen",13.081,13.561],["er",13.701,13.801],["fem",13.941,14.081],["millimeter",14.121,14.521],["og",15.021,15.081],["gevindet",15.121,15.461],["har",15.501,15.601],["ét",15.761,15.861],["løb",15.961,16.161],["så",16.521,16.681],["l",16.981,17.001],["er",17.361,17.461],["fem",17.721,17.982],["millimeter",18.002,18.382],["Friktionskoefficienten",19.422,20.422],["er",20.682,20.762],["nul",20.922,21.082],["komma",21.142,21.322],["et",21.422,21.522]],"text":"Skruen har firkantgevind med middeldiameter tyve millimeter. Stigningen er fem millimeter, og gevindet har ét løb, så l er fem millimeter. Friktionskoefficienten er nul komma et."},"last":{"start":22.962,"end":32.143,"words":[["Lasten",23.002,23.362],["er",23.642,23.722],["ti",23.882,24.022],["kilonewton",24.162,24.762],["Det",25.422,25.522],["er",25.522,25.562],["cirka",25.562,25.782],["et",26.042,26.142],["ton",26.202,26.402],["vægten",26.982,27.242],["af",27.262,27.322],["en",27.342,27.402],["lille",27.442,27.602],["bil",27.622,27.802],["Spørgsmålet",28.762,29.243],["er",29.323,29.383],["hvor",29.843,29.963],["stort",30.063,30.363],["et",30.423,30.503],["moment",30.543,30.823],["skal",30.863,31.003],["der",31.023,31.103],["til",31.123,31.263],["for",31.583,31.683],["at",31.683,31.743],["løfte",31.803,32.043],["den",32.063,32.143]],"text":"Lasten er ti kilonewton. Det er cirka et ton, vægten af en lille bil. Spørgsmålet er: hvor stort et moment skal der til for at løfte den?"},"trin1":{"start":33.963,"end":43.044,"words":[["Trin",34.003,34.203],["et",34.303,34.403],["rampen",35.043,35.383],["Pi",36.483,36.603],["gange",36.963,37.263],["d",37.603,37.623],["m",38.003,38.023],["er",38.623,38.723],["treogtres",38.943,39.483],["komma",39.623,39.823],["otte",40.023,40.263],["tre",40.283,40.403],["millimeter",40.663,41.084],["Det",41.844,41.964],["er",42.004,42.084],["én",42.264,42.384],["omgang",42.504,42.784],["rundt",42.864,43.044]],"text":"Trin et: rampen. Pi gange d m er treogtres komma otte tre millimeter. Det er én omgang rundt."},"tan":{"start":44.304,"end":55.645,"words":[["Tangens",44.344,44.844],["lambda",45.004,45.324],["er",45.964,46.044],["fem",46.284,46.444],["delt",46.704,46.944],["med",47.004,47.104],["treogtres",47.204,47.684],["komma",47.824,48.024],["otte",48.164,48.344],["tre",48.404,48.524],["Det",49.344,49.464],["er",49.564,49.664],["nul",50.084,50.244],["komma",50.384,50.584],["nul",50.664,50.804],["otte",50.964,51.184],["Stigningsvinklen",51.964,52.625],["er",52.725,52.805],["kun",52.845,53.005],["fire",53.285,53.505],["en",53.525,53.565],["halv",53.605,53.745],["grad",53.765,53.965],["En",54.685,54.785],["meget",54.925,55.145],["flad",55.185,55.345],["rampe",55.405,55.645]],"text":"Tangens lambda er fem delt med treogtres komma otte tre. Det er nul komma nul otte. Stigningsvinklen er kun fire en halv grad. En meget flad rampe."},"trin2":{"start":57.465,"end":66.766,"words":[["Trin",57.505,57.685],["to",57.745,57.845],["momentet",58.625,59.085],["Tælleren",60.225,60.625],["er",60.785,60.885],["fem",61.185,61.345],["plus",61.585,61.885],["nul",62.205,62.365],["komma",62.425,62.605],["et",62.705,62.785],["gange",63.005,63.225],["treogtres",63.305,63.806],["komma",63.886,64.066],["otte",64.186,64.366],["tre",64.386,64.506],["Det",65.146,65.286],["er",65.406,65.486],["elleve",65.866,66.106],["komma",66.186,66.366],["otte",66.466,66.666],["tre",66.666,66.766]],"text":"Trin to: momentet. Tælleren er fem plus nul komma et gange treogtres komma otte tre. Det er elleve komma otte tre."},"naevner":{"start":67.806,"end":76.127,"words":[["Nævneren",67.846,68.246],["er",68.386,68.486],["treogtres",68.806,69.306],["komma",69.346,69.526],["otte",69.626,69.806],["tre",69.806,69.926],["minus",70.226,70.586],["nul",70.826,70.966],["komma",71.026,71.206],["et",71.286,71.386],["gange",71.466,71.666],["fem",71.746,71.886],["Det",72.566,72.686],["er",72.806,72.886],["treogtres",73.186,73.706],["komma",73.846,74.026],["tre",74.186,74.326],["tre",74.446,76.127]],"text":"Nævneren er treogtres komma otte tre minus nul komma et gange fem. Det er treogtres komma tre tre."},"arm":{"start":76.327,"end":83.227,"words":[["W",76.367,76.387],["gange",76.787,77.047],["d",77.287,77.307],["m",77.707,77.727],["over",77.907,78.087],["to",78.127,78.227],["er",78.927,79.007],["ti",79.227,79.347],["tusind",79.487,79.827],["gange",80.007,80.187],["ti",80.267,80.367],["altså",80.927,81.147],["hundrede",81.547,81.867],["tusind",81.947,82.267],["newtonmillimeter",82.427,83.227]],"text":"W gange d m over to er ti tusind gange ti, altså hundrede tusind newtonmillimeter."},"T":{"start":84.387,"end":96.728,"words":[["Momentet",84.427,84.847],["er",85.107,85.207],["hundrede",85.787,86.067],["tusind",86.107,86.408],["gange",86.608,86.848],["elleve",87.168,87.408],["komma",87.448,87.628],["otte",87.768,87.968],["tre",87.968,88.108],["delt",88.708,88.948],["med",89.008,89.088],["treogtres",89.148,89.648],["komma",89.788,89.968],["tre",90.028,90.128],["tre",90.228,90.348],["Det",91.088,91.188],["giver",91.208,91.408],["atten",91.668,91.868],["tusind",91.908,92.248],["og",92.488,92.548],["hundrede",92.648,92.988],["newtonmillimeter",93.328,94.128],["altså",94.648,94.868],["atten",95.208,95.408],["komma",95.488,95.648],["et",95.768,95.868],["newtonmeter",96.168,96.728]],"text":"Momentet er hundrede tusind gange elleve komma otte tre, delt med treogtres komma tre tre. Det giver atten tusind og hundrede newtonmillimeter, altså atten komma et newtonmeter."},"haand":{"start":98.049,"end":108.069,"words":[["Hvad",98.089,98.189],["betyder",98.209,98.489],["det",98.509,98.589],["Med",99.509,99.589],["et",99.589,99.669],["håndtag",99.689,100.029],["på",100.069,100.189],["tyve",100.229,100.449],["centimeter",100.469,100.929],["skal",101.149,101.289],["du",101.309,101.349],["trykke",101.409,101.689],["med",101.729,101.829],["cirka",101.849,102.109],["halvfems",102.289,102.769],["newton",102.829,103.129],["Det",103.909,103.969],["er",103.969,104.009],["som",104.009,104.109],["at",104.109,104.169],["løfte",104.189,104.409],["ni",104.649,104.729],["kilo",104.869,105.109],["Med",105.929,106.009],["én",106.109,106.229],["hånd",106.269,106.449],["løfter",106.869,107.129],["du",107.129,107.189],["altså",107.249,107.469],["et",107.729,107.829],["ton",107.889,108.069]],"text":"Hvad betyder det? Med et håndtag på tyve centimeter skal du trykke med cirka halvfems newton. Det er som at løfte ni kilo. Med én hånd løfter du altså et ton."},"trin3":{"start":109.889,"end":117.729,"words":[["Trin",109.929,110.109],["tre",110.149,110.269],["er",111.089,111.169],["den",111.189,111.289],["selvlåsende",111.389,111.969],["Mu",112.729,112.829],["er",113.009,113.089],["nul",113.209,113.369],["komma",113.429,113.609],["et",113.729,113.829],["og",114.029,114.109],["tangens",114.229,114.749],["lambda",114.829,115.129],["er",115.289,115.369],["nul",115.489,115.669],["komma",115.709,115.889],["nul",115.969,116.149],["otte",116.269,117.169],["Mu",117.169,117.249],["er",117.349,117.409],["størst",117.429,117.729]],"text":"Trin tre: er den selvlåsende? Mu er nul komma et, og tangens lambda er nul komma nul otte. Mu er størst."},"ja":{"start":118.209,"end":121.45,"words":[["Ja",118.249,118.309],["den",118.629,118.749],["er",118.769,118.849],["selvlåsende",118.889,119.369],["Slipper",119.829,120.049],["du",120.049,120.109],["håndtaget",120.129,120.549],["bliver",120.589,120.769],["lasten",120.789,121.09],["stående",121.13,121.45]],"text":"Ja, den er selvlåsende. Slipper du håndtaget, bliver lasten stående."},"trin4":{"start":123.27,"end":132.09,"words":[["Trin",123.31,123.49],["fire",123.57,123.77],["er",124.23,124.31],["det",124.33,124.41],["rimeligt",124.45,124.77],["Uden",125.73,125.95],["friktion",125.99,126.43],["skulle",126.49,126.65],["du",126.65,126.69],["kun",126.71,126.85],["bruge",126.93,127.19],["W",127.63,127.65],["l",127.93,127.95],["over",128.15,128.37],["to",128.45,128.59],["pi",128.69,128.81],["altså",129.19,129.39],["otte",129.55,129.77],["newtonmeter",129.81,130.33],["Med",130.83,130.95],["friktion",131.01,131.39],["bruger",131.53,131.71],["du",131.71,131.75],["atten",131.89,132.09]],"text":"Trin fire: er det rimeligt? Uden friktion skulle du kun bruge W l over to pi, altså otte newtonmeter. Med friktion bruger du atten."},"eta":{"start":132.97,"end":142.511,"words":[["Virkningsgraden",133.01,133.691],["er",133.791,133.891],["W",134.331,134.351],["l",134.611,134.631],["over",134.771,134.971],["to",135.031,135.151],["pi",135.271,135.371],["T",135.511,135.531],["bogens",136.051,136.351],["ligning",136.391,136.631],["seksten",136.631,137.051],["fjorten",137.291,137.611],["Det",138.191,138.271],["giver",138.311,138.491],["fireogfyrre",138.631,139.091],["procent",139.091,139.431],["Under",139.971,140.151],["halvtreds",140.171,140.531],["præcis",140.751,141.191],["som",141.231,141.331],["en",141.351,141.431],["selvlåsende",141.471,141.911],["skrue",141.951,142.191],["skal",142.231,142.371],["have",142.391,142.511]],"text":"Virkningsgraden er W l over to pi T, bogens ligning seksten fjorten. Det giver fireogfyrre procent. Under halvtreds, præcis som en selvlåsende skrue skal have."},"saenk":{"start":143.511,"end":150.892,"words":[["Sænkemomentet",143.551,144.151],["bliver",144.191,144.372],["cirka",144.412,144.672],["to",144.792,144.932],["newtonmeter",145.052,145.592],["Det",146.072,146.152],["er",146.172,146.232],["positivt",146.232,146.732],["Du",147.332,147.392],["skal",147.452,147.592],["altså",147.612,147.812],["dreje",147.872,148.172],["lidt",148.232,148.392],["for",148.432,148.532],["at",148.532,148.592],["få",148.612,148.712],["lasten",148.752,149.052],["ned",149.072,149.212],["Det",149.772,149.852],["bekræfter",149.872,150.272],["selvlåsningen",150.312,150.892]],"text":"Sænkemomentet bliver cirka to newtonmeter. Det er positivt. Du skal altså dreje lidt for at få lasten ned. Det bekræfter selvlåsningen."},"hvis":{"start":152.712,"end":155.452,"words":[["Hvad",152.752,152.912],["nu",152.972,153.052],["hvis",153.112,153.372],["Her",153.952,154.072],["viser",154.112,154.332],["du",154.332,154.392],["censor",154.452,154.772],["at",154.792,154.832],["du",154.852,154.912],["har",154.932,155.012],["forstået",155.032,155.332],["det",155.372,155.452]],"text":"Hvad nu hvis? Her viser du censor, at du har forstået det."},"smurt":{"start":156.593,"end":165.453,"words":[["Smører",156.633,156.993],["du",157.013,157.093],["så",157.273,157.413],["mu",157.513,157.593],["bliver",157.733,157.953],["nul",158.033,158.193],["komma",158.233,158.393],["nul",158.433,158.573],["fem",158.653,158.793],["falder",159.053,159.293],["momentet",159.313,159.653],["til",159.713,159.833],["tretten",159.913,160.253],["newtonmeter",160.273,160.833],["Men",161.533,161.653],["nu",161.713,161.793],["er",161.893,161.973],["mu",162.053,162.133],["mindre",162.373,162.713],["end",162.793,162.893],["nul",162.933,163.053],["komma",163.093,163.253],["nul",163.293,163.433],["otte",163.553,163.753],["Skruen",164.253,164.533],["er",164.553,164.593],["ikke",164.593,164.693],["længere",164.693,164.873],["selvlåsende",164.933,165.453]],"text":"Smører du, så mu bliver nul komma nul fem, falder momentet til tretten newtonmeter. Men nu er mu mindre end nul komma nul otte. Skruen er ikke længere selvlåsende."},"stig":{"start":166.673,"end":176.994,"words":[["Dobbelt",166.713,166.973],["stigning",167.013,167.374],["ti",167.814,167.894],["millimeter",168.014,168.414],["løfter",168.814,169.074],["dobbelt",169.154,169.414],["så",169.434,169.514],["hurtigt",169.554,169.934],["og",170.034,170.094],["kræver",170.114,170.374],["seksogtyve",170.374,170.914],["komma",170.934,171.094],["tre",171.194,171.334],["newtonmeter",171.474,172.014],["Men",172.614,172.734],["tangens",172.794,173.174],["lambda",173.254,173.514],["bliver",173.554,173.734],["nul",173.794,173.934],["komma",173.994,174.154],["et",174.274,174.374],["seks",174.474,174.734],["større",175.094,175.334],["end",175.354,175.434],["mu",175.454,175.534],["Heller",176.094,176.314],["ikke",176.334,176.454],["selvlåsende",176.474,176.994]],"text":"Dobbelt stigning, ti millimeter, løfter dobbelt så hurtigt og kræver seksogtyve komma tre newtonmeter. Men tangens lambda bliver nul komma et seks, større end mu. Heller ikke selvlåsende."},"antag":{"start":178.814,"end":188.654,"words":[["Sig",178.854,178.994],["antagelserne",179.074,179.614],["højt",179.674,179.874],["Firkantgevind",180.734,181.354],["Ingen",182.014,182.214],["friktion",182.234,182.594],["i",182.634,182.654],["kraven",182.694,183.034],["Konstant",183.534,183.994],["friktionskoefficient",184.054,184.854],["Og",185.434,185.514],["statisk",185.594,186.074],["last",186.154,186.374],["ingen",186.814,186.974],["rystelser",187.014,187.454],["som",187.494,187.614],["kan",187.654,187.754],["få",187.754,187.854],["skruen",187.854,188.114],["til",188.154,188.234],["at",188.254,188.294],["kravle",188.334,188.654]],"text":"Sig antagelserne højt. Firkantgevind. Ingen friktion i kraven. Konstant friktionskoefficient. Og statisk last, ingen rystelser, som kan få skruen til at kravle."},"censor":{"start":190.474,"end":205.556,"words":[["Det",190.514,190.615],["du",190.635,190.675],["siger",190.735,190.895],["til",190.915,191.015],["censor",191.055,191.355],["er",191.435,191.515],["hævemomentet",192.315,192.935],["er",192.995,193.055],["atten",193.175,193.355],["komma",193.415,193.575],["et",193.715,193.815],["newtonmeter",193.895,194.435],["Tangens",195.255,195.635],["lambda",195.715,195.975],["er",196.135,196.215],["nul",196.315,196.455],["komma",196.495,196.655],["nul",196.715,196.855],["otte",196.955,197.175],["mindre",197.395,197.675],["end",197.775,197.875],["mu",197.895,197.975],["lig",198.095,198.195],["nul",198.275,198.395],["komma",198.435,198.615],["et",198.695,198.795],["så",199.115,199.235],["skruen",199.275,199.535],["er",199.555,199.595],["selvlåsende",199.635,200.155],["Virkningsgraden",201.035,201.716],["er",201.816,201.896],["fireogfyrre",202.016,202.496],["procent",202.496,202.836],["under",203.396,203.556],["halvtreds",203.576,203.916],["som",204.116,204.216],["det",204.236,204.316],["skal",204.336,204.456],["være",204.456,204.616],["for",204.636,204.736],["en",204.756,204.816],["selvlåsende",204.836,205.276],["skrue",205.316,205.556]],"text":"Det, du siger til censor, er: hævemomentet er atten komma et newtonmeter. Tangens lambda er nul komma nul otte, mindre end mu lig nul komma et, så skruen er selvlåsende. Virkningsgraden er fireogfyrre procent, under halvtreds, som det skal være for en selvlåsende skrue."},"tjek_q":{"start":207.376,"end":210.616,"words":[["Tjek",207.416,207.596],["dig",207.636,207.716],["selv",207.736,207.896],["Hvad",208.756,208.876],["er",208.916,208.976],["momentet",208.996,209.356],["hvis",209.376,209.496],["der",209.516,209.616],["slet",209.716,209.956],["ingen",209.996,210.136],["friktion",210.136,210.496],["er",210.536,210.616]],"text":"Tjek dig selv. Hvad er momentet, hvis der slet ingen friktion er?"},"tjek_a":{"start":214.236,"end":222.257,"words":[["W",214.276,214.296],["l",214.556,214.576],["over",214.696,214.856],["to",214.916,215.016],["pi",215.116,215.236],["Ti",216.137,216.237],["tusind",216.337,216.657],["gange",216.697,216.917],["fem",216.997,217.137],["over",217.257,217.417],["to",217.457,217.557],["pi",217.637,217.737],["er",218.257,218.337],["cirka",218.377,218.617],["otte",218.817,219.037],["newtonmeter",219.077,219.597],["Friktionen",220.297,220.697],["koster",220.717,220.977],["altså",220.997,221.177],["mere",221.257,221.557],["end",221.637,221.717],["løftet",221.757,222.037],["selv",222.097,222.257]],"text":"W l over to pi. Ti tusind gange fem over to pi er cirka otte newtonmeter. Friktionen koster altså mere end løftet selv."},"slut":{"start":224.077,"end":232.778,"words":[["Kort",224.117,224.277],["sagt",224.317,224.517],["hævemomentet",224.997,225.597],["er",225.637,225.697],["atten",225.817,225.997],["komma",226.037,226.217],["et",226.317,226.397],["newtonmeter",226.457,226.997],["Skruen",227.558,227.838],["er",227.858,227.918],["selvlåsende",227.958,228.438],["fordi",228.518,228.698],["mu",228.838,228.898],["er",229.018,229.078],["større",229.118,229.418],["end",229.478,229.578],["tangens",229.638,230.018],["lambda",230.078,230.318],["og",230.898,230.978],["virkningsgraden",231.018,231.678],["er",231.758,231.838],["fireogfyrre",231.958,232.438],["procent",232.438,232.778]],"text":"Kort sagt: hævemomentet er atten komma et newtonmeter. Skruen er selvlåsende, fordi mu er større end tangens lambda, og virkningsgraden er fireogfyrre procent."}}}, { audio: 'eks-spm6-b.mp3', id: 'eks-spm6-b' });</script>
+</body>
+</html>
