@@ -256,6 +256,25 @@ var Eks = (function () {
     return h;
   }
 
+  // "forstå det først": hverdagsbilleder, tallene oversat og censor-sætningen (ny liste, v2-videoernes stil)
+  function buildForstaa(d) {
+    var f = d.forstaa;
+    if (!f) return '';
+    var h = '<section id="forstaa">' + secHead('&#129513;', 'Forstå det først &mdash; med ting du kender');
+    if (f.intro) h += '<div class="card lead">' + rich(f.intro) + '</div>';
+    h += '<div class="fgrid">' + f.billeder.map(function (b) {
+      return '<div class="fcard"><div class="fi">' + b.ic + '</div><h3>' + esc(b.h) + '</h3><p>' + rich(b.t) + '</p></div>';
+    }).join('') + '</div>';
+    if (f.tal) h += '<div class="card ftal"><h3>Tallene oversat</h3><ul>' + f.tal.map(function (t) {
+      return '<li><b>' + rich(t[0]) + '</b> &rarr; ' + rich(t[1]) + '</li>';
+    }).join('') + '</ul></div>';
+    if (f.censor) h += '<div class="note go"><b>Sådan siger du det til censor:</b> ' + rich(f.censor) + '</div>';
+    if (f.video) h += '<div class="flinks">' + f.video.map(function (v) {
+      return '<a href="' + url(v.u) + '"><span class="k">VIDEO</span>' + esc(v.t) + '</a>';
+    }).join('') + '</div>';
+    return h + '</section>';
+  }
+
   // videoer + Mathcad til spørgsmålet (ny liste)
   function buildMedia(d) {
     if (!d.media) return '';
@@ -454,7 +473,7 @@ var Eks = (function () {
     var hero = '<header class="hero"><div class="nr">MUNDTLIG EKSAMEN &middot; SPØRGSMÅL ' + d.nr + (d.liste ? ' &middot; ' + esc(d.liste) : '') + '</div>' +
       '<h1>' + esc(d.titel) + '</h1><div class="kap">Kapitel ' + d.kapitel + ' &middot; ' + esc(d.kapitelNavn) + '</div></header>';
 
-    var body = '<main>' + buildQuestion(d) + buildMedia(d) + buildPlain(d) + buildStory(d) + buildPlan(d) + buildModel(d) +
+    var body = '<main>' + buildQuestion(d) + buildForstaa(d) + buildMedia(d) + buildPlain(d) + buildStory(d) + buildPlan(d) + buildModel(d) +
       buildSteps(d) + buildLab(d) + buildCheck(d) + buildTraps(d) + buildQA(d) + buildLinks(d) + '</main>';
 
     var foot = '<footer>MEM1 &mdash; Maskinelementer og design af maskiner &middot; VIA Horsens<br>' +
