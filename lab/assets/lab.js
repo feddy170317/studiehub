@@ -342,6 +342,7 @@
       (c.model ? '<h2 style="margin-top:.8rem">Model og antagelser</h2><ul>' + c.model + '</ul>' : '') + '</div></section>';
     b.insertAdjacentHTML('afterbegin', h);
     if (/(^|[#&])embed\b/.test(location.hash)) b.classList.add('embed');
+    if (/(^|[#&])light\b/.test(location.hash)) b.classList.add('light');
     var g = {}; (c.graphs || []).forEach(function (x) { g[x.id] = document.getElementById(x.id); });
     return {
       stage: document.getElementById('stage'), status: document.getElementById('status'), note: document.getElementById('note'),
@@ -431,7 +432,7 @@
     l.set = function (pts) { geo.setFromPoints(pts); if (dashed) l.computeLineDistances(); geo.computeBoundingSphere(); return l; };
     return l;
   };
-  Lab.grid = function (lab, size, y) { var g = new THREE.GridHelper(size, Math.round(size * 5), 0x2a4560, 0x1a3248); g.position.y = y || 0; lab.scene.add(g); return g; };
+  Lab.grid = function (lab, size, y) { var lt = document.body.classList.contains('light'), g = new THREE.GridHelper(size, Math.round(size * 5), lt ? 0xb4c3d2 : 0x2a4560, lt ? 0xd5dee8 : 0x1a3248); g.position.y = y || 0; lab.scene.add(g); return g; };
 
   function showError(err) {
     var d = document.createElement('div');
