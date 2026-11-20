@@ -59,6 +59,12 @@ Lab.presets(c[1], [
   ['<b>Tæt viklet:</b> D = 16 mm (C = 4)', function () { set(4, 16, 10, 80, 80, 200, false); }]
 ]);
 function set(d, D, Na, G, Lf, Fv, fk) { S.d = d; S.D = D; S.Na = Na; S.G = G; S.Lf = Lf; S.F = Fv; S.fixK = fk; sd.set(d, true); sD.set(D, true); sNa.set(Na, true); sG.set(G, true); sLf.set(Lf, true); sF.set(Fv, true); kChk.set(fk); }
+/* fjernstyring fra en præsentation: postMessage({fjeder: {d, D, Na, G, Lf, F, fixK}}) */
+window.addEventListener('message', function (e) {
+  var v = e.data && e.data.fjeder; if (!v) return;
+  function g(k) { return typeof v[k] === 'number' ? v[k] : S[k]; }
+  set(g('d'), g('D'), g('Na'), g('G'), g('Lf'), g('F'), typeof v.fixK === 'boolean' ? v.fixK : S.fixK);
+});
 var ro = Lab.readouts(c[2], [['C', 'Fjederindeks C = D/d'], ['Kw', 'Wahl-faktor K<sub>w</sub>'], ['tau', 'τ = K<sub>w</sub>·8FD/(πd³)'], ['k', 'Fjederkonstant k'], ['del', 'Udbøjning δ = F/k'], '-', ['Ls', 'Blokhøjde L<sub>s</sub> ≈ (N<sub>a</sub>+2)d'], ['Fs', 'Kraft ved blokhøjde'], ['n', 'τ<sub>till</sub>/τ']]);
 Lab.legendKeys(UI.legend, [['#ffa500', 'kraft F'], [Lab.heatCSS, 'farve = τ/τ<sub>till</sub>'], ['#ff5e5e', 'blokhøjde']]);
 

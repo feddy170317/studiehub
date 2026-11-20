@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spm. 7 · Trykfjedre</title>
+<meta name="description" content="Fremlæggelse af MEM1 eksamensspørgsmål 7: heliske trykfjedre, Wahl-faktoren, fjederkonstanten og beregning af τ og δ, med 3D-lab indlejret.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<style>
+:root{
+  --bg:#08121d; --panel:#0f2032; --panel2:#132a42; --line:#24405e; --ink:#e8f0f8; --mut:#93a9c0;
+  --cy:#5ec8ff; --or:#ffa500; --rd:#ff5e5e; --gr:#00d984; --ye:#ffd27a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+#vp{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{position:relative;width:1600px;height:900px;flex:none;transform-origin:center center}
+.slide{position:absolute;inset:0;padding:34px 48px 0;display:flex;flex-direction:column;opacity:0;visibility:hidden;transition:opacity .35s;
+  background:radial-gradient(1200px 600px at 85% -10%,#12304d 0%,transparent 60%),var(--bg)}
+.slide.on{opacity:1;visibility:visible}
+.hd{display:flex;align-items:baseline;gap:22px;height:78px;flex:none}
+.tag{font:700 17px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--bg);background:var(--cy);padding:8px 12px;border-radius:6px;white-space:nowrap}
+.tag.b{background:var(--or)}
+h1{font-size:44px;font-weight:750;letter-spacing:-.01em}
+h1 small{font-size:24px;color:var(--mut);font-weight:500;margin-left:10px}
+.body{flex:1;display:grid;gap:26px;min-height:0;padding-bottom:16px}
+.ft{flex:none;height:76px;padding-right:270px;display:flex;align-items:center;gap:16px;border-top:1px solid var(--line);font-size:21px;color:var(--ink)}
+.ft b.say{font:700 14px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--ye);border:1px solid var(--ye);padding:7px 9px;border-radius:5px;white-space:nowrap}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px;min-height:0}
+.card h3{font-size:16px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin-bottom:12px;font-weight:650}
+.big{font-size:40px;text-align:center;padding:10px 0 4px}
+.terms{display:grid;gap:9px;margin-top:10px}
+.term{display:grid;grid-template-columns:118px 1fr;gap:14px;align-items:center;font-size:19px;line-height:1.32;padding:8px 12px;border-radius:9px;background:var(--panel2)}
+.term .s{font-size:24px;text-align:center}
+.term em{color:var(--mut);font-style:normal}
+.cy{color:var(--cy)}.or{color:var(--or)}.rd{color:var(--rd)}.gr{color:var(--gr)}.ye{color:var(--ye)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{font:600 17px/1 system-ui,sans-serif;color:var(--ink);background:var(--panel2);border:1px solid var(--line);padding:10px 14px;border-radius:9px;cursor:pointer}
+.btn:hover{border-color:var(--cy)}
+.btn.on{background:var(--cy);color:var(--bg);border-color:var(--cy)}
+.btn.gr.on{background:var(--gr);border-color:var(--gr)}
+.btn.rd.on{background:var(--rd);border-color:var(--rd)}
+.sl{display:grid;grid-template-columns:150px 1fr 92px;gap:12px;align-items:center;font-size:18px}
+.sl input{width:100%;accent-color:var(--cy)}
+.sl output{font:600 18px ui-monospace,Consolas,monospace;text-align:right}
+.ro{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.ro div{background:var(--panel2);border-radius:10px;padding:10px 12px}
+.ro span{display:block;font-size:14px;color:var(--mut);letter-spacing:.05em}
+.ro b{font:700 27px ui-monospace,Consolas,monospace}
+.ro i{font-style:normal;font-size:15px;margin-left:6px}
+.up{color:var(--rd)}.dn{color:var(--gr)}.eq{color:var(--mut)}
+iframe.lab{width:100%;border:1px solid var(--line);border-radius:12px;background:#0b1622;display:block}
+.chips{display:flex;gap:10px;flex-wrap:wrap}
+.chip{background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:8px 15px;font-size:19px}
+.chip small{color:var(--mut);margin-left:6px;font-size:15px}
+.step{display:grid;grid-template-columns:46px 1fr;gap:14px;align-items:start;padding:18px 0;border-bottom:1px dashed var(--line)}
+.step:last-child{border-bottom:0}
+.step .n{width:40px;height:40px;border-radius:50%;background:var(--cy);color:var(--bg);font:800 20px/40px system-ui;text-align:center}
+.step .t{font-size:22px;line-height:1.4}
+.step .t .m{font-size:28px;display:block;margin-top:6px}
+.step .t .note{color:var(--mut);font-size:19px}
+.ok{color:var(--gr);font-weight:700}
+.warn{color:var(--rd);font-weight:700}
+canvas{display:block;width:100%}
+.status{font-size:18px;padding:9px 13px;border-radius:9px;background:var(--panel2)}
+#nav{position:fixed;bottom:12px;right:16px;display:flex;gap:8px;align-items:center;z-index:5;font:600 14px ui-monospace,Consolas,monospace;color:var(--mut)}
+#nav button{background:#0f2032cc;border:1px solid var(--line);color:var(--ink);border-radius:8px;width:38px;height:34px;font-size:16px;cursor:pointer}
+#dots{display:flex;gap:6px}
+#dots i{width:9px;height:9px;border-radius:50%;background:var(--line);cursor:pointer}
+#dots i.on{background:var(--cy)}
+.qcard{font-size:23px;line-height:1.45}
+.qcard .lbl{font:800 20px ui-monospace,Consolas,monospace;margin-bottom:10px;display:block}
+.katex{font-size:1.04em}
+</style>
+</head>
+<body>
+<div id="vp"><div id="deck">
+
+<!-- ============ 0 · FORSIDE ============ -->
+<section class="slide on" data-title="Forside">
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:34px;padding:0 30px">
+    <div>
+      <div class="tag" style="display:inline-block">MEM1 · KAP. 17 · EKSAMENSSPØRGSMÅL 7</div>
+      <h1 style="font-size:76px;margin-top:22px">Heliske trykfjedre</h1>
+      <div style="font-size:30px;color:var(--mut);margin-top:8px">Spænding, Wahl-faktoren og udbøjning: tråden bliver <b class="or">vredet</b>, ikke bøjet</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:26px">
+      <div class="card qcard"><span class="lbl cy">(a) FORKLAR · 2 SLIDES</span>
+        Ligningen <span data-tex="\tau=K_w\dfrac{8FD}{\pi d^3}"></span> og leddenes betydning, Wahl-faktoren <span data-tex="K_w"></span> og fjederkonstanten <span data-tex="k=\dfrac{Gd^4}{8D^3N_a}"></span>.</div>
+      <div class="card qcard"><span class="lbl or">(b) BEREGN · 2 SLIDES</span>
+        <span data-tex="d=4\text{ mm},\ D=32\text{ mm}\ (C=8),\ N_a=10,"></span><br><span data-tex="G=80\text{ GPa},\ F=200\text{ N},\ K_w=1{,}18"></span><br>Find <span data-tex="\tau_{max}"></span> og udbøjningen <span data-tex="\delta"></span>.</div>
+    </div>
+  </div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum / klikker: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm &nbsp;·&nbsp; 3D-fjederen kan drejes med musen</div>
+</section>
+
+<!-- ============ 1 · (a) τ og Wahl ============ -->
+<section class="slide" data-title="(a) τ og Wahl">
+  <div class="hd"><span class="tag">SPM. 7 (a) · 1/2</span><h1>Tråden bliver vredet, ikke bøjet<small>derfor forskydning</small></h1></div>
+  <div class="body" style="grid-template-columns:400px 560px 1fr">
+    <div class="card" style="display:flex;flex-direction:column">
+      <h3>Snit gennem tråden</h3>
+      <svg viewBox="0 0 360 560" style="width:100%;flex:1">
+        <defs>
+          <marker id="aO" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#ffa500"/></marker>
+          <marker id="aR" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#ff5e5e"/></marker>
+          <marker id="aM" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#93a9c0"/></marker>
+        </defs>
+        <!-- akse -->
+        <line x1="150" y1="20" x2="150" y2="540" stroke="#93a9c0" stroke-dasharray="6 6" stroke-width="1.5"/>
+        <!-- topplade + F -->
+        <rect x="60" y="92" width="180" height="14" rx="3" fill="#44586e"/>
+        <line x1="150" y1="22" x2="150" y2="86" stroke="#ffa500" stroke-width="5" marker-end="url(#aO)"/>
+        <text x="162" y="52" fill="#ffa500" font-size="26" font-weight="700">F</text>
+        <!-- vindinger (halv fjeder) -->
+        <g fill="none" stroke="#c9d6e3" stroke-width="9" stroke-linecap="round">
+          <path d="M70 120 C 70 140, 230 150, 230 170"/>
+          <path d="M230 170 C 230 190, 70 200, 70 220" opacity=".45"/>
+          <path d="M70 220 C 70 240, 230 250, 230 270"/>
+          <path d="M230 270 C 230 290, 70 300, 70 320" opacity=".45"/>
+          <path d="M70 320 C 70 340, 230 352, 230 372"/>
+        </g>
+        <!-- snitflade: trådens tværsnit -->
+        <line x1="40" y1="398" x2="320" y2="398" stroke="#ffd27a" stroke-dasharray="4 5" stroke-width="1.5"/>
+        <text x="250" y="390" fill="#ffd27a" font-size="17">snit</text>
+        <circle cx="230" cy="420" r="22" fill="#132a42" stroke="#c9d6e3" stroke-width="3"/>
+        <circle cx="230" cy="420" r="3" fill="#c9d6e3"/>
+        <!-- F op i snittet -->
+        <line x1="230" y1="500" x2="230" y2="448" stroke="#ffa500" stroke-width="5" marker-end="url(#aO)"/>
+        <text x="242" y="492" fill="#ffa500" font-size="24" font-weight="700">F</text>
+        <!-- vridningsmoment -->
+        <path d="M 262 404 A 36 36 0 1 1 262 436" fill="none" stroke="#ff5e5e" stroke-width="4" marker-end="url(#aR)"/>
+        <text x="282" y="470" fill="#ff5e5e" font-size="24" font-weight="700">T</text>
+        <!-- arm D/2 -->
+        <line x1="152" y1="525" x2="226" y2="525" stroke="#93a9c0" stroke-width="2" marker-end="url(#aM)" marker-start="url(#aM)"/>
+        <text x="168" y="552" fill="#e8f0f8" font-size="22">D/2</text>
+        <text x="40" y="452" fill="#93a9c0" font-size="16">fjederens</text><text x="40" y="472" fill="#93a9c0" font-size="16">akse</text>
+      </svg>
+      <div style="font-size:19px;line-height:1.35;text-align:center;margin-top:6px">Kraften sidder på aksen, tråden <span data-tex="D/2"></span> ude:<br><b class="rd" style="font-size:23px" data-tex="T=F\cdot\dfrac{D}{2}"></b></div>
+    </div>
+
+    <div class="card">
+      <h3>Største forskydningsspænding (17.10)</h3>
+      <div class="big" data-tex="\tau=\color{#ff5e5e}{K_w}\cdot\dfrac{8\,\color{#ffa500}{F}\,\color{#5ec8ff}{D}}{\pi\,d^3}"></div>
+      <div class="terms">
+        <div class="term"><span class="s" data-tex="\dfrac{8FD}{\pi d^3}"></span><span><b>Ren vridning.</b> <span data-tex="\tau=\dfrac{16T}{\pi d^3}"></span> for en rund stang, med <span data-tex="T=FD/2"></span>: 16·½ = 8 <em>(som i akslen)</em></span></div>
+        <div class="term"><span class="s or" data-tex="F"></span><span><b>Aksial kraft.</b> Dobbelt kraft giver dobbelt spænding: alt er lineært i F</span></div>
+        <div class="term"><span class="s cy" data-tex="D"></span><span><b>Middeldiameter.</b> Giver armen <span data-tex="D/2"></span>: større spiral, længere arm, mere moment</span></div>
+        <div class="term"><span class="s" data-tex="d^3"></span><span><b>Tråddiameter.</b> Trådens modstand mod vrid. Står i 3. potens: 10 % tykkere giver 25 % lavere τ</span></div>
+        <div class="term"><span class="s rd" data-tex="K_w"></span><span><b>Wahl-faktoren</b> (17.11). Retter for det, ren vridning glemmer, <span data-tex="C=D/d"></span> (17.7) →</span></div>
+      </div>
+    </div>
+
+    <div class="card" style="display:flex;flex-direction:column;gap:10px">
+      <h3>Wahl: spændingen hen over tråden</h3>
+      <div class="row">
+        <button class="btn on" data-w="0">Vridning</button>
+        <button class="btn gr" data-w="1">+ Direkte forskydning</button>
+        <button class="btn rd" data-w="2">+ Krumning</button>
+      </div>
+      <canvas id="cW" width="1000" height="860"></canvas>
+      <div class="sl"><span>Indeks <span data-tex="C=D/d"></span></span><input id="wC" type="range" min="3" max="12" step="0.5" value="8"><output id="wCo">8</output></div>
+      <div class="ro">
+        <div><span>DIREKTE (K<sub>d</sub> = 1 + 0,5/C)</span><b class="gr" id="wKd">+6 %</b></div>
+        <div><span>KRUMNING</span><b class="rd" id="wKc">+12 %</b></div>
+        <div><span>K<sub>w</sub> SAMLET</span><b id="wKw">1,18</b></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>En fjeder er en oprullet torsionsstang. Wahl lægger direkte forskydning (som en saks) og krumning (indersiden er kortere) oveni, så τ er størst på <b class="rd">indersiden</b>, og brud starter dér.</span></div>
+</section>
+
+<!-- ============ 2 · (a) k ============ -->
+<section class="slide" data-title="(a) Fjederkonstanten k">
+  <div class="hd"><span class="tag">SPM. 7 (a) · 2/2</span><h1>Fjederkonstanten k: stivhed mod vridning</h1></div>
+  <div class="body" style="grid-template-columns:600px 1fr">
+    <div class="card">
+      <h3>Fjederkonstant (17.17–17.18)</h3>
+      <div class="big" data-tex="k=\dfrac{F}{\delta}=\dfrac{\color{#00d984}{G}\,\color{#5ec8ff}{d^4}}{8\,\color{#ffa500}{D^3}\,\color{#ff5e5e}{N_a}}"></div>
+      <div style="text-align:center;color:var(--mut);font-size:18px;margin-bottom:6px">N pr. mm sammentrykning · udledt af vridningsvinklen <span data-tex="\theta=\tfrac{TL}{GJ}"></span>, <span data-tex="L=\pi DN_a"></span>, <span data-tex="\delta=\theta\tfrac D2"></span></div>
+      <div class="terms">
+        <div class="term"><span class="s gr" data-tex="G"></span><span><b>Forskydningsmodul</b>, 80 GPa for stål. Stivhed mod <b>vrid</b>, som E er det mod træk. Alt stål har G ≈ 80, så et <em>stærkere</em> stål gør ikke fjederen <em>stivere</em></span></div>
+        <div class="term"><span class="s cy" data-tex="d^4"></span><span><b>Tråddiameter i 4.</b> 10 % tykkere tråd giver 46 % stivere fjeder</span></div>
+        <div class="term"><span class="s or" data-tex="D^3"></span><span><b>Middeldiameter i 3.</b> Stor spiral er meget blødere: derfor er madrasfjedre bløde</span></div>
+        <div class="term"><span class="s rd" data-tex="N_a"></span><span><b>Aktive vindinger.</b> Hver vinding giver lidt efter, og det lægges sammen. Klip fjederen over, og den bliver dobbelt så stiv</span></div>
+      </div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:12px;padding:16px 18px">
+      <iframe class="lab" id="labA" style="flex:1;min-height:0" title="3D-fjeder" loading="eager"></iframe>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 28px">
+        <div class="sl"><span>Tråd d</span><input id="aD1" type="range" min="2.5" max="6" step="0.1" value="4"><output id="aD1o"></output></div>
+        <div class="sl"><span>Spiral D</span><input id="aD2" type="range" min="20" max="60" step="1" value="32"><output id="aD2o"></output></div>
+        <div class="sl"><span>Vindinger N<sub>a</sub></span><input id="aNa" type="range" min="3" max="20" step="1" value="10"><output id="aNao"></output></div>
+        <div class="sl"><span>Modul G</span><input id="aG" type="range" min="25" max="85" step="1" value="80"><output id="aGo"></output></div>
+      </div>
+      <div class="ro">
+        <div><span>FJEDERKONSTANT k</span><b class="cy" id="aK">7,81</b><i id="aKr"></i></div>
+        <div><span>UDBØJNING δ VED 200 N</span><b id="aDel">25,6</b><i id="aDelr"></i></div>
+        <div><span>SPÆNDING τ</span><b id="aTau">300</b><i id="aTaur"></i></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>G står kun i k, ikke i τ. G afgør, hvor meget fjederen <b>giver efter</b>. Stålets styrke afgør, hvor meget τ den <b>tåler</b>. <span class="mut" style="color:var(--mut)">(Prøv: skru på G, og se at τ ikke flytter sig.)</span></span></div>
+</section>
+
+<!-- ============ 3 · (b) τ ============ -->
+<section class="slide" data-title="(b) Beregning af τ">
+  <div class="hd"><span class="tag b">SPM. 7 (b) · 1/2</span><h1>Beregning: forskydningsspændingen τ</h1></div>
+  <div class="chips" style="margin-bottom:18px;flex:none">
+    <span class="chip">d = 4 mm</span><span class="chip">D = 32 mm<small>lille støddæmper</small></span><span class="chip">N<sub>a</sub> = 10</span>
+    <span class="chip">G = 80 GPa</span><span class="chip or">F = 200 N<small>≈ 20 kg</small></span><span class="chip">K<sub>w</sub> = 1,18</span>
+  </div>
+  <div class="body" style="grid-template-columns:760px 1fr">
+    <div class="card" style="padding:8px 24px">
+      <div class="step"><span class="n">1</span><div class="t"><b>Fjederindeks og tjek af Wahl</b>
+        <span class="m" data-tex="C=\dfrac Dd=\dfrac{32}{4}=8"></span><span class="m" data-tex="K_w=\dfrac{4C-1}{4C-4}+\dfrac{0{,}615}{C}=\dfrac{31}{28}+\dfrac{0{,}615}{8}=1{,}184"></span>
+        <span class="note">≈ 1,18 som opgivet <span class="ok">✓</span> · C = 8 ligger midt i det normale område 4–12</span></div></div>
+      <div class="step"><span class="n">2</span><div class="t"><b>Vridningsmomentet i tråden</b>
+        <span class="m" data-tex="T=F\cdot\dfrac D2=200\cdot16=3200\ \text{N}\cdot\text{mm}"></span></div></div>
+      <div class="step"><span class="n">3</span><div class="t"><b>Spændingen (17.10)</b>
+        <span class="m" data-tex="\tau=K_w\dfrac{8FD}{\pi d^3}=1{,}18\cdot\dfrac{8\cdot200\cdot32}{\pi\cdot4^3}=1{,}18\cdot254{,}6"></span>
+        <span class="m" data-tex="\boxed{\tau\approx300\ \text{MPa}}"></span>
+        <span class="note">300 N på hver mm² tråd · størst på vindingens inderside</span></div></div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:14px">
+      <h3>Hvor kommer de 300 MPa fra?</h3>
+      <div class="row">
+        <button class="btn on" data-b="0">1 · Ren vridning</button>
+        <button class="btn gr" data-b="1">2 · + Direkte</button>
+        <button class="btn rd" data-b="2">3 · + Krumning</button>
+      </div>
+      <canvas id="cB" width="1340" height="330"></canvas>
+      <h3 style="margin-top:4px">Er det rimeligt?</h3>
+      <canvas id="cR" width="1340" height="250"></canvas>
+      <div class="status" style="font-size:17px;color:var(--mut)">Vurdering, ikke opgivet: pianotråd d = 4 mm har S<sub>ut</sub> ≈ 1700 MPa, og τ<sub>till</sub> ≈ 0,45·S<sub>ut</sub> ≈ 765 MPa. Sikkerhed ≈ <b class="ok">2,5</b></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Uden Wahl 255 MPa, med Wahl 300 MPa: 18 % mere fra direkte forskydning og krumning. Højt, men fjedertråd er noget af det stærkeste stål, der findes.</span></div>
+</section>
+
+<!-- ============ 4 · (b) δ og k ============ -->
+<section class="slide" data-title="(b) Udbøjning δ og k">
+  <div class="hd"><span class="tag b">SPM. 7 (b) · 2/2</span><h1>Udbøjning δ og fjederkonstant k</h1></div>
+  <div class="body" style="grid-template-columns:640px 1fr">
+    <div class="card" style="padding:8px 24px">
+      <div class="step"><span class="n">4</span><div class="t"><b>Udbøjningen (17.17)</b>
+        <span class="m" data-tex="\delta=\dfrac{8FD^3N_a}{Gd^4}=\dfrac{8\cdot200\cdot32^3\cdot10}{80\,000\cdot4^4}"></span>
+        <span class="m" data-tex="\boxed{\delta=25{,}6\ \text{mm}}"></span></div></div>
+      <div class="step"><span class="n">5</span><div class="t"><b>Fjederkonstanten</b>
+        <span class="m" data-tex="k=\dfrac F\delta=\dfrac{200}{25{,}6}=7{,}81\ \text{N/mm}"></span>
+        <span class="note">1 kg trykker fjederen godt 1 mm sammen</span></div></div>
+      <div class="step"><span class="n">6</span><div class="t"><b>Er det rimeligt?</b><br>
+        20 kg giver 2,6 cm: en almindelig fjeder <span class="ok">✓</span><br>
+        Plads: blokhøjde <span data-tex="L_s\approx(N_a+2)d=48"></span> mm, så <span data-tex="L_f>48+25{,}6=73{,}6"></span> mm, ellers bunder den<br>
+        <span class="note">Antaget: lineært elastisk, F i aksen, statisk last (svingende last: tjek udmattelse)</span></div></div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:12px;padding:16px 18px">
+      <div style="display:grid;grid-template-columns:1fr 330px;gap:14px;flex:1;min-height:0">
+        <iframe class="lab" id="labB" style="height:100%" title="3D-fjeder"></iframe>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <h3 style="margin:0">Hvad nu hvis …</h3>
+          <button class="btn on" data-h="0" style="text-align:left">Opgaven (udgangspunkt)</button>
+          <button class="btn" data-h="1" style="text-align:left">5 vindinger i stedet for 10</button>
+          <button class="btn" data-h="2" style="text-align:left">5 mm tråd i stedet for 4</button>
+          <button class="btn" data-h="3" style="text-align:left">40 mm spiral i stedet for 32</button>
+          <button class="btn" data-h="4" style="text-align:left">Dobbelt kraft, 400 N</button>
+          <div class="sl" style="grid-template-columns:62px 1fr 70px;font-size:16px;margin-top:4px"><span>F</span><input id="bF" type="range" min="0" max="450" step="5" value="200"><output id="bFo"></output></div>
+          <canvas id="cF" width="660" height="300"></canvas>
+        </div>
+      </div>
+      <div class="ro">
+        <div><span>UDBØJNING δ</span><b id="bDel">25,6</b><i id="bDelr"></i></div>
+        <div><span>FJEDERKONSTANT k</span><b class="cy" id="bK">7,81</b><i id="bKr"></i></div>
+        <div><span>SPÆNDING τ</span><b id="bTau">300</b><i id="bTaur"></i></div>
+      </div>
+      <div class="status" id="bSt">Plads: L<sub>s</sub> + δ = 73,6 mm &lt; L<sub>f</sub> = 80 mm (antaget)</div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Halveres N<sub>a</sub>, halveres δ, men τ er uændret: N<sub>a</sub> står ikke i formlen for τ. Tråden står i 4. potens i δ, spiralen i 3.</span></div>
+</section>
+
+</div></div>
+
+<div id="nav"><span id="pg">1 / 5</span><div id="dots"></div><button id="prev" title="Forrige (←)">‹</button><button id="next" title="Næste (→)">›</button><button id="fs" title="Fuld skærm (F)">⛶</button></div>
+
+<script>
+(function () {
+'use strict';
+var PI = Math.PI;
+function $(id) { return document.getElementById(id); }
+function fmt(x, n) { return x.toFixed(n).replace('.', ','); }
+
+/* ---------- fysik (samme formler som 3D-labbet og videoerne) ---------- */
+function calc(p) {
+  var C = p.D / p.d, KwF = (4 * C - 1) / (4 * C - 4) + 0.615 / C;
+  var Kw = Math.abs(C - 8) < 1e-9 ? 1.18 : KwF;            /* opgavens afrundede værdi ved C = 8 */
+  var tv = 8 * p.F * p.D / (PI * Math.pow(p.d, 3));
+  var k = p.G * 1000 * Math.pow(p.d, 4) / (8 * Math.pow(p.D, 3) * p.Na);
+  return { C: C, Kw: Kw, KwF: KwF, Kd: 1 + 0.5 / C, tv: tv, tau: Kw * tv, k: k, del: p.F / k, Ls: (p.Na + 2) * p.d };
+}
+var BASE = { d: 4, D: 32, Na: 10, G: 80, F: 200 }, B0 = calc(BASE);
+function rel(el, v, v0) {
+  var r = v / v0, e = $(el);
+  if (Math.abs(r - 1) < 0.005) { e.className = 'eq'; e.textContent = 'uændret'; }
+  else { e.className = r > 1 ? 'up' : 'dn'; e.textContent = '×' + fmt(r, 2); }
+}
+
+/* ---------- skalering og navigation ---------- */
+var deck = $('deck'), slides = [].slice.call(document.querySelectorAll('.slide')), cur = 0;
+function fit() { var s = Math.min(innerWidth / 1600, innerHeight / 900); deck.style.transform = 'scale(' + s + ')'; }
+addEventListener('resize', fit); fit();
+var dots = $('dots');
+slides.forEach(function (s, i) { var d = document.createElement('i'); d.title = s.dataset.title; d.onclick = function () { go(i); }; dots.appendChild(d); });
+function go(i) {
+  cur = Math.max(0, Math.min(slides.length - 1, i));
+  slides.forEach(function (s, j) { s.classList.toggle('on', j === cur); });
+  [].forEach.call(dots.children, function (d, j) { d.classList.toggle('on', j === cur); });
+  $('pg').textContent = (cur + 1) + ' / ' + slides.length;
+  try { history.replaceState(null, '', '#' + (cur + 1)); } catch (e) {}
+}
+function key(e) {
+  var t = e.target && e.target.tagName;
+  if (t === 'INPUT' && /Arrow/.test(e.key)) return;          /* pile på en aktiv slider flytter slideren */
+  if (['ArrowRight', 'PageDown', ' ', 'Enter'].indexOf(e.key) >= 0) { e.preventDefault(); go(cur + 1); }
+  else if (['ArrowLeft', 'PageUp', 'Backspace'].indexOf(e.key) >= 0) { e.preventDefault(); go(cur - 1); }
+  else if (e.key === 'Home') go(0); else if (e.key === 'End') go(slides.length - 1);
+  else if (e.key === 'f' || e.key === 'F') fsToggle();
+}
+addEventListener('keydown', key);
+/* sliderne slipper fokus efter brug, så piletasterne igen skifter slide */
+document.querySelectorAll('input[type=range]').forEach(function (r) { r.addEventListener('change', function () { r.blur(); }); r.addEventListener('pointerup', function () { setTimeout(function () { r.blur(); }, 0); }); });
+document.querySelectorAll('button').forEach(function (b) { b.addEventListener('click', function () { b.blur(); }); });
+function fsToggle() { if (!document.fullscreenElement) document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+$('prev').onclick = function () { go(cur - 1); }; $('next').onclick = function () { go(cur + 1); }; $('fs').onclick = fsToggle;
+var h = parseInt(location.hash.slice(1), 10); go(h > 0 ? h - 1 : 0);
+
+/* ---------- KaTeX ---------- */
+function tex() {
+  if (!window.katex) return setTimeout(tex, 80);
+  document.querySelectorAll('[data-tex]').forEach(function (el) {
+    try { katex.render(el.getAttribute('data-tex'), el, { throwOnError: false, displayMode: false }); } catch (e) { el.textContent = el.getAttribute('data-tex'); }
+  });
+}
+tex();
+
+/* ---------- lærred-hjælper ---------- */
+function cv(id) { var c = $(id), x = c.getContext('2d'); return { c: c, x: x, W: c.width, H: c.height }; }
+function txt(x, s, px, py, size, col, al, bl) { x.font = '600 ' + size + 'px system-ui,sans-serif'; x.fillStyle = col; x.textAlign = al || 'left'; x.textBaseline = bl || 'middle'; x.fillText(s, px, py); }
+
+/* ---------- 3D-lab i iframe (postMessage → trykfjeder.html) ---------- */
+var LAB = '../../../../lab/mem1/trykfjeder.html#embed';
+function labFrame(id, getP) {
+  var f = $(id), ready = false;
+  f.addEventListener('load', function () {
+    ready = true; send();
+    try { f.contentWindow.addEventListener('keydown', key); } catch (e) {}   /* piletaster virker også, når 3D-fjederen har fokus */
+  });
+  f.src = LAB;
+  function send() { if (!ready) return; var p = getP(); try { f.contentWindow.postMessage({ fjeder: { d: p.d, D: p.D, Na: p.Na, G: p.G, F: p.F, Lf: p.Lf, fixK: Math.abs(p.D / p.d - 8) < 1e-9 } }, '*'); } catch (e) {} }
+  return send;
+}
+
+/* ===== slide 1: Wahl-fordelingen over trådens tværsnit ===== */
+var W = { lvl: 0, C: 8 };
+var bw = document.querySelectorAll('[data-w]');
+bw.forEach(function (b) { b.onclick = function () { W.lvl = +b.dataset.w; bw.forEach(function (o) { o.classList.toggle('on', +o.dataset.w <= W.lvl); }); drawW(); }; });
+$('wC').oninput = function () { W.C = +this.value; drawW(); };
+function drawW() {
+  var g = cv('cW'), x = g.x, Wd = g.W, Ht = g.H, C = W.C;
+  var Kd = 1 + 0.5 / C, Kw = (4 * C - 1) / (4 * C - 4) + 0.615 / C, kc = Kw - Kd;
+  $('wCo').textContent = fmt(C, 1).replace(',0', '');
+  $('wKd').textContent = '+' + Math.round((Kd - 1) * 100) + ' %';
+  $('wKc').textContent = '+' + Math.round(kc * 100) + ' %';
+  $('wKw').textContent = fmt(Kw, 3);
+  x.clearRect(0, 0, Wd, Ht);
+  var L = 120, R = Wd - 40, T = 60, Bt = Ht - 90, y0 = T + (Bt - T) * 0.62, ymax = 1.75, sy = (y0 - T) / ymax;
+  function X(u) { return L + (u + 1) / 2 * (R - L); } function Y(v) { return y0 - v * sy; }
+  /* tråd-tværsnit som baggrund */
+  x.fillStyle = 'rgba(201,214,227,.06)'; x.fillRect(X(-1), T - 30, X(1) - X(-1), Bt - T + 30);
+  x.strokeStyle = '#24405e'; x.lineWidth = 2; x.beginPath(); x.moveTo(L, y0); x.lineTo(R, y0); x.stroke();
+  x.beginPath(); x.moveTo(X(0), T - 30); x.lineTo(X(0), Bt); x.setLineDash([6, 8]); x.stroke(); x.setLineDash([]);
+  txt(x, 'inderside', X(-1) + 6, Bt + 34, 30, '#ff5e5e', 'left'); txt(x, '(mod fjederens akse)', X(-1) + 6, Bt + 70, 24, '#93a9c0', 'left');
+  txt(x, 'yderside', X(1) - 6, Bt + 34, 30, '#93a9c0', 'right');
+  txt(x, 'τ', 40, T, 40, '#e8f0f8', 'left');
+  function curve(f, col, w, dash) { x.strokeStyle = col; x.lineWidth = w; x.setLineDash(dash || []); x.beginPath(); for (var i = 0; i <= 80; i++) { var u = -1 + 2 * i / 80, v = f(u); i ? x.lineTo(X(u), Y(v)) : x.moveTo(X(u), Y(v)); } x.stroke(); x.setLineDash([]); }
+  var tor = function (u) { return -u; }, dir = function (u) { return -u + (Kd - 1); }, tot = function (u) { return -u + (Kd - 1) + kc * Math.max(0, -u) * 1.0; };
+  curve(tor, W.lvl ? 'rgba(94,200,255,.45)' : '#5ec8ff', W.lvl ? 3 : 6, W.lvl ? [10, 8] : null);
+  if (W.lvl >= 1) curve(dir, W.lvl > 1 ? 'rgba(0,217,132,.5)' : '#00d984', W.lvl > 1 ? 3 : 6, W.lvl > 1 ? [10, 8] : null);
+  if (W.lvl >= 2) curve(tot, '#ff5e5e', 6);
+  var f = [tor, dir, tot][W.lvl], vmax = f(-1), K = [1, Kd, Kw][W.lvl];
+  /* opdeling ved indersiden: hvor meget hver korrektion lægger til (zoomet ud til siden) */
+  var zx = X(-1) + 14, zy = y0 + 70, zs = 700;            /* vandret: 1 % = 7 px, i den tomme nederste venstre del */
+  txt(x, 'tillæg på indersiden:', zx, zy - 22, 24, '#93a9c0', 'left');
+  x.strokeStyle = '#24405e'; x.lineWidth = 2; x.strokeRect(zx, zy, 0.3 * zs, 30);
+  if (W.lvl >= 1) { x.fillStyle = '#00d984'; x.fillRect(zx, zy, (Kd - 1) * zs, 30); txt(x, '+' + Math.round((Kd - 1) * 100) + ' % direkte forskydning', zx, zy + 62, 26, '#00d984', 'left'); }
+  if (W.lvl >= 2) { x.fillStyle = '#ff5e5e'; x.fillRect(zx + (Kd - 1) * zs, zy, kc * zs, 30); txt(x, '+' + Math.round(kc * 100) + ' % krumning', zx, zy + 98, 26, '#ff5e5e', 'left'); }
+  if (W.lvl === 0) txt(x, 'ingen endnu', zx, zy + 62, 26, '#93a9c0', 'left');
+  x.fillStyle = '#ffa500'; x.beginPath(); x.arc(X(-1), Y(vmax), 11, 0, 7); x.fill();
+  txt(x, 'τ_max = ' + fmt(K, 3) + ' · 8FD/(πd³)', X(-1) + 26, Y(vmax) - 6, 32, '#ffa500', 'left');
+  txt(x, ['ren vridning: lige stor ind og ud', 'direkte F/A lægges til indvendigt', 'krumning: indersiden er kortere'][W.lvl], X(0.98), T - 8, 26, '#93a9c0', 'right');
+}
+drawW();
+
+/* ===== slide 2: k med 3D-fjeder ===== */
+var A = { d: 4, D: 32, Na: 10, G: 80, F: 200 };
+var sendA = labFrame('labA', function () { var K = calc(A); return { d: A.d, D: A.D, Na: A.Na, G: A.G, F: A.F, Lf: Math.min(200, Math.max(80, Math.ceil(K.Ls + K.del + 14))) }; });
+[['aD1', 'd', 1, ' mm'], ['aD2', 'D', 0, ' mm'], ['aNa', 'Na', 0, ''], ['aG', 'G', 0, ' GPa']].forEach(function (s) {
+  var el = $(s[0]); el.oninput = function () { A[s[1]] = +el.value; updA(); };
+});
+var aOut = [['aD1o', 'd', 1, ' mm'], ['aD2o', 'D', 0, ' mm'], ['aNao', 'Na', 0, ''], ['aGo', 'G', 0, ' GPa']];
+function updA() {
+  aOut.forEach(function (o) { $(o[0]).textContent = fmt(A[o[1]], o[2]) + o[3]; });
+  var K = calc(A);
+  $('aK').textContent = fmt(K.k, 2); rel('aKr', K.k, B0.k);
+  $('aDel').textContent = fmt(K.del, 1) + ' mm'; rel('aDelr', K.del, B0.del);
+  $('aTau').textContent = fmt(K.tau, 0) + ' MPa'; rel('aTaur', K.tau, B0.tau);
+  sendA();
+}
+updA();
+
+/* ===== slide 3: stak af bidrag + rimelighed ===== */
+var Bl = 0, bb = document.querySelectorAll('[data-b]');
+bb.forEach(function (b) { b.onclick = function () { Bl = +b.dataset.b; bb.forEach(function (o) { o.classList.toggle('on', +o.dataset.b <= Bl); }); drawB(); }; });
+function drawB() {
+  var g = cv('cB'), x = g.x, Wd = g.W, Ht = g.H;
+  var tv = B0.tv, td = tv * 0.5 / 8, tc = 1.18 * tv - tv - td;   /* 254,6 + 15,9 + 29,9 = 300,4 */
+  x.clearRect(0, 0, Wd, Ht);
+  var L = 30, R = Wd - 30, S = (R - L) / 340, y = 70, h = 110;
+  function bar(x0, w, col) { x.fillStyle = col; x.fillRect(L + x0 * S, y, w * S, h); }
+  bar(0, tv, '#5ec8ff'); txt(x, '255 ren vridning', L + 20, y + h / 2, 34, '#08121d', 'left');
+  if (Bl >= 1) { bar(tv, td, '#00d984'); txt(x, '+16', L + (tv + td / 2) * S, y - 28, 30, '#00d984', 'center'); }
+  if (Bl >= 2) { bar(tv + td, tc, '#ff5e5e'); txt(x, '+30', L + (tv + td + tc / 2) * S, y - 28, 30, '#ff5e5e', 'center'); }
+  var tot = [tv, tv + td, tv + td + tc][Bl];
+  x.strokeStyle = '#ffa500'; x.lineWidth = 4; x.beginPath(); x.moveTo(L + tot * S, y - 8); x.lineTo(L + tot * S, y + h + 18); x.stroke();
+  txt(x, '= ' + fmt(tot, 0) + ' MPa', Math.min(L + tot * S + 12, R - 210), y + h + 52, 38, '#ffa500', 'left');
+  txt(x, ['K = 1 (ingen korrektion)', 'K_d = 1 + 0,5/C = 1,0625', 'K_w = 1,18 (Wahl)'][Bl], L, y + h + 52, 30, '#93a9c0', 'left');
+  for (var v = 0; v <= 300; v += 100) { x.fillStyle = '#93a9c0'; txt(x, String(v), L + v * S, Ht - 12, 22, '#93a9c0', 'center', 'alphabetic'); }
+}
+drawB();
+(function drawR() {
+  var g = cv('cR'), x = g.x, Wd = g.W, Ht = g.H, L = 30, R = Wd - 40, S = (R - L) / 1800, y = 92, h = 46;
+  function grd(a, b, col) { x.fillStyle = col; x.fillRect(L + a * S, y, (b - a) * S, h); }
+  grd(0, 765, 'rgba(0,217,132,.35)'); grd(765, 1700, 'rgba(255,210,122,.25)'); grd(1700, 1800, 'rgba(255,94,94,.35)');
+  function mk(v, s, col, up) { var px = L + v * S; x.strokeStyle = col; x.lineWidth = 4; x.beginPath(); x.moveTo(px, y - 10); x.lineTo(px, y + h + 10); x.stroke(); txt(x, s, px, up ? y - 34 : y + h + 40, 28, col, v > 1500 ? 'right' : 'center'); }
+  mk(300, 'τ = 300', '#ffa500', true); mk(765, 'τ_till ≈ 765', '#00d984', false); mk(1700, 'S_ut ≈ 1700 MPa', '#ff5e5e', true);
+  txt(x, 'elastisk, sikkert', L + 20, y + h / 2, 22, '#e8f0f8', 'left');
+})();
+
+/* ===== slide 4: hvad nu hvis + 3D ===== */
+var LF = 80, HV = [{}, { Na: 5 }, { d: 5 }, { D: 40 }, { F: 400 }], Bp = { d: 4, D: 32, Na: 10, G: 80, F: 200 };
+var sendB = labFrame('labB', function () { return { d: Bp.d, D: Bp.D, Na: Bp.Na, G: 80, F: Bp.F, Lf: LF }; });
+var hb = document.querySelectorAll('[data-h]');
+hb.forEach(function (b) { b.onclick = function () {
+  var o = HV[+b.dataset.h]; Bp = { d: 4, D: 32, Na: 10, G: 80, F: 200 }; for (var k in o) Bp[k] = o[k];
+  $('bF').value = Bp.F; hb.forEach(function (q) { q.classList.toggle('on', q === b); }); updB();
+}; });
+$('bF').oninput = function () { Bp.F = +this.value; updB(); };
+function updB() {
+  var K = calc(Bp), stroke = LF - K.Ls, Fs = K.k * stroke, bund = K.del > stroke;
+  $('bFo').textContent = Bp.F + ' N';
+  $('bDel').textContent = fmt(K.del, 1) + ' mm'; rel('bDelr', K.del, B0.del);
+  $('bK').textContent = fmt(K.k, 2); rel('bKr', K.k, B0.k);
+  $('bTau').textContent = fmt(K.tau, 0) + ' MPa'; rel('bTaur', K.tau, B0.tau);
+  $('bSt').innerHTML = bund
+    ? '<span class="warn">Bunder!</span> L<sub>s</sub> + δ = ' + fmt(K.Ls + K.del, 1) + ' mm &gt; L<sub>f</sub> = ' + LF + ' mm (antaget): vindingerne ligger an ved F ≈ ' + fmt(Fs, 0) + ' N'
+    : 'Plads: L<sub>s</sub> + δ = ' + fmt(K.Ls, 0) + ' + ' + fmt(K.del, 1) + ' = ' + fmt(K.Ls + K.del, 1) + ' mm &lt; L<sub>f</sub> = ' + LF + ' mm (antaget) <span class="ok">✓</span>';
+  drawF(K, stroke); sendB();
+}
+function drawF(K, stroke) {
+  var g = cv('cF'), x = g.x, Wd = g.W, Ht = g.H, L = 80, R = Wd - 20, T = 20, Bt = Ht - 56, dm = 60, Fm = 450;
+  function X(v) { return L + v / dm * (R - L); } function Y(v) { return Bt - v / Fm * (Bt - T); }
+  x.clearRect(0, 0, Wd, Ht);
+  x.strokeStyle = '#24405e'; x.lineWidth = 2; x.beginPath(); x.moveTo(L, T); x.lineTo(L, Bt); x.lineTo(R, Bt); x.stroke();
+  txt(x, 'F', 30, T + 14, 30, '#93a9c0'); txt(x, 'δ [mm]', R, Ht - 14, 26, '#93a9c0', 'right');
+  [0, 20, 40, 60].forEach(function (v) { txt(x, String(v), X(v), Bt + 22, 22, '#93a9c0', 'center'); });
+  if (stroke < dm) { x.strokeStyle = 'rgba(255,94,94,.75)'; x.setLineDash([8, 6]); x.lineWidth = 3; x.beginPath(); x.moveTo(X(stroke), T); x.lineTo(X(stroke), Bt); x.stroke(); x.setLineDash([]); txt(x, 'blok', X(stroke) + 6, T + 14, 22, '#ff5e5e'); }
+  function ln(k, col, w, dash) { var d1 = Math.min(dm, Fm / k); x.strokeStyle = col; x.lineWidth = w; x.setLineDash(dash || []); x.beginPath(); x.moveTo(X(0), Y(0)); x.lineTo(X(d1), Y(k * d1)); x.stroke(); x.setLineDash([]); }
+  ln(B0.k, 'rgba(147,169,192,.7)', 3, [8, 6]); ln(K.k, '#5ec8ff', 5);
+  var dd = Math.min(K.del, dm); x.fillStyle = '#ffa500'; x.beginPath(); x.arc(X(dd), Y(K.k * dd), 9, 0, 7); x.fill();
+  txt(x, 'hældning = k', X(4), T + 14, 22, '#5ec8ff');
+}
+updB();
+})();
+</script>
+</body>
+</html>
