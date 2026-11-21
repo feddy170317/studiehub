@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spm. 4 · Rullelejer</title>
+<meta name="description" content="Fremlæggelse af MEM1 eksamensspørgsmål 4: levetidsligningen L10 = (C/P)^p for kugle- og rullelejer, med 3D-lab indlejret.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<style>
+/* Design: industrielt datablad. Lys stålgrå, sort, advarselsgul, smal versaltypografi, tabeller og specifikationslinjer. */
+:root{--bg:#f1f1ee;--ink:#151515;--mut:#6b6b66;--line:#151515;--hair:#c9c9c3;--yel:#ffcc00;--yel2:#fff3bf;--blu:#1d5fa8;--red:#d23a1f;--card:#fff;--chart-font:"Barlow Condensed",sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:Barlow,sans-serif;overflow:hidden}
+.vp{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+.deck{position:relative;width:1600px;height:900px;flex:none;transform-origin:center}
+.slide{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .2s;display:grid;grid-template-rows:96px 1fr 70px;background:var(--bg)}
+.slide.on{opacity:1;visibility:visible}
+.bar{display:grid;grid-template-columns:auto 1fr auto;align-items:stretch;background:var(--ink);color:#fff}
+.bar .code{background:var(--yel);color:var(--ink);font:800 34px "Barlow Condensed",sans-serif;padding:0 26px;display:flex;align-items:center;letter-spacing:.02em}
+.bar h1{font:700 46px/96px "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.02em;padding:0 26px;white-space:nowrap}
+.bar .meta{font:600 15px "Barlow Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;padding:0 26px;display:flex;flex-direction:column;justify-content:center;text-align:right;color:#bbb}
+.bar .meta b{color:var(--yel);font-size:20px}
+.bar sub{line-height:0}
+.hz{height:10px;background:repeating-linear-gradient(-45deg,var(--yel) 0 14px,var(--ink) 14px 28px)}
+.bd{display:grid;gap:22px;padding:22px 34px;min-height:0}
+.card{background:var(--card);border-top:6px solid var(--ink);padding:16px 20px;min-height:0;display:flex;flex-direction:column;gap:10px}
+.card h3{font:700 18px "Barlow Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
+.f{font-size:46px;text-align:center;padding:4px 0}
+table.spec{width:100%;border-collapse:collapse;font-size:20px}
+table.spec th{font:700 14px "Barlow Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;text-align:left;color:var(--mut);border-bottom:2px solid var(--ink);padding:6px 8px}
+table.spec td{border-bottom:1px solid var(--hair);padding:9px 8px;vertical-align:top;line-height:1.3}
+table.spec td.s{font-size:26px;width:80px;text-align:center}
+.ft{display:flex;align-items:center;gap:16px;background:#fff;border-top:2px solid var(--ink);padding:0 300px 0 34px;font-size:20px}
+.ft b.say{font:800 16px "Barlow Condensed",sans-serif;letter-spacing:.12em;background:var(--yel);padding:6px 10px}
+.seg{display:flex;border:2px solid var(--ink)}
+.seg button{flex:1;font:700 17px "Barlow Condensed",sans-serif;letter-spacing:.06em;text-transform:uppercase;background:#fff;color:var(--ink);border:0;border-left:2px solid var(--ink);padding:9px 10px;cursor:pointer}
+.seg button:first-child{border-left:0}.seg button.on{background:var(--yel)}
+.sl{display:grid;grid-template-columns:200px 1fr 120px;gap:14px;align-items:center;font:600 19px "Barlow Condensed",sans-serif;letter-spacing:.03em;text-transform:uppercase}
+.sl input{width:100%;accent-color:var(--ink)}
+.sl output{font:700 26px "Barlow Condensed",sans-serif;text-align:right;text-transform:none}
+.kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:2px solid var(--ink)}
+.kpi div{padding:8px 14px;border-left:2px solid var(--ink)}.kpi div:first-child{border-left:0}
+.kpi span{display:block;font:700 13px "Barlow Condensed",sans-serif;letter-spacing:.14em;color:var(--mut);text-transform:uppercase}
+.kpi b{font:800 40px "Barlow Condensed",sans-serif}
+.kpi i{font-style:normal;font:700 17px "Barlow Condensed",sans-serif;margin-left:8px}
+.up{color:var(--blu)}.dn{color:var(--red)}.eq{color:var(--mut)}
+.calc{display:grid;grid-template-columns:70px 1fr;border-bottom:1px solid var(--hair);padding:14px 0}
+.calc:last-child{border-bottom:0}
+.calc .n{font:800 46px "Barlow Condensed",sans-serif;line-height:1;background:var(--ink);color:var(--yel);width:56px;height:56px;display:flex;align-items:center;justify-content:center}
+.calc h4{font:700 22px "Barlow Condensed",sans-serif;letter-spacing:.06em;text-transform:uppercase}
+.calc .e{font-size:30px}
+.calc .c{font-size:18px;color:var(--mut)}
+.res{display:inline-block;background:var(--yel);padding:4px 14px;font-size:30px;margin-top:4px;border:2px solid var(--ink)}
+canvas{display:block;width:100%}
+iframe.lab{width:100%;border:2px solid var(--ink);display:block;background:#f4f7fa}
+.dnav{position:fixed;right:18px;bottom:16px;display:flex;gap:6px;align-items:center;font:700 16px "Barlow Condensed",sans-serif;z-index:9}
+.dnav .dots{display:flex;gap:3px}.dnav .dots i{width:14px;height:14px;background:var(--hair);cursor:pointer}.dnav .dots i.on{background:var(--yel);outline:2px solid var(--ink)}
+.dnav button{width:36px;height:32px;border:2px solid var(--ink);background:#fff;font-weight:800;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="vp"><div class="deck">
+
+<!-- 0 · forside -->
+<section class="slide on" data-title="Forside" style="grid-template-rows:1fr 70px">
+  <div style="display:grid;grid-template-columns:1fr 620px;background:var(--bg)">
+    <div style="padding:80px 60px;display:flex;flex-direction:column;justify-content:center;gap:24px">
+      <div class="hz" style="width:260px"></div>
+      <div style="font:700 22px 'Barlow Condensed';letter-spacing:.18em;color:var(--mut)">MEM1 · KAP. 13 · EKSAMENSSPØRGSMÅL 04</div>
+      <h1 style="font:800 128px/0.9 'Barlow Condensed';text-transform:uppercase">Rullelejer:<br>levetid og<br>bæreevne</h1>
+      <table class="spec" style="max-width:860px;margin-top:10px">
+        <tr><th style="width:120px">Del</th><th>Opgave</th></tr>
+        <tr><td><b>A</b></td><td>Forklar <span data-tex="L_{10}=(C/P)^p"></span>. Eksponenten <span data-tex="p"></span> for kugle- og rullelejer. Definér den dynamiske bæreevne <span data-tex="C"></span>.</td></tr>
+        <tr><td><b>B</b></td><td>Sporkugleleje, <span data-tex="P=5"></span> kN, <span data-tex="C=50"></span> kN. Find <span data-tex="L_{10}"></span> i mio. omdrejninger og i timer ved 1500 o/min.</td></tr>
+      </table>
+    </div>
+    <div style="background:var(--ink);display:flex;align-items:center;justify-content:center"><canvas id="c0" width="1100" height="1100" style="width:560px"></canvas></div>
+  </div>
+  <div class="ft" style="color:var(--mut);font-size:17px">→ / mellemrum / klikker: næste · ←: forrige · F: fuld skærm</div>
+</section>
+
+<!-- 1 · A1 L10 og C -->
+<section class="slide" data-title="A · L10 og C">
+  <div class="bar"><div class="code">A.1</div><h1>Levetidsligningen: hvad betyder "10"?</h1><div class="meta">Spørgsmål 4<b>Del A · 1/2</b></div></div>
+  <div class="bd" style="grid-template-columns:660px 1fr">
+    <div class="card">
+      <h3>Nominel levetid</h3>
+      <div class="f" data-tex="L_{10}=\left(\dfrac{C}{P}\right)^{p}"></div>
+      <table class="spec">
+        <tr><th>Symbol</th><th>Betydning</th></tr>
+        <tr><td class="s" data-tex="L_{10}"></td><td><b>Levetid i millioner omdrejninger</b>, som <b>90 %</b> af ens lejer når, før de første tegn på udmattelse (afskalning). 10 % svigter før</td></tr>
+        <tr><td class="s" data-tex="C"></td><td><b>Dynamisk bæreevne:</b> den last, lejet kan bære i netop <b>1 million omdrejninger</b> med 90 % overlevelse. Står i kataloget</td></tr>
+        <tr><td class="s" data-tex="P"></td><td><b>Ækvivalent belastning</b>: radial- og aksiallast samlet til én tænkt radiallast</td></tr>
+        <tr><td class="s" data-tex="p"></td><td><b>Levetidseksponent</b>: 3 for kugler, 10/3 for ruller (næste slide)</td></tr>
+      </table>
+      <p style="font-size:18px;color:var(--mut)">Tjek: sættes <span data-tex="P=C"></span>, giver ligningen <span data-tex="L_{10}=1"></span> mio. omdrejninger. Det er definitionen af C.</p>
+    </div>
+    <div class="card">
+      <h3>100 ens lejer kører samme last · Weibull-spredning (illustration)</h3>
+      <canvas id="cW" width="1500" height="980"></canvas>
+      <div class="sl"><span>Kørt (× L<sub>10</sub>)</span><input id="wL" type="range" min="0" max="4" step="0.05" value="1"><output id="wLo"></output></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Lejer dør tilfældigt, også når de er ens. L<sub>10</sub> er det tidspunkt, hvor 10 ud af 100 er gået i stykker. C er den last, der giver præcis 1 mio. omdrejninger.</span></div>
+</section>
+
+<!-- 2 · A2 eksponent + lab -->
+<section class="slide" data-title="A · Eksponenten p">
+  <div class="bar"><div class="code">A.2</div><h1>Kugle eller rulle: eksponenten p</h1><div class="meta">Spørgsmål 4<b>Del A · 2/2</b></div></div>
+  <div class="bd" style="grid-template-columns:600px 1fr">
+    <div class="card">
+      <h3>Punktkontakt mod linjekontakt</h3>
+      <table class="spec">
+        <tr><th></th><th>Kugleleje</th><th>Rulleleje</th></tr>
+        <tr><td><b>Kontakt</b></td><td>Punkt (lille ellipse)</td><td>Linje (smal stribe)</td></tr>
+        <tr><td><b>Eksponent</b></td><td><span data-tex="p=3"></span></td><td><span data-tex="p=10/3"></span></td></tr>
+        <tr><td><b>2 × last</b></td><td>levetid ÷ <b>8</b></td><td>levetid ÷ <b>10</b></td></tr>
+        <tr><td><b>Bruges til</b></td><td>Hurtigt, let last</td><td>Tung, langsom last</td></tr>
+      </table>
+      <canvas id="cP" width="1100" height="640"></canvas>
+      <p style="font-size:18px;line-height:1.35">Begge linjer går gennem (1; 1): ved <span data-tex="P=C"></span> er levetiden 1 mio. omdrejninger uanset type.</p>
+    </div>
+    <div class="card">
+      <iframe class="lab" id="lab" style="flex:1;min-height:0" title="3D-leje"></iframe>
+      <div class="seg" id="typ"><button data-t="ball" class="on">Kugleleje · p = 3</button><button data-t="roller">Rulleleje · p = 10/3</button></div>
+      <div class="sl"><span>Last P</span><input id="aP" type="range" min="2" max="20" step="0.5" value="5"><output id="aPo"></output></div>
+      <div class="kpi"><div><span>C / P</span><b id="aCP">10,0</b></div><div><span>L<sub>10</sub> [mio. omdr.]</span><b id="aL">1000</b><i id="aLr"></i></div><div><span>Timer ved 1500 o/min</span><b id="aH">11 111</b></div></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Levetiden er ekstremt følsom over for lasten: dobbelt last giver en ottendedel af levetiden. Ruller har linjekontakt og eksponent 10/3.</span></div>
+</section>
+
+<!-- 3 · B1 beregning -->
+<section class="slide" data-title="B · Beregning">
+  <div class="bar"><div class="code">B.1</div><h1>Beregning: L<sub>10</sub> i omdrejninger og timer</h1><div class="meta">Spørgsmål 4<b>Del B · 1/2</b></div></div>
+  <div class="bd" style="grid-template-columns:1fr 560px">
+    <div class="card" style="padding:12px 26px">
+      <table class="spec" style="margin-bottom:6px"><tr><th>Type</th><th>P</th><th>C</th><th>p</th><th>n</th></tr><tr><td>Sporkugleleje</td><td>5 kN</td><td>50 kN</td><td>3</td><td>1500 o/min</td></tr></table>
+      <div class="calc"><div class="n">1</div><div><h4>Forhold</h4><div class="e" data-tex="\dfrac CP=\dfrac{50}{5}=10"></div></div></div>
+      <div class="calc"><div class="n">2</div><div><h4>Levetid i omdrejninger</h4><div class="e" data-tex="L_{10}=10^3"></div><div class="res" data-tex="L_{10}=1000\ \text{mio. omdr.}=10^9\ \text{omdr.}"></div></div></div>
+      <div class="calc"><div class="n">3</div><div><h4>Omregning til timer</h4><div class="e" data-tex="L_{10h}=\dfrac{L_{10}\cdot10^6}{60\cdot n}=\dfrac{10^9}{60\cdot1500}"></div><div class="res" data-tex="L_{10h}\approx11\,111\ \text{h}"></div><div class="c">60 · 1500 = 90 000 omdrejninger i timen</div></div></div>
+    </div>
+    <div class="card">
+      <h3>Hvor længe er 11 111 timer?</h3>
+      <canvas id="cB" width="1040" height="1060"></canvas>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Forholdet C/P = 10 i tredje giver 1000 mio. omdrejninger. Med 90 000 omdrejninger i timen bliver det godt 11 000 timer.</span></div>
+</section>
+
+<!-- 4 · B2 vurdering -->
+<section class="slide" data-title="B · Hvad nu hvis">
+  <div class="bar"><div class="code">B.2</div><h1>Er det nok? Følsomhed og "hvad nu hvis"</h1><div class="meta">Spørgsmål 4<b>Del B · 2/2</b></div></div>
+  <div class="bd" style="grid-template-columns:520px 1fr">
+    <div class="card">
+      <h3>Vurdering</h3>
+      <table class="spec">
+        <tr><th>Anvendelse</th><th>Typisk krav</th></tr>
+        <tr><td>8 h/dag, ikke fuldt udnyttet</td><td>10 000–25 000 h</td></tr>
+        <tr><td>8 h/dag, fuldt udnyttet</td><td>20 000–30 000 h</td></tr>
+        <tr><td>Døgndrift 24/7</td><td>40 000–50 000 h</td></tr>
+      </table>
+      <p style="font-size:19px;line-height:1.4">11 111 h er i den <b>lave ende</b> for en maskine, der kører 8 timer om dagen. Til døgndrift skal lejet være væsentligt større.</p>
+      <p style="font-size:19px;line-height:1.4"><b>Husk:</b> det er en 90 %-værdi. Hver tiende leje kan svigte før. Smøring, renhed og temperatur ændrer den reelle levetid.</p>
+      <p style="font-size:16px;color:var(--mut)">Kravene er typiske vejledende tal (ikke opgivet i opgaven).</p>
+    </div>
+    <div class="card">
+      <div class="seg" id="hv"><button data-h="0" class="on">Opgaven</button><button data-h="1">P = 10 kN</button><button data-h="2">Rulleleje</button><button data-h="3">n = 3000</button><button data-h="4">C = 60 kN</button></div>
+      <canvas id="cH" width="1800" height="720"></canvas>
+      <div class="kpi"><div><span>L<sub>10</sub> [mio. omdr.]</span><b id="hL">1000</b><i id="hLr"></i></div><div><span>L<sub>10h</sub> [timer]</span><b id="hH">11 111</b><i id="hHr"></i></div><div><span>År ved 8 h/dag</span><b id="hY">5,6</b><i id="hYr"></i></div></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Dobbelt last giver en ottendedel af levetiden. Dobbelt omdrejningstal halverer timerne, men ikke omdrejningerne. Lidt større C hjælper meget.</span></div>
+</section>
+
+</div></div>
+<script src="../assets/deck.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = Deck.$, fmt = Deck.fmt, PI = Math.PI, INK = '#151515', MUT = '#6b6b66', HAIR = '#c9c9c3', YEL = '#ffcc00', BLU = '#1d5fa8', RED = '#d23a1f';
+function th(v) { return Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+function life(C, P, p, n) { var L = Math.pow(C / P, p); return { L: L, h: L * 1e6 / (60 * n) }; }
+
+/* forside: leje set forfra */
+(function () {
+  var g = Deck.cv('c0'), x = g.x, c = 550; g.clear();
+  function ring(r0, r1, col) { x.beginPath(); x.arc(c, c, r1, 0, 2 * PI); x.arc(c, c, r0, 0, 2 * PI, true); x.fillStyle = col; x.fill(); }
+  ring(380, 470, '#3a3a38'); ring(170, 250, '#3a3a38');
+  for (var i = 0; i < 11; i++) { var a = i * 2 * PI / 11; g.dot(c + Math.cos(a) * 315, c + Math.sin(a) * 315, 58, '#d9d9d4'); g.dot(c + Math.cos(a) * 315 - 16, c + Math.sin(a) * 315 - 16, 14, '#fff'); }
+  x.strokeStyle = YEL; x.lineWidth = 10; x.beginPath(); x.arc(c, c, 520, -0.5, 0.5); x.stroke();
+  g.txt('P', c + 470, c, 90, YEL, 'left', 'middle', 800);
+})();
+
+/* ===== A1: 100 lejer ===== */
+var wl = 1;
+var seeds = []; (function () { var s = 7, idx = []; for (var i = 0; i < 100; i++) idx.push(i); for (i = 99; i > 0; i--) { s = (s * 9301 + 49297) % 233280; var j = Math.floor(s / 233280 * (i + 1)), t = idx[i]; idx[i] = idx[j]; idx[j] = t; } idx.forEach(function (k) { seeds.push((k + 0.5) / 100); }); })();  /* jævnt fordelte kvantiler i tilfældig rækkefølge: præcis 10 svigter ved L10 */
+Deck.range('wL', function (v) { wl = v; drawW(); }, function (v) { return fmt(v, 2); });
+function drawW() {
+  var g = Deck.cv('cW'); g.clear();
+  /* hvert leje har en levetid t_i fra Weibull: S = 0,9^(t^1,5) → t = (ln u / ln 0,9)^(1/1,5) */
+  var dead = 0;
+  for (var i = 0; i < 100; i++) {
+    var t = Math.pow(Math.log(seeds[i]) / Math.log(0.9), 1 / 1.5), cx = 90 + (i % 10) * 92, cy = 90 + Math.floor(i / 10) * 80, d = t <= wl;
+    if (d) dead++;
+    g.dot(cx, cy, 30, d ? RED : '#e4e4df'); g.dot(cx, cy, 13, d ? '#fff' : INK);
+    if (d) g.line([[cx - 16, cy - 16], [cx + 16, cy + 16]], '#fff', 4);
+  }
+  var S = 100 * Math.pow(0.9, Math.pow(wl, 1.5));
+  g.rect(1010, 60, 470, 760, '#151515');
+  g.txt('SVIGTET', 1040, 120, 34, '#bbb', 'left', 'middle', 700);
+  g.txt(String(dead), 1040, 250, 180, dead ? YEL : '#fff', 'left', 'middle', 800);
+  g.txt('af 100', 1040, 380, 40, '#bbb', 'left', 'middle', 700);
+  g.txt('forventet: ' + fmt(100 - S, 0), 1040, 450, 32, '#bbb', 'left', 'middle', 600);
+  g.txt(wl === 1 ? 'L = L₁₀' : 'L = ' + fmt(wl, 2) + ' · L₁₀', 1040, 560, 54, '#fff', 'left', 'middle', 800);
+  g.txt(Math.abs(wl - 1) < 0.03 ? '← 10 % er gået' : '', 1040, 640, 36, YEL, 'left', 'middle', 700);
+  g.txt('Weibull-fordeling, hældning 1,5', 1040, 780, 24, '#999', 'left', 'middle', 500);
+}
+drawW();
+
+/* ===== A2: log-plot + lab ===== */
+(function () {
+  var g = Deck.cv('cP'), x = g.x; g.clear();
+  var F = g.frame({ l: 120, r: 1060, t: 30, b: 560, x0: 0, x1: Math.log10(20), y0: 0, y1: 4.4 });
+  for (var e = 0; e <= 4; e++) { g.line([[F.X(0), F.Y(e)], [F.X(Math.log10(20)), F.Y(e)]], e ? '#ecece8' : INK, 1); g.txt('10' + ['⁰', '¹', '²', '³', '⁴'][e], F.X(0) - 14, F.Y(e), 26, MUT, 'right', 'middle', 600); }
+  [1, 2, 5, 10, 20].forEach(function (v) { g.txt(String(v), F.X(Math.log10(v)), F.Y(0) + 30, 26, MUT, 'center', 'middle', 600); });
+  g.line([[F.X(0), F.Y(0)], [F.X(0), F.Y(4.4)]], INK, 2);
+  g.txt('C / P', F.X(Math.log10(20)), F.Y(0) + 62, 26, MUT, 'right', 'middle', 700); g.txt('L₁₀ [mio. omdr.]', F.X(0) + 12, F.Y(4.4) + 6, 24, MUT, 'left', 'middle', 700);
+  g.fn(F, function (u) { return 3 * u; }, 0, Math.log10(20), BLU, 6);
+  g.fn(F, function (u) { return 10 / 3 * u; }, 0, Math.log10(20), RED, 6, [14, 8]);
+  g.txt('kugle p = 3', F.X(1.12), F.Y(3.36) + 44, 28, BLU, 'left', 'middle', 800);
+  g.txt('rulle p = 10/3', F.X(0.82), F.Y(10 / 3 * 0.82) - 26, 28, RED, 'right', 'middle', 800);
+  g.dot(F.X(1), F.Y(3), 11, INK); g.txt('opgaven', F.X(1) + 14, F.Y(3) + 34, 24, INK, 'left', 'middle', 700);
+})();
+var A = { type: 'ball', P: 5 }, A0 = life(50, 5, 3, 1500);
+var send = Deck.lab('lab', 'rulleleje', function () { return { 'lejetype': A.type, 'ækvivalent radiallast': A.P, 'dynamisk bæreevne': 50, 'omdrejningstal': 1500 }; });
+Deck.group('[data-t]', function (v) { A.type = v; updA(); });
+Deck.range('aP', function (v) { A.P = v; updA(); }, function (v) { return fmt(v, 1) + ' kN'; });
+function updA() {
+  var K = life(50, A.P, A.type === 'ball' ? 3 : 10 / 3, 1500);
+  $('aCP').textContent = fmt(50 / A.P, 1); $('aL').textContent = th(K.L); Deck.rel('aLr', K.L, A0.L); $('aH').textContent = th(K.h); send();
+}
+updA();
+
+/* ===== B1: tidslinje ===== */
+(function () {
+  var g = Deck.cv('cB'); g.clear();
+  var rows = [['Døgndrift 24/7', 8760, '1,3 år'], ['To skift, 16 h/dag', 16 * 250, '2,8 år'], ['Ét skift, 8 h/dag', 8 * 250, '5,6 år']];
+  rows.forEach(function (r, i) {
+    var y = 110 + i * 300, yrs = 11111 / r[1], W = 780, sc = W / 6;
+    g.txt(r[0], 60, y, 36, INK, 'left', 'middle', 700);
+    for (var k = 0; k <= 6; k++) { g.line([[60 + k * sc, y + 40], [60 + k * sc, y + 150]], HAIR, 2); g.txt(k + ' år', 60 + k * sc, y + 180, 24, MUT, 'center', 'middle', 600); }
+    g.rect(60, y + 55, yrs * sc, 80, i === 2 ? YEL : INK);
+    g.txt(r[2], 60 + yrs * sc + 16, y + 95, 46, INK, 'left', 'middle', 800);
+  });
+})();
+
+/* ===== B2: hvad nu hvis ===== */
+var HV = [[50, 5, 3, 1500, 'Opgaven'], [50, 10, 3, 1500, 'P = 10 kN'], [50, 5, 10 / 3, 1500, 'Rulleleje'], [50, 5, 3, 3000, 'n = 3000'], [60, 5, 3, 1500, 'C = 60 kN']], H0 = life(50, 5, 3, 1500), hi = 0;
+Deck.group('[data-h]', function (v) { hi = +v; drawH(); });
+function drawH() {
+  var g = Deck.cv('cH'); g.clear();
+  var max = 26000, L = 300, R = 1760, sc = (R - L) / max;
+  for (var k = 0; k <= max; k += 5000) { g.line([[L + k * sc, 30], [L + k * sc, 640]], k ? '#ecece8' : INK, 2); g.txt(th(k), L + k * sc, 670, 24, MUT, 'center', 'middle', 600); }
+  g.txt('timer', R, 704, 24, MUT, 'right', 'middle', 700);
+  HV.forEach(function (h, i) {
+    var K = life(h[0], h[1], h[2], h[3]), y = 60 + i * 118, on = i === hi;
+    g.txt(h[4], L - 20, y + 40, 34, on ? INK : MUT, 'right', 'middle', on ? 800 : 600);
+    g.rect(L, y + 10, Math.min(K.h, max) * sc, 60, on ? YEL : (i ? '#d6d6d0' : INK));
+    if (on) { g.x.strokeStyle = INK; g.x.lineWidth = 3; g.x.strokeRect(L, y + 10, Math.min(K.h, max) * sc, 60); }
+    g.txt(th(K.h) + ' h', L + Math.min(K.h, max) * sc + 14, y + 40, 32, INK, 'left', 'middle', 800);
+  });
+  var h = HV[hi], K = life(h[0], h[1], h[2], h[3]);
+  $('hL').textContent = th(K.L); Deck.rel('hLr', K.L, H0.L);
+  $('hH').textContent = th(K.h); Deck.rel('hHr', K.h, H0.h);
+  $('hY').textContent = fmt(K.h / 2000, 1); Deck.rel('hYr', K.h, H0.h);
+}
+drawH();
+Deck.init();
+})();
+</script>
+</body>
+</html>
