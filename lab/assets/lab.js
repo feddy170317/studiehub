@@ -184,6 +184,17 @@
 
   /* ---------- kontrolpanel ---------- */
   function row(parent, html) { var d = document.createElement('div'); d.className = 'ctl'; d.innerHTML = html; parent.appendChild(d); return d; }
+  /* fjernstyring: en præsentation kan sende postMessage({lab: {'<label-start>': værdi, ...}}).
+     Nøglen matches mod begyndelsen af kontrolelementets label uden HTML (små bogstaver). */
+  Lab._ctl = [];
+  Lab._reg = function (label, api) { Lab._ctl.push({ k: String(label).replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim().toLowerCase(), api: api }); };
+  window.addEventListener('message', function (e) {
+    var v = e.data && e.data.lab; if (!v || typeof v !== 'object') return;
+    Object.keys(v).forEach(function (key) {
+      var kk = key.toLowerCase();
+      for (var i = 0; i < Lab._ctl.length; i++) if (Lab._ctl[i].k.indexOf(kk) === 0) { Lab._ctl[i].api.set(v[key]); break; }
+    });
+  });
   Lab.slider = function (parent, o) {
     var d = row(parent, '<label><span>' + o.label + '</span><span class="v"></span></label><input type="range">' + (o.sub ? '<div class="sub">' + o.sub + '</div>' : ''));
     var inp = d.querySelector('input'), v = d.querySelector('.v');
@@ -197,7 +208,7 @@
     };
     function show() { v.textContent = (o.fmt ? o.fmt(api.get()) : Lab.fmt(api.get())) + (o.unit ? ' ' + o.unit : ''); }
     inp.addEventListener('input', function () { show(); if (o.onInput) o.onInput(api.get()); });
-    show(); return api;
+    show(); Lab._reg(o.label, api); return api;
   };
   Lab.select = function (parent, o) {
     var d = row(parent, '<label><span>' + o.label + '</span></label><select></select>' + (o.sub ? '<div class="sub">' + o.sub + '</div>' : ''));
@@ -205,7 +216,8 @@
     o.options.forEach(function (op) { var e = document.createElement('option'); e.value = op.value; e.textContent = op.label; s.appendChild(e); });
     if (o.value !== undefined) s.value = o.value;
     s.addEventListener('change', function () { if (o.onChange) o.onChange(s.value); });
-    return { el: s, get: function () { return s.value; }, set: function (x, silent) { s.value = x; if (!silent && o.onChange) o.onChange(x); } };
+    var api = { el: s, get: function () { return s.value; }, set: function (x, silent) { s.value = x; if (!silent && o.onChange) o.onChange(x); } };
+    Lab._reg(o.label, api); return api;
   };
   Lab.seg = function (parent, o) {
     var d = row(parent, (o.label ? '<label><span>' + o.label + '</span></label>' : '') + '<div class="seg"></div>');
@@ -215,14 +227,15 @@
       b.onclick = function () { api.set(op.value); }; box.appendChild(b);
     });
     var api = { get: function () { return cur; }, set: function (v, silent) { cur = v; for (var k in btns) btns[k].classList.toggle('on', k == v); if (!silent && o.onChange) o.onChange(v); } };
-    api.set(cur, true); return api;
+    api.set(cur, true); if (o.label) Lab._reg(o.label, api); return api;
   };
   Lab.check = function (parent, o) {
     var l = document.createElement('label'); l.className = 'chk';
     l.innerHTML = '<input type="checkbox"' + (o.value ? ' checked' : '') + '><span>' + o.label + '</span>';
     parent.appendChild(l);
     var c = l.querySelector('input'); c.addEventListener('change', function () { if (o.onChange) o.onChange(c.checked); });
-    return { get: function () { return c.checked; }, set: function (v) { c.checked = v; } };
+    var api = { get: function () { return c.checked; }, set: function (v) { c.checked = v; } };
+    Lab._reg(o.label, { set: function (v) { c.checked = !!v; if (o.onChange) o.onChange(!!v); } }); return api;
   };
   Lab.button = function (parent, label, cls, fn) {
     var b = document.createElement('button'); b.type = 'button'; b.className = 'btn ' + (cls || ''); b.innerHTML = label; b.onclick = fn; parent.appendChild(b); return b;
