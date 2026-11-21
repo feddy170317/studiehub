@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spm. 8 · Lamelkobling</title>
+<meta name="description" content="Fremlæggelse af MEM1 eksamensspørgsmål 8: lamelfriktionskoblinger, konstant tryk mod konstant slid og momentkapaciteten, med 3D-lab indlejret.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<style>
+/* Design: kraftige farveblokke. Fast farvet sidepanel med titlen (orange = del A, petrol = del B), hvidt arbejdsfelt, gul markering. */
+:root{--a:#e4572e;--b:#1b998b;--y:#ffc914;--ink:#17141f;--mut:#6f6a78;--soft:#f4f2f7;--line:#e5e1ea;--chart-font:"Space Grotesk",sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#fff;color:var(--ink);font-family:"Space Grotesk",sans-serif;overflow:hidden}
+.vp{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+.deck{position:relative;width:1600px;height:900px;flex:none;transform-origin:center}
+.slide{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .3s;display:grid;grid-template-columns:400px 1fr;background:#fff}
+.slide.on{opacity:1;visibility:visible}
+.side{background:var(--a);color:#fff;padding:44px 36px;display:flex;flex-direction:column;gap:18px;position:relative;overflow:hidden}
+.slide.B .side{background:var(--b)}
+.side .no{font-size:170px;font-weight:700;line-height:.8;opacity:.22;position:absolute;right:-10px;bottom:-14px}
+.side .tag{font-size:15px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;opacity:.85}
+.side h1{font-size:46px;font-weight:700;line-height:1.04;letter-spacing:-.02em}
+.side .say{margin-top:auto;background:rgba(0,0,0,.16);padding:16px 18px;font-size:18px;line-height:1.4;position:relative;z-index:1}
+.side .say b{display:block;font-size:13px;letter-spacing:.16em;margin-bottom:6px;color:var(--y)}
+.work{padding:38px 44px 34px;display:grid;gap:22px;min-height:0}
+.box{border:2px solid var(--ink);padding:16px 20px;min-height:0;display:flex;flex-direction:column;gap:10px}
+.box.fill{background:var(--soft);border-color:var(--soft)}
+.h{font-size:14px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+.f{font-size:34px;text-align:center}
+.hl{background:linear-gradient(transparent 55%,var(--y) 55%)}
+.terms{display:grid;grid-template-columns:90px 1fr;gap:10px 16px;font-size:19px;line-height:1.38;align-items:baseline}
+.terms .s{font-size:25px;text-align:center}
+.sl{display:grid;grid-template-columns:170px 1fr 110px;gap:14px;align-items:center;font-size:17px;font-weight:600}
+.sl input{width:100%;accent-color:var(--a)}
+.slide.B .sl input{accent-color:var(--b)}
+.sl output{font-size:24px;font-weight:700;text-align:right}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.btns button{font:600 16px "Space Grotesk",sans-serif;background:#fff;color:var(--ink);border:2px solid var(--ink);padding:8px 14px;cursor:pointer}
+.btns button.on{background:var(--ink);color:var(--y)}
+.nums{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:2px solid var(--ink)}
+.nums div{padding:10px 14px;border-left:2px solid var(--ink)}.nums div:first-child{border-left:0}
+.nums span{display:block;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+.nums b{font-size:36px;font-weight:700}
+.nums i{font-style:normal;font-size:15px;font-weight:700;margin-left:6px}
+.up{color:var(--b)}.dn{color:var(--a)}.eq{color:var(--mut)}
+.st{display:grid;grid-template-columns:54px 1fr;gap:12px;padding:12px 0;border-bottom:2px solid var(--soft)}
+.st:last-child{border-bottom:0}
+.st .n{width:44px;height:44px;background:var(--b);color:#fff;font-weight:700;font-size:22px;display:flex;align-items:center;justify-content:center}
+.st h4{font-size:20px;font-weight:700}
+.st .e{font-size:27px;margin-top:2px}
+.st .c{font-size:17px;color:var(--mut)}
+.res{display:inline-block;background:var(--y);padding:4px 14px;font-size:30px;margin-top:6px}
+canvas{display:block;width:100%}
+iframe.lab{width:100%;border:2px solid var(--ink);display:block;background:#f4f7fa}
+.dnav{position:fixed;left:18px;bottom:14px;display:flex;gap:6px;align-items:center;font:700 14px "Space Grotesk",sans-serif;color:#fff;z-index:9}
+.dnav .dots{display:flex;gap:5px}.dnav .dots i{width:12px;height:12px;border:2px solid #fff;cursor:pointer}.dnav .dots i.on{background:var(--y);border-color:var(--y)}
+.dnav button{width:34px;height:30px;border:2px solid #fff;background:transparent;color:#fff;font-weight:700;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="vp"><div class="deck">
+
+<!-- 0 · forside -->
+<section class="slide on" data-title="Forside" style="grid-template-columns:1fr 1fr">
+  <div class="side" style="padding:70px 60px;justify-content:center">
+    <div class="tag">MEM1 · kap. 18 · eksamensspørgsmål 8</div>
+    <h1 style="font-size:96px;line-height:.95">Lamel&shy;koblinger</h1>
+    <p style="font-size:26px;line-height:1.35;max-width:600px">Mange skiver, der presses sammen. Friktionen overfører momentet. Men hvordan fordeler trykket sig hen over skiverne?</p>
+    <div class="no" style="font-size:420px;bottom:-60px">08</div>
+    <div style="font-size:15px;opacity:.85;margin-top:30px;position:relative">→ / mellemrum / klikker: næste · ←: forrige · F: fuld skærm</div>
+  </div>
+  <div style="padding:70px 60px;display:flex;flex-direction:column;justify-content:center;gap:26px">
+    <canvas id="c0" width="1200" height="640"></canvas>
+    <div class="box"><div class="h" style="color:var(--a)">Del A · Forklar</div><div style="font-size:20px;line-height:1.45">Konstant tryk mod konstant slid. Momentkapaciteten <span data-tex="T=N\mu F\,\tfrac{r_o+r_i}{2}"></span> ved konstant slid, leddene og antagelserne.</div></div>
+    <div class="box"><div class="h" style="color:var(--b)">Del B · Beregn</div><div style="font-size:20px;line-height:1.45"><span data-tex="N=4"></span>, <span data-tex="r_i=50"></span> mm, <span data-tex="r_o=100"></span> mm, <span data-tex="\mu=0{,}30"></span>, <span data-tex="F=2000"></span> N. Find <span data-tex="T"></span>.</div></div>
+  </div>
+</section>
+
+<!-- 1 · A1 to teorier -->
+<section class="slide" data-title="A · To teorier">
+  <div class="side"><div class="tag">Del A · 1/2</div><h1>Konstant tryk eller konstant slid?</h1>
+    <div class="say"><b>SIG</b>En ny kobling har jævnt tryk. Efter indkøring slides ydersiden mest, fordi den kører hurtigst. Så flytter trykket indad, og p·r bliver konstant.</div><div class="no">A1</div></div>
+  <div class="work" style="grid-template-columns:1fr 1fr">
+    <div class="box fill">
+      <div class="h">Konstant tryk · ny kobling</div>
+      <div class="f" style="font-size:28px" data-tex="p=\dfrac{F}{\pi(r_o^2-r_i^2)}"></div>
+      <div class="f" style="font-size:26px" data-tex="T=\tfrac23 N\mu F\,\dfrac{r_o^3-r_i^3}{r_o^2-r_i^2}"></div>
+      <div class="h" style="margin-top:10px">Konstant slid · indkørt kobling</div>
+      <div style="font-size:18px;line-height:1.4">Slid ∝ tryk × hastighed, og hastigheden ∝ r. Ens slid overalt kræver:</div>
+      <div class="f" style="font-size:28px" data-tex="p\cdot r=\text{konstant}=p_{max}\,r_i"></div>
+      <div class="f" style="font-size:28px"><span class="hl" data-tex="T=N\mu F\,\dfrac{r_o+r_i}{2}"></span></div>
+    </div>
+    <div class="box">
+      <div class="h">Trykfordeling hen over skiven, samme F</div>
+      <canvas id="cP" width="1080" height="980"></canvas>
+      <div class="sl"><span><span data-tex="r_i/r_o"></span></span><input id="pR" type="range" min="0.2" max="0.9" step="0.01" value="0.5"><output id="pRo"></output></div>
+      <div class="nums"><div><span>T, tryk</span><b id="pT1">187</b></div><div><span>T, slid</span><b id="pT2">180</b></div><div><span>Forskel</span><b id="pD">3,7 %</b></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 · A2 formel + lab -->
+<section class="slide" data-title="A · Momentformlen">
+  <div class="side"><div class="tag">Del A · 2/2</div><h1>Momentformlen, led for led</h1>
+    <div class="say"><b>SIG</b>Hver friktionsflade overfører μF gange middelradius. N flader lægges sammen. Konstant slid giver det laveste moment, så det er det sikre valg.</div><div class="no">A2</div></div>
+  <div class="work" style="grid-template-columns:560px 1fr">
+    <div class="box fill">
+      <div class="f" style="font-size:42px" data-tex="T=\color{#e4572e}{N}\,\mu\,F\cdot\color{#1b998b}{\dfrac{r_o+r_i}{2}}"></div>
+      <div class="terms">
+        <span class="s" style="color:var(--a)" data-tex="N"></span><span><b>Antal friktionsflader</b>, ikke skiver. Hver flade bærer sit eget bidrag</span>
+        <span class="s" data-tex="\mu"></span><span><b>Friktionskoefficient</b>: tør belægning ≈ 0,3, i olie ≈ 0,1</span>
+        <span class="s" data-tex="F"></span><span><b>Aksial klemkraft</b> fra fjederen. Den samme kraft går gennem hele stakken</span>
+        <span class="s" style="color:var(--b)" data-tex="\tfrac{r_o+r_i}{2}"></span><span><b>Middelradius</b>: den effektive arm for friktionskraften</span>
+      </div>
+      <div class="h" style="margin-top:6px">Antagelser</div>
+      <div style="font-size:17px;line-height:1.45">Indkørt (jævnt slid) · slid ∝ p·v · stive plader · konstant μ · ingen friktion i notgangen, så F er ens på alle flader</div>
+    </div>
+    <div class="box" style="padding:12px">
+      <iframe class="lab" id="lab" style="flex:1;min-height:0" title="3D-lamelkobling"></iframe>
+      <div class="sl"><span>Friktionsflader N</span><input id="lN" type="range" min="2" max="12" step="2" value="4"><output id="lNo"></output></div>
+      <div class="sl"><span>Klemkraft F</span><input id="lF" type="range" min="500" max="6000" step="100" value="2000"><output id="lFo"></output></div>
+      <div class="btns" style="align-items:center"><button id="lOn" class="on">Koblet ind</button><span style="font-size:16px;color:var(--mut)">Labbet bremser med 120 N·m. Er T mindre, glider koblingen.</span></div>
+      <div class="nums"><div><span>Moment T</span><b id="lT">180</b> N·m<i id="lTr"></i></div><div><span>Pr. flade</span><b id="lP">45</b> N·m</div><div><span>p<sub>max</sub> ved r<sub>i</sub></span><b id="lPm">0,13</b> MPa</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 · B1 beregning -->
+<section class="slide B" data-title="B · Beregning">
+  <div class="side"><div class="tag">Del B · 1/2</div><h1>Beregning: overført moment</h1>
+    <div class="say"><b>SIG</b>Fire flader gange 0,3 gange 2000 N giver 2400 N. Gange middelradius 75 mm giver 180 N·m.</div><div class="no">B1</div></div>
+  <div class="work" style="grid-template-columns:1fr 460px">
+    <div class="box" style="padding:10px 24px">
+      <div class="st"><span class="n">1</span><div><h4>Middelradius, i meter</h4><div class="e" data-tex="\tfrac{r_o+r_i}{2}=\tfrac{0{,}100+0{,}050}{2}=0{,}075\ \text{m}"></div></div></div>
+      <div class="st"><span class="n">2</span><div><h4>Samlet friktionskraft</h4><div class="e" data-tex="N\mu F=4\cdot0{,}30\cdot2000=2400\ \text{N}"></div></div></div>
+      <div class="st"><span class="n">3</span><div><h4>Moment</h4><div class="e" data-tex="T=2400\cdot0{,}075"></div><span class="res" data-tex="T=180\ \text{N}\cdot\text{m}"></span><div class="c">45 N·m pr. friktionsflade</div></div></div>
+      <div class="st"><span class="n">4</span><div><h4>Største tryk (inderst)</h4><div class="e" data-tex="p_{max}=\tfrac{F}{2\pi r_i(r_o-r_i)}=\tfrac{2000}{2\pi\cdot50\cdot50}=0{,}127\ \text{MPa}"></div></div></div>
+    </div>
+    <div class="box fill">
+      <div class="h">Én friktionsflade set forfra</div>
+      <canvas id="cB" width="900" height="900"></canvas>
+    </div>
+  </div>
+</section>
+
+<!-- 4 · B2 sammenligning -->
+<section class="slide B" data-title="B · Vurdering">
+  <div class="side"><div class="tag">Del B · 2/2</div><h1>Tjek og "hvad nu hvis"</h1>
+    <div class="say"><b>SIG</b>Konstant tryk giver 187 N·m, 4 % mere. Slid-antagelsen er konservativ, derfor dimensioneres der efter den. Flere flader er den nemme vej til mere moment.</div><div class="no">B2</div></div>
+  <div class="work" style="grid-template-columns:480px 1fr">
+    <div class="box fill" style="padding:10px 22px">
+      <div class="st"><span class="n">5</span><div><h4>Til sammenligning: konstant tryk</h4><div class="e" style="font-size:24px" data-tex="T=\tfrac23\cdot2400\cdot\tfrac{0{,}1^3-0{,}05^3}{0{,}1^2-0{,}05^2}=186{,}7\ \text{N}\cdot\text{m}"></div><div class="c">3,7 % mere end ved slid</div></div></div>
+      <div class="st"><span class="n">6</span><div><h4>Rimeligt?</h4><div style="font-size:18px;line-height:1.45">180 N·m svarer til en mindre bilmotor. Trykket 0,13 MPa er lavt for en tør belægning (typisk tilladt ca. 0,3–1 MPa, ikke opgivet).</div></div></div>
+    </div>
+    <div class="box">
+      <div class="btns" id="hv"><button data-h="0" class="on">Opgaven</button><button data-h="1">N = 8</button><button data-h="2">I olie, μ = 0,10</button><button data-h="3">F = 4000 N</button><button data-h="4">r<sub>i</sub> = 25 mm</button><button data-h="5">Konstant tryk</button></div>
+      <canvas id="cH" width="1000" height="700"></canvas>
+      <div class="nums"><div><span>Moment T</span><b id="hT">180</b> N·m<i id="hTr"></i></div><div><span>p<sub>max</sub></span><b id="hP">0,127</b> MPa<i id="hPr"></i></div><div><span>Middelradius</span><b id="hR">75</b> mm</div></div>
+    </div>
+  </div>
+</section>
+
+</div></div>
+<script src="../assets/deck.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = Deck.$, fmt = Deck.fmt, PI = Math.PI, A = '#e4572e', B = '#1b998b', Y = '#ffc914', INK = '#17141f', MUT = '#6f6a78', SOFT = '#f4f2f7';
+function Tw(N, mu, F, ri, ro) { return N * mu * F * (ri + ro) / 2 / 1000; }                       /* N·m, radier i mm */
+function Tp(N, mu, F, ri, ro) { return 2 / 3 * N * mu * F * (ro * ro * ro - ri * ri * ri) / (ro * ro - ri * ri) / 1000; }
+function pmw(F, ri, ro) { return F / (2 * PI * ri * (ro - ri)); }
+function pmp(F, ri, ro) { return F / (PI * (ro * ro - ri * ri)); }
+
+/* forside: stak af lameller */
+(function () {
+  var g = Deck.cv('c0'), x = g.x; g.clear();
+  for (var i = 0; i < 9; i++) { var px = 140 + i * 96, h = i % 2 ? 420 : 520, col = i % 2 ? '#d8d3df' : INK; x.fillStyle = col; x.fillRect(px, 320 - h / 2, 46, h); }
+  g.arrow(30, 320, 128, 320, A, 9); g.arrow(1150, 320, 1052, 320, A, 9);
+  g.txt('F', 40, 270, 56, A, 'left', 'middle', 700); g.txt('F', 1110, 270, 56, A, 'left', 'middle', 700);
+  g.txt('N = 8 friktionsflader', 600, 610, 30, MUT, 'center', 'middle', 600);
+})();
+
+/* ===== A1: trykfordeling ===== */
+var PR = 0.5;
+Deck.range('pR', function (v) { PR = v; drawP(); }, function (v) { return fmt(v, 2); });
+function drawP() {
+  var g = Deck.cv('cP'), x = g.x; g.clear();
+  var ro = 100, ri = PR * ro, F = 2000, p1 = pmp(F, ri, ro), pw = pmw(F, ri, ro), ymax = Math.ceil(pw * 1.35 * 20) / 20;
+  var Fm = g.frame({ l: 110, r: 1050, t: 30, b: 860, x0: 0, x1: 100, y0: 0, y1: ymax });
+  g.line([[Fm.X(0), Fm.Y(ymax)], [Fm.X(0), Fm.Y(0)], [Fm.X(100), Fm.Y(0)]], INK, 3);
+  [0, 25, 50, 75, 100].forEach(function (v) { g.txt(String(v), Fm.X(v), Fm.Y(0) + 30, 24, MUT, 'center', 'middle', 600); });
+  [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45].filter(function (v) { return v < ymax; }).forEach(function (v) { g.txt(fmt(v, 2), Fm.X(0) - 12, Fm.Y(v), 22, MUT, 'right', 'middle', 600); g.line([[Fm.X(0), Fm.Y(v)], [Fm.X(100), Fm.Y(v)]], '#efecf3', 1); });
+  g.txt('r [mm]', Fm.X(100), Fm.Y(0) + 64, 24, MUT, 'right', 'middle', 700); g.txt('p [MPa]', Fm.X(0) + 12, Fm.Y(ymax) + 6, 24, MUT, 'left', 'middle', 700);
+  g.rect(Fm.X(0), Fm.Y(ymax), Fm.X(ri) - Fm.X(0), Fm.Y(0) - Fm.Y(ymax), 'rgba(23,20,31,.05)'); g.txt('hul', Fm.X(ri / 2), Fm.Y(ymax * 0.5), 26, MUT, 'center', 'middle', 600);
+  x.fillStyle = 'rgba(228,87,46,.18)'; x.fillRect(Fm.X(ri), Fm.Y(p1), Fm.X(ro) - Fm.X(ri), Fm.Y(0) - Fm.Y(p1));
+  g.line([[Fm.X(ri), Fm.Y(p1)], [Fm.X(ro), Fm.Y(p1)]], A, 6);
+  x.save(); x.beginPath(); x.rect(Fm.X(0), Fm.Y(ymax), 2000, 2000); x.clip();
+  g.fn(Fm, function (r) { return pw * ri / r; }, ri, ro, B, 6); x.restore();
+  g.txt('konstant tryk', Fm.X(ri) + 14, Fm.Y(p1) + 28, 26, A, 'left', 'middle', 700);
+  g.dot(Fm.X(ri), Fm.Y(pw), 10, B); g.txt('konstant slid (p·r = konst.)', Fm.X(ri) + 16, Fm.Y(pw) - 28, 26, B, 'left', 'middle', 700);
+  var t1 = Tp(4, 0.3, F, ri, ro), t2 = Tw(4, 0.3, F, ri, ro);
+  $('pT1').textContent = fmt(t1, 0); $('pT2').textContent = fmt(t2, 0); $('pD').textContent = fmt((t1 / t2 - 1) * 100, 1) + ' %';
+}
+drawP();
+
+/* ===== A2: lab ===== */
+var L = { N: 4, F: 2000, on: true }, L0 = Tw(4, 0.3, 2000, 50, 100);
+var send = Deck.lab('lab', 'lamelkobling', function () { return { 'friktionsflader': L.N, 'inderradius': 50, 'yderradius': 100, 'friktionskoefficient': 0.3, 'aksial klemkraft': L.F, 'antagelse': 'wear', 'lastmoment': 120, 'koblet ind': L.on }; });
+Deck.range('lN', function (v) { L.N = v; updL(); }, function (v) { return String(v); });
+Deck.range('lF', function (v) { L.F = v; updL(); }, function (v) { return v + ' N'; });
+$('lOn').addEventListener('click', function () { L.on = !L.on; this.classList.toggle('on', L.on); this.textContent = L.on ? 'Koblet ind' : 'Koblet ud'; send(); });
+function updL() { var t = Tw(L.N, 0.3, L.F, 50, 100); $('lT').textContent = fmt(t, 0); Deck.rel('lTr', t, L0); $('lP').textContent = fmt(t / L.N, 0); $('lPm').textContent = fmt(pmw(L.F, 50, 100), 2); send(); }
+updL();
+
+/* ===== B1: friktionsflade ===== */
+(function () {
+  var g = Deck.cv('cB'), x = g.x; g.clear(); var c = 450, s = 3.9;
+  for (var i = 0; i < 40; i++) { var r0 = 50 + 50 * i / 40, r1 = 50 + 50 * (i + 1) / 40, t = 50 / ((r0 + r1) / 2); x.beginPath(); x.arc(c, c, r1 * s, 0, 2 * PI); x.arc(c, c, r0 * s, 0, 2 * PI, true); x.fillStyle = 'rgba(27,153,139,' + (0.15 + 0.75 * (t - 0.5) / 0.5) + ')'; x.fill(); }
+  x.strokeStyle = INK; x.lineWidth = 4; x.beginPath(); x.arc(c, c, 100 * s, 0, 2 * PI); x.stroke(); x.beginPath(); x.arc(c, c, 50 * s, 0, 2 * PI); x.stroke();
+  x.setLineDash([12, 8]); x.strokeStyle = Y; x.lineWidth = 6; x.beginPath(); x.arc(c, c, 75 * s, 0, 2 * PI); x.stroke(); x.setLineDash([]);
+  g.line([[c, c], [c + 75 * s, c]], INK, 3); g.txt('75 mm', c + 75 * s / 2, c - 24, 32, INK, 'center', 'middle', 700);
+  g.txt('r_i = 50', c, c - 50 * s + 36, 26, INK, 'center', 'middle', 600); g.txt('r_o = 100', c, c - 100 * s + 34, 26, INK, 'center', 'middle', 600);
+  g.txt('mørkest = størst tryk (inderst)', c, 880, 26, MUT, 'center', 'middle', 600);
+})();
+
+/* ===== B2: hvad nu hvis ===== */
+var HV = [[4, 0.3, 2000, 50, 'w', 'Opgaven'], [8, 0.3, 2000, 50, 'w', 'N = 8'], [4, 0.1, 2000, 50, 'w', 'μ = 0,10'], [4, 0.3, 4000, 50, 'w', 'F = 4000 N'], [4, 0.3, 2000, 25, 'w', 'r_i = 25'], [4, 0.3, 2000, 50, 'p', 'Konst. tryk']], hi = 0;
+function hv(h) { var t = h[4] === 'w' ? Tw(h[0], h[1], h[2], h[3], 100) : Tp(h[0], h[1], h[2], h[3], 100), p = h[4] === 'w' ? pmw(h[2], h[3], 100) : pmp(h[2], h[3], 100); return { T: t, p: p }; }
+var H0 = hv(HV[0]);
+Deck.group('[data-h]', function (v) { hi = +v; drawH(); });
+function drawH() {
+  var g = Deck.cv('cH'), x = g.x; g.clear();
+  var L = 190, R = 900, sc = (R - L) / 380;
+  g.txt('T [N·m]', R, 684, 22, MUT, 'right', 'middle', 600);
+  [0, 100, 200, 300].forEach(function (v) { g.line([[L + v * sc, 20], [L + v * sc, 620]], v ? '#efecf3' : INK, v ? 2 : 3); g.txt(String(v), L + v * sc, 650, 24, MUT, 'center', 'middle', 600); });
+  HV.forEach(function (h, i) {
+    var K = hv(h), y = 30 + i * 98, on = i === hi;
+    g.txt(h[5], L - 14, y + 32, 26, on ? INK : MUT, 'right', 'middle', on ? 700 : 500);
+    g.rect(L, y + 6, Math.min(K.T, 340) * sc, 54, on ? (i ? A : B) : (i ? '#e8e4ee' : '#bfe3de'));
+    g.txt(fmt(K.T, 0), L + K.T * sc + 10, y + 33, 30, INK, 'left', 'middle', 700);
+  });
+  var h = HV[hi], K = hv(h);
+  $('hT').textContent = fmt(K.T, 0); Deck.rel('hTr', K.T, H0.T);
+  $('hP').textContent = fmt(K.p, 3); Deck.rel('hPr', K.p, H0.p);
+  $('hR').textContent = fmt((h[3] + 100) / 2, 1).replace(',0', '');
+}
+drawH();
+Deck.init();
+})();
+</script>
+</body>
+</html>

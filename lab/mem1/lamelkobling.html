@@ -66,7 +66,7 @@ Lab.presets(c[0], [['<b>Eksamensspm. 14:</b> N = 4, r<sub>i</sub> = 50, r<sub>o<
 var sTl = Lab.slider(c[1], { label: 'Lastmoment på den drevne side', min: 0, max: 600, step: 5, value: S.Tload, unit: 'N·m', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.Tload = v; } });
 var sW = Lab.slider(c[1], { label: 'Drivende omdrejningstal', min: 20, max: 300, step: 5, value: S.win, unit: 'rad/s', fmt: function (x) { return F(x, 0); }, onInput: function (v) { S.win = v; } });
 var br = Lab.btnRow(c[1]);
-Lab.button(br, 'Kobl ind', 'primary', function () { S.engaged = true; }); Lab.button(br, 'Kobl ud', '', function () { S.engaged = false; }); Lab.button(br, '↺ Start forfra', '', function () { S.engaged = false; S.wout = 0; S.heat = 0; S.hist = []; S.t = 0; });
+Lab._reg('Koblet ind', { set: function (v) { S.engaged = !!v; } }); Lab.button(br, 'Kobl ind', 'primary', function () { S.engaged = true; }); Lab.button(br, 'Kobl ud', '', function () { S.engaged = false; }); Lab.button(br, '↺ Start forfra', '', function () { S.engaged = false; S.wout = 0; S.heat = 0; S.hist = []; S.t = 0; });
 var ro = Lab.readouts(c[2], [['Tw', 'T (konstant slid)'], ['Tp', 'T (konstant tryk)'], ['T', 'Anvendt kapacitet'], ['st', 'Tilstand'], '-', ['w', 'Drevet omdrejningstal'], ['P', 'Slipeffekt T·Δω']]);
 Lab.legendKeys(UI.legend, [['#8a5a2b', 'friktionslameller (drivende)'], ['#b8c7d6', 'stålplader (drevne)'], ['#ffa500', 'klemkraft F'], ['#d984ff', 'lastmoment (bremse)']]);
 buildStack();
