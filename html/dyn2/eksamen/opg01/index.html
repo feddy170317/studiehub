@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opg. 1 · Maskinbuesav</title>
+<meta name="description" content="DYN2 eksamenssæt A25, opgave 1 (Hacksaw): krumtap og plejlstang med relativ hastighed (16-16) og relativ acceleration (16-19), med animation og grafer.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<style>
+:root{
+  --bg:#ffffff; --panel:#f6f9fc; --panel2:#ebf1f7; --line:#d3dde8; --ink:#14202d; --mut:#5a6b7d;
+  --cy:#0a7fc2; --or:#d97a00; --rd:#d63a3a; --gr:#0a9a5c; --ye:#a86b00; --pu:#7b4fc9;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+#vp{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{position:relative;width:1600px;height:900px;flex:none;transform-origin:center center}
+.slide{position:absolute;inset:0;padding:34px 48px 0;display:flex;flex-direction:column;opacity:0;visibility:hidden;transition:opacity .35s;
+  background:radial-gradient(1200px 600px at 85% -10%,#e6f1fa 0%,transparent 60%),var(--bg)}
+.slide.on{opacity:1;visibility:visible}
+.hd{display:flex;align-items:baseline;gap:22px;height:78px;flex:none}
+.tag{font:700 17px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:#fff;background:var(--cy);padding:8px 12px;border-radius:6px;white-space:nowrap}
+.tag.b{background:var(--or)}
+.tag.g{background:var(--gr)}
+h1{font-size:44px;font-weight:750;letter-spacing:-.01em}
+h1 small{font-size:24px;color:var(--mut);font-weight:500;margin-left:10px}
+.body{flex:1;display:grid;gap:22px;min-height:0;padding-bottom:16px}
+.ft{flex:none;height:76px;padding-right:270px;display:flex;align-items:center;gap:16px;border-top:1px solid var(--line);font-size:21px;color:var(--ink)}
+.ft b.say{font:700 14px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--ye);border:1px solid var(--ye);padding:7px 9px;border-radius:5px;white-space:nowrap}
+.card{background:var(--panel);border:1px solid var(--line);box-shadow:0 1px 3px rgba(20,32,45,.06);border-radius:14px;padding:18px 20px;min-height:0}
+.card h3{font-size:16px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin-bottom:10px;font-weight:650}
+.big{font-size:36px;text-align:center;padding:8px 0 2px}
+.src{text-align:center;color:var(--mut);font-size:16px;margin-bottom:8px}
+.terms{display:grid;gap:8px;margin-top:8px}
+.term{display:grid;grid-template-columns:118px 1fr;gap:12px;align-items:center;font-size:18px;line-height:1.3;padding:8px 11px;border-radius:9px;background:var(--panel2)}
+.term .s{font-size:22px;text-align:center}
+.term em{color:var(--mut);font-style:normal}
+.cy{color:var(--cy)}.or{color:var(--or)}.rd{color:var(--rd)}.gr{color:var(--gr)}.ye{color:var(--ye)}.pu{color:var(--pu)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{font:600 16px/1 system-ui,sans-serif;color:var(--ink);background:var(--panel2);border:1px solid var(--line);padding:9px 13px;border-radius:9px;cursor:pointer}
+.btn:hover{border-color:var(--cy)}
+.btn.on{background:var(--cy);color:#fff;border-color:var(--cy)}
+.btn.gr.on{background:var(--gr);border-color:var(--gr)}
+.btn.rd.on{background:var(--rd);border-color:var(--rd)}
+.btn.pu.on{background:var(--pu);border-color:var(--pu)}
+.sl{display:grid;grid-template-columns:120px 1fr 92px;gap:12px;align-items:center;font-size:18px}
+.sl input{width:100%;accent-color:var(--cy)}
+.sl output{font:600 18px ui-monospace,Consolas,monospace;text-align:right}
+.ro{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.ro.r3{grid-template-columns:repeat(3,1fr)}
+.ro div{background:var(--panel2);border-radius:10px;padding:8px 11px}
+.ro span{display:block;font-size:13px;color:var(--mut);letter-spacing:.05em}
+.ro b{font:700 24px ui-monospace,Consolas,monospace}
+.ro i{font-style:normal;font-size:14px;margin-left:6px}
+.up{color:var(--rd)}.dn{color:var(--gr)}.eq{color:var(--mut)}
+.chips{display:flex;gap:10px;flex-wrap:wrap}
+.chip{background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:18px}
+.chip small{color:var(--mut);margin-left:6px;font-size:14px}
+.step{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:start;padding:12px 0;border-bottom:1px dashed var(--line)}
+.step:last-child{border-bottom:0}
+.step .n{width:34px;height:34px;border-radius:50%;background:var(--cy);color:#fff;font:800 18px/34px system-ui;text-align:center}
+.step .n.b{background:var(--or)}
+.step .t{font-size:19px;line-height:1.35}
+.step .t .m{font-size:22px;display:block;margin-top:5px}
+.step .t .note{color:var(--mut);font-size:17px}
+.ok{color:var(--gr);font-weight:700}
+.warn{color:var(--rd);font-weight:700}
+canvas{display:block;width:100%}
+.status{font-size:17px;padding:8px 12px;border-radius:9px;background:var(--panel2)}
+#nav{position:fixed;bottom:12px;right:16px;display:flex;gap:8px;align-items:center;z-index:5;font:600 14px ui-monospace,Consolas,monospace;color:var(--mut)}
+#nav button{background:#ffffffcc;border:1px solid var(--line);color:var(--ink);border-radius:8px;width:38px;height:34px;font-size:16px;cursor:pointer}
+#dots{display:flex;gap:6px}
+#dots i{width:9px;height:9px;border-radius:50%;background:var(--line);cursor:pointer}
+#dots i.on{background:var(--cy)}
+.qcard{font-size:22px;line-height:1.45}
+.qcard .lbl{font:800 19px ui-monospace,Consolas,monospace;margin-bottom:10px;display:block}
+.plan{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.plan div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:17px;line-height:1.35}
+.plan b{display:block;font-size:19px;margin-bottom:3px}
+.ans small{font-size:19px;color:var(--mut);margin-left:8px}
+.ans{font-size:28px;line-height:1.5;text-align:center;padding:12px;border-radius:12px;background:#fff;border:2px solid var(--gr);margin-bottom:10px}
+.katex{font-size:1.04em}
+</style>
+</head>
+<body>
+<div id="vp"><div id="deck">
+
+<!-- ============ 0 · FORSIDE ============ -->
+<section class="slide on" data-title="Forside">
+  <div style="flex:1;display:grid;grid-template-columns:1fr 640px;gap:34px;align-items:center;padding:0 10px">
+    <div style="display:flex;flex-direction:column;gap:22px">
+      <div>
+        <div class="tag" style="display:inline-block">DYN2 · KAP. 16 · EKSAMENSSÆT A25 · OPGAVE 1</div>
+        <h1 style="font-size:68px;margin-top:20px">Maskinbuesaven</h1>
+        <div style="font-size:27px;color:var(--mut);margin-top:6px">Krumtap og plejlstang: hjulet drejer jævnt, men klingen <b class="or">accelererer</b></div>
+      </div>
+      <div class="card qcard"><span class="lbl cy">OPGAVEN (HACKSAW)</span>
+        Svinghjulet drejer med konstant <b>60 o/min mod uret</b>. Krumtappen <span data-tex="OB=100"></span> mm trækker plejlstangen <span data-tex="AB=450"></span> mm, og <span data-tex="A"></span> kører vandret i en føring 100 mm under <span data-tex="O"></span>.<br>
+        Find klingens acceleration <span data-tex="\boldsymbol a_A"></span> og plejlstangens vinkelacceleration <span data-tex="\alpha_{AB}"></span>, når <span data-tex="\theta=90^\circ"></span>.</div>
+      <div class="plan">
+        <div><b class="cy">1 · Krumtap</b>fast akse: <span data-tex="\boldsymbol v_B,\ \boldsymbol a_B"></span></div>
+        <div><b class="cy">2 · Hastighed</b>(16-16) giver <span data-tex="\omega_{AB}"></span></div>
+        <div><b class="or">3 · Acceleration</b>(16-19) giver <span data-tex="\alpha_{AB},\ a_A"></span></div>
+        <div><b class="gr">4 · Tjek</b>IC og "uendelig stang"</div>
+      </div>
+    </div>
+    <div class="card" style="padding:12px"><img src="hacksav.jpg" alt="Maskinbuesav med svinghjul, krumtap OB og plejlstang AB" style="width:100%;display:block;border-radius:8px"></div>
+  </div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum / klikker: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm &nbsp;·&nbsp; animationen og graferne kan styres med sliderne</div>
+</section>
+
+<!-- ============ 1 · KRUMTAPPEN ============ -->
+<section class="slide" data-title="1 · Krumtappen">
+  <div class="hd"><span class="tag">TRIN 1 · KRUMTAPPEN OB</span><h1>Hjulet drejer om en fast akse<small>derfor er B let</small></h1></div>
+  <div class="body" style="grid-template-columns:500px 500px 1fr">
+    <div class="card">
+      <h3>Punkt på et legeme om fast akse</h3>
+      <div class="big" data-tex="\color{#0a7fc2}{\boldsymbol v_B}=\boldsymbol\omega\times\boldsymbol r_B"></div>
+      <div class="src">Hibbeler (2023), lign. (16-9)</div>
+      <div class="big" style="font-size:32px" data-tex="\color{#d97a00}{\boldsymbol a_B}=\underbrace{\boldsymbol\alpha\times\boldsymbol r_B}_{=\,\boldsymbol 0}-\,\omega^2\boldsymbol r_B"></div>
+      <div class="src">Hibbeler (2023), lign. (16-14)</div>
+      <div class="terms">
+        <div class="term"><span class="s" data-tex="\omega"></span><span><b>Vinkelhastighed.</b> 60 o/min = 1 omgang pr. sekund = <span data-tex="2\pi"></span> rad/s, mod uret: <span data-tex="+\boldsymbol k"></span></span></div>
+        <div class="term"><span class="s" data-tex="\boldsymbol r_B"></span><span><b>Fra aksen O til B.</b> Ved <span data-tex="\theta=90^\circ"></span> står B lige til venstre for O</span></div>
+        <div class="term"><span class="s" data-tex="\alpha=0"></span><span><b>Konstant fart.</b> Ingen tangentiel acceleration. Kun <em>normal</em>accelerationen ind mod O er tilbage</span></div>
+      </div>
+    </div>
+
+    <div class="card" style="padding:6px 20px">
+      <div class="step"><span class="n">1</span><div class="t"><b>Vinkelhastighed</b>
+        <span class="m" data-tex="\omega=\dfrac{2\pi\cdot60}{60}=6{,}283\ \text{rad/s}"></span></div></div>
+      <div class="step"><span class="n">2</span><div class="t"><b>Geometri ved θ = 90°</b>
+        <span class="m" data-tex="\boldsymbol r_B=-0{,}100\,\boldsymbol i\ \text{m}"></span>
+        <span class="m" data-tex="\sin\varphi=\tfrac{100}{450}\ \Rightarrow\ \varphi=12{,}84^\circ"></span>
+        <span class="m" data-tex="\boldsymbol r_{A/B}=-0{,}4387\,\boldsymbol i-0{,}100\,\boldsymbol j\ \text{m}"></span>
+        <span class="note">B ligger 100 mm over A, stangen er 450 mm, så den vandrette afstand er <span data-tex="450\cos\varphi=438{,}7"></span> mm</span></div></div>
+      <div class="step"><span class="n">3</span><div class="t"><b>B's hastighed og acceleration</b>
+        <span class="m" data-tex="\color{#0a7fc2}{\boldsymbol v_B}=6{,}283\boldsymbol k\times(-0{,}1\boldsymbol i)=-0{,}628\,\boldsymbol j\ \text{m/s}"></span>
+        <span class="m" data-tex="\color{#d97a00}{\boldsymbol a_B}=-6{,}283^2(-0{,}1\boldsymbol i)=3{,}948\,\boldsymbol i\ \text{m/s}^2"></span>
+        <span class="note">B kører lige nedad, og accelerationen peger ind mod O (mod højre)</span></div></div>
+    </div>
+
+    <div class="card" style="display:flex;flex-direction:column;gap:10px;padding:16px 18px">
+      <h3>Mekanismen i bevægelse</h3>
+      <canvas id="cM" width="700" height="620"></canvas>
+      <div class="row"><button class="btn" id="mPlay">▶ Afspil</button><button class="btn on" id="m90">θ = 90° (opgaven)</button>
+        <label style="font-size:16px;color:var(--mut);display:flex;gap:6px;align-items:center"><input type="checkbox" id="mSlow" checked> langsomt</label></div>
+      <div class="sl" style="grid-template-columns:60px 1fr 70px"><span>θ</span><input id="mT" type="range" min="0" max="360" step="1" value="90"><output id="mTo">90°</output></div>
+      <div class="ro">
+        <div><span>v<sub>B</sub> (ALTID)</span><b class="cy">0,628</b><i>m/s</i></div>
+        <div><span>a<sub>B</sub> (ALTID)</span><b class="or">3,95</b><i>m/s²</i></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Krumtappen er det nemme stykke: fast akse og konstant ω. B har altid samme fart, 0,63 m/s, og samme acceleration, 3,95 m/s², ind mod O. Kun retningen skifter.</span></div>
+</section>
+
+<!-- ============ 2 · HASTIGHED ============ -->
+<section class="slide" data-title="2 · Hastighed">
+  <div class="hd"><span class="tag">TRIN 2 · HASTIGHED</span><h1>Plejlstangen AB: relativ hastighed<small>giver ω<sub>AB</sub></small></h1></div>
+  <div class="body" style="grid-template-columns:500px 500px 1fr">
+    <div class="card">
+      <h3>To punkter på samme stive legeme</h3>
+      <div class="big" data-tex="\color{#d97a00}{\boldsymbol v_A}=\color{#0a7fc2}{\boldsymbol v_B}+\color{#d63a3a}{\boldsymbol\omega_{AB}}\times\boldsymbol r_{A/B}"></div>
+      <div class="src">Hibbeler (2023), lign. (16-16) · MA-DYN2 (2025), Kinematik III, slide 2</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="\boldsymbol v_B"></span><span><b>Kendt fra trin 1.</b> B sidder både på hjulet og på stangen, så det er forbindelsen mellem dem</span></div>
+        <div class="term"><span class="s or" data-tex="\boldsymbol v_A=v_A\boldsymbol i"></span><span><b>Binding.</b> A kører i en vandret føring, så <span data-tex="v_{Ay}=0"></span>. Kun størrelsen er ukendt</span></div>
+        <div class="term"><span class="s rd" data-tex="\omega_{AB}\boldsymbol k"></span><span><b>Ukendt.</b> Stangen både flytter sig og drejer: generel plan bevægelse</span></div>
+        <div class="term"><span class="s" data-tex="\boldsymbol r_{A/B}"></span><span><b>Fra B til A</b> (fra det kendte til det ukendte punkt)</span></div>
+      </div>
+      <div class="status" style="margin-top:10px">2 ukendte (<span data-tex="v_A,\ \omega_{AB}"></span>) og 2 ligninger (<span data-tex="\boldsymbol i"></span> og <span data-tex="\boldsymbol j"></span>) <span class="ok">✓</span></div>
+    </div>
+
+    <div class="card" style="padding:6px 20px">
+      <div class="step"><span class="n">4</span><div class="t"><b>Sæt tallene ind</b>
+        <span class="m" data-tex="v_A\boldsymbol i=-0{,}628\boldsymbol j"></span>
+        <span class="m" data-tex="\qquad+\,\omega_{AB}\boldsymbol k\times(-0{,}4387\boldsymbol i-0{,}1\boldsymbol j)"></span>
+        <span class="m" data-tex="v_A\boldsymbol i=0{,}1\,\omega_{AB}\,\boldsymbol i"></span>
+        <span class="m" data-tex="\qquad+(-0{,}628-0{,}4387\,\omega_{AB})\,\boldsymbol j"></span>
+        <span class="note">Huskeregel: <span data-tex="\boldsymbol k\times\boldsymbol i=\boldsymbol j"></span>, <span data-tex="\boldsymbol k\times\boldsymbol j=-\boldsymbol i"></span></span></div></div>
+      <div class="step"><span class="n">5</span><div class="t"><b><span data-tex="\boldsymbol j"></span>-komponenten giver ω<sub>AB</sub></b>
+        <span class="m" data-tex="0=-0{,}628-0{,}4387\,\omega_{AB}"></span>
+        <span class="m" data-tex="\boxed{\omega_{AB}=-1{,}432\ \text{rad/s}}\ \text{(med uret)}"></span></div></div>
+      <div class="step"><span class="n">6</span><div class="t"><b><span data-tex="\boldsymbol i"></span>-komponenten giver v<sub>A</sub></b>
+        <span class="m" data-tex="v_A=0{,}1\cdot(-1{,}432)=-0{,}143\ \text{m/s}"></span>
+        <span class="note">Klingen kører langsomt mod venstre: den er tæt på sit vendepunkt</span></div></div>
+    </div>
+
+    <div class="card" style="display:flex;flex-direction:column;gap:10px;padding:16px 18px">
+      <h3>Over én hel omgang</h3>
+      <canvas id="gV" width="640" height="270"></canvas>
+      <canvas id="gW" width="640" height="270"></canvas>
+      <div class="sl" style="grid-template-columns:60px 1fr 70px"><span>θ</span><input id="vT" type="range" min="0" max="360" step="1" value="90"><output id="vTo">90°</output></div>
+      <div class="ro">
+        <div><span>KLINGEN v<sub>A</sub></span><b class="or" id="vA">−0,143</b><i>m/s</i></div>
+        <div><span>STANGEN ω<sub>AB</sub></span><b class="rd" id="vW">−1,432</b><i>rad/s</i></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Hastigheden skal findes først, fordi ω<sub>AB</sub> indgår i accelerationsligningen. A er bundet til føringen, så j-ligningen giver ω<sub>AB</sub> direkte.</span></div>
+</section>
+
+<!-- ============ 3 · ACCELERATION ============ -->
+<section class="slide" data-title="3 · Acceleration">
+  <div class="hd"><span class="tag b">TRIN 3 · ACCELERATION</span><h1>Relativ acceleration: svaret<small>a<sub>A</sub> og α<sub>AB</sub></small></h1></div>
+  <div class="body" style="grid-template-columns:500px 500px 1fr">
+    <div class="card">
+      <h3>Samme idé, ét led mere</h3>
+      <div class="big" style="font-size:27px" data-tex="\color{#d97a00}{\boldsymbol a_A}=\color{#0a7fc2}{\boldsymbol a_B}+\color{#7b4fc9}{\boldsymbol\alpha_{AB}\times\boldsymbol r_{A/B}}-\color{#0a9a5c}{\omega_{AB}^2\boldsymbol r_{A/B}}"></div>
+      <div class="src">Hibbeler (2023), lign. (16-19) · MA-DYN2 (2025), Kinematik V, slide 1</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="\boldsymbol a_B"></span><span><b>Fra trin 1:</b> 3,948 <span data-tex="\boldsymbol i"></span> m/s², ind mod O</span></div>
+        <div class="term"><span class="s pu" data-tex="\boldsymbol\alpha\times\boldsymbol r"></span><span><b>Tangentielt led.</b> Står vinkelret på stangen. <span data-tex="\alpha_{AB}"></span> er ukendt</span></div>
+        <div class="term"><span class="s gr" data-tex="-\omega^2\boldsymbol r"></span><span><b>Normalt led.</b> Peger langs stangen fra A mod B. Kendt, fordi <span data-tex="\omega_{AB}"></span> kom fra trin 2</span></div>
+        <div class="term"><span class="s or" data-tex="\boldsymbol a_A=a_A\boldsymbol i"></span><span><b>Binding.</b> Føringen er vandret, så <span data-tex="a_{Ay}=0"></span></span></div>
+      </div>
+    </div>
+
+    <div class="card" style="padding:6px 20px">
+      <div class="step"><span class="n b">7</span><div class="t"><b>Sæt tallene ind</b> (<span data-tex="\omega_{AB}^2=2{,}051"></span>)
+        <span class="m" data-tex="a_A\boldsymbol i=3{,}948\boldsymbol i"></span>
+        <span class="m" data-tex="\qquad+\,\alpha_{AB}\boldsymbol k\times(-0{,}4387\boldsymbol i-0{,}1\boldsymbol j)"></span>
+        <span class="m" data-tex="\qquad-2{,}051(-0{,}4387\boldsymbol i-0{,}1\boldsymbol j)"></span></div></div>
+      <div class="step"><span class="n b">8</span><div class="t"><b><span data-tex="\boldsymbol j"></span>-komponenten giver α<sub>AB</sub></b>
+        <span class="m" data-tex="0=-0{,}4387\,\alpha_{AB}+0{,}2051"></span>
+        <span class="m" data-tex="\boxed{\alpha_{AB}=0{,}467\ \text{rad/s}^2}\ \text{(mod uret)}"></span></div></div>
+      <div class="step"><span class="n b">9</span><div class="t"><b><span data-tex="\boldsymbol i"></span>-komponenten giver a<sub>A</sub></b>
+        <span class="m" data-tex="a_A=3{,}948+0{,}1\cdot0{,}467+2{,}051\cdot0{,}4387"></span>
+        <span class="m" data-tex="\boxed{a_A=4{,}89\ \text{m/s}^2}\ \text{(mod højre)}"></span></div></div>
+    </div>
+
+    <div class="card" style="display:flex;flex-direction:column;gap:10px;padding:16px 18px">
+      <h3>Hvor kommer de 4,89 fra?</h3>
+      <div class="row">
+        <button class="btn on" data-b="0">1 · a<sub>B</sub></button>
+        <button class="btn gr" data-b="1">2 · + ω²-led</button>
+        <button class="btn pu" data-b="2">3 · + α-led</button>
+      </div>
+      <canvas id="cB" width="640" height="190"></canvas>
+      <h3 style="margin-top:2px">a<sub>A</sub> over én omgang</h3>
+      <canvas id="gA" width="640" height="270"></canvas>
+      <div class="sl" style="grid-template-columns:60px 1fr 70px"><span>θ</span><input id="aT" type="range" min="0" max="360" step="1" value="90"><output id="aTo">90°</output></div>
+      <div class="ro">
+        <div><span>KLINGEN a<sub>A</sub></span><b class="or" id="aA">4,89</b><i>m/s²</i></div>
+        <div><span>STANGEN α<sub>AB</sub></span><b class="pu" id="aAl">0,467</b><i>rad/s²</i></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Næsten hele svaret er krumtappens 3,95. Plejlstangens drejning lægger 0,90 til, og α-leddet kun 0,05. Klingen bremser op mod venstre og er tæt på at vende.</span></div>
+</section>
+
+<!-- ============ 4 · SVAR OG TJEK ============ -->
+<section class="slide" data-title="4 · Svar og tjek">
+  <div class="hd"><span class="tag g">TRIN 4 · SVAR OG TJEK</span><h1>Er resultatet rimeligt?</h1></div>
+  <div class="body" style="grid-template-columns:640px 1fr">
+    <div class="card" style="padding:16px 22px">
+      <div class="ans"><span data-tex="a_A=4{,}89\ \text{m/s}^2"></span> <small>mod højre</small><br><span data-tex="\alpha_{AB}=0{,}467\ \text{rad/s}^2"></span> <small>mod uret</small></div>
+      <div class="step"><span class="n" style="background:var(--gr)">✓</span><div class="t"><b>Tjek af ω<sub>AB</sub> med øjeblikscentret (IC)</b><br>
+        <span data-tex="\boldsymbol v_A"></span> er vandret og <span data-tex="\boldsymbol v_B"></span> lodret. IC ligger lodret over A og vandret ud for B:
+        <span class="m" data-tex="\omega_{AB}=\dfrac{v_B}{r_{B/IC}}=\dfrac{0{,}628}{0{,}4387}=1{,}432\ \text{rad/s}"></span>
+        <span class="m" data-tex="v_A=\omega_{AB}\cdot r_{A/IC}=1{,}432\cdot0{,}1=0{,}143\ \text{m/s}\ \ \color{#0a9a5c}{\checkmark}"></span></div></div>
+      <div class="step"><span class="n" style="background:var(--gr)">✓</span><div class="t"><b>Uendelig lang stang</b><br>
+        Så ville klingen følge B's vandrette bevægelse: <span data-tex="a_A=r\omega^2=3{,}95"></span> m/s². Stangen er kun 4,5 gange krumtappen, så der kommer 24 % oveni <span class="ok">✓</span></div></div>
+      <div class="step"><span class="n" style="background:var(--gr)">✓</span><div class="t"><b>Fortegn og timing</b><br>
+        Klingen kører mod venstre (<span data-tex="v_A<0"></span>) og accelererer mod højre: den bremser op. Den vender ved <span data-tex="\theta=100{,}5^\circ"></span>, så ved 90° er farten lille, og <span data-tex="a_A"></span> er næsten på sit maksimum (4,93 ved 95,7°) <span class="ok">✓</span></div></div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:12px;padding:16px 20px">
+      <h3>Hvad nu hvis …</h3>
+      <div class="sl"><span>Omdrejninger</span><input id="hN" type="range" min="20" max="150" step="5" value="60"><output id="hNo"></output></div>
+      <div class="sl"><span>Stang AB</span><input id="hL" type="range" min="250" max="1000" step="10" value="450"><output id="hLo"></output></div>
+      <div class="row">
+        <button class="btn" data-h="0">Opgaven</button>
+        <button class="btn" data-h="1">Dobbelt fart (120 o/min)</button>
+        <button class="btn" data-h="2">Kort stang (250 mm)</button>
+        <button class="btn" data-h="3">Lang stang (1000 mm)</button>
+      </div>
+      <div class="ro r3">
+        <div><span>a<sub>A</sub> VED θ = 90°</span><b class="or" id="hA">4,89</b><i id="hAr"></i></div>
+        <div><span>α<sub>AB</sub></span><b class="pu" id="hAl">0,467</b><i id="hAlr"></i></div>
+        <div><span>ω<sub>AB</sub></span><b class="rd" id="hW">1,432</b><i id="hWr"></i></div>
+      </div>
+      <h3 style="margin-top:4px">a<sub>A</sub> over én omgang · stiplet = opgaven</h3>
+      <canvas id="gH" width="1000" height="340"></canvas>
+      <div class="status" id="hSt"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Dobbelt omdrejningstal giver fire gange accelerationen, fordi alt skalerer med ω². En længere stang nærmer sig krumtappens egen 3,95 m/s².</span></div>
+</section>
+
+</div></div>
+
+<div id="nav"><span id="pg">1 / 5</span><div id="dots"></div><button id="prev" title="Forrige (←)">‹</button><button id="next" title="Næste (→)">›</button><button id="fs" title="Fuld skærm (F)">⛶</button></div>
+
+<script>
+(function () {
+'use strict';
+var PI = Math.PI;
+function $(id) { return document.getElementById(id); }
+function fmt(x, n) { return x.toFixed(n).replace('.', ',').replace('-', '−'); }
+
+/* ---------- kinematik: krumtap OB (r), plejlstang AB (l), A i føring e under O ---------- */
+/* θ måles fra lodret op, mod uret. i mod højre, j op, k ud af skærmen (mod uret +). */
+function mek(th, P) {
+  P = P || {};
+  var r = P.r || 0.1, l = P.l || 0.45, e = P.e == null ? 0.1 : P.e, w = 2 * PI * (P.n || 60) / 60;
+  var Bx = -r * Math.sin(th), By = r * Math.cos(th);
+  var dy = By + e, dx = Math.sqrt(l * l - dy * dy);
+  var Ax = Bx - dx, Ay = -e, rx = Ax - Bx, ry = Ay - By;       /* r_A/B */
+  var vBx = -w * By, vBy = w * Bx, aBx = -w * w * Bx, aBy = -w * w * By;
+  var wAB = -vBy / rx, vA = vBx - wAB * ry;
+  var al = -(aBy - wAB * wAB * ry) / rx;
+  var aA = aBx - al * ry - wAB * wAB * rx;
+  return { w: w, Bx: Bx, By: By, Ax: Ax, Ay: Ay, rx: rx, ry: ry, vBx: vBx, vBy: vBy, aBx: aBx, aBy: aBy, wAB: wAB, vA: vA, al: al, aA: aA,
+           aBpart: aBx, alPart: -al * ry, w2Part: -wAB * wAB * rx };
+}
+var R90 = mek(PI / 2);
+function rel(el, v, v0) {
+  var r = v / v0, e = $(el);
+  if (Math.abs(r - 1) < 0.005) { e.className = 'eq'; e.textContent = 'uændret'; }
+  else { e.className = r > 1 ? 'up' : 'dn'; e.textContent = '×' + fmt(r, 2); }
+}
+
+/* ---------- skalering og navigation ---------- */
+var deck = $('deck'), slides = [].slice.call(document.querySelectorAll('.slide')), cur = 0;
+function fit() { var s = Math.min(innerWidth / 1600, innerHeight / 900); deck.style.transform = 'scale(' + s + ')'; }
+addEventListener('resize', fit); fit();
+var dots = $('dots');
+slides.forEach(function (s, i) { var d = document.createElement('i'); d.title = s.dataset.title; d.onclick = function () { go(i); }; dots.appendChild(d); });
+function go(i) {
+  cur = Math.max(0, Math.min(slides.length - 1, i));
+  slides.forEach(function (s, j) { s.classList.toggle('on', j === cur); });
+  [].forEach.call(dots.children, function (d, j) { d.classList.toggle('on', j === cur); });
+  $('pg').textContent = (cur + 1) + ' / ' + slides.length;
+  try { history.replaceState(null, '', '#' + (cur + 1)); } catch (e) {}
+}
+function key(e) {
+  var t = e.target && e.target.tagName;
+  if (t === 'INPUT' && /Arrow/.test(e.key)) return;
+  if (['ArrowRight', 'PageDown', ' ', 'Enter'].indexOf(e.key) >= 0) { e.preventDefault(); go(cur + 1); }
+  else if (['ArrowLeft', 'PageUp', 'Backspace'].indexOf(e.key) >= 0) { e.preventDefault(); go(cur - 1); }
+  else if (e.key === 'Home') go(0); else if (e.key === 'End') go(slides.length - 1);
+  else if (e.key === 'f' || e.key === 'F') fsToggle();
+}
+addEventListener('keydown', key);
+document.querySelectorAll('input[type=range]').forEach(function (r) { r.addEventListener('change', function () { r.blur(); }); r.addEventListener('pointerup', function () { setTimeout(function () { r.blur(); }, 0); }); });
+document.querySelectorAll('button,input[type=checkbox]').forEach(function (b) { b.addEventListener('click', function () { b.blur(); }); });
+function fsToggle() { if (!document.fullscreenElement) document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+$('prev').onclick = function () { go(cur - 1); }; $('next').onclick = function () { go(cur + 1); }; $('fs').onclick = fsToggle;
+var h = parseInt(location.hash.slice(1), 10); go(h > 0 ? h - 1 : 0);
+
+/* ---------- KaTeX ---------- */
+function tex() {
+  if (!window.katex) return setTimeout(tex, 80);
+  document.querySelectorAll('[data-tex]').forEach(function (el) {
+    try { katex.render(el.getAttribute('data-tex'), el, { throwOnError: false, displayMode: false }); } catch (e) { el.textContent = el.getAttribute('data-tex'); }
+  });
+}
+tex();
+
+/* ---------- lærred-hjælpere ---------- */
+function cv(id) { var c = $(id), x = c.getContext('2d'); return { c: c, x: x, W: c.width, H: c.height }; }
+function txt(x, s, px, py, size, col, al, bl) { x.font = '600 ' + size + 'px system-ui,sans-serif'; x.fillStyle = col; x.textAlign = al || 'left'; x.textBaseline = bl || 'middle'; x.fillText(s, px, py); }
+function arrow(x, x0, y0, x1, y1, col, w) {
+  var dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy); if (L < 3) return;
+  var ux = dx / L, uy = dy / L, hl = Math.min(22, L * 0.45);
+  x.strokeStyle = col; x.fillStyle = col; x.lineWidth = w || 5; x.lineCap = 'round';
+  x.beginPath(); x.moveTo(x0, y0); x.lineTo(x1 - ux * hl * 0.8, y1 - uy * hl * 0.8); x.stroke();
+  x.beginPath(); x.moveTo(x1, y1); x.lineTo(x1 - ux * hl - uy * hl * 0.5, y1 - uy * hl + ux * hl * 0.5); x.lineTo(x1 - ux * hl + uy * hl * 0.5, y1 - uy * hl - ux * hl * 0.5); x.closePath(); x.fill();
+}
+
+/* graf over én omgang: f(θ) → værdi; markør ved θm; stiplet ved 90° */
+function graphTh(id, f, o, thm, ref) {
+  var g = cv(id), x = g.x, W = g.W, H = g.H, L = 70, R = W - 18, T = 50, Bt = H - 40;
+  function X(d) { return L + d / 360 * (R - L); } function Y(v) { return Bt - (v - o.min) / (o.max - o.min) * (Bt - T); }
+  x.clearRect(0, 0, W, H);
+  txt(x, o.lbl, 4, 20, 26, o.col, 'left');
+  x.strokeStyle = '#c3d0dd'; x.lineWidth = 2; x.beginPath(); x.moveTo(L, T - 6); x.lineTo(L, Bt); x.lineTo(R, Bt); x.stroke();
+  if (o.min < 0 && o.max > 0) { x.strokeStyle = '#9fb0c2'; x.beginPath(); x.moveTo(L, Y(0)); x.lineTo(R, Y(0)); x.stroke(); txt(x, '0', L - 8, Y(0), 22, '#5a6b7d', 'right'); }
+  (o.yt || []).forEach(function (v) { txt(x, fmt(v, o.yd || 0), L - 8, Y(v), 22, '#5a6b7d', 'right'); x.strokeStyle = 'rgba(159,176,194,.35)'; x.lineWidth = 1; x.beginPath(); x.moveTo(L, Y(v)); x.lineTo(R, Y(v)); x.stroke(); });
+  [0, 90, 180, 270, 360].forEach(function (d) { txt(x, d + '°', X(d), Bt + 22, 22, '#5a6b7d', d === 360 ? 'right' : 'center'); });
+  x.strokeStyle = 'rgba(168,107,0,.6)'; x.setLineDash([7, 6]); x.lineWidth = 2; x.beginPath(); x.moveTo(X(90), T - 6); x.lineTo(X(90), Bt); x.stroke(); x.setLineDash([]);
+  function curve(fn, col, w, dash) { x.strokeStyle = col; x.lineWidth = w; x.setLineDash(dash || []); x.beginPath(); for (var i = 0; i <= 360; i += 2) { var v = fn(i * PI / 180); i ? x.lineTo(X(i), Y(v)) : x.moveTo(X(i), Y(v)); } x.stroke(); x.setLineDash([]); }
+  if (ref) curve(ref, 'rgba(90,107,125,.65)', 3, [9, 7]);
+  curve(f, o.col, 5);
+  var v = f(thm * PI / 180);
+  x.fillStyle = o.col; x.beginPath(); x.arc(X(thm), Y(v), 9, 0, 7); x.fill();
+  var lx = Math.min(Math.max(X(thm) + 14, L + 10), R - 150), ly = Y(v) > (T + Bt) / 2 ? Y(v) - 28 : Y(v) + 30;
+  x.font = '700 26px system-ui,sans-serif'; var tw = x.measureText(fmt(v, o.d) + ' ' + o.u).width;
+  x.fillStyle = 'rgba(246,249,252,.9)'; x.fillRect(lx - 4, ly - 17, tw + 8, 34);
+  txt(x, fmt(v, o.d) + ' ' + o.u, lx, ly, 26, o.col, 'left');
+}
+
+/* ===== slide 1: mekanismen animeret ===== */
+var M = { th: 90, play: false, last: 0 };
+function drawM() {
+  var g = cv('cM'), x = g.x, W = g.W, H = g.H, s = 900, ox = 570, oy = 250;
+  function P(px, py) { return [ox + px * s, oy - py * s]; }
+  var k = mek(M.th * PI / 180);
+  x.clearRect(0, 0, W, H);
+  /* føring */
+  var gy = oy + 0.1 * s;
+  x.fillStyle = '#e3ebf3'; x.fillRect(10, gy - 12, W - 20, 24); x.strokeStyle = '#b5c4d3'; x.lineWidth = 2; x.strokeRect(10, gy - 12, W - 20, 24);
+  /* svinghjul */
+  x.fillStyle = '#d6e8f7'; x.strokeStyle = '#7d8fa3'; x.lineWidth = 3; x.beginPath(); x.arc(ox, oy, 0.12 * s, 0, 7); x.fill(); x.stroke();
+  x.setLineDash([5, 6]); x.strokeStyle = '#9fb0c2'; x.beginPath(); x.arc(ox, oy, 0.1 * s, 0, 7); x.stroke(); x.setLineDash([]);
+  /* θ-bue fra lodret */
+  x.strokeStyle = '#a86b00'; x.lineWidth = 2; x.beginPath(); x.moveTo(ox, oy); x.lineTo(ox, oy - 0.16 * s); x.stroke();
+  x.beginPath(); x.arc(ox, oy, 0.055 * s, -PI / 2, -PI / 2 - M.th * PI / 180, true); x.stroke();
+  /* krumtap */
+  var B = P(k.Bx, k.By), A = P(k.Ax, k.Ay);
+  x.strokeStyle = '#44586e'; x.lineWidth = 12; x.lineCap = 'round'; x.beginPath(); x.moveTo(ox, oy); x.lineTo(B[0], B[1]); x.stroke();
+  /* slæde (savramme) */
+  x.fillStyle = '#9cc3e4'; x.strokeStyle = '#5d86ad'; x.lineWidth = 2; x.fillRect(A[0] - 55, gy - 22, 110, 44); x.strokeRect(A[0] - 55, gy - 22, 110, 44);
+  /* plejlstang */
+  x.strokeStyle = '#e8b9a3'; x.lineWidth = 16; x.beginPath(); x.moveTo(A[0], A[1]); x.lineTo(B[0], B[1]); x.stroke();
+  x.strokeStyle = '#b9856f'; x.lineWidth = 2; x.stroke();
+  [[ox, oy, 'O'], [B[0], B[1], 'B'], [A[0], A[1], 'A']].forEach(function (p) {
+    x.fillStyle = '#fff'; x.strokeStyle = '#14202d'; x.lineWidth = 3; x.beginPath(); x.arc(p[0], p[1], 10, 0, 7); x.fill(); x.stroke();
+  });
+  txt(x, 'O', ox + 16, oy + 30, 36, '#14202d'); txt(x, 'B', B[0] - 26, B[1] - 30, 36, '#14202d', 'center'); txt(x, 'A', A[0] - 30, A[1] - 40, 36, '#14202d', 'center');
+  txt(x, 'θ', ox - 26, oy - 0.09 * s, 32, '#a86b00', 'center');
+  /* vektorer: v (px pr. m/s) og a (px pr. m/s²) */
+  var sv = 240, sa = 30;
+  arrow(x, B[0], B[1], B[0] + k.vBx * sv, B[1] - k.vBy * sv, '#0a7fc2', 6);
+  arrow(x, B[0], B[1], B[0] + k.aBx * sa, B[1] - k.aBy * sa, '#d97a00', 6);
+  arrow(x, A[0], A[1] + 62, A[0] + k.vA * sv, A[1] + 62, '#0a7fc2', 6);
+  arrow(x, A[0], A[1] + 104, A[0] + k.aA * sa, A[1] + 104, '#d97a00', 6);
+  /* forklaring */
+  txt(x, '→ hastighed', 14, H - 100, 30, '#0a7fc2'); txt(x, '→ acceleration', 14, H - 58, 30, '#d97a00');
+  txt(x, 'klingen A:', W - 14, H - 142, 28, '#5a6b7d', 'right');
+  txt(x, 'v = ' + fmt(k.vA, 3) + ' m/s', W - 14, H - 100, 30, '#0a7fc2', 'right'); txt(x, 'a = ' + fmt(k.aA, 2) + ' m/s²', W - 14, H - 58, 30, '#d97a00', 'right');
+  $('mTo').textContent = Math.round(M.th) + '°'; $('mT').value = Math.round(M.th);
+  $('m90').classList.toggle('on', Math.round(M.th) === 90);
+}
+$('mT').oninput = function () { M.th = +this.value; M.play = false; $('mPlay').textContent = '▶ Afspil'; drawM(); };
+$('m90').onclick = function () { M.th = 90; M.play = false; $('mPlay').textContent = '▶ Afspil'; drawM(); };
+$('mPlay').onclick = function () { M.play = !M.play; this.textContent = M.play ? '⏸ Pause' : '▶ Afspil'; M.last = 0; if (M.play) requestAnimationFrame(tick); };
+function tick(t) {
+  if (!M.play) return;
+  if (M.last) { var dt = (t - M.last) / 1000, sp = $('mSlow').checked ? 0.25 : 1; M.th = (M.th + 360 * dt * sp) % 360; if (cur === 1) drawM(); }
+  M.last = t; requestAnimationFrame(tick);
+}
+drawM();
+
+/* ===== slide 2: v_A og ω_AB over én omgang ===== */
+function updV() {
+  var d = +$('vT').value, k = mek(d * PI / 180);
+  $('vTo').textContent = d + '°'; $('vA').textContent = fmt(k.vA, 3); $('vW').textContent = fmt(k.wAB, 3);
+  graphTh('gV', function (t) { return mek(t).vA; }, { min: -0.75, max: 0.75, yt: [-0.6, 0.6], yd: 1, lbl: 'v_A  [m/s]  klingen', col: '#d97a00', d: 3, u: 'm/s' }, d);
+  graphTh('gW', function (t) { return mek(t).wAB; }, { min: -1.7, max: 1.7, yt: [-1.5, 1.5], yd: 1, lbl: 'ω_AB  [rad/s]  stangen', col: '#d63a3a', d: 3, u: 'rad/s' }, d);
+}
+$('vT').oninput = updV; updV();
+
+/* ===== slide 3: bidrag til a_A og a_A(θ) ===== */
+var Bl = 0, bb = document.querySelectorAll('[data-b]');
+bb.forEach(function (b) { b.onclick = function () { Bl = +b.dataset.b; bb.forEach(function (o) { o.classList.toggle('on', +o.dataset.b <= Bl); }); drawB(); }; });
+function drawB() {
+  var g = cv('cB'), x = g.x, W = g.W, H = g.H, p1 = R90.aBpart, p2 = R90.w2Part, p3 = R90.alPart;
+  x.clearRect(0, 0, W, H);
+  var L = 10, R = W - 10, S = (R - L) / 5.4, y = 44, hh = 64;
+  function bar(a, w, col) { x.fillStyle = col; x.fillRect(L + a * S, y, w * S, hh); }
+  bar(0, p1, '#0a7fc2'); txt(x, '3,95  krumtap', L + 14, y + hh / 2, 28, '#fff');
+  if (Bl >= 1) { bar(p1, p2, '#0a9a5c'); txt(x, '+0,90', L + (p1 + p2 / 2) * S, y - 22, 26, '#0a9a5c', 'center'); }
+  if (Bl >= 2) { bar(p1 + p2, p3, '#7b4fc9'); txt(x, '+0,05', L + (p1 + p2 + p3) * S + 34, y - 22, 26, '#7b4fc9', 'center'); }
+  var tot = [p1, p1 + p2, p1 + p2 + p3][Bl];
+  x.strokeStyle = '#d97a00'; x.lineWidth = 4; x.beginPath(); x.moveTo(L + tot * S, y - 8); x.lineTo(L + tot * S, y + hh + 14); x.stroke();
+  txt(x, '= ' + fmt(tot, 2) + ' m/s²', R, y + hh + 40, 32, '#d97a00', 'right');
+  txt(x, ['kun krumtappen', '+ normalled ω²r', '+ tangentielt αr'][Bl], L, y + hh + 40, 26, '#5a6b7d');
+}
+drawB();
+function updA() {
+  var d = +$('aT').value, k = mek(d * PI / 180);
+  $('aTo').textContent = d + '°'; $('aA').textContent = fmt(k.aA, 2); $('aAl').textContent = fmt(k.al, 3);
+  graphTh('gA', function (t) { return mek(t).aA; }, { min: -4, max: 6, yt: [-3, 3, 6], lbl: 'a_A  [m/s²]', col: '#d97a00', d: 2, u: 'm/s²' }, d);
+}
+$('aT').oninput = updA; updA();
+
+/* ===== slide 4: hvad nu hvis ===== */
+var HP = { n: 60, l: 450 }, HV = [{ n: 60, l: 450 }, { n: 120, l: 450 }, { n: 60, l: 250 }, { n: 60, l: 1000 }];
+var hb = document.querySelectorAll('[data-h]');
+hb.forEach(function (b) { b.onclick = function () { var o = HV[+b.dataset.h]; HP.n = o.n; HP.l = o.l; $('hN').value = o.n; $('hL').value = o.l; updH(); }; });
+$('hN').oninput = function () { HP.n = +this.value; updH(); };
+$('hL').oninput = function () { HP.l = +this.value; updH(); };
+function updH() {
+  var p = { n: HP.n, l: HP.l / 1000 }, k = mek(PI / 2, p);
+  $('hNo').textContent = HP.n + ' o/min'; $('hLo').textContent = HP.l + ' mm';
+  $('hA').textContent = fmt(k.aA, 2); rel('hAr', k.aA, R90.aA);
+  $('hAl').textContent = fmt(Math.abs(k.al), 3); rel('hAlr', Math.abs(k.al), Math.abs(R90.al));
+  $('hW').textContent = fmt(Math.abs(k.wAB), 3); rel('hWr', Math.abs(k.wAB), Math.abs(R90.wAB));
+  hb.forEach(function (b) { var o = HV[+b.dataset.h]; b.classList.toggle('on', o.n === HP.n && o.l === HP.l); });
+  var top = Math.max(6, Math.ceil(k.w * k.w * 0.1 * (1 + 0.1 / p.l) * 1.25));
+  graphTh('gH', function (t) { return mek(t, p).aA; }, { min: -top * 0.8, max: top, yt: [-Math.round(top * 0.6), Math.round(top * 0.6)], lbl: 'a_A  [m/s²]', col: '#d97a00', d: 2, u: 'm/s²' }, 90,
+          function (t) { return mek(t).aA; });
+  var rw = k.w * k.w * 0.1;
+  $('hSt').innerHTML = 'Krumtappens egen <span data-tex="r\\omega^2"></span> = ' + fmt(rw, 2) + ' m/s², stangen lægger ' + fmt((k.aA / rw - 1) * 100, 0) + ' % oveni ved θ = 90°';
+  if (window.katex) katex.render('r\\omega^2', $('hSt').querySelector('[data-tex]'), { throwOnError: false });
+}
+updH();
+})();
+</script>
+</body>
+</html>
