@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opg. 6 · Stang og cylinder</title>
+<meta name="description" content="DYN2 eksamenssæt A26, opgave 6: stang hængslet til en rullende cylinder slippes. Mindste statiske friktionskoefficient lige efter slip.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../assets/deck.css">
+</head>
+<body>
+<div id="vp"><div id="deck">
+
+<!-- ============ 0 · FORSIDE ============ -->
+<section class="slide on" data-title="Forside">
+  <div style="flex:1;display:grid;grid-template-columns:1fr 600px;gap:34px;align-items:center;padding:0 10px">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div>
+        <div class="tag" style="display:inline-block">DYN2 · KAP. 17 · EKSAMENSSÆT A26 · OPGAVE 6</div>
+        <h1 style="font-size:66px;margin-top:20px">Stang og cylinder</h1>
+        <div style="font-size:27px;color:var(--mut);margin-top:6px">Stangen vælter og <b>skubber</b> cylinderen: hvor meget friktion skal der til, for at den ruller?</div>
+      </div>
+      <div class="card qcard"><span class="lbl cy">OPGAVEN (ROD AND CYLINDER)</span>
+        En jævn, slank stang <span data-tex="PC"></span> (<span data-tex="m_{rod}=0{,}40"></span> kg, <span data-tex="a=1{,}00"></span> m) er hængslet frit til en cylinder i <span data-tex="C"></span> (<span data-tex="m_{cyl}=1{,}00"></span> kg, <span data-tex="r=0{,}25"></span> m). Systemet slippes fra hvile med stangen <span data-tex="v=40^\circ"></span> fra lodret.<br>
+        Find den mindste statiske friktionskoefficient, så cylinderen ruller uden at glide lige efter slip.</div>
+      <div class="plan">
+        <div><b class="cy">1 · Kinematik</b><span data-tex="\omega=0"></span>, rulning, (16-19)</div>
+        <div><b class="or">2 · Cylinderen</b>friktion og hængselkraft</div>
+        <div><b class="or">3 · Stangen</b>(17-6), (17-17): løs</div>
+        <div><b class="gr">4 · Tjek</b><span data-tex="N"></span> og Lagrange</div>
+      </div>
+    </div>
+    <div class="card" style="padding:12px"><img src="fig.jpg" alt="Stang PC hængslet i centrum af en cylinder på vandret underlag" style="width:100%;display:block;border-radius:8px"></div>
+  </div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm &nbsp;·&nbsp; ☰: alle 10 opgaver</div>
+</section>
+
+<!-- ============ 1 · KINEMATIK ============ -->
+<section class="slide" id="s1" data-title="1 · Kinematik">
+  <div class="hd"><span class="tag">TRIN 1 · KINEMATIK</span><h1>Lige efter slip: alt starter fra hvile</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Rulning og relativ acceleration</h3>
+      <div class="big" style="font-size:30px" data-tex="a_C=-\alpha_c\,r"></div>
+      <div class="src">rulning uden glidning (<span data-tex="\alpha_c"></span> mod uret +)</div>
+      <div class="big" style="font-size:30px" data-tex="\color{#d97a00}{\boldsymbol a_G}=a_C\boldsymbol i+\boldsymbol\alpha_s\times\boldsymbol r_{G/C}"></div>
+      <div class="src">Hibbeler (2023), lign. (16-19) med <span data-tex="\omega=0"></span></div>
+      <div class="terms">
+        <div class="term"><span class="s" data-tex="\omega=0"></span><span><b>Fra hvile.</b> Ingen normalled endnu, kun vinkelaccelerationer</span></div>
+        <div class="term"><span class="s" data-tex="\boldsymbol r_{G/C}"></span><span><b>Fra C til stangens midte:</b> 0,5 m langs stangen, 40° fra lodret mod venstre</span></div>
+        <div class="term"><span class="s" data-tex="\alpha_s"></span><span><b>Stangens</b> vinkelacceleration, mod uret når den vælter mod venstre</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n">1</span><div class="t"><b>Geometri</b>
+        <span class="m" data-tex="\boldsymbol r_{G/C}=-0{,}5\sin40^\circ\boldsymbol i+0{,}5\cos40^\circ\boldsymbol j"></span>
+        <span class="m" data-tex="\quad=-0{,}321\,\boldsymbol i+0{,}383\,\boldsymbol j\ \text{m}"></span></div></div>
+      <div class="step"><span class="n">2</span><div class="t"><b>Stangens tyngdepunkt</b>
+        <span class="m" data-tex="\alpha_s\boldsymbol k\times(-0{,}321\boldsymbol i+0{,}383\boldsymbol j)"></span>
+        <span class="m" data-tex="\boldsymbol a_G=(a_C-0{,}383\,\alpha_s)\,\boldsymbol i-0{,}321\,\alpha_s\,\boldsymbol j"></span></div></div>
+      <div class="step"><span class="n">3</span><div class="t"><b>Ubekendte</b>
+        <span class="m" data-tex="a_C,\ \alpha_s,\ C_x,\ C_y,\ f,\ N"></span>
+        <span class="note">Seks ubekendte: to accelerationer, hængselkraften i to retninger, friktion og normalkraft</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Systemet lige efter slip</h3>
+      <canvas id="c1" width="640" height="600"></canvas>
+      <div class="status" style="font-size:16px">Pilene viser løsningen fra trin 3: stangen vælter til venstre, cylinderen ruller til højre</div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Fra hvile er ω nul for begge legemer. Så hænger stangens tyngdepunkt sammen med cylinderens acceleration og stangens α, og intet andet.</span></div>
+</section>
+
+<!-- ============ 2 · CYLINDEREN ============ -->
+<section class="slide" id="s2" data-title="2 · Cylinderen">
+  <div class="hd"><span class="tag b">TRIN 2 · CYLINDEREN</span><h1>Friktionen er bundet til cylinderens acceleration</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Cylinderen</h3>
+      <div class="big" style="font-size:28px" data-tex="\textstyle\sum F_x=m_c a_C,\quad \sum M_C=I_C\alpha_c"></div>
+      <div class="src">Hibbeler (2023), lign. (17-6) og (17-17), <span data-tex="I_C=\tfrac12m_cr^2"></span></div>
+      <div class="terms">
+        <div class="term"><span class="s rd" data-tex="f"></span><span><b>Friktion</b> i kontaktpunktet. Den eneste kraft med arm om C, så den alene giver cylinderens α</span></div>
+        <div class="term"><span class="s" data-tex="C_x,\ C_y"></span><span><b>Hængselkraft</b> fra cylinder på stang. På cylinderen virker <span data-tex="-C_x,\ -C_y"></span></span></div>
+        <div class="term"><span class="s" data-tex="N"></span><span><b>Normalkraft</b> fra underlaget. Bærer cylinder og en del af stangen</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n b">4</span><div class="t"><b>Moment om C</b>
+        <span class="m" data-tex="f\,r=\tfrac12m_cr^2\alpha_c=-\tfrac12m_c r\,a_C"></span>
+        <span class="m" data-tex="\Rightarrow\ f=-\tfrac12m_c\,a_C=-0{,}5\,a_C"></span></div></div>
+      <div class="step"><span class="n b">5</span><div class="t"><b>Vandret</b>
+        <span class="m" data-tex="-C_x+f=m_c a_C\ \Rightarrow\ C_x=-1{,}5\,a_C"></span></div></div>
+      <div class="step"><span class="n b">6</span><div class="t"><b>Lodret</b>
+        <span class="m" data-tex="N-m_cg-C_y=0\ \Rightarrow\ N=9{,}81+C_y"></span>
+        <span class="note">Stangen trykker ned på cylinderen gennem hængslet, så <span data-tex="C_y"></span> lægges til</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Friktionen deler kraften</h3>
+      <div class="row"><button class="btn on" data-l="0">1 · flyt cylinderen</button><button class="btn rd" data-l="1">2 · + drej den</button></div>
+      <canvas id="b2" width="640" height="190"></canvas>
+      <div class="status">Af det vandrette skub fra stangen (<span data-tex="-C_x=1{,}26"></span> N) går 2/3 til at flytte cylinderen og 1/3 til at dreje den. Den tredjedel er friktionen</div>
+      <div class="ro"><div><span>FRIKTION f</span><b class="rd">−0,420</b><i>N</i></div><div><span>NORMAL N</span><b>12,39</b><i>N</i></div></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>For en massiv cylinder er friktionen altid halvdelen af m gange a, bare med modsat fortegn. Det gør tre af de seks ligninger simple.</span></div>
+</section>
+
+<!-- ============ 3 · STANGEN ============ -->
+<section class="slide" id="s3" data-title="3 · Stangen">
+  <div class="hd"><span class="tag b">TRIN 3 · STANGEN</span><h1>Stangen lukker ligningssystemet</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Stangen i generel plan bevægelse</h3>
+      <div class="big" style="font-size:28px" data-tex="\textstyle\sum\boldsymbol F=m_s\boldsymbol a_G,\quad \sum M_G=I_G\alpha_s"></div>
+      <div class="src">Hibbeler (2023), lign. (17-6) og (17-17), <span data-tex="I_G=\tfrac1{12}m_sa^2=0{,}0333"></span></div>
+      <div class="terms">
+        <div class="term"><span class="s" data-tex="C_x,\ C_y"></span><span><b>Hængselkraften</b> i stangens nederste ende</span></div>
+        <div class="term"><span class="s" data-tex="m_sg"></span><span><b>Tyngden</b> i G, 3,92 N. Den eneste kraft, der får stangen til at vælte</span></div>
+        <div class="term"><span class="s" data-tex="\boldsymbol r_{C/G}"></span><span><b>Arm</b> for hængselkraften om G: <span data-tex="0{,}321\boldsymbol i-0{,}383\boldsymbol j"></span></span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n b">7</span><div class="t"><b>Stangens tre ligninger</b>
+        <span class="m" data-tex="C_x=0{,}4(a_C-0{,}383\alpha_s)"></span>
+        <span class="m" data-tex="C_y-3{,}924=-0{,}4\cdot0{,}321\,\alpha_s"></span>
+        <span class="m" data-tex="0{,}321C_y+0{,}383C_x=0{,}0333\,\alpha_s"></span></div></div>
+      <div class="step"><span class="n b">8</span><div class="t"><b>Løs med trin 2</b> (6 × 6)
+        <span class="m" data-tex="a_C=0{,}841\ \text{m/s}^2,\quad \alpha_s=10{,}42\ \text{rad/s}^2"></span>
+        <span class="m" data-tex="f=-0{,}420\ \text{N},\quad N=12{,}39\ \text{N}"></span></div></div>
+      <div class="step"><span class="n b">9</span><div class="t"><b>Mindste friktionskoefficient</b>
+        <span class="m" data-tex="\mu_{min}=\dfrac{|f|}{N}=\dfrac{0{,}420}{12{,}39}"></span>
+        <span class="m" data-tex="\boxed{\mu_{min}=0{,}034}"></span></div></div>
+    </div>
+    <div class="card col">
+      <h3>μ<sub>min</sub> afhænger af startvinklen</h3>
+      <canvas id="g3" width="640" height="420"></canvas>
+      <div class="sl n"><span>v</span><input id="v3" type="range" min="2" max="85" step="1" value="40"><output id="v3o"></output></div>
+      <div class="ro"><div><span>μ<sub>MIN</sub></span><b class="rd" id="r3u">0,034</b></div><div><span>α<sub>s</sub></span><b class="pu" id="r3a">10,42</b><i>rad/s²</i></div></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Med cylinderens tre ligninger og stangens tre har jeg seks ligninger til seks ubekendte. μ<sub>min</sub> er friktionen delt med normalkraften.</span></div>
+</section>
+
+<!-- ============ 4 · SVAR OG TJEK ============ -->
+<section class="slide" data-title="4 · Svar og tjek">
+  <div class="hd"><span class="tag g">TRIN 4 · SVAR OG TJEK</span><h1>Er resultatet rimeligt?</h1></div>
+  <div class="body c2">
+    <div class="card" style="padding:16px 22px">
+      <div class="ans"><span data-tex="\mu_{min}=0{,}034"></span> <small>lige efter slip</small></div>
+      <div class="step"><span class="n g">✓</span><div class="t"><b>Normalkraften passer</b><br>
+        Hele systemet vejer <span data-tex="1{,}4\cdot9{,}81=13{,}73"></span> N. Stangens G falder med <span data-tex="0{,}321\cdot10{,}42=3{,}35"></span> m/s², så gulvet skal bære <span data-tex="0{,}4\cdot3{,}35=1{,}34"></span> N mindre: <span data-tex="13{,}73-1{,}34=12{,}39"></span> N <span class="ok">✓</span></div></div>
+      <div class="step"><span class="n g">✓</span><div class="t"><b>Uafhængigt tjek med Lagrange</b><br>
+        Koordinaterne <span data-tex="x"></span> og vinklen giver en 2 × 2 massematrix. Samme <span data-tex="a_C"></span> og <span data-tex="\alpha_s"></span> til alle cifre <span class="ok">✓</span></div></div>
+      <div class="step"><span class="n g">✓</span><div class="t"><b>Retninger</b><br>
+        Stangen vælter mod venstre og skubber hængslet mod højre. Cylinderen ruller til højre, og friktionen peger mod venstre for at få den til at dreje <span class="ok">✓</span></div></div>
+    </div>
+    <div class="card col" style="padding:16px 20px">
+      <h3>Hvad nu hvis …</h3>
+      <div class="sl"><span>Stangens masse</span><input id="hM" type="range" min="0.1" max="3" step="0.05" value="0.4"><output id="hMo"></output></div>
+      <div class="sl"><span>Startvinkel v</span><input id="hV" type="range" min="2" max="85" step="1" value="40"><output id="hVo"></output></div>
+      <div class="ro r3">
+        <div><span>μ<sub>MIN</sub></span><b class="rd" id="rU">0,034</b><i id="rUr"></i></div>
+        <div><span>a<sub>C</sub></span><b class="cy" id="rC">0,841</b><i>m/s²</i></div>
+        <div><span>α<sub>s</sub></span><b class="pu" id="rA">10,42</b><i>rad/s²</i></div>
+      </div>
+      <h3 style="margin-top:4px">μ<sub>min</sub> mod stangens masse · stiplet = opgavens</h3>
+      <canvas id="g4" width="1000" height="380"></canvas>
+      <div class="status">En tungere stang skubber hårdere til cylinderen og kræver mere friktion</div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Normalkraften er mindre end den samlede vægt, fordi stangen er på vej ned. Svaret er lille, fordi stangen er let i forhold til cylinderen.</span></div>
+</section>
+
+</div></div>
+<script src="../assets/deck.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = D.$, fmt = D.fmt, g = 9.81, DEG = Math.PI / 180;
+function gauss(A, b) {
+  var n = b.length, M = A.map(function (r, i) { return r.concat([b[i]]); });
+  for (var c = 0; c < n; c++) {
+    var p = c; for (var r = c + 1; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
+    var t = M[c]; M[c] = M[p]; M[p] = t;
+    for (r = 0; r < n; r++) if (r !== c) { var f = M[r][c] / M[c][c]; for (var k = c; k <= n; k++) M[r][k] -= f * M[c][k]; }
+  }
+  return M.map(function (r, i) { return r[n] / r[i]; });
+}
+function sol(mr, vDeg, mc) {
+  mc = mc || 1; var a = 1, v = vDeg * DEG, IG = mr * a * a / 12, gx = -a / 2 * Math.sin(v), gy = a / 2 * Math.cos(v);
+  var A = [[-mr, mr * gy, 1, 0, 0, 0], [0, -mr * gx, 0, 1, 0, 0], [0, -IG, gy, -gx, 0, 0], [mc, 0, 1, 0, -1, 0], [0.5 * mc, 0, 0, 0, 1, 0], [0, 0, 0, -1, 0, 1]];
+  var s = gauss(A, [0, mr * g, 0, 0, 0, mc * g]);
+  return { aC: s[0], al: s[1], Cx: s[2], Cy: s[3], f: s[4], N: s[5], mu: Math.abs(s[4]) / s[5], gx: gx, gy: gy };
+}
+var S0 = sol(0.4, 40);
+
+/* slide 1: tegning med pile */
+(function () {
+  var G = D.cv('c1'), x = G.x, s = 330, cx = 360, cy = 470, R = 0.25 * s;
+  D.ground(x, 40, 620, cy + R);
+  D.circ(x, cx, cy, R, '#d6e8f7', '#5d86ad', 3);
+  var Px = cx - Math.sin(40 * DEG) * s, Py = cy - Math.cos(40 * DEG) * s, Gx = cx + S0.gx * s, Gy = cy - S0.gy * s;
+  D.line(x, [[cx, cy], [Px, Py]], '#9cc3e4', 16); D.line(x, [[cx, cy], [Px, Py]], '#5d86ad', 2);
+  D.line(x, [[cx, cy], [cx, cy - 300]], 'rgba(90,107,125,.5)', 2, [6, 6]);
+  x.strokeStyle = '#a86b00'; x.lineWidth = 2; x.beginPath(); x.arc(cx, cy, 120, -Math.PI / 2, -Math.PI / 2 - 40 * DEG, true); x.stroke(); D.txt(x, 'v = 40°', cx + 50, cy - 150, 26, '#a86b00', 'center');
+  D.pin(x, cx, cy); D.circ(x, Gx, Gy, 8, '#14202d');
+  D.txt(x, 'C', cx + 18, cy + 18, 30, '#14202d'); D.txt(x, 'P', Px - 30, Py - 10, 30, '#14202d'); D.txt(x, 'G', Gx - 34, Gy, 30, '#14202d');
+  D.arrow(x, cx, cy + R + 30, cx + S0.aC * 140, cy + R + 30, '#0a7fc2', 6); D.txt(x, 'a_C = 0,84', cx + 40, cy + R + 64, 26, '#0a7fc2');
+  D.arrow(x, Gx, Gy, Gx + (S0.aC - S0.gy * S0.al) * 40, Gy + S0.gx * S0.al * -40, '#d97a00', 6); D.txt(x, 'a_G', Gx - 150, Gy + 40, 28, '#d97a00');
+  D.marc(x, (cx + Px) / 2 + 60, (cy + Py) / 2 - 20, 40, true, '#7b4fc9', 4); D.txt(x, 'α_s', (cx + Px) / 2 + 110, (cy + Py) / 2 - 60, 28, '#7b4fc9');
+  D.arrow(x, cx + 10, cy + R + 4, cx - 60, cy + R + 4, '#d63a3a', 5); D.txt(x, 'f', cx - 80, cy + R - 20, 28, '#d63a3a');
+})();
+
+/* slide 2 */
+var L2 = 0;
+function draw2() { D.stack('b2', [{ v: -S0.Cx * 2 / 3, col: '#0a7fc2' }, { v: -S0.Cx / 3, col: '#d63a3a' }], L2, { min: 0, max: 1.45, d: 3, u: 'N', note: ['m_c a_C = 0,841 N', '+ |f| = 0,420 N bruges på rotation'] }); }
+D.steps('#s2 [data-l]', function (l) { L2 = l; draw2(); }); draw2();
+
+/* slide 3 */
+function upd3() {
+  var v = +$('v3').value, s = sol(0.4, v); $('v3o').textContent = v + '°';
+  $('r3u').textContent = fmt(s.mu, 3); $('r3a').textContent = fmt(s.al, 2);
+  D.graph('g3', { f: function (q) { return sol(0.4, q).mu; }, x0: 0, x1: 85, xt: [[0, '0°'], [40, '40°'], [85, '85°']], min: 0, max: 0.08, yt: [0.02, 0.04, 0.06, 0.08], yd: 2, lbl: 'μ_min', col: '#d63a3a', d: 3, xm: v, vline: 40 });
+}
+$('v3').oninput = upd3; upd3();
+
+/* slide 4 */
+function upd4() {
+  var m = +$('hM').value, v = +$('hV').value, s = sol(m, v);
+  $('hMo').textContent = fmt(m, 2) + ' kg'; $('hVo').textContent = v + '°';
+  $('rU').textContent = fmt(s.mu, 3); D.rel('rUr', s.mu, S0.mu);
+  $('rC').textContent = fmt(s.aC, 3); $('rA').textContent = fmt(s.al, 2);
+  D.graph('g4', { f: function (q) { return sol(q, v).mu; }, ref: function (q) { return sol(q, 40).mu; }, x0: 0.1, x1: 3, xt: [[0.1, '0,1'], [0.4, '0,4'], [1, '1'], [2, '2'], [3, '3 kg']], min: 0, max: 0.3, yt: [0.1, 0.2, 0.3], yd: 1, lbl: 'μ_min', col: '#d63a3a', d: 3, xm: m, vline: 0.4 });
+}
+$('hM').oninput = upd4; $('hV').oninput = upd4; upd4();
+D.start();
+})();
+</script>
+</body>
+</html>

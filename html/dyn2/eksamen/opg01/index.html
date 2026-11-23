@@ -7,81 +7,7 @@
 <meta name="description" content="DYN2 eksamenssæt A25, opgave 1 (Hacksaw): krumtap og plejlstang med relativ hastighed (16-16) og relativ acceleration (16-19), med animation og grafer.">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-<style>
-:root{
-  --bg:#ffffff; --panel:#f6f9fc; --panel2:#ebf1f7; --line:#d3dde8; --ink:#14202d; --mut:#5a6b7d;
-  --cy:#0a7fc2; --or:#d97a00; --rd:#d63a3a; --gr:#0a9a5c; --ye:#a86b00; --pu:#7b4fc9;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
-#vp{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
-#deck{position:relative;width:1600px;height:900px;flex:none;transform-origin:center center}
-.slide{position:absolute;inset:0;padding:34px 48px 0;display:flex;flex-direction:column;opacity:0;visibility:hidden;transition:opacity .35s;
-  background:radial-gradient(1200px 600px at 85% -10%,#e6f1fa 0%,transparent 60%),var(--bg)}
-.slide.on{opacity:1;visibility:visible}
-.hd{display:flex;align-items:baseline;gap:22px;height:78px;flex:none}
-.tag{font:700 17px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:#fff;background:var(--cy);padding:8px 12px;border-radius:6px;white-space:nowrap}
-.tag.b{background:var(--or)}
-.tag.g{background:var(--gr)}
-h1{font-size:44px;font-weight:750;letter-spacing:-.01em}
-h1 small{font-size:24px;color:var(--mut);font-weight:500;margin-left:10px}
-.body{flex:1;display:grid;gap:22px;min-height:0;padding-bottom:16px}
-.ft{flex:none;height:76px;padding-right:270px;display:flex;align-items:center;gap:16px;border-top:1px solid var(--line);font-size:21px;color:var(--ink)}
-.ft b.say{font:700 14px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:var(--ye);border:1px solid var(--ye);padding:7px 9px;border-radius:5px;white-space:nowrap}
-.card{background:var(--panel);border:1px solid var(--line);box-shadow:0 1px 3px rgba(20,32,45,.06);border-radius:14px;padding:18px 20px;min-height:0}
-.card h3{font-size:16px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin-bottom:10px;font-weight:650}
-.big{font-size:36px;text-align:center;padding:8px 0 2px}
-.src{text-align:center;color:var(--mut);font-size:16px;margin-bottom:8px}
-.terms{display:grid;gap:8px;margin-top:8px}
-.term{display:grid;grid-template-columns:118px 1fr;gap:12px;align-items:center;font-size:18px;line-height:1.3;padding:8px 11px;border-radius:9px;background:var(--panel2)}
-.term .s{font-size:22px;text-align:center}
-.term em{color:var(--mut);font-style:normal}
-.cy{color:var(--cy)}.or{color:var(--or)}.rd{color:var(--rd)}.gr{color:var(--gr)}.ye{color:var(--ye)}.pu{color:var(--pu)}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.btn{font:600 16px/1 system-ui,sans-serif;color:var(--ink);background:var(--panel2);border:1px solid var(--line);padding:9px 13px;border-radius:9px;cursor:pointer}
-.btn:hover{border-color:var(--cy)}
-.btn.on{background:var(--cy);color:#fff;border-color:var(--cy)}
-.btn.gr.on{background:var(--gr);border-color:var(--gr)}
-.btn.rd.on{background:var(--rd);border-color:var(--rd)}
-.btn.pu.on{background:var(--pu);border-color:var(--pu)}
-.sl{display:grid;grid-template-columns:120px 1fr 92px;gap:12px;align-items:center;font-size:18px}
-.sl input{width:100%;accent-color:var(--cy)}
-.sl output{font:600 18px ui-monospace,Consolas,monospace;text-align:right}
-.ro{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
-.ro.r3{grid-template-columns:repeat(3,1fr)}
-.ro div{background:var(--panel2);border-radius:10px;padding:8px 11px}
-.ro span{display:block;font-size:13px;color:var(--mut);letter-spacing:.05em}
-.ro b{font:700 24px ui-monospace,Consolas,monospace}
-.ro i{font-style:normal;font-size:14px;margin-left:6px}
-.up{color:var(--rd)}.dn{color:var(--gr)}.eq{color:var(--mut)}
-.chips{display:flex;gap:10px;flex-wrap:wrap}
-.chip{background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:18px}
-.chip small{color:var(--mut);margin-left:6px;font-size:14px}
-.step{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:start;padding:12px 0;border-bottom:1px dashed var(--line)}
-.step:last-child{border-bottom:0}
-.step .n{width:34px;height:34px;border-radius:50%;background:var(--cy);color:#fff;font:800 18px/34px system-ui;text-align:center}
-.step .n.b{background:var(--or)}
-.step .t{font-size:19px;line-height:1.35}
-.step .t .m{font-size:22px;display:block;margin-top:5px}
-.step .t .note{color:var(--mut);font-size:17px}
-.ok{color:var(--gr);font-weight:700}
-.warn{color:var(--rd);font-weight:700}
-canvas{display:block;width:100%}
-.status{font-size:17px;padding:8px 12px;border-radius:9px;background:var(--panel2)}
-#nav{position:fixed;bottom:12px;right:16px;display:flex;gap:8px;align-items:center;z-index:5;font:600 14px ui-monospace,Consolas,monospace;color:var(--mut)}
-#nav button{background:#ffffffcc;border:1px solid var(--line);color:var(--ink);border-radius:8px;width:38px;height:34px;font-size:16px;cursor:pointer}
-#dots{display:flex;gap:6px}
-#dots i{width:9px;height:9px;border-radius:50%;background:var(--line);cursor:pointer}
-#dots i.on{background:var(--cy)}
-.qcard{font-size:22px;line-height:1.45}
-.qcard .lbl{font:800 19px ui-monospace,Consolas,monospace;margin-bottom:10px;display:block}
-.plan{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.plan div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:17px;line-height:1.35}
-.plan b{display:block;font-size:19px;margin-bottom:3px}
-.ans small{font-size:19px;color:var(--mut);margin-left:8px}
-.ans{font-size:28px;line-height:1.5;text-align:center;padding:12px;border-radius:12px;background:#fff;border:2px solid var(--gr);margin-bottom:10px}
-.katex{font-size:1.04em}
-</style>
+<link rel="stylesheet" href="../assets/deck.css">
 </head>
 <body>
 <div id="vp"><div id="deck">
@@ -91,7 +17,7 @@ canvas{display:block;width:100%}
   <div style="flex:1;display:grid;grid-template-columns:1fr 640px;gap:34px;align-items:center;padding:0 10px">
     <div style="display:flex;flex-direction:column;gap:22px">
       <div>
-        <div class="tag" style="display:inline-block">DYN2 · KAP. 16 · EKSAMENSSÆT A25 · OPGAVE 1</div>
+        <div class="tag" style="display:inline-block">DYN2 · KAP. 16 · EKSAMENSSÆT A26 · OPGAVE 1</div>
         <h1 style="font-size:68px;margin-top:20px">Maskinbuesaven</h1>
         <div style="font-size:27px;color:var(--mut);margin-top:6px">Krumtap og plejlstang: hjulet drejer jævnt, men klingen <b class="or">accelererer</b></div>
       </div>
@@ -107,7 +33,7 @@ canvas{display:block;width:100%}
     </div>
     <div class="card" style="padding:12px"><img src="hacksav.jpg" alt="Maskinbuesav med svinghjul, krumtap OB og plejlstang AB" style="width:100%;display:block;border-radius:8px"></div>
   </div>
-  <div class="ft" style="color:var(--mut)">→ / mellemrum / klikker: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm &nbsp;·&nbsp; animationen og graferne kan styres med sliderne</div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum / klikker: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm &nbsp;·&nbsp; ☰: alle 10 opgaver</div>
 </section>
 
 <!-- ============ 1 · KRUMTAPPEN ============ -->
@@ -291,7 +217,7 @@ canvas{display:block;width:100%}
 
 </div></div>
 
-<div id="nav"><span id="pg">1 / 5</span><div id="dots"></div><button id="prev" title="Forrige (←)">‹</button><button id="next" title="Næste (→)">›</button><button id="fs" title="Fuld skærm (F)">⛶</button></div>
+<div id="nav"><a href="../" title="Alle 10 opgaver">☰</a><span id="pg">1 / 5</span><div id="dots"></div><button id="prev" title="Forrige (←)">‹</button><button id="next" title="Næste (→)">›</button><button id="fs" title="Fuld skærm (F)">⛶</button></div>
 
 <script>
 (function () {
