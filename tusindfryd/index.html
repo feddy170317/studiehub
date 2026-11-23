@@ -238,6 +238,12 @@ h1,h2,h3{font-family:var(--disp);font-weight:800;margin:0;line-height:1.15;text-
   .read.full{font-size:19px}.read.story{font-size:17px;max-height:34vh}
   .rp{grid-template-columns:minmax(0,1fr) auto}.rp-b{grid-column:1/-1;grid-row:2}
 }
+.defbox{display:flex;flex-direction:column;gap:8px;background:#fff;border:2px solid var(--rule);border-radius:12px;padding:12px 14px;font-size:19px;max-width:62ch}
+.defbox small{display:block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.defbox i{font-style:normal}
+.jq{font-size:20px;font-weight:700}
+.judge{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.fb.mid{background:#fff4c9;color:#6b4e00}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.petal{display:none}}
 </style>
 </head><body>
@@ -1880,6 +1886,108 @@ TF.subjects.push({id:'laes',name:'Læsning',short:'Læsning',color:'#8a4fc7',gly
 ]});
 })();
 
+/* Ordbogen: 8 ord pr. session. Del 1: vælg betydningen (multiple choice). Del 2: samme ord, forklar selv.
+   Ord: [ord, forklaring, forkert, forkert, forkert, eksempelsætning]. Forklaringerne er skrevet i børnesprog. */
+(function(){
+const {pick,shuffle,sample,q}=TF;
+const W={
+1:[
+['nysgerrig','Vil gerne vide eller opdage noget','Vil gerne have det, andre har','Er bange for alt, der er nyt og ukendt','Gider ikke lære noget nyt','Katten var nysgerrig og kiggede ned i kassen.'],
+['modig','Tør gøre noget, selvom det er uhyggeligt','Er god til at løbe meget stærkt','Bliver meget let sur på andre','Kan bedst lide at være helt for sig selv','Han var modig og hoppede fra den høje vippe.'],
+['genert','Bliver stille og utryg blandt andre','Larmer og snakker rigtig meget','Er træt og vil gerne sove','Er rigtig god til at tale foran mange','Den nye pige var genert den første dag.'],
+['ærlig','Siger sandheden og snyder ikke','Er rigtig god til at gemme sig','Har altid travlt med noget','Siger tit noget sjovt til andre','Hun var ærlig og fortalte, at det var hende.'],
+['skuffet','Ked af det, fordi noget ikke gik som håbet','Glad, fordi man har fået en stor og flot gave','Træt efter en lang dag i skolen','Sur, fordi nogen har drillet en','Han blev skuffet, da turen blev aflyst.'],
+['stolt','Glad for noget, man selv har klaret','Ked af noget, man har gjort forkert','Bange for at prøve noget nyt','Træt af at øve sig hele tiden','Hun var stolt af sin flotte tegning.'],
+['misundelig','Vil gerne have det, en anden har','Vil gerne dele alt, hvad man har, med andre','Er bange for andre mennesker','Er glad på andres vegne','Han var misundelig på sin vens nye cykel.'],
+['travl','Har meget at lave','Har ingenting at lave','Er meget langsom','Er meget søvnig','Mor havde en travl dag på arbejdet.'],
+['forsigtig','Passer godt på, så der ikke sker noget','Gør tingene meget hurtigt og vildt','Glemmer tit, hvad det var, man skulle huske','Er ligeglad med, hvad der sker','Hun var forsigtig med den varme kop.'],
+['doven','Gider ikke lave noget','Har rigtig travlt','Er meget stærk','Kan godt lide at hjælpe til','Katten var doven og lå i solen hele dagen.'],
+['rolig','Stille og uden uro','Larmende og vild','Bange og meget urolig','Vred og sur','Hunden blev rolig, da den fik mad.'],
+['venlig','Sød og rar over for andre','Sur og uvenlig over for andre','Stille og helt alene','Hurtig og meget stærk','Den venlige dame hjalp os over vejen.'],
+['fortryde','Ønske, at man ikke havde gjort noget','Glæde sig til noget, der skal ske','Glemme noget, man skulle huske','Prøve noget for allerførste gang','Han fortrød, at han havde råbt ad sin søster.'],
+['hviske','Tale meget stille','Råbe meget højt','Synge en sang','Grine højt af noget','Hun hviskede en hemmelighed til sin ven.'],
+['skændes','Være uenige og tale vredt til hinanden','Lege en rigtig sjov leg sammen i skolegården','Hjælpe hinanden med lektierne','Sidde stille og læse en bog','Søskende skændes nogle gange om fjernbetjeningen.'],
+['opdage','Finde eller se noget for første gang','Gemme noget, så ingen andre kan finde det','Glemme, hvor man har lagt noget','Give noget væk til en anden','Hun opdagede en lille frø i haven.'],
+['låne','Få noget for en tid og give det tilbage','Købe noget nyt i en butik','Give noget væk til en anden for altid','Lave noget helt selv','Må jeg låne dit viskelæder?'],
+['vane','Noget, man altid gør uden at tænke','Noget, man kun har gjort én gang','Noget, man er meget, meget bange for','Noget, man har fået i en gave','Det er en god vane at børste tænder hver aften.'],
+['hemmelighed','Noget, man ikke må fortælle til andre','Noget, alle ved i forvejen','En ting, man finder i skoven','En leg, man tit leger i frikvarteret','Det er en hemmelighed, hvad du får i gave.'],
+['regel','Noget, der bestemmer, hvad man må','En lineal til at tegne lige streger','En pause midt i en time','En gave til en, der har været dygtig','I fodbold er der en regel om, at man ikke må tage bolden med hænderne.'],
+],
+2:[
+['tålmodig','Kan vente roligt uden at blive sur','Bliver hurtigt sur, når man skal vente','Er god til at løbe meget langt','Har tit ondt i maven','Man skal være tålmodig, når man fisker.'],
+['pålidelig','Man kan stole på personen','Glemmer tit, hvad man har lovet','Er meget sjov at være sammen med','Er god til at lyve for andre','Hun er pålidelig og kommer altid til tiden.'],
+['fornuftig','Tænker sig om og gør det kloge','Gør tit dumme og meget farlige ting','Er meget sulten hele tiden','Kan slet ikke lide at tænke','Det var et fornuftigt valg at tage regntøj på.'],
+['hjælpsom','Vil gerne hjælpe andre','Vil gerne være alene','Vil gerne bestemme over andre','Vil gerne sove længe','Han var hjælpsom og bar posen for sin farmor.'],
+['utålmodig','Har svært ved at vente','Er god til at vente','Er meget stille og rolig','Er meget glad for dyr','Hun var utålmodig og ville åbne gaven med det samme.'],
+['overraske','Gøre noget, som en anden ikke venter','Fortælle alle, hvad der skal ske','Gøre præcis det samme, som man plejer','Være sur på en anden person','Vi ville overraske mor med morgenmad på sengen.'],
+['forklare','Fortælle, så andre forstår det','Holde noget hemmeligt for andre','Tale meget hurtigt og utydeligt','Spørge om noget, man ikke ved','Læreren forklarede, hvordan man ganger.'],
+['undskylde','Sige, at man er ked af noget','Sige tak for en flot gave','Sige farvel til en rigtig god ven','Sige nej til at være med','Han undskyldte, fordi han havde skubbet.'],
+['samarbejde','Arbejde sammen om noget','Arbejde helt alene uden hjælp','Skændes om noget','Holde fri sammen','Klassen samarbejdede om at bygge en bro af pinde.'],
+['konkurrence','Hvor flere prøver at vinde','Hvor alle hjælper hinanden','Hvor alle sover længe','Hvor man spiser sammen','Hun vandt en konkurrence i at tegne.'],
+['erfaring','Noget, man har lært ved at prøve det','Noget, man har drømt om i nat i sengen','Noget, man har fået af sin lærer','Noget, man har købt i en butik','Med erfaring bliver man bedre til at cykle.'],
+['fordel','Noget, der gør det lettere for en','Noget, der gør det sværere for en','Et stykke af en stor kage','En dør, der står i et hus','Det er en fordel at være høj, når man spiller basket.'],
+['ulempe','Noget, der gør det sværere for en','Noget, der gør det lettere for en','En lille lampe på et bord','En fugl, der bor i skoven','En ulempe ved regnvejr er, at man bliver våd.'],
+['grådig','Vil have mere, end man har brug for','Deler alt, hvad man har, med de andre','Er ked af det og græder meget','Er god til at gemme ting væk','Den grådige hund spiste alle pølserne.'],
+['bekymret','Tænker på, at noget slemt kan ske','Er glad og har det rigtig dejligt','Er sulten og vil gerne have mad','Er træt efter at have løbet','Mor var bekymret, da jeg kom sent hjem.'],
+['lettet','Glad, fordi noget svært er overstået','Ked af, at noget rigtig sjovt er slut nu','Meget nem at løfte op','Bange for, hvad der skal ske','Han var lettet, da prøven var slut.'],
+['flov','Føler sig pinlig foran andre','Er stolt af noget, man har gjort','Er træt og har brug for søvn','Er sulten og vil gerne spise','Hun blev flov, da hun faldt foran klassen.'],
+['uenig','Synes noget andet end en anden','Synes præcis det samme som en anden','Er helt alene i et rum','Er ked af det og trist','Vi var uenige om, hvilken film vi skulle se.'],
+['forvente','Regne med, at noget vil ske','Være sikker på, at intet sker','Glemme, at noget skal ske','Ønske, at noget var sket','Jeg forventer, at det bliver sjovt i morgen.'],
+['opfinde','Finde på og lave noget helt nyt','Finde noget, man har tabt','Købe noget, der er helt nyt','Lave præcis det samme som alle andre','Hvem var den første, der fandt på at opfinde cyklen?'],
+['beslutte','Bestemme sig for noget','Glemme noget vigtigt','Spørge en anden om noget','Lukke noget godt i','Vi besluttede at tage til stranden.'],
+['sammenligne','Se på, hvad der er ens og forskelligt','Lægge to tal sammen, så man får et nyt tal','Gemme to ting sammen i en kasse','Lege sammen med en god ven','Hun sammenlignede de to tegninger.'],
+],
+3:[
+['retfærdig','Behandler alle lige','Er meget streng mod alle','Har altid ret','Er meget glad','Læreren var retfærdig og gav alle en tur.'],
+['ansvarlig','Passer på det, man har lovet at passe','Gør altid lige det, man selv har lyst til','Svarer hurtigt på alle spørgsmål','Er den yngste i hele familien','Hun er ansvarlig for at fodre kaninen.'],
+['taknemmelig','Glad og vil gerne sige tak','Ked af, at man ikke fik noget','Træt af at sige tak hele tiden','Bange for at få en stor gave','Jeg er taknemmelig for min familie.'],
+['hensynsfuld','Tænker på, hvordan andre har det','Tænker kun på sig selv og ingen andre','Er meget god til at huske ting','Er meget hurtig til at løbe','Det var hensynsfuldt at være stille, mens lillebror sov.'],
+['selvstændig','Kan klare tingene selv','Har brug for hjælp til alt','Står altid helt stille','Bor helt alene i skoven','Hun er blevet selvstændig og smører selv sin madpakke.'],
+['fordom','En mening om nogen, før man kender dem','En dom, som en dommer giver nede i retten','En gammel, tung dør i et slot','En regel i et spil, alle skal følge','Det er en fordom, at piger ikke kan lide fodbold.'],
+['konsekvens','Det, der sker, fordi man har gjort noget','Det, der skete for meget, meget lang tid siden','En lang kø af mennesker','Det, man ønsker sig allermest til jul','En konsekvens af at glemme madpakken er, at man bliver sulten.'],
+['kompromis','En løsning, hvor begge giver lidt efter','En leg, hvor kun én person bestemmer det hele','Et løfte, som man ikke holder','En pakke med kiks og kager','Vi lavede et kompromis: først fodbold, så tegnefilm.'],
+['overbevise','Få en anden til at tro det samme','Lade som om man ikke ved noget','Glemme, hvad det var, man selv mente','Tale meget højt til nogen','Hun overbeviste sin far om, at de skulle have en hund.'],
+['tvivle','Ikke være helt sikker','Være helt og aldeles sikker','Dele noget i to','Tale meget stille','Jeg tvivler på, at det bliver solskin i morgen.'],
+['fantasi','Evnen til at finde på ting i hovedet','En fest, hvor alle er klædt ud som dyr','En stor tegning på en væg','Noget, man ser i fjernsynet','Med lidt fantasi kan en pude blive til en båd.'],
+['tradition','Noget, man gør på samme måde hvert år','Noget helt nyt, man aldrig har prøvet før','En sang, man selv finder på','En lang rejse til et andet land','Det er en tradition at danse om juletræet.'],
+['fællesskab','At høre sammen med andre','At være helt alene hele tiden','Et skab, man deler','En stor fælde','Der er et godt fællesskab i klassen.'],
+['frivillig','Noget, man gør, fordi man selv vil','Noget, man er nødt til at gøre for andre','Noget, man får mange penge for','Noget, man kun gør om natten','Han meldte sig frivilligt til at rydde op.'],
+['respekt','At tage andre alvorligt og være pæn','At være meget bange for alle de andre','At bestemme over alle andre','At grine ad andre','Vi viser respekt ved at lytte, når andre taler.'],
+['udfordring','Noget svært, man prøver at klare','Noget nemt, man gør hver dag','En invitation til en fest','En vej ud af en meget stor bygning','Det var en udfordring at klatre op i træet.'],
+['nøjagtig','Helt præcis','Helt forkert','Meget hurtig','Lidt sjusket','Hun var nøjagtig, da hun målte bordet.'],
+['midlertidig','Kun for en kort tid','For altid','Midt på dagen, ved frokost','Meget gammel','Vi bor midlertidigt hos mormor, mens huset bliver malet.'],
+['ensom','Alene og savner nogen','Glad for at være helt alene','Den eneste i familien','Bange for mørket','Ællingen var ensom i mosen.'],
+['misforståelse','Når nogen forstår noget forkert','Når alle forstår præcis det samme','En sætning, der er stavet forkert','En meget svær regneopgave','Det var en misforståelse, at festen var i dag.'],
+['beundre','Synes, at nogen er rigtig dygtig','Synes, at nogen er rigtig dum','Undre sig rigtig meget over noget','Bo sammen med nogen','Hun beundrer sin storesøster, der kan spille guitar.'],
+['vurdere','Tænke over, hvor godt noget er','Glemme, hvad noget engang var værd','Vaske noget helt rent igen','Bære noget meget tungt','Læreren skal vurdere vores stile.'],
+],
+};
+const N=8;
+const intro1=`<p><b>Del 1: Vælg betydningen</b></p><p>Du får ${N} ord. Til hvert ord vælger du, hvad det betyder.</p><p>Læg godt mærke til ordene. Du får dem igen i del 2.</p>`;
+const intro2=`<p><b>Del 2: Forklar selv</b></p><p>Nu kommer de samme ${N} ord. Skriv med dine egne ord, hvad ordet betyder.</p><p>Det behøver ikke være præcis som i del 1. Bagefter ser du ordbogens forklaring og bedømmer selv, om du havde det.</p>`;
+const mcQ=w=>q.mc(`Hvad betyder <b>${w[0]}</b>?`,w[1],[w[2],w[3],w[4]],{rtype:'o',word:w[0],explain:`Eksempel: »${w[5]}«`});
+const defQ=w=>({kind:'def',prompt:`Hvad betyder <b>${w[0]}</b>? Skriv det med dine egne ord.`,answer:w[1],word:w[0],example:w[5]});
+const gen=(L,t,seen)=>{
+  const pool=[];for(let k=1;k<=L;k++)pool.push(...W[k]);
+  const fresh=pool.filter(w=>!seen||!seen.has(`Hvad betyder <b>${w[0]}</b>?`));
+  const top=(fresh.length?fresh:pool).filter(w=>W[L].includes(w));
+  return mcQ((top.length&&Math.random()<.7)?pick(top):pick(fresh.length?fresh:pool));
+};
+gen.pool=L=>[1,2,3].filter(k=>k<=L).reduce((n,k)=>n+W[k].length,0);
+const build=L=>{
+  const ws=sample(W[L],N);
+  const a=ws.map(mcQ),b=shuffle(ws).map(defQ);
+  Object.assign(a[0],{_first:true,plain:intro1,story:{title:'Ordbogen',part:1,of:2,btn:'Start del 1'}});
+  Object.assign(b[0],{_first:true,plain:intro2,story:{title:'Ordbogen',part:2,of:2,btn:'Start del 2',tip:'Prøv at bruge ordet i en sætning inde i hovedet. Så er det lettere at forklare.'}});
+  a.forEach(x=>x.story=x.story||{title:'Ordbogen'});b.forEach(x=>x.story=x.story||{title:'Ordbogen'});
+  return [...a,...b];
+};
+const info=L=>({text:`${N} ord. I del 1 vælger du, hvad ordene betyder. I del 2 får du de samme ord og forklarer dem selv. Ordbogen har ${W[L].length} ord på dette niveau, så der kommer nye ord, når du prøver igen.`});
+TF.ORDBOG=W;
+const sb=TF.subjects.find(s=>s.id==='laes');
+sb.units[0].lessons.splice(1,0,{id:'l_dict',title:'Ordbogen',gen,build,info,words:true});
+})();
+
 /* Engelsk: gloser med billede og oplæsning, og første grammatik */
 (function(){
 const {pick,sample,q,bank,rnd}=TF;
@@ -2038,7 +2146,7 @@ const app=()=>document.getElementById('app');
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 const DEF=()=>({v:1,name:'',drops:0,seeds:12,streak:{last:'',n:0},lessons:{},bosses:{},inv:{},garden:{0:'tusind'},
-  settings:{len:15,sound:true,unlockAll:false},log:[],mixDay:'',ui:{sub:'mat'},rstat:{},ordMiss:[],updatedAt:0});
+  settings:{len:15,sound:true,unlockAll:false},log:[],mixDay:'',ui:{sub:'mat'},rstat:{},ordMiss:[],defs:[],updatedAt:0});
 let S=Object.assign(DEF(),load()||{});
 let view='map',SES=null,modal=null,sel=null,lastRes=null,pg=false,scrollCur=true;
 
@@ -2206,6 +2314,7 @@ function readDone(){if(SES&&SES.state==='read'){SES.state='ask';render()}}
 function answer(v){
   if(SES.state!=='ask'&&SES.state!=='retry')return;
   const q=cur();
+  if(q.kind==='def'){defCheck(v);return}
   if(q.kind!=='mc'&&String(v).trim()===''){const i=$('#ans');if(i){i.classList.remove('shake');void i.offsetWidth;i.classList.add('shake')}return}
   if(q.kind==='num'&&Number.isNaN(parseNum(v))){toast('Skriv kun tal her.');return}
   SES.lastVal=v;
@@ -2239,6 +2348,23 @@ function answer(v){
     if(SES.order.length<SES.base*2)SES.order.push(Object.assign({},q,{_again:true}));
   }
   render();
+}
+function defCheck(v){
+  v=String(v).trim();
+  if(v.length<2){const i=$('#ans');if(i){i.classList.remove('shake');void i.offsetWidth;i.classList.add('shake')}return}
+  SES.lastVal=v;SES.state='judge';render();
+}
+const DEFSAY=['Skønt, du kunne forklare det!','Flot forklaret!','Lige præcis!','Godt sagt med dine egne ord!'];
+function judge(g){
+  if(SES.state!=='judge')return;
+  const q=cur();
+  S.defs=[{w:q.word,a:SES.lastVal,g,t:Date.now()},...(S.defs||[])].slice(0,60);
+  SES.defG=g;
+  if(g===2){tone([660,880]);SES.firstOK++;SES.drops+=2;SES.combo++;SES.marks[SES.i]='ok';rec(q,true);SES.state='right';SES.fbText=COMBO[SES.combo]||pick(DEFSAY);render();clearTimeout(SES.tm);SES.tm=setTimeout(next,1500);return}
+  SES.combo=0;SES.marks[SES.i]='no';rec(q,false);SES.missed.push(q);
+  if(g===1){SES.drops+=1;SES.fbText='Næsten er også godt. Læs ordbogens forklaring en gang til, så sidder den bedre.'}
+  else SES.fbText='Fint, at du er ærlig. Læs forklaringen og eksemplet, så husker du ordet til næste gang.';
+  SES.state='wrong';render();
 }
 function rec(q,ok){
   const id=q._src;if(!id)return;
@@ -2340,7 +2466,7 @@ function openModal(){
   const lv=[1,2,3].map(n=>`<button class="lvb ${modal.L===n?'on':''}" data-a="lv" data-v="${n}" ${n>allowed?'disabled':''}>${LV[n-1]}<small>${r.s>=n?'klaret ★':n>allowed?'låst':'klar'}</small></button>`).join('');
   return `<div class="scrim" data-a="close"><div class="modal" data-stop="1" role="dialog" aria-modal="true" aria-label="${esc(f.l.title)}">
     <small>${esc(f.u.title)}</small><h2>${esc(f.l.title)}</h2>
-    ${f.l.info?(()=>{const i=f.l.info(modal.L);return `<p>${i.texts?`${i.parts} korte tekster`:i.parts>1?`Et eventyr i ${i.parts} dele`:'Et eventyr'} med ${i.qs} spørgsmål (ca. ${Math.round(i.words/10)*10} ord at læse). Du skal have 70 % rigtige i første forsøg for at åbne næste bane.</p>`})():`<p>${S.settings.len} opgaver. Du skal have 70 % rigtige i første forsøg for at åbne næste bane.</p>`}
+    ${f.l.info?(()=>{const i=f.l.info(modal.L);if(i.text)return `<p>${i.text}</p>`;return `<p>${i.texts?`${i.parts} korte tekster`:i.parts>1?`Et eventyr i ${i.parts} dele`:'Et eventyr'} med ${i.qs} spørgsmål (ca. ${Math.round(i.words/10)*10} ord at læse). Du skal have 70 % rigtige i første forsøg for at åbne næste bane.</p>`})():`<p>${S.settings.len} opgaver. Du skal have 70 % rigtige i første forsøg for at åbne næste bane.</p>`}
     <div class="lv">${lv}</div>
     ${math?'<div class="tip"><span>✏️</span><span>Find blyant og papir. Regn på papiret, og skriv svaret her bagefter.</span></div>':''}
     ${f.l.story?'<div class="tip"><span>📖</span><span>Læs teksten først. Du må gerne kigge i den igen, når du svarer. Læs den gerne højt for en voksen.</span></div>':''}
@@ -2360,10 +2486,10 @@ function readView(q,prog,idx,n){
   const s=q.story;
   return `<div class="les" style="--c:${SES.color}">
     <div class="lt"><button class="quit" data-a="quit">Stop</button><div class="prog">${prog}</div><span class="cnt">${idx+1}/${n}</span></div>
-    <div class="sheet"><div class="tags"><span class="tag">📖 ${esc(s.title)}</span>${s.of>1?`<span class="tag">Del ${s.part} af ${s.of}</span>`:''}</div>
+    <div class="sheet"><div class="tags"><span class="tag">${s.btn?'🔤':'📖'} ${esc(s.title)}</span>${s.of>1?`<span class="tag">Del ${s.part} af ${s.of}</span>`:''}</div>
       <div class="read full">${q.plain}</div>
-      <div class="tip rtip">${hog('happy')}<span>Læs teksten i ro og mag. Bagefter kommer der spørgsmål, og du må gerne kigge i teksten igen.</span></div>
-      <button class="big check" data-a="readdone" id="rd">Jeg har læst teksten</button>
+      <div class="tip rtip">${hog('happy')}<span>${s.tip||'Læs teksten i ro og mag. Bagefter kommer der spørgsmål, og du må gerne kigge i teksten igen.'}</span></div>
+      <button class="big check" data-a="readdone" id="rd">${s.btn||'Jeg har læst teksten'}</button>
     </div></div>`;
 }
 function askView(){
@@ -2374,7 +2500,10 @@ function askView(){
   const speakBtn=q.speak&&voiceFor(q.speak.lang)?`<button class="say-b" data-a="spk">Hør ordet</button>`:'';
   const tags=(q.rtype&&TF.RTYPE?`<span class="tag rt rt-${q.rtype}">${TF.RTYPE[q.rtype].tag}</span>`:'')+(q.paper?'<span class="tag">✏️ Papir og blyant</span>':'')+(q._rep?'<span class="tag">Repetition</span>':'')+(q._again?'<span class="tag ag">Den prøver vi igen</span>':'');
   let area='';
-  if(q.kind==='mc'){
+  if(q.kind==='def'){
+    if(st==='ask')area=`<div class="inp"><input id="ans" class="ans-in txt def-in" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Din forklaring" placeholder="Ordet betyder ..."></div><div class="letters">${['æ','ø','å'].map(c=>`<button class="key" data-a="ch" data-v="${c}">${c}</button>`).join('')}</div><button class="big check" data-a="chk">Tjek</button>`;
+    else area=`<div class="defbox"><div><small>Du skrev</small><span>${esc(SES.lastVal)}</span></div><div><small>Ordbogen siger</small><b>${q.answer}</b></div>${q.example?`<div><small>Eksempel</small><i>»${q.example}«</i></div>`:''}</div>`+(st==='judge'?`<p class="jq">Betyder dit svar det samme?</p><div class="judge"><button class="op" data-a="judge" data-v="2">Ja</button><button class="op" data-a="judge" data-v="1">Næsten</button><button class="op" data-a="judge" data-v="0">Nej, ikke helt</button></div>`:'');
+  }else if(q.kind==='mc'){
     area=`<div class="mc" id="mcs">`+SES.shuffled(q).map((o,i)=>{
       const isAns=o===q.answer,bad=(SES.wrong||[]).includes(o);
       const cls=(done&&isAns)?'right':bad?'wrong':'';
@@ -2396,6 +2525,7 @@ function askView(){
   let fb='';
   if(st==='right')fb=`<div class="fb good" role="status">${SES.fbText}</div>`;
   else if(st==='retry')fb=`<div class="fb bad" role="status">Næsten. <span class="ex">${SES.fbText}</span></div>`;
+  else if(st==='wrong'&&q.kind==='def')fb=`<div class="fb ${SES.defG===1?'mid':'bad'}" role="status">${SES.fbText}</div><button class="big check" data-a="next" id="nx">Næste ord</button>`;
   else if(st==='wrong')fb=`<div class="fb bad" role="status">${q.art&&q.kind==='mc'?'Det rigtige svar er markeret med grønt.':`Det rigtige svar er ${showAnswer(q)}.`}${q.explain?`<span class="ex">${q.explain}</span>`:''}</div><button class="big check" data-a="next" id="nx">Næste opgave</button>`;
   const foto=q.foto&&TF.FOTO&&TF.FOTO[q.foto];
   const hasVis=q.visual||q.bigEmoji||foto;
@@ -2447,11 +2577,17 @@ function gardenView(){
   <div class="shop"><h2>Havecentret · du har ${S.seeds} frø</h2><div class="items">${items}</div></div>
   <div style="margin-top:14px"><button class="big alt" data-a="tohome">Tilbage til stien</button></div></div></div>`;
 }
+function defList(){
+  const d=(S.defs||[]).slice(0,15);
+  if(!d.length)return '';
+  const G=['✗ Nej','~ Næsten','✓ Ja'];
+  return `<div><h2>Egne forklaringer fra Ordbogen</h2><p class="note2">Barnet bedømmer selv sine forklaringer. Her kan du se, hvad der faktisk blev skrevet.</p><div class="ptwrap"><table class="ptab"><tr><th>Ord</th><th>Barnet skrev</th><th>Selv bedømt</th></tr>${d.map(x=>`<tr><td><b>${esc(x.w)}</b></td><td>${esc(x.a)}</td><td>${G[x.g]}</td></tr>`).join('')}</table></div></div>`;
+}
 function readProfile(){
   const R=S.rstat||{},TY=[['o','Ordenes betydning','Kender barnet ordene?'],['l','På linjen','Svaret står i teksten'],['m','Mellem linjerne','Svaret skal tænkes frem'],['b','Bag linjerne','Hvad vil teksten fortælle?']];
   const pc=k=>R[k]&&R[k].t?R[k].c/R[k].t:null;
   const total=TY.reduce((n,[k])=>n+(R[k]?R[k].t:0),0);
-  if(!total)return `<div><h2>Læseprofil</h2><p class="note2">Når barnet har lavet baner under Læsning, kan du her se, om det er ordene, det der står i teksten, eller det der står mellem linjerne, der driller.</p></div>`;
+  if(!total)return defList()+`<div><h2>Læseprofil</h2><p class="note2">Når barnet har lavet baner under Læsning, kan du her se, om det er ordene, det der står i teksten, eller det der står mellem linjerne, der driller.</p></div>`;
   const bars=TY.map(([k,nm,sub])=>{const p=pc(k),n=R[k]?R[k].t:0;return `<div class="rp"><div class="rp-h"><b>${nm}</b><small>${sub}</small></div><div class="rp-b"><i style="width:${p==null?0:Math.round(p*100)}%"></i></div><span class="rp-v">${p==null?'-':Math.round(p*100)+' %'}<small>${n} spm.</small></span></div>`}).join('');
   const o=pc('o'),l=pc('l'),m=pc('m'),enough=['o','l','m'].every(k=>R[k]&&R[k].t>=8);
   let say='Der skal mindst 8 spørgsmål af hver af de tre første typer til, før profilen siger noget sikkert.';
@@ -2462,7 +2598,7 @@ function readProfile(){
     else say='Ingen af typerne skiller sig ud. Gå videre til sværere niveauer og længere tekster.';
   }
   const words=(S.ordMiss||[]).slice(0,20);
-  return `<div><h2>Læseprofil</h2><div class="rpw">${bars}</div><p class="rp-say">${say}</p>${words.length?`<p class="note2"><b>Ord der drillede:</b> ${words.map(esc).join(', ')}</p>`:''}</div>`;
+  return `<div><h2>Læseprofil</h2><div class="rpw">${bars}</div><p class="rp-say">${say}</p>${words.length?`<p class="note2"><b>Ord der drillede:</b> ${words.map(esc).join(', ')}</p>`:''}</div>${defList()}`;
 }
 function parentsView(){
   if(!pg){
@@ -2542,6 +2678,7 @@ function act(a,v,el){
     case 'chk':{const i=$('#ans');if(i)answer(i.value);break}
     case 'next':next();break;
     case 'readdone':readDone();break;
+    case 'judge':judge(+v);break;
     case 'spk':{const q=cur();speak(q.speak.text,q.speak.lang);break}
     case 'opennext':modal={id:v};view='map';render();break;
     case 'retry':{const f=lastRes.lesson;startLesson(f,+v);break}
