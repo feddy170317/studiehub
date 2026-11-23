@@ -39,7 +39,7 @@ h1,h2,h3{font-family:var(--disp);font-weight:800;margin:0;line-height:1.15;text-
 .tbtn:hover{background:#eefbe5}
 
 /* Fag-faner */
-.tabs{max-width:1080px;margin:14px auto 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.tabs{max-width:1080px;margin:14px auto 0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
 .tab{--t:var(--leaf);background:#fff;border-radius:16px;padding:9px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;border:3px solid transparent;border-bottom-width:6px;border-bottom-color:#00000022;font-family:var(--disp);font-weight:700;font-size:15px;min-width:0}
 .tab .g{font-size:21px;font-weight:800;color:var(--t);height:26px;display:flex;align-items:center}
 .tab .g svg{width:26px;height:26px}
@@ -219,6 +219,24 @@ h1,h2,h3{font-family:var(--disp);font-weight:800;margin:0;line-height:1.15;text-
   .column{grid-template-columns:repeat(var(--w),32px);font-size:30px}
   .tab{font-size:13px}
   .vis .bars,.vis .line,.vis .rect,.vis .coord{width:100%}
+}
+/* Læsning */
+.read p{margin:0 0 .65em}.read p:last-child{margin-bottom:0}
+.read mark{background:#ffe27a;padding:0 4px;border-radius:5px;font-weight:700;color:inherit}
+.read.story{max-height:38vh;overflow:auto;position:relative;font-size:18px}
+.read.full{font-size:21px;line-height:1.7;max-width:60ch}
+.rtip{align-items:center}.rtip svg{width:56px;flex:none}
+.tag.rt{background:#efe4fb}.tag.rt-l{background:#dff0ff}.tag.rt-m{background:#e3f6df}.tag.rt-b{background:#fde5ef}
+.rpw{display:flex;flex-direction:column;gap:8px;max-width:560px}
+.rp{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) auto;gap:10px;align-items:center;background:#fff;border:2px solid #cfd8c9;border-radius:12px;padding:8px 10px}
+.rp-h b{display:block;font-size:15px}.rp-h small,.rp-v small{color:var(--muted);font-size:12px}
+.rp-b{height:12px;background:#eee7d6;border-radius:6px;overflow:hidden}.rp-b i{display:block;height:100%;background:#8a4fc7;border-radius:6px}
+.rp-v{font-family:var(--disp);font-weight:800;font-variant-numeric:tabular-nums;text-align:right;min-width:54px}.rp-v small{display:block;font-family:var(--body);font-weight:400}
+.rp-say{max-width:62ch;background:#fff4c9;border-radius:12px;padding:10px 12px;margin-top:8px}
+@media (max-width:520px){
+  .tabs{gap:5px}.tab{font-size:12px;padding:8px 2px}.tab small{font-size:11px}
+  .read.full{font-size:19px}.read.story{font-size:17px;max-height:34vh}
+  .rp{grid-template-columns:minmax(0,1fr) auto}.rp-b{grid-column:1/-1;grid-row:2}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.petal{display:none}}
 </style>
@@ -1254,14 +1272,611 @@ const laes=(L,t,seen)=>{
   return q.mc(y[0],y[1],y[2],{reading:x.t});
 };
 laes.pool=L=>LAES.filter(x=>x.d<=L).reduce((n,x)=>n+x.q.length,0);
+const laesText=(x,pi,of)=>shuffle(x.q).map((y,qi)=>Object.assign(q.mc(y[0],y[1],y[2],{reading:`<p>${x.t}</p>`,plain:`<p>${x.t}</p>`,story:{title:'Læs og forstå',part:pi,of}}),qi===0?{_first:true}:{}));
+const laesPick=(L,rand)=>{const a=LAES.filter(x=>x.d===L),b=LAES.filter(x=>x.d<L).reverse(),out=[];let n=0;for(const x of [...(rand?shuffle(a):a),...b]){if(n>=10)break;out.push(x);n+=x.q.length}return out};
+laes.build=L=>{const ts=laesPick(L,true);return ts.flatMap((x,i)=>laesText(x,i+1,ts.length))};
+laes.chunk=L=>laesText(pick(LAES.filter(x=>x.d<=Math.min(L,2))),0,0);
+laes.info=L=>{const ts=laesPick(L,false);return {parts:ts.length,qs:ts.reduce((n,x)=>n+x.q.length,0),words:ts.reduce((n,x)=>n+x.t.split(/\s+/).length,0),texts:true}};
 
-const u=(id,title,lessons)=>({id,title,lessons:lessons.map(([k,t,gen])=>({id:'d_'+k,title:t,gen}))});
+const u=(id,title,lessons)=>({id,title,lessons:lessons.map(([k,t,gen])=>({id:'d_'+k,title:t,gen,build:gen.build,chunk:gen.chunk,info:gen.info,story:!!gen.build}))});
 TF.subjects.push({id:'dan',name:'Dansk',short:'Dansk',color:'#2f62d6',glyph:'Aa',units:[
   u('d1','Bogstaver og lyde',[['vo','Vokaler og konsonanter',vokaler],['al','Alfabetet',alfabet],['ri','Rim',rim],['st','Stavelser',stavelser]]),
   u('d2','Stavning',[['sd','Stumt d',fra(STUMT)],['hv','Ord med hv',fra(HV)],['hj','Svære begyndelser',fra(HJ)],['do','Dobbelte bogstaver',fra(DOB)],['fa','Stavefælder',faelder],['sk','Skriv ordet',staveord]]),
   u('d3','Ordklasser og bøjning',[['ok','Ordklasser',ordklasser],['en','En eller et',enet],['fl','Flertal',flertal],['da','Datid',datid],['gr','Større og størst',grad]]),
   u('d4','Ord og sætninger',[['mo','Modsatte ord',modsat],['sy','Ord der ligner',synonym],['sa','Sammensatte ord',sammensat],['te','Tegn og store bogstaver',tegn]]),
   u('d5','Læs og forstå',[['la','Læs og svar',laes]]),
+]});
+})();
+
+/* Læsning: H.C. Andersens eventyr genfortalt i tre sværhedsgrader + ordforståelse.
+   Spørgsmålstyper: o = ordets betydning, l = på linjen, m = mellem linjerne, b = bag linjerne.
+   Spørgsmål: [type, spørgsmål, rigtigt, forkert, forkert, forkert, forklaring?]
+   Typen 'o:ord' markerer ordet i teksten; tomt spørgsmål giver »Hvad betyder ordet her?«. */
+(function(){
+const {pick,shuffle,q}=TF;
+
+const TYPE=TF.RTYPE={
+  o:{tag:'🔤 Ordet',hint:'Læs sætningen med ordet igen. Hvilket svar giver mening lige dér?'},
+  l:{tag:'📖 På linjen',hint:'Kig i teksten igen. Svaret står der.'},
+  m:{tag:'🔍 Mellem linjerne',hint:'Svaret står ikke direkte. Tænk over det, der sker i teksten.'},
+  b:{tag:'💭 Bag linjerne',hint:'Tænk over, hvad historien gerne vil fortælle os.'},
+};
+const reEsc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+const findRe=w=>new RegExp('(^|[^\\p{L}])('+reEsc(w)+')(?=[^\\p{L}]|$)','iu');
+const mark=(text,w)=>text.replace(findRe(w),'$1<mark>$2</mark>');
+TF.hasWord=(text,w)=>findRe(w).test(text);
+const para=t=>t.trim().split(/\n+/).map(p=>`<p>${p.trim()}</p>`).join('');
+
+function mk(text,it){
+  const [typ,prompt,right,a,b,c,explain]=it;
+  const [t,word]=typ.split(':');
+  const pr=prompt||`Hvad betyder <b>${word}</b> her?`;
+  return q.mc(pr,right,[a,b,c],{reading:para(word?mark(text,word):text),plain:para(text),rtype:t,word:word||'',hint:TYPE[t].hint,explain:explain||(t==='l'?'Svaret står i teksten. Find stedet, og læs det igen.':'')});
+}
+
+/* Et eventyr: levels = {1:[[tekst,[spørgsmål]]...],2:...,3:...} */
+function tale(id,title,levels){
+  const part=(ps,pi)=>shuffle(ps[pi][1]).map((it,qi)=>{
+    const x=mk(ps[pi][0],it);
+    x.story={title,part:pi+1,of:ps.length};
+    if(qi===0)x._first=true;
+    return x;
+  });
+  const build=L=>levels[L].flatMap((p,pi)=>part(levels[L],pi));
+  /* En hel del til Kæmpeblomsten og blandingen: Let- eller Middel-tekst med alle dens spørgsmål */
+  const chunk=L=>{const k=Math.min(L,2),ps=levels[k],pi=Math.floor(Math.random()*ps.length);return part(ps,pi).map(x=>(x.story.of=0,x))};
+  /* Enkeltspørgsmål til Kæmpeblomsten og blandingen: kun Let- og Middel-tekster */
+  const gen=(L,t,seen)=>{
+    const all=[];
+    for(let k=1;k<=Math.min(L,2);k++)levels[k].forEach(p=>p[1].forEach(it=>all.push([p[0],it])));
+    const fresh=all.filter(([,it])=>!seen||!seen.has(it[1]||`Hvad betyder <b>${it[0].split(':')[1]}</b> her?`));
+    const [text,it]=pick(fresh.length?fresh:all);
+    const x=mk(text,it);x.story={title,part:0,of:0};
+    return x;
+  };
+  const info=L=>({parts:levels[L].length,qs:levels[L].reduce((n,p)=>n+p[1].length,0),words:levels[L].reduce((n,p)=>n+p[0].split(/\s+/).filter(Boolean).length,0)});
+  return {id:'l_'+id,title,gen,build,chunk,info,levels,story:true};
+}
+
+/* ---------- Eventyrene ---------- */
+const TALES=[
+tale('prins','Prinsessen på ærten',{
+1:[
+[`Der var engang en prins, som gerne ville giftes. Men han ville kun have en rigtig prinsesse. Han rejste hele verden rundt for at finde hende. Men han fandt ingen, som var rigtig nok.`,[
+ ['l','Hvad ville prinsen gerne?','Giftes med en prinsesse','Være konge i et andet land','Bygge et nyt slot','Lære at ride på hest'],
+ ['l','Hvad slags prinsesse ville han have?','En rigtig prinsesse','En rig prinsesse','En sjov prinsesse','En lille prinsesse'],
+ ['l','Hvor rejste prinsen hen?','Hele verden rundt','Hjem til sin mor','Ud i den mørke skov','Ned til stranden'],
+ ['o:rejste','','Tog på en lang tur','Stod op fra stolen','Gik tidligt i seng','Sang en høj sang','At rejse er at tage langt væk. Ordet kan også betyde at stå op, men her rejser prinsen jorden rundt.'],
+]],
+[`En aften kom der et frygteligt uvejr. Det tordnede og regnede. Pludselig bankede det på byporten. Udenfor stod en prinsesse. Vandet løb ud af hendes hår og ned i hendes sko.`,[
+ ['l','Hvordan var vejret?','Det tordnede og regnede','Solen skinnede varmt','Det sneede hele dagen','Det var helt stille'],
+ ['l','Hvem stod uden for porten?','En prinsesse','En prins','En gammel heks','En soldat'],
+ ['o:frygteligt','','Meget slemt','Meget smukt','Lidt koldt','Helt stille','Frygteligt betyder meget slemt. Det er noget, man kan blive bange for.'],
+ ['m','Hvordan så prinsessen ud?','Hun var helt våd','Hun var meget fin','Hun var helt tør','Hun var meget glad','Der står, at vandet løb ud af hendes hår. Så var hun våd.'],
+]],
+[`Dronningen ville teste prinsessen. Hun lagde en lille ært i bunden af sengen. Ovenpå lagde hun tyve madrasser. Om morgenen sagde prinsessen: »Jeg har næsten ikke sovet. Der lå noget hårdt i sengen!«`,[
+ ['l','Hvad lagde dronningen i sengen?','En ært','En sten','En nøgle','En bog'],
+ ['l','Hvor mange madrasser lå der?','Tyve','To','Ti','Hundrede'],
+ ['m','Hvorfor kunne prinsessen ikke sove?','Hun kunne mærke ærten','Hun var bange for uvejret','Sengen var alt for kort','Hun var meget sulten','Der lå noget hårdt i sengen. Det var ærten under madrasserne.'],
+ ['o:teste','','Prøve, om noget er sandt','Give en flot gave til','Gemme noget langt væk','Lege en rigtig sjov leg med','At teste er at prøve noget af for at finde ud af, om det passer.'],
+]],
+],
+2:[
+[`Der var engang en prins, som ville giftes med en prinsesse. Men det skulle være en rigtig prinsesse. Han rejste hele verden rundt for at finde en. Prinsesser var der nok af, men der var altid noget, som ikke var helt rigtigt. Nogle var for strenge, og andre var for kedelige. Til sidst tog han hjem til slottet igen. Han var meget bedrøvet, for han ønskede sig så inderligt en rigtig prinsesse.`,[
+ ['l','Hvorfor rejste prinsen rundt i verden?','For at finde en rigtig prinsesse','For at finde en gammel skat','For at se andre landes slotte','For at lære at kæmpe med sværd'],
+ ['m','Hvad skete der først i teksten?','Prinsen rejste verden rundt','Prinsen kom hjem igen','Prinsen blev meget bedrøvet','Prinsen fandt en prinsesse','Først rejste han ud. Bagefter kom han hjem og var bedrøvet. Han fandt ingen på rejsen.'],
+ ['o:bedrøvet','','Trist og ked af det','Træt og meget søvnig','Sur og vred på alle','Glad og stolt','Bedrøvet betyder trist. Prinsen havde ikke fundet det, han ledte efter.'],
+ ['m','Hvorfor blev prinsen ikke gift på sin rejse?','Ingen af dem var helt rigtige','Der fandtes ingen prinsesser','Prinsesserne var bange for ham','Han ledte de forkerte steder','Der var nok af prinsesser, men der var altid noget, som ikke var helt rigtigt.'],
+ ['o:inderligt','','Af hele sit hjerte','Bare en lille smule','Kun om aftenen','Uden at tænke over det','Når man ønsker sig noget inderligt, ønsker man det rigtig, rigtig meget.'],
+]],
+[`En aften kom der et forfærdeligt uvejr. Det lynede og tordnede, og regnen styrtede ned. Det var helt uhyggeligt. Så bankede det på byporten, og den gamle konge gik selv ud for at lukke op. Uden for stod en prinsesse. Men sikke hun så ud i regnen! Vandet løb ned ad hendes hår og hendes tøj. Det løb ind i snuden på skoene og ud ad hælen. Alligevel sagde hun, at hun var en rigtig prinsesse.`,[
+ ['l','Hvem lukkede op for prinsessen?','Den gamle konge','Den unge prins','Den gamle dronning','En af tjenerne'],
+ ['m','Hvorfor står der: »Men sikke hun så ud i regnen!«?','Hun så helt forfærdelig ud','Hun så meget fin og pæn ud','Hun havde en flot krone på','Hun var meget lille og tynd','»Sikke hun så ud« siger man, når nogen ser forkerte eller mærkelige ud. Hun var gennemblødt.'],
+ ['o:uhyggeligt','','Så man kunne blive bange','Så man kunne blive glad','Så man kunne blive sulten','Så man kunne blive træt','Uhyggeligt er noget, der gør en lidt bange, fx et voldsomt uvejr om aftenen.'],
+ ['m','Hvorfor var det svært at tro, at hun var en prinsesse?','Hun lignede slet ikke en prinsesse','Hun havde en stor krone på','Hun kom kørende i en guldvogn','Hun sagde ikke et ord til kongen','En prinsesse plejer at være fin. Hun var gennemblødt og så ikke spor fin ud.'],
+ ['o:alligevel','','Selvom det så anderledes ud','Fordi hun var træt og sulten','Lige med det samme','Bagefter om morgenen','Alligevel betyder: selvom noget taler imod det. Hun så ikke fin ud, men sagde det alligevel.'],
+]],
+[`»Det skal vi nok finde ud af,« tænkte den gamle dronning. Men hun sagde ingenting. Hun gik ind i soveværelset og tog alt tøjet af sengen. På bunden lagde hun en lille ært. Ovenpå lagde hun tyve madrasser og tyve dyner. Der skulle prinsessen sove. Om morgenen spurgte de, hvordan hun havde sovet. »Åh, forfærdeligt!« sagde prinsessen. »Jeg har ligget på noget hårdt, så jeg er helt brun og blå over hele kroppen!« Så kunne de se, at hun var en rigtig prinsesse. Kun en rigtig prinsesse kunne være så fintfølende. Prinsen tog hende til kone, og ærten kom på museum.`,[
+ ['m','Hvad ville der være sket, hvis prinsessen havde sovet godt?','De ville tro, hun ikke var ægte','De ville give hende en krone','Prinsen ville blive rigtig glad','Ærten ville komme på museum','Prøven gik ud på at mærke ærten. Hvis hun sov godt, havde hun ikke mærket den.'],
+ ['m','Hvorfor sagde dronningen ingenting?','Prøven skulle være hemmelig','Hun var for træt til at tale','Hun kunne ikke lide prinsessen','Hun havde travlt med kongen','Hvis prinsessen vidste, at der lå en ært, ville prøven ikke virke.'],
+ ['o:fintfølende','','Mærker selv små ting','Går i meget pænt tøj','Ejer mange dyre ting','Er god til at synge','At være fintfølende er at kunne mærke selv meget små ting, som en ært under tyve madrasser.'],
+ ['l','Hvad skete der med ærten til sidst?','Den kom på museum','Den blev spist','Den blev smidt ud','Den blev plantet'],
+ ['m','Hvordan kunne de se, at hun var en rigtig prinsesse?','Hun mærkede ærten','Hun havde en krone','Hun sov meget længe','Hun takkede pænt','Hun kunne mærke den lille ært gennem alle madrasserne. Det var hele prøven.'],
+]],
+],
+3:[
+[`Der var engang en prins, som gerne ville have sig en prinsesse. Men det skulle være en rigtig prinsesse, en ægte en af slagsen. Så han rejste hele verden rundt for at finde en, men overalt var der noget i vejen. Prinsesser var der nok af, men om de var rigtige prinsesser, kunne han ikke rigtig finde ud af. Der var altid et eller andet, som ikke var helt, som det skulle være. Den ene snakkede for meget, og den anden grinede aldrig. Så kom han hjem igen og var så bedrøvet, for han ville så gerne have en rigtig prinsesse.
+En aften blev det et forfærdeligt uvejr. Det lynede og tordnede, og regnen skyllede ned. Det var ganske frygteligt. Så bankede det på byporten, og den gamle konge gik hen for at lukke op. Det var en prinsesse, som stod udenfor. Men du store, hvor hun så ud af regnen og det onde vejr! Vandet løb ned ad hendes hår og hendes klæder. Det løb ind ad snuden på skoene og ud ad hælen. Og så sagde hun, at hun var en rigtig prinsesse. Kongen kiggede tvivlende på hende. Kunne det virkelig være sandt?`,[
+ ['o:ægte','','Rigtig og ikke falsk','Meget gammel og slidt','Meget rig og fin','Helt ny og blank','Ægte betyder, at noget er det, det siger, det er. Det modsatte er falsk.'],
+ ['m','Hvorfor kunne prinsen ikke finde en rigtig prinsesse?','Han kunne ikke se, om de var ægte','Der fandtes ingen prinsesser','Prinsesserne ville ikke møde ham','Han rejste de forkerte steder hen','Der var nok af prinsesser, men han kunne ikke finde ud af, om de var rigtige.'],
+ ['l','Hvad var der galt med en af prinsesserne?','Hun snakkede for meget','Hun spiste for meget','Hun sang for højt','Hun sov for længe'],
+ ['o:tvivlende','','Uden helt at tro på det','Med et meget stort smil','Med tårer i begge øjne','Uden at kunne se noget','Når man er i tvivl, er man ikke sikker. Kongen var ikke sikker på, at hun talte sandt.'],
+ ['m','Hvorfor troede kongen nok ikke på hende?','Hun så slet ikke fin ud','Hun talte et andet sprog','Hun var alt for gammel','Hun kom midt om dagen','Hun var gennemblødt af regn. Sådan ser man ikke en prinsesse for sig.'],
+ ['b','Teksten slutter med: »Kunne det virkelig være sandt?« Hvorfor spørger fortælleren sådan?','Så vi bliver spændte på resten','Fordi han har glemt historien','Fordi kongen ikke kan høre godt','Så vi kan svare ham højt','Et spørgsmål til sidst gør os nysgerrige. Vi vil gerne vide, om hun er en rigtig prinsesse.'],
+ ['m','Hvordan havde prinsen det, da han kom hjem?','Han var ked af det','Han var glad og stolt','Han var sur på kongen','Han var bange for uvejret','Der står, at han var bedrøvet. Bedrøvet betyder trist.'],
+ ['o:uvejr','','Storm med lyn og regn','Et varmt og stille vejr','Let sne om morgenen','En tæt og grå tåge','Uvejr er meget dårligt vejr. I teksten lyner, tordner og regner det.'],
+]],
+[`»Ja, det skal vi nok få at se!« tænkte den gamle dronning. Men hun sagde ikke et ord. Hun gik ind i sovekammeret og tog alle sengeklæderne af. Så lagde hun en ært på bunden af sengen. Derefter tog hun tyve madrasser og lagde dem oven på ærten. Og oven på madrasserne lagde hun tyve dyner af de blødeste fjer. Dér skulle prinsessen ligge om natten.
+Om morgenen spurgte de hende, hvordan hun havde sovet.
+»Åh, forfærdelig dårligt!« sagde prinsessen. »Jeg har næsten ikke lukket mine øjne hele natten! Hvem ved, hvad der har været i sengen? Jeg har ligget på noget hårdt, så jeg er helt brun og blå over hele min krop. Det er ganske forfærdeligt!«
+Nu kunne de se, at hun var en rigtig prinsesse. Hun havde jo mærket ærten igennem de tyve madrasser og de tyve dyner. Så fintfølende kunne ingen andre end en rigtig prinsesse være.
+Prinsen tog hende til kone, for nu vidste han, at han havde en rigtig prinsesse. Ærten kom på kunstkammeret, hvor den endnu kan ses, hvis ingen har taget den. Se, det var en rigtig historie!`,[
+ ['m','Hvorfor fortalte dronningen ikke nogen om ærten?','Så ingen kunne snyde i prøven','Fordi hun havde glemt den','Fordi kongen lå syg i sengen','Så ærten ikke blev spist','Hvis prinsessen vidste det, kunne hun bare sige, at hun havde sovet dårligt.'],
+ ['m','Hvorfor lagde dronningen så meget oven på ærten?','Så det blev en svær prøve','Så sengen blev pæn','Så prinsessen ikke frøs','Så ærten ikke blev væk','Jo mere der lå ovenpå, jo sværere var det at mærke ærten. Kun en rigtig prinsesse kunne klare det.'],
+ ['o:sovekammeret','','Rummet, hvor man sover','Rummet, hvor man laver mad','Rummet, hvor man spiser','Rummet, hvor man bader','Et kammer er et gammelt ord for et værelse. Et sovekammer er et soveværelse.'],
+ ['l','Hvordan havde prinsessen sovet?','Forfærdelig dårligt','Rigtig godt og trygt','Helt fint','Længe og dejligt'],
+ ['o:lukket mine øjne','Prinsessen siger: »Jeg har næsten ikke <b>lukket mine øjne</b>.« Hvad mener hun?','Hun har næsten ikke sovet','Hun har haft ondt i øjnene','Hun har grædt hele natten','Hun har kigget ud af vinduet','Man lukker øjnene, når man sover. Hun mener, at hun næsten ikke har sovet.'],
+ ['m','Hvorfor var prinsessen brun og blå?','Ærten havde trykket hende','Hun var faldet ud af sengen','Hun havde fået maling på','Hun havde frosset hele natten','Brun og blå betyder, at man har blå mærker. Den hårde ært havde trykket hende hele natten.'],
+ ['b','Ærten kan stadig ses, »hvis ingen har taget den«. Hvad mener fortælleren?','Han ved ikke, om den er der endnu','Ærten er blevet til et stort træ','Ærten er lavet af det rene guld','Alle må tage ærten med hjem','Fortælleren laver lidt sjov. Han ved ikke, om nogen har taget ærten.'],
+ ['m','Hvorfor var prinsen glad til sidst?','Han fandt en ægte prinsesse','Han fik lov at beholde ærten','Uvejret var endelig forbi','Dronningen gav ham et slot','Prinsen havde ledt efter en rigtig prinsesse hele tiden. Nu havde han fundet hende.'],
+]],
+]}),
+
+tale('kejser','Kejserens nye klæder',{
+1:[
+[`For mange år siden levede en kejser. Han elskede nyt tøj. Han brugte alle sine penge på at være fin. Han skiftede tøj hver eneste time.`,[
+ ['l','Hvad elskede kejseren?','Nyt tøj','God mad','Store heste','Gamle bøger'],
+ ['l','Hvad brugte han sine penge på?','At være fin','At bygge slotte','At købe slik','At hjælpe de fattige'],
+ ['l','Hvor tit skiftede han tøj?','Hver time','Hver uge','Hver morgen','Hver måned'],
+ ['o:skiftede','','Tog noget andet på','Vaskede sit tøj rent','Syede nyt tøj','Smed tøjet ud','At skifte tøj er at tage noget andet tøj på.'],
+]],
+[`En dag kom to snydere til byen. De sagde, at de kunne væve det flotteste stof. Stoffet havde en hemmelighed. Hvis man var dum, kunne man ikke se det.`,[
+ ['l','Hvem kom til byen?','To snydere','To prinser','To soldater','To bagere'],
+ ['l','Hvad sagde de, at de kunne?','Væve flot stof','Bygge et slot','Bage store kager','Synge smukke sange'],
+ ['o:snydere','','Folk, der narrer andre','Folk, der syr fint tøj','Folk, der sælger fisk','Folk, der passer på dyr','En snyder lyver for at få noget, fx penge.'],
+ ['l','Hvem kunne ikke se stoffet?','Dem, der var dumme','Dem, der var små','Dem, der var gamle','Dem, der var syge'],
+]],
+[`Kejseren gik gennem byen i sit nye tøj. Alle råbte, at det var flot. Så sagde et lille barn: »Men han har jo ikke noget på!«`,[
+ ['l','Hvem sagde sandheden?','Et lille barn','En gammel mand','Kejserens mor','En soldat'],
+ ['m','Hvorfor sagde de voksne, at tøjet var flot?','De ville ikke virke dumme','De kunne godt se tøjet','De var kejserens venner','De havde selv lavet det','Hvis man ikke kunne se stoffet, var man dum. Det ville ingen indrømme.'],
+ ['l','Hvad sagde barnet om kejseren?','Han har ikke noget på','Han har en rød kappe på','Han har en guldkrone på','Han har sin pyjamas på'],
+ ['o:råbte','','Sagde det højt','Hviskede stille','Græd længe','Grinede lidt','At råbe er at sige noget meget højt.'],
+]],
+],
+2:[
+[`For mange år siden levede der en kejser, som holdt så meget af nyt tøj, at han brugte alle sine penge på at blive pyntet. Han brød sig ikke om sine soldater, og han kørte kun ud for at vise sit nye tøj frem. Han havde en kjole for hver time på dagen. Om andre konger sagde man: »Kongen er i rådet.« Men om ham sagde man altid: »Kejseren er i garderoben!«`,[
+ ['l','Hvad brugte kejseren sine penge på?','At blive pyntet','At passe sine soldater','At bygge nye veje','At købe mad til folket'],
+ ['o:kjole','I teksten har kejseren en <b>kjole</b> for hver time. Hvad er en kjole her?','En fin, lang jakke','En pigekjole med blomster','En stor krone af guld','Et tæppe til sengen','I gamle dage var en kjole også en lang, fin jakke til mænd.'],
+ ['o:garderoben','','Stedet, hvor tøjet hænger','Stedet, hvor man laver mad','Stedet, hvor hestene står','Stedet, hvor man sover','En garderobe er et skab eller et rum til tøj.'],
+ ['m','Hvorfor sagde folk, at kejseren var i garderoben?','Han tænkte altid på tøj','Han gemte sig for soldaterne','Han boede i et lille skab','Han var bange for mørke','Andre konger arbejdede i rådet. Kejseren var altid optaget af sit tøj.'],
+ ['m','Hvad var vigtigst for kejseren?','At se fin ud','At passe godt på landet','At være god ved soldaterne','At holde møder i rådet','Han brugte alle pengene på tøj og brød sig ikke om soldaterne.'],
+]],
+[`En dag kom der to bedragere til byen. De sagde, at de var vævere og kunne væve det dejligste stof, man kunne tænke sig. Men stoffet havde en underlig egenskab. Det var usynligt for alle, som var dumme, eller som ikke passede til deres arbejde. »Det er noget for mig,« tænkte kejseren. »Så kan jeg se, hvem der er kloge, og hvem der er dumme!« Han gav straks de to bedragere en masse penge, så de kunne begynde.`,[
+ ['l','Hvad sagde de to mænd, at de var?','Vævere','Bagere','Soldater','Konger'],
+ ['o:usynligt','','Noget, man ikke kan se','Noget, man ikke kan røre','Noget, der er meget tungt','Noget, der er meget dyrt','Usynligt betyder, at man ikke kan se det.'],
+ ['m','Hvorfor ville kejseren have stoffet?','Han ville se, hvem der var dumme','Han ville give det til sin mor','Han ville sælge det for mange penge','Han ville bruge det som gardiner','Kejseren tænkte: »Så kan jeg se, hvem der er kloge, og hvem der er dumme.«'],
+ ['o:bedragere','','Folk, der snyder andre','Folk, der bygger huse','Folk, der kører vogn','Folk, der laver mad','En bedrager er en, der snyder og lyver for at få noget.'],
+ ['m','Hvad ville de to mænd egentlig have?','Kejserens penge','Et nyt arbejde','En plads i hæren','Kejserens slot','De var bedragere. De ville snyde kejseren for hans penge.'],
+]],
+[`Så gik kejseren i optog gennem byen. Alle folk på gaden og i vinduerne råbte: »Hvor er kejserens nye klæder smukke!« Ingen ville lade sig mærke med, at de intet kunne se. For så var de jo dumme. »Men han har jo ikke noget på!« sagde et lille barn. Den ene hviskede til den anden, hvad barnet havde sagt. Til sidst råbte hele folket: »Han har ikke noget på!« Det gav et sæt i kejseren, for han syntes, de havde ret. Men han tænkte: »Nu må jeg holde optoget ud.« Og så gik han endnu mere stolt videre.`,[
+ ['l','Hvad råbte folk først?','At klæderne var smukke','At kejseren var nøgen','At de var meget sultne','At det snart ville regne'],
+ ['o:optog','','Et festligt tog gennem byen','Et tog, der kører på skinner','Et stort måltid mad','En leg ude i skolegården','Et optog er mange mennesker, der går i en lang række gennem byen.'],
+ ['m','Hvorfor ville ingen sige, at de ikke kunne se tøjet?','De ville ikke virke dumme','De var bange for regnen','De havde meget travlt','De kunne godt se det','Hvis man ikke kunne se stoffet, var man dum. Det ville ingen indrømme.'],
+ ['m','Hvad skete der, efter barnet havde talt?','Til sidst råbte hele folket det','Kejseren gik straks hjem igen','Folk blev vrede på barnet','Væverne kom tilbage til byen','Først hviskede folk det til hinanden. Til sidst råbte hele folket: »Han har ikke noget på!«'],
+ ['b','Hvorfor tror du, det var et barn, der sagde sandheden?','Børn siger det, de ser','Børn kan se usynlige ting','Børn kan ikke lide kejsere','Børn råber altid meget højt','Barnet var ikke bange for at virke dumt. Det sagde bare det, det så.'],
+]],
+],
+3:[
+[`For mange år siden levede der en kejser, som var så forfængelig, at han brugte alle sine penge på nyt tøj. Han brød sig hverken om sine soldater eller om teatret. Han kørte kun en tur i skoven for at vise sine nye klæder frem.
+I den store by, hvor han boede, gik det meget livligt til. Hver dag kom der mange fremmede. En dag kom der to bedragere. De udgav sig for at være vævere og sagde, at de kunne væve det dejligste stof, man kunne forestille sig. Farverne og mønstret var usædvanlig smukke. Men klæderne havde også den forunderlige egenskab, at de var usynlige for ethvert menneske, som var meget dum, eller som ikke passede til sit embede.
+»Det var jo nogle dejlige klæder,« tænkte kejseren. »Hvis jeg havde dem på, kunne jeg finde ud af, hvem i mit rige der ikke passer til deres embede!« Han gav de to bedragere mange penge på hånden. De stillede to væve op og lod, som om de arbejdede. Men de havde slet ikke noget på vævene. De forlangte den fineste silke og det prægtigste guld, men det puttede de i deres egen taske.`,[
+ ['o:forfængelig','','Optaget af at se flot ud','Bange for at gå udenfor','God til at styre et land','Glad for at give gaver','En forfængelig person tænker meget på, hvordan han ser ud.'],
+ ['m','Hvorfor var det let at narre netop denne kejser med tøj?','Han elskede tøj mere end noget andet','Han havde slet ingen penge tilbage','Han kunne ikke lide stærke farver','Han var den klogeste i hele landet','Kejseren var forfængelig og brugte alle pengene på tøj. Derfor ville han gerne tro på de fine klæder.'],
+ ['o:udgav sig for','De to mænd <b>udgav sig for</b> at være vævere. Hvad betyder det?','De lod, som om de var det','De var rigtig gode til det','De skrev en bog om det','De glemte, at de var det','At udgive sig for noget er at lade, som om man er noget, man ikke er.'],
+ ['l','Hvem kunne ikke se klæderne?','Dem, der var meget dumme','Dem, der var meget gamle','Dem, der var meget rige','Dem, der var meget små'],
+ ['o:embede','','Det arbejde, man har','Det hus, man bor i','Den familie, man har','Det tøj, man går i','Embede er et gammelt ord for et vigtigt arbejde, fx at være minister.'],
+ ['m','Hvordan kan man vide, at de to mænd snød?','De puttede guldet i tasken','De arbejdede hele natten','De var gode til at væve','De kom fra et fremmed land','De lod, som om de vævede, men der var ingenting på vævene. Silken og guldet tog de selv.'],
+ ['m','Hvorfor gav kejseren dem mange penge?','Han ville have klæderne','Han syntes, de var fattige','De havde vundet en pris','Han skyldte dem penge','Kejseren ville gerne have de usynlige klæder og se, hvem der var dumme.'],
+]],
+[`Kejseren ville gerne se stoffet. Han sendte først sin gamle, ærlige minister. Ministeren spærrede øjnene op, for han kunne ikke se noget. »Er jeg dum?« tænkte han. »Det må ingen få at vide!« Så han roste stoffet og lovede at fortælle kejseren, hvor smukt det var.
+Til sidst kom kejseren selv. »Hvad for noget!« tænkte han. »Jeg kan ikke se noget! Er jeg dum? Duer jeg ikke til at være kejser?« Men højt sagde han: »Det er meget smukt!« Hele hans følge sagde det samme, selvom ingen af dem kunne se det mindste.
+Så gik kejseren i optog gennem byen, og alle folk råbte, at klæderne var pragtfulde. Ingen ville lade sig mærke med, at de intet så.
+»Men han har jo ikke noget på!« sagde et lille barn. »Hør, hvad den uskyldige siger!« sagde faderen. Og den ene hviskede til den anden, hvad barnet sagde. »Han har ikke noget på!« råbte til sidst hele folket. Det krøb i kejseren, for han syntes, de havde ret. Men han tænkte: »Nu må jeg holde optoget ud.« Og så holdt han sig endnu mere stolt, og kammerherrerne gik og bar på slæbet, som slet ikke var der.`,[
+ ['m','Hvad har ministeren og kejseren til fælles?','Begge løj om stoffet','Begge kunne se stoffet','Begge var dygtige vævere','Begge var bange for barnet','Ingen af dem kunne se noget, men begge sagde, at stoffet var smukt.'],
+ ['o:spærrede øjnene op','','Åbnede øjnene helt op','Lukkede øjnene i','Gned sig i øjnene','Blinkede med øjnene','Man spærrer øjnene op, når man bliver meget overrasket.'],
+ ['m','Hvorfor løj ministeren?','Han ville ikke virke dum','Han ville selv have stoffet','Han ville gøre kejseren glad','Han kunne godt se stoffet','Ministeren tænkte: »Er jeg dum? Det må ingen få at vide!«'],
+ ['m','Kejseren tænker »Jeg kan ikke se noget!«, men siger »Det er meget smukt!«. Hvorfor?','Han tør ikke sige sandheden','Han har glemt, hvad han ville','Han vil gøre væverne kede af det','Han kan godt se lidt af stoffet','Han vil ikke indrømme, at han ikke kan se stoffet. Så ville alle tro, at han var dum.'],
+ ['o:følge','','Folk, der går med ham','Det, der sker bagefter','En hest, han rider på','En fest, han holder','Et følge er de mennesker, der går sammen med en konge eller kejser.'],
+ ['o:uskyldige','Faderen siger: »Hør, hvad den <b>uskyldige</b> siger!« Hvem er den uskyldige?','Barnet, der siger sandheden','Kejseren, der går uden tøj','Ministeren, der lyver','Væveren, der stjæler guldet','Uskyldig betyder, at man ikke har gjort noget forkert. Barnet lyver ikke og vil ikke snyde nogen.'],
+ ['m','Hvorfor gik kejseren videre, selvom folket havde ret?','Han turde ikke indrømme det','Han frøs ikke det mindste','Han kunne ikke høre folket','Han ville gerne hjem i seng','Kejseren ville ikke vise, at han var blevet snydt. Så han holdt sig endnu mere stolt.'],
+ ['b','Hvad kan man lære af eventyret?','Man skal turde sige sandheden','Man skal altid købe nyt tøj','Man skal ikke gå ud om dagen','Man skal altid gøre som de voksne','Alle de voksne løj, fordi de var bange. Kun barnet turde sige, hvad det så.'],
+]],
+]}),
+
+tale('aelling','Den grimme ælling',{
+1:[
+[`Det var sommer på landet. En andemor lå på sine æg. Endelig revnede de, og små ællinger kom ud. Men et æg var større end de andre.`,[
+ ['l','Hvad lå andemor på?','Sine æg','Nogle sten','En stor bold','Noget brød'],
+ ['l','Hvilken årstid var det?','Sommer','Vinter','Efterår','Forår'],
+ ['o:revnede','','Gik i stykker','Blev meget varme','Blev større og større','Trillede væk','Når et æg revner, får det sprækker og går i stykker, så ællingen kan komme ud.'],
+ ['l','Hvad var der særligt ved det sidste æg?','Det var større','Det var blåt','Det var mindre','Det var af guld'],
+]],
+[`Til sidst kom der en stor, grå ælling ud. Den var meget grim. De andre dyr bed den og skubbede til den. Selv dens søskende var onde ved den.`,[
+ ['l','Hvilken farve havde den sidste ælling?','Grå','Gul','Hvid','Sort'],
+ ['l','Hvad gjorde de andre dyr?','Bed og skubbede den','Legede godt med den','Gav den mad og vand','Sang for den'],
+ ['m','Hvordan havde ællingen det?','Den var ked af det','Den var glad og fri','Den var stolt','Den var sur på dem','Når alle bider og skubber en, bliver man ked af det.'],
+ ['o:søskende','','Brødre og søstre','Mor og far','Venner fra skolen','Naboer i byen','Søskende er ens brødre og søstre.'],
+]],
+[`Ællingen løb væk. Den var alene hele vinteren. Om foråret så den nogle smukke, hvide fugle. Den kiggede ned i vandet. Nu var den selv en smuk svane!`,[
+ ['l','Hvor længe var ællingen alene?','Hele vinteren','En enkelt dag','Hele sommeren','En time'],
+ ['l','Hvad så den om foråret?','Smukke, hvide fugle','En stor, sort hund','En lille pige','Et skib på havet'],
+ ['m','Hvordan kunne ællingen se, at den var en svane?','Den så sig selv i vandet','En fugl fortalte den det','Den kunne flyve højt','Den fik en krone på','Den kiggede ned i vandet og så sit eget spejlbillede.'],
+ ['o:alene','','Uden nogen andre','Med mange venner','Sammen med sin mor','Med alle svanerne','At være alene er at være uden andre.'],
+]],
+],
+2:[
+[`Det var så dejligt ude på landet. Det var sommer, og kornet stod gult. I solskinnet lå en gammel gård, og ved gården var der en lille sø. Her lå en and på sin rede. Hun skulle ruge sine ællinger ud, men hun var ved at være træt af det. Det tog så lang tid, og hun fik næsten aldrig besøg. Endelig knagede det ene æg efter det andet. »Pip! Pip!« sagde det, og så stak de små hovedet frem.`,[
+ ['l','Hvor lå anden?','På sin rede ved søen','Inde i den gamle gård','Midt ude i kornmarken','På stranden ved havet'],
+ ['o:ruge','','Sidde og varme æggene','Gemme æggene i græsset','Male æggene i farver','Bære æggene hen til søen','At ruge er at ligge på æggene, så de holdes varme, til ungerne kommer ud.'],
+ ['l','Hvorfor var anden træt af at ruge?','Det tog lang tid','Hun var meget sulten','Hun ville ud at svømme','Æggene var for kolde'],
+ ['o:knagede','','Gav et lille knæk','Blev helt stille','Trillede rundt','Blev varmt','Det knager, når noget hårdt begynder at gå i stykker. Æggeskallen knækker.'],
+ ['m','Hvordan ved man, at ællingerne kom ud af æggene?','Æggene knagede, og det sagde pip','Anden fortalte det til de andre','Kornet stod gult ude på marken','Anden blev træt af at ruge','Først knagede æggene. Så sagde det pip, og de små hoveder kom frem.'],
+]],
+[`Men det største æg lå der endnu. Anden lagde sig igen. Endelig revnede det. »Pip! Pip!« sagde den lille og væltede ud. Den var så stor og grim. Anden så på den. »Det er da en forfærdelig stor ælling,« sagde hun. »Ingen af de andre ser sådan ud.« I andegården blev ællingen bidt, puffet og gjort nar ad. Hønsene huggede efter den, og pigen, som fodrede dyrene, sparkede til den. »Gid du var langt borte!« sagde selv dens søskende.`,[
+ ['l','Hvad sagde anden om den nye ælling?','Den er forfærdelig stor','Den er meget sød og blød','Den er bitte lille','Den er flot, gul og fin'],
+ ['o:gjort nar ad','','Drillet og grinet af','Klappet og nusset','Fodret og vasket','Hjulpet og trøstet','At gøre nar ad nogen er at drille og grine ad dem.'],
+ ['m','Hvorfor blev ællingen drillet?','Den så anderledes ud','Den tog de andres mad','Den bed de andre først','Den sang hele natten','Den var større og grimmere end de andre. Derfor drillede de den.'],
+ ['m','Hvorfor sagde selv søskendene »Gid du var langt borte«?','De skammede sig over den','De var sultne og trætte','De ville lege skjul med den','De var bange for hønsene','Ællingen var anderledes, og alle drillede den. Søskendene ville ikke ses sammen med den.'],
+ ['o:gid','Søskendene siger: »<b>Gid</b> du var langt borte!« Hvad betyder gid?','Jeg ønsker, at','Jeg tror, at','Jeg ved, at','Jeg glemmer, at','Gid bruger man, når man ønsker sig noget. Søskendene ønskede, at ællingen var væk.'],
+]],
+[`Ællingen løb væk fra andegården. Den gemte sig i mosen hele efteråret. En aften så den en flok store, smukke fugle. De var skinnende hvide og havde lange, smidige halse. Det var svaner. Så kom vinteren, og det blev bidende koldt. Ællingen havde det rigtig svært. Men en dag skinnede solen varmt igen. Det var forår. Ællingen fløj ned til svanerne. Den bøjede hovedet mod vandet og ventede på, at de ville hugge den. Men hvad så den nede i vandet? Den var ikke længere en grim, grå fugl. Den var selv en svane!`,[
+ ['m','Hvad skete der i den rigtige rækkefølge?','Mosen, vinteren, svanerne om foråret','Svanerne om foråret, mosen, vinteren','Vinteren, svanerne om foråret, mosen','Mosen, svanerne om foråret, vinteren','Først gemte den sig i mosen om efteråret. Så kom vinteren. Om foråret fløj den ned til svanerne.'],
+ ['o:smidige','','Lette at bøje','Korte og tykke','Hårde og stive','Våde og kolde','Noget smidigt kan let bøje sig, ligesom en svanehals.'],
+ ['o:bidende','Det blev <b>bidende</b> koldt. Hvad betyder det?','Så koldt, at det gjorde ondt','Lidt koldt, men kun om natten','Koldt, men med sol','Så varmt, at man svedte','Bidende koldt er så koldt, at det føles, som om kulden bider i huden.'],
+ ['m','Hvorfor troede ællingen, at svanerne ville hugge den?','Alle andre havde drillet den','Svaner er farlige dyr','Den havde taget al deres mad','Den havde råbt ad dem','Alle de andre dyr havde været onde ved den. Så troede den, at svanerne også ville være det.'],
+ ['l','Hvad så ællingen i vandet?','At den selv var en svane','En stor fisk, der svømmede','Sin mor, der ledte efter den','Sneen, der smeltede'],
+ ['b','Hvad kan man lære af eventyret?','Anderledes er ikke forkert','Svaner er bedre end ænder','Man skal blive hjemme','Om vinteren er der koldt','Ællingen blev drillet, fordi den var anderledes. Men den var bare ikke en and. Den var en svane.'],
+]],
+],
+3:[
+[`Der var så dejligt ude på landet. Det var sommer! Kornet stod gult, havren grøn, og høet var rejst i stakke nede i de grønne enge. Dér gik storken på sine lange, røde ben og snakkede ægyptisk, for det sprog havde han lært af sin mor. Rundt om marker og enge var der store skove, og midt i skovene dybe søer.
+I solskinnet lå en gammel herregård med dybe kanaler rundt om. Inde i det høje skræppekrat lå en and på sin rede. Hun skulle ruge sine små ællinger ud, men nu var hun næsten ked af det, for det varede længe, og hun fik sjældent besøg. De andre ænder ville hellere svømme rundt i kanalerne end sidde og snakke med hende.
+Endelig knagede det ene æg efter det andet. »Pip! Pip!« sagde det, og alle æggeblommerne var blevet levende og stak hovedet ud.
+»Er I nu alle sammen?« spurgte anden og rejste sig. »Nej, det største æg ligger der endnu. Hvor længe skal det vare?« Og så lagde hun sig igen.
+»Lad det æg ligge,« sagde en gammel and, som kom på besøg. »Det er et kalkunæg, kan du tro. Du får den aldrig ud i vandet!«
+»Jeg vil nu ligge lidt endnu,« sagde anden.`,[
+ ['l','Hvilket sprog snakkede storken?','Ægyptisk','Dansk','Engelsk','Fuglesprog'],
+ ['m','Hvorfor fik anden sjældent besøg?','De andre ville hellere svømme','Hun boede alt for langt væk','De andre var bange for hende','Hun ville ikke have besøg','Der står, at de andre ænder hellere ville svømme rundt i kanalerne.'],
+ ['o:sjældent','','Ikke ret tit','Næsten hver dag','Kun om natten','Helt med det samme','Sjældent betyder ikke ret tit. Det modsatte er ofte.'],
+ ['o:skræppekrat','','Tætte, store planter','En høj stenmur','Et lille hus af træ','En dyb, mørk sø','Skræpper er planter med store blade. Et krat er planter, der vokser meget tæt.'],
+ ['l','Hvad troede den gamle and, at det store æg var?','Et kalkunæg','Et svaneæg','Et gåseæg','Et stenæg'],
+ ['m','Hvad viser det om anden, at hun bliver liggende?','Hun giver ikke op','Hun er doven','Hun vil sove lidt','Hun er sulten','Den gamle and siger, at hun skal lade ægget ligge. Men anden bliver liggende alligevel.'],
+ ['o:varede','Det <b>varede</b> længe. Hvad betyder det?','Det tog lang tid','Det var meget varmt','Det var meget vådt','Det gjorde ondt','At noget varer længe betyder, at det tager lang tid. Det har ikke noget med varme at gøre.'],
+]],
+[`Endelig revnede det store æg. »Pip! Pip!« sagde den unge og væltede ud. Den var så stor og styg. Anden så på den. »Det er da en forfærdelig stor ælling,« sagde hun. »Ingen af de andre ser sådan ud. Mon det dog skulle være en kalkunkylling? Nå, det skal vi snart få at se. I vandet skal den, om jeg så selv skal sparke den ud!«
+Næste dag gik hele familien ned til kanalen. Plask! sprang anden i vandet, og den ene ælling efter den anden plumpede efter. Den store, grimme ælling svømmede med og var lige så god som de andre.
+»Nej, det er ingen kalkun,« sagde anden. »Se, hvor nydeligt den bruger benene, og hvor rank den holder sig. Det er min egen unge! Han er egentlig ganske køn, når man ser rigtigt på ham.«
+Men i andegården blev den stakkels ælling bidt, puffet og gjort nar ad, både af ænderne og af hønsene. »Den er for stor!« sagde de alle sammen. Sådan gik det den første dag, og siden blev det værre og værre. Til sidst løb ællingen sin vej, og fuglene i buskene fløj forskrækkede op. »Det er, fordi jeg er så grim,« tænkte ællingen og lukkede øjnene.`,[
+ ['o:styg','','Grim at se på','Sød og blød','Lille og let','Hurtig og vild','Styg er et gammelt ord for grim.'],
+ ['l','Hvordan ville anden finde ud af, om det var en kalkun?','Den skulle ud i vandet','Den skulle flyve højt','Den skulle spise korn','Den skulle lægge æg','Kalkuner svømmer ikke. Kan ællingen svømme, er det ingen kalkun.'],
+ ['m','Hvorfor var anden glad efter turen i kanalen?','Den kunne svømme godt','Vandet var dejligt varmt','Hun fandt en masse mad','Ællingen var blevet mindre','Ællingen svømmede lige så godt som de andre. Så var den ingen kalkun, men hendes egen unge.'],
+ ['o:rank','','Lige og ret op','Krum og bøjet','Tyk og tung','Våd og kold','At holde sig rank er at stå eller sidde helt lige.'],
+ ['m','Hvordan ændrer anden mening om sin store ælling?','Først undrende, så stolt','Først stolt, så flov','Hele tiden ligeglad','Først glad, så meget vred','Først tror hun, det er en kalkun. Efter svømmeturen siger hun: »Det er min egen unge!«'],
+ ['m','Ællingen tænker: »Det er, fordi jeg er så grim.« Hvad tror den?','At det er dens egen skyld','At den er glad for at være grim','At fuglene er grimme','At fuglene vil lege med den','Fuglene fløj op af forskrækkelse. Men ællingen tror, at det er, fordi den selv er grim.'],
+ ['b','Hvordan tror du, ællingen havde det, da den løb væk?','Ensom og ked af det','Glad og endelig fri','Stolt og meget modig','Sur og vred','Alle drillede den, og den troede, at den var for grim. Så har man det trist og ensomt.'],
+]],
+]}),
+
+tale('klods','Klods-Hans',{
+1:[
+[`Der var engang en gammel gård. Her boede en far med to kloge sønner. De ville giftes med prinsessen. Prinsessen ville kun have én, der var god til at snakke.`,[
+ ['l','Hvem ville giftes med prinsessen?','To kloge sønner','To gamle mænd','En konge','En soldat'],
+ ['l','Hvad skulle man være god til?','At snakke','At danse','At synge','At ride'],
+ ['o:sønner','','Drenge, som er ens børn','Piger, som er ens børn','Venner fra byen','Heste på gården','En søn er en dreng, som er ens barn. To sønner er to drenge.'],
+]],
+[`Der var også en tredje bror. Han hed Klods-Hans. Ingen troede, han var klog. Han red af sted på en gedebuk. På vejen samlede han en død krage op.`,[
+ ['l','Hvad red Klods-Hans på?','En gedebuk','En sort hest','En ko','En gris'],
+ ['l','Hvad samlede han op på vejen?','En død krage','En guldmønt','En blomst','En sten'],
+ ['m','Hvad tænkte de andre om Klods-Hans?','At han var dum','At han var stærk','At han var rig','At han var sød','Der står, at ingen troede, han var klog.'],
+ ['o:tredje','','Nummer tre','Nummer to','Nummer fire','Nummer et','Den første, den anden, den tredje. Klods-Hans var bror nummer tre.'],
+]],
+[`Prinsessen sagde: »Her er så varmt.« »Fint,« sagde Klods-Hans. »Så kan jeg stege min krage!« Prinsessen grinede. Hun syntes, han var sjov. Så blev Klods-Hans konge.`,[
+ ['l','Hvad ville Klods-Hans stege?','Sin krage','En kylling','En fisk','Et æble'],
+ ['m','Hvorfor valgte prinsessen Klods-Hans?','Han fik hende til at grine','Han var den rigeste af dem','Han var den største af dem','Han havde en flot krone på','Prinsessen grinede og syntes, han var sjov.'],
+ ['o:stege','','Lave mad over varme','Vaske i koldt vand','Spise helt råt','Gemme i et skab','At stege er at lave mad på en pande eller over ild.'],
+ ['l','Hvad blev Klods-Hans til sidst?','Konge','Bonde','Soldat','Bager'],
+]],
+],
+2:[
+[`Ude på landet lå en gammel gård. Her boede en gammel herremand med to sønner. De var så kloge, at det var for meget. De ville fri til kongens datter. Det turde de godt, for hun havde sagt, at hun ville tage den til mand, som bedst kunne tale for sig. Den ene kunne hele ordbogen udenad. Den anden vidste alt om landets love. De øvede sig i otte dage.`,[
+ ['l','Hvad kunne den ene bror udenad?','Hele ordbogen','Alle salmerne','Hele landkortet','Alle stjernerne'],
+ ['o:fri','De ville <b>fri</b> til kongens datter. Hvad betyder det?','Spørge, om hun vil giftes','Have fri fra skole en dag','Sætte en fugl fri igen','Betale for noget dyrt','At fri er at spørge en anden, om de vil giftes med en.'],
+ ['l','Hvad havde prinsessen sagt?','Hun ville have den bedste taler','Hun ville have den rigeste mand','Hun ville have den stærkeste','Hun ville aldrig giftes'],
+ ['m','Hvorfor øvede brødrene sig i otte dage?','De ville vinde prinsessen','De skulle til en eksamen','De kedede sig derhjemme','Faren ville have ro','De ville giftes med prinsessen, og hun ville have den, der bedst kunne tale.'],
+ ['o:udenad','','Uden at kigge i bogen','Mens man står udenfor','Ved at læse den højt','Kun et lille stykke','At kunne noget udenad er at kunne huske det uden at kigge.'],
+]],
+[`Faren gav dem hver en flot hest. Men så kom den tredje bror. Ham regnede ingen med, for han var ikke så lærd. Han blev bare kaldt Klods-Hans. »Jeg vil også have prinsessen,« sagde han. »Hun tager mig, hvis hun tager mig. Og tager hun mig ikke, så tager jeg hende alligevel!« Han fik ingen hest af faren, så han red på sin gedebuk. Undervejs fandt han en død krage, en gammel træsko og en hel lomme fuld af mudder. »Det kan jeg bruge,« sagde han.`,[
+ ['m','Hvad mente Klods-Hans med »så tager jeg hende alligevel«?','Han ville ikke give op','Han ville stjæle hende væk','Han var ligeglad med hende','Han ville blive hjemme','Klods-Hans var ikke bange for at tabe. Han ville prøve, uanset hvad.'],
+ ['o:lærd','','Har lært meget','Er meget stærk','Er meget sjov','Er meget rig','En lærd person har læst og lært rigtig meget.'],
+ ['m','Hvorfor fik Klods-Hans ingen hest?','Faren troede ikke på ham','Han var bange for heste','Hesten var syg','Han ville hellere gå','Ingen regnede med Klods-Hans. Faren troede ikke, han kunne vinde.'],
+ ['l','Hvad fandt han undervejs?','En krage, en træsko og mudder','En hat, en kniv og en stor fisk','En sko, en bog og en lampe','Et æble, en stok og et tov'],
+ ['o:undervejs','','Mens han var på vej','Da han kom hjem','Før han tog af sted','Inde på slottet','Undervejs betyder på vejen, mens man er på vej et sted hen.'],
+]],
+[`På slottet stod frierne i en lang række. Inde i salen var der hedt, for der stod en stor kakkelovn. Når en frier kom ind, blev han helt forvirret og vidste ikke, hvad han skulle sige. Så kom Klods-Hans ridende lige ind på sin gedebuk. »Her er rædsomt hedt!« sagde han. »Det er, fordi min far steger hanekyllinger,« sagde prinsessen. »Det var godt!« sagde Klods-Hans. »Så kan jeg vel få stegt en krage?« »Det kan du godt,« sagde prinsessen. »Men har du noget at stege den i?« »Ja da,« sagde Klods-Hans og tog træskoen frem. Prinsessen lo. »Du kan svare for dig,« sagde hun. »Dig vil jeg have!«`,[
+ ['l','Hvorfor var der varmt i salen?','Der stod en stor kakkelovn','Solen skinnede ind ad vinduet','Der var mange mennesker','Der var et bål midt i salen'],
+ ['o:forvirret','','Usikker og rodet i hovedet','Glad og helt rolig indeni','Sur og meget vred på alle','Træt og meget søvnig','Når man er forvirret, ved man ikke rigtig, hvad man skal gøre eller sige.'],
+ ['m','Hvordan brugte Klods-Hans det, han havde fundet?','Træskoen blev en pande til kragen','Mudderet blev til et nyt sæde','Kragen blev en gave til kongen','Træskoen blev sko til gedebukken','Han ville stege kragen og tog træskoen frem for at stege den i.'],
+ ['m','Hvorfor blev frierne forvirrede?','De blev nervøse foran prinsessen','De havde glemt alt om hestene','De kunne slet ikke tåle varme','De forstod ikke prinsessens sprog','De havde øvet sig længe. Men foran prinsessen blev de nervøse og glemte, hvad de ville sige.'],
+ ['b','Hvorfor tror du, at prinsessen valgte Klods-Hans?','Han var sjov og ikke bange','Han kunne hele ordbogen','Han havde den flotteste hest','Han var den klogeste bror','Klods-Hans var ikke nervøs. Han svarede hurtigt og sjovt, og prinsessen lo.'],
+]],
+],
+3:[
+[`Ude på landet var der en gammel gård, og i den boede en gammel herremand, som havde to sønner. De var så vittige, at det halve var nok. De ville fri til kongens datter, og det turde de, for hun havde ladet kundgøre, at hun ville tage den til mand, som bedst kunne tale for sig.
+De to forberedte sig nu i otte dage. Den ene kunne hele den latinske ordbog udenad og byens avis for tre år, både forfra og bagfra. Den anden vidste alt om landets love og kunne snakke om alt, hvad der skete i byen. Desuden kunne han brodere seler, for han var fin og fingernem.
+»Jeg får kongsdatteren!« sagde de begge to. Faderen gav dem hver en dejlig hest. Den, der kunne ordbogen, fik en kulsort, og den, der kendte lovene, fik en mælkehvid. Så smurte de mundvigene med tran, for at de kunne blive mere smidige i munden.
+Alle tjenestefolkene stod nede i gården for at se dem stige til hest. I det samme kom den tredje broder, for de var tre. Men der var ingen, som regnede ham med som broder, for han havde ikke sådan lærdom som de to andre. Han blev bare kaldt Klods-Hans.`,[
+ ['o:vittige','','Kvikke og kloge i munden','Store og stærke i armene','Søde og stille i stuen','Gamle og trætte i benene','Vittig betyder kvik og god til at sige sjove og kloge ting.'],
+ ['o:kundgøre','','Gøre det kendt for alle','Holde det hemmeligt','Glemme det igen','Skrive det i sin dagbog','At kundgøre er at fortælle noget, så alle får det at vide.'],
+ ['l','Hvad kunne den ene bror forfra og bagfra?','Byens avis for tre år','Alle kongens sange','Hele bibelen på tysk','Navnene på alle heste'],
+ ['m','Hvorfor er brødrene sikre på at vinde?','De har lært en masse udenad','De har de fineste heste','Prinsessen kender dem godt','De er de ældste i landet','De har øvet sig i otte dage og kan ordbogen og lovene. Derfor siger de begge: »Jeg får kongsdatteren!«'],
+ ['m','Hvorfor smurte brødrene tran på munden?','For at kunne tale bedre','For at blive mere flotte','For at holde varmen','For at slippe for sult','De ville være smidige i munden. Så ville de bedre kunne tale for sig.'],
+ ['o:fingernem','','God med sine fingre','Har meget lange fingre','Har ondt i fingrene','Bider sine negle','En fingernem person er god til at lave små ting med fingrene, fx at brodere.'],
+ ['m','Hvad tænkte de andre om Klods-Hans?','At han ikke var så klog','At han var den stærkeste','At han var den rigeste','At han var den yngste','Ingen regnede ham med som broder, fordi han ikke havde lært så meget som de andre.'],
+]],
+[`»Hvor skal I hen, siden I har søndagsklæderne på?« spurgte Klods-Hans. »Til hove for at snakke kongsdatteren til!« sagde de. »Ved du ikke det, som trommes ud over hele landet?« Og så fortalte de ham det.
+»Så må jeg også med!« sagde Klods-Hans. Men brødrene lo ad ham og red af sted. Klods-Hans fik ingen hest af faderen, så han satte sig op på sin gedebuk og red ud ad landevejen. Undervejs fandt han en død krage, en gammel træsko og en hel lomme fuld af mudder.
+På slottet stod frierne i række. Ved vinduet stod skrivere, som skulle skrive alt op, hvad der blev sagt. Når en frier kom ind, var det, som om ordene smeltede i munden på ham. Brødrene stammede og blev sendt ud.
+Så kom Klods-Hans ridende ind på gedebukken. »Her er en hede!« sagde han. »Det er, fordi min far steger hanekyllinger,« sagde kongsdatteren. »Det var godt! Så kan jeg vel få stegt en krage?« »Har du noget at stege den i?« »Ja da!« Han tog træskoen frem. »Og hvor har du sovs?« »Den har jeg i lommen,« sagde han og hældte lidt mudder ud. »Du kan svare for dig!« sagde kongsdatteren. »Dig vil jeg have!« Og Klods-Hans blev konge med en krone og en trone.`,[
+ ['l','Hvorfor havde brødrene søndagsklæder på?','De skulle til slottet','De skulle i kirke','Det var deres fødselsdag','De skulle til marked'],
+ ['o:til hove','','Hen til kongens slot','Hen til smedens hus','Ud på hovedvejen','Ned til stranden','Hoffet er kongens slot og folkene der. At tage til hove er at tage til slottet.'],
+ ['o:trommes ud','Det »<b>trommes ud</b> over hele landet«. Hvad betyder det?','Alle i landet får det at vide','Der spilles trommer til en fest','Folk danser i alle byer','Ingen må sige noget','I gamle dage gik en mand rundt med en tromme og råbte nyhederne ud, så alle hørte dem.'],
+ ['m','Hvad mente brødrene, da de lo ad Klods-Hans?','At han aldrig kunne vinde','At han var meget sjov','At han havde flot tøj på','At han var den klogeste','De troede ikke, at Klods-Hans havde en chance.'],
+ ['m','Hvorfor blev det sværere for frierne, at skriverne skrev alt op?','De blev endnu mere nervøse','De kunne ikke se prinsessen','Der blev for varmt i salen','De måtte slet ikke tale','Når alt, man siger, bliver skrevet ned, bliver man bange for at sige noget forkert.'],
+ ['o:ordene smeltede i munden','Det var, »som om <b>ordene smeltede i munden</b>« på frierne. Hvad betyder det?','De kunne ikke sige noget','De havde slik i munden','De havde brændt tungen','De sang i stedet for at tale','Ordene forsvandt, før de kom ud. Frierne var så nervøse, at de ikke kunne tale.'],
+ ['m','Hvad har kragen, træskoen og mudderet til fælles?','Han bruger dem til sine svar','De er alle tre meget dyre','Brødrene har tabt dem på vejen','Prinsessen har lagt dem ud','Han samler dem op på vejen og bruger dem til at svare sjovt: en krage at stege, en træsko at stege i og mudder som sovs.'],
+ ['b','Hvorfor vandt Klods-Hans, selvom brødrene havde lært mere?','Han var modig og sjov','Han kunne mest udenad','Han havde den fineste hest','Kongen var hans onkel','Brødrene kunne en masse udenad, men blev nervøse. Klods-Hans var ikke bange og svarede sjovt.'],
+]],
+]}),
+
+tale('tommel','Tommelise',{
+1:[
+[`Der var engang en kone, som ønskede sig et lille barn. Hun fik et frø af en heks. Hun plantede frøet, og der voksede en smuk blomst op. Inde i blomsten sad en bitte lille pige.`,[
+ ['l','Hvad ønskede konen sig?','Et lille barn','En lille hund','Et større hus','En smuk have'],
+ ['l','Hvem fik hun frøet af?','En heks','En fe','En bonde','En prins'],
+ ['l','Hvor sad den lille pige?','Inde i blomsten','Under et blad','I en æske','På et bord'],
+ ['o:plantede','','Satte det i jorden','Spiste det op','Gemte det i lommen','Kastede det væk','At plante er at sætte et frø eller en plante i jorden, så den kan vokse.'],
+]],
+[`Pigen var ikke større end en tommelfinger. Derfor kaldte de hende Tommelise. Hun sov i en valnøddeskal. En nat kom en stor, grim tudse og tog hende med.`,[
+ ['l','Hvor stor var pigen?','Som en tommelfinger','Som en lille kat','Som en lillebitte mus','Som et rødt æble'],
+ ['m','Hvorfor hed hun Tommelise?','På grund af sin størrelse','På grund af sin farve','På grund af sin mor','På grund af sin fine stemme','Hun var ikke større end en tommelfinger. Derfor hed hun Tommelise.'],
+ ['l','Hvad sov hun i?','En valnøddeskal','En tændstikæske','En tekop','En sko'],
+ ['o:tudse','','Et dyr, der ligner en frø','En fugl med meget lange ben','En stor, grim fisk','En mus med lang hale','En tudse ligner en frø, men har tykkere og mere knudret hud.'],
+]],
+[`Tommelise flygtede fra tudsen. Hun fandt en svale, som var syg. Hun passede godt på den hele vinteren. Om foråret fløj svalen med hende til et varmt land. Der fik hun vinger og blev blomsternes dronning.`,[
+ ['l','Hvilken fugl hjalp Tommelise?','En svale','En ugle','En krage','En and'],
+ ['m','Hvorfor hjalp svalen Tommelise?','Hun havde passet på den','Hun havde givet den penge','Den var hendes mor','Den ville have mad','Tommelise passede på svalen hele vinteren. Bagefter hjalp svalen hende.'],
+ ['o:flygtede','Tommelise <b>flygtede</b> fra tudsen. Hvad betyder det?','Hun løb væk fra den','Hun faldt i søvn hos den','Hun blev venner med den','Hun sang en sang for den','At flygte er at løbe væk fra noget farligt.'],
+ ['l','Hvad blev Tommelise til sidst?','Blomsternes dronning','Svalernes prinsesse','Tudsens kone i åen','En helt almindelig pige'],
+]],
+],
+2:[
+[`Der var engang en kone, som så inderligt ønskede sig et lille bitte barn. Men hun vidste slet ikke, hvor hun skulle få det fra. Så gik hun hen til en gammel heks. Heksen gav hende et byggryn og sagde: »Plant det i en urtepotte, så skal du få at se.« Konen gjorde det, og straks voksede der en stor, dejlig blomst. Den lignede en tulipan, men bladene var lukket sammen. Konen kyssede den røde blomst, og så sprang den op med et knald. Midt i blomsten sad en ganske lille pige, så nydelig og sød.`,[
+ ['l','Hvad gav heksen konen?','Et byggryn','En blomst','En flaske','En nøgle'],
+ ['o:urtepotte','','En potte til planter','En gryde til suppe','En spand til vand','En kasse til legetøj','En urtepotte er en lerpotte med jord, som man sætter planter i.'],
+ ['m','Hvorfor gik konen hen til heksen?','Hun vidste ikke, hvor hun fik et barn fra','Hun ville købe en smuk blomst','Hun var syg og trængte til hjælp','Heksen var hendes gamle søster','Konen ønskede sig et barn, men vidste ikke, hvor hun skulle få det fra. Så søgte hun hjælp hos heksen.'],
+ ['l','Hvad fik blomsten til at springe op?','Konen kyssede den','Solen skinnede på den','Heksen sagde et ord','Den fik koldt vand'],
+ ['o:nydelig','','Sød og pæn','Sur og vred','Træt og sulten','Våd og kold','Nydelig betyder pæn og sød at se på.'],
+]],
+[`Tommelise fik en valnøddeskal som vugge. Blå violblade var hendes madras, og et rosenblad var hendes dyne. Om dagen legede hun på bordet i en tallerken med vand. En nat, mens hun lå og sov, kom en grim tudse hoppende ind ad vinduet. »Det var en dejlig kone til min søn!« sagde tudsen. Så tog den valnøddeskallen med Tommelise og hoppede ud i haven. Dér løb en stor, bred å. Her boede tudsen med sin søn i det sumpede mudder.`,[
+ ['m','Hvorfor kunne Tommelise sove i en valnøddeskal?','Hun var bitte lille','Hun var meget træt','Hun elskede nødder','Der var ingen senge','Hun var så lille, at en nøddeskal passede som seng.'],
+ ['m','Hvordan kunne tudsen nemt tage Tommelise med?','Hun lå og sov i nøddeskallen','Hun gik selv med den ud','Konen gav hende til tudsen','Hun legede ude i haven','Det var nat, og hun sov. Tudsen tog bare hele nøddeskallen med.'],
+ ['o:vugge','','En seng til et lille barn','En båd, der sejler på vandet','En leg, man leger i haven','En kasse til mad','En vugge er en lille seng til en baby. Den kan vugge frem og tilbage.'],
+ ['m','Hvordan havde Tommelise det nok, da hun vågnede?','Hun var bange','Hun var glad','Hun var stolt','Hun var sulten','Hun var blevet taget væk om natten af en grim tudse. Det ville gøre de fleste bange.'],
+ ['o:sumpede','','Vådt og blødt','Tørt og hårdt','Varmt og lyst','Højt og stejlt','En sump er et sted, hvor jorden er meget våd og blød.'],
+]],
+[`Tommelise slap væk fra tudsen. Hele sommeren levede hun alene i skoven. Men så kom den lange, kolde vinter. En markmus lod hende bo hos sig. En dag fandt Tommelise en svale, som lå helt stiv i den underjordiske gang. Alle troede, den var død. Men Tommelise lagde sit øre til den. Dens hjerte bankede! Hun passede den hele vinteren. Om foråret fløj svalen bort. Senere kom den tilbage og hentede Tommelise. De fløj til de varme lande, hvor hun mødte blomsternes prins. Han gav hende et par vinger, og hun blev hans dronning.`,[
+ ['l','Hvem lod hende bo hos sig om vinteren?','En markmus','En svale','En tudse','En muldvarp'],
+ ['o:stiv','Svalen lå helt <b>stiv</b>. Hvad betyder det?','Den kunne ikke bevæge sig','Den var helt blød og varm','Den fløj højt op i luften','Den sang meget højt','Når noget er stift, kan det ikke bøje sig eller bevæge sig.'],
+ ['m','Hvordan fandt Tommelise ud af, at svalen levede?','Hun hørte dens hjerte','Den åbnede sine øjne igen','Den sang en sang','Musen fortalte det','Hun lagde øret til svalen og hørte hjertet banke.'],
+ ['o:underjordiske','','Under jorden','Oppe i luften','Inde i huset','Nede i vandet','Underjordisk betyder, at noget er under jorden.'],
+ ['b','Hvorfor tror du, svalen kom tilbage efter Tommelise?','Den ville takke hende','Den var meget sulten','Den var faret vild','Den ville bygge rede','Tommelise reddede svalens liv. Nu ville svalen hjælpe hende tilbage.'],
+]],
+],
+3:[
+[`Hele sommeren igennem levede Tommelise ganske alene i den store skov. Hun flettede sig en seng af græs og hængte den under et stort skræppeblad, så det ikke kunne regne på hende. Hun spiste honning fra blomsterne og drak af duggen, som hver morgen lå på bladene. Sådan gik sommer og efterår.
+Men så kom vinteren, den lange, kolde vinter. Alle fuglene, som havde sunget så smukt for hende, fløj deres vej. Træerne og blomsterne visnede, og det store skræppeblad rullede sig sammen til en gul, vissen stilk. Tommelise frøs forfærdeligt, for hendes klæder var i stykker, og hun var så fin og lille.
+Hun gik ud i en stor kornmark, hvor der kun var tørre stubbe tilbage. Dér kom hun til markmusens dør. Det var et lille hul nede under kornstubbene. Tommelise stod ved døren som en fattig tiggerpige og bad om et lille stykke bygkorn, for hun havde ikke fået det mindste at spise i to dage.
+»Du lille stakkel!« sagde markmusen, for det var i grunden en god, gammel markmus. »Kom ind i min varme stue og spis med mig! Du kan blive hos mig om vinteren, hvis du vil holde mine stuer rene og fortælle mig historier, for dem holder jeg meget af.«`,[
+ ['l','Hvad drak Tommelise om sommeren?','Duggen på bladene','Vand fra åen','Mælk fra en ko','Saft fra bærrene'],
+ ['o:visnede','','Blev tørre og døde','Blev store og grønne','Fik mange nye blade','Duftede rigtig dejligt','Når en blomst visner, bliver den tør og brun og dør.'],
+ ['m','Hvorfor frøs Tommelise så meget?','Hendes tøj var i stykker','Hun havde mistet sine sko','Hun boede ved et stort hav','Hun havde ikke noget hår','Der står, at hendes klæder var i stykker, og at hun var så lille.'],
+ ['o:tiggerpige','','En pige, der beder om mad','En pige, der sælger blomster','En pige, der går i skole','En pige, der bor på et slot','At tigge er at bede andre om mad eller penge, fordi man ingenting har.'],
+ ['m','Hvorfor var sommeren lettere for Tommelise end vinteren?','Der var mad, læ og varme','Hun havde mange venner','Hun boede hos markmusen','Hun havde fået nyt tøj','Om sommeren var der honning, dug og et blad at sove under. Om vinteren visnede alt, og hun frøs.'],
+ ['m','Hvad fik markmusen ud af at lade Tommelise bo hos sig?','Rene stuer og gode historier','Masser af korn og mad','En ny og rig nabo','En svale til haven','Markmusen siger, at hun kan bo der, hvis hun gør rent og fortæller historier.'],
+ ['m','Hvordan kan man se, at markmusen var venlig?','Den lukkede hende ind','Den smed hende ud','Den spiste hendes mad','Den fik hende til at græde','Markmusen sagde »du lille stakkel« og bød hende ind i den varme stue.'],
+]],
+[`Markmusen havde en nabo, en muldvarp, som var meget rig og meget klog. Han havde en sort fløjlspels, men han kunne ikke lide solen og de smukke blomster. Han havde jo aldrig set dem. »Han vil være en god mand for dig,« sagde markmusen. Muldvarpen gravede en lang gang fra sit hus til musens hus. Midt i gangen lå en død fugl. Det var en svale, som var død af kulde.
+Om natten kunne Tommelise ikke sove. Hun flettede et tæppe af hø og bredte det over svalen. »Farvel, du smukke lille fugl,« sagde hun og lagde hovedet ind til dens bryst. Men så blev hun forskrækket. Det bankede derinde! Fuglens hjerte slog. Svalen var ikke død, den var kun stivnet af kulde, og nu var den blevet varm igen.
+Hele vinteren passede Tommelise den syge svale i al hemmelighed. Hun bragte den vand i et blad. Da foråret kom, sagde svalen: »Vil du ikke flyve med mig? Du kan sidde på min ryg.« Men Tommelise vidste, at den gamle markmus ville blive bedrøvet, hvis hun forlod den. »Nej, jeg kan ikke,« sagde hun. »Farvel, farvel, du søde pige!« sagde svalen og fløj ud i solskinnet. Tommelise så efter den, og tårerne kom hende i øjnene.`,[
+ ['b','Muldvarpen kan ikke lide solen, men har aldrig set den. Hvad siger det om ham?','Han dømmer noget, han ikke kender','Han ved alt om solen og blomster','Han er den bedste til at grave','Han er bange for at blive brun','Han har bestemt sig for ikke at kunne lide noget, han aldrig har prøvet.'],
+ ['o:fløjlspels','','En blød og glat pels','En hård og ru skal','En jakke af metal','En pels fuld af torne','Fløjl er et meget blødt stof. En fløjlspels er blød og glat.'],
+ ['m','Hvorfor sagde markmusen, at muldvarpen var en god mand?','Han var både rig og klog','Han var sød og sjov','Han kunne flyve med hende','Han elskede blomster','Der står, at muldvarpen var meget rig og meget klog.'],
+ ['o:stivnet','','Blevet stiv og ubevægelig','Blevet blød og dejlig varm','Blevet meget sulten','Blevet glad og munter','Svalen var så kold, at den ikke kunne røre sig. Den var stivnet.'],
+ ['l','Hvad bragte Tommelise svalen vand i?','Et blad','En kop','En skål','En sko'],
+ ['o:i al hemmelighed','','Uden at nogen vidste det','Sammen med markmusen','Med hjælp fra muldvarpen','Mens alle så med','Noget, man gør i al hemmelighed, gør man, uden at andre ved det.'],
+ ['m','Hvorfor ville Tommelise ikke flyve med svalen?','Musen ville blive ked af det','Hun var bange for at flyve','Hun ville giftes med muldvarpen','Svalen var for lille til hende','Der står, at markmusen ville blive bedrøvet, hvis Tommelise forlod den.'],
+ ['b','Hvad siger det om Tommelise, at hun hjalp svalen?','Hun var god og omsorgsfuld','Hun var doven og træt','Hun var bange for fugle','Hun ville gerne være rig','Hun passede på svalen hele vinteren, selvom ingen bad hende om det. Det er at være omsorgsfuld.'],
+]],
+]}),
+
+tale('natter','Nattergalen',{
+1:[
+[`I Kina boede en kejser i et slot af porcelæn. Ude i skoven boede en lille, grå fugl. Det var nattergalen. Den sang så smukt, at alle stoppede op for at lytte.`,[
+ ['l','Hvad var slottet lavet af?','Porcelæn','Rent guld','Rødt træ','Grå mursten'],
+ ['l','Hvilken farve havde fuglen?','Grå','Rød','Gul','Blå'],
+ ['o:lytte','','Høre godt efter','Se godt efter','Gå hurtigt væk','Tale meget højt','At lytte er at høre godt efter.'],
+ ['l','Hvorfor stoppede folk op?','For at høre fuglen','For at spise mad','For at se kejseren','For at hvile benene'],
+]],
+[`Kejseren fik nattergalen hen på slottet. Den sang, så kejseren græd. Men en dag fik han en kunstig fugl af guld. Den kunne synge, når man drejede på en nøgle. Alle ville kun høre guldfuglen.`,[
+ ['l','Hvad gjorde kejseren, da nattergalen sang?','Han græd','Han grinede','Han sov','Han dansede'],
+ ['o:kunstig','','Lavet af mennesker','Født i skoven','Meget lille og grå','Meget syg og træt','Noget kunstigt er ikke levende. Det er lavet af mennesker.'],
+ ['m','Hvordan havde nattergalen det, da alle kun ville høre guldfuglen?','Ked af det og glemt','Glad og meget stolt','Sulten og meget træt','Vred og farlig','Ingen gad høre nattergalen mere. Så føler man sig glemt.'],
+ ['l','Hvad skulle man dreje på, før guldfuglen sang?','En nøgle','En fløjte','En klokke','En bog'],
+]],
+[`En dag gik guldfuglen i stykker. Så blev kejseren meget syg. Men nattergalen kom tilbage. Den sang for kejseren hele natten. Om morgenen var han rask igen.`,[
+ ['l','Hvad skete der med guldfuglen?','Den gik i stykker','Den fløj væk','Den blev solgt','Den blev større'],
+ ['m','Hvorfor blev kejseren rask?','Nattergalen sang for ham','Han fik medicin af lægen','Guldfuglen blev lavet igen','Han sov hele dagen','Nattergalen sang hele natten. Om morgenen var han rask.'],
+ ['o:rask','','Ikke syg mere','Stadig meget syg','Meget træt','Ked af det','At være rask er at være sund og ikke syg.'],
+ ['b','Hvad kan man lære af historien?','Det ægte er mest værd','Guld er det bedste','Fugle er dumme dyr','Man skal sove meget','Guldfuglen var flot, men gik i stykker. Den levende fugl kom tilbage og hjalp.'],
+]],
+],
+2:[
+[`I Kina boede kejseren i det prægtigste slot i verden. Det var bygget af fint porcelæn. I haven voksede de mest forunderlige blomster, og haven var så stor, at gartneren ikke vidste, hvor den endte. Gik man langt nok, kom man ind i en dejlig skov ved havet. Her boede en nattergal. Den sang så smukt, at selv den fattige fisker, som havde så meget andet at gøre, lå stille og lyttede. Folk kom fra hele verden for at se slottet. Men når de hørte nattergalen, sagde de alle: »Det er dog det bedste!«`,[
+ ['l','Hvor boede nattergalen?','I en skov ved havet','I kejserens køkken','I en gammel kirke','På en ø langt væk'],
+ ['o:prægtigste','','Det allerflotteste','Det allermindste','Det allerældste','Det allergrimmeste','Prægtig betyder meget flot. Det prægtigste er det allerflotteste.'],
+ ['m','Hvorfor lyttede fiskeren, selvom han havde travlt?','Sangen var så smuk','Han var helt færdig','Han var syg i ryggen','Fiskene sov om natten','Sangen var så smuk, at selv en travl fisker stoppede op.'],
+ ['o:forunderlige','','Mærkelige og vidunderlige','Små og helt almindelige','Visne og helt brune','Farlige og giftige','Forunderlig betyder så mærkelig og flot, at man undrer sig.'],
+ ['m','Hvad syntes de fremmede var det bedste i Kina?','Nattergalens sang','Kejserens slot','De smukke blomster','Den store have','Folk kom for at se slottet, men når de hørte nattergalen, sagde de: »Det er dog det bedste!«'],
+]],
+[`Kejseren læste i en bog om nattergalen. »Hvad for noget?« sagde han. »Den kender jeg slet ikke! Den skal komme og synge for mig i aften.« Ingen på slottet havde hørt om den. Til sidst fandt de en lille pige i køkkenet. Hun kendte nattergalen. Om aftenen sang nattergalen for kejseren. Den sang så dejligt, at kejseren fik tårer i øjnene. »Du skal have min guldtøffel om halsen,« sagde kejseren. Men nattergalen sagde: »Nej tak. Jeg har set tårer i kejserens øjne. Det er den største skat for mig.«`,[
+ ['m','Hvad er mærkeligt ved, at kejseren læste om nattergalen i en bog?','Den boede i hans egen skov','Den var lavet af rent guld','Den var en meget gammel fugl','Han kunne slet ikke læse','Folk fra hele verden kendte nattergalen, men kejseren vidste ikke, at den boede lige ved hans slot.'],
+ ['l','Hvem kendte nattergalen?','En lille køkkenpige','Kejserens gamle tjener','En klog minister','Den gamle gartner'],
+ ['m','Hvorfor ville nattergalen ikke have guldtøflen?','Kejserens tårer var nok','Tøflen var alt for tung','Den ville hellere have mad','Den kunne ikke lide guld','Nattergalen siger, at kejserens tårer er den største skat for den.'],
+ ['o:skat','Tårerne er »den største <b>skat</b>« for nattergalen. Hvad betyder skat her?','Noget meget værdifuldt','Penge, man betaler til staten','En kasse med legetøj','Et sted, man graver huller','En skat kan være en kiste med guld. Her betyder det noget, der er meget værdifuldt.'],
+ ['m','Hvorfor fik kejseren tårer i øjnene?','Sangen rørte hans hjerte','Han havde ondt i maven','Han var sur på pigen','Der var røg i stuen','Sangen var så smuk, at kejseren blev rørt.'],
+]],
+[`En dag fik kejseren en stor pakke. I den lå en kunstig nattergal. Den var lavet af guld og diamanter. Når man trak den op, sang den en vals, og halen gik op og ned. Alle syntes, den var meget bedre end den rigtige fugl. Den kunne synge den samme sang 33 gange uden at blive træt. Imens fløj den rigtige nattergal ud ad vinduet og hjem til skoven. Ingen lagde mærke til det. Efter et år knækkede noget inde i guldfuglen. Snurr! Musikken stoppede. Fem år senere blev kejseren dødssyg. Da kom den rigtige nattergal og sang. Den sang så smukt, at Døden fløj ud ad vinduet.`,[
+ ['l','Hvad var den kunstige fugl lavet af?','Guld og diamanter','Træ og rød maling','Sølv og blankt glas','Fjer og lim'],
+ ['m','Hvad var den store forskel på de to fugle?','Den ene levede, den anden var en maskine','Den ene var stor, den anden meget lille','Den ene var gul, den anden helt grå','Den ene kunne flyve, den anden kun svømme','Den rigtige nattergal er en levende fugl. Den kunstige skal trækkes op og kan gå i stykker.'],
+ ['o:lagde mærke til','Ingen <b>lagde mærke til</b> det. Hvad betyder det?','Ingen opdagede det','Ingen tegnede det','Ingen kunne lide det','Ingen ville have det','At lægge mærke til noget er at opdage det.'],
+ ['m','Hvorfor fløj den rigtige nattergal hjem?','Ingen ville høre den mere','Den var blevet syg','Den ville bygge en rede','Den skulle finde mad','Alle ville kun høre guldfuglen. Ingen savnede den rigtige fugl.'],
+ ['b','Hvad vil eventyret fortælle med de to fugle?','Ægte ting er mest værd','Guld er det fineste','Maskiner er altid bedst','Fugle skal bo i bur','Guldfuglen var flot, men den gik i stykker. Den levende fugl kom tilbage og reddede kejseren.'],
+]],
+],
+3:[
+[`Kejseren lå kold og bleg i sin store, prægtige seng. Hele hoffet troede, at han var død, og alle løb hen for at hilse på den nye kejser. Men kejseren var ikke død endnu. Han lå stiv og bleg, og højt oppe stod et vindue åbent. Månen skinnede ind på kejseren og den kunstige fugl.
+Den stakkels kejser kunne næsten ikke trække vejret. Det var, som om der sad noget på hans bryst. Han åbnede øjnene, og så så han, at det var Døden. Døden havde taget kejserens guldkrone på og holdt hans sværd i den ene hånd. Rundt om fra sengeforhænget kiggede mærkelige hoveder frem, nogle stygge, andre søde og milde. Det var alle kejserens onde og gode gerninger, som så på ham nu, da Døden sad på hans hjerte.
+»Musik, musik!« råbte kejseren. »Syng dog, du lille guldfugl! Jeg har givet dig guld og kostbarheder. Syng dog!« Men fuglen stod stille. Der var ingen til at trække den op, og uden det kunne den ikke synge. Og Døden blev ved med at stirre på kejseren med sine store, tomme øjne. Der var stille, frygtelig stille.`,[
+ ['b','Hvad viser det om hoffet, at de løb hen til den nye kejser?','De tænkte mest på sig selv','De elskede den gamle kejser','De var trætte og sultne','De ville hente en læge','De troede, han var død, og skyndte sig væk fra ham i stedet for at blive hos ham.'],
+ ['o:hoffet','','Folkene omkring kejseren','Gården bag ved slottet','Hestene nede i stalden','Børnene i den store by','Hoffet er alle de fine folk, der bor og arbejder hos en konge eller kejser.'],
+ ['l','Hvad havde Døden taget på?','Kejserens guldkrone','Kejserens røde kappe','Kejserens sorte sko','Kejserens sølvring'],
+ ['o:gerninger','','Ting, man har gjort','Ting, man har drømt','Ting, man har købt','Ting, man har spist','En gerning er noget, man har gjort. Gode gerninger er gode ting, man har gjort.'],
+ ['m','Hvorfor var guldfuglen ingen hjælp, da kejseren havde brug for den?','Den kan ikke synge af sig selv','Den var bange for Døden i sengen','Den var fløjet hjem til skoven','Den sang kun om dagen','Guldfuglen er en maskine. Uden nogen til at trække den op, står den bare stille.'],
+ ['m','Hvorfor råbte kejseren på musik?','Han håbede, musik kunne redde ham','Han ville have, at alle dansede','Han ville vække hele hoffet igen','Han kunne slet ikke lide stilhed','Kejseren var ved at dø. Han håbede, at musikken kunne jage Døden væk.'],
+ ['o:stirre','','Kigge længe og stift','Lukke øjnene i','Græde meget stille','Grine meget højt','At stirre er at kigge på noget længe uden at se væk.'],
+]],
+[`Da lød der pludselig tæt ved vinduet den dejligste sang. Det var den lille, levende nattergal, som sad på grenen udenfor. Den havde hørt om kejserens nød og var kommet for at synge trøst og håb for ham. Og mens den sang, blev de mærkelige hoveder blegere og blegere. Blodet begyndte at strømme hurtigere i kejserens svage krop. Selv Døden lyttede og sagde: »Bliv ved, lille nattergal! Bliv ved!«
+»Ja, hvis du giver mig den prægtige guldkrone,« sagde nattergalen. Og Døden gav hver kostbarhed for en sang. Nattergalen sang om den stille kirkegård, hvor de hvide roser gror. Så fik Døden længsel efter sin have og svævede som en kold, hvid tåge ud ad vinduet.
+»Tak, tak!« sagde kejseren. »Dig har jeg jaget bort fra mit land, og dog har du sunget Døden bort fra mit hjerte! Hvordan skal jeg lønne dig?«
+»Du har lønnet mig,« sagde nattergalen. »Jeg fik tårer af dine øjne, første gang jeg sang. Det glemmer jeg aldrig. Men lad mig komme, når jeg selv har lyst. Så vil jeg sidde om aftenen på grenen her ved vinduet og synge for dig.« Og kejseren lovede det.`,[
+ ['o:nød','','At have det rigtig svært','At spise rigtig mange nødder','At holde en stor fest','At skulle sove længe','At være i nød er at have det meget svært og have brug for hjælp.'],
+ ['l','Hvad ville nattergalen have for at synge videre?','Den prægtige guldkrone','Et smukt bur af sølv','Lidt brød og vand','Kejserens hvide hest'],
+ ['m','Hvorfor forsvandt Døden ud ad vinduet?','Han længtes efter sin have','Han var bange for fuglen','Kejseren jog ham bort','Solen stod op udenfor','Nattergalen sang om kirkegården. Så fik Døden længsel efter sin have.'],
+ ['o:længsel','','At savne noget meget','At være meget træt','At være bange for noget','At være sur på nogen','Længsel er, når man savner noget og gerne vil derhen.'],
+ ['o:lønne','»Hvordan skal jeg <b>lønne</b> dig?« Hvad betyder det at lønne?','At betale for hjælpen','At sende nogen væk','At synge for nogen','At gemme sig for nogen','Man får løn for sit arbejde. At lønne er at give noget tilbage for hjælp.'],
+ ['m','Hvilken løn havde nattergalen allerede fået?','Kejserens tårer','Kejserens krone','Et bur af guld','En ny have','Nattergalen siger: »Jeg fik tårer af dine øjne, første gang jeg sang.«'],
+ ['b','Hvorfor vil nattergalen kun komme, når den selv har lyst?','Den vil gerne være fri','Den kan ikke lide kejseren','Den er bange for mørke','Den vil hjem til guldfuglen','En levende fugl kan ikke trækkes op som en maskine. Den synger bedst, når den er fri.'],
+ ['m','Hvorfor er det flot, at nattergalen hjalp kejseren?','Kejseren havde jaget den bort','Kejseren havde givet den guld','Kejseren var dens bedste ven','Kejseren havde bygget dens rede','Kejseren siger: »Dig har jeg jaget bort fra mit land.« Alligevel kom den og hjalp.'],
+]],
+]}),
+];
+
+/* ---------- Ordbaner ---------- */
+/* Hvad betyder ordet: [sværhed, sætning, ord, rigtigt, forkert, forkert, forkert, forklaring?] */
+const ORD=[
+[1,'Ællingen var så sulten, at den spiste alt brødet.','sulten','Ville gerne have mad','Ville gerne sove lidt','Ville gerne lege','Ville gerne hjem'],
+[1,'Soldaten var modig og gik ind i den mørke skov.','modig','Ikke bange','Meget træt','Lidt sur','Meget lille'],
+[1,'Kongen boede på et stort slot.','slot','Et kæmpestort hus','En lille hytte i skoven','En stor båd','En høj bakke'],
+[1,'Tudsen var grim at se på.','grim','Ikke pæn','Meget sød','Meget lille','Meget hurtig'],
+[1,'Kejseren havde travlt hele dagen.','travlt','Havde meget at lave','Havde ondt i maven','Havde intet at lave','Havde det meget sjovt'],
+[1,'Klods-Hans grinede højt af sin egen spøg.','grinede','Lo og var glad','Græd og var trist','Råbte og var sur','Sov og var træt'],
+[1,'Svalen frøs i den kolde vinter.','frøs','Havde det koldt','Havde det varmt','Var meget sulten','Var meget glad'],
+[1,'Den lille pige var bange for mørket.','bange','Ræd og utryg','Glad og tryg','Træt og søvnig','Sur og vred'],
+[1,'Nattergalen sang smukt i træet.','smukt','Meget dejligt','Meget falsk','Meget lavt','Meget kort'],
+[1,'Ællingen svømmede rundt i søen.','svømmede','Bevægede sig i vandet','Fløj højt oppe i luften','Gik på landjorden','Sov i sin rede'],
+[1,'Heksen gav konen et lille frø, som hun kunne plante.','frø','Noget, man planter','Et dyr, der hopper','En lille sten','En slags slik','Frø kan både være et dyr og noget, man planter. Her skal det plantes.'],
+[1,'Tommelise var bitte lille.','bitte lille','Meget, meget lille','Ret stor','Lidt for stor','Helt almindelig stor'],
+[1,'Kragen var død, så den rørte sig ikke.','død','Ikke levende mere','Meget søvnig og træt','Meget sulten','Helt ny'],
+[1,'Kejseren fik tårer i øjnene.','tårer','Dråber, når man græder','Sand, der blæser i øjnene','Lys fra solen','Små insekter, der flyver'],
+[1,'Prinsessen hviskede til sin far.','hviskede','Talte meget stille','Råbte meget højt','Sang en sang','Skrev et brev'],
+[2,'Ællingen var ensom, for den havde ingen venner.','ensom','Alene og ked af det','Glad og helt fri','Sulten og meget træt','Stor og stærk'],
+[2,'Kejseren var meget stolt af sit nye tøj.','stolt','Glad for at vise det frem','Ked af at have det på','Bange for, at det går i stykker','Træt af at se på det'],
+[2,'Tommelise flettede en seng af græs.','flettede','Snoede græsset sammen','Klippede græsset af','Malede græsset grønt','Spiste græsset op'],
+[2,'Soldaten adlød kongen og gik hen til porten.','adlød','Gjorde, som han fik besked','Glemte, hvad kongen sagde','Lo ad alt, kongen sagde','Sagde nej til kongens ord'],
+[2,'Den gamle mand var meget klog.','klog','Vidste og forstod meget','Havde rigtig mange penge','Var meget stærk','Var meget høj og tynd'],
+[2,'Prinsessen var nysgerrig og åbnede kassen.','nysgerrig','Ville gerne vide noget','Ville gerne sove','Var meget sulten','Var bange for kassen'],
+[2,'Heksen gav ham en advarsel: »Gå ikke ind i skoven!«','advarsel','Besked om en fare','En gave af guld','En lille sang','En slags kage'],
+[2,'Klods-Hans undrede sig over det store slot.','undrede','Syntes, det var mærkeligt','Syntes, det var kedeligt','Var bange for det','Ville købe det'],
+[2,'Han var udmattet efter den lange tur.','udmattet','Helt træt','Helt frisk','Helt sulten','Helt glad'],
+[2,'Kongen gav en befaling til sine soldater.','befaling','Besked, de skal gøre efter','En gave, de skal pakke op','Et brev, de skal læse','En sang, de skal synge'],
+[2,'Svalen kvidrede glad i træet.','kvidrede','Lavede små fuglelyde','Byggede en stor rede','Spiste en orm','Sov helt stille'],
+[2,'Prinsen var høflig og sagde tak for maden.','høflig','Pæn og venlig','Sur og uvenlig','Træt og doven','Sulten og grådig'],
+[2,'Vejen gennem skoven var smal.','smal','Ikke ret bred','Meget lang','Meget bred','Meget mudret'],
+[2,'Den fattige pige havde hverken sko eller strømper.','hverken','Hun havde ingen af delene','Hun havde begge dele','Hun havde mange af dem','Hun havde fået nye af mor','Hverken ... eller betyder: ikke det ene og heller ikke det andet.'],
+[2,'Tinsoldaten stod standhaftigt på sit ene ben.','standhaftigt','Fast og uden at give op','Vaklende og meget bange','Hurtigt og meget muntert','Træt og dovent'],
+[3,'Ællingen var forsigtig, da den kom tæt på svanerne.','forsigtig','Passede godt på','Var helt ligeglad','Løb meget hurtigt','Var meget glad'],
+[3,'Kejseren blev forlegen, da folk grinede.','forlegen','Flov og usikker','Glad og stolt','Vred og farlig','Træt og søvnig'],
+[3,'Prinsessen var fornem og ville kun have det bedste.','fornem','Meget fin på det','Fattig og sulten','Sjov og fjollet','Lille og bange'],
+[3,'Han var misundelig på sin brors nye hest.','misundelig','Ville selv have hesten','Var glad på brorens vegne','Var bange for hesten','Ville give hesten væk'],
+[3,'Snyderne narrede hele byen.','narrede','Fik alle til at tro på løgn','Gav alle i hele byen en gave','Sang for alle i byen','Gjorde rent i hele byen'],
+[3,'Nattergalen sang vemodigt om de syge og fattige.','vemodigt','Lidt trist og stille','Vildt og meget glad','Højt og meget vredt','Hurtigt og rigtig sjovt'],
+[3,'Muldvarpen var nærig og ville aldrig dele noget.','nærig','Holdt alt for sig selv','Gav alt, han havde, væk','Var sjov at være sammen med','Kunne slet ikke se noget'],
+[3,'Prinsen tøvede, før han bankede på døren.','tøvede','Ventede lidt og var usikker','Løb hurtigt og var meget glad','Råbte højt og var vred','Sov lidt og var træt'],
+[3,'Den gamle konge var retfærdig over for alle.','retfærdig','Behandlede alle ens','Var streng mod alle','Var bange for alle','Glemte alle navnene'],
+[3,'Tinsoldaten var trofast mod danserinden.','trofast','Holdt altid af hende','Glemte hende hurtigt','Var bange for hende','Drillede hende tit'],
+[3,'Det var en stormfuld nat.','stormfuld','Med kraftig blæst','Med stille luft','Med varm sol','Med klar måne'],
+[3,'Hun forsvandt ind i den mørke skov.','forsvandt','Kunne ikke ses mere','Blev meget større','Faldt og slog sig','Blev siddende stille'],
+[3,'Klods-Hans var frimodig og talte højt til prinsessen.','frimodig','Modig og ikke genert','Genert og meget stille','Vred og uhøflig','Træt og doven'],
+[3,'Kongen tilgav sin søn, selvom han havde løjet.','tilgav','Var ikke vred mere','Straffede ham hårdt','Sendte ham langt væk','Gav ham en gave'],
+[3,'Det var utroligt, at den lille pige kunne bære så meget.','utroligt','Svært at tro på','Nemt at forstå','Meget kedeligt','Helt forkert'],
+];
+/* Find det rigtige ord: [sværhed, sætning med _, rigtigt, forkert, forkert, forkert, forklaring?] */
+const HUL=[
+[1,'Ællingen _ rundt i søen.','svømmede','kørte','gravede','cyklede'],
+[1,'Prinsessen var helt våd af _.','regnen','solen','sandet','maden'],
+[1,'Tommelise var så lille, at hun kunne sove i en _.','valnøddeskal','dobbeltseng','sofa','stor seng','Hun var ikke større end en tommelfinger. Så kan man sove i en nøddeskal.'],
+[1,'Kejseren elskede nyt _ og skiftede hver time.','tøj','vejr','brød','vand'],
+[1,'Fuglen sad i sin _ og sang.','rede','gryde','sko','kælder'],
+[1,'Om vinteren er der _ på søen.','is','sand','græs','blomster'],
+[1,'Klods-Hans havde ingen hest, så han red på en _.','gedebuk','sofa','sko','bog'],
+[1,'Det var mørkt, så de tændte et _.','lys','vindue','bord','æble'],
+[1,'Snemanden smeltede, da _ kom frem.','solen','månen','sneen','natten'],
+[1,'Prinsen var træt, så han lagde sig i sin _.','seng','gryde','taske','kop'],
+[1,'Nattergalen kunne _ meget smukt.','synge','grave','svømme','bage'],
+[1,'Den lille pige var sulten og spiste et stykke _.','brød','sten','papir','sæbe'],
+[2,'Ællingen var ked af det, fordi de andre _ den.','drillede','hjalp','elskede','fodrede'],
+[2,'Ingen sagde, at de intet så, for de ville ikke virke _.','dumme','kloge','glade','høje'],
+[2,'Svalen var stiv af kulde, men Tommelise gjorde den _ igen.','varm','kold','våd','syg'],
+[2,'Prinsessen kunne ikke sove, fordi der lå noget _ i sengen.','hårdt','blødt','varmt','sødt'],
+[2,'Klods-Hans fik prinsessen til at _, fordi han var så sjov.','grine','græde','sove','gå'],
+[2,'Da guldfuglen gik i stykker, kunne den ikke _ mere.','synge','sove','spise','vokse'],
+[2,'Svanerne var så _, at ællingen ikke kunne lade være med at kigge.','smukke','grimme','små','sure'],
+[2,'Soldaten var ikke bange. Han var meget _.','modig','doven','sulten','lille'],
+[2,'Det blev aften, og solen gik _.','ned','op','ind','over'],
+[2,'Heksen var ond, men den gamle kone var _.','venlig','grim','sur','farlig','Ordet men fortæller, at det næste er det modsatte af ond.'],
+[2,'Muldvarpen boede under jorden, så han havde aldrig set _.','solen','mørket','jorden','ormene'],
+[2,'Fordi det var så koldt, tog pigen sin tykke _ på.','frakke','badedragt','T-shirt','solhat'],
+[3,'Prinsessen var våd og beskidt. _ sagde hun, at hun var en rigtig prinsesse.','Alligevel','Derfor','Fordi','Hvis','Alligevel bruger man, når noget sker, selvom noget andet taler imod det.'],
+[3,'Ællingen var stor og grim. _ blev den drillet af alle.','Derfor','Alligevel','Selvom','Men','Derfor fortæller, at det ene er grunden til det andet.'],
+[3,'Kejseren kunne ikke se tøjet, _ han sagde, at det var smukt.','men','fordi','derfor','hvis','Men bruger man, når det næste er noget andet, end man venter.'],
+[3,'Klods-Hans havde ingen hest, _ han red på en gedebuk.','så','men','selvom','hvis','Så fortæller, hvad der skete på grund af det første.'],
+[3,'Tommelise hjalp svalen, _ den var syg.','fordi','selvom','men','så','Fordi fortæller grunden til, at hun hjalp.'],
+[3,'_ nattergalen sang, glemte kejseren alt om sin sygdom.','Mens','Selvom','Derfor','Men','Mens betyder: på samme tid som.'],
+[3,'Svanen var _ smuk end alle de andre fugle.','mere','mest','meget','megen','Når man sammenligner med »end«, bruger man mere.'],
+[3,'Det var den _ vinter, ællingen nogensinde havde oplevet.','koldeste','koldere','kold','koldt'],
+[3,'Kongen blev vred, _ prinsen kom for sent hjem.','da','men','eller','selvom'],
+[3,'Hun ville gerne ud at lege, _ det regnede for meget.','men','fordi','derfor','hvis'],
+[3,'Soldaten var træt, men han gik _ videre.','alligevel','derfor','fordi','aldrig'],
+[3,'_ du er sød ved andre, er de også søde ved dig.','Hvis','Men','Selvom','Eller'],
+];
+const fromBank=(items,make)=>{
+  const gen=(L,t,seen)=>{
+    const pool=items.filter(i=>i[0]<=L);
+    const fresh=pool.filter(i=>!seen||!seen.has(make(i).prompt));
+    const from=fresh.length?fresh:pool,top=from.filter(i=>i[0]===L);
+    return make((top.length&&Math.random()<.6)?pick(top):pick(from));
+  };
+  gen.pool=L=>items.filter(i=>i[0]<=L).length;
+  return gen;
+};
+const ordQ=i=>q.mc(`Hvad betyder <b>${i[2]}</b>?`,i[3],[i[4],i[5],i[6]],{reading:para(mark(i[1],i[2])),rtype:'o',word:i[2],hint:TYPE.o.hint,explain:i[7]||''});
+const hulQ=i=>q.mc(`Hvilket ord passer ind? ${i[1].replace('_','<span class="gap">?</span>')}`,i[2],[i[3],i[4],i[5]],{rtype:'o',word:i[2],hint:'Læs hele sætningen. Hvilket ord giver mening?',explain:i[6]||''});
+TF.LAES={TALES,ORD,HUL,para,mark};
+
+const L=(id,title,gen)=>({id:'l_'+id,title,gen});
+TF.subjects.push({id:'laes',name:'Læsning',short:'Læsning',color:'#8a4fc7',glyph:'📖',units:[
+  {id:'l1',title:'Eventyrskoven',lessons:[L('ob','Hvad betyder ordet?',fromBank(ORD,ordQ)),TALES[0],TALES[1],TALES[2]]},
+  {id:'l2',title:'Eventyrslottet',lessons:[L('hu','Find det rigtige ord',fromBank(HUL,hulQ)),TALES[3],TALES[4],TALES[5]]},
 ]});
 })();
 
@@ -1423,7 +2038,7 @@ const app=()=>document.getElementById('app');
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 const DEF=()=>({v:1,name:'',drops:0,seeds:12,streak:{last:'',n:0},lessons:{},bosses:{},inv:{},garden:{0:'tusind'},
-  settings:{len:15,sound:true,unlockAll:false},log:[],mixDay:'',ui:{sub:'mat'},updatedAt:0});
+  settings:{len:15,sound:true,unlockAll:false},log:[],mixDay:'',ui:{sub:'mat'},rstat:{},ordMiss:[],updatedAt:0});
 let S=Object.assign(DEF(),load()||{});
 let view='map',SES=null,modal=null,sel=null,lastRes=null,pg=false,scrollCur=true;
 
@@ -1520,6 +2135,7 @@ function earlier(id){
   return out;
 }
 function buildLesson(l,L){
+  if(l.build){const list=l.build(L);list.forEach(x=>x._src=l.id);return list}
   const n=S.settings.len,list=[],seen=new Set(),back=shuffle(earlier(l.id));
   for(let i=0;i<n;i++){
     const t=n>1?i/(n-1):0;
@@ -1531,13 +2147,19 @@ function buildLesson(l,L){
   }
   return list;
 }
+/* Tekst-baner: en hel tekst med alle dens spørgsmål som én blok */
+function addChunk(list,l,L,used){
+  for(let k=0;k<8;k++){const c=l.chunk(L),key=c[0].plain;if(!used.has(key)){used.add(key);c.forEach(x=>{x._src=l.id;list.push(x)});return true}}
+  return false;
+}
 function buildBoss(u){
-  const n=Math.max(20,S.settings.len),list=[],seen=new Set();let order=[];
-  for(let i=0;i<n;i++){
+  const n=Math.max(20,S.settings.len),list=[],seen=new Set(),used=new Set();let order=[],guard=0;
+  while(list.length<n&&guard++<n*4){
     if(!order.length)order=shuffle(u.lessons);
-    const t=i/(n-1),L=t>.7?3:2;
-    let done=tryAdd(list,seen,order.pop(),L,t);
-    if(!done)for(const o of u.lessons){if(tryAdd(list,seen,o,L,t)){done=true;break}}
+    const t=list.length/(n-1),L=t>.7?3:2,l=order.pop();
+    if(l.chunk){addChunk(list,l,L,used);continue}
+    let done=tryAdd(list,seen,l,L,t);
+    if(!done)for(const o of u.lessons){if(!o.chunk&&tryAdd(list,seen,o,L,t)){done=true;break}}
   }
   return list;
 }
@@ -1549,18 +2171,21 @@ function buildMix(){
     pool.push({l,L:Math.min(r.s,3),w:1+(1-acc)*6+Math.min(days,14)/3});
   })));
   if(!pool.length)subjects.forEach(sb=>pool.push({l:sb.units[0].lessons[0],L:1,w:1}));
-  const n=S.settings.len,list=[],seen=new Set();
-  let guard=0;
+  const n=S.settings.len,list=[],seen=new Set(),used=new Set(),groups=[];
+  let guard=0,texts=0;
   while(list.length<n&&guard++<n*12){
     let r=Math.random()*pool.reduce((a,x)=>a+x.w,0),c=pool[0];
     for(const x of pool){r-=x.w;if(r<=0){c=x;break}}
-    tryAdd(list,seen,c.l,c.L,Math.random());
+    const from=list.length;
+    if(c.l.chunk){if(texts>=2)continue;if(addChunk(list,c.l,c.L,used))texts++}
+    else tryAdd(list,seen,c.l,c.L,Math.random());
+    if(list.length>from)groups.push(list.slice(from));
   }
-  return shuffle(list);
+  return shuffle(groups).flat();
 }
 function start(cfg){
   SES=Object.assign({i:0,order:[],results:[],firstOK:0,drops:0,combo:0,missed:[],t0:Date.now(),state:'ask',tries:0,lastVal:''},cfg);
-  SES.base=SES.qs.length;SES.order=SES.qs.slice();SES.marks=Array(SES.base).fill('');
+  SES.base=SES.qs.length;SES.order=SES.qs.slice();SES.marks=Array(SES.base).fill('');SES.state=readState();
   view='lesson';modal=null;render();
 }
 
@@ -1576,6 +2201,8 @@ const PRAISE=['Rigtigt!','Flot regnet!','Sådan!','Du har styr på det!','Fint k
 const COMBO={5:'Fem rigtige i træk!',10:'Ti i træk! Haven jubler.',15:'Femten i træk!'};
 
 function cur(){return SES.order[SES.i]}
+function readState(){const q=cur();return q&&q._first&&!q._again?'read':'ask'}
+function readDone(){if(SES&&SES.state==='read'){SES.state='ask';render()}}
 function answer(v){
   if(SES.state!=='ask'&&SES.state!=='retry')return;
   const q=cur();
@@ -1617,13 +2244,17 @@ function rec(q,ok){
   const id=q._src;if(!id)return;
   const r=S.lessons[id]=S.lessons[id]||{s:0,plays:0,tries:0,correct:0,last:0};
   r.tries++;if(ok)r.correct++;r.last=Date.now();
+  if(q.rtype){
+    const t=S.rstat[q.rtype]=S.rstat[q.rtype]||{t:0,c:0};t.t++;if(ok)t.c++;
+    if(!ok&&q.rtype==='o'&&q.word){S.ordMiss=[q.word,...S.ordMiss.filter(w=>w!==q.word)].slice(0,30)}
+  }
 }
 function next(){
   if(!SES||view!=='lesson')return;
   clearTimeout(SES.tm);
   if(SES.state!=='right'&&SES.state!=='wrong')return;
   SES.i++;SES.state='ask';SES.tries=0;SES.wrong=[];
-  if(SES.i>=SES.order.length)finish();else render();
+  if(SES.i>=SES.order.length)finish();else{SES.state=readState();render()}
 }
 function finish(){
   const before=lvl().l,pct=SES.base?SES.firstOK/SES.base:0;
@@ -1709,9 +2340,10 @@ function openModal(){
   const lv=[1,2,3].map(n=>`<button class="lvb ${modal.L===n?'on':''}" data-a="lv" data-v="${n}" ${n>allowed?'disabled':''}>${LV[n-1]}<small>${r.s>=n?'klaret ★':n>allowed?'låst':'klar'}</small></button>`).join('');
   return `<div class="scrim" data-a="close"><div class="modal" data-stop="1" role="dialog" aria-modal="true" aria-label="${esc(f.l.title)}">
     <small>${esc(f.u.title)}</small><h2>${esc(f.l.title)}</h2>
-    <p>${S.settings.len} opgaver. Du skal have 70 % rigtige i første forsøg for at åbne næste bane.</p>
+    ${f.l.info?(()=>{const i=f.l.info(modal.L);return `<p>${i.texts?`${i.parts} korte tekster`:i.parts>1?`Et eventyr i ${i.parts} dele`:'Et eventyr'} med ${i.qs} spørgsmål (ca. ${Math.round(i.words/10)*10} ord at læse). Du skal have 70 % rigtige i første forsøg for at åbne næste bane.</p>`})():`<p>${S.settings.len} opgaver. Du skal have 70 % rigtige i første forsøg for at åbne næste bane.</p>`}
     <div class="lv">${lv}</div>
     ${math?'<div class="tip"><span>✏️</span><span>Find blyant og papir. Regn på papiret, og skriv svaret her bagefter.</span></div>':''}
+    ${f.l.story?'<div class="tip"><span>📖</span><span>Læs teksten først. Du må gerne kigge i den igen, når du svarer. Læs den gerne højt for en voksen.</span></div>':''}
     <div class="rowb"><button class="big alt" data-a="close">Tilbage</button><button class="big" id="go" data-a="go" style="background:${f.sb.color}">Start</button></div>
   </div></div>`;
 }
@@ -1724,12 +2356,23 @@ function bossModal(){
     <div class="rowb"><button class="big alt" data-a="close">Tilbage</button><button class="big" data-a="goboss" data-v="${modal.boss}" style="background:${sb.color}">Start</button></div>
   </div></div>`;
 }
+function readView(q,prog,idx,n){
+  const s=q.story;
+  return `<div class="les" style="--c:${SES.color}">
+    <div class="lt"><button class="quit" data-a="quit">Stop</button><div class="prog">${prog}</div><span class="cnt">${idx+1}/${n}</span></div>
+    <div class="sheet"><div class="tags"><span class="tag">📖 ${esc(s.title)}</span>${s.of>1?`<span class="tag">Del ${s.part} af ${s.of}</span>`:''}</div>
+      <div class="read full">${q.plain}</div>
+      <div class="tip rtip">${hog('happy')}<span>Læs teksten i ro og mag. Bagefter kommer der spørgsmål, og du må gerne kigge i teksten igen.</span></div>
+      <button class="big check" data-a="readdone" id="rd">Jeg har læst teksten</button>
+    </div></div>`;
+}
 function askView(){
   const q=cur(),st=SES.state,n=SES.base,idx=Math.min(SES.i,n-1);
   const prog=Array.from({length:n},(_,i)=>`<i class="${SES.marks[i]}${i===SES.i?' now':''}"></i>`).join('');
   const done=st==='right'||st==='wrong';
+  if(st==='read')return readView(q,prog,idx,n);
   const speakBtn=q.speak&&voiceFor(q.speak.lang)?`<button class="say-b" data-a="spk">Hør ordet</button>`:'';
-  const tags=(q.paper?'<span class="tag">✏️ Papir og blyant</span>':'')+(q._rep?'<span class="tag">Repetition</span>':'')+(q._again?'<span class="tag ag">Den prøver vi igen</span>':'');
+  const tags=(q.rtype&&TF.RTYPE?`<span class="tag rt rt-${q.rtype}">${TF.RTYPE[q.rtype].tag}</span>`:'')+(q.paper?'<span class="tag">✏️ Papir og blyant</span>':'')+(q._rep?'<span class="tag">Repetition</span>':'')+(q._again?'<span class="tag ag">Den prøver vi igen</span>':'');
   let area='';
   if(q.kind==='mc'){
     area=`<div class="mc" id="mcs">`+SES.shuffled(q).map((o,i)=>{
@@ -1759,7 +2402,7 @@ function askView(){
   return `<div class="les" style="--c:${SES.color}">
     <div class="lt"><button class="quit" data-a="quit">Stop</button><div class="prog">${prog}</div><span class="cnt">${idx+1}/${n}</span></div>
     <div class="sheet"><div class="tags">${tags}${speakBtn}</div>
-      ${q.reading?`<div class="read">${q.reading}</div>`:''}
+      ${q.reading?`<div class="read${q.story?' story':''}">${q.reading}</div>`:''}
       <div class="pr">${q.prompt}</div>
       ${q.eq?`<div class="eq">${q.eq}</div>`:''}
       ${hasVis?`<div class="vis">${q.bigEmoji?`<div class="emo">${q.bigEmoji}</div>`:''}${foto?`<img class="foto" src="${foto.src}" alt="Foto af ${esc(q.foto)}"><small class="foto-cap">Foto: ${esc(foto.by||'Ukendt')}, ${esc(foto.lic)}, <a href="${esc(foto.url)}" target="_blank" rel="noopener">kilde</a></small>`:''}${q.visual||''}</div>`:''}
@@ -1804,6 +2447,23 @@ function gardenView(){
   <div class="shop"><h2>Havecentret · du har ${S.seeds} frø</h2><div class="items">${items}</div></div>
   <div style="margin-top:14px"><button class="big alt" data-a="tohome">Tilbage til stien</button></div></div></div>`;
 }
+function readProfile(){
+  const R=S.rstat||{},TY=[['o','Ordenes betydning','Kender barnet ordene?'],['l','På linjen','Svaret står i teksten'],['m','Mellem linjerne','Svaret skal tænkes frem'],['b','Bag linjerne','Hvad vil teksten fortælle?']];
+  const pc=k=>R[k]&&R[k].t?R[k].c/R[k].t:null;
+  const total=TY.reduce((n,[k])=>n+(R[k]?R[k].t:0),0);
+  if(!total)return `<div><h2>Læseprofil</h2><p class="note2">Når barnet har lavet baner under Læsning, kan du her se, om det er ordene, det der står i teksten, eller det der står mellem linjerne, der driller.</p></div>`;
+  const bars=TY.map(([k,nm,sub])=>{const p=pc(k),n=R[k]?R[k].t:0;return `<div class="rp"><div class="rp-h"><b>${nm}</b><small>${sub}</small></div><div class="rp-b"><i style="width:${p==null?0:Math.round(p*100)}%"></i></div><span class="rp-v">${p==null?'-':Math.round(p*100)+' %'}<small>${n} spm.</small></span></div>`}).join('');
+  const o=pc('o'),l=pc('l'),m=pc('m'),enough=['o','l','m'].every(k=>R[k]&&R[k].t>=8);
+  let say='Der skal mindst 8 spørgsmål af hver af de tre første typer til, før profilen siger noget sikkert.';
+  if(enough){
+    if(l<.7)say='Svarene, der står direkte i teksten, driller. Det tyder på, at teksten ikke bliver hængende, mens barnet læser. Prøv at læse teksten højt sammen, og lad barnet pege på det sted, hvor svaret står.';
+    else if(o<l-.15&&o<=m)say='Ordene er den største forhindring: barnet finder det, der står, men kender ikke alle ordene. Tal om de ord, der drillede (listen nedenfor), og brug dem i hverdagen. Banerne »Hvad betyder ordet?« og »Find det rigtige ord« træner netop dette.';
+    else if(m<l-.15)say='Barnet finder det, der står i teksten, men har sværere ved at læse mellem linjerne. Stil spørgsmål efter læsningen, fx »Hvorfor gjorde hun det?« og »Hvordan tror du, han havde det?«.';
+    else say='Ingen af typerne skiller sig ud. Gå videre til sværere niveauer og længere tekster.';
+  }
+  const words=(S.ordMiss||[]).slice(0,20);
+  return `<div><h2>Læseprofil</h2><div class="rpw">${bars}</div><p class="rp-say">${say}</p>${words.length?`<p class="note2"><b>Ord der drillede:</b> ${words.map(esc).join(', ')}</p>`:''}</div>`;
+}
 function parentsView(){
   if(!pg){
     const a=window._pgA||(window._pgA=rnd(12,19)),b=window._pgB||(window._pgB=rnd(13,19));
@@ -1818,6 +2478,7 @@ function parentsView(){
     <div class="pgrid"><div class="pstat"><b>${totals.t}</b><small>opgaver i alt</small></div><div class="pstat"><b>${totals.t?Math.round(100*totals.c/totals.t)+' %':'-'}</b><small>rigtige i første forsøg</small></div><div class="pstat"><b>${S.log.length}</b><small>afsluttede sessioner</small></div><div class="pstat"><b>${S.streak.n}</b><small>dage i træk</small></div></div>
     <div><h2>Fagene</h2><div class="ptwrap"><table class="ptab"><tr><th>Fag</th><th>Baner klaret</th><th>Opgaver</th><th>Rigtige</th></tr>${rows}</table></div></div>
     <div><h2>Hvor det driller mest</h2>${weak.length?`<div class="ptwrap"><table class="ptab"><tr><th>Bane</th><th>Fag</th><th>Rigtige</th><th>Opgaver</th></tr>${weak.map(w=>`<tr><td>${esc(w.t)}</td><td>${w.s}</td><td>${Math.round(w.a*100)} %</td><td>${w.n}</td></tr>`).join('')}</table></div>`:'<p class="note2">Vises, når der er lavet mindst 6 opgaver i en bane.</p>'}</div>
+    ${readProfile()}
     ${logs?`<div><h2>Seneste sessioner</h2><div class="ptwrap"><table class="ptab">${logs}</table></div></div>`:''}
     <div><h2>Indstillinger</h2>
       <div style="display:flex;flex-direction:column;gap:10px;max-width:360px">
@@ -1848,6 +2509,8 @@ function render(){
   if(a&&!a.disabled){a.focus();if(a.classList.contains('txt'))a.select()}
   if(view==='map'&&scrollCur&&!modal){scrollCur=false;const c=$('.node.cur');if(c&&S.drops>0)c.scrollIntoView({block:'center'});else window.scrollTo(0,0)}
   if(view==='lesson'||view==='result')window.scrollTo(0,0);
+  const mk=view==='lesson'&&$('.read.story mark');
+  if(mk){const box=mk.closest('.read');box.scrollTop=Math.max(0,mk.offsetTop-box.clientHeight/3)}
 }
 
 /* Svar-rækkefølge: blandes én gang pr. opgave */
@@ -1878,6 +2541,7 @@ function act(a,v,el){
     case 'bs':{const i=$('#ans');if(i){i.value=i.value.slice(0,-1);i.focus()}break}
     case 'chk':{const i=$('#ans');if(i)answer(i.value);break}
     case 'next':next();break;
+    case 'readdone':readDone();break;
     case 'spk':{const q=cur();speak(q.speak.text,q.speak.lang);break}
     case 'opennext':modal={id:v};view='map';render();break;
     case 'retry':{const f=lastRes.lesson;startLesson(f,+v);break}
@@ -1921,7 +2585,8 @@ document.addEventListener('keydown',e=>{
   const st=SES.state,q=cur();
   if(e.key==='Enter'){
     e.preventDefault();
-    if(st==='right'||st==='wrong')next();
+    if(st==='read')readDone();
+    else if(st==='right'||st==='wrong')next();
     else if(q.kind!=='mc'){const i=$('#ans');if(i)answer(i.value)}
     return;
   }
@@ -1931,7 +2596,7 @@ document.addEventListener('keydown',e=>{
   }
 });
 
-window.__tf={get S(){return S},get SES(){return SES},cur:()=>SES&&cur(),answer,next};
+window.__tf={get S(){return S},get SES(){return SES},cur:()=>SES&&cur(),answer,next,readDone};
 window.addEventListener('DOMContentLoaded',()=>{render();setTimeout(cloud,0)});
 if(document.readyState!=='loading'){render();setTimeout(cloud,0)}
 })();
