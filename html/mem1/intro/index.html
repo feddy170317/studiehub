@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MEM1 hurtigstart</title>
+<meta name="description" content="Hurtigstart til Maskinelementer: kort over de seks temaer, værktøjsvælger og et interaktivt intro-deck pr. tema, før bogen læses.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="assets/oversigt.css">
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+var CFG = {
+  fag: 'MEM1', tagline: 'MEM1 · HURTIGSTART',
+  h1: 'Maskinelementer på seks temaer',
+  lead: 'Formen på faget, før bogen åbnes. En cykel er fuld af maskinelementer: en aksel med lejer, et tandhjul og en kæde, skruer, fjedre i sadlen og bremser. Faget spørger om det samme hver gang: Hvilken spænding giver lasten, og holder delen, både én gang og millioner af gange?',
+  three: [
+    ['t1', 'Hvor stor er spændingen?', 'Last giver spænding og tøjning. Træk, bøjning og vridning. Tema 1.'],
+    ['t2', 'Holder delen?', 'Én statisk last eller millioner af cyklusser. Sikkerhedsfaktor. Tema 2.'],
+    ['t5', 'Hvordan dimensioneres elementet?', 'Søjle, beholder, aksel, leje, tandhjul, skrue, fjeder, kobling og rem. Tema 3 til 6.']
+  ],
+  links: [['../../../index.html', '← Studiehub'], ['../eksamen-ny/', 'Mundtlig eksamen (9 spm.) →']],
+  mapW: 760, mapH: 430,
+  nodes: {
+    t1: { x: 30, y: 50, w: 180, h: 100, k: 't1', l1: 'Tema 1', l2: 'Spænding', l3: 'σ, τ, Mohr, δ', t: 'Tema 1 · Spænding og tøjning', p: 'Fundamentet. Last omsættes til spænding i et snit, og spænding til deformation. Alle eksamensspørgsmål starter her.', li: ['σ = P/A, σ = Mc/I, τ = Tr/J', 'plan spænding og Mohrs cirkel', 'Hookes lov og nedbøjning'] },
+    t2: { x: 30, y: 280, w: 180, h: 100, k: 't2', l1: 'Tema 2', l2: 'Brud og udmattelse', l3: 'von Mises, Goodman', t: 'Tema 2 · Statisk brud og udmattelse', p: 'Holder delen? Ved én last sammenlignes von Mises-spændingen med flydegrænsen. Ved gentagen last bruges udmattelsesgrænsen og Goodman.', li: ['spændingskoncentration K_t', 'Tresca og von Mises, sikkerhedsfaktor', 'S-N-kurve, S_e og Goodman'] },
+    t3: { x: 520, y: 8, w: 220, h: 92, k: 't3', l1: 'Tema 3', l2: 'Søjler og trykbeholdere', l3: 'spm. 1 og 2', t: 'Tema 3 · Søjler og trykbeholdere', p: 'To måder, en del kan svigte uden at materialet er overbelastet i klassisk forstand: Formen bliver ustabil (knækning), eller trykket spænder væggen.', li: ['Euler P_cr = π²EI/l_e²', 'Johnson for korte søjler, overgangsslankhed', 'σ_θ = pr/t og σ_z = pr/2t'] },
+    t4: { x: 520, y: 112, w: 220, h: 92, k: 't4', l1: 'Tema 4', l2: 'Aksler og lejer', l3: 'spm. 3 og 4', t: 'Tema 4 · Aksler og rullelejer', p: 'En roterende aksel skifter mellem træk og tryk for hver omgang. Derfor dimensioneres den mod udmattelse. Lejet dimensioneres mod levetid.', li: ['momentdiagram og kritisk snit', 'diameter efter DE-Goodman', 'L10 = (C/P)^p og ækvivalent last'] },
+    t5: { x: 520, y: 216, w: 220, h: 92, k: 't5', l1: 'Tema 5', l2: 'Tandhjul og skruer', l3: 'spm. 5 og 6', t: 'Tema 5 · Tandhjul og kraftskruer', p: 'To måder at overføre kraft på: Tanden er en lille bjælke i bøjning (Lewis), og skruen er en kile viklet om en cylinder.', li: ['Lewis: tanden som udkraget bjælke', 'moment for at løfte og sænke', 'selvlåsning: μ > tan λ'] },
+    t6: { x: 520, y: 320, w: 220, h: 92, k: 't6', l1: 'Tema 6', l2: 'Fjedre, koblinger, remme', l3: 'spm. 7, 8 og 9', t: 'Tema 6 · Fjedre, koblinger og remme', p: 'Elementer der lagrer energi eller overfører moment med friktion.', li: ['k = Gd⁴/(8D³N) og Wahl-faktor', 'lamelkobling: konstant slid', 'remtræk: F₁/F₂ = e^{μφ}'] }
+  },
+  edges: [['t1', 't2', 'σ_e'], ['t1', 't3', 'I og A'], ['t1', 't5', 'bøjning'], ['t2', 't4', 'Goodman'], ['t2', 't6', 'udmattelse']],
+  qs: [
+    ['t1', 'Hvor stor er spændingen i et snit?', '\\sigma=\\dfrac{P}{A},\\quad \\sigma=\\dfrac{Mc}{I},\\quad \\tau=\\dfrac{Tr}{J}', 'Find den indre last i snittet først (snitkræfter), og vælg formel efter lasttype.', ['sp03_akseldesign.html', 'Spm. 3 · Aksel']],
+    ['t1', 'Største normal- og forskydningsspænding?', '\\sigma_{1,2}=\\dfrac{\\sigma_x+\\sigma_y}{2}\\pm\\sqrt{\\Big(\\dfrac{\\sigma_x-\\sigma_y}{2}\\Big)^2+\\tau_{xy}^2}', 'Mohrs cirkel: centrum i middelspændingen, radius = τ_max.', ['sp02_trykbeholder.html', 'Spm. 2 · Trykbeholder']],
+    ['t2', 'Holder delen ved én statisk last?', 'n_s=\\dfrac{S_y}{\\sigma_e}', 'Duktilt materiale: von Mises-spændingen σ_e sammenlignes med flydegrænsen.', ['sp02_trykbeholder.html', 'Spm. 2 · Trykbeholder']],
+    ['t2', 'Holder den til millioner af cyklusser?', '\\dfrac{\\sigma_a}{S_e}+\\dfrac{\\sigma_m}{S_u}=\\dfrac{1}{n}', 'Goodman. Del lasten i middel- og amplitudespænding, og brug den modificerede udmattelsesgrænse S_e.', ['sp07_fjeder.html', 'Spm. 7 · Trykfjeder']],
+    ['t3', 'Bøjer en slank stang ud under tryk?', 'P_{cr}=\\dfrac{\\pi^2 E I}{l_e^2}', 'Euler for slanke søjler, Johnson for korte. Slankheden l_e/r_g afgør, hvilken der gælder.', ['sp01_soejleknaekning.html', 'Spm. 1 · Søjleknækning']],
+    ['t3', 'Spænding i væggen på en beholder under tryk?', '\\sigma_\\theta=\\dfrac{p\\,r}{t},\\quad \\sigma_z=\\dfrac{p\\,r}{2t}', 'Omkredsspændingen er dobbelt så stor som den aksiale. Derfor sprækker pølser på langs.', ['sp02_trykbeholder.html', 'Spm. 2 · Trykbeholder']],
+    ['t4', 'Hvor tyk skal akslen være?', 'd=\\Big[\\dfrac{16\\,n}{\\pi}\\Big(\\dfrac{2K_fM_a}{S_e}+\\dfrac{\\sqrt3\\,K_{fs}T_m}{S_u}\\Big)\\Big]^{1/3}', 'Roterende bøjning er fuldt vekslende, konstant vridning er middelspænding. Find det kritiske snit i momentdiagrammet.', ['sp03_akseldesign.html', 'Spm. 3 · Akseldesign']],
+    ['t4', 'Hvor længe holder lejet?', 'L_{10}=\\Big(\\dfrac{C}{P}\\Big)^{p}', 'p = 3 for kuglelejer og 10/3 for rullelejer. L10 er i millioner omdrejninger.', ['sp04_rulleleje.html', 'Spm. 4 · Rulleleje']],
+    ['t5', 'Kan tanden holde til momentet?', '\\sigma_t=\\dfrac{W_t}{b\\,m\\,Y}', 'Lewis: tanden er en udkraget bjælke, og Y er formfaktoren for tandens profil.', ['sp05_lewis.html', 'Spm. 5 · Lewis']],
+    ['t5', 'Moment for at løfte med en skrue, og er den selvlåsende?', '\\mu>\\tan\\lambda\\ \\Rightarrow\\ \\text{selvlåsende}', 'Skruen er en kile viklet om en cylinder. Er friktionen større end stigningen, glider lasten ikke ned af sig selv.', ['sp06_kraftskrue.html', 'Spm. 6 · Kraftskrue']],
+    ['t6', 'Stivhed og spænding i en skruefjeder?', 'k=\\dfrac{G\\,d^4}{8\\,D^3 N_a}', 'Fjedertråden vrides. Wahl-faktoren tager højde for krumning og direkte forskydning.', ['sp07_fjeder.html', 'Spm. 7 · Trykfjeder']],
+    ['t6', 'Hvor meget moment kan en kobling eller rem overføre?', '\\dfrac{F_1}{F_2}=e^{\\mu\\varphi}', 'Remmen: forholdet mellem stram og slap part vokser eksponentielt med omslutningsvinklen. Koblingen: konstant slid giver det sikre moment.', ['sp09_remtraek.html', 'Spm. 9 · Remtræk']]
+  ],
+  tip: '<b>Tommelfingerregel:</b> Ligger lasten konstant, er det tema 2 statisk (von Mises). Roterer delen eller svinger lasten, er det udmattelse (Goodman). Er delen lang, slank og i tryk, så tjek knækning først.',
+  decksTitle: 'Intro-decks: ét pr. tema',
+  decksSub: 'Fem slides pr. tema: hverdagsbillede, tre kerneidéer med formel, tal og en graf at lege med, og til sidst typiske fejl og koblingen til eksamen. → / mellemrum: næste · F: fuld skærm.',
+  decks: [
+    ['t1', 'tema1', 'TEMA 1 · KAP. 1–5', 'Spænding og tøjning', 'Træk, bøjning, vridning, Mohrs cirkel og deformation.', '\\sigma=\\dfrac{Mc}{I}'],
+    ['t2', 'tema2', 'TEMA 2 · KAP. 6–7', 'Statisk brud og udmattelse', 'Brudkriterier, S-N-kurven og Goodman. Hvorfor papirclipsen knækker.', '\\dfrac{\\sigma_a}{S_e}+\\dfrac{\\sigma_m}{S_u}=\\dfrac1n'],
+    ['t3', 'tema3', 'TEMA 3 · KAP. 9–10', 'Søjler og trykbeholdere', 'Euler og Johnson, omkreds- og aksialspænding.', 'P_{cr}=\\dfrac{\\pi^2EI}{l_e^2}'],
+    ['t4', 'tema4', 'TEMA 4 · KAP. 11, 13', 'Aksler og rullelejer', 'Momentdiagram, akseldiameter mod udmattelse og lejelevetid.', 'L_{10}=(C/P)^p'],
+    ['t5', 'tema5', 'TEMA 5 · KAP. 14, 16', 'Tandhjul og kraftskruer', 'Lewis-ligningen, moment i skruen og selvlåsning.', '\\sigma_t=\\dfrac{W_t}{bmY}'],
+    ['t6', 'tema6', 'TEMA 6 · KAP. 17–19', 'Fjedre, koblinger og remme', 'Skruefjederen, lamelkoblingen og remtrækket.', 'k=\\dfrac{Gd^4}{8D^3N_a}']
+  ],
+  exTitle: 'De 9 eksamensspørgsmål fordelt på temaer',
+  exHead: ['Tema', 'Spørgsmål', 'Hvad der regnes'],
+  ex: [
+    ['t3', 'Tema 3 · Søjler og trykbeholdere', [['sp01_soejleknaekning.html', '1 Søjleknækning'], ['sp02_trykbeholder.html', '2 Trykbeholder']], 'P_cr, σ_cr, σ_θ'],
+    ['t4', 'Tema 4 · Aksler og lejer', [['sp03_akseldesign.html', '3 Akseldesign'], ['sp04_rulleleje.html', '4 Rulleleje']], 'd, L10'],
+    ['t5', 'Tema 5 · Tandhjul og skruer', [['sp05_lewis.html', '5 Lewis'], ['sp06_kraftskrue.html', '6 Kraftskrue']], 'σ_t, moment, λ'],
+    ['t6', 'Tema 6 · Fjedre, koblinger, remme', [['sp07_fjeder.html', '7 Trykfjeder'], ['sp08_lamelkobling.html', '8 Lamelkobling'], ['sp09_remtraek.html', '9 Remtræk']], 'k, τ, T, F₁/F₂']
+  ],
+  exBase: '../eksamen-ny/',
+  exNote: 'Tema 1 og 2 er fundamentet under alle ni spørgsmål.',
+  footer: 'Kilde: Hamrock, B. J., Schmid, S. R. og Jacobson, B. O. (2014). <i>Fundamentals of machine elements</i> (3. udg.). CRC Press. Lavet med hjælp fra Claude (Anthropic).'
+};
+</script>
+<script src="assets/oversigt.js"></script>
+</body>
+</html>

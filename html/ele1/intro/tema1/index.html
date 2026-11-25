@@ -1,0 +1,374 @@
+<!doctype html><html lang="da"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tema 1 · DC og Kirchhoff</title>
+<meta name="description" content="Hurtigstart til ELE1 tema 1: Ohms lov og effekt, Kirchhoffs strømlov med spændings- og strømdeler, og Kirchhoffs spændingslov med maskemetoden (dag 2).">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../assets/deck.css"></head>
+<body>
+<div id="vp"><div id="deck">
+
+<!-- ============ 0 · FORSIDE ============ -->
+<section class="slide on" data-title="Forside">
+  <div style="flex:1;display:grid;grid-template-columns:1fr 600px;gap:34px;align-items:center;padding:0 10px">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div>
+        <div class="tag" style="display:inline-block">ELE1 · HURTIGSTART · TEMA 1</div>
+        <h1 style="font-size:64px;margin-top:18px">DC-kredsløb og Kirchhoff</h1>
+        <div style="font-size:26px;color:var(--mut);margin-top:6px">Spænding <b>driver</b> strømmen gennem modstanden, og to love om <b>bevarelse</b> løser resten af kredsløbet</div>
+      </div>
+      <div class="card qcard"><span class="lbl cy">KORT FORTALT</span>
+        Et lukket vandrør med en pumpe: pumpen skaber tryk, vandet løber rundt, og et smalt stykke rør bremser det. Det er et kredsløb. Trykket er spændingen, vandstrømmen er strømmen, det smalle rør er modstanden. Vandet hober sig ikke op nogen steder, og trykket, pumpen giver, bruges op på turen rundt.</div>
+      <div class="plan">
+        <div><b class="cy">1 · Ohm og effekt</b><span data-tex="V=IR,\ P=VI"></span></div>
+        <div><b class="or">2 · KCL og dellere</b>strøm ind = strøm ud</div>
+        <div><b class="pu">3 · KVL og masker</b><span data-tex="\textstyle\sum v=0"></span></div>
+        <div><b class="gr">4 · Tjek</b>fejl og eksamen</div>
+      </div>
+      <div class="links"><a href="../../dag/Dag02_Studienote.pdf">📖 Studienote dag 2</a><a href="../../../../lab/ele1/spaendingslandskab.html">🧪 3D-lab: spændingslandskab</a><a href="../../lab/dag02.html">📝 Øvelseslab dag 2</a></div>
+    </div>
+    <div class="card" style="padding:12px"><canvas id="c0" width="560" height="440"></canvas>
+      <div style="font-size:18px;color:var(--mut);text-align:center;margin-top:8px">Samme kredsløb to gange: pumpe og batteri er <b class="cy">V</b>, smalt rør og modstand er <b class="pu">R</b>, vand og ladning pr. sekund er <b class="or">I</b></div></div>
+  </div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm &nbsp;·&nbsp; ☰: alle temaer</div>
+</section>
+
+<!-- ============ 1 · OHM OG EFFEKT ============ -->
+<section class="slide" id="s1" data-title="1 · Ohm og effekt">
+  <div class="hd"><span class="tag">IDÉ 1 · OHMS LOV OG EFFEKT</span><h1>Spænding og modstand bestemmer strømmen</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Strøm og varme i en modstand</h3>
+      <div class="big" style="font-size:36px" data-tex="V=I\,R"></div>
+      <div class="src">Rizzoni og Kearns (2022), lign. (1.14), s. 30</div>
+      <div class="big" style="font-size:30px" data-tex="P=VI=I^2R=\dfrac{V^2}{R}"></div>
+      <div class="src">Rizzoni og Kearns (2022), lign. (1.11), s. 21 og (1.17), s. 35</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="V"></span><span><b>Spænding</b> i volt: det tryk, der driver ladningen gennem komponenten</span></div>
+        <div class="term"><span class="s or" data-tex="I"></span><span><b>Strøm</b> i ampere: ladning pr. sekund, <span data-tex="1\ \text{A}=1\ \text{C/s}"></span></span></div>
+        <div class="term"><span class="s pu" data-tex="R"></span><span><b>Modstand</b> i ohm: jo større, jo mindre strøm for samme spænding</span></div>
+        <div class="term"><span class="s gr" data-tex="P"></span><span><b>Effekt</b> i watt: energi omsat til varme pr. sekund. Vokser med <span data-tex="I^2"></span> og <span data-tex="V^2"></span></span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n">1</span><div class="t"><b>Strøm</b>, <span data-tex="V=12"></span> V over <span data-tex="R=500\ \Omega"></span>
+        <span class="m" data-tex="I=\dfrac{V}{R}=\dfrac{12}{500}=\boxed{24\ \text{mA}}"></span></div></div>
+      <div class="step"><span class="n b">2</span><div class="t"><b>Effekt</b> uden at bruge strømmen
+        <span class="m" data-tex="P=\dfrac{V^2}{R}=\dfrac{12^2}{500}=\boxed{0{,}288\ \text{W}}"></span></div></div>
+      <div class="step"><span class="n p">3</span><div class="t"><b>Kontrol</b> med den anden formel
+        <span class="m" data-tex="P=VI=12\cdot0{,}024=0{,}288\ \text{W}"></span>
+        <span class="note">Begge veje giver det samme</span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Dobbelt spænding</b>, <span data-tex="V=24"></span> V
+        <span class="m" data-tex="I=48\ \text{mA},\ \ P=\dfrac{24^2}{500}=1{,}152\ \text{W}"></span>
+        <span class="note">Strømmen fordobles, men varmen firedobles</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Skru på kilden og modstanden</h3>
+      <canvas id="b1" width="640" height="250"></canvas>
+      <canvas id="g1" width="640" height="230"></canvas>
+      <div class="sl"><span>Spænding V</span><input id="v1" type="range" min="0" max="24" step="1" value="12"><output id="v1o"></output></div>
+      <div class="sl"><span>Modstand R</span><input id="r1" type="range" min="100" max="1000" step="10" value="500"><output id="r1o"></output></div>
+      <div class="ro r3">
+        <div><span>I</span><b class="or" id="a1">24,0</b><i>mA</i></div>
+        <div><span>P</span><b class="gr" id="p1">0,288</b><i>W</i></div>
+        <div><span>mod 12 V, 500 Ω</span><b class="pu" id="f1">×1,00</b></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Strømmen er spændingen delt med modstanden. Varmen i modstanden vokser med kvadratet på spændingen eller strømmen.</span></div>
+</section>
+
+<!-- ============ 2 · KCL OG DELLERE ============ -->
+<section class="slide" id="s2" data-title="2 · KCL og dellere">
+  <div class="hd"><span class="tag b">IDÉ 2 · KCL, SPÆNDINGSDELER, STRØMDELER</span><h1>Strømmen deler sig, spændingen deles</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Knudepunktsmetoden</h3>
+      <div class="big" style="font-size:34px" data-tex="\sum_{n=1}^{N} i_n=0"></div>
+      <div class="src">KCL, Rizzoni og Kearns (2022), lign. (1.5), s. 11</div>
+      <div class="big" style="font-size:28px" data-tex="V_{ud}=V\dfrac{R_2}{R_1+R_2},\quad I_1=I\dfrac{R_2}{R_1+R_2}"></div>
+      <div class="src">Følger af Ohms lov (1.14), KVL (1.8) og KCL (1.5)</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="\textstyle\sum i=0"></span><span><b>Ladning hober sig ikke op</b> i en knude. Strøm ind er lig strøm ud</span></div>
+        <div class="term"><span class="s or" data-tex="\dfrac{v_a-v_b}{R}"></span><span><b>Strøm i en gren</b> (2.5): knudespænding minus knudespænding, delt med modstanden</span></div>
+        <div class="term"><span class="s pu" data-tex="V_{ud}"></span><span><b>Serie</b>: samme strøm, spændingen deles i forhold til modstandene</span></div>
+        <div class="term"><span class="s gr" data-tex="I_1"></span><span><b>Parallel</b>: samme spænding, strømmen går mest gennem den mindste modstand</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n b">1</span><div class="t"><b>KCL i knude 1</b>, <span data-tex="I_1=50"></span> mA ind
+        <span class="m" data-tex="I_1-\dfrac{v_1}{R_1}-\dfrac{v_1-v_2}{R_2}-\dfrac{v_1-v_2}{R_3}=0"></span></div></div>
+      <div class="step"><span class="n b">2</span><div class="t"><b>Matrixform</b> (2.9), kΩ og mA, fra dag 2
+        <span class="m" data-tex="\begin{bmatrix}1{,}6&-0{,}6\\-0{,}6&1{,}1\end{bmatrix}\begin{bmatrix}v_1\\v_2\end{bmatrix}=\begin{bmatrix}50\\-10\end{bmatrix}"></span>
+        <span class="m" data-tex="\boxed{v_1=35\ \text{V},\ v_2=10\ \text{V}}"></span></div></div>
+      <div class="step"><span class="n b">3</span><div class="t"><b>Kontrol i knuden</b>
+        <span class="m" data-tex="35+12{,}5+2{,}5=\boxed{50\ \text{mA ud}}"></span>
+        <span class="note">Grenene <span data-tex="v_1/R_1,\ \tfrac{v_1-v_2}{R_2},\ \tfrac{v_1-v_2}{R_3}"></span></span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Deler</b>, <span data-tex="R_1=1,\ R_2=2"></span> kΩ
+        <span class="m" data-tex="V_{ud}=12\cdot\dfrac{2}{3}=\boxed{8\ \text{V}}"></span>
+        <span class="note">Med en strøm på 12 mA: <span data-tex="I_1=8"></span> mA og <span data-tex="I_2=4"></span> mA</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Deleren med to modstande</h3>
+      <div class="row" id="mb"><button class="btn or on" data-m="v">Spændingsdeler, 12 V</button><button class="btn or" data-m="i">Strømdeler, 12 mA</button></div>
+      <canvas id="d2" width="640" height="290"></canvas>
+      <div class="sl"><span>R<sub>1</sub></span><input id="r12" type="range" min="0.5" max="10" step="0.5" value="1"><output id="r12o"></output></div>
+      <div class="sl"><span>R<sub>2</sub></span><input id="r22" type="range" min="0.5" max="10" step="0.5" value="2"><output id="r22o"></output></div>
+      <div class="ro r3">
+        <div><span id="l2a">I</span><b class="or" id="a2">4,00</b><i id="ua2">mA</i></div>
+        <div><span id="l2b">V<sub>ud</sub></span><b class="cy" id="b2">8,00</b><i id="ub2">V</i></div>
+        <div><span id="l2c">V<sub>R1</sub></span><b class="pu" id="c2">4,00</b><i id="uc2">V</i></div>
+      </div>
+      <div class="status" id="st2"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Strøm ind er lig strøm ud af hver knude. I serie deles spændingen, i parallel deles strømmen, og den største modstand tager mest spænding.</span></div>
+</section>
+
+<!-- ============ 3 · KVL OG MASKER ============ -->
+<section class="slide" id="s3" data-title="3 · KVL og masker">
+  <div class="hd"><span class="tag p">IDÉ 3 · KVL OG MASKEMETODEN</span><h1>Rundt i en maske summerer spændingerne til nul</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Maskemetoden</h3>
+      <div class="big" style="font-size:34px" data-tex="\sum_{n=1}^{N} v_n=0"></div>
+      <div class="src">KVL, Rizzoni og Kearns (2022), lign. (1.8), s. 16</div>
+      <div class="big" style="font-size:34px" data-tex="\mathbf{R}\,\mathbf{i}=\mathbf{v}"></div>
+      <div class="src">Rizzoni og Kearns (2022), lign. (2.15) og (2.16), s. 84 til 85</div>
+      <div class="terms">
+        <div class="term"><span class="s pu" data-tex="\textstyle\sum v=0"></span><span><b>Energi bevares</b>: det kilden løfter, bruger modstandene op på turen rundt</span></div>
+        <div class="term"><span class="s cy" data-tex="+V"></span><span><b>Stigning</b> (kilde fra minus til plus) regnes positiv, <b>fald</b> i en modstand negativ</span></div>
+        <div class="term"><span class="s or" data-tex="R(i_1-i_2)"></span><span><b>Delt modstand</b>: begge maskestrømme løber igennem, i hver sin retning</span></div>
+        <div class="term"><span class="s gr" data-tex="\mathbf{R}"></span><span><b>Diagonal</b>: summen af modstandene i masken. Uden for: minus den fælles modstand</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n p">1</span><div class="t"><b>To masker</b>, begge med uret. <span data-tex="V=12\ \text{V}"></span>, <span data-tex="R_1=2,\ R_2=4,\ R_3=4\ \Omega"></span>
+        <span class="note"><span data-tex="R_2"></span> er delt: fald <span data-tex="R_2(i_1-i_2)"></span></span></div></div>
+      <div class="step"><span class="n p">2</span><div class="t"><b>KVL, maske 1</b>
+        <span class="m" data-tex="12-2i_1-4(i_1-i_2)=0\ \Rightarrow\ 6i_1-4i_2=12"></span></div></div>
+      <div class="step"><span class="n p">3</span><div class="t"><b>KVL, maske 2</b>, ingen kilde
+        <span class="m" data-tex="-4(i_2-i_1)-4i_2=0\ \Rightarrow\ -4i_1+8i_2=0"></span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Løs</b>: <span data-tex="i_2=i_1/2"></span>, så <span data-tex="4i_1=12"></span>
+        <span class="m" data-tex="\boxed{i_1=3\ \text{A},\ \ i_2=1{,}5\ \text{A}}"></span>
+        <span class="note">Kontrol: <span data-tex="2\cdot3+4\cdot1{,}5=12\ \text{V}"></span>. Regnet efter i Python</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Spændingsfaldene summer til kilden</h3>
+      <canvas id="m3" width="640" height="270"></canvas>
+      <canvas id="b3" width="640" height="230"></canvas>
+      <div class="sl"><span>Kilde V</span><input id="v3" type="range" min="6" max="24" step="1" value="12"><output id="v3o"></output></div>
+      <div class="sl"><span>Modstand R<sub>2</sub></span><input id="r3" type="range" min="1" max="12" step="1" value="4"><output id="r3o"></output></div>
+      <div class="ro r3">
+        <div><span>i<sub>1</sub></span><b class="or" id="i31">3,00</b><i>A</i></div>
+        <div><span>i<sub>2</sub></span><b class="cy" id="i32">1,50</b><i>A</i></div>
+        <div><span>i<sub>1</sub> − i<sub>2</sub> i R<sub>2</sub></span><b class="pu" id="i33">1,50</b><i>A</i></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Tegn en maskestrøm med uret i hver maske, skriv spændingerne rundt, og løs ligningerne. Kontrollen er, at faldene summer til kilden.</span></div>
+</section>
+
+<!-- ============ 4 · FALDGRUBER OG TJEK ============ -->
+<section class="slide" data-title="4 · Faldgruber og tjek">
+  <div class="hd"><span class="tag g">FALDGRUBER OG TJEK</span><h1>Hvor det typisk går galt</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Typiske fejl</h3>
+      <div class="fejl">
+        <div><span>Fortegn og retning i KVL blandes, og en negativ strøm opfattes som en fejl.<span class="ret">Stigning plus, fald minus, alle maskestrømme med uret. Negativ strøm betyder blot modsat pilen.</span></span></div>
+        <div><span>Strømmen antages at være den samme i alle parallelle grene.<span class="ret">Strømmen deler sig. Kontrollér med KCL: <span data-tex="50=35+12{,}5+2{,}5"></span> mA.</span></span></div>
+        <div><span>Effekten regnes med kildespændingen i stedet for spændingen over modstanden.<span class="ret"><span data-tex="P=V^2/R"></span> bruger spændingen over netop den modstand, fx <span data-tex="V_{ud}=8"></span> V, ikke 12 V.</span></span></div>
+        <div><span>Serie og parallel byttes om.<span class="ret">Serie: samme strøm, spændingen deles. Parallel: samme spænding, strømmen deles.</span></span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Tjek dig selv</h3>
+      <div class="qa">
+        <details><summary>100 Ω har 10 V over sig. Find I og P.</summary><p><span data-tex="I=10/100=0{,}1"></span> A og <span data-tex="P=VI=10\cdot0{,}1=1"></span> W. Samme svar med <span data-tex="V^2/R"></span> og <span data-tex="I^2R"></span>.</p></details>
+        <details><summary>Strømmen i en modstand fordobles. Hvad sker der med varmen?</summary><p>Den firedobles, fordi <span data-tex="P=I^2R"></span>. Derfor bruges tykke kabler til store strømme.</p></details>
+        <details><summary>3 A løber ind i en knude, og 1,2 A løber ud i den ene gren. Hvad løber ud i den anden?</summary><p>KCL giver <span data-tex="3-1{,}2=1{,}8"></span> A ud i den anden gren.</p></details>
+      </div>
+    </div>
+    <div class="card col">
+      <h3>Til eksamen</h3>
+      <div class="exlinks">
+        <a href="../../lab/dag02.html"><b>EMNE 1</b> Øvelseslab dag 2 · Ohm, effekt, knudepunkts- og maskemetoden</a>
+        <a href="../../lab/dag12.html"><b>EMNE 1</b> Eksamenstræner dag 12 · Ohms lov, effekt og Kirchhoff</a>
+      </div>
+      <h3 style="margin-top:8px">Læs i bogen</h3>
+      <div style="display:grid;gap:6px;font-size:16px;line-height:1.35">
+        <div><b>Rizzoni, s. 11 og 16</b> KCL (1.5) og KVL (1.8)</div>
+        <div><b>Rizzoni, s. 21 og 30</b> effekt (1.11) og Ohms lov (1.14)</div>
+        <div><b>Rizzoni, s. 73 til 74</b> knudepunktsmetoden, (2.5) og (2.9)</div>
+        <div><b>Rizzoni, s. 84 til 85</b> maskemetoden, (2.15) og (2.16)</div>
+        <div><b>Pontoppidan, dag 2</b> slides s. 9, 13 til 16 og 19 til 21</div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Find først, om det er serie eller parallel. Vælg så knudepunkter ved strømkilder og masker ved spændingskilder, og kontrollér med KCL eller KVL.</span></div>
+</section>
+
+</div></div>
+<script src="../assets/deck.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = D.$, fmt = D.fmt, PI = Math.PI;
+var CY = '#0a7fc2', OR = '#d97a00', PU = '#7b4fc9', GR = '#0a9a5c', RD = '#d63a3a', INK = '#14202d', MUT = '#5a6b7d';
+
+/* ---------- tegnehjælpere ---------- */
+function W(x, pts, w) { D.line(x, pts, INK, w || 4); }
+function res(x, x0, y0, x1, y1, col) { D.spring(x, x0, y0, x1, y1, col || INK, 6); }
+function bat(x, cx, cy) { /* lodret batteri, plus øverst */
+  D.line(x, [[cx - 24, cy - 9], [cx + 24, cy - 9]], CY, 5); D.line(x, [[cx - 13, cy + 9], [cx + 13, cy + 9]], CY, 9);
+  D.txt(x, '+', cx + 38, cy - 20, 24, CY, 'center', 'middle', 800);
+}
+function pt(P, s) { /* punkt på lukket polylinje */
+  var L = 0, i, n = P.length, seg = [];
+  for (i = 0; i < n; i++) { var a = P[i], b = P[(i + 1) % n], d = Math.hypot(b[0] - a[0], b[1] - a[1]); seg.push(d); L += d; }
+  s = ((s % L) + L) % L;
+  for (i = 0; i < n; i++) { if (s <= seg[i]) { var a2 = P[i], b2 = P[(i + 1) % n], f = s / seg[i]; return [a2[0] + (b2[0] - a2[0]) * f, a2[1] + (b2[1] - a2[1]) * f]; } s -= seg[i]; }
+  return P[0];
+}
+
+/* ---------- slide 0: vandrør og kredsløb ---------- */
+(function () {
+  var x = D.cv('c0').x, N = 22;
+  var wx0 = 44, wx1 = 254, y0 = 70, y1 = 290, ex0 = 326, ex1 = 536;
+  var WP = [[wx0, y0], [wx1, y0], [wx1, y1], [wx0, y1]], EP = [[ex0, y0], [ex1, y0], [ex1, y1], [ex0, y1]];
+  var LEN = 2 * (wx1 - wx0) + 2 * (y1 - y0), ws = [], es = [], i;
+  for (i = 0; i < N; i++) { ws.push(i * LEN / N); es.push(i * LEN / N); }
+  var na = (wx1 - wx0) + (y1 - y0) * 0.3, nb = (wx1 - wx0) + (y1 - y0) * 0.7;
+  D.anim(0, function (dt) {
+    x.clearRect(0, 0, 560, 440);
+    D.txt(x, 'Vandrør', 149, 24, 24, MUT, 'center'); D.txt(x, 'Elektrisk kredsløb', 431, 24, 24, MUT, 'center');
+    /* vand: rør */
+    D.line(x, WP.concat([WP[0]]), '#bcdcf2', 22);
+    D.line(x, [[wx1, y0 + 66], [wx1, y1 - 66]], '#fff', 30);
+    D.line(x, [[wx1, y0 + 66], [wx1, y1 - 66]], PU, 8);
+    D.circ(x, wx0, 180, 30, '#e4f1fa', CY, 5); D.arrow(x, wx0, 196, wx0, 164, CY, 5);
+    for (i = 0; i < N; i++) {
+      var sp = (ws[i] > na && ws[i] < nb) ? 150 : 62; ws[i] = (ws[i] + sp * dt) % LEN;
+      var p = pt(WP, ws[i]); D.circ(x, p[0], p[1], 4.5, '#2b8fd0');
+    }
+    /* elektrisk */
+    W(x, EP.concat([EP[0]]), 5);
+    D.line(x, [[ex0, 150], [ex0, 160]], '#fff', 12); /* hul til batteri */
+    D.line(x, [[ex0, y0], [ex0, 150]], INK, 5); D.line(x, [[ex0, 210], [ex0, y1]], INK, 5);
+    x.clearRect(ex0 - 14, 151, 28, 58); bat(x, ex0, 180);
+    D.line(x, [[ex1, y0], [ex1, y0 + 66]], INK, 5); D.line(x, [[ex1, y1 - 66], [ex1, y1]], INK, 5);
+    x.clearRect(ex1 - 30, y0 + 67, 60, y1 - y0 - 134);
+    res(x, ex1, y0 + 66, ex1, y1 - 66, PU); D.line(x, [[ex1, y0 + 66], [ex1, y1 - 66]], 'rgba(0,0,0,0)', 1);
+    for (i = 0; i < N; i++) { es[i] = (es[i] + 62 * dt) % LEN; var q = pt(EP, es[i]); D.circ(x, q[0], q[1], 4.5, OR); }
+    D.arrow(x, ex0 + 70, y0 - 20, ex0 + 130, y0 - 20, OR, 5); D.txt(x, 'I', ex0 + 150, y0 - 20, 24, OR, 'left', 'middle', 800);
+    D.arrow(x, wx0 + 70, y0 - 20, wx0 + 130, y0 - 20, OR, 5); D.txt(x, 'I', wx0 + 150, y0 - 20, 24, OR, 'left', 'middle', 800);
+    /* tekst */
+    D.txt(x, 'pumpe = V', 34, 330, 22, CY, 'left', 'middle', 700); D.txt(x, 'smalt rør = R', 34, 360, 22, PU, 'left', 'middle', 700); D.txt(x, 'vand pr. sekund = I', 34, 390, 22, OR, 'left', 'middle', 700);
+    D.txt(x, 'batteri = V', 326, 330, 22, CY, 'left', 'middle', 700); D.txt(x, 'modstand = R', 326, 360, 22, PU, 'left', 'middle', 700); D.txt(x, 'ladning pr. sekund = I', 326, 390, 22, OR, 'left', 'middle', 700);
+  });
+})();
+
+/* ---------- slide 1: Ohm og effekt ---------- */
+function upd1() {
+  var V = +$('v1').value, R = +$('r1').value, I = V / R, P = V * V / R, P0 = 144 / 500;
+  $('v1o').textContent = V + ' V'; $('r1o').textContent = R + ' Ω';
+  $('a1').textContent = fmt(I * 1000, 1); $('p1').textContent = fmt(P, 3); $('f1').textContent = '×' + fmt(P / P0, 2);
+  var G = D.cv('b1'), x = G.x, k = Math.sqrt(P / 5.76);
+  x.clearRect(0, 0, G.W, G.H);
+  var l = 50, r = 300, t = 50, b = 220, by = 135;
+  var gl = x.createRadialGradient(r, by, 10, r, by, 30 + 90 * k);
+  gl.addColorStop(0, 'rgba(255,196,40,' + (0.85 * k) + ')'); gl.addColorStop(1, 'rgba(255,196,40,0)');
+  x.fillStyle = gl; x.fillRect(r - 130, by - 130, 260, 260);
+  W(x, [[l, t], [r, t], [r, by - 40]]); W(x, [[r, by + 40], [r, b], [l, b]]); W(x, [[l, t], [l, by - 9]]); W(x, [[l, by + 9], [l, b]]);
+  bat(x, l, by);
+  D.circ(x, r, by, 38, 'rgba(255,224,120,' + (0.15 + 0.85 * k) + ')', INK, 4);
+  D.line(x, [[r - 22, by + 12], [r - 11, by - 10], [r, by + 12], [r + 11, by - 10], [r + 22, by + 12]], k > 0.3 ? OR : MUT, 4);
+  D.arrow(x, 120, t, 120 + 14 + 100 * I / 0.24, t, OR, 3 + 6 * I / 0.24);
+  D.txt(x, 'I', 132, t - 26, 24, OR, 'left', 'middle', 800);
+  D.txt(x, 'V = ' + V + ' V', 350, 50, 28, CY, 'left', 'middle', 800);
+  D.txt(x, 'R = ' + R + ' Ω', 350, 100, 28, PU, 'left', 'middle', 800);
+  D.txt(x, 'I = ' + fmt(I * 1000, 1) + ' mA', 350, 150, 28, OR, 'left', 'middle', 800);
+  D.txt(x, 'P = ' + fmt(P, 3) + ' W', 350, 200, 28, GR, 'left', 'middle', 800);
+  var pm = 576 / R, ymax = Math.ceil(pm * 4) / 4; if (ymax < 0.25) ymax = 0.25;
+  D.graph('g1', { f: function (v) { return v * v / R; }, x0: 0, x1: 24, xt: [[0, '0'], [6, '6'], [12, '12'], [18, '18'], [24, '24 V']], min: 0, max: ymax, yt: [ymax / 2, ymax], yd: 2, lbl: 'P (W) mod V', col: GR, d: 3, u: 'W', xm: V, xl: 'spænding V', L: 84 });
+}
+$('v1').oninput = upd1; $('r1').oninput = upd1; upd1();
+
+/* ---------- slide 2: KCL og dellere ---------- */
+var M2 = 'v';
+function upd2() {
+  var R1 = +$('r12').value, R2 = +$('r22').value, G = D.cv('d2'), x = G.x, Rt = R1 + R2;
+  $('r12o').textContent = fmt(R1, 1) + ' kΩ'; $('r22o').textContent = fmt(R2, 1) + ' kΩ';
+  x.clearRect(0, 0, G.W, G.H);
+  if (M2 === 'v') {
+    var V = 12, I = V / Rt, Vu = V * R2 / Rt, V1 = V * R1 / Rt;
+    var xl = 70, xr = 360, yt = 60, yb = 240;
+    W(x, [[xl, yt], [150, yt]]); res(x, 150, yt, 270, yt, PU); W(x, [[270, yt], [xr, yt], [xr, 95]]); res(x, xr, 95, xr, 205, PU); W(x, [[xr, 205], [xr, yb], [xl, yb], [xl, 159]]); W(x, [[xl, 141], [xl, yt]]);
+    bat(x, xl, 150); D.txt(x, '12 V', xl + 36, 182, 24, CY, 'left', 'middle', 800);
+    D.txt(x, 'R1 = ' + fmt(R1, 1) + ' kΩ', 210, yt - 26, 22, PU, 'center', 'middle', 700); D.txt(x, 'R2 = ' + fmt(R2, 1) + ' kΩ', xr + 26, 150, 22, PU, 'left', 'middle', 700);
+    D.arrow(x, 160, yb - 24, 260, yb - 24, OR, 3 + 7 * I / 6); D.txt(x, 'I = ' + fmt(I, 2) + ' mA', 215, yb + 32, 24, OR, 'center', 'middle', 800);
+    D.txt(x, 'Vud = ' + fmt(Vu, 2) + ' V', 460, 200, 26, CY, 'left', 'middle', 800);
+    D.line(x, [[xr + 16, 95], [xr + 16, 205]], CY, 3, [6, 5]);
+    $('l2a').innerHTML = 'I'; $('ua2').textContent = 'mA'; $('l2b').innerHTML = 'V<sub>ud</sub>'; $('ub2').textContent = 'V'; $('l2c').innerHTML = 'V<sub>R1</sub>'; $('uc2').textContent = 'V';
+    $('a2').textContent = fmt(I, 2); $('b2').textContent = fmt(Vu, 2); $('c2').textContent = fmt(V1, 2);
+    $('st2').innerHTML = '<b>Spændingsdeler</b>: samme strøm i begge, og <span class="mu">V<sub>ud</sub> = 12 · R<sub>2</sub>/(R<sub>1</sub>+R<sub>2</sub>)</span>. ' + (Math.abs(R1 - R2) < 0.01 ? 'Ens modstande giver halvdelen.' : (R2 > R1 ? 'R<sub>2</sub> er størst og tager mest spænding.' : 'R<sub>1</sub> er størst og tager mest spænding.'));
+  } else {
+    var Is = 12, I1 = Is * R2 / Rt, I2 = Is * R1 / Rt, Vp = Is * R1 * R2 / Rt;
+    var xl2 = 110, xa = 290, xb = 450, yt2 = 50, yb2 = 245;
+    W(x, [[xl2, yt2], [xb, yt2]]); W(x, [[xl2, yb2], [xb, yb2]]);
+    W(x, [[xa, yt2], [xa, 90]]); res(x, xa, 90, xa, 205, PU); W(x, [[xa, 205], [xa, yb2]]);
+    W(x, [[xb, yt2], [xb, 90]]); res(x, xb, 90, xb, 205, PU); W(x, [[xb, 205], [xb, yb2]]);
+    W(x, [[xl2, yt2], [xl2, 105]]); W(x, [[xl2, 195], [xl2, yb2]]);
+    D.circ(x, xl2, 150, 45, '#fff', CY, 5); D.arrow(x, xl2, 175, xl2, 125, CY, 5);
+    D.txt(x, '12 mA', xl2, 270, 22, CY, 'center', 'middle', 800);
+    D.circ(x, xa, yt2, 6, INK); D.circ(x, xb, yt2, 6, INK);
+    D.arrow(x, xa + 22, 120, xa + 22, 175, OR, 3 + 7 * I1 / 12); D.arrow(x, xb + 22, 120, xb + 22, 175, OR, 3 + 7 * I2 / 12);
+    D.txt(x, 'R1 = ' + fmt(R1, 1) + ' kΩ', xa - 18, 150, 20, PU, 'right', 'middle', 700); D.txt(x, 'R2 = ' + fmt(R2, 1) + ' kΩ', xb - 18, 150, 20, PU, 'right', 'middle', 700);
+    D.txt(x, 'I1 = ' + fmt(I1, 2) + ' mA', xa + 20, 270, 22, OR, 'center', 'middle', 800); D.txt(x, 'I2 = ' + fmt(I2, 2) + ' mA', xb + 20, 270, 22, OR, 'center', 'middle', 800);
+    $('l2a').innerHTML = 'I<sub>1</sub> (R<sub>1</sub>)'; $('ua2').textContent = 'mA'; $('l2b').innerHTML = 'I<sub>2</sub> (R<sub>2</sub>)'; $('ub2').textContent = 'mA'; $('l2c').innerHTML = 'V over begge'; $('uc2').textContent = 'V';
+    $('a2').textContent = fmt(I1, 2); $('b2').textContent = fmt(I2, 2); $('c2').textContent = fmt(Vp, 2);
+    $('st2').innerHTML = '<b>Strømdeler</b>: samme spænding over begge, og <span class="mu">I<sub>1</sub> = 12 · R<sub>2</sub>/(R<sub>1</sub>+R<sub>2</sub>)</span>. ' + (Math.abs(R1 - R2) < 0.01 ? 'Ens modstande deler ligeligt.' : (R1 < R2 ? 'Den mindste modstand (R<sub>1</sub>) tager mest strøm.' : 'Den mindste modstand (R<sub>2</sub>) tager mest strøm.'));
+  }
+}
+document.querySelectorAll('#mb [data-m]').forEach(function (b) { b.onclick = function () { M2 = b.dataset.m; document.querySelectorAll('#mb [data-m]').forEach(function (o) { o.classList.toggle('on', o === b); }); upd2(); }; });
+$('r12').oninput = upd2; $('r22').oninput = upd2; upd2();
+
+/* ---------- slide 3: KVL og masker ---------- */
+function upd3() {
+  var V = +$('v3').value, R1 = 2, R2 = +$('r3').value, R3 = 4;
+  var det = (R1 + R2) * (R2 + R3) - R2 * R2, i1 = V * (R2 + R3) / det, i2 = V * R2 / det, d = i1 - i2;
+  var f1 = R1 * i1, f2 = R2 * d, f3 = R3 * i2;
+  $('v3o').textContent = V + ' V'; $('r3o').textContent = R2 + ' Ω';
+  $('i31').textContent = fmt(i1, 2); $('i32').textContent = fmt(i2, 2); $('i33').textContent = fmt(d, 2);
+  var G = D.cv('m3'), x = G.x;
+  x.clearRect(0, 0, G.W, G.H);
+  var xl = 50, xm = 300, xr = 550, yt = 45, yb = 235;
+  W(x, [[xl, yt], [95, yt]]); res(x, 95, yt, 215, yt, OR); W(x, [[215, yt], [xr, yt], [xr, 80]]); res(x, xr, 80, xr, 200, GR); W(x, [[xr, 200], [xr, yb], [xl, yb], [xl, 160]]); W(x, [[xl, 141], [xl, yt]]);
+  W(x, [[xm, yt], [xm, 80]]); res(x, xm, 80, xm, 200, PU); W(x, [[xm, 200], [xm, yb]]); D.circ(x, xm, yt, 6, INK); D.circ(x, xm, yb, 6, INK);
+  bat(x, xl, 150); D.txt(x, V + ' V', xl + 36, 175, 22, CY, 'left', 'middle', 800);
+  D.txt(x, 'R1 = 2 Ω', 155, yt - 26, 22, OR, 'center', 'middle', 700);
+  D.txt(x, 'R2 = ' + R2 + ' Ω', xm + 12, 100, 20, PU, 'left', 'middle', 700);
+  D.txt(x, 'R3 = 4 Ω', xr - 24, 100, 20, GR, 'right', 'middle', 700);
+  D.marc(x, 175, 160, 30, false, RD, 4); D.txt(x, 'i1', 175, 160, 24, RD, 'center', 'middle', 800);
+  D.marc(x, 425, 160, 30, false, RD, 4); D.txt(x, 'i2', 425, 160, 24, RD, 'center', 'middle', 800);
+  D.txt(x, 'maske 1', 175, 212, 20, MUT, 'center'); D.txt(x, 'maske 2', 425, 212, 20, MUT, 'center');
+  /* søjler */
+  var B = D.cv('b3'), y = B.x, base = 172, SC = 118 / 24;
+  y.clearRect(0, 0, B.W, B.H);
+  D.txt(y, 'Spændingsfald (V)', 4, 16, 22, MUT, 'left');
+  D.line(y, [[20, base], [620, base]], '#9fb0c2', 2);
+  function bar(cx, w, v, y0v, col) { var h = v * SC; y.fillStyle = col; y.fillRect(cx - w / 2, base - (y0v + v) * SC, w, h); }
+  function lab(cx, s, yy, col) { D.txt(y, s, cx, yy, 22, col, 'center', 'middle', 700); }
+  bar(80, 90, V, 0, CY); lab(80, fmt(V, 1), base - V * SC - 14, CY); lab(80, 'Kilde', base + 20, INK);
+  bar(250, 90, f1, 0, OR); bar(250, 90, f2, f1, PU); lab(250, fmt(f1, 1), base - f1 * SC / 2, '#fff'); lab(250, fmt(f2, 1), base - (f1 + f2 / 2) * SC, '#fff');
+  lab(250, '= ' + fmt(f1 + f2, 1), base - (f1 + f2) * SC - 14, INK); lab(250, 'R1 + R2', base + 20, INK);
+  bar(430, 80, f2, 0, PU); lab(430, fmt(f2, 1), base - f2 * SC - 14, PU); lab(430, 'R2', base + 20, INK);
+  bar(540, 80, f3, 0, GR); lab(540, fmt(f3, 1), base - f3 * SC - 14, GR); lab(540, 'R3', base + 20, INK);
+  D.txt(y, 'maske 1: V = V_R1 + V_R2', 165, base + 50, 20, MUT, 'center'); D.txt(y, 'maske 2: V_R2 = V_R3', 485, base + 50, 20, MUT, 'center');
+}
+$('v3').oninput = upd3; $('r3').oninput = upd3; upd3();
+D.start();
+})();
+</script>
+</body></html>

@@ -1,0 +1,349 @@
+<!doctype html><html lang="da"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tema 3 · Søjler og trykbeholdere</title>
+<meta name="description" content="Hurtigstart til MEM1 tema 3: Eulers knækning, overgangen til Johnson og spændinger i tynd- og tykvæggede trykbeholdere (Hamrock kap. 9 og 10).">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../assets/deck.css"></head>
+<body>
+<div id="vp"><div id="deck">
+
+<!-- ============ 0 · FORSIDE ============ -->
+<section class="slide on" data-title="Forside">
+  <div style="flex:1;display:grid;grid-template-columns:1fr 600px;gap:34px;align-items:center;padding:0 10px">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div>
+        <div class="tag" style="display:inline-block">MEM1 · HURTIGSTART · TEMA 3</div>
+        <h1 style="font-size:64px;margin-top:18px">Søjler og trykbeholdere</h1>
+        <div style="font-size:26px;color:var(--mut);margin-top:6px">En slank søjle <b>knækker</b> af form, før materialet giver op. En beholder svigter af <b>spænding i væggen</b></div>
+      </div>
+      <div class="card qcard"><span class="lbl cy">KORT FORTALT</span>
+        En lang lineal presses mellem to hænder. Den knuses ikke, men slår pludselig ud til siden ved en bestemt kraft. En ballon eller trykflaske gør noget andet: væggen strækkes jævnt rundt om omkredsen, og den revner på langs. Søjlen svigter på form og længde, beholderen på spændingen i væggen.</div>
+      <div class="plan">
+        <div><b class="cy">1 · Euler</b><span data-tex="P_{cr}=\pi^2EI/l_e^2"></span></div>
+        <div><b class="or">2 · Euler eller Johnson</b>slankhed og overgang</div>
+        <div><b class="pu">3 · Trykbeholdere</b><span data-tex="\sigma_\theta=pr/t"></span></div>
+        <div><b class="gr">4 · Tjek</b>fejl og eksamen</div>
+      </div>
+      <div class="links"><a href="../../Kapitel09_Studienote.pdf">📖 Studienote kap. 9</a><a href="../../Kapitel10_Studienote.pdf">📖 Studienote kap. 10</a><a href="../../../../lab/mem1/soejleknaekning.html">🧪 3D-lab: søjleknækning</a><a href="../../../../lab/mem1/trykbeholder.html">🧪 3D-lab: trykbeholder</a><a href="../../eksamen-ny/sp01_soejleknaekning.html">📝 Spm. 1 Søjleknækning</a><a href="../../eksamen-ny/sp02_trykbeholder.html">📝 Spm. 2 Trykbeholder</a></div>
+    </div>
+    <div class="card" style="padding:12px"><canvas id="c0" width="560" height="440"></canvas>
+      <div style="font-size:18px;color:var(--mut);text-align:center;margin-top:8px">Til venstre knækker linealen ved <b>P<sub>cr</sub></b>. Til højre vokser omkredsspændingen <b>σ<sub>θ</sub></b> med trykket</div></div>
+  </div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm &nbsp;·&nbsp; ☰: alle temaer</div>
+</section>
+
+<!-- ============ 1 · EULER ============ -->
+<section class="slide" id="s1" data-title="1 · Euler og indspænding">
+  <div class="hd"><span class="tag">IDÉ 1 · EULERS KNÆKNING</span><h1>Længden tæller i anden, enderne ændrer l<sub>e</sub></h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Hvornår slår søjlen ud?</h3>
+      <div class="big" style="font-size:34px" data-tex="P_{cr}=\dfrac{\pi^2EI}{l_e^{\,2}},\quad l_e=K\,l"></div>
+      <div class="src">Hamrock et al. (2014), lign. (9.12), s. 231</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="E I"></span><span><b>Stivhed</b> af materiale og form. Flydespændingen <span data-tex="S_y"></span> indgår slet ikke</span></div>
+        <div class="term"><span class="s or" data-tex="l_e"></span><span><b>Effektiv længde</b>: afstanden mellem vendepunkterne i knækformen, altså bueslængden søjlen faktisk laver</span></div>
+        <div class="term"><span class="s pu" data-tex="K"></span><span><b>Indspænding</b>: 0,5 fast-fast, 0,7 fast-leddet, 1 leddet-leddet, 2 fast-fri (flagstang)</span></div>
+        <div class="term"><span class="s gr" data-tex="r_g"></span><span><b>Inertiradius</b> <span data-tex="\sqrt{I/A}"></span>: tværsnittets effektive tykkelse mod bøjning, <span data-tex="d/4"></span> for massiv cirkel</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n">1</span><div class="t"><b>Tværsnit</b>, stålstang <span data-tex="d=20"></span> mm, <span data-tex="E=200"></span> GPa
+        <span class="m" data-tex="I=\tfrac{\pi}{64}\,20^4=7854\ \text{mm}^4"></span>
+        <span class="m" data-tex="A=314{,}2\ \text{mm}^2,\ \ r_g=5\ \text{mm}"></span></div></div>
+      <div class="step"><span class="n b">2</span><div class="t"><b>Leddet i begge ender</b>, <span data-tex="l=1"></span> m, <span data-tex="K=1"></span>
+        <span class="m" data-tex="P_{cr}=\dfrac{\pi^2\cdot200\,000\cdot7854}{1000^2}"></span>
+        <span class="m" data-tex="\boxed{P_{cr}=15{,}5\ \text{kN}}"></span></div></div>
+      <div class="step"><span class="n p">3</span><div class="t"><b>Fast-fast</b>, <span data-tex="K=0{,}5"></span>
+        <span class="m" data-tex="P_{cr}=\dfrac{\pi^2EI}{500^2}=62{,}0\ \text{kN}"></span>
+        <span class="note">Fire gange så meget, fordi <span data-tex="l_e"></span> er halveret</span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Fast-fri</b>, <span data-tex="K=2"></span>
+        <span class="m" data-tex="P_{cr}=\dfrac{\pi^2EI}{2000^2}=3{,}88\ \text{kN}"></span>
+        <span class="note">En fjerdedel. Flagstangen er den værste indspænding</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Vælg ender, træk i længden</h3>
+      <div class="row" id="kb"><button class="btn on" data-k="1">Leddet-leddet</button><button class="btn" data-k="0.5">Fast-fast</button><button class="btn" data-k="0.7">Fast-leddet</button><button class="btn" data-k="2">Fast-fri</button></div>
+      <canvas id="k1" width="640" height="300"></canvas>
+      <canvas id="g1" width="640" height="290"></canvas>
+      <div class="sl n"><span>l</span><input id="l1" type="range" min="0.5" max="2" step="0.05" value="1"><output id="l1o"></output></div>
+      <div class="ro r3">
+        <div><span>l<sub>e</sub></span><b class="or" id="v1e">1,00</b><i>m</i></div>
+        <div><span>P<sub>cr</sub></span><b class="cy" id="v1p">15,5</b><i>kN</i></div>
+        <div><span>mod leddet-leddet</span><b class="pu" id="v1f">×1,00</b></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Knæklasten falder med længden i anden. Indspænding gør søjlen effektivt kortere, og frie ender gør den effektivt længere.</span></div>
+</section>
+
+<!-- ============ 2 · EULER ELLER JOHNSON ============ -->
+<section class="slide" id="s2" data-title="2 · Euler eller Johnson">
+  <div class="hd"><span class="tag b">IDÉ 2 · EULER ELLER JOHNSON</span><h1>Slankheden afgør, hvilken formel der gælder</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Slankhed og overgang</h3>
+      <div class="big" style="font-size:30px" data-tex="\sigma_{cr}=\dfrac{\pi^2E}{(l_e/r_g)^2}"></div>
+      <div class="src">Hamrock et al. (2014), lign. (9.13), s. 231</div>
+      <div class="big" style="font-size:26px" data-tex="\sigma_{cr}=S_y-\dfrac{S_y^2}{4\pi^2E}\Big(\dfrac{l_e}{r_g}\Big)^2"></div>
+      <div class="src">Johnson, lign. (9.16), s. 232</div>
+      <div class="big" style="font-size:28px" data-tex="\Big(\dfrac{l_e}{r_g}\Big)_T=\sqrt{\dfrac{2\pi^2E}{S_y}}"></div>
+      <div class="src">Overgang, lign. (9.15) og (9.18), s. 232</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="l_e/r_g"></span><span><b>Slank</b> (højt tal): Euler. <b>Kort</b> (lavt tal): Johnson, ellers flyder søjlen først</span></div>
+        <div class="term"><span class="s or" data-tex="S_y/2"></span><span><b>Skiftet</b> sker, hvor begge kurver rører hinanden ved halv flydespænding</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n b">1</span><div class="t"><b>Slankhed</b>, samme stang, <span data-tex="l_e=1000"></span> mm
+        <span class="m" data-tex="\dfrac{l_e}{r_g}=\dfrac{1000}{5}=200"></span></div></div>
+      <div class="step"><span class="n b">2</span><div class="t"><b>Overgang</b>, <span data-tex="S_y=400"></span> MPa
+        <span class="m" data-tex="\Big(\dfrac{l_e}{r_g}\Big)_T=\sqrt{\dfrac{2\pi^2\cdot200\,000}{400}}=99{,}3"></span></div></div>
+      <div class="step"><span class="n b">3</span><div class="t"><b>Valg</b>: <span data-tex="200>99{,}3"></span>, så Euler gælder
+        <span class="m" data-tex="\sigma_{cr}=\dfrac{\pi^2\cdot200\,000}{200^2}=49{,}3\ \text{MPa}"></span>
+        <span class="note">Langt under <span data-tex="S_y/2=200"></span> MPa</span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Knæk eller flydning?</b>
+        <span class="m" data-tex="P_y=S_yA=400\cdot314{,}2=125{,}7\ \text{kN}"></span>
+        <span class="m" data-tex="\boxed{P_{cr}/P_y=15{,}5/125{,}7=12\,\%}"></span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Kritisk spænding mod slankhed</h3>
+      <canvas id="g2" width="640" height="400"></canvas>
+      <div class="sl"><span>Slankhed</span><input id="sl2" type="range" min="10" max="250" step="1" value="200"><output id="sl2o"></output></div>
+      <div class="sl"><span>Flydespænding</span><input id="y2" type="range" min="250" max="700" step="10" value="400"><output id="y2o"></output></div>
+      <div class="ro r3">
+        <div><span>overgang</span><b class="or" id="v2t">99,3</b></div>
+        <div><span>σ<sub>cr</sub></span><b class="pu" id="v2s">49,3</b><i>MPa</i></div>
+        <div><span>P<sub>cr</sub> (d = 20)</span><b class="cy" id="v2p">15,5</b><i>kN</i></div>
+      </div>
+      <div class="status" id="st2"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Slanke søjler knækker elastisk efter Euler, korte flyder og følger Johnson. Højere flydespænding flytter kun den korte del af kurven.</span></div>
+</section>
+
+<!-- ============ 3 · TRYKBEHOLDERE ============ -->
+<section class="slide" id="s3" data-title="3 · Trykbeholdere">
+  <div class="hd"><span class="tag p">IDÉ 3 · TRYKBEHOLDERE</span><h1>Omkredsen bærer dobbelt så meget som længden</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Tyndvæggede cylindre</h3>
+      <div class="big" style="font-size:34px" data-tex="\sigma_\theta=\dfrac{p\,r}{t}"></div>
+      <div class="src">Omkreds, Hamrock et al. (2014), lign. (10.4), s. 246</div>
+      <div class="big" style="font-size:34px" data-tex="\sigma_z=\dfrac{p\,r}{2t}"></div>
+      <div class="src">Aksial (længde), lign. (10.6), s. 246</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="\sigma_\theta"></span><span><b>Ringspænding</b>: halvdelen af trykket på <span data-tex="2rl"></span> holdes af to vægsnit <span data-tex="2tl"></span>. Derfor revner røret på langs</span></div>
+        <div class="term"><span class="s gr" data-tex="\sigma_z"></span><span><b>Endebund</b>: trykket på <span data-tex="\pi r^2"></span> holdes af ringen <span data-tex="2\pi rt"></span>. Halvt så stor</span></div>
+        <div class="term"><span class="s pu" data-tex="d_i/t<40"></span><span><b>Tykvægget</b> (10.2): spændingen varierer gennem væggen. Brug Lamé, lign. (10.24) og (10.26)</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n p">1</span><div class="t"><b>Tynd eller tyk</b>, <span data-tex="r=200"></span> mm, <span data-tex="t=5"></span> mm, <span data-tex="p=1"></span> MPa
+        <span class="m" data-tex="\dfrac{d_i}{t}=\dfrac{400}{5}=80>40"></span>
+        <span class="note">Tyndvægget, lign. (10.1)</span></div></div>
+      <div class="step"><span class="n p">2</span><div class="t"><b>Omkreds</b>
+        <span class="m" data-tex="\sigma_\theta=\dfrac{1\cdot200}{5}=40\ \text{MPa}"></span></div></div>
+      <div class="step"><span class="n p">3</span><div class="t"><b>Aksial</b>
+        <span class="m" data-tex="\sigma_z=\dfrac{1\cdot200}{2\cdot5}=20\ \text{MPa}"></span>
+        <span class="m" data-tex="\boxed{\sigma_\theta=2\,\sigma_z}"></span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Tykvægget som spm. 2</b>, <span data-tex="r_i=40,\ r_o=60"></span> mm, <span data-tex="p_i=50,\ p_o=0"></span>
+        <span class="m" data-tex="\sigma_\theta(r_i)=50\cdot\dfrac{3600+1600}{3600-1600}=130\ \text{MPa}"></span>
+        <span class="note"><span data-tex="\sigma_r(r_i)=-50"></span> MPa. <span data-tex="pr_i/t=100"></span> MPa undervurderer med 23 %</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Tryk og vægtykkelse (r = 200 mm)</h3>
+      <canvas id="r3" width="640" height="240"></canvas>
+      <canvas id="b3" width="640" height="250"></canvas>
+      <div class="sl"><span>Tryk p</span><input id="p3" type="range" min="0.2" max="3" step="0.1" value="1"><output id="p3o"></output></div>
+      <div class="sl"><span>Vægtykkelse t</span><input id="t3" type="range" min="4" max="40" step="1" value="5"><output id="t3o"></output></div>
+      <div class="ro r3">
+        <div><span>σ<sub>θ</sub></span><b class="cy" id="v3a">40,0</b><i>MPa</i></div>
+        <div><span>σ<sub>z</sub></span><b class="gr" id="v3z">20,0</b><i>MPa</i></div>
+        <div><span>d<sub>i</sub>/t</span><b class="pu" id="v3d">80</b></div>
+      </div>
+      <div class="status" id="st3"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Omkredsspændingen er <span data-tex="pr/t"></span> og aksialspændingen det halve. Er væggen tyk, ligger toppen på indersiden, og Lamé tager over.</span></div>
+</section>
+
+<!-- ============ 4 · FALDGRUBER OG TJEK ============ -->
+<section class="slide" data-title="4 · Faldgruber og tjek">
+  <div class="hd"><span class="tag g">FALDGRUBER OG TJEK</span><h1>Hvor det typisk går galt</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Typiske fejl</h3>
+      <div class="fejl">
+        <div><span>Længden <span data-tex="l"></span> sættes direkte ind i Euler, eller <span data-tex="K"></span> glemmes.<span class="ret">Brug <span data-tex="l_e=K\,l"></span> og tjek indspændingen: fast-fri giver <span data-tex="K=2"></span>, fast-fast <span data-tex="K=0{,}5"></span>.</span></span></div>
+        <div><span><span data-tex="r_g"></span> sættes til <span data-tex="d/2"></span> eller regnes uden kvadratrod.<span class="ret"><span data-tex="r_g=\sqrt{I/A}"></span>, for massiv cirkel <span data-tex="d/4=5"></span> mm. Med <span data-tex="d/2"></span> bliver slankheden 100 i stedet for 200.</span></span></div>
+        <div><span>Euler bruges på en kort søjle.<span class="ret">Sammenlign først <span data-tex="l_e/r_g"></span> med overgangen. Under 99 for dette stål: Johnson.</span></span></div>
+        <div><span>Omkreds og aksial byttes om.<span class="ret"><span data-tex="\sigma_\theta=pr/t"></span> er den store, <span data-tex="\sigma_z=pr/(2t)"></span> den halve.</span></span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Tjek dig selv</h3>
+      <div class="qa">
+        <details><summary>Fast-fast i stedet for leddet-leddet. Hvad sker der med P<sub>cr</sub>?</summary><p><span data-tex="K"></span> går fra 1 til 0,5, så <span data-tex="l_e"></span> halveres, og <span data-tex="P_{cr}"></span> bliver 4 gange større, her 62,0 kN i stedet for 15,5 kN.</p></details>
+        <details><summary>Hjælper et stærkere stål på en slank søjle?</summary><p>Nej. <span data-tex="S_y"></span> står ikke i Eulers formel. Kun <span data-tex="E"></span>, <span data-tex="I"></span> og <span data-tex="l_e"></span> tæller, og alle stål har næsten samme <span data-tex="E"></span>.</p></details>
+        <details><summary>Hvorfor revner en trykflaske på langs og ikke på tværs?</summary><p>Fordi <span data-tex="\sigma_\theta=2\sigma_z"></span>. Omkredsen bærer den største spænding, så revnen følger aksen.</p></details>
+      </div>
+    </div>
+    <div class="card col">
+      <h3>Til eksamen</h3>
+      <div class="exlinks">
+        <a href="../../eksamen-ny/sp01_soejleknaekning.html"><b>SPM 1</b> Søjleknækning · Euler, Johnson og overgangen</a>
+        <a href="../../eksamen-ny/sp02_trykbeholder.html"><b>SPM 2</b> Trykbeholder · Lamé på indersiden, <span data-tex="p_o=0"></span></a>
+      </div>
+      <h3 style="margin-top:8px">Læs i bogen</h3>
+      <div style="display:grid;gap:6px;font-size:16px;line-height:1.35">
+        <div><b>§ 9.3, s. 229</b> Eulers formel og udledning</div>
+        <div><b>§ 9.4, s. 231</b> endebetingelser og effektiv længde</div>
+        <div><b>§ 9.5 og 9.6, s. 232</b> slankhed og Johnsons kriterium</div>
+        <div><b>§ 10.3.1, s. 245</b> tyndvæggede cylindre</div>
+        <div><b>§ 10.3.2, s. 247</b> tykvæggede cylindre, Lamé</div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Søjle: find slankheden først og vælg Euler eller Johnson. Beholder: find først, om væggen er tynd eller tyk.</span></div>
+</section>
+
+</div></div>
+<script src="../assets/deck.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = D.$, fmt = D.fmt, PI = Math.PI;
+var CY = '#0a7fc2', OR = '#d97a00', PU = '#7b4fc9', GR = '#0a9a5c', RD = '#d63a3a', INK = '#14202d', MUT = '#5a6b7d';
+var E = 200000, DIA = 20, I = PI * Math.pow(DIA, 4) / 64, AR = PI * DIA * DIA / 4, RG = DIA / 4;
+
+function ruler(x, pts, w) { D.line(x, pts, '#d9a06c', w); D.line(x, pts, '#a8703e', 2); }
+
+/* ---------- slide 0: lineal knækker, trykbeholder pustes op ---------- */
+(function () {
+  var x = D.cv('c0').x, T = 6.2;
+  D.anim(0, function (dt, t) {
+    var tt = t % T, rs = tt > 5.5 ? Math.max(0, 1 - (tt - 5.5) / 0.7) : 1;
+    var f = tt < 2.4 ? tt / 2.4 : 1, A = 0;
+    if (tt > 2.4) A = 62 * (1 - Math.exp(-(tt - 2.4) * 6));
+    f *= rs; A *= rs;
+    x.clearRect(0, 0, 560, 440);
+    D.txt(x, 'Lineal i tryk', 135, 22, 22, MUT, 'center');
+    D.txt(x, 'Trykbeholder', 420, 22, 22, MUT, 'center');
+    var cx = 135, top = 92, bot = 372, L = bot - top, dy = 16 * A / 62, pts = [];
+    for (var i = 0; i <= 40; i++) { var s = i / 40; pts.push([cx + A * Math.sin(PI * s), top + dy + s * (L - dy)]); }
+    D.ground(x, cx - 60, cx + 60, bot);
+    ruler(x, pts, 13);
+    x.fillStyle = MUT; x.fillRect(cx - 40, top + dy - 14, 80, 10);
+    var al = 14 + f * 46; D.arrow(x, cx, top + dy - 16 - al, cx, top + dy - 16, RD, 7);
+    D.txt(x, 'F', cx + 24, top + dy - 16 - al * 0.6, 26, RD, 'left');
+    if (tt > 2.4 && tt < 5.5) D.txt(x, 'Knækker!', cx, 410, 26, RD, 'center', 'middle', 800);
+    else D.txt(x, tt < 2.4 ? 'Lige, mens F vokser' : '', cx, 410, 22, MUT, 'center');
+    /* trykbeholder, endesnit */
+    var pr = Math.min(1, tt / 4.2); pr = pr * pr * (3 - 2 * pr); pr *= rs;
+    var ccx = 420, ccy = 215, R = 72 + 34 * pr, w = 12;
+    D.circ(x, ccx, ccy, R, 'rgba(10,127,194,.08)'); D.circ(x, ccx, ccy, R, null, CY, w);
+    for (var k = 0; k < 8; k++) {
+      var a = k * PI / 4 + PI / 8, r0 = 14, r1 = 14 + 20 + pr * (R - 50);
+      D.arrow(x, ccx + r0 * Math.cos(a), ccy + r0 * Math.sin(a), ccx + r1 * Math.cos(a), ccy + r1 * Math.sin(a), RD, 4);
+    }
+    D.txt(x, 'p', ccx, ccy, 28, RD, 'center');
+    [0.9, 2.2, 3.5, 5.3].forEach(function (a) {
+      var px = ccx + (R + 6) * Math.cos(a), py = ccy + (R + 6) * Math.sin(a), tx = -Math.sin(a), ty = Math.cos(a), l = 14 + 22 * pr;
+      D.arrow(x, px, py, px + tx * l, py + ty * l, PU, 5);
+    });
+    D.txt(x, 'σθ', ccx + R + 34, ccy - 8, 26, PU, 'left');
+    D.txt(x, 'Ringen strækkes', ccx, 410, 22, MUT, 'center');
+  });
+})();
+
+/* ---------- slide 1: Euler og indspænding ---------- */
+var K1 = 1, A_ = 4.4934;
+function shape(K, s) {
+  if (K >= 1.5) return 1 - Math.cos(PI * s / 2);
+  if (K <= 0.6) return 1 - Math.cos(2 * PI * s);
+  if (K <= 0.85) return Math.sin(A_ * s) - A_ * s + A_ * (1 - Math.cos(A_ * s));
+  return Math.sin(PI * s);
+}
+function pcr(K, l) { return PI * PI * E * I / Math.pow(K * l * 1000, 2) / 1000; }
+function upd1() {
+  var l = +$('l1').value, K = K1, le = K * l, P = pcr(K, l);
+  $('l1o').textContent = fmt(l, 2) + ' m';
+  $('v1e').textContent = fmt(le, 2); $('v1p').textContent = fmt(P, P < 10 ? 2 : 1); $('v1f').textContent = '×' + fmt(P / pcr(1, l), 2);
+  var G = D.cv('k1'), x = G.x, cx = 200, y1 = 268, Lp = 70 * l + 50, y0 = y1 - Lp, amp = 34, i, pts = [], fm = 0;
+  x.clearRect(0, 0, G.W, G.H);
+  for (i = 0; i <= 200; i++) fm = Math.max(fm, Math.abs(shape(K, i / 200)));
+  for (i = 0; i <= 60; i++) { var s = i / 60; pts.push([cx + amp * shape(K, s) / fm, y1 - s * Lp]); }
+  D.line(x, [[cx, y0], [cx, y1]], 'rgba(90,107,125,.35)', 2, [5, 5]);
+  ruler(x, pts, 9);
+  function fixd(y) { D.line(x, [[cx - 26, y], [cx + 26, y]], MUT, 4); for (var q = -24; q <= 20; q += 11) D.line(x, [[cx + q, y + (y > 100 ? 0 : 0)], [cx + q - 8, y + (y > 130 ? 10 : -10)]], '#9fb0c2', 2); }
+  function pin(y, up) { D.pin(x, cx, y, 7); D.line(x, [[cx - 22, y + (up ? -12 : 12)], [cx + 22, y + (up ? -12 : 12)]], MUT, 3); }
+  if (K >= 1.5) { fixd(y1 + 4); }
+  else if (K <= 0.6) { fixd(y1 + 4); fixd(y0 - 4); }
+  else if (K <= 0.85) { fixd(y1 + 4); pin(y0, true); }
+  else { pin(y1, false); pin(y0, true); }
+  D.arrow(x, pts[60][0], y0 - 52, pts[60][0], y0 - 16, RD, 6); D.txt(x, 'P', pts[60][0] + 20, y0 - 38, 24, RD, 'left');
+  D.line(x, [[cx - 62, y0], [cx - 62, y1]], PU, 3); D.line(x, [[cx - 70, y0], [cx - 54, y0]], PU, 3); D.line(x, [[cx - 70, y1], [cx - 54, y1]], PU, 3);
+  D.txt(x, 'l = ' + fmt(l, 2) + ' m', cx - 78, (y0 + y1) / 2, 22, PU, 'right');
+  D.txt(x, 'K = ' + ({ 1: '1', 0.5: '0,5', 0.7: '0,7', 2: '2' })[K], 360, 90, 34, OR, 'left', 'middle', 800);
+  D.txt(x, 'le = K · l = ' + fmt(le, 2) + ' m', 360, 140, 26, INK, 'left');
+  D.txt(x, ({ 1: 'leddet-leddet', 0.5: 'fast-fast', 0.7: 'fast-leddet', 2: 'fast-fri' })[K], 360, 182, 24, MUT, 'left');
+  var pm = Math.ceil(pcr(K, 0.5) / 10) * 10;
+  D.graph('g1', { f: function (q) { return pcr(K, q); }, x0: 0.5, x1: 2, xt: [[0.5, '0,5'], [1, '1'], [1.5, '1,5'], [2, '2 m']], min: 0, max: pm, yt: [pm / 2, pm], yd: 0, lbl: 'Pcr (kN)', col: CY, d: P < 10 ? 2 : 1, u: 'kN', xm: l, xl: 'længde l', ref: function (q) { return pcr(1, q); } });
+}
+document.querySelectorAll('#kb [data-k]').forEach(function (b) { b.onclick = function () { K1 = +b.dataset.k; document.querySelectorAll('#kb [data-k]').forEach(function (o) { o.classList.toggle('on', o === b); }); upd1(); }; });
+$('l1').oninput = upd1; upd1();
+
+/* ---------- slide 2: Euler eller Johnson ---------- */
+function upd2() {
+  var lam = +$('sl2').value, Sy = +$('y2').value, lt = Math.sqrt(2 * PI * PI * E / Sy);
+  function eul(q) { return PI * PI * E / (q * q); }
+  function joh(q) { var v = Sy - Sy * Sy / (4 * PI * PI * E) * q * q; return v < 0 ? NaN : v; }
+  function gov(q) { return q >= lt ? eul(q) : joh(q); }
+  var sc = gov(lam), P = sc * AR / 1000;
+  $('sl2o').textContent = lam; $('y2o').textContent = Sy + ' MPa';
+  $('v2t').textContent = fmt(lt, 1); $('v2s').textContent = fmt(sc, 1); $('v2p').textContent = fmt(P, 1);
+  var g = D.graph('g2', { f: gov, x0: 0, x1: 250, xt: [[0, '0'], [50, '50'], [100, '100'], [150, '150'], [200, '200'], [250, '250']], min: 0, max: 750, yt: [200, 400, 600], yd: 0, lbl: 'σcr (MPa)', col: PU, d: 1, u: 'MPa', xm: lam, xl: 'slankhed le / rg', vline: lt, hl: [Sy / 2, 'Sy/2'],
+    more: [{ f: eul, col: CY, w: 3, dash: [9, 6] }, { f: joh, col: OR, w: 3, dash: [9, 6] }] });
+  D.txt(g.x, 'Johnson', g.X(8), g.Y(Sy) - 20, 22, OR, 'left');
+  D.txt(g.x, 'Euler', g.X(122), g.Y(eul(122)) + 30, 22, CY, 'left');
+  $('st2').innerHTML = lam >= lt ? '<b>Euler</b> gælder: slank søjle, knækker elastisk. <span class="mu">Prøv flydespændingen: P<sub>cr</sub> ændres ikke.</span>' : '<b>Johnson</b> gælder: kort søjle, Euler ville give for høj spænding.';
+}
+$('sl2').oninput = upd2; $('y2').oninput = upd2; upd2();
+
+/* ---------- slide 3: trykbeholdere ---------- */
+function upd3() {
+  var p = +$('p3').value, t = +$('t3').value, r = 200, ro = r + t;
+  var st = p * r / t, sz = p * r / (2 * t), lame = p * (ro * ro + r * r) / (ro * ro - r * r), di = 2 * r / t;
+  $('p3o').textContent = fmt(p, 1) + ' MPa'; $('t3o').textContent = t + ' mm';
+  $('v3a').textContent = fmt(st, 1); $('v3z').textContent = fmt(sz, 1); $('v3d').textContent = fmt(di, 0);
+  var G = D.cv('r3'), x = G.x;
+  x.clearRect(0, 0, G.W, G.H);
+  var cx = 150, cy = 125, R = 82, w = 3 + t * 0.45, k;
+  D.circ(x, cx, cy, R, 'rgba(10,127,194,.08)'); D.circ(x, cx, cy, R - w / 2, null, CY, w);
+  for (k = 0; k < 8; k++) { var a = k * PI / 4 + PI / 8, l1 = 16 + p * 12; D.arrow(x, cx + 10 * Math.cos(a), cy + 10 * Math.sin(a), cx + (10 + l1) * Math.cos(a), cy + (10 + l1) * Math.sin(a), RD, 4); }
+  D.txt(x, 'p', cx, cy, 24, RD, 'center');
+  [0.9, 2.2, 3.5, 5.3].forEach(function (a) { var px = cx + (R + 4) * Math.cos(a), py = cy + (R + 4) * Math.sin(a); D.arrow(x, px, py, px - Math.sin(a) * 34, py + Math.cos(a) * 34, PU, 5); });
+  D.txt(x, 'σθ', cx + R + 26, cy - 40, 24, CY, 'left'); D.txt(x, 'endesnit', cx, 228, 18, MUT, 'center');
+  var bx0 = 370, bx1 = 560, by0 = 85, by1 = 165;
+  x.fillStyle = 'rgba(10,127,194,.1)'; x.fillRect(bx0, by0, bx1 - bx0, by1 - by0);
+  D.line(x, [[bx0, by0], [bx1, by0]], CY, 5 + t * 0.15); D.line(x, [[bx0, by1], [bx1, by1]], CY, 5 + t * 0.15); D.line(x, [[bx1, by0], [bx1, by1]], CY, 5 + t * 0.15); D.line(x, [[bx0, by0], [bx0, by1]], CY, 5 + t * 0.15);
+  D.arrow(x, bx1 + 4, (by0 + by1) / 2, bx1 + 50, (by0 + by1) / 2, GR, 6); D.arrow(x, bx0 - 4, (by0 + by1) / 2, bx0 - 50, (by0 + by1) / 2, GR, 6);
+  D.txt(x, 'σz', bx1 + 14, by0 + 4, 24, GR, 'left'); D.txt(x, 'p', (bx0 + bx1) / 2, (by0 + by1) / 2, 24, RD, 'center'); D.txt(x, 'længdesnit', (bx0 + bx1) / 2, 228, 18, MUT, 'center');
+  var B = D.cv('b3'), y = B.x, SC = 160, L0 = 160, R0 = 600;
+  y.clearRect(0, 0, B.W, B.H);
+  function bar(row, v, col, lab, tag) {
+    var yy = 22 + row * 76, ww = Math.min(1, v / SC) * (R0 - L0);
+    D.txt(y, lab, 4, yy + 26, 24, col, 'left', 'middle', 700); D.txt(y, tag, 4, yy + 52, 16, MUT, 'left');
+    y.fillStyle = '#e4ecf4'; y.fillRect(L0, yy, R0 - L0, 52); y.fillStyle = col; y.fillRect(L0, yy, ww, 52);
+    D.txt(y, fmt(v, 1) + ' MPa', Math.min(L0 + ww + 8, R0 - 130), yy + 26, 24, ww > 330 ? '#fff' : col, 'left', 'middle', 800);
+  }
+  bar(0, st, CY, 'σθ', 'pr/t'); bar(1, sz, GR, 'σz', 'pr/(2t)'); bar(2, lame, '#8a97a6', 'Lamé', 'σθ ved ri');
+  $('st3').innerHTML = di > 40 ? '<b>Tyndvægget</b> (d<sub>i</sub>/t &gt; 40): pr/t og Lamé er næsten ens.' : '<b>Tykvægget</b> (d<sub>i</sub>/t &lt; 40): Lamé giver ' + fmt(lame, 1) + ' MPa ved indersiden. Brug (10.24).';
+}
+$('p3').oninput = upd3; $('t3').oninput = upd3; upd3();
+D.start();
+})();
+</script>
+</body></html>

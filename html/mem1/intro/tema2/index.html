@@ -1,0 +1,371 @@
+<!doctype html><html lang="da"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tema 2 · Statisk brud og udmattelse</title>
+<meta name="description" content="Hurtigstart til MEM1 tema 2: spændingskoncentration, Tresca og von Mises, S-N-kurve, udmattelsesgrænse og Goodman-linjen.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../assets/deck.css"></head>
+<body>
+<div id="vp"><div id="deck">
+
+<!-- ============ 0 · FORSIDE ============ -->
+<section class="slide on" data-title="Forside">
+  <div style="flex:1;display:grid;grid-template-columns:1fr 600px;gap:34px;align-items:center;padding:0 10px">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div>
+        <div class="tag" style="display:inline-block">MEM1 · HURTIGSTART · TEMA 2</div>
+        <h1 style="font-size:64px;margin-top:18px">Statisk brud og udmattelse</h1>
+        <div style="font-size:26px;color:var(--mut);margin-top:6px">Samme del kan holde til ét stort træk, men give op efter mange <b>små</b> gentagelser</div>
+      </div>
+      <div class="card qcard"><span class="lbl cy">KORT FORTALT</span>
+        En papirclips kan hænge en tung nøgle uden at tage skade, men bøjes den frem og tilbage, knækker den efter en lille håndfuld bøjninger. Hver bøjning er langt under det, der skal til for at bryde den i ét træk. Statisk brud handler om det ene store træk, udmattelse om de mange små.</div>
+      <div class="plan">
+        <div><b class="cy">1 · Statisk brud</b>Tresca og von Mises, <span data-tex="n_s"></span></div>
+        <div><b class="or">2 · Udmattelse</b>S-N-kurve og <span data-tex="S_e"></span></div>
+        <div><b class="pu">3 · Middelspænding</b>Goodman-linjen</div>
+        <div><b class="gr">4 · Tjek</b>fejl og eksamen</div>
+      </div>
+      <div class="links"><a href="../../Kapitel06_Studienote.pdf">📖 Kap. 6 Studienote PDF</a><a href="../../Kapitel07_Studienote.pdf">📖 Kap. 7 Studienote PDF</a><a href="../../../../lab/mem1/flydekriterier.html">🧪 3D-lab: flydekriterier</a><a href="../../../../lab/mem1/udmattelse-goodman.html">🧪 3D-lab: udmattelse og Goodman</a><a href="../../eksamen-ny/sp03_akseldesign.html">📝 Spm. 3 Akseldesign</a><a href="../../eksamen-ny/sp07_fjeder.html">📝 Spm. 7 Fjeder</a></div>
+    </div>
+    <div class="card" style="padding:12px"><canvas id="c0" width="560" height="440"></canvas>
+      <div style="font-size:18px;color:var(--mut);text-align:center;margin-top:8px">Samme metal: <b>mange små</b> bøjninger knækker, <b>ét</b> træk holder</div></div>
+  </div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm &nbsp;·&nbsp; ☰: alle temaer</div>
+</section>
+
+<!-- ============ 1 · STATISK BRUD ============ -->
+<section class="slide" id="s1" data-title="1 · Statisk brud">
+  <div class="hd"><span class="tag">IDÉ 1 · STATISK BRUD</span><h1>Ét tal fra spændingstilstanden mod S<sub>y</sub></h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Duktilt materiale, statisk last</h3>
+      <div class="big" style="font-size:28px" data-tex="\sigma_1-\sigma_3=\dfrac{S_y}{n_s}"></div>
+      <div class="src">Tresca (MSST): Hamrock et al. (2014), lign. (6.8), s. 144</div>
+      <div class="big" style="font-size:28px" data-tex="\sigma_e=\sqrt{\sigma_1^2-\sigma_1\sigma_2+\sigma_2^2}=\dfrac{S_y}{n_s}"></div>
+      <div class="src">Von Mises (DET): Hamrock et al. (2014), lign. (6.12), s. 145</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="\sigma_1,\sigma_3"></span><span><b>Største og mindste</b> hovedspænding. Alle tre ordnes, også nullet fra plan spænding</span></div>
+        <div class="term"><span class="s or" data-tex="\sigma_e"></span><span><b>Ét sammenligningstal</b>, som holdes op mod <span data-tex="S_y"></span> fra trækprøven</span></div>
+        <div class="term"><span class="s gr" data-tex="n_s"></span><span><b>Sikkerhedsfaktor</b>: styrke divideret med spænding. Over 1 betyder ingen flydning</span></div>
+        <div class="term"><span class="s pu" data-tex="K_t"></span><span><b>Kærvfaktor</b> <span data-tex="\sigma_{max}/\sigma_{nom}"></span> (6.1, s. 134). Statisk og duktilt udjævner flydning spidsen, så den udelades</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n">1</span><div class="t"><b>Ordn hovedspændingerne</b>, plan spænding har <span data-tex="\sigma_3=0"></span>
+        <span class="m" data-tex="\sigma_1=120,\ 0,\ -40\ \text{MPa},\quad S_y=280\ \text{MPa}"></span></div></div>
+      <div class="step"><span class="n">2</span><div class="t"><b>Tresca</b>, største minus mindste
+        <span class="m" data-tex="\boxed{n_s=\dfrac{280}{120-(-40)}=\dfrac{280}{160}=1{,}75}"></span></div></div>
+      <div class="step"><span class="n b">3</span><div class="t"><b>Von Mises</b>
+        <span class="m" data-tex="\sigma_e=\sqrt{120^2+40^2+120\cdot40}=144{,}2\ \text{MPa}"></span>
+        <span class="m" data-tex="\boxed{n_s=\dfrac{280}{144{,}2}=1{,}94}"></span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Tresca er konservativ</b>
+        <span class="note">Sekskanten ligger inden for ellipsen, så Tresca giver aldrig større <span data-tex="n_s"></span>. Her er forskellen 11 %.</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Flyt punktet i (σ₁, σ₂)-planen</h3>
+      <canvas id="p1" width="640" height="600"></canvas>
+      <div class="sl n"><span data-tex="\sigma_1"></span><input id="a1" type="range" min="-300" max="300" step="5" value="120"><output id="a1o"></output></div>
+      <div class="sl n"><span data-tex="\sigma_2"></span><input id="a2" type="range" min="-300" max="300" step="5" value="-40"><output id="a2o"></output></div>
+      <div class="ro r3">
+        <div><span>n<sub>s</sub> Tresca</span><b class="cy" id="v1t">1,75</b></div>
+        <div><span>n<sub>s</sub> von Mises</span><b class="or" id="v1m">1,94</b></div>
+        <div><span>σ<sub>e</sub></span><b class="pu" id="v1e">144,2</b><i>MPa</i></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Ligger punktet inden for sekskanten, er delen sikker. Tresca er den strenge, von Mises den præcise, og de mødes ved lige store σ₁ og σ₂.</span></div>
+</section>
+
+<!-- ============ 2 · UDMATTELSE ============ -->
+<section class="slide" id="s2" data-title="2 · Udmattelse">
+  <div class="hd"><span class="tag b">IDÉ 2 · UDMATTELSE</span><h1>Under knækket holder delen i det uendelige</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>S-N-kurve og udmattelsesgrænse</h3>
+      <div class="big" style="font-size:30px" data-tex="S'_e\approx0{,}5\,S_u\ \text{(stål)}"></div>
+      <div class="src">Hamrock et al. (2014), lign. (7.6), s. 166</div>
+      <div class="big" style="font-size:30px" data-tex="S_e=k_f\,k_s\,k_r\,k_t\,k_m\,S'_e"></div>
+      <div class="src">Hamrock et al. (2014), lign. (7.18), s. 171</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="S'_e"></span><span><b>Prøvestang</b>: amplituden, den tåler i mere end 10<sup>6</sup> cyklusser (knækket i kurven)</span></div>
+        <div class="term"><span class="s or" data-tex="S_e"></span><span><b>Den rigtige del</b>, nedskrevet af overflade, størrelse, pålidelighed, temperatur og diverse</span></div>
+        <div class="term"><span class="s gr" data-tex="k_f,k_s,k_r"></span><span><b>Hver faktor under 1</b> gør delen svagere end stangen: ru overflade, stor diameter, høj pålidelighed</span></div>
+        <div class="term"><span class="s pu" data-tex="S_f"></span><span><b>Styrke ved N cyklusser</b>: lige linje i log-log fra 0,9 <span data-tex="S_u"></span> ved 10<sup>3</sup> til <span data-tex="S_e"></span> ved 10<sup>6</sup></span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n b">1</span><div class="t"><b>Stålstang</b>, <span data-tex="S_u=700"></span> MPa
+        <span class="m" data-tex="S'_e=0{,}5\cdot700=350\ \text{MPa}"></span></div></div>
+      <div class="step"><span class="n b">2</span><div class="t"><b>Kurvens start</b> ved 10<sup>3</sup> cyklusser
+        <span class="m" data-tex="0{,}9\cdot700=630\ \text{MPa}"></span></div></div>
+      <div class="step"><span class="n b">3</span><div class="t"><b>Maskindel</b>, <span data-tex="k_f=0{,}85,\ k_s=0{,}90,\ k_r=0{,}90"></span>
+        <span class="m" data-tex="\boxed{S_e=0{,}85\cdot0{,}90\cdot0{,}90\cdot350=241\ \text{MPa}}"></span></div></div>
+      <div class="step"><span class="n b">4</span><div class="t"><b>Ved 10<sup>5</sup> cyklusser</b>, hældning <span data-tex="b=-0{,}085"></span>
+        <span class="m" data-tex="S_f=630\cdot100^{-0{,}085}=426\ \text{MPa (stang)}"></span>
+        <span class="note">Delen tåler kun 332 MPa her.</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Træk i antal cyklusser N</h3>
+      <canvas id="p2" width="640" height="540"></canvas>
+      <div class="sl n"><span>N</span><input id="a3" type="range" min="3" max="7" step="0.05" value="5"><output id="a3o"></output></div>
+      <div class="ro r3">
+        <div><span>N</span><b id="v2n">10<sup>5,0</sup></b></div>
+        <div><span>S<sub>f</sub> stang</span><b class="cy" id="v2s">426</b><i>MPa</i></div>
+        <div><span>S<sub>f</sub> del</span><b class="or" id="v2d">332</b><i>MPa</i></div>
+      </div>
+      <div class="status" id="st2"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Under udmattelsesgrænsen holder stangen i det uendelige. Delens grænse er lavere, fordi overflade, størrelse og pålidelighed trækker den ned.</span></div>
+</section>
+
+<!-- ============ 3 · GOODMAN ============ -->
+<section class="slide" id="s3" data-title="3 · Middelspænding">
+  <div class="hd"><span class="tag p">IDÉ 3 · MIDDELSPÆNDING</span><h1>Goodman: forhåndsspænding æder amplituden</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Svingende last med middelværdi</h3>
+      <div class="big" style="font-size:30px" data-tex="\dfrac{\sigma_a}{S_e}+\dfrac{\sigma_m}{S_{ut}}=\dfrac1{n_s}"></div>
+      <div class="src">Hamrock et al. (2014), lign. (7.28), s. 177</div>
+      <div class="big" style="font-size:24px" data-tex="\begin{aligned}\sigma_m&=\dfrac{\sigma_{max}+\sigma_{min}}2\\[2pt]\sigma_a&=\dfrac{\sigma_{max}-\sigma_{min}}2\end{aligned}"></div>
+      <div class="src">Hamrock et al. (2014), afsnit 7.3, s. 162</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="\sigma_a"></span><span><b>Amplitude</b>: det halve udsving, regnet fra middelværdien</span></div>
+        <div class="term"><span class="s pu" data-tex="\sigma_m"></span><span><b>Middelspænding</b>: midten af svingningen. Den æder af det, amplituden må være</span></div>
+        <div class="term"><span class="s gr" data-tex="S_e"></span><span><b>Grænse ved ren veksling</b> (<span data-tex="\sigma_m=0"></span>), den modificerede fra idé 2</span></div>
+        <div class="term"><span class="s or" data-tex="S_{ut}"></span><span><b>Brudstyrke i træk</b>, grænsen når der slet ingen amplitude er</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n p">1</span><div class="t"><b>Last</b> mellem 50 og 250 MPa
+        <span class="m" data-tex="\sigma_m=\tfrac{250+50}2=150\ \text{MPa}"></span><span class="m" data-tex="\sigma_a=\tfrac{250-50}2=100\ \text{MPa}"></span></div></div>
+      <div class="step"><span class="n p">2</span><div class="t"><b>Goodman</b> indsat
+        <span class="m" data-tex="\tfrac{100}{200}+\tfrac{150}{600}=0{,}50+0{,}25=0{,}75"></span></div></div>
+      <div class="step"><span class="n p">3</span><div class="t"><b>Sikkerhedsfaktor</b>
+        <span class="m" data-tex="\boxed{n_s=\dfrac1{0{,}75}=1{,}33}"></span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Grafisk kontrol</b>
+        <span class="note">Lastlinjen fra origo gennem (150, 100) rammer linjen i (200, 133). Forholdet 200/150 giver samme 1,33.</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Flyt arbejdspunktet i Goodman-diagrammet</h3>
+      <canvas id="p3" width="640" height="580"></canvas>
+      <div class="sl n"><span data-tex="\sigma_m"></span><input id="a4" type="range" min="0" max="600" step="5" value="150"><output id="a4o"></output></div>
+      <div class="sl n"><span data-tex="\sigma_a"></span><input id="a5" type="range" min="0" max="250" step="5" value="100"><output id="a5o"></output></div>
+      <div class="ro r3">
+        <div><span>n<sub>s</sub></span><b class="pu" id="v3n">1,33</b></div>
+        <div><span>σ<sub>max</sub></span><b class="cy" id="v3x">250</b><i>MPa</i></div>
+        <div><span>σ<sub>min</sub></span><b class="cy" id="v3m">50</b><i>MPa</i></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Hver MPa middelspænding koster amplitude. Ligger punktet under Goodman-linjen, er n over 1, og delen holder til evigt.</span></div>
+</section>
+
+<!-- ============ 4 · FALDGRUBER OG TJEK ============ -->
+<section class="slide" data-title="4 · Faldgruber og tjek">
+  <div class="hd"><span class="tag g">FALDGRUBER OG TJEK</span><h1>Hvor det typisk går galt</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Typiske fejl</h3>
+      <div class="fejl">
+        <div><span>K<sub>t</sub> ganges på spændingen ved statisk last på et duktilt materiale.<span class="ret">Flydning udjævner spidsen, så K<sub>t</sub> udelades. Den hører til udmattelse og sprøde materialer.</span></span></div>
+        <div><span>S<sub>e</sub> = 0,5 S<sub>u</sub> bruges direkte på maskindelen.<span class="ret">Det er kun prøvestangen. Gang med k<sub>f</sub>, k<sub>s</sub>, k<sub>r</sub>, k<sub>t</sub>, k<sub>m</sub> først.</span></span></div>
+        <div><span>σ<sub>m</sub> og σ<sub>a</sub> byttes om, eller σ<sub>a</sub> sættes lig σ<sub>max</sub>.<span class="ret">σ<sub>m</sub> er gennemsnittet og σ<sub>a</sub> det halve udsving: (max − min)/2.</span></span></div>
+        <div><span>Tresca regnes som σ<sub>1</sub> − σ<sub>2</sub> ved plan spænding.<span class="ret">Ordn alle tre med nullet og tag største minus mindste.</span></span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Tjek dig selv</h3>
+      <div class="qa">
+        <details><summary>Hvorfor er Tresca mere konservativ end von Mises?</summary><p>Sekskanten ligger inden for ellipsen og rører den kun i hjørnerne. Samme spændingstilstand giver derfor lavere n<sub>s</sub> med Tresca. Forskellen er størst ved ren forskydning.</p></details>
+        <details><summary>Hvorfor er S<sub>e</sub> for en aksel lavere end S'<sub>e</sub> for prøvestangen?</summary><p>Prøvestangen er poleret og lille. Akslen har ru overflade, større diameter og krav om pålidelighed, og hver faktor under 1 sænker grænsen.</p></details>
+        <details><summary>σ<sub>min</sub> = 50 og σ<sub>max</sub> = 250 MPa, S<sub>e</sub> = 200, S<sub>ut</sub> = 600. Hvad er n<sub>s</sub>?</summary><p>σ<sub>m</sub> = 150 og σ<sub>a</sub> = 100. Så er 1/n<sub>s</sub> = 100/200 + 150/600 = 0,75, altså n<sub>s</sub> = 1,33.</p></details>
+      </div>
+    </div>
+    <div class="card col">
+      <h3>Til eksamen</h3>
+      <div style="font-size:16px;color:var(--mut)">Typisk: spændingstilstand, S<sub>e</sub> med faktorer, derefter Goodman</div>
+      <div class="exlinks">
+        <a href="../../eksamen-ny/sp03_akseldesign.html"><b>SPM 3</b> Akseldesign · udmattelsesdimensionering med Goodman / DE-Goodman</a>
+        <a href="../../eksamen-ny/sp07_fjeder.html"><b>SPM 7</b> Fjeder · udmattelse</a>
+      </div>
+      <h3 style="margin-top:8px">Læs i bogen</h3>
+      <div style="display:grid;gap:6px;font-size:16px;line-height:1.35">
+        <div><b>§ 6.2, s. 134</b> spændingskoncentration, K<sub>t</sub></div>
+        <div><b>§ 6.6 og 6.7, s. 143</b> Tresca og von Mises</div>
+        <div><b>§ 7.3, s. 162</b> cykliske spændinger</div>
+        <div><b>§ 7.5 og 7.6, s. 166</b> udmattelsesstyrke, S-N-kurve</div>
+        <div><b>§ 7.7 og 7.8, s. 169</b> K<sub>f</sub> og modificeret grænse</div>
+        <div><b>§ 7.10, s. 176</b> middelspænding, Goodman</div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Statisk: Tresca eller von Mises mod S<sub>y</sub>. Svingende: S<sub>e</sub> med faktorer, derefter Goodman med σ<sub>m</sub> og σ<sub>a</sub>.</span></div>
+</section>
+
+</div></div>
+<script src="../assets/deck.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = D.$, fmt = D.fmt, PI = Math.PI, LG = Math.log10;
+var CY = '#0a7fc2', OR = '#d97a00', PU = '#7b4fc9', GR = '#0a9a5c', RD = '#d63a3a', INK = '#14202d', MUT = '#5a6b7d';
+
+/* ---------- slide 0: papirclips (udmattelse) mod krog (ét træk) ---------- */
+(function () {
+  var x = D.cv('c0').x, T = 12, P = 1.2, NB = 6;
+  function clip(t) {
+    var bx = 140, by = 330, L = 200, hinge = 70;
+    var cracked = t >= NB * P, th = 0;
+    if (!cracked) th = 0.8 * Math.sin(2 * PI * t / P) * Math.min(1, 0.3 + t / 2);
+    var crack = Math.min(1, t / (NB * P));
+    x.fillStyle = MUT; x.fillRect(bx - 38, by, 76, 18);
+    D.txt(x, 'Klemt fast', bx, by + 40, 18, MUT, 'center');
+    function wire(len, ox, oy, rot, th0) {
+      var pts = [], px = ox, py = oy, n = 40, ds = len / n;
+      for (var i = 0; i <= n; i++) {
+        pts.push([px, py]);
+        var s = i * ds, ph = rot + th0 * Math.min(1, s / hinge);
+        px += Math.sin(ph) * ds; py -= Math.cos(ph) * ds;
+      }
+      return pts;
+    }
+    if (!cracked) {
+      var w = wire(L, bx, by, 0, th);
+      D.line(x, w, '#8b97a5', 9); D.line(x, w, '#c9d2dc', 3);
+      var cw = 3 + 14 * crack;
+      x.fillStyle = INK; x.beginPath(); x.moveTo(bx - 5, by); x.lineTo(bx - 5 + cw * 0.9, by - 1 - cw * 0.35); x.lineTo(bx - 5 + cw * 0.9, by + 2); x.closePath(); x.fill();
+    } else {
+      var q = Math.min(1.4, t - NB * P), w2 = wire(hinge * 0.55, bx, by, 0, 0.18);
+      D.line(x, w2, '#8b97a5', 9); D.line(x, w2, '#c9d2dc', 3);
+      var e = w2[w2.length - 1], ox = e[0] + 40 * q, oy = e[1] + 150 * q * q - 20 * q, rot = 0.18 + 2.2 * q;
+      var w3 = wire(L - hinge * 0.55, ox, oy, rot, 0);
+      D.line(x, w3, '#8b97a5', 9); D.line(x, w3, '#c9d2dc', 3);
+      D.txt(x, 'BRUD', bx + 70, by - 40, 30, RD, 'center', 'middle', 800);
+    }
+    var cnt = cracked ? NB * 2 : Math.min(NB * 2, Math.floor(t / (P / 2)) + 1);
+    D.txt(x, 'Papirclips', bx, 58, 24, INK, 'center');
+    D.txt(x, 'frem og tilbage', bx, 86, 19, MUT, 'center');
+    D.txt(x, 'Bøjning nr. ' + cnt, bx, 120, 22, OR, 'center');
+  }
+  function hook(t) {
+    var cx = 420, top = 170, e = t < 0.8 ? 0 : Math.min(1, (t - 0.8) / 1.4);
+    D.txt(x, 'Krog', cx, 58, 24, INK, 'center');
+    D.txt(x, 'ét stort træk', cx, 86, 19, MUT, 'center');
+    x.fillStyle = MUT; x.fillRect(cx - 40, top - 22, 80, 18);
+    var sy = 6 * e, bot = 280 + sy;
+    D.line(x, [[cx, top - 4], [cx, bot]], '#8b97a5', 9); D.line(x, [[cx, top - 4], [cx, bot]], '#c9d2dc', 3);
+    x.strokeStyle = '#8b97a5'; x.lineWidth = 9; x.beginPath(); x.arc(cx - 32, bot, 32, 0, PI * 1.15, false); x.stroke();
+    x.strokeStyle = '#c9d2dc'; x.lineWidth = 3; x.beginPath(); x.arc(cx - 32, bot, 32, 0, PI * 1.15, false); x.stroke();
+    var wy = bot + 36 + sy * 0.0;
+    x.fillStyle = '#5a6b7d'; x.fillRect(cx - 62, wy, 60, 46); D.txt(x, 'last', cx - 32, wy + 23, 18, '#fff', 'center');
+    if (e > 0) D.arrow(x, cx - 32, wy + 50, cx - 32, wy + 50 + 44 * e, RD, 6);
+    D.txt(x, e > 0.9 ? 'Træk nr. 1: holder' : 'Træk nr. 1', cx, 120, 22, e > 0.9 ? GR : CY, 'center');
+  }
+  D.anim(0, function (dt, tt) {
+    var t = tt % T;
+    x.clearRect(0, 0, 560, 440);
+    clip(t); hook(t);
+    D.line(x, [[280, 40], [280, 420]], 'rgba(90,107,125,.3)', 2, [6, 6]);
+  });
+})();
+
+/* ---------- slide 1: flydekriterier i (σ1, σ2)-planen ---------- */
+var SY = 280;
+function upd1() {
+  var s1 = +$('a1').value, s2 = +$('a2').value;
+  $('a1o').textContent = s1 + ' MPa'; $('a2o').textContent = s2 + ' MPa';
+  var mx = Math.max(s1, s2, 0), mn = Math.min(s1, s2, 0), tr = mx - mn;
+  var se = Math.sqrt(s1 * s1 - s1 * s2 + s2 * s2);
+  var nT = tr < 1 ? Infinity : SY / tr, nM = se < 1 ? Infinity : SY / se;
+  function f(n) { return isFinite(n) ? fmt(n, 2) : '∞'; }
+  $('v1t').textContent = f(nT); $('v1m').textContent = f(nM); $('v1e').textContent = fmt(se, 1);
+  var G = D.cv('p1'), x = G.x, cx = 320, cy = 300, k = 0.78;
+  function X(a) { return cx + a * k; } function Y(b) { return cy - b * k; }
+  x.clearRect(0, 0, G.W, G.H);
+  x.strokeStyle = '#c3d0dd'; x.lineWidth = 2; x.beginPath(); x.moveTo(X(-320), cy); x.lineTo(X(320), cy); x.moveTo(cx, Y(-320)); x.lineTo(cx, Y(320)); x.stroke();
+  D.txt(x, 'σ1', X(320) - 4, cy - 20, 24, MUT, 'right'); D.txt(x, 'σ2', cx + 16, Y(320) + 14, 24, MUT, 'left');
+  var hx = [[SY, 0], [SY, SY], [0, SY], [-SY, 0], [-SY, -SY], [0, -SY]].map(function (p) { return [X(p[0]), Y(p[1])]; });
+  x.beginPath(); hx.forEach(function (p, i) { i ? x.lineTo(p[0], p[1]) : x.moveTo(p[0], p[1]); }); x.closePath();
+  x.fillStyle = 'rgba(10,127,194,.10)'; x.fill(); x.strokeStyle = CY; x.lineWidth = 5; x.stroke();
+  x.beginPath();
+  for (var i = 0; i <= 200; i++) {
+    var ph = 2 * PI * i / 200, c = Math.cos(ph), s = Math.sin(ph), r = SY / Math.sqrt(c * c - c * s + s * s);
+    i ? x.lineTo(X(r * c), Y(r * s)) : x.moveTo(X(r * c), Y(r * s));
+  }
+  x.closePath(); x.strokeStyle = OR; x.lineWidth = 5; x.setLineDash([]); x.stroke();
+  D.txt(x, '280', X(SY) + 4, cy + 18, 20, MUT, 'left');
+  D.txt(x, 'Tresca', X(SY * 0.62), Y(SY) - 16, 22, CY, 'center', 'middle', 700);
+  D.txt(x, 'von Mises', X(-SY * 0.8), Y(SY * 0.97), 22, OR, 'center', 'middle', 700);
+  var ok = Math.min(nT, nM) >= 1;
+  if (Math.hypot(s1, s2) > 1) { D.line(x, [[cx, cy], [X(s1), Y(s2)]], 'rgba(123,79,201,.55)', 3, [7, 6]); }
+  D.circ(x, X(s1), Y(s2), 11, ok ? GR : RD, '#fff', 3);
+  D.txt(x, ok ? 'sikker' : 'flyder', Math.min(Math.max(X(s1), 50), 590), Y(s2) + (s2 > 0 ? 34 : -34), 22, ok ? GR : RD, 'center', 'middle', 800);
+}
+$('a1').oninput = upd1; $('a2').oninput = upd1; upd1();
+
+/* ---------- slide 2: S-N-kurve (log-log) ---------- */
+var SU = 700, SL = 0.9 * SU, SEp = 0.5 * SU, SE = 0.85 * 0.9 * 0.9 * SEp;
+var bS = LG(SEp / SL) / 3, bD = LG(SE / SL) / 3;
+function sfS(lg) { return lg >= 6 ? SEp : SL * Math.pow(10, (lg - 3) * bS); }
+function sfD(lg) { return lg >= 6 ? SE : SL * Math.pow(10, (lg - 3) * bD); }
+function upd2() {
+  var lg = +$('a3').value;
+  var ex = '10<sup>' + fmt(lg, 1) + '</sup>';
+  $('a3o').innerHTML = ex; $('v2n').innerHTML = ex;
+  $('v2s').textContent = fmt(sfS(lg), 0); $('v2d').textContent = fmt(sfD(lg), 0);
+  $('st2').innerHTML = lg < 6 ? '<b>Begrænset levetid:</b> kurven falder, så højere spænding giver færre cyklusser.' : '<b>Over knækket:</b> amplituder under S<sub>e</sub> giver i teorien uendelig levetid.';
+  var G = D.cv('p2'), x = G.x, L = 86, R = 618, Tp = 40, B = G.H - 52, y0 = LG(200), y1 = LG(700);
+  function X(l) { return L + (l - 3) / 4 * (R - L); } function Y(s) { return B - (LG(s) - y0) / (y1 - y0) * (B - Tp); }
+  x.clearRect(0, 0, G.W, G.H);
+  D.txt(x, 'S (MPa)', 4, 20, 24, MUT, 'left');
+  [200, 300, 400, 500, 600, 700].forEach(function (v) { D.txt(x, '' + v, L - 8, Y(v), 20, MUT, 'right'); x.strokeStyle = 'rgba(159,176,194,.35)'; x.lineWidth = 1; x.beginPath(); x.moveTo(L, Y(v)); x.lineTo(R, Y(v)); x.stroke(); });
+  ['10³', '10⁴', '10⁵', '10⁶', '10⁷'].forEach(function (t, i) { D.txt(x, t, X(3 + i), B + 24, 20, MUT, 'center'); x.strokeStyle = 'rgba(159,176,194,.35)'; x.lineWidth = 1; x.beginPath(); x.moveTo(X(3 + i), Tp); x.lineTo(X(3 + i), B); x.stroke(); });
+  x.strokeStyle = '#c3d0dd'; x.lineWidth = 2; x.beginPath(); x.moveTo(L, Tp - 6); x.lineTo(L, B); x.lineTo(R, B); x.stroke();
+  D.txt(x, 'N (log)', R, B + 44, 20, MUT, 'right');
+  x.fillStyle = 'rgba(10,154,92,.07)'; x.fillRect(X(6), Tp, R - X(6), B - Tp);
+  D.txt(x, 'uendelig levetid', (X(6) + R) / 2, Tp + 20, 19, GR, 'center', 'middle', 700);
+  function curve(fn, col) { x.strokeStyle = col; x.lineWidth = 5; x.beginPath(); for (var i = 0; i <= 80; i++) { var l = 3 + 4 * i / 80; i ? x.lineTo(X(l), Y(fn(l))) : x.moveTo(X(l), Y(fn(l))); } x.stroke(); }
+  curve(sfS, CY); curve(sfD, OR);
+  D.txt(x, "S'e = 350", X(6.1), Y(SEp) - 16, 20, CY, 'left', 'middle', 700);
+  D.txt(x, 'Se = 241', X(6.1), Y(SE) + 18, 20, OR, 'left', 'middle', 700);
+  D.line(x, [[X(lg), Tp], [X(lg), B]], 'rgba(168,107,0,.6)', 2, [7, 6]);
+  D.circ(x, X(lg), Y(sfS(lg)), 9, CY, '#fff', 2); D.circ(x, X(lg), Y(sfD(lg)), 9, OR, '#fff', 2);
+  D.txt(x, 'stang', X(3) + 8, Y(SL) - 18, 20, CY, 'left', 'middle', 700);
+  D.txt(x, 'del', X(3.3), Y(sfD(3.3)) + 26, 20, OR, 'left', 'middle', 700);
+}
+$('a3').oninput = upd2; upd2();
+
+/* ---------- slide 3: Goodman-diagram ---------- */
+var SE3 = 200, SUT = 600;
+function upd3() {
+  var sm = +$('a4').value, sa = +$('a5').value;
+  $('a4o').textContent = sm + ' MPa'; $('a5o').textContent = sa + ' MPa';
+  var u = sa / SE3 + sm / SUT, n = u < 0.001 ? Infinity : 1 / u;
+  $('v3n').textContent = isFinite(n) ? fmt(n, 2) : '∞'; $('v3x').textContent = sm + sa; $('v3m').textContent = sm - sa;
+  var G = D.cv('p3'), x = G.x, L = 78, R = 618, Tp = 36, B = G.H - 56, XM = 700, YM = 280;
+  function X(v) { return L + v / XM * (R - L); } function Y(v) { return B - v / YM * (B - Tp); }
+  x.clearRect(0, 0, G.W, G.H);
+  D.txt(x, 'σa (MPa)', 4, 18, 24, PU, 'left');
+  [0, 100, 200].forEach(function (v) { D.txt(x, '' + v, L - 8, Y(v), 20, MUT, 'right'); x.strokeStyle = 'rgba(159,176,194,.35)'; x.lineWidth = 1; x.beginPath(); x.moveTo(L, Y(v)); x.lineTo(R, Y(v)); x.stroke(); });
+  [0, 200, 400, 600].forEach(function (v) { D.txt(x, '' + v, X(v), B + 24, 20, MUT, 'center'); });
+  D.txt(x, 'σm (MPa)', R, B + 46, 22, PU, 'right');
+  x.strokeStyle = '#c3d0dd'; x.lineWidth = 2; x.beginPath(); x.moveTo(L, Tp - 6); x.lineTo(L, B); x.lineTo(R, B); x.stroke();
+  x.beginPath(); x.moveTo(X(0), Y(0)); x.lineTo(X(0), Y(SE3)); x.lineTo(X(SUT), Y(0)); x.closePath(); x.fillStyle = 'rgba(10,154,92,.10)'; x.fill();
+  D.line(x, [[X(0), Y(SE3)], [X(SUT), Y(0)]], CY, 5);
+  D.txt(x, 'Se = 200', X(0) + 10, Y(SE3) - 16, 20, CY, 'left', 'middle', 700); D.txt(x, 'Sut = 600', X(SUT) + 4, Y(0) - 18, 20, CY, 'right', 'middle', 700);
+  D.txt(x, 'Goodman', X(330), Y(95) - 20, 22, CY, 'left', 'middle', 700);
+  if (u > 0.001) {
+    var k = 1 / u; var ex = Math.min(sm * k, XM), ey = sa * k;
+    D.line(x, [[X(0), Y(0)], [X(sm * k), Y(sa * k)]], 'rgba(123,79,201,.55)', 3, [7, 6]);
+    D.circ(x, X(sm * k), Y(sa * k), 8, '#fff', PU, 3);
+  }
+  var ok = u <= 1;
+  D.circ(x, X(sm), Y(sa), 11, ok ? PU : RD, '#fff', 3);
+  D.txt(x, ok ? 'holder' : 'udmattelsesbrud', Math.min(Math.max(X(sm), 80), 560), Y(sa) - 28, 22, ok ? GR : RD, 'center', 'middle', 800);
+}
+$('a4').oninput = upd3; $('a5').oninput = upd3; upd3();
+D.start();
+})();
+</script>
+</body></html>

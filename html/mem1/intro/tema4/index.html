@@ -1,0 +1,347 @@
+<!doctype html><html lang="da"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tema 4 · Aksler og rullelejer</title>
+<meta name="description" content="Hurtigstart til MEM1 tema 4: aksler under roterende bøjning og vridning, akseldiameter efter Tresca og DE-Goodman, og rullelejets L10-levetid.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../assets/deck.css"></head>
+<body>
+<div id="vp"><div id="deck">
+
+<!-- ============ 0 · FORSIDE ============ -->
+<section class="slide on" data-title="Forside">
+  <div style="flex:1;display:grid;grid-template-columns:1fr 600px;gap:34px;align-items:center;padding:0 10px">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div>
+        <div class="tag" style="display:inline-block">MEM1 · HURTIGSTART · TEMA 4</div>
+        <h1 style="font-size:64px;margin-top:18px">Aksler og rullelejer</h1>
+        <div style="font-size:26px;color:var(--mut);margin-top:6px">Begge dør af <b>træthed</b>: akslen af skiftende bøjning, lejet af gentagne klemninger. Begge regnes ud fra antal omgange</div>
+      </div>
+      <div class="card qcard"><span class="lbl cy">KORT FORTALT</span>
+        En papirclips bøjes frem og tilbage. Første bøjning gør ingenting, men efter nogle stykker knækker den. En aksel bøjes på samme måde, for hver omgang går et punkt på overfladen fra træk til tryk og tilbage. Rullelejet trættes af det samme: hver kugle klemmer et punkt på løbebanen, millioner af gange.</div>
+      <div class="plan">
+        <div><b class="cy">1 · Aksel</b>bøjning + vridning, <span data-tex="\sigma_a,\ \tau_m"></span></div>
+        <div><b class="or">2 · Diameter</b>Tresca og DE-Goodman</div>
+        <div><b class="pu">3 · Rulleleje</b><span data-tex="L_{10}=(C/P)^p"></span></div>
+        <div><b class="gr">4 · Tjek</b>fejl og eksamen</div>
+      </div>
+      <div class="links"><a href="../../Kapitel11_Studienote.pdf">📖 Kap. 11 Studienote PDF</a><a href="../../Kapitel13_Studienote.pdf">📖 Kap. 13 Studienote PDF</a><a href="../../../../lab/mem1/aksel.html">🧪 3D-lab: aksel</a><a href="../../../../lab/mem1/rulleleje.html">🧪 3D-lab: rulleleje</a><a href="../../eksamen-ny/sp03_akseldesign.html">📝 Spm. 3 Akseldesign</a><a href="../../eksamen-ny/sp04_rulleleje.html">📝 Spm. 4 Rulleleje</a></div>
+    </div>
+    <div class="card" style="padding:12px"><canvas id="c0" width="560" height="440"></canvas>
+      <div style="font-size:18px;color:var(--mut);text-align:center;margin-top:8px">Akslen drejer, lasten står stille. Punktet skifter mellem <b class="rd">træk</b> og <b class="cy">tryk</b> hver omgang</div></div>
+  </div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm &nbsp;·&nbsp; ☰: alle temaer</div>
+</section>
+
+<!-- ============ 1 · AKSEL I UDMATTELSE ============ -->
+<section class="slide" id="s1" data-title="1 · Aksel i udmattelse">
+  <div class="hd"><span class="tag">IDÉ 1 · AKSEL I UDMATTELSE</span><h1>Bøjningen vender hver omgang, vridningen bliver</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Spændinger i akslens overflade</h3>
+      <div class="big" style="font-size:30px" data-tex="\sigma=\dfrac{32\,M}{\pi d^3},\qquad \tau=\dfrac{16\,T}{\pi d^3}"></div>
+      <div class="src">Hamrock et al. (2014), lign. (11.4) og (11.5), s. 265</div>
+      <div class="big" style="font-size:27px" data-tex="\sigma_m=0,\quad \sigma_a=\dfrac{32M_a}{\pi d^3}"></div>
+      <div class="big" style="font-size:27px;padding-top:14px" data-tex="\tau_a=0,\quad \tau_m=\dfrac{16T_m}{\pi d^3}"></div>
+      <div class="src">roterende aksel, Abou-Hayt (2026), slide 6</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="\sigma_a"></span><span><b>Roterende bøjning</b>: punktet er skiftevis i træk og tryk, så middel nul og amplituden er hele <span data-tex="\sigma_{max}"></span></span></div>
+        <div class="term"><span class="s or" data-tex="\tau_m"></span><span><b>Konstant vridning</b>: samme moment hele tiden, så en middelspænding uden amplitude</span></div>
+        <div class="term"><span class="s pu" data-tex="d^3"></span><span><b>Diameteren i tredje</b>: lidt tykkere aksel sænker begge spændinger meget</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n">1</span><div class="t"><b>Understøtninger</b>: kraften F = 4,0 kN midt på akslen, L = 0,40 m
+        <span class="m" data-tex="R_A=R_B=\tfrac{F}{2}=2{,}0\ \text{kN}"></span></div></div>
+      <div class="step"><span class="n">2</span><div class="t"><b>Største moment</b> under kraften
+        <span class="m" data-tex="M_{max}=R_A\cdot0{,}20=400\ \text{N m}"></span></div></div>
+      <div class="step"><span class="n">3</span><div class="t"><b>Vekslende bøjning</b>, d = 40 mm
+        <span class="m" data-tex="\boxed{\sigma_a=\tfrac{32\cdot400\cdot10^3}{\pi\cdot40^3}=63{,}7\ \text{MPa}}"></span>
+        <span class="note"><span data-tex="\sigma_m=0"></span>, fordi punktet kommer rundt</span></div></div>
+      <div class="step"><span class="n">4</span><div class="t"><b>Konstant vridning</b>, T = 300 N m
+        <span class="m" data-tex="\boxed{\tau_m=\tfrac{16\cdot300\cdot10^3}{\pi\cdot40^3}=23{,}9\ \text{MPa}}"></span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Flyt kraften langs akslen</h3>
+      <canvas id="r1" width="640" height="290"></canvas>
+      <div class="sl"><span>placering a</span><input id="a1" type="range" min="0.02" max="0.38" step="0.01" value="0.2"><output id="a1o"></output></div>
+      <canvas id="g1" width="640" height="290"></canvas>
+      <div class="ro r3">
+        <div><span>M<sub>max</sub></span><b class="cy" id="v1M">400</b><i>N m</i></div>
+        <div><span>σ<sub>a</sub> (d = 40)</span><b class="cy" id="v1s">63,7</b><i>MPa</i></div>
+        <div><span>τ<sub>m</sub> (d = 40)</span><b class="or" id="v1t">23,9</b><i>MPa</i></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Hver omgang tager punktet fra træk til tryk, så bøjningen er fuldt vekslende. Vridningen er konstant og giver kun en middelspænding.</span></div>
+</section>
+
+<!-- ============ 2 · AKSELDIAMETER ============ -->
+<section class="slide" id="s2" data-title="2 · Akseldiameter">
+  <div class="hd"><span class="tag b">IDÉ 2 · AKSELDIAMETER</span><h1>Diameteren står i tredje potens</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Tresca og DE-Goodman</h3>
+      <div class="big" style="font-size:25px" data-tex="d=\left(\dfrac{16\,T_e}{\pi\,\tau_{till}}\right)^{1/3},\quad T_e=\sqrt{M^2+T^2}"></div>
+      <div class="src">Hamrock et al. (2014), lign. (11.16), s. 265, med <span data-tex="\tau_{till}=S_y/(2n_s)"></span></div>
+      <div class="big" style="font-size:25px" data-tex="d=\left\{\dfrac{32\,n}{\pi}\left[\dfrac{K_fM_a}{S_e}+\dfrac{\sqrt3}{2}\dfrac{T_m}{S_u}\right]\right\}^{1/3}"></div>
+      <div class="src">Abou-Hayt (2026), slide 6, bygger på lign. (7.28) og (7.44), s. 177 og 181</div>
+      <div class="terms">
+        <div class="term"><span class="s or" data-tex="T_e"></span><span><b>Pythagoras</b>: bøjning og vridning som kateter. Samme <span data-tex="\tau_{max}"></span> som et rent moment <span data-tex="T_e"></span></span></div>
+        <div class="term"><span class="s pu" data-tex="\tfrac{K_fM_a}{S_e}"></span><span><b>Bøjning mod udmattelsesgrænsen</b>, med kærvfaktor <span data-tex="K_f"></span> og sikkerhed <span data-tex="n"></span></span></div>
+        <div class="term"><span class="s pu" data-tex="\tfrac{T_m}{S_u}"></span><span><b>Vridning mod brudstyrken</b>, fordi den er en middelspænding</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n b">1</span><div class="t"><b>Ækvivalent moment</b>
+        <span class="m" data-tex="T_e=\sqrt{400^2+300^2}=500\ \text{N m}"></span>
+        <span class="note">M = 400 N m, T = 300 N m. Regn i N mm (500 000), så bliver d i mm</span></div></div>
+      <div class="step"><span class="n b">2</span><div class="t"><b>Tresca</b>, <span data-tex="\tau_{till}=50"></span> MPa
+        <span class="m" data-tex="d^3=\tfrac{16\cdot500\,000}{\pi\cdot50}=50\,930\ \text{mm}^3"></span>
+        <span class="m" data-tex="\boxed{d=37{,}1\ \text{mm}}"></span></div></div>
+      <div class="step"><span class="n b">3</span><div class="t"><b>Standardmål 40 mm</b>
+        <span class="m" data-tex="\tau_{max}=\tfrac{16\cdot500\,000}{\pi\cdot40^3}=39{,}8\ \text{MPa}<50"></span></div></div>
+      <div class="step"><span class="n b">4</span><div class="t"><b>DE-Goodman</b>, samme M og T, <span data-tex="K_f=1{,}60"></span>, <span data-tex="S_u=600"></span>, <span data-tex="S_e=200"></span> MPa, n = 2,0
+        <span class="m" data-tex="d=\left\{\tfrac{32\cdot2{,}0}{\pi}\left[3200+433\right]\right\}^{1/3}"></span>
+        <span class="m" data-tex="\boxed{d=42{,}0\ \text{mm}}"></span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Skru på M og T</h3>
+      <canvas id="g2" width="640" height="440"></canvas>
+      <div class="sl"><span>M</span><input id="m2" type="range" min="0" max="1000" step="10" value="400"><output id="m2o"></output></div>
+      <div class="sl"><span>T</span><input id="t2" type="range" min="0" max="1000" step="10" value="300"><output id="t2o"></output></div>
+      <div class="ro r3">
+        <div><span>T<sub>e</sub></span><b class="or" id="v2e">500</b><i>N m</i></div>
+        <div><span>d Tresca</span><b class="or" id="v2a">37,1</b><i>mm</i></div>
+        <div><span>d DE-Goodman</span><b class="pu" id="v2b">42,0</b><i>mm</i></div>
+      </div>
+      <div class="status" style="font-size:15px">Tresca: <span data-tex="\tau_{till}=50"></span> MPa. DE-Goodman: <span data-tex="K_f=1{,}60,\ S_u=600,\ S_e=200"></span> MPa, <span data-tex="n=2{,}0"></span>, <span data-tex="M_a=M,\ T_m=T"></span></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Moment og vridning lægges som en retvinklet trekant. Udmattelse og kærv gør akslen tykkere, og diameteren vokser kun med tredjeroden af lasten.</span></div>
+</section>
+
+<!-- ============ 3 · RULLELEJE ============ -->
+<section class="slide" id="s3" data-title="3 · Rullelejets levetid">
+  <div class="hd"><span class="tag p">IDÉ 3 · RULLELEJETS LEVETID</span><h1>Lasten står i tredje potens</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Hvor mange omgange når 90 % af lejerne?</h3>
+      <div class="big" style="font-size:28px" data-tex="L_{10}=\left(\dfrac{C}{P}\right)^{p}\ \ [10^6\ \text{omdr.}]"></div>
+      <div class="src">Hamrock et al. (2014), lign. (13.82), s. 363</div>
+      <div class="big" style="font-size:26px" data-tex="L_{10h}=\dfrac{10^6}{60\,n}\left(\dfrac{C}{P}\right)^{p}"></div>
+      <div class="src">Hamrock et al. (2014), lign. (13.84), s. 363</div>
+      <div class="big" style="font-size:26px" data-tex="P=X\,V\,F_r+Y\,F_a"></div>
+      <div class="src">Hamrock et al. (2014), lign. (13.85), s. 364</div>
+      <div class="terms">
+        <div class="term"><span class="s pu" data-tex="p"></span><span><b>3 for kugle</b> (punktkontakt), <b>10/3 for rulle</b> (linjekontakt)</span></div>
+        <div class="term"><span class="s cy" data-tex="C"></span><span><b>Katalogets bæreevne</b>: lasten, der giver 1 mio. omdrejninger</span></div>
+        <div class="term"><span class="s or" data-tex="P"></span><span><b>Ækvivalent last</b>, samlet af radial og aksial last med <span data-tex="X,\ Y,\ V"></span></span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n p">1</span><div class="t"><b>Kugleleje, runde tal fra eksamensspm. 4</b>: C = 50 kN, P = 5 kN
+        <span class="m" data-tex="C/P=50/5=10"></span></div></div>
+      <div class="step"><span class="n p">2</span><div class="t"><b>Levetid i millioner omdrejninger</b>, p = 3
+        <span class="m" data-tex="\boxed{L_{10}=10^3=1000\ \text{mio. omdr.}}"></span></div></div>
+      <div class="step"><span class="n p">3</span><div class="t"><b>Timer</b> ved n = 1500 o/min
+        <span class="m" data-tex="L_{10h}=\tfrac{10^6\cdot1000}{60\cdot1500}=\boxed{11\,111\ \text{h}}"></span></div></div>
+      <div class="step"><span class="n p">4</span><div class="t"><b>Rulleleje</b> med samme C/P, p = 10/3
+        <span class="m" data-tex="10^{10/3}=2154\ \text{mio.}\approx23\,900\ \text{h}"></span>
+        <span class="note">Mere end dobbelt så lang levetid</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Træk i lasten, skift lejetype</h3>
+      <div class="row"><button class="btn pu on" id="bk">Kugle · p = 3</button><button class="btn or" id="br">Rulle · p = 10/3</button></div>
+      <canvas id="g3" width="640" height="440"></canvas>
+      <div class="sl"><span>P / C</span><input id="p3" type="range" min="0.05" max="1" step="0.01" value="0.1"><output id="p3o"></output></div>
+      <div class="ro r3">
+        <div><span>L<sub>10</sub></span><b class="pu" id="v3L">1000</b><i>mio.</i></div>
+        <div><span>L<sub>10h</sub> (1500 o/min)</span><b class="pu" id="v3h">11 111</b><i>h</i></div>
+        <div><span>dobbelt last giver</span><b class="rd" id="v3f">×0,13</b></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Levetiden er statistik: L10 er det, 90 % når. Halv last giver otte gange så lang levetid for kugler, og L10 står i millioner omdrejninger.</span></div>
+</section>
+
+<!-- ============ 4 · FALDGRUBER OG TJEK ============ -->
+<section class="slide" data-title="4 · Faldgruber og tjek">
+  <div class="hd"><span class="tag g">FALDGRUBER OG TJEK</span><h1>Hvor det typisk går galt</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Typiske fejl</h3>
+      <div class="fejl">
+        <div><span>σ<sub>m</sub> og σ<sub>a</sub> byttes om for den roterende aksel.<span class="ret">Roterende bøjning: σ<sub>m</sub> = 0 og σ<sub>a</sub> = 32M<sub>a</sub>/(πd³). Konstant vridning: τ<sub>a</sub> = 0 og τ<sub>m</sub> = 16T<sub>m</sub>/(πd³).</span></span></div>
+        <div><span>Moment i N m sættes ind sammen med MPa, og d bliver 3,7 mm.<span class="ret">500 N m = 500 000 N mm. Med N mm og MPa (N/mm²) kommer d i mm: 37,1 mm.</span></span></div>
+        <div><span>p = 3 bruges på rullelejer.<span class="ret">p = 3 kun for kugler, p = 10/3 for ruller (linjekontakt).</span></span></div>
+        <div><span>L<sub>10</sub> = 1000 aflæses som 1000 omdrejninger og som timer.<span class="ret">L<sub>10</sub> er i millioner omdrejninger. Timer: gange 10⁶ og divider med 60n, her 11 111 h.</span></span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Tjek dig selv</h3>
+      <div class="qa">
+        <details><summary>Hvorfor er σ<sub>m</sub> = 0 for en roterende aksel med fast last?</summary><p>Punktet er øverst i tryk og nederst i træk, hver omgang. Middelværdien er nul, og amplituden er hele σ<sub>max</sub>. Vridningen står stille og giver kun τ<sub>m</sub>.</p></details>
+        <details><summary>Hvorfor giver DE-Goodman 42,0 mm, men Tresca 37,1 mm for samme M og T?</summary><p>Tresca er statisk. DE-Goodman tager udmattelsesgrænsen S<sub>e</sub> = 200 MPa og kærvfaktoren K<sub>f</sub> = 1,60 med, og de kræver en tykkere aksel.</p></details>
+        <details><summary>Lasten på et kugleleje halveres. Hvad sker der med L<sub>10</sub>?</summary><p>L<sub>10</sub> ∝ P⁻³, så levetiden bliver 2³ = 8 gange så lang. For en rulle er faktoren 2<sup>10/3</sup> ≈ 10.</p></details>
+      </div>
+    </div>
+    <div class="card col">
+      <h3>Til eksamen</h3>
+      <div class="exlinks">
+        <a href="../../eksamen-ny/sp03_akseldesign.html"><b>SPM 3</b> <span>Akseldesign · T<sub>e</sub> og d efter Tresca</span></a>
+        <a href="../../eksamen-ny/sp04_rulleleje.html"><b>SPM 4</b> <span>Rulleleje · L<sub>10</sub> og driftstimer</span></a>
+      </div>
+      <h3 style="margin-top:8px">Læs i bogen</h3>
+      <div style="display:grid;gap:6px;font-size:16px;line-height:1.35">
+        <div><b>§ 11.2, s. 265</b> aksler under statisk last, Te og Me</div>
+        <div><b>§ 11.3, s. 268</b> aksler under udmattelse (bogens variant)</div>
+        <div><b>§ 13.9, s. 362</b> udmattelseslevetid og dynamisk bæreevne</div>
+        <div><b>§ 13.9.4, s. 364</b> ækvivalent last P</div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Først hvilke spændinger der veksler, så diameteren med tredjeroden, så lejets L10 i millioner omdrejninger og til sidst i timer.</span></div>
+</section>
+
+</div></div>
+<script src="../assets/deck.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = D.$, fmt = D.fmt, PI = Math.PI;
+var CY = '#0a7fc2', OR = '#d97a00', PU = '#7b4fc9', GR = '#0a9a5c', RD = '#d63a3a', INK = '#14202d', MUT = '#5a6b7d';
+function lerpC(u) { /* u 0 = tryk (blå) ... 1 = træk (rød) */
+  var a = [10, 127, 194], b = [214, 58, 58], m = [235, 235, 235], c = [];
+  for (var i = 0; i < 3; i++) c.push(Math.round(u < 0.5 ? a[i] + (m[i] - a[i]) * (u * 2) : m[i] + (b[i] - m[i]) * ((u - 0.5) * 2)));
+  return 'rgb(' + c.join(',') + ')';
+}
+function nf(v) {
+  if (v >= 1000) return String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  if (v >= 100) return String(Math.round(v));
+  if (v >= 10) return fmt(v, 1);
+  return fmt(v, 2);
+}
+
+/* ---------- slide 0: roterende aksel med tandhjul og to lejer ---------- */
+(function () {
+  var x = D.cv('c0').x, cy = 110, rr = 20, W = 0.45 * 2 * PI;
+  D.anim(0, function (dt, t) {
+    var ph = W * t, s = -Math.cos(ph), col = lerpC((s + 1) / 2);
+    x.clearRect(0, 0, 560, 440);
+    /* sidebillede */
+    D.line(x, [[40, cy], [520, cy]], '#b8c6d4', rr * 2);
+    D.line(x, [[40, cy - rr], [520, cy - rr]], '#8fa2b6', 2); D.line(x, [[40, cy + rr], [520, cy + rr]], '#8fa2b6', 2);
+    [90, 470].forEach(function (bx) {
+      x.fillStyle = 'rgba(90,107,125,.25)'; x.strokeStyle = MUT; x.lineWidth = 3; x.fillRect(bx - 16, cy - 32, 32, 64); x.strokeRect(bx - 16, cy - 32, 32, 64);
+      D.txt(x, 'leje', bx, cy + 50, 20, MUT, 'center');
+    });
+    x.fillStyle = '#9fb0c2'; x.strokeStyle = INK; x.lineWidth = 3; x.fillRect(266, cy - 56, 28, 112); x.strokeRect(266, cy - 56, 28, 112);
+    for (var k = -50; k <= 50; k += 14) D.line(x, [[266, cy + k], [294, cy + k]], INK, 2);
+    D.txt(x, 'tandhjul', 280, cy + 76, 20, MUT, 'center');
+    D.arrow(x, 280, 4, 280, cy - 58, RD, 6); D.txt(x, 'F', 300, 22, 24, RD, 'left');
+    var py = cy - rr * Math.cos(ph);
+    D.circ(x, 390, py, 9, col, INK, 2);
+    D.txt(x, 'punkt på overfladen', 390, cy - 40, 18, MUT, 'center');
+    /* endebillede */
+    var ex = 120, ey = 300, R = 70;
+    x.fillStyle = 'rgba(10,127,194,.14)'; x.beginPath(); x.arc(ex, ey, R, PI, 2 * PI); x.fill();
+    x.fillStyle = 'rgba(214,58,58,.14)'; x.beginPath(); x.arc(ex, ey, R, 0, PI); x.fill();
+    D.circ(x, ex, ey, R, null, INK, 3);
+    D.line(x, [[ex - R - 8, ey], [ex + R + 8, ey]], MUT, 2, [7, 5]);
+    D.txt(x, 'tryk', ex, ey - R - 16, 20, CY, 'center'); D.txt(x, 'træk', ex, ey + R + 18, 20, RD, 'center');
+    D.circ(x, ex + R * Math.sin(ph), ey - R * Math.cos(ph), 11, col, INK, 3);
+    /* spænding mod tid */
+    var gx0 = 290, gw = 250, gy = 315, ga = 55, win = 2.5, pts = [], u;
+    D.line(x, [[gx0, gy], [gx0 + gw, gy]], '#9fb0c2', 2);
+    D.txt(x, 'σ', gx0 - 4, gy - ga - 6, 24, MUT, 'right'); D.txt(x, 'tid', gx0 + gw, gy + 80, 18, MUT, 'right');
+    for (u = 0; u <= 1.0001; u += 0.01) pts.push([gx0 + u * gw, gy - ga * (-Math.cos(W * (t - win + u * win)))]);
+    D.line(x, pts, CY, 3);
+    D.circ(x, gx0 + gw, gy - ga * s, 10, col, INK, 2);
+    D.txt(x, s > 0.05 ? 'TRÆK' : (s < -0.05 ? 'TRYK' : '0'), 415, 238, 26, s > 0.05 ? RD : CY, 'center', 'middle', 800);
+    D.txt(x, 'omgang nr. ' + (Math.floor(ph / (2 * PI)) + 1), 415, 410, 20, INK, 'center');
+    D.txt(x, 'vridning τ: konstant', 120, 422, 18, MUT, 'center');
+  });
+})();
+
+/* ---------- slide 1: momentdiagram og σ(t) ---------- */
+var L1 = 0.4, F1 = 4000, D40 = 40;
+function upd1() {
+  var a = +$('a1').value, M = F1 * a * (L1 - a) / L1, sa = 32 * M * 1000 / (PI * D40 * D40 * D40), tm = 16 * 300e3 / (PI * D40 * D40 * D40);
+  $('a1o').textContent = fmt(a, 2) + ' m';
+  $('v1M').textContent = fmt(M, 0); $('v1s').textContent = fmt(sa, 1); $('v1t').textContent = fmt(tm, 1);
+  var G = D.cv('r1'), x = G.x, x0 = 50, sc = 540 / L1, xf = x0 + a * sc, sy = 60;
+  x.clearRect(0, 0, G.W, G.H);
+  D.line(x, [[x0, sy], [x0 + 540, sy]], '#b8c6d4', 20);
+  [x0, x0 + 540].forEach(function (px, i) {
+    x.fillStyle = '#9fb0c2'; x.strokeStyle = INK; x.lineWidth = 2; x.beginPath(); x.moveTo(px, sy + 12); x.lineTo(px - 18, sy + 44); x.lineTo(px + 18, sy + 44); x.closePath(); x.fill(); x.stroke();
+    D.txt(x, i ? 'B' : 'A', px, sy + 62, 22, MUT, 'center');
+  });
+  D.arrow(x, xf, 6, xf, sy - 12, RD, 7); D.txt(x, 'F = 4,0 kN', xf + 14, 20, 22, RD, 'left');
+  D.line(x, [[x0, 275], [x0 + 540, 275]], '#9fb0c2', 2);
+  var py = 275 - M / 400 * 110;
+  x.beginPath(); x.moveTo(x0, 275); x.lineTo(xf, py); x.lineTo(x0 + 540, 275); x.closePath();
+  x.fillStyle = 'rgba(10,127,194,.22)'; x.fill(); x.strokeStyle = CY; x.lineWidth = 3; x.stroke();
+  D.txt(x, 'M = ' + fmt(M, 0) + ' N m', xf, py < 160 ? py - 14 : py - 14, 24, CY, 'center', 'middle', 700);
+  D.txt(x, 'momentdiagram', x0 + 540, 150, 18, MUT, 'right');
+  D.graph('g1', { f: function (u) { return sa * Math.sin(2 * PI * u); }, more: [{ f: function () { return tm; }, col: OR, w: 5 }], x0: 0, x1: 2, xt: [[0, '0'], [1, '1 omgang'], [2, '2']], min: -80, max: 80, yt: [-60, 0, 60], yd: 0, lbl: 'σ (blå) og τ (orange) i et punkt, MPa', col: CY, xl: '' });
+}
+$('a1').oninput = upd1; upd1();
+
+/* ---------- slide 2: d mod M ---------- */
+function dTre(M, T) { return Math.cbrt(16 * Math.hypot(M, T) * 1000 / (PI * 50)); }
+function dDEG(M, T) { return Math.cbrt(32 * 2 / PI * (1.6 * M * 1000 / 200 + Math.sqrt(3) / 2 * T * 1000 / 600)); }
+function upd2() {
+  var M = +$('m2').value, T = +$('t2').value;
+  $('m2o').textContent = M + ' N m'; $('t2o').textContent = T + ' N m';
+  $('v2e').textContent = fmt(Math.hypot(M, T), 0); $('v2a').textContent = fmt(dTre(M, T), 1); $('v2b').textContent = fmt(dDEG(M, T), 1);
+  var g = D.graph('g2', { f: function (m) { return dTre(m, T); }, more: [{ f: function (m) { return dDEG(m, T); }, col: PU, w: 5 }], x0: 0, x1: 1000, xt: [[0, '0'], [250, '250'], [500, '500'], [750, '750'], [1000, '1000']], min: 0, max: 80, yt: [0, 20, 40, 60, 80], yd: 0, lbl: 'd (mm) mod M', col: OR, xl: 'M (N m)' });
+  var x = g.x;
+  D.circ(x, g.X(M), g.Y(dTre(M, T)), 9, OR, '#fff', 2); D.circ(x, g.X(M), g.Y(dDEG(M, T)), 9, PU, '#fff', 2);
+  D.txt(x, 'Tresca (statisk)', g.X(1000) - 4, g.Y(17), 22, OR, 'right', 'middle', 700);
+  D.txt(x, 'DE-Goodman (udmattelse)', g.X(1000) - 4, g.Y(8), 22, PU, 'right', 'middle', 700);
+}
+$('m2').oninput = upd2; $('t2').oninput = upd2; upd2();
+
+/* ---------- slide 3: L10 mod P/C (log-log) ---------- */
+var P3 = 3;
+function upd3() {
+  var pc = +$('p3').value, p = P3, L = Math.pow(1 / pc, p), h = 1e6 * L / (60 * 1500);
+  $('p3o').textContent = fmt(pc, 2);
+  $('v3L').textContent = nf(L); $('v3h').textContent = nf(h); $('v3f').textContent = '×' + fmt(Math.pow(2, -p), 2);
+  var G = D.cv('g3'), x = G.x, Lm = 84, R = 622, T = 46, Bt = 412, lo = Math.log10(0.05), top = 4.5;
+  function X(v) { return Lm + (Math.log10(v) - lo) / (0 - lo) * (R - Lm); }
+  function Y(lg) { return Bt - lg / top * (Bt - T); }
+  x.clearRect(0, 0, G.W, G.H);
+  D.txt(x, 'L10 (mio. omdr.)', 4, 20, 26, P3 === 3 ? PU : OR, 'left');
+  D.txt(x, 'P/C', R, 20, 22, MUT, 'right');
+  x.strokeStyle = '#c3d0dd'; x.lineWidth = 2; x.beginPath(); x.moveTo(Lm, T - 6); x.lineTo(Lm, Bt); x.lineTo(R, Bt); x.stroke();
+  ['1', '10', '100', '1 000', '10 000'].forEach(function (s, k) {
+    D.txt(x, s, Lm - 8, Y(k), 20, MUT, 'right');
+    x.strokeStyle = 'rgba(159,176,194,.35)'; x.lineWidth = 1; x.beginPath(); x.moveTo(Lm, Y(k)); x.lineTo(R, Y(k)); x.stroke();
+  });
+  [[0.05, '0,05'], [0.1, '0,1'], [0.2, '0,2'], [0.5, '0,5'], [1, '1']].forEach(function (t) {
+    D.txt(x, t[1], X(t[0]), Bt + 22, 20, MUT, t[0] === 1 ? 'right' : (t[0] === 0.05 ? 'left' : 'center'));
+    x.strokeStyle = 'rgba(159,176,194,.35)'; x.lineWidth = 1; x.beginPath(); x.moveTo(X(t[0]), T - 6); x.lineTo(X(t[0]), Bt); x.stroke();
+  });
+  function curve(pp, c, w) {
+    var pts = [], k, v;
+    for (k = 0; k <= 60; k++) { v = Math.pow(10, lo * (1 - k / 60)); pts.push([X(v), Y(-pp * Math.log10(v))]); }
+    D.line(x, pts, c, w);
+  }
+  if (P3 === 3) { curve(10 / 3, 'rgba(217,122,0,.35)', 3); curve(3, PU, 5); } else { curve(3, 'rgba(123,79,201,.35)', 3); curve(10 / 3, OR, 5); }
+  var col = P3 === 3 ? PU : OR, mx = X(pc), my = Y(Math.log10(L));
+  D.line(x, [[mx, my], [mx, Bt]], 'rgba(168,107,0,.6)', 2, [7, 6]); D.line(x, [[Lm, my], [mx, my]], 'rgba(168,107,0,.6)', 2, [7, 6]);
+  D.circ(x, mx, my, 10, col, '#fff', 2);
+  var s = nf(L) + ' mio.'; x.font = '700 24px system-ui,sans-serif'; var tw = x.measureText(s).width;
+  var lx = Math.min(mx + 16, R - tw - 8), ly = my < T + 50 ? my + 30 : my - 28;
+  x.fillStyle = 'rgba(246,249,252,.9)'; x.fillRect(lx - 4, ly - 16, tw + 8, 32); D.txt(x, s, lx, ly, 24, col, 'left');
+}
+$('p3').oninput = upd3;
+$('bk').onclick = function () { P3 = 3; $('bk').classList.add('on'); $('br').classList.remove('on'); upd3(); };
+$('br').onclick = function () { P3 = 10 / 3; $('br').classList.add('on'); $('bk').classList.remove('on'); upd3(); };
+upd3();
+D.start();
+})();
+</script>
+</body></html>

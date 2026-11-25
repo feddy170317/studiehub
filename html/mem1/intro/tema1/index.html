@@ -1,0 +1,393 @@
+<!doctype html><html lang="da"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tema 1 · Spænding og tøjning</title>
+<meta name="description" content="Hurtigstart til MEM1 tema 1: spændinger fra last, plan spænding og Mohrs cirkel, Hookes lov og deformation.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../assets/deck.css"></head>
+<body>
+<div id="vp"><div id="deck">
+
+<!-- ============ 0 · FORSIDE ============ -->
+<section class="slide on" data-title="Forside">
+  <div style="flex:1;display:grid;grid-template-columns:1fr 600px;gap:34px;align-items:center;padding:0 10px">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div>
+        <div class="tag" style="display:inline-block">MEM1 · HURTIGSTART · TEMA 1</div>
+        <h1 style="font-size:64px;margin-top:18px">Spænding og tøjning</h1>
+        <div style="font-size:26px;color:var(--mut);margin-top:6px">Last giver <b>spænding</b> inde i materialet, og spændingen giver <b>tøjning</b> og <b>deformation</b></div>
+      </div>
+      <div class="card qcard"><span class="lbl cy">KORT FORTALT</span>
+        En elastik trækkes ud, og den bliver længere i takt med kraften. En lineal bøjes, og ydersiden strækkes, mens indersiden trykkes sammen. Midt i linealen sker der næsten ingenting. Spænding er kraft pr. flade, og den er størst, hvor materialet er længst fra midten.</div>
+      <div class="plan">
+        <div><b class="cy">1 · Spændinger</b><span data-tex="\sigma=P/A,\ \sigma=Mc/I,\ \tau=Tr/J"></span></div>
+        <div><b class="or">2 · Mohrs cirkel</b>hovedspændinger og <span data-tex="\tau_{max}"></span></div>
+        <div><b class="pu">3 · Hookes lov</b><span data-tex="\sigma=E\epsilon,\ \delta=PL/AE"></span></div>
+        <div><b class="gr">4 · Tjek</b>fejl og eksamen</div>
+      </div>
+      <div class="links"><a href="../../Kapitel02_Studienote.pdf">📖 Kapitel 2 Studienote</a><a href="../../Kapitel04_Studienote.pdf">📖 Kapitel 4 Studienote</a><a href="../../../../lab/mem1/mohrs-cirkel.html">🧪 3D-lab: Mohrs cirkel</a><a href="../../eksamen-ny/index.html">📝 Mundtlig eksamen: oversigt</a></div>
+    </div>
+    <div class="card" style="padding:12px"><canvas id="c0" width="560" height="440"></canvas>
+      <div style="font-size:18px;color:var(--mut);text-align:center;margin-top:8px">Træk forlænger stangen, moment vrider akslen. Begge dele er elastiske og går tilbage</div></div>
+  </div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm &nbsp;·&nbsp; ☰: alle temaer</div>
+</section>
+
+<!-- ============ 1 · SPÆNDINGER ============ -->
+<section class="slide" id="s1" data-title="1 · Spændinger fra last">
+  <div class="hd"><span class="tag">IDÉ 1 · SPÆNDING FRA LAST</span><h1>Last pr. flade, og afstand fra midten</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Fire lasttyper, fire formler</h3>
+      <div class="big" style="font-size:28px;padding:2px 0 0" data-tex="\sigma=\dfrac{P}{A}"></div>
+      <div class="src" style="margin-bottom:2px">Hamrock et al. (2014), lign. (2.7), s. 34</div>
+      <div class="big" style="font-size:28px;padding:2px 0 0" data-tex="\sigma_{max}=\dfrac{M\,c}{I}"></div>
+      <div class="src" style="margin-bottom:2px">Hamrock et al. (2014), lign. (4.45) og (4.46), s. 100</div>
+      <div class="big" style="font-size:28px;padding:2px 0 0" data-tex="\tau_{max}=\dfrac{T\,c}{J}"></div>
+      <div class="src" style="margin-bottom:2px">Hamrock et al. (2014), lign. (4.32) og (4.33), s. 98</div>
+      <div class="big" style="font-size:28px;padding:2px 0 0" data-tex="\tau=\dfrac{V\,Q}{I\,b}"></div>
+      <div class="src" style="margin-bottom:2px">Hamrock et al. (2014), lign. (4.63), s. 104</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="A,\ I,\ J"></span><span><b>Tværsnittets</b> areal og inertimomenter. J = 2I for rundt tværsnit</span></div>
+        <div class="term"><span class="s or" data-tex="c"></span><span><b>Afstand</b> fra midten til yderfiberen. Her er spændingen størst</span></div>
+        <div class="term"><span class="s pu" data-tex="P,\,M,\,T,\,V"></span><span><b>Snitlasten</b> fra ligevægt: normalkraft, moment, drejemoment, tværkraft</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n">1</span><div class="t"><b>Træk</b>, P = 90 kN på 30 × 60 mm
+        <span class="m" data-tex="\boxed{\sigma=\dfrac{90\,000}{1\,800}=50\ \text{MPa}}"></span></div></div>
+      <div class="step"><span class="n b">2</span><div class="t"><b>Bøjning</b>, M = 3 kNm om den stærke akse
+        <span class="m" data-tex="I=\tfrac{bh^3}{12}=540\,000\ \text{mm}^4"></span>
+        <span class="m" data-tex="\boxed{\sigma=\dfrac{3\cdot10^6\cdot30}{540\,000}=166{,}7\ \text{MPa}}"></span></div></div>
+      <div class="step"><span class="n p">3</span><div class="t"><b>Vridning</b>, T = 1 kNm i aksel Ø40
+        <span class="m" data-tex="J=\tfrac{\pi d^4}{32}=251\,327\ \text{mm}^4"></span>
+        <span class="m" data-tex="\boxed{\tau=\dfrac{10^6\cdot20}{251\,327}=79{,}6\ \text{MPa}}"></span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Forskydning</b>, V = 90 kN, rektangel
+        <span class="m" data-tex="\boxed{\tau_{max}=\tfrac32\,\dfrac{V}{A}=75\ \text{MPa}}"></span>
+        <span class="note">Midt i tværsnittet, nul i top og bund</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Vælg last og skru på den</h3>
+      <div class="row"><button class="btn on" data-m="n">Normal</button><button class="btn" data-m="b">Bøjning</button><button class="btn" data-m="t">Vridning</button><button class="btn" data-m="s">Forskydning</button></div>
+      <canvas id="p1" width="640" height="520"></canvas>
+      <div class="sl n"><span id="l1">P</span><input id="a1" type="range" min="0" max="180" step="5" value="90"><output id="a1o"></output></div>
+      <div class="ro">
+        <div><span id="r1l">σ</span><b class="cy" id="r1v" style="font-size:22px">50,0</b><i>MPa</i></div>
+        <div><span>TVÆRSNIT</span><b class="mu" id="r1g" style="font-size:20px">A = 1 800</b><i id="r1u">mm²</i></div>
+      </div>
+      <div class="status" id="st1"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Træk fordeler sig jævnt. Ved bøjning og vridning vokser spændingen lineært ud fra midten, og forskydning er parabelformet. Dobbelt last giver dobbelt spænding.</span></div>
+</section>
+
+<!-- ============ 2 · MOHRS CIRKEL ============ -->
+<section class="slide" id="s2" data-title="2 · Plan spænding og Mohrs cirkel">
+  <div class="hd"><span class="tag b">IDÉ 2 · PLAN SPÆNDING</span><h1>Samme punkt, forskellige snit, én cirkel</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Hovedspændinger og største forskydning</h3>
+      <div class="big" style="font-size:25px;padding-top:2px" data-tex="\sigma_{1,2}=\dfrac{\sigma_x+\sigma_y}{2}\pm\sqrt{\Big(\dfrac{\sigma_x-\sigma_y}{2}\Big)^{2}+\tau_{xy}^{2}}"></div>
+      <div class="src">Hamrock et al. (2014), lign. (2.16), s. 36</div>
+      <div class="big" style="font-size:26px;padding-top:2px" data-tex="\tau_{max}=\dfrac{\sigma_1-\sigma_2}{2}=R"></div>
+      <div class="src">Hamrock et al. (2014), lign. (2.19), s. 36</div>
+      <div class="big" style="font-size:26px;padding-top:2px" data-tex="\tan2\phi_\sigma=\dfrac{2\tau_{xy}}{\sigma_x-\sigma_y}"></div>
+      <div class="src">Hamrock et al. (2014), lign. (2.15), s. 36</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="\sigma_c"></span><span><b>Cirklens centrum</b>, middelværdien af <span data-tex="\sigma_x"></span> og <span data-tex="\sigma_y"></span>, lign. (2.24), s. 37</span></div>
+        <div class="term"><span class="s or" data-tex="R"></span><span><b>Radius</b> er <span data-tex="\tau_{max}"></span>. Alle snit gennem punktet ligger på cirklen, lign. (2.25), s. 38</span></div>
+        <div class="term"><span class="s gr" data-tex="\sigma_1,\sigma_2"></span><span><b>Hovedspændinger</b> er cirklens skæring med <span data-tex="\sigma"></span>-aksen. Der er <span data-tex="\tau=0"></span></span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n b">1</span><div class="t"><b>Elementet</b> i en aksel
+        <span class="m" data-tex="\sigma_x=80,\ \sigma_y=20,\ \tau_{xy}=40\ \text{MPa}"></span></div></div>
+      <div class="step"><span class="n b">2</span><div class="t"><b>Centrum og radius</b>
+        <span class="m" data-tex="\sigma_c=\tfrac{80+20}{2}=50\ \text{MPa}"></span>
+        <span class="m" data-tex="R=\sqrt{30^2+40^2}=50\ \text{MPa}"></span></div></div>
+      <div class="step"><span class="n b">3</span><div class="t"><b>Hovedspændinger</b>
+        <span class="m" data-tex="\boxed{\sigma_1=100,\ \sigma_2=0\ \text{MPa}}"></span></div></div>
+      <div class="step"><span class="n b">4</span><div class="t"><b>Største forskydning og vinkel</b>
+        <span class="m" data-tex="\boxed{\tau_{max}=50\ \text{MPa}}"></span>
+        <span class="m" data-tex="\tan2\phi_\sigma=\tfrac{80}{60}\Rightarrow\phi_\sigma=26{,}6^\circ"></span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Sæt spændingerne, se cirklen</h3>
+      <canvas id="m2" width="640" height="540"></canvas>
+      <div class="sl"><span data-tex="\sigma_x"></span><input id="sx" type="range" min="-40" max="120" step="1" value="80"><output id="sxo"></output></div>
+      <div class="sl"><span data-tex="\sigma_y"></span><input id="sy" type="range" min="-40" max="120" step="1" value="20"><output id="syo"></output></div>
+      <div class="sl"><span data-tex="\tau_{xy}"></span><input id="tx" type="range" min="-60" max="60" step="1" value="40"><output id="txo"></output></div>
+      <div class="ro">
+        <div><span>σ1</span><b class="gr" id="m1v">100,0</b><i>MPa</i></div>
+        <div><span>σ2</span><b class="gr" id="m2v">0,0</b><i>MPa</i></div>
+        <div><span>τmax</span><b class="or" id="m3v">50,0</b><i>MPa</i></div>
+        <div><span>φσ</span><b class="cy" id="m4v">26,6</b><i>°</i></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Mohrs cirkel er transformationsligningerne tegnet som en cirkel. Centrum er middelspændingen, radius er den største forskydning, og vinklen i cirklen er det dobbelte af vinklen i legemet.</span></div>
+</section>
+
+<!-- ============ 3 · HOOKES LOV ============ -->
+<section class="slide" id="s3" data-title="3 · Hookes lov og deformation">
+  <div class="hd"><span class="tag p">IDÉ 3 · DEFORMATION</span><h1>Spænding bliver til tøjning og flytning</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Lineær elasticitet</h3>
+      <div class="big" style="font-size:30px;padding-top:2px" data-tex="\sigma=E\,\epsilon"></div>
+      <div class="src">Hamrock et al. (2014), lign. (3.3), s. 60</div>
+      <div class="big" style="font-size:30px;padding-top:2px" data-tex="\delta=\dfrac{P\,L}{A\,E}"></div>
+      <div class="src">Hamrock et al. (2014), lign. (4.22) til (4.25), s. 94 og 97</div>
+      <div class="big" style="font-size:30px;padding-top:2px" data-tex="\delta=\dfrac{P\,L^3}{3\,E\,I}"></div>
+      <div class="src">Udkraget bjælke, Abou-Hayt (2026), slide 10, og Hamrock et al. (2014), afsnit 5.4</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="E"></span><span><b>Stivhed</b> af materialet: stål 200 GPa, aluminium 70 GPa</span></div>
+        <div class="term"><span class="s or" data-tex="\epsilon"></span><span><b>Tøjning</b> er forlængelse pr. længde, <span data-tex="\delta/L"></span>. Uden enhed</span></div>
+        <div class="term"><span class="s pu" data-tex="AE,\ EI"></span><span><b>Stivhed af emnet</b>: aksial og bøjning. Stor stivhed giver lille <span data-tex="\delta"></span></span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n p">1</span><div class="t"><b>Stålstang</b>, P = 40 kN, A = 200 mm², L = 2,0 m
+        <span class="m" data-tex="\sigma=\dfrac{40\,000}{200}=200\ \text{MPa}"></span></div></div>
+      <div class="step"><span class="n p">2</span><div class="t"><b>Tøjning</b> med E = 200 000 MPa
+        <span class="m" data-tex="\epsilon=\dfrac{200}{200\,000}=0{,}0010"></span></div></div>
+      <div class="step"><span class="n p">3</span><div class="t"><b>Forlængelse</b>
+        <span class="m" data-tex="\boxed{\delta=\epsilon L=0{,}0010\cdot2000=2{,}0\ \text{mm}}"></span></div></div>
+      <div class="step"><span class="n p">4</span><div class="t"><b>Udkraget bjælke</b>, P = 600 N, L = 500 mm, I = 50 000 mm⁴
+        <span class="m" data-tex="\boxed{\delta=\dfrac{600\cdot500^3}{3\cdot200\,000\cdot50\,000}=2{,}5\ \text{mm}}"></span>
+        <span class="note">600 N bøjer lige så meget som 40 000 N strækker</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Skru på kraften P</h3>
+      <div class="row"><button class="btn pu on" data-m="a">Stang i træk</button><button class="btn pu" data-m="b">Udkraget bjælke</button></div>
+      <canvas id="d3" width="640" height="330"></canvas>
+      <canvas id="g3" width="640" height="320"></canvas>
+      <div class="sl n"><span>P</span><input id="p3" type="range" min="0" max="80" step="1" value="40"><output id="p3o"></output></div>
+      <div class="ro r3">
+        <div><span id="q1l">σ</span><b class="cy" id="q1v" style="font-size:21px">200</b><i id="q1u">MPa</i></div>
+        <div><span id="q2l">ε</span><b class="or" id="q2v" style="font-size:21px">1,00</b><i id="q2u">‰</i></div>
+        <div><span>δ</span><b class="pu" id="q3v" style="font-size:21px">2,00</b><i>mm</i></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Dobbelt kraft giver dobbelt flytning, så længe materialet er elastisk. Bøjning er langt blødere end træk, fordi L står i tredje potens.</span></div>
+</section>
+
+<!-- ============ 4 · FALDGRUBER OG TJEK ============ -->
+<section class="slide" data-title="4 · Faldgruber og tjek">
+  <div class="hd"><span class="tag g">FALDGRUBER OG TJEK</span><h1>Hvor det typisk går galt</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Typiske fejl</h3>
+      <div class="fejl">
+        <div><span>Kraft i N regnes sammen med mål i m, og svaret kaldes MPa.<span class="ret">Hold N, mm og MPa (= N/mm²) hele vejen. Ellers er svaret en faktor 10⁶ forkert.</span></span></div>
+        <div><span>I bruges til vridning, eller J til bøjning.<span class="ret">Bøjning bruger I, vridning bruger J. For en rund aksel er J = 2I.</span></span></div>
+        <div><span>c i σ = Mc/I forveksles med højden h.<span class="ret">c er afstanden fra neutralaksen til yderfiberen. For symmetrisk tværsnit er c = h/2.</span></span></div>
+        <div><span>Fortegn glemt i Mohrs cirkel: Y-punktet lægges ved +τxy, eller σ1 og σ2 byttes om.<span class="ret">Y ligger ved −τxy. σ1 er den største. Kontrollér vinklen ved at sætte den ind i (2.13).</span></span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Tjek dig selv</h3>
+      <div class="qa">
+        <details><summary>Hvorfor er bøjningsspændingen nul midt i bjælken, men størst yderst?</summary><p>σ = My/I vokser lineært med afstanden y fra neutralaksen. Ved y = 0 er den nul, og ved y = c er den størst. Vridning er det samme med τ = Tr/J.</p></details>
+        <details><summary>σx = 100 MPa, σy = 0 og τxy = 0. Hvad er σ1, σ2 og τmax?</summary><p>σ1 = 100 MPa og σ2 = 0, så snittet giver sig selv. Radius er R = 50 MPa, så τmax = 50 MPa.</p></details>
+        <details><summary>Aluminiums- og stålstang har samme mål og last. Hvilken forlænges mest?</summary><p>Aluminium. δ = PL/(AE) er omvendt proportional med E, og 200/70 ≈ 2,9. Aluminiumsstangen forlænges altså næsten tre gange så meget.</p></details>
+      </div>
+    </div>
+    <div class="card col">
+      <h3>Til eksamen</h3>
+      <div style="font-size:17px;line-height:1.4">Dette tema er <b>fundamentet for alle 9 eksamensspørgsmål</b>. Hver løsning begynder med at finde spændinger og deformationer ud fra last og geometri.</div>
+      <div class="exlinks">
+        <a href="../../eksamen-ny/index.html"><b>ALLE</b> Mundtlig eksamen: oversigt over de 9 spørgsmål</a>
+        <a href="../../eksamen-ny/sp03_akseldesign.html"><b>SPM 3</b> Akseldesign · aksel bruger bøjning og vridning samtidig</a>
+      </div>
+      <h3 style="margin-top:8px">Læs i bogen</h3>
+      <div style="display:grid;gap:6px;font-size:16px;line-height:1.35">
+        <div><b>§ 2.9 til 2.13, s. 34</b> spænding, plan spænding, Mohrs cirkel</div>
+        <div><b>§ 3.5, s. 60</b> Hookes lov og materialeegenskaber</div>
+        <div><b>§ 4.2 til 4.3, s. 90</b> tværsnit, I og J, normalspænding</div>
+        <div><b>§ 4.4 til 4.6, s. 98</b> vridning, bøjning, tværkraft</div>
+        <div><b>§ 5.2 til 5.4, s. 116</b> udbøjning af bjælker</div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Først snitlasten, så spændingen, så tøjningen og flytningen. Hold enhederne til N, mm og MPa.</span></div>
+</section>
+
+</div></div>
+<script src="../assets/deck.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = D.$, fmt = D.fmt, PI = Math.PI;
+var CY = '#0a7fc2', OR = '#d97a00', PU = '#7b4fc9', GR = '#0a9a5c', RD = '#d63a3a', INK = '#14202d', MUT = '#5a6b7d';
+function sp(v, n) { return fmt(v, n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+function hatch(x, px, y0, y1, dir) { D.line(x, [[px, y0], [px, y1]], MUT, 4); for (var y = y0; y < y1; y += 16) D.line(x, [[px, y], [px + dir * 12, y + 12]], '#9fb0c2', 2); }
+
+/* ---------- slide 0: stang i træk + aksel i vridning ---------- */
+(function () {
+  var x = D.cv('c0').x, ye = 0;
+  D.anim(0, function (dt, t) {
+    var s = 0.5 - 0.5 * Math.cos(t * 1.5), e = 0.22 * s, i;
+    x.clearRect(0, 0, 560, 440);
+    /* stang i træk */
+    D.txt(x, 'Stang i træk', 30, 24, 24, MUT, 'left');
+    hatch(x, 40, 56, 144, -1);
+    var L = 300 * (1 + e), y0 = 78, h = 44;
+    x.fillStyle = '#c9dbec'; x.fillRect(40, y0, L, h); x.strokeStyle = CY; x.lineWidth = 3; x.strokeRect(40, y0, L, h);
+    for (i = 1; i < 6; i++) D.line(x, [[40 + L * i / 6, y0], [40 + L * i / 6, y0 + h]], 'rgba(10,127,194,.55)', 2);
+    D.line(x, [[340, 60], [340, 140]], 'rgba(90,107,125,.6)', 2, [6, 5]);
+    D.arrow(x, 40 + L + 6, y0 + h / 2, 40 + L + 40 + 38 * s, y0 + h / 2, RD, 7);
+    D.txt(x, 'P', 40 + L + 52 + 38 * s, y0 + h / 2 - 22, 26, RD, 'center');
+    if (e > 0.02) { D.txt(x, 'δ = ' + fmt(e * 300 / 3, 1) + ' (forstørret)', 40, 164, 20, OR, 'left'); }
+    /* aksel i vridning */
+    D.txt(x, 'Aksel i vridning', 30, 232, 24, MUT, 'left');
+    hatch(x, 40, 262, 382, -1);
+    var xa = 40, xb = 340, yc = 322, hh = 52, off = 30 * s;
+    x.fillStyle = '#e1d6f3'; x.fillRect(xa, yc - hh, xb - xa, 2 * hh); x.strokeStyle = PU; x.lineWidth = 3; x.strokeRect(xa, yc - hh, xb - xa, 2 * hh);
+    for (i = 1; i < 6; i++) D.line(x, [[xa + (xb - xa) * i / 6, yc - hh], [xa + (xb - xa) * i / 6, yc + hh]], 'rgba(123,79,201,.4)', 2);
+    D.line(x, [[xa, yc - 24], [xb, yc - 24 + off]], RD, 5);
+    x.fillStyle = '#cdbbea'; x.beginPath(); x.ellipse(xb, yc, 16, hh, 0, 0, 2 * PI); x.fill(); x.strokeStyle = PU; x.lineWidth = 3; x.stroke();
+    D.line(x, [[xb, yc], [xb, yc - hh + 6 + off * 0.9]], RD, 4);
+    D.marc(x, xb + 70, yc, 36, true, OR, 6);
+    D.txt(x, 'T', xb + 118, yc, 26, OR, 'center');
+    D.txt(x, 'Linjen skråner: forskydning', 40, 410, 20, RD, 'left');
+  });
+})();
+
+/* ---------- slide 1: spændingsfordeling ---------- */
+var MD = {
+  n: { k: 1000 / 1800, max: 180, step: 5, val: 90, u: 'kN', sym: 'P', rec: 'σ', sec: 'r', shape: 'jævn', geo: 'A = 1 800', gu: 'mm²', prof: function () { return 1; }, col: CY,
+       st: '<b>Normalspænding</b> σ = P/A. Samme spænding i hele tværsnittet. Tryk giver negativ σ.' },
+  b: { k: 0, max: 6, step: 0.1, val: 3, u: 'kNm', sym: 'M', rec: 'σmax', sec: 'r', shape: 'lineær', geo: 'I = 540 000', gu: 'mm⁴', prof: function (y) { return -y; }, col: CY,
+       st: '<b>Bøjning</b> σ = My/I. Træk i den ene side, tryk i den anden, nul i neutralaksen.' },
+  t: { k: 20e6 / 251327.4, max: 2, step: 0.05, val: 1, u: 'kNm', sym: 'T', rec: 'τmax', sec: 'c', shape: 'lineær', geo: 'J = 251 327', gu: 'mm⁴', prof: function (y) { return y; }, col: PU,
+       st: '<b>Vridning</b> τ = Tr/J. Nul i centrum, størst i overfladen. Aksel Ø40 mm.' },
+  s: { k: 1.5 / 1800 * 1000, max: 180, step: 5, val: 90, u: 'kN', sym: 'V', rec: 'τmax', sec: 'r', shape: 'parabel', geo: 'A = 1 800', gu: 'mm²', prof: function (y) { return 1 - y * y; }, col: PU,
+       st: '<b>Forskydning</b> τ = VQ/(Ib). For rektangel er τmax = 1,5·V/A, midt i tværsnittet og nul i top og bund.' }
+};
+MD.b.k = 1e6 * 30 / 540000 / 1000;               /* = 55,56 MPa pr. kNm */
+MD.t.k = 1e6 * 20 / 251327.4 / 1000;
+MD.n.k = 1000 / 1800; MD.s.k = 1.5 * 1000 / 1800;
+var mode1 = 'n';
+function draw1() {
+  var m = MD[mode1], v = +$('a1').value, s = m.k * v, full = m.k * m.max, G = D.cv('p1'), x = G.x, cy = 270, x0 = 345, hh = m.sec === 'c' ? 60 : 90, W = 215, i, N = 18;
+  x.clearRect(0, 0, G.W, G.H);
+  D.txt(x, 'Tværsnit', 62, 36, 24, MUT, 'center'); D.txt(x, 'Spændingsfordeling', 450, 36, 24, MUT, 'center');
+  /* tværsnit */
+  x.fillStyle = '#e3ecf5'; x.strokeStyle = INK; x.lineWidth = 3;
+  if (m.sec === 'r') { x.fillRect(17, cy - hh, 90, 2 * hh); x.strokeRect(17, cy - hh, 90, 2 * hh); }
+  else { D.circ(x, 62, cy, 60, '#e3ecf5', INK, 3); }
+  D.line(x, [[62, cy - hh - 14], [62, cy + hh + 14]], 'rgba(90,107,125,.4)', 2, [6, 5]);
+  D.line(x, [[107, cy - hh], [x0 - 30, cy - hh]], 'rgba(90,107,125,.35)', 2, [5, 5]);
+  D.line(x, [[107, cy + hh], [x0 - 30, cy + hh]], 'rgba(90,107,125,.35)', 2, [5, 5]);
+  D.line(x, [[x0, cy - hh - 16], [x0, cy + hh + 16]], INK, 3);
+  if (mode1 === 'b') D.line(x, [[x0 - 235, cy], [x0 + 235, cy]], 'rgba(90,107,125,.55)', 2, [8, 6]);
+  /* profil */
+  var pts = [];
+  for (i = -N; i <= N; i++) {
+    var yy = i / N, f = m.prof(yy), len = f * s / full * W, py = cy - yy * hh;
+    pts.push([x0 + len, py]);
+    if (Math.abs(len) > 8 && i % 2 === 0) D.arrow(x, x0, py, x0 + len, py, mode1 === 'b' ? (len < 0 ? RD : CY) : m.col, 3);
+  }
+  x.fillStyle = mode1 === 'b' ? 'rgba(10,127,194,.10)' : (m.col === CY ? 'rgba(10,127,194,.12)' : 'rgba(123,79,201,.12)');
+  x.beginPath(); x.moveTo(x0, cy - hh); pts.forEach(function (p) { x.lineTo(p[0], p[1]); }); x.lineTo(x0, cy + hh); x.closePath(); x.fill();
+  D.line(x, pts, mode1 === 'b' ? OR : m.col, 4);
+  var hdr = (mode1 === 'b' || mode1 === 'n') ? 'σ' : 'τ';
+  D.txt(x, hdr + (mode1 === 'b' || mode1 === 'n' ? '' : '') + ' = ' + sp(s, 1) + ' MPa', 450, cy + hh + 44, 30, m.col === CY ? CY : PU, 'center', 'middle', 700);
+  if (mode1 === 'b') { D.txt(x, 'tryk', x0 - 210, cy - hh + 16, 24, RD, 'left'); D.txt(x, 'træk', x0 + 120, cy + hh - 14, 24, CY, 'left'); D.txt(x, 'neutralakse', x0 + 235, cy - 14, 22, MUT, 'right'); }
+  if (mode1 === 't') D.txt(x, 'r = 0 giver τ = 0', x0 + 225, cy - 14, 22, MUT, 'right');
+  if (mode1 === 's') D.txt(x, 'nul i kanten', x0 + 225, cy - hh + 16, 22, MUT, 'right');
+  $('a1o').textContent = fmt(v, m.step < 1 ? (m.step < 0.1 ? 2 : 1) : 0) + ' ' + m.u;
+  $('r1v').textContent = sp(s, 1); $('r1v').className = m.col === CY ? 'cy' : 'pu';
+  $('r1l').textContent = m.rec; $('r1g').textContent = m.geo; $('r1u').textContent = m.gu;
+  $('st1').innerHTML = m.st;
+}
+function setMode1(k) {
+  mode1 = k; var m = MD[k], a = $('a1');
+  document.querySelectorAll('#s1 [data-m]').forEach(function (b) { b.classList.toggle('on', b.dataset.m === k); });
+  a.min = 0; a.max = m.max; a.step = m.step; a.value = m.val; $('l1').textContent = m.sym; draw1();
+}
+document.querySelectorAll('#s1 [data-m]').forEach(function (b) { b.onclick = function () { setMode1(b.dataset.m); }; });
+$('a1').oninput = draw1; setMode1('n');
+
+/* ---------- slide 2: Mohrs cirkel ---------- */
+function MX(s) { return 36 + (s + 80) * 1.85; } function MY(t) { return 250 - t * 1.85; }
+function draw2() {
+  var sx = +$('sx').value, sy = +$('sy').value, tx = +$('tx').value;
+  var sc = (sx + sy) / 2, R = Math.sqrt(Math.pow((sx - sy) / 2, 2) + tx * tx), s1 = sc + R, s2 = sc - R, al = Math.atan2(tx, (sx - sy) / 2);
+  $('sxo').textContent = sx; $('syo').textContent = sy; $('txo').textContent = tx;
+  $('m1v').textContent = fmt(s1, 1); $('m2v').textContent = fmt(s2, 1); $('m3v').textContent = fmt(R, 1); $('m4v').textContent = fmt(al * 90 / PI, 1);
+  var G = D.cv('m2'), x = G.x, i, cx = MX(sc), cyy = MY(0);
+  x.clearRect(0, 0, G.W, G.H);
+  D.line(x, [[MX(-80), MY(0)], [MX(240), MY(0)]], '#9fb0c2', 2); D.line(x, [[MX(0), MY(-108)], [MX(0), MY(108)]], '#9fb0c2', 2);
+  D.txt(x, 'σ', 628, MY(0) - 18, 26, MUT, 'right'); D.txt(x, 'τ', MX(0) + 16, 22, 26, MUT, 'left');
+  for (i = -50; i <= 200; i += 50) if (Math.abs(MX(i) - MX(s1)) > 20 && Math.abs(MX(i) - MX(s2)) > 20) { D.line(x, [[MX(i), MY(0) - 5], [MX(i), MY(0) + 5]], '#9fb0c2', 2); D.txt(x, i, MX(i), MY(0) + 24, 20, MUT, 'center'); }
+  /* cirkel */
+  x.beginPath(); x.arc(cx, cyy, R * 1.85, 0, 2 * PI); x.fillStyle = 'rgba(10,127,194,.08)'; x.fill(); x.strokeStyle = CY; x.lineWidth = 4; x.stroke();
+  D.line(x, [[MX(sx), MY(tx)], [MX(sy), MY(-tx)]], 'rgba(90,107,125,.7)', 2, [8, 6]);
+  if (R > 3) { D.line(x, [[cx, cyy], [cx, MY(R)]], 'rgba(217,122,0,.6)', 2, [6, 5]); }
+  /* vinkel 2φσ */
+  if (R > 12 && Math.abs(al) > 0.05) {
+    x.strokeStyle = CY; x.lineWidth = 3; x.beginPath(); x.arc(cx, cyy, 40, 0, -al, al > 0); x.stroke();
+    D.line(x, [[cx, cyy], [MX(sx), MY(tx)]], 'rgba(10,127,194,.6)', 2);
+    D.txt(x, '2φσ', cx + 62 * Math.cos(-al / 2), cyy + 62 * Math.sin(-al / 2), 22, CY, 'center');
+  }
+  D.circ(x, cx, cyy, 6, CY);
+  D.circ(x, MX(sx), MY(tx), 9, INK); D.txt(x, 'X', MX(sx) + (sx >= sy ? 20 : -20), MY(tx) + (tx >= 0 ? -16 : 20), 26, INK, 'center', 'middle', 700);
+  D.circ(x, MX(sy), MY(-tx), 9, '#fff', INK, 3); D.txt(x, 'Y', MX(sy) + (sx >= sy ? -20 : 20), MY(-tx) + (tx >= 0 ? 20 : -16), 26, INK, 'center', 'middle', 700);
+  D.circ(x, MX(s1), cyy, 9, GR); D.txt(x, 'σ1', MX(s1) + 4, cyy + 26, 24, GR, 'center', 'middle', 700);
+  D.circ(x, MX(s2), cyy, 9, GR); D.txt(x, 'σ2', MX(s2) - 4, cyy + 26, 24, GR, 'center', 'middle', 700);
+  D.circ(x, cx, MY(R), 9, OR); D.txt(x, 'τmax', cx + 14, MY(R) - 18, 24, OR, 'left', 'middle', 700);
+  D.txt(x, 'X = (σx, τxy), Y = (σy, −τxy)', 14, 520, 21, MUT, 'left');
+}
+['sx', 'sy', 'tx'].forEach(function (id) { $(id).oninput = draw2; }); draw2();
+
+/* ---------- slide 3: Hookes lov ---------- */
+var mode3 = 'a', E3 = 200000;
+var HD = { a: { max: 80, val: 40, u: 'kN', xmax: 80, ymax: 4, xt: [[0, '0'], [20, '20'], [40, '40'], [60, '60'], [80, '80 kN']], yt: [0, 1, 2, 3, 4] },
+           b: { max: 1200, val: 600, u: 'N', xmax: 1200, ymax: 5, xt: [[0, '0'], [300, '300'], [600, '600'], [900, '900'], [1200, '1200 N']], yt: [0, 1, 2, 3, 4, 5] } };
+function delta3(p) { return mode3 === 'a' ? (p * 1000 * 2000) / (200 * E3) : (p * Math.pow(500, 3)) / (3 * E3 * 50000); }
+function draw3() {
+  var h = HD[mode3], p = +$('p3').value, d = delta3(p), G = D.cv('d3'), x = G.x, i;
+  $('p3o').textContent = p + ' ' + h.u;
+  x.clearRect(0, 0, G.W, G.H);
+  if (mode3 === 'a') {
+    var ext = d * 20, y0 = 120, hb = 44, x0 = 80, Lb = 360;
+    hatch(x, x0, y0 - 30, y0 + hb + 30, -1);
+    x.fillStyle = '#c9dbec'; x.fillRect(x0, y0, Lb + ext, hb); x.strokeStyle = CY; x.lineWidth = 3; x.strokeRect(x0, y0, Lb + ext, hb);
+    for (i = 1; i < 6; i++) D.line(x, [[x0 + (Lb + ext) * i / 6, y0], [x0 + (Lb + ext) * i / 6, y0 + hb]], 'rgba(10,127,194,.5)', 2);
+    D.line(x, [[x0 + Lb, y0 - 24], [x0 + Lb, y0 + hb + 24]], 'rgba(90,107,125,.7)', 2, [6, 5]);
+    if (p > 0) { D.arrow(x, x0 + Lb + ext + 6, y0 + hb / 2, x0 + Lb + ext + 14 + p * 1.1, y0 + hb / 2, RD, 7); D.txt(x, 'P', x0 + Lb + ext + 30 + p * 1.1, y0 + hb / 2 - 24, 26, RD, 'center'); }
+    if (ext > 16) { D.arrow(x, x0 + Lb, y0 + hb + 40, x0 + Lb + ext, y0 + hb + 40, PU, 4); D.txt(x, 'δ = ' + fmt(d, 2) + ' mm', x0 + Lb + ext / 2, y0 + hb + 68, 26, PU, 'center', 'middle', 700); }
+    D.txt(x, 'L = 2,0 m', x0 + 160, y0 - 30, 24, MUT, 'center');
+    D.txt(x, 'Forlængelsen er forstørret ca. ' + Math.round(20 * 2000 / 360) + ' gange', 320, 276, 20, MUT, 'center');
+    $('q1l').textContent = 'σ'; $('q1v').textContent = fmt(p * 5, 0); $('q1u').textContent = 'MPa';
+    $('q2l').textContent = 'ε'; $('q2v').textContent = fmt(p * 5 / E3 * 1000, 2); $('q2u').textContent = '‰';
+  } else {
+    var x0b = 80, y0b = 90, f = 16, pts = [];
+    hatch(x, x0b, y0b - 50, y0b + 50, -1);
+    D.line(x, [[x0b, y0b], [x0b + 400, y0b]], 'rgba(90,107,125,.7)', 2, [6, 5]);
+    for (i = 0; i <= 40; i++) { var xm = 500 * i / 40, ym = p * xm * xm * (3 * 500 - xm) / (6 * E3 * 50000); pts.push([x0b + xm * 0.8, y0b + ym * f]); }
+    D.line(x, pts, PU, 12); D.line(x, pts, '#d6c6f0', 4);
+    if (p > 0) { D.arrow(x, x0b + 400, y0b + d * f - 62, x0b + 400, y0b + d * f - 8, RD, 7); D.txt(x, 'P', x0b + 430, y0b + d * f - 40, 26, RD, 'center'); }
+    if (d * f > 18) { D.arrow(x, x0b + 460, y0b, x0b + 460, y0b + d * f, PU, 4); D.txt(x, 'δ = ' + fmt(d, 2) + ' mm', x0b + 440, y0b + d * f + 38, 26, PU, 'center', 'middle', 700); }
+    D.txt(x, 'L = 500 mm', x0b + 200, y0b - 40, 24, MUT, 'center');
+    D.txt(x, 'Udbøjningen er forstørret 20 gange', 320, 276, 20, MUT, 'center');
+    $('q1l').textContent = 'M = P·L'; $('q1v').textContent = fmt(p * 0.5, 0); $('q1u').textContent = 'Nm';
+    $('q2l').textContent = 'STIVHED'; $('q2v').textContent = p > 0 ? fmt(p / d, 0) : '240'; $('q2u').textContent = 'N/mm';
+  }
+  $('q3v').textContent = fmt(d, 2);
+  D.graph('g3', { f: function (q) { return delta3(q); }, x0: 0, x1: h.xmax, xt: h.xt, min: 0, max: h.ymax, yt: h.yt, yd: 0, lbl: 'δ (mm) som funktion af P', col: PU, d: 2, xm: p });
+}
+function setMode3(k) {
+  mode3 = k; var h = HD[k], a = $('p3');
+  document.querySelectorAll('#s3 [data-m]').forEach(function (b) { b.classList.toggle('on', b.dataset.m === k); });
+  a.min = 0; a.max = h.max; a.step = 1; a.value = h.val; draw3();
+}
+document.querySelectorAll('#s3 [data-m]').forEach(function (b) { b.onclick = function () { setMode3(b.dataset.m); }; });
+$('p3').oninput = draw3; setMode3('a');
+D.start();
+})();
+</script>
+</body></html>

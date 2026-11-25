@@ -1,0 +1,337 @@
+<!doctype html><html lang="da"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tema 2 · Komplekse tal, kondensator og spole</title>
+<meta name="description" content="Hurtigstart til ELE1 tema 2: komplekse tal på tre former, kondensatoren og spolen, energi og RC-opladning (dag 3 og 4).">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../assets/deck.css"></head>
+<body>
+<div id="vp"><div id="deck">
+
+<!-- ============ 0 · FORSIDE ============ -->
+<section class="slide on" data-title="Forside">
+  <div style="flex:1;display:grid;grid-template-columns:1fr 600px;gap:34px;align-items:center;padding:0 10px">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div>
+        <div class="tag" style="display:inline-block">ELE1 · HURTIGSTART · TEMA 2</div>
+        <h1 style="font-size:60px;margin-top:18px">Komplekse tal, kondensator og spole</h1>
+        <div style="font-size:26px;color:var(--mut);margin-top:6px">Ét tal kan bære <b>størrelse og vinkel</b>. To komponenter <b>gemmer energi</b>, og hver har en størrelse, der ikke kan springe</div>
+      </div>
+      <div class="card qcard"><span class="lbl cy">KORT FORTALT</span>
+        En kondensator er en vandtank: spændingen er vandstanden, og den stiger kun, så hurtigt vandet løber til. En spole er et tungt svinghjul i røret: strømmen er hjulets fart, og den kan ikke ændres brat. Begge gemmer energi, og begge reagerer på ændringer, ikke på det konstante. Komplekse tal er værktøjet, der senere gør vekselstrøm til almindelig regning.</div>
+      <div class="plan">
+        <div><b class="cy">1 · Komplekse tal</b><span data-tex="a+jb=r\angle\theta"></span></div>
+        <div><b class="or">2 · Kondensatoren</b><span data-tex="i=C\,dv/dt"></span></div>
+        <div><b class="pu">3 · Spolen</b><span data-tex="v=L\,di/dt"></span></div>
+        <div><b class="gr">4 · Tjek</b>fejl og eksamen</div>
+      </div>
+      <div class="links"><a href="../../dag/Dag03_Studienote.pdf">📖 Studienote dag 3</a><a href="../../dag/Dag04_Studienote.pdf">📖 Studienote dag 4</a><a href="../../../../lab/ele1/kondensator-spole.html">🧪 3D-lab: kondensator og spole</a><a href="../../lab/dag03.html">📝 Opgaver dag 3</a></div>
+    </div>
+    <div class="card" style="padding:12px"><canvas id="c0" width="560" height="440"></canvas>
+      <div style="font-size:18px;color:var(--mut);text-align:center;margin-top:8px">Til venstre fyldes tanken: <b>v</b> stiger langsomt. Til højre får svinghjulet fart: <b>i</b> vokser langsomt og ebber ud langsomt</div></div>
+  </div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm &nbsp;·&nbsp; ☰: alle temaer</div>
+</section>
+
+<!-- ============ 1 · KOMPLEKSE TAL ============ -->
+<section class="slide" id="s1" data-title="1 · Komplekse tal">
+  <div class="hd"><span class="tag">IDÉ 1 · KOMPLEKSE TAL</span><h1>Samme tal på tre måder, og kvadranten afgør vinklen</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Tre former, ét tal</h3>
+      <div class="big" style="font-size:32px" data-tex="\mathbf{A}=a+jb=r\angle\theta=r\,e^{j\theta}"></div>
+      <div class="src">Rizzoni og Kearns (2022), lign. (A.10) til (A.13), s. 757 og 758</div>
+      <div class="big" style="font-size:26px" data-tex="r=\sqrt{a^2+b^2},\quad \theta=\tan^{-1}\!\dfrac{b}{a}"></div>
+      <div class="src">Omregning, lign. (A.12), s. 758. Euler: lign. (3.33), s. 166</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="a,\,b"></span><span><b>Kartesisk</b>: realdel og imaginærdel, som koordinater. Bruges til at lægge til og trække fra</span></div>
+        <div class="term"><span class="s or" data-tex="r,\,\theta"></span><span><b>Polær</b>: afstand og vinkel fra origo. Bruges til at gange og dividere, hvor længder ganges og vinkler lægges sammen</span></div>
+        <div class="term"><span class="s pu" data-tex="e^{j\theta}"></span><span><b>Euler</b>: <span data-tex="e^{j\theta}=\cos\theta+j\sin\theta"></span>. Vinklen er her i radianer</span></div>
+        <div class="term"><span class="s gr" data-tex="j^2=-1"></span><span><b>Imaginær enhed</b>. At gange med <span data-tex="j"></span> drejer tallet 90° mod uret</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n">1</span><div class="t"><b>Længden</b>, <span data-tex="\mathbf{A}=-3+j4"></span>
+        <span class="m" data-tex="r=\sqrt{(-3)^2+4^2}=5"></span></div></div>
+      <div class="step"><span class="n">2</span><div class="t"><b>Vinklen</b>: lommeregneren giver kun −90° til 90°
+        <span class="m" data-tex="\tan^{-1}\!\dfrac{4}{-3}=-53{,}1^\circ"></span>
+        <span class="note"><span data-tex="a<0"></span>: punktet ligger i 2. kvadrant. Læg 180° til</span>
+        <span class="m" data-tex="\boxed{\mathbf{A}=5\angle126{,}9^\circ}"></span></div></div>
+      <div class="step"><span class="n">3</span><div class="t"><b>Eksponentiel form</b>, i radianer
+        <span class="m" data-tex="126{,}9^\circ=2{,}214\ \text{rad}\ \Rightarrow\ 5\,e^{j2{,}214}"></span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Gange og dividere</b> med <span data-tex="2\angle-60^\circ"></span>
+        <span class="m" data-tex="5\angle126{,}9^\circ\cdot2\angle{-60^\circ}=10\angle66{,}9^\circ"></span>
+        <span class="m" data-tex="\dfrac{5\angle126{,}9^\circ}{2\angle{-60^\circ}}=2{,}5\angle186{,}9^\circ=2{,}5\angle{-173{,}1^\circ}"></span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Træk i a og b</h3>
+      <canvas id="p1" width="640" height="420"></canvas>
+      <div class="sl n"><span>a (reel)</span><input id="a1" type="range" min="-6" max="6" step="0.5" value="-3"><output id="a1o"></output></div>
+      <div class="sl n"><span>b (imag.)</span><input id="b1" type="range" min="-6" max="6" step="0.5" value="4"><output id="b1o"></output></div>
+      <div class="ro r3">
+        <div><span>r</span><b class="or" id="v1r">5,00</b></div>
+        <div><span>θ korrekt</span><b class="cy" id="v1t">126,9</b><i>°</i></div>
+        <div><span>tan⁻¹(b/a)</span><b class="pu" id="v1n">−53,1</b><i>°</i></div>
+      </div>
+      <div class="status" id="st1"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Kartesisk til plus og minus, polær til gange og dividere. Vinklen findes ud fra, hvor punktet ligger, ikke blindt ud fra lommeregneren.</span></div>
+</section>
+
+<!-- ============ 2 · KONDENSATOR ============ -->
+<section class="slide" id="s2" data-title="2 · Kondensatoren">
+  <div class="hd"><span class="tag b">IDÉ 2 · KONDENSATOREN</span><h1>Spændingen kan ikke springe, og ved DC er den afbrudt</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Tank, der fyldes</h3>
+      <div class="big" style="font-size:34px" data-tex="i=C\,\dfrac{dv}{dt}"></div>
+      <div class="src">Rizzoni og Kearns (2022), lign. (3.4), s. 142</div>
+      <div class="big" style="font-size:30px" data-tex="W=\tfrac{1}{2}\,C\,v^2"></div>
+      <div class="src">Lign. (3.9), s. 144. Serie og parallel: lign. (3.7), s. 143</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="v"></span><span><b>Vandstanden</b> kan ikke springe, for det kræver uendelig strøm. Den stiger glat</span></div>
+        <div class="term"><span class="s or" data-tex="i"></span><span><b>Tilløbet</b> løber kun, mens <span data-tex="v"></span> ændrer sig. Ved DC er <span data-tex="dv/dt=0"></span>, så kondensatoren er en afbrydelse</span></div>
+        <div class="term"><span class="s gr" data-tex="W"></span><span><b>Lagret energi</b> vokser med spændingen i anden. Dobbelt spænding giver fire gange energien</span></div>
+        <div class="term"><span class="s pu" data-tex="C_{EQ}"></span><span><b>Modsat modstande</b>: parallel lægges sammen, serie er <span data-tex="1/C_1+1/C_2"></span></span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n b">1</span><div class="t"><b>Strømpuls</b>, 2 mA i 3 ms ind i <span data-tex="C=1\ \mu\text{F}"></span>
+        <span class="m" data-tex="v=\dfrac{i}{C}\,t=\dfrac{2\cdot10^{-3}}{10^{-6}}\cdot0{,}003"></span>
+        <span class="m" data-tex="\boxed{v=6\ \text{V}}"></span>
+        <span class="note">Bliver liggende på 6 V, når pulsen slutter</span></div></div>
+      <div class="step"><span class="n b">2</span><div class="t"><b>Energien</b> i tanken
+        <span class="m" data-tex="W=\tfrac12\cdot10^{-6}\cdot6^2=18\ \mu\text{J}"></span></div></div>
+      <div class="step"><span class="n b">3</span><div class="t"><b>To kondensatorer</b> på 1 µF
+        <span class="m" data-tex="C_{par}=1+1=2\ \mu\text{F}"></span>
+        <span class="m" data-tex="C_{ser}=\dfrac{1\cdot1}{1+1}=0{,}5\ \mu\text{F}"></span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Opladning</b>, <span data-tex="R=10"></span> kΩ, <span data-tex="C=100"></span> µF, <span data-tex="V=10"></span> V
+        <span class="m" data-tex="\tau=RC=1\ \text{s}"></span>
+        <span class="m" data-tex="v(\tau)=10\,(1-e^{-1})=6{,}32\ \text{V}"></span></div></div>
+    </div>
+    <div class="card col">
+      <h3>RC-opladning mod en 10 V kilde</h3>
+      <canvas id="g2" width="640" height="430"></canvas>
+      <div class="sl"><span>R</span><input id="r2" type="range" min="1" max="50" step="1" value="10"><output id="r2o"></output></div>
+      <div class="sl"><span>C</span><input id="c2" type="range" min="10" max="470" step="10" value="100"><output id="c2o"></output></div>
+      <div class="ro r3">
+        <div><span>τ = RC</span><b class="or" id="v2t">1,00</b><i>s</i></div>
+        <div><span>v(τ)</span><b class="cy" id="v2v">6,32</b><i>V</i></div>
+        <div><span>næsten fuld (4,6 τ)</span><b class="gr" id="v2f">4,6</b><i>s</i></div>
+      </div>
+      <div class="status" id="st2"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Strømmen i en kondensator er proportional med, hvor hurtigt spændingen ændrer sig. Efter én tidskonstant er den 63 % oppe, uanset R og C.</span></div>
+</section>
+
+<!-- ============ 3 · SPOLE ============ -->
+<section class="slide" id="s3" data-title="3 · Spolen">
+  <div class="hd"><span class="tag p">IDÉ 3 · SPOLEN</span><h1>Strømmen kan ikke springe, og ved DC er den en kortslutning</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Svinghjul i røret</h3>
+      <div class="big" style="font-size:34px" data-tex="v=L\,\dfrac{di}{dt}"></div>
+      <div class="src">Rizzoni og Kearns (2022), lign. (3.11), s. 152</div>
+      <div class="big" style="font-size:30px" data-tex="W=\tfrac{1}{2}\,L\,i^2"></div>
+      <div class="src">Lign. (3.16), s. 153. Serie og parallel: lign. (3.14), s. 152</div>
+      <div class="terms">
+        <div class="term"><span class="s or" data-tex="i"></span><span><b>Hjulets fart</b> kan ikke springe, for det kræver uendelig spænding. Derfor gnister en åbnet kontakt</span></div>
+        <div class="term"><span class="s cy" data-tex="v"></span><span><b>Kraften</b> på hjulet opstår kun, mens <span data-tex="i"></span> ændrer sig. Ved DC er <span data-tex="di/dt=0"></span>, så spolen er en ledning</span></div>
+        <div class="term"><span class="s gr" data-tex="W"></span><span><b>Lagret energi</b> i magnetfeltet, som kinetisk energi i hjulet</span></div>
+        <div class="term"><span class="s pu" data-tex="L_{EQ}"></span><span><b>Som modstande</b>: serie lægges sammen, parallel er <span data-tex="1/L_1+1/L_2"></span></span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n p">1</span><div class="t"><b>Trapez-strøm</b>, <span data-tex="L=10"></span> H, op til 0,1 mA på 4 ms
+        <span class="m" data-tex="\dfrac{di}{dt}=\dfrac{0{,}1\cdot10^{-3}}{4\cdot10^{-3}}=0{,}025\ \text{A/s}"></span></div></div>
+      <div class="step"><span class="n p">2</span><div class="t"><b>Spændingen</b> følger hældningen
+        <span class="m" data-tex="v=10\cdot0{,}025=0{,}25\ \text{V}"></span>
+        <span class="note">Konstant strøm giver 0 V, faldende rampe giver −0,25 V</span></div></div>
+      <div class="step"><span class="n p">3</span><div class="t"><b>Energi</b> ved 0,1 mA
+        <span class="m" data-tex="W=\tfrac12\cdot10\cdot(10^{-4})^2=50\ \text{nJ}"></span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Større skala</b>: 500 mH og 2 A, mod 2000 µF og 400 V
+        <span class="m" data-tex="W_L=\tfrac12\cdot0{,}5\cdot2^2=1\ \text{J}"></span>
+        <span class="m" data-tex="W_C=\tfrac12\cdot2\cdot10^{-3}\cdot400^2=160\ \text{J}"></span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Vælg strøm, aflæs spændingen</h3>
+      <div class="row" id="fb"><button class="btn on" data-f="trap">Trapez</button><button class="btn" data-f="ramp">Rampe</button><button class="btn" data-f="tri">Trekant</button></div>
+      <canvas id="i3" width="640" height="250"></canvas>
+      <canvas id="v3" width="640" height="250"></canvas>
+      <div class="sl n"><span>t</span><input id="t3" type="range" min="0" max="15" step="0.1" value="3"><output id="t3o"></output></div>
+      <div class="sl n"><span>L</span><input id="l3" type="range" min="1" max="20" step="1" value="10"><output id="l3o"></output></div>
+      <div class="ro r3">
+        <div><span>i</span><b class="or" id="v3i">0,05</b><i>mA</i></div>
+        <div><span>di/dt</span><b class="pu" id="v3d">0,025</b><i>A/s</i></div>
+        <div><span>v = L·di/dt</span><b class="cy" id="v3v">0,25</b><i>V</i></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Spændingen over spolen er induktansen gange strømmens hældning. En ret linje i strømmen giver en vandret linje i spændingen.</span></div>
+</section>
+
+<!-- ============ 4 · FALDGRUBER OG TJEK ============ -->
+<section class="slide" data-title="4 · Faldgruber og tjek">
+  <div class="hd"><span class="tag g">FALDGRUBER OG TJEK</span><h1>Hvor det typisk går galt</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Typiske fejl</h3>
+      <div class="fejl">
+        <div><span>Vinklen tages direkte fra <span data-tex="\tan^{-1}(b/a)"></span>, også når <span data-tex="a<0"></span>.<span class="ret">Tegn punktet. Ved <span data-tex="a<0"></span> lægges 180° til: <span data-tex="-3+j4"></span> er <span data-tex="5\angle126{,}9^\circ"></span>, ikke <span data-tex="-53{,}1^\circ"></span>.</span></span></div>
+        <div><span>Grader og radianer blandes.<span class="ret">I <span data-tex="e^{j\theta}"></span> skal <span data-tex="\theta"></span> være i radianer: <span data-tex="126{,}9^\circ=2{,}214"></span> rad.</span></span></div>
+        <div><span>Kondensatorer i serie og parallel regnes som modstande.<span class="ret">Parallel lægges sammen, serie er <span data-tex="1/C_{EQ}=1/C_1+1/C_2"></span>. Spoler er omvendt.</span></span></div>
+        <div><span>Spændingen over C lader sig springe ved en omskifter.<span class="ret">Kun strømmen kan springe. <span data-tex="v_C"></span> lige efter er den samme som lige før, og <span data-tex="i_L"></span> for spolen.</span></span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Tjek dig selv</h3>
+      <div class="qa">
+        <details><summary>Find vinklen af −3 − j4, og hvor ligger punktet?</summary><p>3. kvadrant. <span data-tex="\tan^{-1}(4/3)=53{,}1^\circ"></span> giver forkert retning, så <span data-tex="\theta=-126{,}9^\circ"></span> (eller 233,1°), og <span data-tex="r=5"></span>.</p></details>
+        <details><summary>Hvad er en kondensator og en spole ved DC, når alt har stillet sig til ro?</summary><p>Kondensatoren er en afbrydelse (<span data-tex="i=0"></span>), spolen en kortslutning (<span data-tex="v=0"></span>), fordi ændringen er nul.</p></details>
+        <details><summary>To 1 µF i serie, og hvor meget energi ved 10 V?</summary><p><span data-tex="C_{ser}=0{,}5\ \mu\text{F}"></span>. <span data-tex="W=\tfrac12\cdot0{,}5\cdot10^{-6}\cdot10^2=25\ \mu\text{J}"></span>.</p></details>
+      </div>
+    </div>
+    <div class="card col">
+      <h3>Til eksamen</h3>
+      <div class="exlinks">
+        <a href="../../lab/dag03.html"><b>EMNE 2</b> Komplekse tal · tre former, omregning og kvadrant</a>
+        <a href="../../lab/dag04.html"><b>EMNE 3</b> Kondensator og spole · i-v, DC, energi, serie og parallel</a>
+        <a href="../../lab/dag12.html"><b>TRÆNER</b> Eksamenstræner · alle emner med typiske fejl</a>
+      </div>
+      <h3 style="margin-top:8px">Læs i bogen</h3>
+      <div style="display:grid;gap:6px;font-size:16px;line-height:1.35">
+        <div><b>App. A, s. 757 til 759</b> komplekse tal og regneregler</div>
+        <div><b>§ 3.1, s. 141 til 144</b> kondensator, energi, serie og parallel</div>
+        <div><b>§ 3.1, s. 151 til 153</b> spole, energi, serie og parallel</div>
+        <div><b>§ 3.3, s. 163 til 164</b> kredsløb med energilagring, RC</div>
+        <div><b>§ 3.4, s. 166</b> Eulers formel</div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Tegn altid tallet før vinklen. Spørg, hvad der ikke kan springe: spændingen over C og strømmen i L.</span></div>
+</section>
+
+</div></div>
+<script src="../assets/deck.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = D.$, fmt = D.fmt, PI = Math.PI;
+var CY = '#0a7fc2', OR = '#d97a00', PU = '#7b4fc9', GR = '#0a9a5c', RD = '#d63a3a', INK = '#14202d', MUT = '#5a6b7d';
+
+/* ---------- slide 0: tank fyldes, svinghjul tager fart ---------- */
+(function () {
+  var x = D.cv('c0').x, T = 8, ang = 0;
+  D.anim(0, function (dt, t) {
+    var tt = t % T, on = tt >= 0.6 && tt < 5.2, fade = tt > 7.2 ? Math.max(0, 1 - (tt - 7.2) / 0.8) : 1;
+    var lvl, om;
+    if (tt < 0.6) { lvl = 0; om = 0; }
+    else if (tt < 5.2) { lvl = 1 - Math.exp(-(tt - 0.6) / 1.3); om = lvl; }
+    else { lvl = 1 - Math.exp(-(4.6) / 1.3); om = lvl * Math.exp(-(tt - 5.2) / 2.2); }
+    lvl *= fade; om *= fade; ang += om * dt * 9;
+    x.clearRect(0, 0, 560, 440);
+    D.txt(x, 'Kondensator', 140, 22, 22, MUT, 'center'); D.txt(x, 'Spole', 420, 22, 22, MUT, 'center');
+    /* tank */
+    var tx0 = 70, tx1 = 210, ty0 = 130, ty1 = 350, hh = (ty1 - ty0) * lvl;
+    x.fillStyle = 'rgba(10,127,194,.28)'; x.fillRect(tx0 + 3, ty1 - hh, tx1 - tx0 - 6, hh);
+    D.line(x, [[tx0, ty0 - 6], [tx0, ty1], [tx1, ty1], [tx1, ty0 - 6]], MUT, 6);
+    D.line(x, [[18, 96], [140, 96], [140, ty0 + 10]], '#9fb0c2', 12);
+    D.txt(x, 'R', 70, 70, 22, MUT, 'center');
+    var flow = on ? (1 - lvl) : 0, k;
+    if (flow > 0.03) for (k = 0; k < 6; k++) {
+      var s = ((t * 0.6 * (0.4 + flow) + k / 6) % 1), px, py, L1 = 122, L2 = (ty1 - hh) - 96;
+      var d = s * (L1 + L2);
+      if (d < L1) { px = 18 + d; py = 96; } else { px = 140; py = 96 + (d - L1); }
+      D.circ(x, px, py, 4 + 3 * flow, CY);
+    }
+    if (on) D.arrow(x, 28, 128, 28 + 14 + 40 * flow, 128, OR, 5);
+    D.txt(x, 'v', 250, ty1 - hh, 28, CY, 'left', 'middle', 800);
+    D.line(x, [[216, ty1 - hh], [236, ty1 - hh]], CY, 3);
+    D.txt(x, 'Vandstand stiger', 140, 392, 20, MUT, 'center');
+    D.txt(x, on ? 'Tilløbet falder' : (tt < 0.6 ? 'Tom tank' : 'v bliver stående'), 140, 418, 20, on ? OR : MUT, 'center');
+    /* svinghjul */
+    var cx = 420, cy = 250, R = 70;
+    D.line(x, [[300, cy], [540, cy]], '#9fb0c2', 12);
+    if (on) D.arrow(x, 304, cy - 44, 304 + 30 + 50, cy - 44, RD, 5);
+    D.txt(x, on ? 'Tryk på' : 'Tryk fra', 300, cy - 66, 20, on ? RD : MUT, 'left');
+    D.circ(x, cx, cy, R + 8, '#eef3f8', MUT, 6);
+    for (k = 0; k < 6; k++) { var a = ang + k * PI / 3; D.line(x, [[cx, cy], [cx + R * Math.cos(a), cy + R * Math.sin(a)]], '#8a97a6', 8); }
+    D.circ(x, cx, cy, 12, MUT);
+    D.circ(x, cx + R * Math.cos(ang), cy + R * Math.sin(ang), 9, RD);
+    var al = 14 + 90 * om; D.arrow(x, 340, cy + 100, 340 + al, cy + 100, PU, 6);
+    D.txt(x, 'i', 340 + al + 14, cy + 100, 28, PU, 'left', 'middle', 800);
+    D.txt(x, 'Farten vokser langsomt', 420, 392, 20, MUT, 'center');
+    D.txt(x, on ? 'Hjulet tager fart' : (tt < 0.6 ? 'Hjulet står stille' : 'Hjulet kører videre'), 420, 418, 20, on ? RD : MUT, 'center');
+  });
+})();
+
+/* ---------- slide 1: komplekse tal ---------- */
+function upd1() {
+  var a = +$('a1').value, b = +$('b1').value, r = Math.sqrt(a * a + b * b), th = Math.atan2(b, a) * 180 / PI;
+  var nv = a === 0 ? (b === 0 ? 0 : (b > 0 ? 90 : -90)) : Math.atan(b / a) * 180 / PI;
+  $('a1o').textContent = fmt(a, 1); $('b1o').textContent = fmt(b, 1);
+  $('v1r').textContent = fmt(r, 2); $('v1t').textContent = fmt(th, 1); $('v1n').textContent = fmt(nv, 1);
+  var G = D.cv('p1'), x = G.x, cx = 320, cy = 210, S = 33, i;
+  x.clearRect(0, 0, G.W, G.H);
+  function X(v) { return cx + v * S; } function Y(v) { return cy - v * S; }
+  x.fillStyle = 'rgba(10,127,194,.05)'; x.fillRect(X(-6), Y(6), 6 * S, 6 * S); x.fillRect(X(0), Y(0), 6 * S, 6 * S);
+  for (i = -6; i <= 6; i += 2) if (i) { D.txt(x, fmt(i, 0), X(i), cy + 16, 16, MUT, 'center'); D.txt(x, fmt(i, 0), cx - 8, Y(i), 16, MUT, 'right'); }
+  D.arrow(x, X(-7), cy, X(7.6), cy, '#9fb0c2', 3); D.arrow(x, cx, Y(-6.2), cx, Y(6.6), '#9fb0c2', 3);
+  D.txt(x, 'Re', X(7.6) - 4, cy + 18, 20, MUT, 'right'); D.txt(x, 'Im', cx + 20, Y(6.6) + 4, 20, MUT, 'left');
+  D.txt(x, 'II', X(-5.6), Y(5.4), 20, '#9fb0c2', 'center'); D.txt(x, 'I', X(5.6), Y(5.4), 20, '#9fb0c2', 'center');
+  D.txt(x, 'III', X(-5.6), Y(-5.4), 20, '#9fb0c2', 'center'); D.txt(x, 'IV', X(5.6), Y(-5.4), 20, '#9fb0c2', 'center');
+  if (r > 0.01) {
+    if (a < 0) { var m = -nv * PI / 180; D.line(x, [[cx, cy], [cx + r * S * Math.cos(m), cy + r * S * Math.sin(m)]], 'rgba(214,58,58,.7)', 4, [8, 7]); var ex = cx + r * S * Math.cos(m), ey = cy + r * S * Math.sin(m); D.txt(x, 'tan⁻¹ peger her', ex + 8, ey + (ey > cy ? 14 : -14), 18, RD, 'left'); }
+    D.line(x, [[X(a), cy], [X(a), Y(b)], [cx, Y(b)]], 'rgba(10,127,194,.45)', 2, [5, 5]);
+    D.arrow(x, cx, cy, X(a), Y(b), CY, 6);
+    D.circ(x, X(a), Y(b), 8, CY);
+    var ar = 30 + 0, t0 = 0, t1 = -th * PI / 180;
+    x.strokeStyle = OR; x.lineWidth = 4; x.setLineDash([]); x.beginPath(); x.arc(cx, cy, ar, t0, t1, th > 0); x.stroke();
+    D.txt(x, fmt(a, 1) + (b < 0 ? ' − j' + fmt(-b, 1).replace('−', '') : ' + j' + fmt(b, 1)) + ' = ' + fmt(r, 2) + '∠' + fmt(th, 1) + '°', 12, 20, 22, INK, 'left', 'middle', 700);
+  }
+  var q = a > 0 && b >= 0 ? '1. kvadrant' : (a <= 0 && b > 0 ? '2. kvadrant' : (a < 0 && b <= 0 ? '3. kvadrant' : '4. kvadrant'));
+  if (r < 0.01) $('st1').innerHTML = 'Nul har ingen vinkel. Træk i a eller b.';
+  else if (a < 0) $('st1').innerHTML = '<b>Kvadrant-fælde</b> (' + q + '): tan⁻¹(b/a) giver ' + fmt(nv, 1) + '° (rød). ' + (b >= 0 ? 'Læg 180° til' : 'Træk 180° fra') + ' og få ' + fmt(th, 1) + '°.';
+  else $('st1').innerHTML = '<b>' + q.charAt(0).toUpperCase() + q.slice(1) + '</b>: tan⁻¹(b/a) er rigtig, når a ≥ 0. <span class="mu">Træk a under nul og se faldet.</span>';
+}
+$('a1').oninput = upd1; $('b1').oninput = upd1; upd1();
+
+/* ---------- slide 2: RC-opladning ---------- */
+function upd2() {
+  var R = +$('r2').value * 1000, C = +$('c2').value * 1e-6, tau = R * C, V = 10;
+  $('r2o').textContent = fmt(R / 1000, 0) + ' kΩ'; $('c2o').textContent = fmt(C * 1e6, 0) + ' µF';
+  function f(t) { return V * (1 - Math.exp(-t / tau)); }
+  var d = tau < 1 ? 2 : (tau < 10 ? 2 : 1);
+  $('v2t').textContent = fmt(tau, d); $('v2v').textContent = fmt(f(tau), 2); $('v2f').textContent = fmt(4.6 * tau, tau < 1 ? 2 : 1);
+  var xt = [[0, '0']]; for (var k = 1; k <= 5; k++) xt.push([k * tau, k + 'τ']);
+  D.graph('g2', { f: f, x0: 0, x1: 5 * tau, xt: xt, min: 0, max: 11, yt: [5, 10], yd: 0, lbl: 'v(t) over C (V)', col: CY, d: 2, u: 'V', xm: tau, xl: 'tid, τ = ' + fmt(tau, d) + ' s', vline: tau, hl: [V * (1 - Math.exp(-1)), '63 %'],
+    more: [{ f: function (t) { return V; }, col: 'rgba(90,107,125,.5)', w: 2, dash: [4, 6] }] });
+  $('st2').innerHTML = 'Starter i 0 V og <b>springer aldrig</b>. Efter τ er v altid 63 % af kilden. <span class="mu">Større R eller C gør opladningen langsommere.</span>';
+}
+$('r2').oninput = upd2; $('c2').oninput = upd2; upd2();
+
+/* ---------- slide 3: spole, v = L di/dt ---------- */
+var FORM = 'trap';
+var SH = {
+  trap: [[0, 0], [1, 0], [5, 0.1], [9, 0.1], [13, 0], [15, 0]],
+  ramp: [[0, 0], [1, 0], [5, 0.1], [15, 0.1]],
+  tri: [[0, 0], [1, 0], [7, 0.1], [13, 0], [15, 0]]
+};
+function iOf(t) { var p = SH[FORM], j; for (j = 0; j < p.length - 1; j++) if (t <= p[j + 1][0]) { var u = (t - p[j][0]) / (p[j + 1][0] - p[j][0]); return p[j][1] + u * (p[j + 1][1] - p[j][1]); } return p[p.length - 1][1]; }
+function sOf(t) { var p = SH[FORM], j; for (j = 0; j < p.length - 1; j++) if (t >= p[j][0] && t < p[j + 1][0]) return (p[j + 1][1] - p[j][1]) / (p[j + 1][0] - p[j][0]); return 0; }
+function upd3() {
+  var t = +$('t3').value, L = +$('l3').value, s = sOf(t), v = L * s;
+  $('t3o').textContent = fmt(t, 1) + ' ms'; $('l3o').textContent = fmt(L, 0) + ' H';
+  $('v3i').textContent = fmt(iOf(t), 3); $('v3d').textContent = fmt(s, 3); $('v3v').textContent = fmt(v, 3);
+  var xt = [[0, '0'], [5, '5'], [10, '10'], [15, '15 ms']];
+  D.graph('i3', { f: iOf, x0: 0, x1: 15, xt: xt, min: 0, max: 0.13, yt: [0.05, 0.1], yd: 2, lbl: 'i (mA)', col: OR, d: 3, u: 'mA', xm: t });
+  D.graph('v3', { f: function (q) { return L * sOf(q); }, x0: 0, x1: 15, xt: xt, min: -0.7, max: 0.7, yt: [-0.5, 0.5], yd: 1, lbl: 'v = L di/dt (V)', col: CY, d: 3, u: 'V', xm: Math.min(14.99, t) });
+}
+document.querySelectorAll('#fb [data-f]').forEach(function (b) { b.onclick = function () { FORM = b.dataset.f; document.querySelectorAll('#fb [data-f]').forEach(function (o) { o.classList.toggle('on', o === b); }); upd3(); }; });
+$('t3').oninput = upd3; $('l3').oninput = upd3; upd3();
+D.start();
+})();
+</script>
+</body></html>

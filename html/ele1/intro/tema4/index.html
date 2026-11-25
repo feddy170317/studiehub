@@ -1,0 +1,340 @@
+<!doctype html><html lang="da"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tema 4 · AC-effekt og effektfaktor</title>
+<meta name="description" content="Hurtigstart til ELE1 tema 4: øjeblikseffekt, middeleffekt, effektfaktor, kompleks effekt og effektfaktorkorrektion (Rizzoni og Kearns, kap. 6, dag 6 og 7).">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../assets/deck.css"></head>
+<body>
+<div id="vp"><div id="deck">
+
+<!-- ============ 0 · FORSIDE ============ -->
+<section class="slide on" data-title="Forside">
+  <div style="flex:1;display:grid;grid-template-columns:1fr 600px;gap:34px;align-items:center;padding:0 10px">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div>
+        <div class="tag" style="display:inline-block">ELE1 · HURTIGSTART · TEMA 4</div>
+        <h1 style="font-size:64px;margin-top:18px">AC-effekt og effektfaktor</h1>
+        <div style="font-size:26px;color:var(--mut);margin-top:6px">Kun en del af strømmen <b>udfører arbejde</b>. Resten pendler frem og tilbage og belaster ledningerne, og effekttrekanten holder styr på begge dele</div>
+      </div>
+      <div class="card qcard"><span class="lbl cy">KORT FORTALT</span>
+        Et glas øl rummer øl og skum. Øllet er det, der kan drikkes, og det svarer til den aktive effekt P. Skummet fylder i glasset, men giver ingen øl, og det svarer til den reaktive effekt Q. Hele glasset er den tilsyneladende effekt S, og det er glassets størrelse, ledningerne skal bære. En motor har en del skum, og en kondensator kan fjerne det.</div>
+      <div class="plan">
+        <div><b class="cy">1 · p(t) og P</b><span data-tex="P=\tilde V\tilde I\cos\theta"></span></div>
+        <div><b class="or">2 · Kompleks effekt</b><span data-tex="\mathbf S=\tilde{\mathbf V}\tilde{\mathbf I}^{*}=P+jQ"></span></div>
+        <div><b class="pu">3 · Korrektion</b><span data-tex="C=\tfrac{Q_1-Q_2}{\omega\tilde V^2}"></span></div>
+        <div><b class="gr">4 · Tjek</b>fejl og eksamen</div>
+      </div>
+      <div class="links"><a href="../../dag/Dag06_Studienote.pdf">📖 Studienote dag 6</a><a href="../../dag/Dag07_Studienote.pdf">📖 Studienote dag 7</a><a href="../../../../lab/ele1/ac-effekt.html">🧪 3D-lab: AC-effekt</a><a href="../../lab/dag06.html">📝 Dag 6: opgaver</a></div>
+    </div>
+    <div class="card" style="padding:12px"><canvas id="c0" width="560" height="440"></canvas>
+      <div style="font-size:18px;color:var(--mut);text-align:center;margin-top:8px">Glasset S er fast. Når fasevinklen vokser, bliver der mere skum og mindre øl, og trekanten vokser i takt</div></div>
+  </div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm &nbsp;·&nbsp; ☰: alle temaer</div>
+</section>
+
+<!-- ============ 1 · p(t) OG P ============ -->
+<section class="slide" id="s1" data-title="1 · Øjeblikseffekt og middeleffekt">
+  <div class="hd"><span class="tag">IDÉ 1 · ØJEBLIKSEFFEKT OG MIDDELEFFEKT</span><h1>Effekten pulserer, og middelværdien er P</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Hvor meget optages i middel?</h3>
+      <div class="big" style="font-size:30px" data-tex="p(t)=\dfrac{VI}{2}\cos\theta+\dfrac{VI}{2}\cos(2\omega t-\theta)"></div>
+      <div class="src">Rizzoni og Kearns (2022), lign. (6.4), s. 304</div>
+      <div class="big" style="font-size:34px" data-tex="P=\tilde V\tilde I\cos\theta,\quad \mathrm{pf}=\cos\theta"></div>
+      <div class="src">Lign. (6.12), s. 306 og lign. (6.17), (6.21), s. 307</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="\tfrac{VI}{2}\cos\theta"></span><span><b>Konstant led</b>: det, der i middel optages. Det er middeleffekten P</span></div>
+        <div class="term"><span class="s or" data-tex="\cos(2\omega t-\theta)"></span><span><b>Svingende led</b> med dobbelt frekvens: 50 Hz giver 100 Hz. Middelværdien er nul</span></div>
+        <div class="term"><span class="s pu" data-tex="\theta"></span><span><b>Fasevinklen</b> er impedansens vinkel. Er den ±90°, er P nul: effekten går kun frem og tilbage</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n">1</span><div class="t"><b>Givet</b> (dag 6, øvelse 1)
+        <span class="m" data-tex="v=325\cos(314t),\ i=2\cos(314t-\tfrac\pi3)"></span>
+        <span class="note">Strømmen halter <span data-tex="\theta=60^\circ"></span> efter spændingen</span></div></div>
+      <div class="step"><span class="n">2</span><div class="t"><b>Middeleffekt</b> med topværdier
+        <span class="m" data-tex="P=\dfrac{325\cdot2}{2}\cos60^\circ=162{,}5\ \text{W}"></span></div></div>
+      <div class="step"><span class="n">3</span><div class="t"><b>Samme med RMS</b>, faktoren ½ forsvinder
+        <span class="m" data-tex="P=229{,}8\cdot1{,}414\cdot\cos60^\circ=162{,}5\ \text{W}"></span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Øjebliksværdi</b> svinger omkring P
+        <span class="m" data-tex="\boxed{p(t)=162{,}5+325\cos(628t-\tfrac\pi3)\ \text{W}}"></span>
+        <span class="note">Fra −162,5 W til 487,5 W, og pf = 0,5</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Drej fasevinklen</h3>
+      <canvas id="g1a" width="640" height="290"></canvas>
+      <canvas id="g1b" width="640" height="290"></canvas>
+      <div class="sl"><span>Fasevinkel θ</span><input id="th1" type="range" min="-90" max="90" step="1" value="60"><output id="th1o"></output></div>
+      <div class="row" id="b1"><button class="btn" data-t="0">R: 0°</button><button class="btn" data-t="90">L: +90°</button><button class="btn" data-t="-90">C: −90°</button><button class="btn pu" data-t="60">Øvelse: 60°</button></div>
+      <div class="ro r3">
+        <div><span>P = ½VI cos θ</span><b class="cy" id="r1p">162,5</b><i>W</i></div>
+        <div><span>pf = cos θ</span><b class="or" id="r1f">0,50</b></div>
+        <div><span>mindste p(t)</span><b class="pu" id="r1m">−162,5</b><i>W</i></div>
+      </div>
+      <div class="status" id="st1"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Effekten pulserer med dobbelt frekvens omkring middelværdien P = Ṽ Ĩ cos θ. Cos θ er effektfaktoren, og for en ren spole eller kondensator er den nul.</span></div>
+</section>
+
+<!-- ============ 2 · KOMPLEKS EFFEKT ============ -->
+<section class="slide" id="s2" data-title="2 · Kompleks effekt">
+  <div class="hd"><span class="tag b">IDÉ 2 · KOMPLEKS EFFEKT</span><h1>P, Q og S samles i ét komplekst tal og en trekant</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Tre slags effekt</h3>
+      <div class="big" style="font-size:32px" data-tex="\mathbf S=\tilde{\mathbf V}\,\tilde{\mathbf I}^{*}=P+jQ"></div>
+      <div class="src">Rizzoni og Kearns (2022), lign. (6.24) til (6.26), s. 311 til 312</div>
+      <div class="big" style="font-size:28px" data-tex="|\mathbf S|^2=P^2+Q^2,\quad \mathrm{pf}=\dfrac{P}{|\mathbf S|}"></div>
+      <div class="src">Effekttrekanten, s. 312 til 313 (Pontoppidan, 2026, dag 7)</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="P"></span><span><b>Aktiv effekt</b> i W: omsættes til varme eller arbejde. Sidder kun i resistansen</span></div>
+        <div class="term"><span class="s or" data-tex="Q"></span><span><b>Reaktiv effekt</b> i VAR: pendler til spoler og kondensatorer. Plus er induktivt, minus kapacitivt</span></div>
+        <div class="term"><span class="s pu" data-tex="|\mathbf S|"></span><span><b>Tilsyneladende effekt</b> i VA: Ṽ Ĩ. Kabler og sikringer dimensioneres efter den</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n b">1</span><div class="t"><b>Givet</b> (eksempel 6.7)
+        <span class="m" data-tex="\tilde{\mathbf V}=60\angle0^\circ\ \text{V},\ \ \mathbf Z=3+j9-j5=3+j4\ \Omega"></span></div></div>
+      <div class="step"><span class="n b">2</span><div class="t"><b>Strømmen</b>, <span data-tex="|\mathbf Z|=5\ \Omega"></span>
+        <span class="m" data-tex="\tilde{\mathbf I}=\dfrac{60\angle0^\circ}{5\angle53{,}13^\circ}=12\angle{-53{,}13^\circ}\ \text{A}"></span></div></div>
+      <div class="step"><span class="n b">3</span><div class="t"><b>Konjugér strømmen</b>, så vinklerne trækkes fra
+        <span class="m" data-tex="\mathbf S=60\angle0^\circ\cdot12\angle{+53{,}13^\circ}=720\angle53{,}13^\circ"></span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Del i real og imaginær</b>
+        <span class="m" data-tex="\boxed{\mathbf S=432+j576\ \text{VA}}"></span>
+        <span class="note">Kontrol: <span data-tex="P=12^2\cdot3=432"></span> W, pf = 0,6 haltende</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Byg effekttrekanten</h3>
+      <canvas id="g2" width="640" height="500"></canvas>
+      <div class="sl"><span style="color:var(--cy)">P</span><input id="p2" type="range" min="0" max="1000" step="1" value="432"><output id="p2o"></output></div>
+      <div class="sl"><span style="color:var(--or)">Q</span><input id="q2" type="range" min="-450" max="800" step="1" value="576"><output id="q2o"></output></div>
+      <div class="ro r3">
+        <div><span>|S| = √(P²+Q²)</span><b class="pu" id="r2s">720</b><i>VA</i></div>
+        <div><span>θ</span><b class="or" id="r2t">53,1</b><i>°</i></div>
+        <div><span>pf = P/|S|</span><b class="cy" id="r2f">0,60</b></div>
+      </div>
+      <div class="status" id="st2"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Den komplekse effekt er spænding gange den konjugerede strøm. Realdelen er P, imaginærdelen er Q, og længden er S. De tre danner en retvinklet trekant.</span></div>
+</section>
+
+<!-- ============ 3 · KORREKTION ============ -->
+<section class="slide" id="s3" data-title="3 · Effektfaktorkorrektion">
+  <div class="hd"><span class="tag p">IDÉ 3 · EFFEKTFAKTORKORREKTION</span><h1>Kondensatoren fjerner skummet og sænker strømmen</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Hvor stor skal C være?</h3>
+      <div class="big" style="font-size:32px" data-tex="C=\dfrac{Q_1-Q_2}{\omega\,\tilde V^{2}}"></div>
+      <div class="src">Rizzoni og Kearns (2022), eksempel 6.10, s. 322 til 323</div>
+      <div class="big" style="font-size:28px" data-tex="Q_C=-\omega C\tilde V^2,\quad \tilde I=\dfrac{|\mathbf S|}{\tilde V}"></div>
+      <div class="src">Kondensatorens reaktive effekt er negativ (Pontoppidan, 2026, dag 7)</div>
+      <div class="terms">
+        <div class="term"><span class="s or" data-tex="Q_1"></span><span><b>Før</b>: <span data-tex="P\tan\theta_1"></span>. Motorens skum, som kondensatoren skal tage</span></div>
+        <div class="term"><span class="s cy" data-tex="Q_2"></span><span><b>Efter</b>: <span data-tex="P\tan\theta_2"></span> ved den ønskede pf. Ofte 0,95, sjældent præcis 1</span></div>
+        <div class="term"><span class="s pu" data-tex="C"></span><span><b>Parallelt</b>, så spændingen og P er uændrede. Kun strømmen fra nettet falder</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n p">1</span><div class="t"><b>Motor</b>, 230 V, 50 Hz
+        <span class="m" data-tex="P=2000\ \text{W},\ \ \mathrm{pf}_1=0{,}80\ \text{haltende}"></span></div></div>
+      <div class="step"><span class="n p">2</span><div class="t"><b>Reaktiv effekt</b> før og efter (pf 0,95)
+        <span class="m" data-tex="Q_1=2000\tan36{,}87^\circ=1500\ \text{VAR}"></span>
+        <span class="m" data-tex="Q_2=2000\tan18{,}19^\circ=657\ \text{VAR}"></span></div></div>
+      <div class="step"><span class="n p">3</span><div class="t"><b>Kondensator</b>
+        <span class="m" data-tex="\boxed{C=\dfrac{1500-657}{314{,}16\cdot230^2}=50{,}7\ \mu\text{F}}"></span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Linjestrøm</b> før og efter
+        <span class="m" data-tex="\tilde I=\dfrac{2000}{0{,}80\cdot230}=10{,}9\ \text{A}\to\dfrac{2000}{0{,}95\cdot230}=9{,}2\ \text{A}"></span>
+        <span class="note">16 % mindre strøm, og kabeltabet <span data-tex="I^2R"></span> falder ca. 29 %</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Træk i kondensatoren</h3>
+      <canvas id="g3" width="640" height="420"></canvas>
+      <div class="sl"><span>Kondensator C</span><input id="c3" type="range" min="0" max="100" step="0.1" value="50.7"><output id="c3o"></output></div>
+      <div class="row"><button class="btn" id="c0b">Ingen</button><button class="btn pu" id="c95">pf 0,95</button><button class="btn" id="c1b">pf 1</button></div>
+      <div class="ro r3">
+        <div><span>pf efter</span><b class="cy" id="r3f">0,95</b></div>
+        <div><span>linjestrøm</span><b class="pu" id="r3i">9,2</b><i>A</i></div>
+        <div><span>strøm vs. før</span><b class="gr" id="r3d">−15,8</b><i>%</i></div>
+      </div>
+      <div class="status" id="st3"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Motoren har brug for skum, men det behøver ikke komme fra nettet. En kondensator parallelt leverer det lokalt, så S og linjestrømmen falder, mens P er uændret.</span></div>
+</section>
+
+<!-- ============ 4 · FALDGRUBER OG TJEK ============ -->
+<section class="slide" data-title="4 · Faldgruber og tjek">
+  <div class="hd"><span class="tag g">FALDGRUBER OG TJEK</span><h1>Hvor det typisk går galt</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Typiske fejl</h3>
+      <div class="fejl">
+        <div><span>Topværdi og RMS blandes i P-formlen.<span class="ret">Med topværdier er <span data-tex="P=\tfrac{VI}{2}\cos\theta"></span>, med RMS <span data-tex="P=\tilde V\tilde I\cos\theta"></span>. Glemt RMS i eksempel 6.4 giver dobbelt så stor effekt.</span></span></div>
+        <div><span>Glemt konjugering: <span data-tex="\mathbf S=\tilde{\mathbf V}\tilde{\mathbf I}"></span>.<span class="ret"><span data-tex="\mathbf S=\tilde{\mathbf V}\tilde{\mathbf I}^{*}"></span>. Uden stjernen lægges vinklerne sammen, og Q får forkert størrelse og fortegn.</span></span></div>
+        <div><span>Fortegn på Q: kondensator regnes som induktiv.<span class="ret"><span data-tex="Q>0"></span> er induktiv (haltende pf), <span data-tex="Q<0"></span> er kapacitiv (førende pf). Kondensatoren bidrager med <span data-tex="-\omega C\tilde V^2"></span>.</span></span></div>
+        <div><span>Typeskiltets effekt bruges som P fra nettet.<span class="ret">Den er mekanisk. <span data-tex="P_{\mathrm{el}}=P_{\mathrm{mek}}/\eta"></span>, fx 3 kW ved <span data-tex="\eta=0{,}85"></span> giver 3,53 kW.</span></span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Tjek dig selv</h3>
+      <div class="qa">
+        <details><summary>En last har S = 800 + j600 VA. Find |S| og pf. Induktiv eller kapacitiv?</summary><p><span data-tex="|\mathbf S|=\sqrt{800^2+600^2}=1000"></span> VA, <span data-tex="\mathrm{pf}=800/1000=0{,}8"></span>. Q er positiv, så lasten er induktiv med haltende pf.</p></details>
+        <details><summary>Hvorfor har en ren spole pf = 0, selvom der løber strøm?</summary><p>Strøm og spænding er forskudt 90°, så <span data-tex="\cos90^\circ=0"></span>. Effekten svinger lige meget op og ned, og middeleffekten er nul. Energien pendler blot til og fra spolen.</p></details>
+        <details><summary>Sættes kondensatoren i serie eller parallelt, og hvad ændres ikke?</summary><p>Parallelt. Så er spændingen over motoren den samme, og dens P er uændret. Kun den reaktive effekt og dermed strømmen fra nettet ændres.</p></details>
+      </div>
+    </div>
+    <div class="card col">
+      <h3>Til eksamen</h3>
+      <div class="exlinks">
+        <a href="../../lab/dag06.html"><b>EMNE 7</b><span> AC-effekt og effektfaktor · p(t), P, impedanstrekant, pf for R, L og C</span></a>
+        <a href="../../lab/dag07.html"><b>EMNE 8</b><span> Kompleks effekt og korrektion · P, Q, S, effekttrekant, hvorfor og hvordan der korrigeres</span></a>
+        <a href="../../lab/dag12.html"><b>DAG 12</b><span> Eksamensforberedelse · alle emner og typiske fejl</span></a>
+      </div>
+      <h3 style="margin-top:8px">Læs i bogen</h3>
+      <div style="display:grid;gap:6px;font-size:16px;line-height:1.35">
+        <div><b>Lign. (6.4), s. 304</b> øjeblikseffekt</div>
+        <div><b>Lign. (6.12), s. 306</b> middeleffekt med RMS</div>
+        <div><b>Lign. (6.17), s. 307</b> effektfaktor</div>
+        <div><b>Lign. (6.24) til (6.26), s. 311</b> kompleks effekt</div>
+        <div><b>Eksempel 6.7, s. 316</b> effekttrekant</div>
+        <div><b>Eksempel 6.10, s. 322</b> korrektion</div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Tjek først, om tallet er RMS eller topværdi. Regn derefter S = Ṽ Ĩ*, aflæs P og Q, og brug en parallel kondensator til at ophæve Q.</span></div>
+</section>
+
+</div></div>
+<script src="../assets/deck.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = D.$, fmt = D.fmt, PI = Math.PI, R = PI / 180;
+var CY = '#0a7fc2', OR = '#d97a00', PU = '#7b4fc9', GR = '#0a9a5c', RD = '#d63a3a', INK = '#14202d', MUT = '#5a6b7d';
+
+/* ---------- slide 0: ølglas og effekttrekant ---------- */
+(function () {
+  var x = D.cv('c0').x, gx0 = 36, gx1 = 190, gt = 96, gb = 396, H = gb - gt;
+  var ox = 280, oy = 382, L = 250;
+  D.anim(0, function (dt, t) {
+    var th = (40 + 30 * Math.sin(t * 0.8)) * R, c = Math.cos(th), s = Math.sin(th);
+    x.clearRect(0, 0, 560, 440);
+    D.txt(x, 'cos θ = ' + fmt(c, 2) + '   θ = ' + fmt(th / R, 0) + '°', 280, 28, 28, INK, 'center', 'middle', 800);
+    var beerTop = gb - H * c;
+    /* glas (let tilspidset), klippes til glasformen */
+    x.save(); x.beginPath(); x.moveTo(gx0, gt); x.lineTo(gx1, gt); x.lineTo(gx1 - 14, gb); x.lineTo(gx0 + 14, gb); x.closePath(); x.clip();
+    x.fillStyle = '#e8a317'; x.fillRect(gx0, beerTop, gx1 - gx0, gb - beerTop);
+    x.fillStyle = '#fff8e0'; x.fillRect(gx0, gt, gx1 - gx0, beerTop - gt);
+    for (var i = 0; i < 14; i++) { var bx = gx0 + 14 + (i * 37) % (gx1 - gx0 - 28), by = gb - ((t * 40 + i * 53) % (H * c)); D.circ(x, bx, by, 3, 'rgba(255,255,255,.55)'); }
+    for (var j = 0; j < 9; j++) { D.circ(x, gx0 + 18 + (j * 29) % (gx1 - gx0 - 36), beerTop - 8 - (j * 11) % Math.max(10, H * (1 - c) - 14), 7, 'rgba(255,255,255,.9)', 'rgba(200,180,120,.5)', 1); }
+    x.restore();
+    x.strokeStyle = INK; x.lineWidth = 4; x.lineJoin = 'round'; x.beginPath(); x.moveTo(gx0, gt); x.lineTo(gx0 + 14, gb); x.lineTo(gx1 - 14, gb); x.lineTo(gx1, gt); x.stroke();
+    D.line(x, [[gx0 - 6, gt], [gx1 + 6, gt]], INK, 3);
+    D.line(x, [[gx1 + 14, gt], [gx1 + 24, gt], [gx1 + 24, gb], [gx1 + 14, gb]], PU, 3);
+    D.txt(x, 'S', gx1 + 34, (gt + gb) / 2, 26, PU, 'left', 'middle', 800);
+    D.txt(x, 'Q skum', (gx0 + gx1) / 2, gt - 16, 22, OR, 'center');
+    D.txt(x, 'P øl', (gx0 + gx1) / 2, gb + 26, 22, '#a86b00', 'center');
+    /* trekant */
+    var px = ox + L * c, qy = oy - L * s;
+    D.line(x, [[ox - 10, oy], [ox + L + 20, oy]], 'rgba(90,107,125,.4)', 2);
+    D.line(x, [[ox, oy + 10], [ox, oy - L - 20]], 'rgba(90,107,125,.3)', 2);
+    x.beginPath(); x.moveTo(ox, oy); x.lineTo(px, oy); x.lineTo(px, qy); x.closePath(); x.fillStyle = 'rgba(123,79,201,.08)'; x.fill();
+    D.arrow(x, ox, oy, px, oy, CY, 7);
+    D.arrow(x, px, oy, px, qy, OR, 7);
+    D.arrow(x, ox, oy, px, qy, PU, 7);
+    x.strokeStyle = MUT; x.lineWidth = 2; x.beginPath(); x.arc(ox, oy, 46, 0, -th, true); x.stroke();
+    D.txt(x, 'θ', ox + 58, oy - 14, 22, MUT, 'left');
+    D.txt(x, 'P = ' + fmt(c * 100, 0) + ' % af S', (ox + px) / 2, oy + 24, 22, CY, 'center');
+    D.txt(x, 'Q', px + 12, (oy + qy) / 2, 22, OR, 'left');
+    D.txt(x, 'S', ox + (px - ox) / 2 - 18, (oy + qy) / 2 - 8, 24, PU, 'right', 'middle', 800);
+  });
+})();
+
+/* ---------- slide 1: v, i og p(t) ---------- */
+function upd1() {
+  var T = +$('th1').value, th = T * R, V = 325, I = 2, W = 2 * PI * 50, ms = 1e-3;
+  var P = V * I / 2 * Math.cos(th), pmin = P - V * I / 2;
+  $('th1o').textContent = (T > 0 ? '+' : T < 0 ? '−' : '') + Math.abs(T) + '°';
+  $('r1p').textContent = fmt(Math.abs(P) < 0.05 ? 0 : P, 1); $('r1f').textContent = fmt(Math.abs(Math.cos(th)) < 1e-9 ? 0 : Math.cos(th), 2); $('r1m').textContent = fmt(pmin, 1);
+  var tt = [[0, '0'], [10, '10'], [20, '20 ms'], [30, '30'], [40, '40']];
+  var vf = function (t) { return V * Math.cos(W * t * ms); }, if_ = function (t) { return 100 * I * Math.cos(W * t * ms - th); };
+  D.graph('g1a', { f: vf, x0: 0, x1: 40, xt: tt, min: -420, max: 420, yt: [-300, 300], yd: 0, lbl: 'v(t) blå, 100·i(t) orange', col: CY, d: 0, u: 'V', xl: 'tid',
+    more: [{ f: if_, col: OR, w: 4 }] });
+  D.graph('g1b', { f: function (t) { return vf(t) * (I * Math.cos(W * t * ms - th)); }, x0: 0, x1: 40, xt: tt, min: -700, max: 700, yt: [-500, 500], yd: 0, lbl: 'p(t) = v·i (W)', col: PU, d: 0, u: 'W', xl: 'tid',
+    hl: [P, 'P = ' + fmt(Math.abs(P) < 0.05 ? 0 : P, 1) + ' W'] });
+  var kind = T === 0 ? '<b>Resistiv</b>: strøm og spænding i fase, p(t) aldrig negativ, pf = 1.'
+    : T >= 89 ? '<b>Ren spole</b>: strømmen halter 90°. P = 0, p(t) svinger lige meget op og ned.'
+    : T <= -89 ? '<b>Ren kondensator</b>: strømmen fører 90°. P = 0, energien pendler kun frem og tilbage.'
+    : T > 0 ? '<b>Induktiv</b>: strømmen halter. pf haltende, og p(t) er negativ i korte intervaller.' : '<b>Kapacitiv</b>: strømmen fører. pf førende, og p(t) er negativ i korte intervaller.';
+  $('st1').innerHTML = kind + ' <span class="mu">p(t) har 2 toppe pr. periode af v.</span>';
+}
+$('th1').oninput = upd1;
+document.querySelectorAll('#b1 [data-t]').forEach(function (b) { b.onclick = function () { $('th1').value = b.dataset.t; upd1(); }; });
+upd1();
+
+/* ---------- slide 2: effekttrekant ---------- */
+function upd2() {
+  var P = +$('p2').value, Q = +$('q2').value, S = Math.hypot(P, Q), th = Math.atan2(Q, P), pf = S > 0 ? P / S : 1;
+  $('p2o').textContent = fmt(P, 0) + ' W'; $('q2o').textContent = fmt(Q, 0) + ' VAR';
+  $('r2s').textContent = fmt(S, 0); $('r2t').textContent = fmt(th / R, 1); $('r2f').textContent = fmt(pf, 2);
+  var G = D.cv('g2'), x = G.x, ox = 70, oy = 335, sc = 0.37;
+  x.clearRect(0, 0, G.W, G.H);
+  D.line(x, [[ox - 20, oy], [G.W - 14, oy]], 'rgba(90,107,125,.45)', 2);
+  D.line(x, [[ox, oy + 190], [ox, 14]], 'rgba(90,107,125,.35)', 2);
+  D.txt(x, 'P (W)', G.W - 14, oy + 22, 20, MUT, 'right'); D.txt(x, 'Q (VAR)', ox + 8, 22, 20, MUT, 'left');
+  var px = ox + P * sc, qy = oy - Q * sc;
+  x.beginPath(); x.moveTo(ox, oy); x.lineTo(px, oy); x.lineTo(px, qy); x.closePath(); x.fillStyle = 'rgba(123,79,201,.08)'; x.fill();
+  D.arrow(x, ox, oy, px, oy, CY, 7);
+  D.arrow(x, px, oy, px, qy, OR, 7);
+  D.arrow(x, ox, oy, px, qy, PU, 7);
+  if (S > 20) { x.strokeStyle = MUT; x.lineWidth = 2; x.beginPath(); x.arc(ox, oy, 50, 0, -th, th > 0); x.stroke(); D.txt(x, 'θ', ox + 64, oy - (th >= 0 ? 16 : -16), 22, MUT, 'left'); }
+  D.txt(x, 'P = ' + fmt(P, 0), (ox + px) / 2, oy + (Q >= 0 ? 24 : -22), 22, CY, 'center');
+  D.txt(x, 'Q = ' + fmt(Q, 0), px + 10, (oy + qy) / 2, 22, OR, 'left');
+  D.txt(x, '|S| = ' + fmt(S, 0), ox + (px - ox) / 2 - 10, (oy + qy) / 2 + (Q >= 0 ? -22 : 24), 24, PU, 'right', 'middle', 800);
+  var kind = Math.abs(Q) < 1 ? '<b>Resistiv</b>: Q = 0, pf = 1.' : Q > 0 ? '<b>Induktiv</b> (Q > 0): strømmen halter, pf haltende ' + fmt(pf, 2) + '.' : '<b>Kapacitiv</b> (Q < 0): strømmen fører, pf førende ' + fmt(pf, 2) + '.';
+  $('st2').innerHTML = kind + ' <span class="mu">Q = P·tan θ = ' + fmt(P * Math.tan(th), 0) + ' VAR. Eksempel 6.7: 432 og 576 giver 720 VA.</span>';
+}
+['p2', 'q2'].forEach(function (id) { $(id).oninput = upd2; });
+upd2();
+
+/* ---------- slide 3: korrektion ---------- */
+var P3 = 2000, V3 = 230, W3 = 2 * PI * 50, Q1 = P3 * Math.tan(Math.acos(0.8)), Q2t = P3 * Math.tan(Math.acos(0.95));
+var C95 = (Q1 - Q2t) / (W3 * V3 * V3) * 1e6, C1 = Q1 / (W3 * V3 * V3) * 1e6, S1 = Math.hypot(P3, Q1), I1 = S1 / V3;
+function upd3() {
+  var Cu = +$('c3').value, QC = W3 * Cu * 1e-6 * V3 * V3, Qn = Q1 - QC, S2 = Math.hypot(P3, Qn), pf = P3 / S2, I2 = S2 / V3;
+  $('c3o').textContent = fmt(Cu, 1) + ' µF';
+  $('r3f').textContent = fmt(pf, 2); $('r3i').textContent = fmt(I2, 1); $('r3d').textContent = fmt((I2 / I1 - 1) * 100, 1);
+  var G = D.cv('g3'), x = G.x, ox = 60, oy = 372, sc = 0.21;
+  x.clearRect(0, 0, G.W, G.H);
+  D.line(x, [[ox - 14, oy], [G.W - 14, oy]], 'rgba(90,107,125,.45)', 2);
+  D.line(x, [[ox, oy + 40], [ox, 12]], 'rgba(90,107,125,.35)', 2);
+  D.txt(x, 'P', G.W - 14, oy + 22, 20, MUT, 'right'); D.txt(x, 'Q', ox + 8, 22, 20, MUT, 'left');
+  var px = ox + P3 * sc, y1 = oy - Q1 * sc, y2 = oy - Qn * sc;
+  /* før (grå, stiplet) */
+  D.line(x, [[ox, oy], [px, y1]], 'rgba(90,107,125,.7)', 3, [9, 7]);
+  D.line(x, [[px, oy], [px, y1]], 'rgba(90,107,125,.7)', 3, [9, 7]);
+  D.txt(x, 'før: S = ' + fmt(S1, 0) + ' VA', px - 16, y1 - 8, 20, MUT, 'right');
+  /* kondensatorens bidrag */
+  if (QC > 3) { D.arrow(x, px + 26, y1, px + 26, y2, GR, 6); D.txt(x, 'Q_C = −' + fmt(QC, 0), px + 40, (y1 + y2) / 2, 20, GR, 'left'); }
+  /* efter */
+  x.beginPath(); x.moveTo(ox, oy); x.lineTo(px, oy); x.lineTo(px, y2); x.closePath(); x.fillStyle = 'rgba(123,79,201,.08)'; x.fill();
+  D.arrow(x, ox, oy, px, oy, CY, 7);
+  D.arrow(x, px, oy, px, y2, OR, 7);
+  D.arrow(x, ox, oy, px, y2, PU, 7);
+  D.txt(x, 'P = 2000 W', (ox + px) / 2, oy + (Qn >= 0 ? 22 : -20), 20, CY, 'center');
+  D.txt(x, 'efter: S = ' + fmt(S2, 0) + ' VA', ox + 14, 50, 22, PU, 'left', 'middle', 800);
+  var kind = Math.abs(Qn) < 15 ? '<b>pf ≈ 1</b>: kondensatoren har ophævet hele Q.' : Qn < 0 ? '<b>Overkorrigeret</b>: nu er lasten kapacitiv (Q < 0), og strømmen stiger igen.' : pf >= 0.95 ? '<b>Godt</b>: pf over 0,95, stadig let induktivt.' : '<b>Delvis korrektion</b>: Q er faldet fra ' + fmt(Q1, 0) + ' til ' + fmt(Qn, 0) + ' VAR.';
+  $('st3').innerHTML = kind + ' <span class="mu">Før: ' + fmt(I1, 1) + ' A. P er 2000 W hele vejen.</span>';
+}
+$('c3').oninput = upd3;
+$('c0b').onclick = function () { $('c3').value = 0; upd3(); };
+$('c95').onclick = function () { $('c3').value = C95.toFixed(1); upd3(); };
+$('c1b').onclick = function () { $('c3').value = C1.toFixed(1); upd3(); };
+upd3();
+D.start();
+})();
+</script>
+</body></html>

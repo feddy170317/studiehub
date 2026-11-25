@@ -1,0 +1,328 @@
+<!doctype html><html lang="da"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tema 6 · Trefase og elnettet</title>
+<meta name="description" content="Hurtigstart til ELE1 tema 6: fase- og linjespænding, trefaseeffekt, installationer, elsikkerhed og elnettet (Rizzoni og Kearns, afsnit 6.5, dag 9 til 11).">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../assets/deck.css"></head>
+<body>
+<div id="vp"><div id="deck">
+
+<!-- ============ 0 · FORSIDE ============ -->
+<section class="slide on" data-title="Forside">
+  <div style="flex:1;display:grid;grid-template-columns:1fr 600px;gap:34px;align-items:center;padding:0 10px">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div>
+        <div class="tag" style="display:inline-block">ELE1 · HURTIGSTART · TEMA 6</div>
+        <h1 style="font-size:64px;margin-top:18px">Trefase og elnettet</h1>
+        <div style="font-size:26px;color:var(--mut);margin-top:6px">Tre sinusser, <b>forskudt 120°</b>, summer til nul og giver en konstant effekt. Fra kraftværk til stikkontakt holder <b>høj spænding</b> tabet nede</div>
+      </div>
+      <div class="card qcard"><span class="lbl cy">KORT FORTALT</span>
+        Tre roere trækker i årerne efter hinanden, hver en tredjedel af takten bagud. Båden får aldrig et dødt punkt, og det samme gælder en trefaset motor. Fra stikkontakten til nul er der 230 V. Mellem to af de tre faser er der 400 V. I tavlen beskytter sikringen kablet mod overstrøm, mens fejlstrømsafbryderen (HPFI, RCD) beskytter mennesker.</div>
+      <div class="plan">
+        <div><b class="cy">1 · Fase og linje</b><span data-tex="V_L=\sqrt3\,V_f"></span></div>
+        <div><b class="or">2 · Effekt</b><span data-tex="P=\sqrt3\,V_LI_L\cos\theta"></span></div>
+        <div><b class="pu">3 · Installation og net</b><span data-tex="P_{\mathrm{tab}}=I^2R"></span></div>
+        <div><b class="gr">4 · Tjek</b>fejl og eksamen</div>
+      </div>
+      <div class="links"><a href="../../dag/Dag09_Studienote.pdf">📖 Studienote dag 9</a><a href="../../dag/Dag11_Studienote.pdf">📖 Studienote dag 11</a><a href="../../../../lab/ele1/trefase.html">🧪 3D-lab: trefase</a><a href="../../../../lab/ele1/elnettet.html">🧪 3D-lab: elnettet</a></div>
+    </div>
+    <div class="card" style="padding:12px"><canvas id="c0" width="560" height="440"></canvas>
+      <div style="font-size:18px;color:var(--mut);text-align:center;margin-top:8px">Tre pile med 120° imellem. <b>Summen</b> af de tre spændinger er nul hele tiden</div></div>
+  </div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm &nbsp;·&nbsp; ☰: alle temaer</div>
+</section>
+
+<!-- ============ 1 · FASE OG LINJE ============ -->
+<section class="slide" id="s1" data-title="1 · Fase og linje">
+  <div class="hd"><span class="tag">IDÉ 1 · FASE OG LINJE</span><h1>Mellem to faser er spændingen √3 gange større</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>230 V og 400 V i samme net</h3>
+      <div class="big" style="font-size:34px" data-tex="V_L=\sqrt3\,V_f\ \ (400=\sqrt3\cdot230)"></div>
+      <div class="src">Rizzoni og Kearns (2022), lign. (6.50), s. 340</div>
+      <div class="big" style="font-size:26px" data-tex="\text{Stjerne: }V_L=\sqrt3\,V_f,\ \ I_L=I_f"></div>
+      <div class="big" style="font-size:26px;padding-top:0" data-tex="\text{Trekant: }V_L=V_f,\ \ I_L=\sqrt3\,I_f"></div>
+      <div class="src">Lign. (6.50) og (6.59), s. 340 til 342 (Pontoppidan, 2026, dag 9)</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="V_f"></span><span><b>Fasespænding</b>: fra én fase til nul. Stikkontakten er 230 V</span></div>
+        <div class="term"><span class="s rd" data-tex="V_L"></span><span><b>Linjespænding</b>: forskellen mellem to fasepile. To pile med 120° imellem giver en pil, der er <span data-tex="\sqrt3"></span> længere</span></div>
+        <div class="term"><span class="s gr" data-tex="I_n=0"></span><span><b>Nulleder</b>: tre ens strømme med 120° imellem summer til nul, så nullederen er strømløs ved balance</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n">1</span><div class="t"><b>Tre ens impedanser</b> på det danske net
+        <span class="m" data-tex="\mathbf Z=16+j12=20\angle36{,}9^\circ\ \Omega"></span>
+        <span class="note"><span data-tex="\cos\theta=16/20=0{,}8"></span>. Linjespænding <span data-tex="\sqrt3\cdot230=398"></span> V</span></div></div>
+      <div class="step"><span class="n">2</span><div class="t"><b>Stjerne</b>: hver Z får 230 V
+        <span class="m" data-tex="I_L=I_f=\dfrac{230}{20}=11{,}5\ \text{A}"></span></div></div>
+      <div class="step"><span class="n">3</span><div class="t"><b>Trekant</b>: hver Z får 398 V
+        <span class="m" data-tex="I_f=\dfrac{398}{20}=19{,}9\ \text{A}"></span>
+        <span class="m" data-tex="I_L=\sqrt3\cdot19{,}9=34{,}5\ \text{A}"></span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Forholdet</b>
+        <span class="m" data-tex="\boxed{I_{L,\Delta}=3\,I_{L,Y}}"></span>
+        <span class="note">Én faktor <span data-tex="\sqrt3"></span> fra spændingen, én fra linjestrømmen</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Fasordiagram: træk i fasespændingen</h3>
+      <canvas id="p1" width="640" height="440"></canvas>
+      <div class="row" id="mb"><button class="btn on" data-m="0">Stjerne</button><button class="btn rd" data-m="1">Trekant</button></div>
+      <div class="sl"><span style="color:var(--cy)">Fasespænding</span><input id="v1" type="range" min="100" max="300" step="1" value="230"><output id="v1o"></output></div>
+      <div class="ro">
+        <div><span>linjespænding V<sub>L</sub></span><b class="rd" id="r1l">398</b><i>V</i></div>
+        <div><span>spænding over hver Z (20 Ω)</span><b class="cy" id="r1z">230</b><i>V</i></div>
+        <div><span>strøm i hver Z</span><b class="or" id="r1f">11,5</b><i>A</i></div>
+        <div><span>linjestrøm I<sub>L</sub></span><b class="pu" id="r1i">11,5</b><i>A</i></div>
+      </div>
+      <div class="status" id="st1"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Fasespændingen måles til nul, linjespændingen mellem to faser, og den er √3 gange større. Stjerne giver hver impedans fasespændingen, trekant giver den linjespændingen.</span></div>
+</section>
+
+<!-- ============ 2 · EFFEKT ============ -->
+<section class="slide" id="s2" data-title="2 · Effekt">
+  <div class="hd"><span class="tag b">IDÉ 2 · TREFASEEFFEKT</span><h1>Tre pulserende effekter giver én konstant</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Samlet effekt</h3>
+      <div class="big" style="font-size:30px" data-tex="P=\sqrt3\,V_LI_L\cos\theta=3\,V_fI_f\cos\theta"></div>
+      <div class="src">Rizzoni og Kearns (2022), lign. (6.56) til (6.58), s. 341 (Pontoppidan, 2026, dag 9)</div>
+      <div class="big" style="font-size:28px" data-tex="p_a+p_b+p_c=3\,V_fI_f\cos\theta"></div>
+      <div class="src">Konstant i tid: lign. (6.52) og (6.53), s. 340 til 341</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="p_a(t)"></span><span><b>Én fase</b> pulserer med dobbelt frekvens, som enfaset effekt gør</span></div>
+        <div class="term"><span class="s or" data-tex="p(t)"></span><span><b>Summen</b>: de tre pulseringer er forskudt og udligner hinanden. Motoren får et jævnt moment</span></div>
+        <div class="term"><span class="s pu" data-tex="\cos\theta"></span><span><b>Effektfaktor</b>: vinklen på impedansen. Q og S følger samme trekant som enfaset</span></div>
+        <div class="term"><span class="s gr" data-tex="\sqrt3"></span><span><b>Linjestørrelser</b>: bruges, fordi typeskiltet opgiver V<sub>L</sub> og I<sub>L</sub></span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n b">1</span><div class="t"><b>Stjerne</b>, <span data-tex="16+j12\ \Omega"></span>, <span data-tex="I_L=11{,}5"></span> A
+        <span class="m" data-tex="P=3\cdot230\cdot11{,}5\cdot0{,}8=6{,}35\ \text{kW}"></span></div></div>
+      <div class="step"><span class="n b">2</span><div class="t"><b>Trekant</b>, samme Z, <span data-tex="I_L=34{,}5"></span> A
+        <span class="m" data-tex="P=\sqrt3\cdot398\cdot34{,}5\cdot0{,}8=19{,}0\ \text{kW}"></span>
+        <span class="note">Tre gange så meget som i stjerne</span></div></div>
+      <div class="step"><span class="n b">3</span><div class="t"><b>Motor</b> 11 kW på akslen, 400 V, <span data-tex="\eta=0{,}90"></span>, pf 0,85
+        <span class="m" data-tex="P_{\mathrm{el}}=\dfrac{11\,000}{0{,}90}=12{,}2\ \text{kW}"></span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Linjestrøm</b> til motoren
+        <span class="m" data-tex="\boxed{I_L=\dfrac{12\,222}{\sqrt3\cdot400\cdot0{,}85}=20{,}8\ \text{A}}"></span>
+        <span class="note">Typeskiltets effekt er mekanisk, så der divideres med <span data-tex="\eta"></span></span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Motor på 3 × 400 V: p(t) mod summen</h3>
+      <canvas id="g2" width="640" height="400"></canvas>
+      <div class="sl"><span style="color:var(--pu)">Linjestrøm I<sub>L</sub></span><input id="i2" type="range" min="0" max="40" step="0.1" value="20.8"><output id="i2o"></output></div>
+      <div class="sl"><span style="color:var(--pu)">cos θ</span><input id="c2" type="range" min="0.3" max="1" step="0.01" value="0.85"><output id="c2o"></output></div>
+      <div class="ro r3">
+        <div><span>P aktiv</span><b class="or" id="r2p">12,2</b><i>kW</i></div>
+        <div><span>Q reaktiv</span><b class="cy" id="r2q">7,6</b><i>kvar</i></div>
+        <div><span>S tilsyneladende</span><b class="pu" id="r2s">14,4</b><i>kVA</i></div>
+      </div>
+      <div class="status" id="st2"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Hver fase pulserer, men tre faser forskudt 120° summer til en konstant effekt. Med linjestørrelser er effekten rod tre gange V<sub>L</sub> gange I<sub>L</sub> gange cos θ.</span></div>
+</section>
+
+<!-- ============ 3 · INSTALLATION OG NET ============ -->
+<section class="slide" id="s3" data-title="3 · Installation og net">
+  <div class="hd"><span class="tag p">IDÉ 3 · INSTALLATION OG NET</span><h1>Høj spænding giver lille strøm og lille tab</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Ledningstab og beskyttelse</h3>
+      <div class="big" style="font-size:30px" data-tex="P_{\mathrm{tab}}=I^2R=\left(\dfrac{P}{V}\right)^2R"></div>
+      <div class="src">Rizzoni og Kearns (2022), s. 345 og lign. (1.17), s. 35 (Pontoppidan, 2026, dag 11)</div>
+      <div class="terms">
+        <div class="term"><span class="s pu" data-tex="V\uparrow"></span><span><b>Dobbelt spænding</b> giver halv strøm og en fjerdedel af tabet</span></div>
+        <div class="term"><span class="s or">Sikring</span><span>Beskytter <b>kablet</b> mod overstrøm og kortslutning, men reagerer først ved mange ampere</span></div>
+        <div class="term"><span class="s rd">RCD</span><span>Slår fra ved <b>30 mA</b> fejlstrøm til jord og beskytter <b>mennesker</b>. Krav i nye boliger</span></div>
+        <div class="term"><span class="s gr">PE</span><span><b>Beskyttelsesleder</b> (gul/grøn): leder fejlstrøm fra kabinettet til jord, så sikring eller RCD kobler ud</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n p">1</span><div class="t"><b>Komfur 10 kW</b>, 0,05 Ω pr. leder
+        <span class="m" data-tex="\text{1 fase: }43{,}5\ \text{A},\ 189\ \text{W tab}"></span>
+        <span class="m" data-tex="\text{3 faser: }14{,}4\ \text{A},\ 31\ \text{W tab}"></span></div></div>
+      <div class="step"><span class="n p">2</span><div class="t"><b>Isolationsfejl</b>, våde hænder, 1000 Ω
+        <span class="m" data-tex="I=\dfrac{230}{1000}=230\ \text{mA}"></span>
+        <span class="note">Langt over hjerteflimmer (ca. 100 mA). En 10 A sikring ser det ikke, RCD'en gør</span></div></div>
+      <div class="step"><span class="n p">3</span><div class="t"><b>Nettets niveauer</b>
+        <span class="m" data-tex="400\ \text{kV}\to150/132\ \text{kV}\to0{,}4\ \text{kV}"></span>
+        <span class="note">Transmission, distribution og forbruger (3 × 400/230 V). Energinet (2018)</span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Kontrol</b> af komfuret
+        <span class="m" data-tex="\boxed{\dfrac{189}{31}\approx6\ \text{gange mindre tab}}"></span>
+        <span class="note">Nullederen er strømløs ved balance, så kun tre ledere har tab</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>10 MW over 20 km: vælg spænding</h3>
+      <canvas id="g3" width="640" height="410"></canvas>
+      <div class="sl"><span style="color:var(--pu)">Spænding V<sub>L</sub></span><input id="v3" type="range" min="-0.398" max="2.602" step="any" value="1"><output id="v3o"></output></div>
+      <div class="row" id="b3"><button class="btn" data-k="0.4">0,4 kV</button><button class="btn" data-k="10">10 kV</button><button class="btn" data-k="150">150 kV</button><button class="btn" data-k="400">400 kV</button></div>
+      <div class="ro r3">
+        <div><span>strøm I<sub>L</sub></span><b class="or" id="r3i">578</b><i>A</i></div>
+        <div><span>tab (3 ledere)</span><b class="rd" id="r3t">5,0</b><i id="r3tu">MW</i></div>
+        <div><span>tab af effekten</span><b class="pu" id="r3p">50</b><i>%</i></div>
+      </div>
+      <div class="status" id="st3"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Tabet i ledningen er strøm i anden gange modstand, og strømmen er effekten divideret med spændingen. Derfor transporteres el ved høj spænding. Sikringen beskytter kablet, RCD'en mennesker.</span></div>
+</section>
+
+<!-- ============ 4 · FALDGRUBER OG TJEK ============ -->
+<section class="slide" data-title="4 · Faldgruber og tjek">
+  <div class="hd"><span class="tag g">FALDGRUBER OG TJEK</span><h1>Hvor det typisk går galt</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Typiske fejl</h3>
+      <div class="fejl">
+        <div><span>Fase- og linjestørrelser blandes: 230 V sættes ind i <span data-tex="\sqrt3\,V_LI_L\cos\theta"></span>.<span class="ret">230 V er fasespænding, 400 V er linjespænding. Hold fast i ét par: <span data-tex="V_L,I_L"></span> eller <span data-tex="V_f,I_f"></span>.</span></span></div>
+        <div><span><span data-tex="\sqrt3"></span> bruges forkert: <span data-tex="V_f=\sqrt3\,V_L"></span> eller <span data-tex="\sqrt3"></span> på både spænding og strøm i stjerne.<span class="ret">Stjerne: <span data-tex="V_L=\sqrt3\,V_f"></span> og <span data-tex="I_L=I_f"></span>. Trekant: <span data-tex="V_L=V_f"></span> og <span data-tex="I_L=\sqrt3\,I_f"></span>.</span></span></div>
+        <div><span>Sikring og RCD forveksles.<span class="ret">Sikringen beskytter kablet mod overstrøm. RCD'en (30 mA) beskytter mennesker mod fejlstrøm til jord.</span></span></div>
+        <div><span>Effekt pr. fase bruges som samlet effekt: <span data-tex="230\cdot11{,}5\cdot0{,}8=2{,}12"></span> kW.<span class="ret">Gang med 3: <span data-tex="3\cdot2{,}12=6{,}35"></span> kW.</span></span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Tjek dig selv</h3>
+      <div class="qa">
+        <details><summary>En balanceret last tager 20 A ved 3 × 400 V med pf 0,9. Hvad er effekten?</summary><p><span data-tex="P=\sqrt3\cdot400\cdot20\cdot0{,}9=12{,}5"></span> kW. Linjestørrelser og <span data-tex="\sqrt3"></span> hører sammen.</p></details>
+        <details><summary>Hvorfor er strømmen i nullederen nul ved balanceret last?</summary><p>Tre lige store strømme med 120° imellem peger i tre retninger, der udligner hinanden, så summen er nul.</p></details>
+        <details><summary>Hvorfor transporteres el ved 400 kV, og hvad er forskellen på sikring og RCD?</summary><p>Samme effekt giver lille strøm ved høj spænding, og tabet <span data-tex="I^2R"></span> falder med spændingens kvadrat. Sikringen beskytter kablet, RCD'en mennesker.</p></details>
+      </div>
+    </div>
+    <div class="card col">
+      <h3>Til eksamen</h3>
+      <div class="exlinks">
+        <a href="../../lab/dag09.html"><b>EMNE 11</b><span> Trefasesystemet · fase og linje, Y og Δ, nulleder</span></a>
+        <a href="../../lab/dag10.html"><b>DAG 10</b><span> Trefase-øvelser · fasorer og linjespændinger</span></a>
+        <a href="../../lab/dag11.html"><b>EMNE 13</b><span> Installationer og elnet · tab, PE, sikring og RCD</span></a>
+        <a href="../../lab/dag12.html"><b>DAG 12</b><span> Eksamensforberedelse · alle emner og typiske fejl</span></a>
+      </div>
+      <h3 style="margin-top:8px">Læs i bogen</h3>
+      <div style="display:grid;gap:6px;font-size:16px;line-height:1.35">
+        <div><b>Lign. (6.47) til (6.50), s. 340</b> fase og linje</div>
+        <div><b>Lign. (6.51), s. 340</b> nulleder ved balance</div>
+        <div><b>Lign. (6.56) til (6.58), s. 341</b> samlet effekt</div>
+        <div><b>Eksempel 6.16, s. 343</b> pr.-fase-beregning</div>
+        <div><b>Afsnit 6.6 til 6.7, s. 345 til 349</b> tab, sikkerhed, net</div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Tjek først, om tallet er fase eller linje. Brug derefter ét sæt størrelser i hele formlen, og husk, at sikringen beskytter kablet og RCD'en beskytter mennesker.</span></div>
+</section>
+
+</div></div>
+<script src="../assets/deck.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = D.$, fmt = D.fmt, PI = Math.PI, SQ2 = Math.SQRT2, SQ3 = Math.sqrt(3);
+var CY = '#0a7fc2', OR = '#d97a00', PU = '#7b4fc9', GR = '#0a9a5c', RD = '#d63a3a', INK = '#14202d', MUT = '#5a6b7d';
+
+/* ---------- slide 0: tre pile, tre sinusser, sum = 0 ---------- */
+(function () {
+  var x = D.cv('c0').x, cx = 108, cy = 140, R = 80, x0 = 215, k = 2 * PI / 170, Vp = 230 * SQ2;
+  var col = [CY, OR, PU], off = [0, -2 * PI / 3, 2 * PI / 3], nm = ['L1', 'L2', 'L3'];
+  D.anim(0, function (dt, t) {
+    var a = t * 1.1, i, j;
+    x.clearRect(0, 0, 560, 440);
+    D.txt(x, '3 × 400/230 V, 50 Hz', 280, 24, 26, INK, 'center', 'middle', 800);
+    D.circ(x, cx, cy, R, 'rgba(10,127,194,.05)', 'rgba(90,107,125,.4)', 2);
+    D.line(x, [[cx - R - 12, cy], [548, cy]], 'rgba(90,107,125,.45)', 2);
+    D.line(x, [[cx, cy - R - 12], [cx, cy + R + 12]], 'rgba(90,107,125,.3)', 2);
+    for (j = 0; j < 3; j++) {
+      var ang = a + off[j], tx = cx + R * Math.cos(ang), ty = cy - R * Math.sin(ang), pts = [];
+      for (i = 0; i <= 333; i++) pts.push([x0 + i, cy - R * Math.sin(a + off[j] - i * k)]);
+      D.line(x, [[tx, ty], [x0, ty]], col[j], 1.5, [4, 5]);
+      D.line(x, pts, col[j], 4);
+      D.arrow(x, cx, cy, tx, ty, col[j], 6);
+      D.circ(x, x0, ty, 7, col[j]);
+      D.txt(x, nm[j], cx + (R + 24) * Math.cos(ang) - 6, cy - (R + 24) * Math.sin(ang), 18, col[j], 'center', 'middle', 800);
+    }
+    var s = 0; for (j = 0; j < 3; j++) s += Vp * Math.sin(a + off[j]);
+    var sy = 318, spts = [];
+    for (i = 0; i <= 333; i++) { var v = 0; for (j = 0; j < 3; j++) v += R * Math.sin(a + off[j] - i * k); spts.push([x0 + i, sy - v]); }
+    D.line(x, [[x0 - 6, sy], [548, sy]], 'rgba(90,107,125,.35)', 2);
+    D.line(x, spts, GR, 5);
+    D.txt(x, 'Summen af de tre', cx, sy - 24, 21, GR, 'center', 'middle', 800);
+    D.txt(x, 'v₁ + v₂ + v₃ = ' + fmt(Math.abs(s) < 0.05 ? 0 : s, 1) + ' V', cx, sy + 8, 21, GR, 'center', 'middle', 700);
+    D.txt(x, '230 V fase', 140, 395, 28, CY, 'center', 'middle', 800);
+    D.txt(x, '400 V linje', 420, 395, 28, RD, 'center', 'middle', 800);
+    D.txt(x, '√3 · 230 V = 398 V ≈ 400 V', 280, 428, 20, MUT, 'center');
+  });
+})();
+
+/* ---------- slide 1: fase- og linjespænding som fasorer ---------- */
+var MODE1 = 0;
+function upd1() {
+  var Vf = +$('v1').value, VL = SQ3 * Vf, Z = 20, G = D.cv('p1'), x = G.x, ox = 170, oy = 225, sc = 0.75;
+  $('v1o').textContent = Vf + ' V';
+  function P(a, b) { return [ox + a * sc, oy - b * sc]; }
+  var pa = P(Vf, 0), pb = P(-Vf / 2, -Vf * SQ3 / 2), pc = P(-Vf / 2, Vf * SQ3 / 2), o = P(0, 0);
+  x.clearRect(0, 0, G.W, G.H);
+  D.line(x, [[20, oy], [G.W - 20, oy]], 'rgba(90,107,125,.3)', 2); D.line(x, [[ox, 16], [ox, G.H - 16]], 'rgba(90,107,125,.3)', 2);
+  if (MODE1 === 0) {
+    D.arrow(x, o[0], o[1], pa[0], pa[1], CY, 6); D.arrow(x, o[0], o[1], pb[0], pb[1], OR, 6); D.arrow(x, o[0], o[1], pc[0], pc[1], PU, 6);
+    D.arrow(x, pb[0], pb[1], pa[0], pa[1], RD, 5);
+    D.txt(x, 'Van', pa[0] + 10, pa[1] + 22, 22, CY, 'left'); D.txt(x, 'Vbn', pb[0] - 8, pb[1] + 24, 22, OR, 'right'); D.txt(x, 'Vcn', pc[0] - 8, pc[1] - 22, 22, PU, 'right');
+    D.txt(x, 'Vab = Van − Vbn', 420, 70, 22, RD, 'left', 'middle', 800);
+  } else {
+    D.arrow(x, o[0], o[1], pa[0], pa[1], 'rgba(10,127,194,.3)', 3); D.arrow(x, o[0], o[1], pb[0], pb[1], 'rgba(217,122,0,.3)', 3); D.arrow(x, o[0], o[1], pc[0], pc[1], 'rgba(123,79,201,.3)', 3);
+    D.arrow(x, pb[0], pb[1], pa[0], pa[1], RD, 5); D.arrow(x, pc[0], pc[1], pb[0], pb[1], RD, 5); D.arrow(x, pa[0], pa[1], pc[0], pc[1], RD, 5);
+    D.txt(x, 'Vab', (pa[0] + pb[0]) / 2 + 30, (pa[1] + pb[1]) / 2 + 8, 22, RD, 'left'); D.txt(x, 'Vbc', pb[0] - 10, oy, 22, RD, 'right'); D.txt(x, 'Vca', (pa[0] + pc[0]) / 2 + 30, (pa[1] + pc[1]) / 2 - 8, 22, RD, 'left');
+    D.txt(x, 'Hver Z sidder på en linjespænding', 420, 70, 22, RD, 'left', 'middle', 800);
+  }
+  D.txt(x, 'Vfase = ' + Vf + ' V', 420, 110, 24, CY, 'left', 'middle', 800);
+  D.txt(x, 'Vlinje = ' + fmt(VL, 0) + ' V', 420, 146, 24, RD, 'left', 'middle', 800);
+  D.txt(x, '= √3 · ' + Vf, 420, 178, 20, MUT, 'left');
+  var Vz = MODE1 === 0 ? Vf : VL, If = Vz / Z, IL = MODE1 === 0 ? If : SQ3 * If, ILy = Vf / Z;
+  $('r1l').textContent = fmt(VL, 0); $('r1z').textContent = fmt(Vz, 0); $('r1f').textContent = fmt(If, 1); $('r1i').textContent = fmt(IL, 1);
+  $('st1').innerHTML = MODE1 === 0 ? '<b>Stjerne</b>: hver Z får fasespændingen, og <b>I<sub>L</sub> = I<sub>f</sub></b>. Nullederen fører <b>0 A</b> ved balance.' : '<b>Trekant</b>: hver Z får linjespændingen, og <b>I<sub>L</sub> = √3 · I<sub>f</sub></b> = ' + fmt(IL, 1) + ' A mod ' + fmt(ILy, 1) + ' A i stjerne, altså <b>3 gange</b> så meget.';
+}
+$('v1').oninput = upd1;
+document.querySelectorAll('#mb [data-m]').forEach(function (b) { b.onclick = function () { MODE1 = +b.dataset.m; document.querySelectorAll('#mb [data-m]').forEach(function (o) { o.classList.toggle('on', o === b); }); upd1(); }; });
+upd1();
+
+/* ---------- slide 2: p(t) for én fase og summen ---------- */
+function upd2() {
+  var I = +$('i2').value, c = +$('c2').value, th = Math.acos(c), VL = 400, Vf = VL / SQ3, W = 2 * PI * 50, ms = 1e-3;
+  var S = SQ3 * VL * I, Pw = S * c, Q = S * Math.sin(th);
+  $('i2o').textContent = fmt(I, 1) + ' A'; $('c2o').textContent = fmt(c, 2);
+  $('r2p').textContent = fmt(Pw / 1000, 1); $('r2q').textContent = fmt(Q / 1000, 1); $('r2s').textContent = fmt(S / 1000, 1);
+  /* fase j er forskudt j·120° i spændingen, så cos(2ωt - 2·j·120° - θ) */
+  function pj(j) { return function (t) { return Vf * I * (c + Math.cos(2 * (W * t * ms - j * 2 * PI / 3) - th)) / 1000; }; }
+  var pa = pj(0), pb = pj(1), pc = pj(2);
+  var g = D.graph('g2', { f: function (t) { return pa(t) + pb(t) + pc(t); }, x0: 0, x1: 20, xt: [[0, '0'], [5, '5'], [10, '10 ms'], [15, '15'], [20, '20']], min: -10, max: 30, yt: [0, 10, 20, 30], yd: 0, lbl: 'p(t) (kW)', col: OR, d: 1, u: 'kW', xl: 'tid',
+    more: [{ f: pa, col: CY, w: 4 }, { f: pb, col: 'rgba(90,107,125,.55)', w: 2, dash: [8, 6] }, { f: pc, col: 'rgba(90,107,125,.55)', w: 2, dash: [8, 6] }] });
+  D.txt(g.x, 'én fase', 210, 20, 22, CY, 'left'); D.txt(g.x, 'sum af tre', 330, 20, 22, OR, 'left');
+  D.txt(g.x, fmt(Pw / 1000, 1) + ' kW', g.X(20) - 4, g.Y(Pw / 1000) - 16, 24, OR, 'right', 'middle', 800);
+  $('st2').innerHTML = I < 0.05 ? 'Uden strøm er der ingen effekt.' : 'Én fase svinger mellem <b>' + fmt(Vf * I * (c - 1) / 1000, 1) + '</b> og <b>' + fmt(Vf * I * (c + 1) / 1000, 1) + ' kW</b>. Summen er <b>' + fmt(Pw / 1000, 1) + ' kW</b> hele tiden. P = ' + fmt(S / 1000, 1) + ' · ' + fmt(c, 2) + '.';
+}
+$('i2').oninput = upd2; $('c2').oninput = upd2; upd2();
+
+/* ---------- slide 3: tab mod transmissionsspænding (log) ---------- */
+var P3 = 10e6, R3 = 5;
+function loss(lg) { var V = Math.pow(10, lg) * 1000, I = P3 / (SQ3 * V); return 3 * I * I * R3; }
+function fw(w) { return w >= 1e9 ? [fmt(w / 1e9, 1), 'GW'] : w >= 1e6 ? [fmt(w / 1e6, 1), 'MW'] : w >= 1e3 ? [fmt(w / 1e3, w < 1e4 ? 1 : 0), 'kW'] : [fmt(w, 0), 'W']; }
+function upd3() {
+  var lg = +$('v3').value, kV = Math.pow(10, lg), V = kV * 1000, I = P3 / (SQ3 * V), L = loss(lg), pc = L / P3 * 100, lw = fw(L);
+  $('v3o').textContent = (kV < 10 ? fmt(kV, 1) : fmt(kV, 0)) + ' kV';
+  $('r3i').textContent = I >= 1000 ? fmt(I / 1000, 1) + ' k' : fmt(I, 0);
+  $('r3t').textContent = lw[0]; $('r3tu').textContent = lw[1];
+  $('r3p').textContent = pc >= 10 ? fmt(pc, 0) : (pc >= 1 ? fmt(pc, 1) : fmt(pc, 2));
+  var g = D.graph('g3', { f: function (z) { return Math.log10(loss(z)); }, x0: -0.398, x1: 2.602, xt: [[-0.398, '0,4'], [1, '10'], [2, '100 kV']], min: 3, max: 10, yt: [], yd: 0, lbl: 'tab i ledningen (log)', col: PU, d: 0, u: '', xl: 'spænding (log)', hl: [7, 'effekten 10 MW'] });
+  [[3, '1 kW'], [6, '1 MW'], [9, '1 GW']].forEach(function (t) { D.txt(g.x, t[1], 66, g.Y(t[0]), 20, MUT, 'right'); D.line(g.x, [[74, g.Y(t[0])], [622, g.Y(t[0])]], 'rgba(159,176,194,.35)', 1); });
+  var mx = g.X(lg), my = g.Y(Math.log10(L)), s = lw[0] + ' ' + lw[1];
+  D.circ(g.x, mx, my, 9, PU);
+  g.x.font = '700 26px system-ui,sans-serif'; var tw = g.x.measureText(s).width, lx = Math.min(mx + 14, 620 - tw - 6), ly = my < 190 ? my + 32 : my - 30;
+  g.x.fillStyle = 'rgba(246,249,252,.92)'; g.x.fillRect(lx - 4, ly - 17, tw + 8, 34); D.txt(g.x, s, lx, ly, 26, PU, 'left');
+  $('st3').innerHTML = L >= P3 ? '<b>Tabet er større end de 10 MW</b>: ledningen kan slet ikke levere effekten ved så lav en spænding.' : (pc > 5 ? 'Tabet er <b>' + fmt(pc, 0) + ' %</b> af effekten: alt for meget. Hæv spændingen.' : 'Tabet er kun <b>' + fmt(pc, 2) + ' %</b>. Hver fordobling af spændingen giver <b>en fjerdedel</b> af tabet.');
+}
+$('v3').oninput = upd3;
+document.querySelectorAll('#b3 [data-k]').forEach(function (b) { b.onclick = function () { $('v3').value = Math.log10(+b.dataset.k); upd3(); }; });
+upd3();
+D.start();
+})();
+</script>
+</body></html>

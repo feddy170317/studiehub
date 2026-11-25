@@ -1,0 +1,435 @@
+<!doctype html><html lang="da"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tema 6 · Fjedre, koblinger og remme</title>
+<meta name="description" content="Hurtigstart til MEM1 tema 6: skruefjederens stivhed og Wahl-spænding, lamelkoblingens moment ved konstant slid og remtrækkets eksponentielle friktion (Hamrock kap. 17, 18 og 19).">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../assets/deck.css"></head>
+<body>
+<div id="vp"><div id="deck">
+
+<!-- ============ 0 · FORSIDE ============ -->
+<section class="slide on" data-title="Forside">
+  <div style="flex:1;display:grid;grid-template-columns:1fr 600px;gap:34px;align-items:center;padding:0 10px">
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div>
+        <div class="tag" style="display:inline-block">MEM1 · HURTIGSTART · TEMA 6</div>
+        <h1 style="font-size:60px;margin-top:18px">Fjedre, koblinger og remme</h1>
+        <div style="font-size:25px;color:var(--mut);margin-top:6px">En fjeder <b>vrider</b> en tråd, en kobling <b>gnider</b> flader mod hinanden, og en rem <b>griber</b> ved friktion, der ganges op for hver omgang</div>
+      </div>
+      <div class="card qcard"><span class="lbl cy">KORT FORTALT</span>
+        Kuglepennens klik: fjederen trykkes sammen og springer ud igen, fordi tråden bliver vredet, ikke bøjet. Koblingspedalen i en bil presser skiver sammen, og gnidningen tager bilen med. En rem om to skiver er som et reb om en pæl: jo flere omgange, desto hårdere griber den, og det vokser eksponentielt.</div>
+      <div class="plan">
+        <div><b class="cy">1 · Fjeder</b><span data-tex="k=Gd^4/(8D^3N_a)"></span></div>
+        <div><b class="or">2 · Lamelkobling</b><span data-tex="T=N\mu F\,r_m"></span></div>
+        <div><b class="pu">3 · Remtræk</b><span data-tex="F_1/F_2=e^{\mu\phi}"></span></div>
+        <div><b class="gr">4 · Tjek</b>fejl og eksamen</div>
+      </div>
+      <div class="links"><a href="../../Kapitel17_Studienote.pdf">📖 Studienote kap. 17</a><a href="../../Kapitel18_Studienote.pdf">📖 Studienote kap. 18</a><a href="../../Kapitel19_Studienote.pdf">📖 Studienote kap. 19</a><a href="../../../../lab/mem1/trykfjeder.html">🧪 3D-lab: trykfjeder</a><a href="../../../../lab/mem1/lamelkobling.html">🧪 3D-lab: lamelkobling</a><a href="../../../../lab/mem1/remtraek.html">🧪 3D-lab: remtræk</a><a href="../../eksamen-ny/sp07_fjeder.html">📝 Spm. 7 Fjeder</a><a href="../../eksamen-ny/sp08_lamelkobling.html">📝 Spm. 8 Lamelkobling</a><a href="../../eksamen-ny/sp09_remtraek.html">📝 Spm. 9 Remtræk</a></div>
+    </div>
+    <div class="card" style="padding:12px"><canvas id="c0" width="560" height="440"></canvas>
+      <div style="font-size:18px;color:var(--mut);text-align:center;margin-top:8px">Fjederen <b>springer ud</b>, koblingen <b>griber</b>, og remmens stramme part er tykkere end den slappe</div></div>
+  </div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm &nbsp;·&nbsp; ☰: alle temaer</div>
+</section>
+
+<!-- ============ 1 · FJEDER ============ -->
+<section class="slide" id="s1" data-title="1 · Skruefjeder">
+  <div class="hd"><span class="tag">IDÉ 1 · SKRUEFJEDER</span><h1>Tråden vrides, så d<sup>4</sup> og D<sup>3</sup> styrer stivheden</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Spænding og stivhed</h3>
+      <div class="big" style="font-size:28px" data-tex="\tau=K_w\,\dfrac{8FD}{\pi d^{3}}"></div>
+      <div class="src">Hamrock et al. (2014), lign. (17.10), s. 496</div>
+      <div class="big" style="font-size:25px" data-tex="K_w=\dfrac{4C-1}{4C-4}+\dfrac{0{,}615}{C}"></div>
+      <div class="src">Lign. (17.11), s. 496, med <span data-tex="C=D/d"></span> (17.7), s. 495</div>
+      <div class="big" style="font-size:28px" data-tex="k=\dfrac{G\,d^{4}}{8\,D^{3}N_a}"></div>
+      <div class="src">Lign. (17.15), s. 496</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="d"></span><span><b>Tråddiameter</b>: <span data-tex="d^3"></span> i spændingen, <span data-tex="d^4"></span> i stivheden</span></div>
+        <div class="term"><span class="s or" data-tex="D"></span><span><b>Middeldiameter</b>: momentarmen <span data-tex="D/2"></span>. Større spiral er blødere</span></div>
+        <div class="term"><span class="s pu" data-tex="N_a"></span><span><b>Aktive vindinger</b>: kun dem, der fjedrer. Flere er blødere, spændingen uændret</span></div>
+        <div class="term"><span class="s gr" data-tex="K_w"></span><span><b>Wahl-faktor</b>: tillæg for krumning og direkte forskydning på vindingens inderside</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n">1</span><div class="t"><b>Fjederindeks</b>, <span data-tex="d=4"></span> mm, <span data-tex="D=32"></span> mm
+        <span class="m" data-tex="C=\dfrac{32}{4}=8,\ \ K_w=\dfrac{31}{28}+\dfrac{0{,}615}{8}=1{,}18"></span></div></div>
+      <div class="step"><span class="n b">2</span><div class="t"><b>Spænding</b>, <span data-tex="F=200"></span> N
+        <span class="m" data-tex="\tau=1{,}18\cdot\dfrac{8\cdot200\cdot32}{\pi\cdot4^3}=1{,}18\cdot254{,}6"></span>
+        <span class="m" data-tex="\boxed{\tau=300{,}5\ \text{MPa}}"></span>
+        <span class="note">Uden Wahl: 254,6 MPa, altså 18 % for lavt</span></div></div>
+      <div class="step"><span class="n p">3</span><div class="t"><b>Stivhed</b>, <span data-tex="G=80"></span> GPa, <span data-tex="N_a=10"></span>
+        <span class="m" data-tex="k=\dfrac{80\,000\cdot4^4}{8\cdot32^3\cdot10}=7{,}81\ \text{N/mm}"></span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Udbøjning</b>
+        <span class="m" data-tex="\delta=\dfrac{F}{k}=\dfrac{200}{7{,}81}"></span>
+        <span class="m" data-tex="\boxed{\delta=25{,}6\ \text{mm}}"></span>
+        <span class="note">Lign. (17.18) har faktoren <span data-tex="1+0{,}5/C^2=1{,}008"></span>: <span data-tex="k=7{,}75"></span></span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Træk i d, D og N<sub>a</sub></h3>
+      <canvas id="sp1" width="640" height="350"></canvas>
+      <div class="sl"><span>d</span><input id="d1" type="range" min="2" max="6" step="0.5" value="4"><output id="d1o"></output></div>
+      <div class="sl"><span>D</span><input id="D1" type="range" min="16" max="64" step="2" value="32"><output id="D1o"></output></div>
+      <div class="sl"><span>N<sub>a</sub></span><input id="n1" type="range" min="4" max="12" step="1" value="10"><output id="n1o"></output></div>
+      <div class="ro r3">
+        <div><span>k</span><b class="cy" id="v1k">7,8</b><i>N/mm</i></div>
+        <div><span>δ</span><b class="gr" id="v1d">25,6</b><i>mm</i></div>
+        <div><span>τ</span><b class="or" id="v1t">301,5</b><i>MPa</i></div>
+      </div>
+      <div class="status" id="st1"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Kraften vrider tråden med momentet <span data-tex="FD/2"></span>. Tykkere tråd stivner med d i fjerde, større spiral blødgør med D i tredje, og Wahl lægger tillæg på spændingen.</span></div>
+</section>
+
+<!-- ============ 2 · LAMELKOBLING ============ -->
+<section class="slide" id="s2" data-title="2 · Lamelkobling">
+  <div class="hd"><span class="tag b">IDÉ 2 · LAMELKOBLING</span><h1>Konstant slid: kraft gange middelradius gange antal flader</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Konstant slid (dimensionerende)</h3>
+      <div class="big" style="font-size:32px" data-tex="T=N\,\mu F\,\dfrac{r_o+r_i}{2}"></div>
+      <div class="src">Hamrock et al. (2014), lign. (18.15) og (18.22), s. 523 og 524, <span data-tex="\gamma=N"></span></div>
+      <div class="big" style="font-size:26px" data-tex="T_p=\dfrac{2}{3}N\mu F\,\dfrac{r_o^3-r_i^3}{r_o^2-r_i^2}"></div>
+      <div class="src">Konstant tryk (ny kobling), lign. (18.7) og (18.20), s. 522 og 523</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="\mu F"></span><span><b>Friktionskraft</b> pr. flade. Den virker samlet ved middelradius, som en kraft på en skruenøgle</span></div>
+        <div class="term"><span class="s or" data-tex="r_m"></span><span><b>Middelradius</b> <span data-tex="(r_o+r_i)/2"></span>: armen. Den ydre del af ringen tæller mest for momentet</span></div>
+        <div class="term"><span class="s pu" data-tex="N"></span><span><b>Antal friktionsflader</b>: hver flade bærer samme moment ved samme klemkraft. Skiver gør kobling kompakt</span></div>
+        <div class="term"><span class="s gr" data-tex="p\cdot r"></span><span><b>Konstant slid</b>: yderkanten glider længst og slides mest, så trykket flytter indad. <span data-tex="p\,r"></span> bliver konstant (18.9)</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n b">1</span><div class="t"><b>Middelradius</b>, <span data-tex="r_i=50"></span>, <span data-tex="r_o=100"></span> mm
+        <span class="m" data-tex="r_m=\dfrac{100+50}{2}=75\ \text{mm}"></span></div></div>
+      <div class="step"><span class="n b">2</span><div class="t"><b>Moment</b>, <span data-tex="N=4"></span>, <span data-tex="\mu=0{,}30"></span>, <span data-tex="F=2000"></span> N
+        <span class="m" data-tex="T=4\cdot0{,}30\cdot2000\cdot75=180\,000\ \text{N\,mm}"></span>
+        <span class="m" data-tex="\boxed{T=180\ \text{N\,m}}"></span></div></div>
+      <div class="step"><span class="n b">3</span><div class="t"><b>Konstant tryk</b> til sammenligning
+        <span class="m" data-tex="T_p=\tfrac23\cdot4\cdot0{,}30\cdot2000\cdot\dfrac{100^3-50^3}{100^2-50^2}=186{,}7\ \text{N\,m}"></span>
+        <span class="note">Kun 3,7 % mere. Slid er den sikre side</span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Største tryk</b>, indersiden
+        <span class="m" data-tex="p_{max}=\dfrac{F}{2\pi r_i(r_o-r_i)}=0{,}127\ \text{MPa}"></span>
+        <span class="note">Ved fast <span data-tex="p_{max}"></span> er momentet størst for <span data-tex="r_i/r_o=1/\sqrt3=0{,}577"></span>, afledt af (18.22)</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Ring og antal flader</h3>
+      <div class="row" id="mb"><button class="btn or on" data-m="F">Fast klemkraft 2000 N</button><button class="btn or" data-m="p">Fast p<sub>max</sub> 0,127 MPa</button></div>
+      <canvas id="rg2" width="640" height="250"></canvas>
+      <canvas id="g2" width="640" height="260"></canvas>
+      <div class="sl"><span>r<sub>i</sub>/r<sub>o</sub></span><input id="b2" type="range" min="0.2" max="0.95" step="0.01" value="0.5"><output id="b2o"></output></div>
+      <div class="sl"><span>Flader N</span><input id="n2" type="range" min="1" max="8" step="1" value="4"><output id="n2o"></output></div>
+      <div class="ro r3">
+        <div><span>T</span><b class="or" id="v2t">180,0</b><i>N·m</i></div>
+        <div><span>F</span><b class="cy" id="v2f">2000</b><i>N</i></div>
+        <div><span>p<sub>max</sub></span><b class="gr" id="v2p">0,127</b><i>MPa</i></div>
+      </div>
+      <div class="status" id="st2"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Koblingen kører sig til, så sliddet er ens, og trykket er størst inderst. Momentet er <span data-tex="N\mu F r_m"></span>, og ved fast største tryk er <span data-tex="r_i/r_o=0{,}577"></span> bedst.</span></div>
+</section>
+
+<!-- ============ 3 · REMTRÆK ============ -->
+<section class="slide" id="s3" data-title="3 · Remtræk">
+  <div class="hd"><span class="tag p">IDÉ 3 · REMTRÆK</span><h1>Friktionen ganges op for hver omgang om skiven</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Remligning, moment og effekt</h3>
+      <div class="big" style="font-size:32px" data-tex="\dfrac{F_1-F_c}{F_2-F_c}=e^{\mu\phi}"></div>
+      <div class="src">Hamrock et al. (2014), lign. (19.9), s. 549, <span data-tex="\phi"></span> i radianer</div>
+      <div class="big" style="font-size:24px" data-tex="T=(F_1-F_2)\,r,\quad P=(F_1-F_2)\,u"></div>
+      <div class="src">Moment på skiven og effekt, lign. (19.7), s. 549</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="F_1,F_2"></span><span><b>Stram og slap part</b>. Forskellen drejer skiven. Den stramme part trækker i skiven, den slappe slipper den</span></div>
+        <div class="term"><span class="s or" data-tex="\mu\phi"></span><span><b>Friktion og omslutning</b> i radianer. Halv omgang ved <span data-tex="\mu=0{,}35"></span> giver faktor 3, en hel omgang 9</span></div>
+        <div class="term"><span class="s pu" data-tex="F_c"></span><span><b>Centrifugalkraft</b> <span data-tex="m'u^2"></span> (19.8): trækker lige meget i begge parter, men presser ikke remmen mod skiven</span></div>
+        <div class="term"><span class="s gr" data-tex="r"></span><span><b>Skiveradius</b>: momentarmen. Aksellasten er summen <span data-tex="F_1+F_2"></span>, ikke forskellen</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n p">1</span><div class="t"><b>Grebet</b>, <span data-tex="\phi=\pi"></span> rad, <span data-tex="\mu=0{,}35"></span>, <span data-tex="F_c\approx0"></span>
+        <span class="m" data-tex="e^{\mu\phi}=e^{0{,}35\pi}=3{,}0"></span></div></div>
+      <div class="step"><span class="n p">2</span><div class="t"><b>Slap part og moment</b>, <span data-tex="F_1=3000"></span> N, <span data-tex="r=0{,}2"></span> m
+        <span class="m" data-tex="F_2=\dfrac{3000}{3{,}0}=1000\ \text{N}"></span>
+        <span class="m" data-tex="\boxed{T=(3000-1000)\cdot0{,}2=400\ \text{N\,m}}"></span></div></div>
+      <div class="step"><span class="n p">3</span><div class="t"><b>Høj fart</b>, <span data-tex="u=20"></span> m/s, <span data-tex="m'=0{,}5"></span> kg/m
+        <span class="m" data-tex="F_c=0{,}5\cdot20^2=200\ \text{N}"></span>
+        <span class="m" data-tex="F_2=200+\dfrac{3000-200}{3{,}003}=1132\ \text{N}"></span>
+        <span class="note"><span data-tex="T=373{,}5"></span> N·m: 7 % af kapaciteten er væk</span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Aksel og effekt</b>
+        <span class="m" data-tex="F_1+F_2=3000+1000=4000\ \text{N}"></span>
+        <span class="note">Lejerne bærer summen. Ved <span data-tex="u=10"></span> m/s er <span data-tex="P=2000\cdot10=20"></span> kW (<span data-tex="F_c=50"></span> N er ubetydelig)</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>F<sub>1</sub>/F<sub>2</sub> mod omslutning</h3>
+      <canvas id="pl3" width="640" height="250"></canvas>
+      <canvas id="g3" width="640" height="270"></canvas>
+      <div class="sl"><span>μ</span><input id="m3" type="range" min="0.1" max="0.8" step="0.01" value="0.35"><output id="m3o"></output></div>
+      <div class="sl"><span>φ</span><input id="f3" type="range" min="60" max="300" step="5" value="180"><output id="f3o"></output></div>
+      <div class="sl"><span>Fart u</span><input id="u3" type="range" min="0" max="40" step="1" value="10"><output id="u3o"></output></div>
+      <div class="ro r3">
+        <div><span>F<sub>1</sub>/F<sub>2</sub></span><b class="pu" id="v3r">3,0</b></div>
+        <div><span>F<sub>2</sub></span><b class="cy" id="v3f">999</b><i>N</i></div>
+        <div><span>T (r = 0,2 m)</span><b class="or" id="v3t">400,2</b><i>N·m</i></div>
+      </div>
+      <div class="status" id="st3"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Forholdet mellem de to remparter er <span data-tex="e^{\mu\phi}"></span> med <span data-tex="\phi"></span> i radianer. Momentet er forskellen gange armen, og centrifugalkraften stjæler greb ved høj fart.</span></div>
+</section>
+
+<!-- ============ 4 · FALDGRUBER OG TJEK ============ -->
+<section class="slide" data-title="4 · Faldgruber og tjek">
+  <div class="hd"><span class="tag g">FALDGRUBER OG TJEK</span><h1>Hvor det typisk går galt</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Typiske fejl</h3>
+      <div class="fejl">
+        <div><span><span data-tex="D"></span> og <span data-tex="d"></span> byttes om, eller <span data-tex="C"></span> regnes som <span data-tex="d/D"></span>.<span class="ret"><span data-tex="C=D/d=32/4=8"></span>. Momentarmen er <span data-tex="D/2"></span>, men d står i <span data-tex="d^3"></span> og <span data-tex="d^4"></span>.</span></span></div>
+        <div><span>Alle vindinger tælles med i <span data-tex="k"></span>.<span class="ret">Kun de <b>aktive</b> vindinger <span data-tex="N_a"></span> fjedrer. Endevindinger ligger an og tæller ikke.</span></span></div>
+        <div><span>Vinklen <span data-tex="\phi"></span> sættes ind i grader: <span data-tex="e^{0{,}35\cdot180}"></span>.<span class="ret">Brug radianer: <span data-tex="180^\circ=\pi"></span>, så <span data-tex="e^{0{,}35\pi}=3{,}0"></span>.</span></span></div>
+        <div><span>Formlen for konstant tryk bruges på en indkørt kobling.<span class="ret">Dimensionér med slid: <span data-tex="(r_o+r_i)/2"></span> giver 180 N·m, ikke 186,7. Optimum <span data-tex="r_i/r_o=0{,}577"></span> hører til slid.</span></span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Tjek dig selv</h3>
+      <div class="qa">
+        <details><summary>Antallet af aktive vindinger halveres til 5. Hvad sker der med k og τ?</summary><p><span data-tex="k"></span> fordobles til 15,6 N/mm. <span data-tex="\tau"></span> er uændret ved samme kraft, for <span data-tex="N_a"></span> står ikke i spændingen. Samme udbøjning kræver nu dobbelt kraft.</p></details>
+        <details><summary>Hvorfor giver konstant slid mindre moment end konstant tryk?</summary><p>Trykket flytter indad, hvor armen er kort. Ved <span data-tex="r_i/r_o=0{,}5"></span> er forskellen kun 3,7 %. Koblinger kører sig til, så der dimensioneres efter slid.</p></details>
+        <details><summary>Remmen har <span data-tex="\mu=0{,}35"></span> og <span data-tex="\phi=\pi"></span>. Hvad sker der med forholdet ved en hel omgang?</summary><p>Det kvadreres: <span data-tex="e^{0{,}35\cdot2\pi}=9{,}0"></span> i stedet for 3,0. Det ganges, ikke lægges sammen, som reb om en pæl.</p></details>
+      </div>
+    </div>
+    <div class="card col">
+      <h3>Til eksamen</h3>
+      <div class="exlinks">
+        <a href="../../eksamen-ny/sp07_fjeder.html"><b>SPM 7</b> Trykfjeder · <span data-tex="\tau"></span> med Wahl og <span data-tex="k"></span></a>
+        <a href="../../eksamen-ny/sp08_lamelkobling.html"><b>SPM 8</b> Lamelkobling · slid mod tryk</a>
+        <a href="../../eksamen-ny/sp09_remtraek.html"><b>SPM 9</b> Remtræk · <span data-tex="F_2"></span>, moment og centrifugalkraft</a>
+      </div>
+      <h3 style="margin-top:8px">Læs i bogen</h3>
+      <div style="display:grid;gap:6px;font-size:16px;line-height:1.35">
+        <div><b>§ 17.3, s. 495</b> skruefjeder, indeks og Wahl-faktor</div>
+        <div><b>§ 17.3, s. 496</b> udbøjning og fjederkonstant</div>
+        <div><b>§ 18.3, s. 522 til 524</b> lamelkobling, konstant tryk og slid</div>
+        <div><b>§ 19.2, s. 549</b> fladremme, remligning og centrifugalkraft</div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Fjeder: vrid først, læg Wahl på bagefter. Kobling: moment er kraft gange middelradius gange flader. Rem: radianer i eksponenten, og forskellen på de to parter er det, der drejer.</span></div>
+</section>
+
+</div></div>
+<script src="../assets/deck.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = D.$, fmt = D.fmt, PI = Math.PI;
+var CY = '#0a7fc2', OR = '#d97a00', PU = '#7b4fc9', GR = '#0a9a5c', RD = '#d63a3a', INK = '#14202d', MUT = '#5a6b7d';
+
+function mix(a, b, t) {
+  t = Math.max(0, Math.min(1, t));
+  var A = [1, 3, 5].map(function (i) { return parseInt(a.substr(i, 2), 16); }), B = [1, 3, 5].map(function (i) { return parseInt(b.substr(i, 2), 16); });
+  return 'rgb(' + A.map(function (v, i) { return Math.round(v + (B[i] - v) * t); }).join(',') + ')';
+}
+/* skruefjeder set fra siden: bagstrenge lyse, forstrenge mørke */
+function hel(x, cx, yt, yb, R, turns, w, col, colB) {
+  var n = Math.ceil(turns * 40), i, pts = [];
+  for (i = 0; i <= n; i++) { var th = 2 * PI * turns * i / n; pts.push([cx + R * Math.sin(th), yt + (yb - yt) * i / n, Math.cos(th)]); }
+  [-1, 1].forEach(function (side) {
+    x.strokeStyle = side < 0 ? colB : col; x.lineWidth = w; x.lineCap = 'round'; x.lineJoin = 'round'; x.setLineDash([]);
+    x.beginPath(); var pen = false;
+    for (i = 0; i < n; i++) {
+      var m = (pts[i][2] + pts[i + 1][2]) / 2, on = side < 0 ? m < 0 : m >= 0;
+      if (on) { if (!pen) { x.moveTo(pts[i][0], pts[i][1]); pen = true; } x.lineTo(pts[i + 1][0], pts[i + 1][1]); } else pen = false;
+    }
+    x.stroke();
+  });
+}
+
+/* ---------- slide 0: fjeder, kobling og rem ---------- */
+(function () {
+  var x = D.cv('c0').x, T = 7, th1 = 0, th2 = 0, W1 = 7;
+  /* rem: geometri beregnes én gang */
+  var R1 = 56, R2 = 38, ax = 140, bx = 440, cyy = 345, cc = bx - ax, al = Math.asin((R1 - R2) / cc), pts = [], cum = [0], i, N;
+  var nT = { x: Math.sin(al), y: -Math.cos(al) }, nB = { x: Math.sin(al), y: Math.cos(al) };
+  var rr = 1 / 3, k;
+  function add(px, py, f) { pts.push([px, py, f]); }
+  N = 24;
+  for (i = 0; i <= N; i++) add(ax + R1 * nT.x + (bx + R2 * nT.x - ax - R1 * nT.x) * i / N, cyy + R1 * nT.y + (R2 * nT.y - R1 * nT.y) * i / N, 1);
+  for (i = 1; i <= 24; i++) { var a = -PI / 2 + al + (PI - 2 * al) * i / 24; add(bx + R2 * Math.cos(a), cyy + R2 * Math.sin(a), Math.pow(rr, i / 24)); }
+  for (i = 1; i <= N; i++) add(bx + R2 * nB.x + (ax + R1 * nB.x - bx - R2 * nB.x) * i / N, cyy + R2 * nB.y + (R1 * nB.y - R2 * nB.y) * i / N, rr);
+  for (i = 1; i <= 32; i++) { var a2 = PI / 2 - al + (PI + 2 * al) * i / 32; add(ax + R1 * Math.cos(a2), cyy + R1 * Math.sin(a2), Math.pow(rr, 1 - i / 32)); }
+  for (i = 1; i < pts.length; i++) cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+  var LT = cum[cum.length - 1];
+  function at(s) {
+    s = ((s % LT) + LT) % LT; var j = 1; while (j < cum.length - 1 && cum[j] < s) j++;
+    var u = (s - cum[j - 1]) / ((cum[j] - cum[j - 1]) || 1);
+    return [pts[j - 1][0] + (pts[j][0] - pts[j - 1][0]) * u, pts[j - 1][1] + (pts[j][1] - pts[j - 1][1]) * u, pts[j][2]];
+  }
+  function pulley(cx, R, ang, lab) {
+    D.circ(x, cx, cyy, R - 4, '#ebf1f7', INK, 4);
+    for (var q = 0; q < 3; q++) { var aa = ang + q * PI / 3; D.line(x, [[cx - (R - 12) * Math.cos(aa), cyy - (R - 12) * Math.sin(aa)], [cx + (R - 12) * Math.cos(aa), cyy + (R - 12) * Math.sin(aa)]], '#9fb0c2', 3); }
+    D.circ(x, cx, cyy, 7, INK);
+    D.txt(x, lab, cx, cyy + R + 22, 18, MUT, 'center');
+  }
+  D.anim(0, function (dt, t) {
+    var p = t % T;
+    x.clearRect(0, 0, 560, 440);
+    th1 += W1 * dt;
+    /* A: fjeder */
+    D.txt(x, 'Fjeder', 135, 16, 22, MUT, 'center');
+    var dis;
+    if (p < 1.8) { var q = p / 1.8; dis = q * q * (3 - 2 * q); } else if (p < 2.5) dis = 1; else if (p < 5.5) { var s = p - 2.5; dis = Math.exp(-s * 4.5) * Math.cos(s * 13); } else dis = 0;
+    var base = 218, L = 125 - 62 * dis, ytop = base - L;
+    x.fillStyle = '#9fb0c2'; x.fillRect(75, base, 120, 8); D.ground(x, 75, 195, base + 8);
+    hel(x, 135, ytop, base, 30, 7, 6, mix(CY, RD, Math.max(0, dis)), mix('#9fb0c2', '#e3a0a0', Math.max(0, dis)));
+    x.fillStyle = MUT; x.fillRect(95, ytop - 10, 80, 10);
+    if (p < 2.5) { var al2 = 14 + 36 * dis; D.arrow(x, 135, ytop - 12 - al2, 135, ytop - 13, RD, 6); D.txt(x, 'F', 156, ytop - 14 - al2 * 0.5, 22, RD, 'left'); }
+    D.txt(x, p < 2.5 ? 'trykkes sammen' : (p < 5.5 ? 'springer ud' : 'i hvile'), 135, 257, 20, p < 2.5 ? RD : GR, 'center', 'middle', 700);
+    /* B: kobling */
+    D.txt(x, 'Kobling', 420, 16, 22, MUT, 'center');
+    var gap, w2, st, stc;
+    if (p < 1.4) { gap = 10; w2 = 0; st = 'åben'; stc = MUT; }
+    else if (p < 2.0) { gap = 10 * (1 - (p - 1.4) / 0.6); w2 = 0; st = 'klemmer'; stc = CY; }
+    else if (p < 4.0) { gap = 0; w2 = W1 * (p - 2) / 2; st = 'slipper'; stc = OR; }
+    else if (p < 5.4) { gap = 0; w2 = W1; st = 'låst: moment overføres'; stc = GR; }
+    else if (p < 6.0) { gap = 10 * (p - 5.4) / 0.6; w2 = W1 * (1 - (p - 5.4) / 1.0); st = 'åbner'; stc = MUT; }
+    else { gap = 10; w2 = Math.max(0, W1 * (1 - (p - 5.4) / 1.0)); st = 'åben'; stc = MUT; }
+    th2 += w2 * dt;
+    var tw = 72 + 5 * gap, x0 = 420 - tw / 2, yc = 125, xs = [], j;
+    for (j = 0; j < 6; j++) xs.push(x0 + j * (12 + gap));
+    D.line(x, [[290, yc], [xs[4] + 12, yc]], mix(CY, '#ffffff', 0.35), 12);
+    D.line(x, [[xs[1], yc], [552, yc]], mix(OR, '#ffffff', 0.35), 12);
+    for (j = 0; j < 6; j++) {
+      var cl = j % 2 ? OR : CY, th = j % 2 ? th2 : th1;
+      x.fillStyle = mix(cl, '#ffffff', 0.7); x.strokeStyle = cl; x.lineWidth = 3; x.fillRect(xs[j], yc - 58, 12, 116); x.strokeRect(xs[j], yc - 58, 12, 116);
+      D.circ(x, xs[j] + 6, yc + 46 * Math.sin(th), 5, INK);
+    }
+    if (gap < 9) { var ca = 1 - gap / 10; x.globalAlpha = ca; D.arrow(x, x0 - 50, yc, x0 - 8, yc, RD, 6); D.arrow(x, x0 + tw + 50, yc, x0 + tw + 8, yc, RD, 6); D.txt(x, 'F', x0 - 40, yc - 22, 22, RD, 'center'); x.globalAlpha = 1; }
+    D.txt(x, st, 420, 215, 20, stc, 'center', 'middle', 700);
+    /* C: rem */
+    D.txt(x, 'Rem', 10, 282, 22, MUT, 'left');
+    pulley(ax, R1, th1 * 0.55, 'drevet'); pulley(bx, R2, th1 * 0.55 * R1 / R2, 'drivende');
+    for (i = 1; i < pts.length; i++) {
+      var f = (pts[i][2] + pts[i - 1][2]) / 2;
+      D.line(x, [[pts[i - 1][0], pts[i - 1][1]], [pts[i][0], pts[i][1]]], mix(CY, OR, (f - rr) / (1 - rr)), 3 + 9 * f);
+    }
+    var off = th1 * 0.55 * R1 * 1, nt = 30;
+    for (i = 0; i < nt; i++) { var pp = at(i * LT / nt + off); x.fillStyle = 'rgba(255,255,255,.85)'; x.beginPath(); x.arc(pp[0], pp[1], 1.4 + 2.2 * pp[2], 0, 2 * PI); x.fill(); }
+    D.txt(x, 'F1 stram', 292, 284, 20, OR, 'center', 'middle', 700);
+    D.txt(x, 'F2 slap', 292, 414, 20, CY, 'center', 'middle', 700);
+  });
+})();
+
+/* ---------- slide 1: skruefjeder ---------- */
+function upd1() {
+  var d = +$('d1').value, Dm = +$('D1').value, Na = +$('n1').value, F = 200, G = 80000;
+  var C = Dm / d, Kw = (4 * C - 1) / (4 * C - 4) + 0.615 / C, tau = Kw * 8 * F * Dm / (PI * d * d * d), k = G * Math.pow(d, 4) / (8 * Dm * Dm * Dm * Na), del = F / k;
+  var Ssy = 765, nS = Ssy / tau;
+  $('d1o').textContent = fmt(d, 1) + ' mm'; $('D1o').textContent = Dm + ' mm'; $('n1o').textContent = Na;
+  $('v1k').textContent = fmt(k, k < 10 ? 2 : 1); $('v1d').textContent = fmt(del, 1); $('v1t').textContent = fmt(tau, 0 + (tau < 1000 ? 1 : 0));
+  var G1 = D.cv('sp1'), x = G1.x, s = 2.2, p = 8, L0 = Na * p, Ls = Na * d, de = Math.min(del, L0 - Ls), blok = del > L0 - Ls;
+  x.clearRect(0, 0, G1.W, G1.H);
+  var base = 300, cx = 150, R = Dm / 2 * s, w = d * s, Lc = (L0 - de) * s, ytop = base - Lc;
+  D.ground(x, cx - 85, cx + 85, base + 8); x.fillStyle = '#9fb0c2'; x.fillRect(cx - 80, base, 160, 8);
+  D.line(x, [[cx - 85, base - L0 * s - 10], [cx + 108, base - L0 * s - 10]], 'rgba(90,107,125,.45)', 2, [6, 6]);
+  hel(x, cx, ytop, base - 1, R, Na, w, mix(CY, RD, tau / Ssy), mix('#b8c6d6', '#e8aaaa', tau / Ssy));
+  x.fillStyle = MUT; x.fillRect(cx - 80, ytop - 10, 160, 10);
+  D.arrow(x, cx, ytop - 62, cx, ytop - 13, RD, 7); D.txt(x, 'F = 200 N', cx - 14, ytop - 40, 22, RD, 'right');
+  var ax2 = cx + 108; D.arrow(x, ax2, base - L0 * s - 10, ax2, base - L0 * s - 10 + de * s, GR, 4); D.arrow(x, ax2, base - L0 * s - 10 + de * s, ax2, base - L0 * s - 10, GR, 4);
+  D.txt(x, 'δ = ' + fmt(de, 1), ax2 + 12, base - L0 * s - 10 + de * s / 2, 24, GR, 'left', 'middle', 800);
+  D.line(x, [[cx - R, base + 26], [cx + R, base + 26]], OR, 3); D.line(x, [[cx - R, base + 18], [cx - R, base + 34]], OR, 3); D.line(x, [[cx + R, base + 18], [cx + R, base + 34]], OR, 3);
+  D.txt(x, 'D', cx, base + 44, 22, OR, 'center');
+  var tx = 420;
+  D.txt(x, 'd = ' + fmt(d, 1) + ' mm', tx, 90, 28, CY, 'left', 'middle', 800);
+  D.txt(x, 'D = ' + Dm + ' mm', tx, 134, 28, OR, 'left', 'middle', 800);
+  D.txt(x, 'Na = ' + Na, tx, 178, 28, PU, 'left', 'middle', 800);
+  D.txt(x, 'C = D/d = ' + fmt(C, 1), tx, 232, 26, C < 4 || C > 12 ? RD : INK, 'left');
+  D.txt(x, 'Kw = ' + fmt(Kw, 3), tx, 272, 26, GR, 'left');
+  $('st1').innerHTML = (blok ? '<span class="warn">Fjederen går på blok</span> (vindingerne rører). ' : '') + (C < 4 || C > 12 ? '<span class="warn">C uden for 4 til 12</span>. ' : '') +
+    'Sikkerhedsfaktor <b>' + fmt(nS, 1) + '</b> mod S<sub>sy</sub> ≈ 765 MPa. <span class="mu">Opgaven runder K<sub>w</sub> til 1,18: 300,5 MPa.</span>';
+}
+['d1', 'D1', 'n1'].forEach(function (id) { $(id).oninput = upd1; }); upd1();
+
+/* ---------- slide 2: lamelkobling ---------- */
+var MODE = 'F', RO = 100, MU = 0.3, FF = 2000, PM = FF / (2 * PI * 50 * 50);
+function T2(b, N, mode) {
+  var ri = b * RO;
+  if (mode === 'F') return N * MU * FF * (RO + ri) / 2 / 1000;
+  return N * PI * MU * ri * PM * (RO * RO - ri * ri) / 1000;
+}
+function Tp2(b, N) { var ri = b * RO; return N * 2 / 3 * MU * FF * (Math.pow(RO, 3) - Math.pow(ri, 3)) / (RO * RO - ri * ri) / 1000; }
+function F2(b, mode) { var ri = b * RO; return mode === 'F' ? FF : 2 * PI * PM * ri * (RO - ri); }
+function P2(b, mode) { var ri = b * RO; return mode === 'F' ? FF / (2 * PI * ri * (RO - ri)) : PM; }
+function nice(v) { var st = v < 150 ? 25 : v < 400 ? 50 : 100; return Math.ceil(v / st) * st; }
+function upd2() {
+  var b = +$('b2').value, N = +$('n2').value, ri = b * RO, t = T2(b, N, MODE), mode = MODE;
+  $('b2o').textContent = fmt(b, 2); $('n2o').textContent = N;
+  $('v2t').textContent = fmt(t, 1); $('v2f').textContent = fmt(F2(b, mode), 0); $('v2p').textContent = fmt(P2(b, mode), 3);
+  var G = D.cv('rg2'), x = G.x, cx = 120, cy = 112, Rr = 98, rin = Rr * b, r;
+  x.clearRect(0, 0, G.W, G.H);
+  for (r = rin; r <= Rr; r += 1.5) { D.circ(x, cx, cy, r, null, mix('#f6d9bd', RD, rin / r * rin / r), 3); }
+  D.circ(x, cx, cy, rin, '#f6f9fc', INK, 3); D.circ(x, cx, cy, Rr, null, INK, 3);
+  D.circ(x, cx, cy, (Rr + rin) / 2, null, OR, 3);
+  var an = -0.7; D.line(x, [[cx, cy], [cx + Rr * Math.cos(an), cy + Rr * Math.sin(an)]], INK, 2, [5, 4]);
+  D.txt(x, 'ro', cx + (Rr + 8) * Math.cos(an), cy + (Rr + 8) * Math.sin(an) - 4, 20, INK, 'left');
+  D.txt(x, 'ri/ro = ' + fmt(b, 2) + '  (ri = ' + fmt(ri, 0) + ' mm)', cx, 236, 20, OR, 'center', 'middle', 700);
+  D.txt(x, 'mørk = højt tryk', cx + 112, 22, 18, RD, 'left');
+  var pit = Math.min(24, 250 / (N + 1)), x0 = 470 - (N * pit + 12) / 2, yc = 108, j;
+  D.line(x, [[330, yc], [628, yc]], '#9fb0c2', 10);
+  for (j = 0; j <= N; j++) { var cl = j % 2 ? OR : CY; x.fillStyle = mix(cl, '#ffffff', 0.65); x.strokeStyle = cl; x.lineWidth = 3; x.fillRect(x0 + j * pit, yc - 62, 12, 124); x.strokeRect(x0 + j * pit, yc - 62, 12, 124); }
+  D.arrow(x, x0 - 56, yc, x0 - 6, yc, RD, 6); D.arrow(x, x0 + N * pit + 68, yc, x0 + N * pit + 18, yc, RD, 6);
+  D.txt(x, 'F', x0 - 40, yc - 22, 22, RD, 'center');
+  D.txt(x, 'N = ' + N + (N === 1 ? ' flade' : ' flader'), 470, 236, 22, PU, 'center', 'middle', 700);
+  D.txt(x, 'ro = 100 mm, μ = 0,30', 628, 22, 18, MUT, 'right');
+  /* graf */
+  var mx = 0, q, bb; for (bb = 0.2; bb <= 0.95; bb += 0.01) { mx = Math.max(mx, T2(bb, N, mode), mode === 'F' ? Tp2(bb, N) : 0); }
+  var Y = nice(mx * 1.08);
+  D.graph('g2', { f: function (u) { return T2(u, N, mode); }, x0: 0.2, x1: 0.95, xt: [[0.2, '0,2'], [0.4, '0,4'], [0.6, '0,6'], [0.8, '0,8'], [0.95, '0,95']], min: 0, max: Y, yt: [Y / 2, Y], yd: 0, lbl: 'T (N·m)', col: OR, d: 1, u: 'N·m', xm: b, xl: 'ri/ro',
+    ref: mode === 'F' ? function (u) { return Tp2(u, N); } : null, vline: mode === 'p' ? 1 / Math.sqrt(3) : null });
+  var opt = T2(1 / Math.sqrt(3), N, 'p');
+  $('st2').innerHTML = mode === 'F'
+    ? '<b>Fast F:</b> mere moment med større r<sub>i</sub>/r<sub>o</sub>, men p<sub>max</sub> stiger. Stiplet: konstant tryk (' + fmt(Tp2(b, N), 1) + ' N·m).'
+    : '<b>Fast p<sub>max</sub>:</b> toppen ligger ved <b>0,577</b> (N·m: ' + fmt(opt, 1) + '). Her: ' + fmt(t / opt * 100, 1) + ' % af optimum.';
+}
+document.querySelectorAll('#mb [data-m]').forEach(function (bt) { bt.onclick = function () { MODE = bt.dataset.m; document.querySelectorAll('#mb [data-m]').forEach(function (o) { o.classList.toggle('on', o === bt); }); upd2(); }; });
+$('b2').oninput = upd2; $('n2').oninput = upd2; upd2();
+
+/* ---------- slide 3: remtræk ---------- */
+var F1 = 3000, RR = 0.2, MP = 0.5;
+function upd3() {
+  var mu = +$('m3').value, ph = +$('f3').value, u = +$('u3').value, phr = ph * PI / 180;
+  var ratio = Math.exp(mu * phr), Fc = MP * u * u, ok = Fc < F1, F2v = ok ? Fc + (F1 - Fc) / ratio : F1, Tq = (F1 - F2v) * RR, P = (F1 - F2v) * u / 1000;
+  $('m3o').textContent = fmt(mu, 2); $('f3o').textContent = ph + '°'; $('u3o').textContent = u + ' m/s';
+  $('v3r').textContent = ok ? fmt((F1 - Fc) / (F2v - Fc), ratio < 10 ? 1 : 0) : '-'; $('v3f').textContent = fmt(F2v, 0); $('v3t').textContent = fmt(Tq, 1);
+  var G = D.cv('pl3'), x = G.x, cx = 175, cy = 138, R = 58, i;
+  x.clearRect(0, 0, G.W, G.H);
+  D.circ(x, cx, cy, R, '#ebf1f7', INK, 4); D.circ(x, cx, cy, 6, INK);
+  var a0 = PI - phr / 2, a1 = PI + phr / 2, nn = 40, tb = Math.max(0.05, F2v / F1);
+  for (i = 0; i < nn; i++) {
+    var f0 = i / nn, f1 = (i + 1) / nn, A0 = a0 + (a1 - a0) * f0, A1 = a0 + (a1 - a0) * f1, ten = Math.pow(tb, (f0 + f1) / 2);
+    D.line(x, [[cx + (R + 3) * Math.cos(A0), cy - (R + 3) * Math.sin(A0)], [cx + (R + 3) * Math.cos(A1), cy - (R + 3) * Math.sin(A1)]], mix(CY, OR, (ten - tb) / (1 - tb + 1e-9)), 3 + 11 * ten);
+  }
+  function tail(a, dirx, diry, ten, lab, col) {
+    var px = cx + (R + 3) * Math.cos(a), py = cy - (R + 3) * Math.sin(a), ex = px + dirx * 70, ey = py + diry * 70;
+    D.line(x, [[px, py], [ex, ey]], col, 3 + 11 * ten);
+    D.arrow(x, ex, ey, ex + dirx * 52, ey + diry * 52, col, 3 + 6 * ten);
+    D.txt(x, lab, ex + dirx * 52 + (dirx >= 0 ? 12 : -12), ey + diry * 52, 24, col, dirx >= 0 ? 'left' : 'right', 'middle', 800);
+  }
+  tail(a0, Math.sin(a0), Math.cos(a0), 1, 'F1 = ' + fmt(F1, 0) + ' N', OR);
+  tail(a1, -Math.sin(a1), -Math.cos(a1), tb, 'F2 = ' + fmt(F2v, 0) + ' N', CY);
+  D.marc(x, cx, cy, 30, false, GR, 5); D.txt(x, 'T', cx - 44, cy, 22, GR, 'center');
+  D.txt(x, 'φ = ' + ph + '° = ' + fmt(phr, 2) + ' rad', 330, 238, 22, MUT, 'left', 'middle', 700);
+  var r300 = Math.exp(mu * 300 * PI / 180), m = r300 <= 8 ? 8 : r300 <= 16 ? 16 : r300 <= 40 ? 40 : 100;
+  D.graph('g3', { f: function (q) { return Math.exp(mu * q * PI / 180); }, x0: 0, x1: 300, xt: [[0, '0'], [60, '60°'], [120, '120°'], [180, '180°'], [240, '240°'], [300, '300°']], min: 0, max: m, yt: [m / 2, m], yd: 0, lbl: 'F1/F2', col: PU, d: ratio < 10 ? 1 : 0, u: '', xm: ph, xl: 'omslutning φ', vline: 180,
+    ref: function (q) { return Math.exp(0.35 * q * PI / 180); } });
+  $('st3').innerHTML = !ok ? '<span class="warn">Remmen har mistet grebet:</span> F<sub>c</sub> = ' + fmt(Fc, 0) + ' N er over F<sub>1</sub>.' :
+    'F<sub>c</sub> = ' + fmt(Fc, 0) + ' N. Effekt P = ' + fmt(P, 1) + ' kW. Aksellast ' + fmt(F1 + F2v, 0) + ' N. <span class="mu">Stiplet: μ = 0,35.</span>';
+}
+['m3', 'f3', 'u3'].forEach(function (id) { $(id).oninput = upd3; }); upd3();
+D.start();
+})();
+</script>
+</body></html>

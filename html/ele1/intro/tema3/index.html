@@ -1,0 +1,320 @@
+<!doctype html><html lang="da"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tema 3 · RMS, fasorer og impedans</title>
+<meta name="description" content="Hurtigstart til ELE1 tema 3: RMS-værdi, fasorer og impedans af modstand, spole og kondensator (Rizzoni og Kearns, kap. 3, dag 4 og 5).">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../assets/deck.css"></head>
+<body>
+<div id="vp"><div id="deck">
+
+<!-- ============ 0 · FORSIDE ============ -->
+<section class="slide on" data-title="Forside">
+  <div style="flex:1;display:grid;grid-template-columns:1fr 600px;gap:34px;align-items:center;padding:0 10px">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div>
+        <div class="tag" style="display:inline-block">ELE1 · HURTIGSTART · TEMA 3</div>
+        <h1 style="font-size:64px;margin-top:18px">RMS, fasorer og impedans</h1>
+        <div style="font-size:26px;color:var(--mut);margin-top:6px">En vekselspænding er en <b>roterende pil</b>. Med pilen som regnemåde bliver spoler og kondensatorer til <b>komplekse modstande</b></div>
+      </div>
+      <div class="card qcard"><span class="lbl cy">KORT FORTALT</span>
+        Stikkontakten svinger mellem +325 V og −325 V, 50 gange i sekundet, men en varmeovn mærker kun &quot;230 V&quot;. Det tal er den jævnspænding, der varmer lige så meget. En pil, der kører rundt i cirkel, har en lodret skygge, og skyggen er sinussen. Pilen holder styr på størrelse og vinkel, så spoler og kondensatorer kan regnes som almindelige modstande med en vinkel på.</div>
+      <div class="plan">
+        <div><b class="cy">1 · RMS</b><span data-tex="\tilde V=V/\sqrt2"></span></div>
+        <div><b class="or">2 · Fasorer</b><span data-tex="V\cos(\omega t+\theta)\leftrightarrow V\angle\theta"></span></div>
+        <div><b class="pu">3 · Impedans</b><span data-tex="Z_L=j\omega L,\ Z_C=\tfrac{1}{j\omega C}"></span></div>
+        <div><b class="gr">4 · Tjek</b>fejl og eksamen</div>
+      </div>
+      <div class="links"><a href="../../dag/Dag04_Studienote.pdf">📖 Studienote dag 4</a><a href="../../dag/Dag05_Studienote.pdf">📖 Studienote dag 5</a><a href="../../../../lab/ele1/fasorer-impedans.html">🧪 3D-lab: fasorer og impedans</a><a href="../../lab/dag05.html">📝 Dag 5: opgaver</a></div>
+    </div>
+    <div class="card" style="padding:12px"><canvas id="c0" width="560" height="440"></canvas>
+      <div style="font-size:18px;color:var(--mut);text-align:center;margin-top:8px">Pilen drejer 50 gange i sekundet (her i slowmotion). Dens <b>lodrette projektion</b> er sinussen</div></div>
+  </div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm &nbsp;·&nbsp; ☰: alle temaer</div>
+</section>
+
+<!-- ============ 1 · RMS ============ -->
+<section class="slide" id="s1" data-title="1 · Middel og RMS">
+  <div class="hd"><span class="tag">IDÉ 1 · MIDDEL OG RMS</span><h1>Middelværdien er nul, men RMS er den effektive værdi</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Hvad betyder 230 V?</h3>
+      <div class="big" style="font-size:30px" data-tex="V_{\mathrm{rms}}=\sqrt{\dfrac{1}{T}\displaystyle\int_0^T v^2(\tau)\,d\tau}"></div>
+      <div class="src">Rizzoni og Kearns (2022), lign. (3.24), s. 159</div>
+      <div class="big" style="font-size:34px" data-tex="\tilde V=\dfrac{V}{\sqrt2}\approx0{,}707\,V"></div>
+      <div class="src">Kun for sinus, eksempel 3.9, s. 161 (Pontoppidan, 2026, dag 4)</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="V"></span><span><b>Topværdi</b>: sinussens største udsving. Stikkontakten når 325 V</span></div>
+        <div class="term"><span class="s pu" data-tex="\tilde V"></span><span><b>RMS</b>: den jævnspænding, der afsætter samme effekt i en modstand. Stikkontakten er 230 V</span></div>
+        <div class="term"><span class="s or" data-tex="\overline{v^2}"></span><span><b>Middel af kvadratet</b>: kvadrering fjerner minus, så halvperioderne ikke udligner hinanden</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n">1</span><div class="t"><b>Topværdi</b> for 230 V RMS
+        <span class="m" data-tex="V=230\sqrt2=325{,}3\ \text{V}"></span>
+        <span class="note">Middelværdien af selve sinussen er nul</span></div></div>
+      <div class="step"><span class="n">2</span><div class="t"><b>Middel af <span data-tex="v^2"></span></b>, <span data-tex="\overline{\sin^2}=\tfrac12"></span>
+        <span class="m" data-tex="\overline{v^2}=\dfrac{V^2}{2}=\dfrac{325{,}3^2}{2}=52\,900\ \text{V}^2"></span></div></div>
+      <div class="step"><span class="n">3</span><div class="t"><b>Kvadratroden</b>
+        <span class="m" data-tex="\boxed{\tilde V=\sqrt{52\,900}=230\ \text{V}}"></span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Samme effekt</b> i 100 Ω
+        <span class="m" data-tex="P=\dfrac{\tilde V^2}{R}=\dfrac{230^2}{100}=529\ \text{W}"></span>
+        <span class="note">230 V jævnspænding giver nøjagtig 529 W i middel</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Træk i topværdien, aflæs RMS</h3>
+      <canvas id="g1a" width="640" height="330"></canvas>
+      <canvas id="g1b" width="640" height="330"></canvas>
+      <div class="sl"><span>Topværdi V</span><input id="v1" type="range" min="50" max="400" step="0.1" value="325.3"><output id="v1o"></output></div>
+      <div class="ro r3">
+        <div><span>middel af v²</span><b class="or" id="r1m">52900</b><i>V²</i></div>
+        <div><span>RMS = √middel</span><b class="pu" id="r1r">230,0</b><i>V</i></div>
+        <div><span>V / RMS</span><b class="cy" id="r1k">1,414</b></div>
+      </div>
+      <div class="status" id="st1"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>RMS er sinussens topværdi delt med kvadratroden af 2. Den er den jævnspænding, der varmer lige så meget, og derfor opgives stikkontakten som 230 V.</span></div>
+</section>
+
+<!-- ============ 2 · FASORER ============ -->
+<section class="slide" id="s2" data-title="2 · Fasorer">
+  <div class="hd"><span class="tag b">IDÉ 2 · FASORER</span><h1>Én pil pr. signal, og piles regneregler er vektorer</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Fra tid til pil</h3>
+      <div class="big" style="font-size:34px" data-tex="v(t)=V\cos(\omega t+\theta)\ \leftrightarrow\ \mathbf V=V\angle\theta"></div>
+      <div class="src">Rizzoni og Kearns (2022), lign. (3.39) til (3.41), s. 167 til 168</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="V"></span><span><b>Pilens længde</b> er amplituden. Pilen drejer med <span data-tex="\omega"></span>, men tegnes ved <span data-tex="t=0"></span></span></div>
+        <div class="term"><span class="s or" data-tex="\theta"></span><span><b>Pilens vinkel</b> er fasen. Den skal være i radianer i formlen, men må tegnes i grader</span></div>
+        <div class="term"><span class="s gr" data-tex="e^{j\omega t}"></span><span><b>Samme frekvens</b> gør faktoren ens for alle signaler, så den kan udelades. Det er hele tricket</span></div>
+        <div class="term"><span class="s rd" data-tex="\omega_1\ne\omega_2"></span><span><b>Forskellig frekvens</b>: ingen fælles faktor. Brug superposition og læg sammen i tid</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n b">1</span><div class="t"><b>To kilder i serie</b>, <span data-tex="\omega=100\pi"></span>
+        <span class="m" data-tex="\mathbf V_1=15\angle45^\circ,\ \ \mathbf V_2=15\angle15^\circ"></span></div></div>
+      <div class="step"><span class="n b">2</span><div class="t"><b>Kartesisk</b> (plus kræver det)
+        <span class="m" data-tex="\mathbf V_1=10{,}61+j10{,}61"></span>
+        <span class="m" data-tex="\mathbf V_2=14{,}49+j3{,}88"></span></div></div>
+      <div class="step"><span class="n b">3</span><div class="t"><b>Summen</b>
+        <span class="m" data-tex="\mathbf V_S=25{,}10+j14{,}49=28{,}98\angle30^\circ"></span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Tilbage til tid</b>
+        <span class="m" data-tex="\boxed{v_S(t)=28{,}98\cos(100\pi t+\pi/6)\ \text{V}}"></span>
+        <span class="note">Pilerne er ens lange, så summen er <span data-tex="2\cdot15\cos15^\circ"></span></span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Læg to fasorer sammen</h3>
+      <canvas id="p2" width="640" height="270"></canvas>
+      <canvas id="g2" width="640" height="250"></canvas>
+      <div class="sl"><span style="color:var(--cy)">V<sub>1</sub></span><input id="a1" type="range" min="0" max="40" step="0.5" value="15"><output id="a1o"></output></div>
+      <div class="sl"><span style="color:var(--cy)">θ<sub>1</sub></span><input id="t1" type="range" min="-180" max="180" step="1" value="45"><output id="t1o"></output></div>
+      <div class="sl"><span style="color:var(--or)">V<sub>2</sub></span><input id="a2" type="range" min="0" max="40" step="0.5" value="15"><output id="a2o"></output></div>
+      <div class="sl"><span style="color:var(--or)">θ<sub>2</sub></span><input id="t2" type="range" min="-180" max="180" step="1" value="15"><output id="t2o"></output></div>
+      <div class="row" id="fb"><button class="btn on" data-m="0">Samme frekvens</button><button class="btn rd" data-m="1">V₂ har dobbelt frekvens</button></div>
+      <div class="status" id="st2"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Hver sinus med samme frekvens er en pil. Pilene lægges sammen som vektorer, og summen aflæses som ny amplitude og vinkel.</span></div>
+</section>
+
+<!-- ============ 3 · IMPEDANS ============ -->
+<section class="slide" id="s3" data-title="3 · Impedans">
+  <div class="hd"><span class="tag p">IDÉ 3 · IMPEDANS</span><h1>Spolen vokser med frekvensen, kondensatoren falder</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Komplekse modstande</h3>
+      <div class="big" style="font-size:30px" data-tex="\mathbf Z_R=R,\quad \mathbf Z_L=j\omega L"></div>
+      <div class="src">Rizzoni og Kearns (2022), lign. (3.51) og (3.56), s. 170 til 171</div>
+      <div class="big" style="font-size:30px" data-tex="\mathbf Z_C=\dfrac{1}{j\omega C}=\dfrac{-j}{\omega C}"></div>
+      <div class="src">Lign. (3.61), s. 172 (Pontoppidan, 2026, dag 5)</div>
+      <div class="big" style="font-size:28px" data-tex="\mathbf I=\dfrac{\mathbf V}{\mathbf Z},\quad \varphi=\arg\mathbf Z"></div>
+      <div class="src">Ohms lov for vekselstrøm, lign. (3.46) og (3.47), s. 169 til 170</div>
+      <div class="terms">
+        <div class="term"><span class="s or" data-tex="X_L>0"></span><span><b>Spole</b>: strømmen halter 90° efter spændingen. Bremser hurtige signaler</span></div>
+        <div class="term"><span class="s cy" data-tex="X_C<0"></span><span><b>Kondensator</b>: strømmen fører 90° foran. Lukker for DC, slipper hurtige signaler igennem</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n p">1</span><div class="t"><b>Serie RLC</b>, <span data-tex="R=50\,\Omega"></span>, <span data-tex="L=10"></span> mH, <span data-tex="C=100\,\mu"></span>F, 50 Hz
+        <span class="m" data-tex="\omega=2\pi\cdot50=314{,}2\ \text{rad/s}"></span></div></div>
+      <div class="step"><span class="n p">2</span><div class="t"><b>Hver komponent</b>
+        <span class="m" data-tex="\mathbf Z_L=j\omega L=j3{,}14\ \Omega"></span>
+        <span class="m" data-tex="\mathbf Z_C=\dfrac{-j}{\omega C}=-j31{,}83\ \Omega"></span></div></div>
+      <div class="step"><span class="n p">3</span><div class="t"><b>Serie</b>: læg sammen
+        <span class="m" data-tex="\mathbf Z=50-j28{,}69=57{,}65\angle{-29{,}8^\circ}\ \Omega"></span>
+        <span class="note"><span data-tex="X<0"></span>: kapacitivt kredsløb</span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Strømmen</b>, <span data-tex="\tilde V=230"></span> V
+        <span class="m" data-tex="\boxed{\mathbf I=\dfrac{230\angle0^\circ}{57{,}65\angle{-29{,}8^\circ}}=3{,}99\angle29{,}8^\circ\ \text{A}}"></span>
+        <span class="note">Strømmen fører foran. Ved 159 Hz ophæves reaktansen</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Impedans mod frekvens (serie RLC)</h3>
+      <canvas id="g3" width="640" height="520"></canvas>
+      <div class="sl"><span>Frekvens f</span><input id="f3" type="range" min="1" max="3.3" step="0.005" value="1.699"><output id="f3o"></output></div>
+      <div class="row"><button class="btn pu" id="res3">Gå til resonans</button><button class="btn" id="f50">50 Hz</button></div>
+      <div class="ro r3">
+        <div><span>|Z<sub>L</sub>|</span><b class="or" id="r3l">3,1</b><i>Ω</i></div>
+        <div><span>|Z<sub>C</sub>|</span><b class="cy" id="r3c">31,8</b><i>Ω</i></div>
+        <div><span>|Z| samlet</span><b class="pu" id="r3z">57,6</b><i>Ω</i></div>
+      </div>
+      <div class="status" id="st3"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Spolens reaktans er plus og vokser med f, kondensatorens er minus og falder med f. Hvor de ophæver hinanden, står kun R tilbage: resonans.</span></div>
+</section>
+
+<!-- ============ 4 · FALDGRUBER OG TJEK ============ -->
+<section class="slide" data-title="4 · Faldgruber og tjek">
+  <div class="hd"><span class="tag g">FALDGRUBER OG TJEK</span><h1>Hvor det typisk går galt</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Typiske fejl</h3>
+      <div class="fejl">
+        <div><span>Topværdi og RMS blandes: 230 V sættes ind som topværdi, eller 325 V som RMS.<span class="ret">Med RMS er <span data-tex="P=\tilde V\tilde I\cos\theta"></span>, med topværdier <span data-tex="P=\tfrac{VI}{2}\cos\theta"></span>.</span></span></div>
+        <div><span>Fasorer ved forskellig frekvens lægges sammen som tal.<span class="ret">Fælles frekvens kræves. Ellers superposition, og læg delsvarene sammen i tidsdomænet.</span></span></div>
+        <div><span>Fortegn på reaktans: kondensatorens <span data-tex="X_C"></span> sættes positiv.<span class="ret"><span data-tex="X_L=\omega L>0"></span> og <span data-tex="X_C=-1/(\omega C)<0"></span>. Ved 50 Hz og 100 µF er <span data-tex="\mathbf Z_C=-j31{,}8\ \Omega"></span>.</span></span></div>
+        <div><span>Grader og radianer blandes i <span data-tex="\omega t+\theta"></span>.<span class="ret"><span data-tex="\theta"></span> i radianer: 45° er <span data-tex="\pi/4"></span>, ikke 45.</span></span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Tjek dig selv</h3>
+      <div class="qa">
+        <details><summary>En maskine opgives til 400 V RMS. Hvad er topværdien?</summary><p><span data-tex="400\sqrt2=566"></span> V. RMS ganges med <span data-tex="\sqrt2"></span> for at få topværdien, og aldrig omvendt.</p></details>
+        <details><summary>Hvorfor må to fasorer kun lægges sammen ved samme frekvens?</summary><p>Faktoren <span data-tex="e^{j\omega t}"></span> er kun fælles ved samme <span data-tex="\omega"></span> og kan derfor kun udelades da. Ellers regnes hver frekvens for sig og lægges sammen i tid.</p></details>
+        <details><summary>Hvad er |Z<sub>C</sub>| for 100 µF ved 50 Hz, og hvad sker der ved 500 Hz?</summary><p><span data-tex="1/(2\pi\cdot50\cdot10^{-4})=31{,}8\ \Omega"></span>. Ved 10 gange højere frekvens bliver den 10 gange mindre, altså 3,18 Ω.</p></details>
+      </div>
+    </div>
+    <div class="card col">
+      <h3>Til eksamen</h3>
+      <div class="exlinks">
+        <a href="../../lab/dag04.html"><b>EMNE 4</b><span> Middel- og RMS-værdi · 230 V og 325 V, I/√2</span></a>
+        <a href="../../lab/dag04.html"><b>EMNE 5</b><span> Fasorer · hvorfor de virker, superposition</span></a>
+        <a href="../../lab/dag05.html"><b>EMNE 6</b><span> Impedans · Z<sub>R</sub>, Z<sub>L</sub>, Z<sub>C</sub>, reaktans og fortegn</span></a>
+        <a href="../../lab/dag12.html"><b>DAG 12</b><span> Eksamensforberedelse · alle emner og typiske fejl</span></a>
+      </div>
+      <h3 style="margin-top:8px">Læs i bogen</h3>
+      <div style="display:grid;gap:6px;font-size:16px;line-height:1.35">
+        <div><b>Lign. (3.24), s. 159</b> RMS-værdi</div>
+        <div><b>Lign. (3.39) til (3.41), s. 167</b> fasorer</div>
+        <div><b>Lign. (3.46), s. 169</b> Ohms lov for AC</div>
+        <div><b>Lign. (3.51) til (3.61), s. 170</b> Z for R, L og C</div>
+        <div><b>Eksempel 3.12, s. 178</b> den praktiske kondensator</div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Tjek først, om tallet er RMS eller topværdi. Skriv derefter alt som fasorer ved samme frekvens, og regn impedanser som komplekse modstande.</span></div>
+</section>
+
+</div></div>
+<script src="../assets/deck.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = D.$, fmt = D.fmt, PI = Math.PI, SQ2 = Math.SQRT2;
+var CY = '#0a7fc2', OR = '#d97a00', PU = '#7b4fc9', GR = '#0a9a5c', RD = '#d63a3a', INK = '#14202d', MUT = '#5a6b7d';
+
+/* ---------- slide 0: roterende pil og dens lodrette projektion ---------- */
+(function () {
+  var x = D.cv('c0').x, cx = 120, cy = 245, R = 95, x0 = 262, k = 2 * PI / 190;
+  D.anim(0, function (dt, t) {
+    var a = t * 1.3;
+    x.clearRect(0, 0, 560, 440);
+    D.txt(x, '230 V RMS = 325 V i top', 280, 28, 28, INK, 'center', 'middle', 800);
+    D.txt(x, '50 Hz', 280, 62, 24, MUT, 'center');
+    D.circ(x, cx, cy, R, 'rgba(10,127,194,.06)', 'rgba(90,107,125,.4)', 2);
+    D.line(x, [[cx - R - 14, cy], [548, cy]], 'rgba(90,107,125,.5)', 2);
+    D.line(x, [[cx, cy - R - 14], [cx, cy + R + 14]], 'rgba(90,107,125,.35)', 2);
+    var rr = R / SQ2;
+    D.line(x, [[cx - R, cy - R], [548, cy - R]], 'rgba(168,107,0,.55)', 2, [7, 6]);
+    D.line(x, [[cx - R, cy - rr], [548, cy - rr]], 'rgba(214,58,58,.6)', 2, [7, 6]);
+    D.txt(x, '325 V', 256, cy - R - 13, 20, OR, 'right');
+    D.txt(x, '230 V', 256, cy - rr - 13, 20, RD, 'right');
+    var tx = cx + R * Math.cos(a), ty = cy - R * Math.sin(a), pts = [], i;
+    for (i = 0; i <= 285; i++) pts.push([x0 + i, cy - R * Math.sin(a - i * k)]);
+    D.line(x, [[tx, ty], [x0, ty]], 'rgba(10,127,194,.55)', 2, [5, 5]);
+    D.line(x, [[tx, ty], [tx, cy]], 'rgba(10,127,194,.55)', 3);
+    D.line(x, pts, PU, 5);
+    D.arrow(x, cx, cy, tx, ty, CY, 7);
+    D.circ(x, x0, ty, 8, PU);
+    D.txt(x, 'Pilen V', cx - 4, cy + R + 36, 22, CY, 'center');
+    D.txt(x, 'v(t) = V sin(ωt)', 400, cy + R + 36, 22, PU, 'center');
+  });
+})();
+
+/* ---------- slide 1: v(t), v²(t), middel og RMS ---------- */
+function upd1() {
+  var Vm = +$('v1').value, W = 2 * PI * 50, ms = 1e-3, m = Vm * Vm / 2, rms = Math.sqrt(m);
+  $('v1o').textContent = fmt(Vm, 1) + ' V';
+  $('r1m').textContent = Math.round(m); $('r1r').textContent = fmt(rms, 1); $('r1k').textContent = fmt(Vm / rms, 3);
+  var tt = [[0, '0'], [10, '10'], [20, '20 ms'], [30, '30'], [40, '40']];
+  D.graph('g1a', { f: function (t) { return Vm * Math.sin(W * t * ms); }, x0: 0, x1: 40, xt: tt, min: -420, max: 420, yt: [-300, 300], yd: 0, lbl: 'v(t) (V)', col: CY, d: 0, u: 'V', hl: [rms, 'RMS ' + fmt(rms, 0) + ' V'], xl: 'tid' });
+  D.graph('g1b', { f: function (t) { return Math.pow(Vm * Math.sin(W * t * ms), 2) / 1000; }, x0: 0, x1: 40, xt: tt, min: 0, max: 175, yt: [50, 100, 150], yd: 0, lbl: 'v²(t) (10³ V²)', col: OR, d: 0, u: '', hl: [m / 1000, 'middel ' + fmt(m / 1000, 1)], xl: 'tid' });
+  $('st1').innerHTML = Math.abs(rms - 230) < 0.6 ? '<b>Stikkontakten</b>: topværdi 325 V giver RMS 230 V. <span class="mu">v² svinger omkring middelværdien V²/2.</span>' : 'Middel af v² er altid <b>V²/2</b>, så RMS er <b>V/√2</b> uanset størrelse.';
+}
+$('v1').oninput = upd1; upd1();
+
+/* ---------- slide 2: to fasorer og summen ---------- */
+var MODE2 = 0;
+function upd2() {
+  var A1 = +$('a1').value, T1 = +$('t1').value, A2 = +$('a2').value, T2 = +$('t2').value, r = PI / 180;
+  $('a1o').textContent = fmt(A1, 1) + ' V'; $('t1o').textContent = T1 + '°'; $('a2o').textContent = fmt(A2, 1) + ' V'; $('t2o').textContent = T2 + '°';
+  var re1 = A1 * Math.cos(T1 * r), im1 = A1 * Math.sin(T1 * r), re2 = A2 * Math.cos(T2 * r), im2 = A2 * Math.sin(T2 * r);
+  var sr = re1 + re2, si = im1 + im2, As = Math.hypot(sr, si), Ts = Math.atan2(si, sr);
+  var G = D.cv('p2'), x = G.x, ox = 170, oy = 145, sc = 115 / Math.max(25, A1 + A2);
+  function P(a, b) { return [ox + a * sc, oy - b * sc]; }
+  x.clearRect(0, 0, G.W, G.H);
+  D.line(x, [[20, oy], [G.W - 20, oy]], 'rgba(90,107,125,.4)', 2); D.line(x, [[ox, 14], [ox, G.H - 14]], 'rgba(90,107,125,.4)', 2);
+  D.txt(x, 'Re', 26, oy - 14, 20, MUT, 'left'); D.txt(x, 'Im', ox + 10, 22, 20, MUT, 'left');
+  var p1 = P(re1, im1), p2 = P(re2, im2), ps = P(sr, si), p12 = P(re1 + re2, im1 + im2);
+  if (MODE2 === 0) {
+    D.line(x, [P(0, 0), p2], 'rgba(217,122,0,.35)', 2, [6, 5]);
+    D.arrow(x, p1[0], p1[1], ps[0], ps[1], OR, 5);
+    D.arrow(x, ox, oy, p1[0], p1[1], CY, 6);
+    D.arrow(x, ox, oy, ps[0], ps[1], PU, 7);
+  } else {
+    D.arrow(x, ox, oy, p1[0], p1[1], CY, 6);
+    D.arrow(x, ox, oy, p2[0], p2[1], OR, 6);
+    D.txt(x, 'ingen fælles faktor:', 340, 190, 24, RD, 'left', 'middle', 800);
+    D.txt(x, 'summen er ikke en pil', 340, 222, 24, RD, 'left', 'middle', 800);
+  }
+  D.txt(x, 'V₁ = ' + fmt(A1, 1) + ' ∠ ' + T1 + '°', 340, 36, 24, CY, 'left');
+  D.txt(x, 'V₂ = ' + fmt(A2, 1) + ' ∠ ' + T2 + '°', 340, 70, 24, OR, 'left');
+  if (MODE2 === 0) D.txt(x, 'Sum = ' + fmt(As, 2) + ' ∠ ' + fmt(Ts / r, 1) + '°', 340, 110, 26, PU, 'left', 'middle', 800);
+  var w1 = 2 * PI * 50, w2 = MODE2 ? 2 * w1 : w1, ms = 1e-3;
+  var f1 = function (t) { return A1 * Math.cos(w1 * t * ms + T1 * r); }, f2 = function (t) { return A2 * Math.cos(w2 * t * ms + T2 * r); };
+  D.graph('g2', { f: function (t) { return f1(t) + f2(t); }, x0: 0, x1: 40, xt: [[0, '0'], [10, '10'], [20, '20 ms'], [30, '30'], [40, '40']], min: -85, max: 85, yt: [-60, 60], yd: 0, lbl: 'v(t) (V)', col: PU, d: 1, u: 'V', xl: 'tid',
+    more: [{ f: f1, col: CY, w: 3 }, { f: f2, col: OR, w: 3 }] });
+  $('st2').innerHTML = MODE2 === 0 ? 'Samme frekvens: <b>summen er en sinus</b> med amplitude ' + fmt(As, 1) + ' V og fase ' + fmt(Ts / r, 0) + '°. Ved 180° forskel og lige store pile udslukker de hinanden.' : '<b>Forskellig frekvens</b>: summen (lilla) er ikke en ren sinus. Læg sammen i <b>tidsdomænet</b>.';
+}
+['a1', 't1', 'a2', 't2'].forEach(function (id) { $(id).oninput = upd2; });
+document.querySelectorAll('#fb [data-m]').forEach(function (b) { b.onclick = function () { MODE2 = +b.dataset.m; document.querySelectorAll('#fb [data-m]').forEach(function (o) { o.classList.toggle('on', o === b); }); upd2(); }; });
+upd2();
+
+/* ---------- slide 3: impedans mod frekvens ---------- */
+var Rr = 50, Lh = 0.01, Cf = 100e-6, F0 = 1 / (2 * PI * Math.sqrt(Lh * Cf));
+function zl(lg) { return 2 * PI * Math.pow(10, lg) * Lh; }
+function zc(lg) { return 1 / (2 * PI * Math.pow(10, lg) * Cf); }
+function zt(lg) { return Math.hypot(Rr, zl(lg) - zc(lg)); }
+function upd3() {
+  var lg = +$('f3').value, f = Math.pow(10, lg), L_ = zl(lg), C_ = zc(lg), X = L_ - C_, Z = zt(lg), phi = Math.atan2(X, Rr) * 180 / PI;
+  $('f3o').textContent = (f < 100 ? fmt(f, 1) : fmt(f, 0)) + ' Hz';
+  $('r3l').textContent = fmt(L_, L_ < 10 ? 2 : 1); $('r3c').textContent = fmt(C_, C_ < 10 ? 2 : 1); $('r3z').textContent = fmt(Z, 1);
+  var g = D.graph('g3', { f: zt, x0: 1, x1: 3.3, xt: [[1, '10'], [2, '100'], [3, '1000 Hz']], min: 0, max: 200, yt: [50, 100, 150], yd: 0, lbl: '|Z| (Ω)', col: PU, d: 1, u: 'Ω', xm: lg, xl: 'frekvens f (log)', vline: Math.log10(F0),
+    more: [{ f: function () { return Rr; }, col: GR, w: 3, dash: [9, 6] }, { f: zl, col: OR, w: 3, dash: [9, 6] }, { f: zc, col: CY, w: 3, dash: [9, 6] }] });
+  D.txt(g.x, 'R', g.X(2.78), g.Y(Rr) + 17, 22, GR, 'left');
+  D.txt(g.x, '|ZL|', g.X(2.93), g.Y(zl(2.93)) + 22, 22, OR, 'left');
+  D.txt(g.x, '|ZC|', g.X(1.22), g.Y(zc(1.22)) + 24, 22, CY, 'left');
+  D.txt(g.x, 'f₀ = ' + fmt(F0, 0) + ' Hz', g.X(Math.log10(F0)) + 8, g.Y(185), 20, '#a86b00', 'left');
+  var I = 230 / Z, kind = Math.abs(X) < 1.5 ? '<b>resonans</b>: X ≈ 0, Z ≈ R, strøm og spænding i fase' : (X < 0 ? '<b>kapacitivt</b> (X = ' + fmt(X, 1) + ' Ω): strømmen fører foran' : '<b>induktivt</b> (X = +' + fmt(X, 1) + ' Ω): strømmen halter');
+  $('st3').innerHTML = kind + '. φ = ' + fmt(phi, 1) + '°, I = 230 / ' + fmt(Z, 1) + ' = ' + fmt(I, 2) + ' A';
+}
+$('f3').oninput = upd3;
+$('res3').onclick = function () { $('f3').value = Math.log10(F0); upd3(); };
+$('f50').onclick = function () { $('f3').value = Math.log10(50); upd3(); };
+upd3();
+D.start();
+})();
+</script>
+</body></html>

@@ -1,0 +1,398 @@
+<!doctype html><html lang="da"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tema 5 · Tandhjul og kraftskruer</title>
+<meta name="description" content="Hurtigstart til MEM1 tema 5: tandhjulsgeometri og kræfter, Lewis' bøjespænding i tanden og kraftskruens moment, selvlåsning og virkningsgrad (Hamrock kap. 14 og 16).">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../assets/deck.css"></head>
+<body>
+<div id="vp"><div id="deck">
+
+<!-- ============ 0 · FORSIDE ============ -->
+<section class="slide on" data-title="Forside">
+  <div style="flex:1;display:grid;grid-template-columns:1fr 600px;gap:34px;align-items:center;padding:0 10px">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div>
+        <div class="tag" style="display:inline-block">MEM1 · HURTIGSTART · TEMA 5</div>
+        <h1 style="font-size:64px;margin-top:18px">Tandhjul og kraftskruer</h1>
+        <div style="font-size:26px;color:var(--mut);margin-top:6px">Begge omsætter et <b>moment</b> til en <b>kraft</b>: tandhjulet langs omkredsen, skruen langs aksen</div>
+      </div>
+      <div class="card qcard"><span class="lbl cy">KORT FORTALT</span>
+        På en cykel drejer det lille tandhjul hurtigt, og det store drejer langsomt, men med mere moment. Hver tand bøjes som en vippe, der sidder fast i roden. Skruen i en donkraft er en rampe viklet om en stang: mange omdrejninger giver et lille løft og en stor kraft, og friktionen holder bilen oppe, når håndtaget slippes.</div>
+      <div class="plan">
+        <div><b class="cy">1 · Geometri</b><span data-tex="W_t=2T/d"></span></div>
+        <div><b class="or">2 · Lewis</b><span data-tex="\sigma_b=W_t/(bmY)"></span></div>
+        <div><b class="pu">3 · Kraftskrue</b><span data-tex="\mu>\cos\theta_n\tan\lambda"></span></div>
+        <div><b class="gr">4 · Tjek</b>fejl og eksamen</div>
+      </div>
+      <div class="links"><a href="../../Kapitel14_Studienote.pdf">📖 Studienote kap. 14</a><a href="../../Kapitel16_Studienote.pdf">📖 Studienote kap. 16</a><a href="../../../../lab/mem1/tandhjul-lewis.html">🧪 3D-lab: tandhjul og Lewis</a><a href="../../../../lab/mem1/kraftskrue.html">🧪 3D-lab: kraftskrue</a><a href="../../eksamen-ny/sp05_lewis.html">📝 Spm. 5 Lewis</a><a href="../../eksamen-ny/sp06_kraftskrue.html">📝 Spm. 6 Kraftskrue</a></div>
+    </div>
+    <div class="card" style="padding:12px"><canvas id="c0" width="560" height="440"></canvas>
+      <div style="font-size:18px;color:var(--mut);text-align:center;margin-top:8px">Det lille hjul drejer dobbelt så hurtigt som det store. Skruen drejer, og lasten løftes</div></div>
+  </div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm &nbsp;·&nbsp; ☰: alle temaer</div>
+</section>
+
+<!-- ============ 1 · GEOMETRI OG KRÆFTER ============ -->
+<section class="slide" id="s1" data-title="1 · Geometri og kræfter">
+  <div class="hd"><span class="tag">IDÉ 1 · TANDHJULSGEOMETRI OG KRÆFTER</span><h1>Modul giver størrelse, moment giver kraft</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Fra moment til tandkraft</h3>
+      <div class="big" style="font-size:32px" data-tex="W_t=\dfrac{2T}{d},\quad W_r=W_t\tan\phi"></div>
+      <div class="src">Hamrock et al. (2014), lign. (14.49) og (14.50), s. 400</div>
+      <div class="big" style="font-size:28px" data-tex="m=\dfrac{d}{N},\quad i=\dfrac{N_2}{N_1}"></div>
+      <div class="src">Lign. (14.7), s. 384, og (14.19), s. 387 (bogen skriver <span data-tex="g_r"></span>)</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="W_t"></span><span><b>Tangentialkraften</b> overfører momentet og bøjer tanden. Samme kraft som <span data-tex="P/v"></span> på delecirklen</span></div>
+        <div class="term"><span class="s or" data-tex="W_r"></span><span><b>Radialkraften</b> skubber hjulene fra hinanden og belaster aksler og lejer. <span data-tex="\phi=20^\circ"></span></span></div>
+        <div class="term"><span class="s pu" data-tex="m"></span><span><b>Modulet</b> er tandens størrelse i mm. To hjul i indgreb skal have samme <span data-tex="m"></span></span></div>
+        <div class="term"><span class="s gr" data-tex="i"></span><span><b>Udvekslingen</b>: hastighed ned med <span data-tex="i"></span>, moment op med <span data-tex="i"></span> (uden tab)</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n">1</span><div class="t"><b>Delediametre</b>, <span data-tex="m=4"></span> mm, <span data-tex="N_1=20"></span>, <span data-tex="N_2=60"></span>
+        <span class="m" data-tex="d_1=4\cdot20=80,\ \ d_2=4\cdot60=240\ \text{mm}"></span></div></div>
+      <div class="step"><span class="n b">2</span><div class="t"><b>Udveksling</b>, drev <span data-tex="n_1=1500"></span> o/min, <span data-tex="T_1=64"></span> N·m
+        <span class="m" data-tex="i=\dfrac{60}{20}=3,\ \ n_2=500\ \text{o/min}"></span>
+        <span class="note">Momentet på hjul 2 er <span data-tex="iT_1=192"></span> N·m</span></div></div>
+      <div class="step"><span class="n p">3</span><div class="t"><b>Tangentialkraft</b>
+        <span class="m" data-tex="W_t=\dfrac{2\cdot64\,000}{80}"></span>
+        <span class="m" data-tex="\boxed{W_t=1600\ \text{N}}"></span>
+        <span class="note">Kontrol: <span data-tex="P=T\omega=10{,}05"></span> kW, <span data-tex="v=6{,}28"></span> m/s, <span data-tex="P/v=1600"></span> N</span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Radial og samlet kraft</b>, <span data-tex="\phi=20^\circ"></span>
+        <span class="m" data-tex="\boxed{W_r=1600\tan20^\circ=582\ \text{N}}"></span>
+        <span class="m" data-tex="W=\dfrac{W_t}{\cos\phi}=1703\ \text{N}"></span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Vælg tandantal, modul og moment</h3>
+      <canvas id="g1" width="640" height="330"></canvas>
+      <div class="sl n"><span>N<sub>1</sub></span><input id="n1" type="range" min="10" max="30" step="1" value="20"><output id="n1o"></output></div>
+      <div class="sl n"><span>N<sub>2</sub></span><input id="n2" type="range" min="20" max="80" step="1" value="60"><output id="n2o"></output></div>
+      <div class="sl n"><span>m</span><input id="m1" type="range" min="2" max="8" step="1" value="4"><output id="m1o"></output></div>
+      <div class="sl n"><span>T<sub>1</sub></span><input id="t1" type="range" min="10" max="150" step="2" value="64"><output id="t1o"></output></div>
+      <div class="ro">
+        <div><span>udveksling i</span><b class="gr" id="v1i">3,00</b></div>
+        <div><span>W<sub>t</sub> på pinionen</span><b class="cy" id="v1w">1600</b><i>N</i></div>
+        <div><span>W<sub>r</sub></span><b class="or" id="v1r">582</b><i>N</i></div>
+        <div><span>T<sub>2</sub> på hjul 2</span><b class="pu" id="v1t">192</b><i>N·m</i></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Modulet er tandens størrelse, og <span data-tex="W_t=2T/d"></span> er momentet delt med radius. Radialkraften er <span data-tex="\tan20^\circ"></span> gange så stor og går til lejerne.</span></div>
+</section>
+
+<!-- ============ 2 · LEWIS ============ -->
+<section class="slide" id="s2" data-title="2 · Lewis">
+  <div class="hd"><span class="tag b">IDÉ 2 · LEWIS' BØJESPÆNDING</span><h1>Tanden er en udkraget bjælke, og Y samler formen</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Spænding i tandroden</h3>
+      <div class="big" style="font-size:36px" data-tex="\sigma_b=\dfrac{W_t}{b\,m\,Y}"></div>
+      <div class="src">Hamrock et al. (2014), lign. (14.54) og (14.55), s. 401, SI-form med <span data-tex="m=1/p_d"></span></div>
+      <div class="big" style="font-size:28px" data-tex="\sigma=\dfrac{Mc}{I}=\dfrac{6W_tl}{b\,t^2},\quad Y=\dfrac{2x}{3m}"></div>
+      <div class="src">Bjælkeformlen, lign. (14.51) til (14.53), s. 400 og 401</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="b\,m"></span><span><b>Tandens størrelse</b>: bredde langs akslen gange modul. Dobbelt bredde er som to vipper side om side</span></div>
+        <div class="term"><span class="s or" data-tex="Y"></span><span><b>Formfaktor</b>, dimensionsløs. Få tænder giver smal rod og lav <span data-tex="Y"></span>, derfor er pinionen kritisk</span></div>
+        <div class="term"><span class="s pu" data-tex="K_v"></span><span><b>Dynamikfaktor</b> (lign. 14.66) ganges på spændingen for stød. Ved <span data-tex="v=6{,}3"></span> m/s er <span data-tex="K_v\approx2{,}0"></span></span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n b">1</span><div class="t"><b>Fra vippe til Lewis</b>: lasten i spidsen, parablen giver <span data-tex="l=t^2/(4x)"></span>
+        <span class="m" data-tex="\sigma=\dfrac{3W_t}{2bx}=\dfrac{W_t}{b\,m\,Y}"></span></div></div>
+      <div class="step"><span class="n b">2</span><div class="t"><b>Tal fra spm. 5</b>, <span data-tex="m=4"></span>, <span data-tex="b=40"></span> mm, <span data-tex="N=20"></span>, <span data-tex="Y=0{,}32"></span>
+        <span class="m" data-tex="bmY=40\cdot4\cdot0{,}32=51{,}2\ \text{mm}^2"></span></div></div>
+      <div class="step"><span class="n b">3</span><div class="t"><b>Spænding</b>, <span data-tex="W_t=1600"></span> N
+        <span class="m" data-tex="\boxed{\sigma_b=\dfrac{1600}{51{,}2}=31{,}25\ \text{MPa}}"></span>
+        <span class="note">Lavt mod tilladt 100 til 200 MPa for stål (antaget)</span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Få tænder og stød</b>
+        <span class="m" data-tex="N=12:\ Y=0{,}245\ \Rightarrow\ \sigma_b=40{,}8\ \text{MPa}"></span>
+        <span class="note">Med <span data-tex="K_v\approx2{,}0"></span> bliver 31,25 MPa til ca. 63 MPa</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Tandbredde og modul</h3>
+      <canvas id="t2" width="640" height="230"></canvas>
+      <canvas id="g2" width="640" height="290"></canvas>
+      <div class="row" id="nb"><button class="btn or" data-n="12">N = 12</button><button class="btn or on" data-n="20">N = 20</button><button class="btn or" data-n="50">N = 50</button></div>
+      <div class="sl"><span>Bredde b</span><input id="b2" type="range" min="10" max="80" step="1" value="40"><output id="b2o"></output></div>
+      <div class="sl"><span>Modul m</span><input id="m2" type="range" min="1" max="8" step="0.5" value="4"><output id="m2o"></output></div>
+      <div class="ro r3">
+        <div><span>σ<sub>b</sub></span><b class="cy" id="v2s">31,3</b><i>MPa</i></div>
+        <div><span>Y</span><b class="or" id="v2y">0,32</b></div>
+        <div><span>mod tilladt 150</span><b class="gr" id="v2u">21 %</b></div>
+      </div>
+      <div class="status" id="st2"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Lewis er bjælkeformlen på en tand: kraften delt med bredde, modul og formfaktor. Større modul eller bredere hjul sænker spændingen, få tænder hæver den.</span></div>
+</section>
+
+<!-- ============ 3 · KRAFTSKRUE ============ -->
+<section class="slide" id="s3" data-title="3 · Kraftskrue">
+  <div class="hd"><span class="tag p">IDÉ 3 · KRAFTSKRUEN</span><h1>Løft plus friktion koster moment, friktionen holder lasten</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Løft, sænkning og selvlåsning</h3>
+      <div class="big" style="font-size:30px" data-tex="T_R=\dfrac{W d_m}{2}\cdot\dfrac{l+\pi\mu d_m}{\pi d_m-\mu l}"></div>
+      <div class="src">Løft, lign. (16.10), s. 451, firkantgevind <span data-tex="\theta_n=0"></span>, uden krave</div>
+      <div class="big" style="font-size:26px" data-tex="T_L=\dfrac{W d_m}{2}\cdot\dfrac{\pi\mu d_m-l}{\pi d_m+\mu l}"></div>
+      <div class="src">Sænkning, lign. (16.13), s. 452. Bogen har modsat fortegn: <span data-tex="T_l=-T_L"></span></div>
+      <div class="big" style="font-size:28px" data-tex="\mu>\cos\theta_n\tan\lambda,\ \ \tan\lambda=\dfrac{l}{\pi d_m}"></div>
+      <div class="src">Selvlåsning, lign. (16.15), s. 453, og (16.3), s. 450</div>
+      <div class="terms">
+        <div class="term"><span class="s pu" data-tex="\theta_n"></span><span><b>Gevindets halve flankevinkel</b>: 0 for firkant, 14,5° for trapez. Trapez skal have lidt mere friktion for at låse</span></div>
+        <div class="term"><span class="s gr" data-tex="\eta"></span><span><b>Virkningsgrad</b> <span data-tex="Wl/(2\pi T)"></span>, lign. (16.14), s. 452. En selvlåsende firkantskrue har altid <span data-tex="\eta<50\,\%"></span></span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n p">1</span><div class="t"><b>Geometri</b>, <span data-tex="d_m=20"></span> mm, <span data-tex="l=5"></span> mm, <span data-tex="\mu=0{,}10"></span>
+        <span class="m" data-tex="\pi d_m=62{,}83,\ \ \tan\lambda=\dfrac{5}{62{,}83}=0{,}0796"></span>
+        <span class="note"><span data-tex="\lambda=4{,}55^\circ"></span></span></div></div>
+      <div class="step"><span class="n p">2</span><div class="t"><b>Løftemoment</b>, <span data-tex="W=10"></span> kN
+        <span class="m" data-tex="T_R=100\,000\cdot\dfrac{5+6{,}283}{62{,}83-0{,}5}"></span>
+        <span class="m" data-tex="\boxed{T_R=18{,}1\ \text{N}{\cdot}\text{m}}"></span></div></div>
+      <div class="step"><span class="n p">3</span><div class="t"><b>Selvlåsning</b>
+        <span class="m" data-tex="\mu=0{,}10>0{,}0796=\tan\lambda"></span>
+        <span class="note">Selvlåsende. <span data-tex="T_L=2{,}03"></span> N·m er positivt: der skal drejes for at sænke. <span data-tex="\rho=\arctan\mu=5{,}71^\circ>\lambda"></span></span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Virkningsgrad</b>
+        <span class="m" data-tex="\eta=\dfrac{10\,000\cdot5}{2\pi\cdot18\,102}=44\,\%"></span>
+        <span class="note">Under 50 %, som det skal være. Ca. 60 N på et håndtag på 30 cm</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Træk i friktion og stigning</h3>
+      <div class="row" id="tb"><button class="btn pu on" data-t="0">Firkantgevind</button><button class="btn pu" data-t="14.5">Trapezgevind 14,5°</button></div>
+      <canvas id="r3" width="640" height="230"></canvas>
+      <canvas id="g3" width="640" height="300"></canvas>
+      <div class="sl"><span>Friktion μ</span><input id="mu3" type="range" min="0.01" max="0.3" step="0.01" value="0.1"><output id="mu3o"></output></div>
+      <div class="sl"><span>Stigning l</span><input id="l3" type="range" min="1" max="20" step="0.5" value="5"><output id="l3o"></output></div>
+      <div class="ro r3">
+        <div><span>T<sub>R</sub> løft</span><b class="cy" id="v3r">18,1</b><i>N·m</i></div>
+        <div><span>T<sub>L</sub> sænk</span><b class="pu" id="v3l">2,03</b><i>N·m</i></div>
+        <div><span>η</span><b class="gr" id="v3e">44</b><i>%</i></div>
+      </div>
+      <div class="status" id="st3"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Gevindet er en rampe: momentet er last gange arm gange løft plus friktion. Skruen låser, når friktionen er større end rampens hældning, og det koster virkningsgrad.</span></div>
+</section>
+
+<!-- ============ 4 · FALDGRUBER OG TJEK ============ -->
+<section class="slide" data-title="4 · Faldgruber og tjek">
+  <div class="hd"><span class="tag g">FALDGRUBER OG TJEK</span><h1>Hvor det typisk går galt</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Typiske fejl</h3>
+      <div class="fejl">
+        <div><span>Diameter og radius byttes: <span data-tex="W_t=T/d"></span> giver halv kraft.<span class="ret"><span data-tex="W_t=2T/d=T/r"></span>. Her <span data-tex="2\cdot64\,000/80=1600"></span> N, ikke 800 N.</span></span></div>
+        <div><span>Modulet sættes ind i meter, mens <span data-tex="b"></span> står i mm.<span class="ret">Alt i N og mm giver MPa direkte: <span data-tex="1600/(40\cdot4\cdot0{,}32)=31{,}25"></span>.</span></span></div>
+        <div><span><span data-tex="Y"></span> slås op med forkert tandantal eller forkert tabel.<span class="ret">Slå op for hjulet, der checkes (pinionen). <span data-tex="Y(60)=0{,}42"></span> giver 23,7 MPa, for lavt. Tabel 14.7 gælder 14,5°.</span></span></div>
+        <div><span>Selvlåsning vurderes med <span data-tex="\mu"></span> mod <span data-tex="\lambda"></span> i grader, eller med ydre diameter.<span class="ret"><span data-tex="\mu"></span> mod <span data-tex="\tan\lambda=l/(\pi d_m)=0{,}0796"></span> med middeldiameter. Ydre diameter 22,5 mm giver 0,0707. Trapez: <span data-tex="\mu>\cos\theta_n\tan\lambda"></span>.</span></span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Tjek dig selv</h3>
+      <div class="qa">
+        <details><summary>Pinion med 20 tænder, 1500 o/min, 64 N·m driver et hjul med 60 tænder. Hjul 2?</summary><p><span data-tex="i=3"></span>, så 500 o/min og <span data-tex="T_2=3\cdot64=192"></span> N·m uden tab. Tandkraften <span data-tex="W_t"></span> er den samme 1600 N i indgrebet.</p></details>
+        <details><summary>Modulet fordobles, men <span data-tex="W_t"></span>, <span data-tex="b"></span> og <span data-tex="Y"></span> er uændrede. Hvad sker der med <span data-tex="\sigma_b"></span>?</summary><p>Den halveres til 15,6 MPa, fordi <span data-tex="m"></span> står i nævneren. Ved samme moment og tandantal fordobles <span data-tex="d"></span> også, så <span data-tex="W_t"></span> halveres, og <span data-tex="\sigma_b"></span> bliver en fjerdedel.</p></details>
+        <details><summary>Samme skrue smøres, så <span data-tex="\mu=0{,}05"></span>. Stadig selvlåsende?</summary><p>Nej, <span data-tex="0{,}05<0{,}0796"></span>. <span data-tex="T_L=-2{,}95"></span> N·m: lasten driver skruen ned af sig selv. <span data-tex="T_R"></span> falder til 13,0 N·m og <span data-tex="\eta"></span> stiger til 61 %.</p></details>
+      </div>
+    </div>
+    <div class="card col">
+      <h3>Til eksamen</h3>
+      <div class="exlinks">
+        <a href="../../eksamen-ny/sp05_lewis.html"><b>SPM 5</b> Lewis · geometri, bøjespænding i tanden og vurdering</a>
+        <a href="../../eksamen-ny/sp06_kraftskrue.html"><b>SPM 6</b> Kraftskrue · løftemoment, selvlåsning og virkningsgrad</a>
+      </div>
+      <h3 style="margin-top:8px">Læs i bogen</h3>
+      <div style="display:grid;gap:6px;font-size:16px;line-height:1.35">
+        <div><b>§ 14.3, s. 380 til 386</b> geometri, modul og indgrebsvinkel</div>
+        <div><b>§ 14.4, s. 387</b> udvekslingsforhold</div>
+        <div><b>§ 14.10, s. 400</b> kræfter på tanden</div>
+        <div><b>§ 14.11, s. 400 til 401</b> Lewis og formfaktor, tabel 14.7</div>
+        <div><b>§ 16.3, s. 450 til 451</b> kraftskruer, kræfter og moment</div>
+        <div><b>§ 16.3, s. 452 til 453</b> virkningsgrad og selvlåsning</div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Tandhjul: find først <span data-tex="d=mN"></span> og <span data-tex="W_t=2T/d"></span>, slå så <span data-tex="Y"></span> op for pinionen. Skrue: find <span data-tex="\tan\lambda"></span> og sammenlign med <span data-tex="\mu"></span>.</span></div>
+</section>
+
+</div></div>
+<script src="../assets/deck.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = D.$, fmt = D.fmt, PI = Math.PI;
+var CY = '#0a7fc2', OR = '#d97a00', PU = '#7b4fc9', GR = '#0a9a5c', RD = '#d63a3a', INK = '#14202d', MUT = '#5a6b7d';
+var TAN20 = Math.tan(20 * PI / 180);
+
+/* tandhjul: rp og mm i pixel, ang i radianer (urets retning), tand med trapezprofil */
+function gear(x, cx, cy, rp, N, ang, m, col) {
+  var u = 2 * PI / N, rr = rp - 1.25 * m, ro = rp + m, k, a;
+  function P(r, w) { return [cx + r * Math.cos(w), cy + r * Math.sin(w)]; }
+  x.beginPath();
+  for (k = 0; k < N; k++) {
+    a = ang + k * u;
+    var p0 = P(rr, a - 0.30 * u), p1 = P(ro, a - 0.14 * u), p2 = P(ro, a + 0.14 * u), p3 = P(rr, a + 0.30 * u);
+    if (k === 0) x.moveTo(p0[0], p0[1]); else x.lineTo(p0[0], p0[1]);
+    x.lineTo(p1[0], p1[1]); x.lineTo(p2[0], p2[1]); x.lineTo(p3[0], p3[1]);
+    x.arc(cx, cy, rr, a + 0.30 * u, a + 0.70 * u);
+  }
+  x.closePath(); x.fillStyle = col + '22'; x.fill(); x.strokeStyle = col; x.lineWidth = 2.5; x.setLineDash([]); x.stroke();
+  D.circ(x, cx, cy, Math.max(4, rr * 0.28), '#fff', col, 2.5);
+  D.line(x, [[cx + rr * 0.28 * Math.cos(ang + u / 2), cy + rr * 0.28 * Math.sin(ang + u / 2)], [cx + rr * 0.8 * Math.cos(ang + u / 2), cy + rr * 0.8 * Math.sin(ang + u / 2)]], col, 3);
+}
+
+/* ---------- slide 0: tandhjul og donkraft ---------- */
+(function () {
+  var x = D.cv('c0').x, T = 9;
+  D.anim(0, function (dt, t) {
+    x.clearRect(0, 0, 560, 440);
+    D.txt(x, 'Tandhjul', 130, 24, 22, MUT, 'center');
+    D.txt(x, 'Kraftskrue', 424, 24, 22, MUT, 'center');
+    /* tandhjul */
+    var a1 = t * 3.0, cy = 215, m = 34 * 2 / 12, c1 = 62, c2 = 62 + 34 + 68;
+    var a2 = PI + PI / 24 - a1 * 12 / 24;
+    gear(x, c2, cy, 68, 24, a2, m, OR);
+    gear(x, c1, cy, 34, 12, a1, m, CY);
+    D.marc(x, c1, cy - 62, 22, false, CY, 4);
+    D.marc(x, c2, cy - 98, 26, true, OR, 4);
+    D.txt(x, 'N = 12, hurtigt', 80, 330, 20, CY, 'center');
+    D.txt(x, 'N = 24, langsomt', 180, 360, 20, OR, 'center');
+    D.txt(x, 'i = 2', 130, 396, 24, INK, 'center', 'middle', 800);
+    /* kraftskrue */
+    var tt = t % T, turns = Math.min(tt, 6.5) / 1.3, rise = turns * 20;
+    if (tt > 8.2) rise *= Math.max(0, 1 - (tt - 8.2) / 0.8);
+    var phi = turns * 2 * PI, cx = 424, yb = 395, yp = 330 - rise, i;
+    x.fillStyle = '#9fb0c2'; x.fillRect(cx - 74, yb, 148, 14);
+    x.fillStyle = '#c3d0dd'; x.fillRect(cx - 14, yp, 28, yb - yp);
+    x.save(); x.beginPath(); x.rect(cx - 14, yp, 28, yb - yp); x.clip();
+    var ph = (turns * 20) % 20;
+    for (i = -1; i < (yb - yp) / 10 + 2; i++) { var yy = yb - i * 20 + ph; D.line(x, [[cx - 14, yy], [cx + 14, yy - 10]], PU, 3); }
+    x.restore();
+    x.strokeStyle = PU; x.lineWidth = 3; x.strokeRect(cx - 14, yp, 28, yb - yp);
+    x.fillStyle = '#e7dff7'; x.fillRect(cx - 52, yp - 12, 104, 14); x.strokeStyle = PU; x.lineWidth = 3; x.strokeRect(cx - 52, yp - 12, 104, 14);
+    x.fillStyle = '#d9e2ec'; x.fillRect(cx - 38, yp - 62, 76, 50); x.strokeStyle = MUT; x.lineWidth = 3; x.strokeRect(cx - 38, yp - 62, 76, 50);
+    D.txt(x, 'W', cx, yp - 37, 28, INK, 'center', 'middle', 800);
+    var hx = 52 * Math.cos(phi);
+    D.line(x, [[cx, yb - 20], [cx + hx, yb - 20]], OR, 7); D.circ(x, cx + hx, yb - 20, 8, OR);
+    D.arrow(x, cx + 92, yb - 6, cx + 92, yp - 20, GR, 5);
+    D.txt(x, 'løft', cx + 100, (yb + yp) / 2, 20, GR, 'left');
+    D.txt(x, (tt > 6.5 && tt < 8.2) ? 'Slip: lasten bliver stående' : 'Håndtaget drejer skruen', cx, 424, 20, (tt > 6.5 && tt < 8.2) ? RD : MUT, 'center');
+  });
+})();
+
+/* ---------- slide 1: geometri og kræfter ---------- */
+var S1 = { N1: 20, N2: 60, m: 4, T: 64 };
+function upd1() {
+  S1.N1 = +$('n1').value; S1.N2 = +$('n2').value; S1.m = +$('m1').value; S1.T = +$('t1').value;
+  var d1 = S1.m * S1.N1, i = S1.N2 / S1.N1, Wt = 2 * S1.T * 1000 / d1, Wr = Wt * TAN20;
+  $('n1o').textContent = S1.N1; $('n2o').textContent = S1.N2; $('m1o').textContent = S1.m + ' mm'; $('t1o').textContent = S1.T + ' N·m';
+  $('v1i').textContent = fmt(i, 2); $('v1w').textContent = fmt(Wt, 0); $('v1r').textContent = fmt(Wr, 0); $('v1t').textContent = fmt(i * S1.T, 0);
+}
+(function () {
+  var x = D.cv('g1').x, ang = 0;
+  D.anim(1, function (dt) {
+    ang += dt * 2.2;
+    var N1 = S1.N1, N2 = S1.N2, m = S1.m, r1 = m * N1 / 2, r2 = m * N2 / 2;
+    var s = Math.min(600 / (2 * (r1 + r2) + 2 * m), 230 / (2 * (Math.max(r1, r2) + m)));
+    var W = (2 * (r1 + r2) + 2 * m) * s, x1 = (640 - W) / 2 + (r1 + m) * s, x2 = x1 + (r1 + r2) * s, cy = 168;
+    x.clearRect(0, 0, 640, 330);
+    var a2 = PI + PI / N2 - ang * N1 / N2;
+    D.line(x, [[x1, cy - 0], [x2, cy]], 'rgba(90,107,125,.0)', 1);
+    gear(x, x2, cy, r2 * s, N2, a2, m * s, OR);
+    gear(x, x1, cy, r1 * s, N1, ang, m * s, CY);
+    x.beginPath(); x.arc(x1, cy, r1 * s, 0, 2 * PI); x.strokeStyle = 'rgba(90,107,125,.5)'; x.lineWidth = 1.5; x.setLineDash([6, 5]); x.stroke();
+    x.beginPath(); x.arc(x2, cy, r2 * s, 0, 2 * PI); x.stroke(); x.setLineDash([]);
+    var Wt = 2 * S1.T * 1000 / (m * N1), Wr = Wt * TAN20, px = x1 + r1 * s;
+    D.arrow(x, px, cy, px, cy + 24 + 56 * Math.min(1, Wt / 3000), CY, 6);
+    D.txt(x, 'Wt', px + 12, cy + 30 + 40 * Math.min(1, Wt / 3000), 20, CY, 'left');
+    D.arrow(x, px, cy - 10, px - 24 - 44 * Math.min(1, Wr / 1100), cy - 10, OR, 5);
+    D.txt(x, 'Wr', px - 24 - 44 * Math.min(1, Wr / 1100) - 4, cy - 28, 20, OR, 'right');
+    D.txt(x, 'hjul 1: N = ' + N1 + ', d = ' + fmt(m * N1, 0) + ' mm', 6, 22, 21, CY, 'left');
+    D.txt(x, 'hjul 2: N = ' + N2 + ', d = ' + fmt(m * N2, 0) + ' mm', 634, 22, 21, OR, 'right');
+    D.txt(x, 'n2 = n1 / ' + fmt(N2 / N1, 2), 320, 314, 21, INK, 'center');
+  });
+})();
+['n1', 'n2', 'm1', 't1'].forEach(function (id) { $(id).oninput = upd1; }); upd1();
+
+/* ---------- slide 2: Lewis ---------- */
+var S2 = { N: 20 }, YN = { 12: 0.245, 20: 0.32, 50: 0.409 }, WT2 = 1600, STIL = 150;
+function upd2() {
+  var b = +$('b2').value, m = +$('m2').value, Y = YN[S2.N];
+  function sig(q) { return WT2 / (b * q * Y); }
+  var sg = sig(m);
+  $('b2o').textContent = b + ' mm'; $('m2o').textContent = fmt(m, 1) + ' mm';
+  $('v2s').textContent = fmt(sg, 1); $('v2y').textContent = fmt(Y, Y === 0.32 ? 2 : 3); $('v2u').textContent = fmt(sg / STIL * 100, 0) + ' %';
+  /* tegning af tand */
+  var G = D.cv('t2'), x = G.x, ps = 10, l = 2.25 * m, xx = 1.5 * Y * m, t = 2 * Math.sqrt(l * xx), tx = 180, ty = 28, i;
+  x.clearRect(0, 0, G.W, G.H);
+  var ut = Math.min(1, sg / STIL), col = ut > 1 ? RD : (ut > 0.7 ? OR : GR);
+  x.fillStyle = '#d9e2ec'; x.fillRect(tx - 150, ty + l * ps, 300, 24);
+  D.line(x, [[tx - 150, ty + l * ps], [tx + 150, ty + l * ps]], MUT, 3);
+  x.beginPath();
+  for (i = 0; i <= 40; i++) { var y = l * i / 40, hw = (t / 2) * Math.sqrt(y / l); if (i === 0) x.moveTo(tx - hw * ps, ty + y * ps); else x.lineTo(tx - hw * ps, ty + y * ps); }
+  for (i = 40; i >= 0; i--) { var y2 = l * i / 40, hw2 = (t / 2) * Math.sqrt(y2 / l); x.lineTo(tx + hw2 * ps, ty + y2 * ps); }
+  x.closePath(); x.fillStyle = 'rgba(217,122,0,.16)'; x.fill(); x.strokeStyle = OR; x.lineWidth = 3; x.stroke();
+  D.arrow(x, tx + 100, ty, tx + 8, ty, CY, 6); D.txt(x, 'Wt', tx + 110, ty, 24, CY, 'left');
+  D.line(x, [[tx - t / 2 * ps, ty + l * ps + 14], [tx + t / 2 * ps, ty + l * ps + 14]], PU, 4);
+  D.circ(x, tx + t / 2 * ps, ty + l * ps, 9, col);
+  D.txt(x, 'Lewis-parabel', tx - 150, ty + 6, 19, OR, 'left');
+  D.txt(x, 'rodtykkelse t = ' + fmt(t, 1) + ' mm', tx - 150, ty + l * ps + 40, 20, PU, 'left');
+  D.txt(x, 'σb = ' + fmt(sg, 1) + ' MPa', 628, 40, 28, col, 'right', 'middle', 800);
+  D.txt(x, 'Wt = 1600 N', 628, 138, 21, CY, 'right');
+  D.txt(x, 'l = ' + fmt(l, 1) + ' mm', 628, 78, 21, MUT, 'right');
+  D.txt(x, 'x = ' + fmt(xx, 2) + ' mm', 628, 108, 21, MUT, 'right');
+  D.graph('g2', { f: sig, x0: 1, x1: 8, xt: [[1, '1'], [2, '2'], [3, '3'], [4, '4'], [5, '5'], [6, '6'], [7, '7'], [8, '8 mm']], min: 0, max: 300, yt: [100, 200, 300], yd: 0, lbl: 'σb (MPa)', col: CY, d: 1, u: 'MPa', xm: m, xl: 'modul m', hl: [STIL, 'tilladt 150 (antaget)'],
+    ref: function (q) { return WT2 / (40 * q * Y); } });
+  $('st2').innerHTML = sg <= STIL ? '<b class="ok">Under tilladt</b>: tanden har reserve. Med <span class="mu">K<sub>v</sub> ≈ 2,0</span> bliver spændingen ' + fmt(2 * sg, 0) + ' MPa.' : '<b class="warn">Over tilladt</b>: øg tandbredden b eller modulet m, eller brug flere tænder.';
+}
+document.querySelectorAll('#nb [data-n]').forEach(function (bn) { bn.onclick = function () { S2.N = +bn.dataset.n; document.querySelectorAll('#nb [data-n]').forEach(function (o) { o.classList.toggle('on', o === bn); }); upd2(); }; });
+$('b2').oninput = upd2; $('m2').oninput = upd2; upd2();
+
+/* ---------- slide 3: kraftskrue ---------- */
+var S3 = { th: 0 }, DM = 20, WL = 10000;
+function scr(mu, l, th) {
+  var ta = l / (PI * DM), c = Math.cos(th * PI / 180);
+  var TR = WL * DM / 2 * (c * ta + mu) / (c - mu * ta) / 1000;
+  var TL = WL * DM / 2 * (mu - c * ta) / (c + mu * ta) / 1000;
+  return { ta: ta, lam: Math.atan(ta) * 180 / PI, rho: Math.atan(mu) * 180 / PI, TR: TR, TL: TL, e: WL * l / (2 * PI * TR * 1000), crit: c * ta, self: mu > c * ta };
+}
+function upd3() {
+  var mu = +$('mu3').value, l = +$('l3').value, r = scr(mu, l, S3.th);
+  $('mu3o').textContent = fmt(mu, 2); $('l3o').textContent = fmt(l, 1) + ' mm';
+  $('v3r').textContent = fmt(r.TR, 1); $('v3l').textContent = fmt(r.TL, 2); $('v3e').textContent = fmt(r.e * 100, 0);
+  $('v3l').className = r.self ? 'pu' : 'rd';
+  /* skråplan */
+  var G = D.cv('r3'), x = G.x;
+  x.clearRect(0, 0, G.W, G.H);
+  var ax = 40, ay = 176, bx = 340, h = 300 * r.ta, cyy = ay - h;
+  x.beginPath(); x.moveTo(ax, ay); x.lineTo(bx, ay); x.lineTo(bx, cyy); x.closePath(); x.fillStyle = 'rgba(123,79,201,.10)'; x.fill(); x.strokeStyle = PU; x.lineWidth = 3; x.stroke();
+  var al = Math.atan2(h, 300), mx = ax + 0.52 * 300, my = ay - 0.52 * h;
+  x.save(); x.translate(mx, my); x.rotate(-al);
+  x.fillStyle = '#d9e2ec'; x.fillRect(-30, -26, 60, 26); x.strokeStyle = MUT; x.lineWidth = 3; x.strokeRect(-30, -26, 60, 26);
+  x.restore();
+  var gy = my - 14;
+  D.arrow(x, mx, gy, mx, gy + 54, RD, 5); D.txt(x, 'W', mx + 12, gy + 58, 22, RD, 'left');
+  var pl = 24 + Math.min(70, r.TR * 2.2);
+  D.arrow(x, mx - 36 - pl, gy + 4, mx - 36, gy + 4, CY, 6); D.txt(x, 'P', mx - 44 - pl, gy - 12, 22, CY, 'right');
+  D.txt(x, 'λ = ' + fmt(r.lam, 2) + '°,  ρ = atan μ = ' + fmt(r.rho, 2) + '°', 372, 202, 20, MUT, 'left');
+  D.txt(x, 'dm = 20 mm, W = 10 kN', 372, 228, 19, MUT, 'left');
+  D.txt(x, r.self ? 'SELVLÅSENDE' : 'KØRER NED', 372, 50, 30, r.self ? GR : RD, 'left', 'middle', 800);
+  D.txt(x, 'tan λ = ' + fmt(r.ta, 4), 372, 92, 22, INK, 'left');
+  D.txt(x, (S3.th ? 'cos θn · tan λ = ' : 'grænse = tan λ = ') + fmt(r.crit, 4), 372, 124, 22, MUT, 'left');
+  D.txt(x, 'μ = ' + fmt(mu, 2), 372, 156, 22, OR, 'left', 'middle', 700);
+  D.graph('g3', { f: function (q) { return scr(q, l, S3.th).TL; }, x0: 0, x1: 0.3, xt: [[0, '0'], [0.1, '0,1'], [0.2, '0,2'], [0.3, '0,3']], min: -40, max: 80, yt: [-40, 40, 80], yd: 0, lbl: 'T (N·m) mod μ', col: PU, d: 2, u: 'N·m', xm: mu, vline: r.crit,
+    more: [{ f: function (q) { return scr(q, l, S3.th).TR; }, col: CY, w: 4, dash: [9, 6] }] });
+  D.txt(D.cv('g3').x, 'TR', 560, D.cv('g3').H * 0.28, 22, CY, 'left');
+  D.txt(D.cv('g3').x, 'TL', 560, D.cv('g3').H * 0.78, 22, PU, 'left');
+  $('st3').innerHTML = r.self ? '<b class="ok">Selvlåsende</b>: μ &gt; ' + fmt(r.crit, 3) + '. T<sub>L</sub> &gt; 0, der skal drejes for at sænke. η = ' + fmt(r.e * 100, 0) + ' % (&lt; 50 %).' :
+    '<b class="warn">Ikke selvlåsende</b>: μ ≤ ' + fmt(r.crit, 3) + '. T<sub>L</sub> &lt; 0, lasten driver skruen ned af sig selv. Kræver bremse. η = ' + fmt(r.e * 100, 0) + ' %.';
+}
+document.querySelectorAll('#tb [data-t]').forEach(function (bn) { bn.onclick = function () { S3.th = +bn.dataset.t; document.querySelectorAll('#tb [data-t]').forEach(function (o) { o.classList.toggle('on', o === bn); }); upd3(); }; });
+$('mu3').oninput = upd3; $('l3').oninput = upd3; upd3();
+D.start();
+})();
+</script>
+</body></html>

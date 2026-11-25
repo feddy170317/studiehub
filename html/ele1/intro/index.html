@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ELE1 hurtigstart</title>
+<meta name="description" content="Hurtigstart til Elektroteknik: kort over de seks temaer, værktøjsvælger og et interaktivt intro-deck pr. tema, før bogen læses.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="assets/oversigt.css">
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+var CFG = {
+  fag: 'ELE1', tagline: 'ELE1 · HURTIGSTART',
+  h1: 'Elektroteknik på seks temaer',
+  lead: 'Formen på faget, før bogen åbnes. Strøm opfører sig som vand i rør: Spændingen er trykket, strømmen er mængden, der løber, og modstanden er et smalt rør. Fra stikkontakten kommer der dog vekselstrøm, der skifter retning 50 gange i sekundet, og så skal der regnes med komplekse tal. Faget ender ved motorer, transformere og trefasenettet.',
+  three: [
+    ['t1', 'Hvordan løber strømmen?', 'Ohms lov og Kirchhoffs love i jævnstrømskredsløb. Tema 1.'],
+    ['t3', 'Hvad sker der ved vekselstrøm?', 'Komplekse tal, fasorer og impedans gør AC til næsten DC. Tema 2 og 3.'],
+    ['t5', 'Hvor går effekten hen?', 'Aktiv og reaktiv effekt, maskiner, transformere og trefase. Tema 4 til 6.']
+  ],
+  links: [['../../../index.html', '← Studiehub'], ['../lab/dag12.html', 'Eksamenstræner (dag 12) →']],
+  mapW: 760, mapH: 420,
+  nodes: {
+    t1: { x: 20, y: 20, w: 180, h: 92, k: 't1', l1: 'Tema 1', l2: 'DC og Kirchhoff', l3: 'dag 2', t: 'Tema 1 · DC og Kirchhoff', p: 'Grundlaget. Ohms lov sammen med Kirchhoffs to love løser ethvert kredsløb af modstande.', li: ['V = IR og P = VI = I²R', 'KCL: strøm ind = strøm ud af en knude', 'KVL: spændingerne rundt i en maske summer til nul'] },
+    t2: { x: 290, y: 20, w: 180, h: 92, k: 't2', l1: 'Tema 2', l2: 'Komplekse tal, C og L', l3: 'dag 3 og 4', t: 'Tema 2 · Komplekse tal, kondensator og spole', p: 'De to nye komponenter lagrer energi og reagerer på ændringer. Komplekse tal er værktøjet, der gør dem lette at regne med.', li: ['a + jb = r∠θ = re<sup>jθ</sup>', 'i = C dv/dt og v = L di/dt', 'W = ½Cv² og W = ½Li²'] },
+    t3: { x: 560, y: 20, w: 180, h: 92, k: 't3', l1: 'Tema 3', l2: 'Fasorer og impedans', l3: 'dag 4 og 5', t: 'Tema 3 · RMS, fasorer og impedans', p: 'Ved én frekvens bliver hver sinus til en pil (fasor), og C og L bliver til komplekse modstande. Så gælder Ohm og Kirchhoff igen.', li: ['Ṽ = V/√2, 230 V er RMS', 'v(t) = V cos(ωt + θ) ↔ V∠θ', 'Z_L = jωL og Z_C = 1/(jωC)'] },
+    t4: { x: 560, y: 165, w: 180, h: 92, k: 't4', l1: 'Tema 4', l2: 'AC-effekt', l3: 'dag 6 og 7', t: 'Tema 4 · AC-effekt og effektfaktor', p: 'Kun en del af strømmen udfører arbejde. Resten pendler frem og tilbage som reaktiv effekt og belaster ledningerne.', li: ['P = ṼĨ cos θ', 'S = ṼĨ* = P + jQ', 'effektfaktorkorrektion med en kondensator'] },
+    t5: { x: 560, y: 310, w: 180, h: 92, k: 't5', l1: 'Tema 5', l2: 'Transformer, maskiner', l3: 'dag 7, 8 og 10', t: 'Tema 5 · Transformer og elektriske maskiner', p: 'Magnetisme omsætter elektrisk energi til en anden spænding (transformer) eller til drejning (motor).', li: ['V₂/V₁ = N₂/N₁', 'DC-motor: E_b = kφω og T = kφI_a', 'synkron hastighed og slip'] },
+    t6: { x: 290, y: 310, w: 180, h: 92, k: 't6', l1: 'Tema 6', l2: 'Trefase og elnettet', l3: 'dag 9, 10 og 11', t: 'Tema 6 · Trefase og elnettet', p: 'Tre sinusser forskudt 120° giver konstant effekt og sparer ledninger. Sådan er hele elnettet bygget.', li: ['V_L = √3 V_f i stjerne', 'P = √3 V_L I_L cos θ', 'PE, sikring og RCD'] }
+  },
+  edges: [['t1', 't2', 'samme love'], ['t2', 't3', 'jω'], ['t3', 't4', 'Ṽ, Ĩ, Z'], ['t4', 't5', 'P og pf'], ['t4', 't6', 'effekt pr. fase']],
+  qs: [
+    ['t1', 'Strøm, spænding eller effekt i et DC-kredsløb?', 'V=IR,\\quad P=VI=I^2R', 'Opstil KCL i knuderne eller KVL i maskerne, og brug Ohms lov for hver modstand.', ['dag02.html', 'Øvelseslab dag 2']],
+    ['t2', 'Omregn mellem kartesisk og polær form?', 'r=\\sqrt{a^2+b^2},\\quad \\theta=\\tan^{-1}\\dfrac{b}{a}', 'Tjek kvadranten: Er a negativ, skal der lægges 180° til vinklen.', ['dag03.html', 'Øvelseslab dag 3']],
+    ['t2', 'Strøm i en kondensator eller spænding over en spole?', 'i=C\\dfrac{dv}{dt},\\quad v=L\\dfrac{di}{dt}', 'Spændingen over C og strømmen i L kan ikke springe. Ved DC er C en afbrydelse og L en kortslutning.', ['dag03.html', 'Øvelseslab dag 3']],
+    ['t3', 'Hvad er topværdien af 230 V?', '\\tilde V=\\dfrac{V}{\\sqrt2}\\ \\Rightarrow\\ V=230\\sqrt2=325\\ \\text{V}', 'RMS er den DC-spænding, der giver samme effekt i en modstand.', ['dag04.html', 'Øvelseslab dag 4']],
+    ['t3', 'Strøm i et AC-kredsløb med R, L og C?', '\\mathbf{Z}_L=j\\omega L,\\quad \\mathbf{Z}_C=\\dfrac{1}{j\\omega C},\\quad \\mathbf{I}=\\dfrac{\\mathbf{V}}{\\mathbf{Z}}', 'Omsæt alt til fasorer og impedanser, regn som DC, og omsæt svaret tilbage til tid.', ['dag05.html', 'Øvelseslab dag 5']],
+    ['t4', 'Hvor meget effekt bruger lasten?', 'P=\\tilde V\\tilde I\\cos\\theta', 'θ er vinklen mellem spænding og strøm, altså impedansens vinkel. cos θ er effektfaktoren.', ['dag06.html', 'Øvelseslab dag 6']],
+    ['t4', 'Hvor stor kondensator retter effektfaktoren?', 'C=\\dfrac{Q_C}{\\omega\\tilde V^2}', 'Kondensatoren leverer den reaktive effekt, som motoren ellers trækker fra nettet.', ['dag07.html', 'Øvelseslab dag 7']],
+    ['t5', 'Spænding og strøm på transformerens anden side?', '\\dfrac{V_2}{V_1}=\\dfrac{N_2}{N_1}=\\dfrac{I_1}{I_2}', 'Effekten er den samme på begge sider (ideel transformer). Op i spænding betyder ned i strøm.', ['dag08.html', 'Øvelseslab dag 8']],
+    ['t5', 'Hastighed og moment for en motor?', 'n_s=\\dfrac{120f}{p},\\quad s=\\dfrac{n_s-n}{n_s}', 'Induktionsmotoren kører lidt under synkron hastighed. DC-motoren: T = kφI_a og E_b = kφω.', ['dag07.html', 'Øvelseslab dag 7']],
+    ['t6', 'Linjespænding, strøm og effekt i trefase?', 'V_L=\\sqrt3\\,V_f,\\quad P=\\sqrt3\\,V_L I_L\\cos\\theta', '230 V er fasespænding, 400 V er linjespænding. Balanceret last: regn én fase og gang med tre.', ['dag09.html', 'Øvelseslab dag 9']],
+    ['t6', 'Hvad beskytter mod stød, og hvad mod overlast?', 'I_{\\Delta n}=30\\ \\text{mA}', 'Sikringen beskytter ledningen mod for stor strøm. RCD (HPFI) slår fra, når strøm løber den forkerte vej, fx gennem et menneske.', ['dag11.html', 'Øvelseslab dag 11']]
+  ],
+  tip: '<b>Tommelfingerregel:</b> Står der en frekvens eller en sinus i opgaven, så skift til fasorer med det samme. Står der kW og cos φ, er det effekt (tema 4). Står der 400 V, er det næsten altid linjespænding i trefase.',
+  decksTitle: 'Intro-decks: ét pr. tema',
+  decksSub: 'Fem slides pr. tema: hverdagsbillede, tre kerneidéer med formel, tal og en graf at lege med, og til sidst typiske fejl og koblingen til eksamen. → / mellemrum: næste · F: fuld skærm.',
+  decks: [
+    ['t1', 'tema1', 'TEMA 1 · DAG 2', 'DC og Kirchhoff', 'Ohms lov, effekt, knudepunkts- og maskemetoden.', 'V=IR'],
+    ['t2', 'tema2', 'TEMA 2 · DAG 3–4', 'Komplekse tal, C og L', 'De tre former af et komplekst tal, kondensatoren og spolen.', 'i=C\\dfrac{dv}{dt}'],
+    ['t3', 'tema3', 'TEMA 3 · DAG 4–5', 'RMS, fasorer og impedans', 'Hvorfor 230 V er 325 V i top, og hvordan AC regnes som DC.', '\\mathbf Z_C=\\dfrac{1}{j\\omega C}'],
+    ['t4', 'tema4', 'TEMA 4 · DAG 6–7', 'AC-effekt og effektfaktor', 'Aktiv, reaktiv og tilsyneladende effekt, og hvordan cos φ rettes.', 'S=P+jQ'],
+    ['t5', 'tema5', 'TEMA 5 · DAG 7–8, 10', 'Transformer og maskiner', 'Omsætningsforhold, DC-motoren og induktionsmotorens slip.', '\\dfrac{V_2}{V_1}=\\dfrac{N_2}{N_1}'],
+    ['t6', 'tema6', 'TEMA 6 · DAG 9–11', 'Trefase og elnettet', 'Stjerne og trekant, trefaseeffekt, sikring og RCD.', 'P=\\sqrt3\\,V_LI_L\\cos\\theta']
+  ],
+  exTitle: 'De 13 eksamensemner fordelt på temaer',
+  exHead: ['Tema', 'Emner (dag 12) og øvelseslab', 'Hvad der regnes'],
+  ex: [
+    ['t1', 'Tema 1 · DC og Kirchhoff', [['dag02.html', '1 Ohm, effekt og Kirchhoff']], 'I, V, P'],
+    ['t2', 'Tema 2 · Komplekse tal, C og L', [['dag03.html', '2 Komplekse tal'], ['dag03.html', '3 Kondensator og spole']], 'r∠θ, i_C, v_L, W'],
+    ['t3', 'Tema 3 · RMS, fasorer, impedans', [['dag04.html', '4 Middel og RMS'], ['dag04.html', '5 Fasorer'], ['dag05.html', '6 Impedans']], 'Ṽ, Z, I'],
+    ['t4', 'Tema 4 · AC-effekt', [['dag06.html', '7 AC-effekt og pf'], ['dag07.html', '8 Kompleks effekt og korrektion']], 'P, Q, S, C'],
+    ['t5', 'Tema 5 · Transformer og maskiner', [['dag08.html', '9 Transformeren'], ['dag07.html', '10 Elektriske maskiner'], ['dag10.html', '12 Motorstart']], 'n, E_b, T, s'],
+    ['t6', 'Tema 6 · Trefase og elnettet', [['dag09.html', '11 Trefase'], ['dag11.html', '13 Installationer og elnet']], 'V_L, P, RCD']
+  ],
+  exBase: '../lab/',
+  exNote: 'Emnelisten er fra dag 12-noten og bygger på kursusplanen. Den er ikke underviserens officielle liste. Øvelseslab dag 12 er en eksamenstræner med 15 opgavetyper.',
+  footer: 'Kilde: Rizzoni, G. og Kearns, J. (2022). <i>Fundamentals of electrical engineering</i> (2. udg.). McGraw Hill. Pontoppidan, K. (2026). ELE1-slides, VIA. Lavet med hjælp fra Claude (Anthropic).'
+};
+</script>
+<script src="assets/oversigt.js"></script>
+</body>
+</html>

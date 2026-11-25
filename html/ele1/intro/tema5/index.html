@@ -1,0 +1,359 @@
+<!doctype html><html lang="da"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tema 5 · Transformer og elektriske maskiner</title>
+<meta name="description" content="Hurtigstart til ELE1 tema 5: ideel transformer, DC-motorens modspænding og induktionsmotorens slip og motorstart (Rizzoni og Kearns, afsnit 6.4 og kap. 13, dag 7, 8 og 10).">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../assets/deck.css"></head>
+<body>
+<div id="vp"><div id="deck">
+
+<!-- ============ 0 · FORSIDE ============ -->
+<section class="slide on" data-title="Forside">
+  <div style="flex:1;display:grid;grid-template-columns:1fr 600px;gap:34px;align-items:center;padding:0 10px">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div>
+        <div class="tag" style="display:inline-block">ELE1 · HURTIGSTART · TEMA 5</div>
+        <h1 style="font-size:64px;margin-top:18px">Transformer og elektriske maskiner</h1>
+        <div style="font-size:26px;color:var(--mut);margin-top:6px">Et skiftende magnetfelt <b>flytter energi</b> uden ledning: gennem en jernkerne i transformeren og over luftspalten i motoren</div>
+      </div>
+      <div class="card qcard"><span class="lbl cy">KORT FORTALT</span>
+        En transformer er to spoler om samme jernkerne. Den ene spole puster feltet frem og tilbage, og den anden mærker det. Flere vindinger giver mere spænding, men mindre strøm. En induktionsmotor er en transformer, hvor sekundærsiden er rotoren. Feltet drejer rundt, og rotoren følger efter, men altid lidt bagud. Den lille forskel er <b>slippet</b>, og uden den ville der ikke være noget moment.</div>
+      <div class="plan">
+        <div><b class="cy">1 · Transformer</b><span data-tex="V_2=N V_1,\ I_2=I_1/N"></span></div>
+        <div><b class="or">2 · DC-motor</b><span data-tex="V_a=R_aI_a+E_b"></span></div>
+        <div><b class="pu">3 · Induktionsmotor</b><span data-tex="n_s=\tfrac{120f}{p},\ s=\tfrac{n_s-n}{n_s}"></span></div>
+        <div><b class="gr">4 · Tjek</b>fejl og eksamen</div>
+      </div>
+      <div class="links"><a href="../../dag/Dag07_Studienote.pdf">📖 Studienote dag 7</a><a href="../../dag/Dag08_Studienote.pdf">📖 Studienote dag 8</a><a href="../../../../lab/ele1/transformer.html">🧪 3D-lab: transformer</a><a href="../../../../lab/ele1/dc-motor.html">🧪 3D-lab: DC-motor</a><a href="../../../../lab/ele1/induktionsmotor.html">🧪 3D-lab: induktionsmotor</a></div>
+    </div>
+    <div class="card" style="padding:12px"><canvas id="c0" width="560" height="440"></canvas>
+      <div style="font-size:18px;color:var(--mut);text-align:center;margin-top:8px">Fluxen pulserer i kernen. Rotoren løber <b>bagud</b> efter det roterende felt (slip, her overdrevet)</div></div>
+  </div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm &nbsp;·&nbsp; ☰: alle temaer</div>
+</section>
+
+<!-- ============ 1 · TRANSFORMER ============ -->
+<section class="slide" id="s1" data-title="1 · Transformer">
+  <div class="hd"><span class="tag">IDÉ 1 · TRANSFORMER</span><h1>Spænding op, strøm ned, samme effekt</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Ideel transformer</h3>
+      <div class="big" style="font-size:30px" data-tex="N=\dfrac{n_2}{n_1},\quad \tilde V_2=N\tilde V_1,\quad \tilde I_2=\dfrac{\tilde I_1}{N}"></div>
+      <div class="src">Rizzoni og Kearns (2022), lign. (6.29) og (6.30), s. 329 til 330</div>
+      <div class="big" style="font-size:30px" data-tex="\mathbf Z_1=\dfrac{\mathbf Z_2}{N^2}"></div>
+      <div class="src">Lign. (6.32), s. 331. Samme effekt: <span data-tex="\mathbf S_1=\mathbf S_2"></span>, lign. (6.31), s. 330</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="N"></span><span><b>Vindingsforhold</b>: spænding pr. vinding er ens, så spændingerne forholder sig som vindingstallene</span></div>
+        <div class="term"><span class="s or" data-tex="\tilde I"></span><span><b>Strømmen omvendt</b>: <span data-tex="V\cdot I"></span> er ens på begge sider, så højere spænding giver lavere strøm</span></div>
+        <div class="term"><span class="s pu" data-tex="N^2"></span><span><b>Impedans</b> ses med kvadratet. Lasten på sekundærsiden ser fra nettet ud som <span data-tex="Z_2/N^2"></span></span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n">1</span><div class="t"><b>12 V-lampe</b> på 230 V, 24 W
+        <span class="m" data-tex="N=\dfrac{12}{230}=0{,}0522"></span></div></div>
+      <div class="step"><span class="n">2</span><div class="t"><b>Strømmene</b>
+        <span class="m" data-tex="\tilde I_2=\dfrac{24}{12}=2\ \text{A},\ \ \tilde I_1=N\tilde I_2=0{,}104\ \text{A}"></span></div></div>
+      <div class="step"><span class="n">3</span><div class="t"><b>Nettet ser</b>, lampen er 6 Ω
+        <span class="m" data-tex="\boxed{R_1=\dfrac{6}{0{,}0522^2}=2204\ \Omega}"></span>
+        <span class="note">Kontrol: 230 V / 0,104 A = 2204 Ω</span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Ledningstab</b>, 1 MW i 2 Ω
+        <span class="m" data-tex="10\,\text{kV}:\ 100\,\text{A}\Rightarrow 20\ \text{kW}"></span>
+        <span class="m" data-tex="400\,\text{V}:\ 2500\,\text{A}\Rightarrow \boxed{12{,}5\ \text{MW}}"></span>
+        <span class="note">Ved 400 V er tabet større end effekten</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Transformer og ledning</h3>
+      <canvas id="t1" width="640" height="180"></canvas>
+      <div class="sl"><span style="color:var(--or)">n<sub>1</sub></span><input id="n1" type="range" min="100" max="1000" step="50" value="500"><output id="n1o"></output></div>
+      <div class="sl"><span style="color:var(--pu)">n<sub>2</sub></span><input id="n2" type="range" min="100" max="5000" step="100" value="5000"><output id="n2o"></output></div>
+      <div class="sl"><span>Last P</span><input id="p1" type="range" min="1" max="50" step="1" value="20"><output id="p1o"></output></div>
+      <div class="ro r3">
+        <div><span>V<sub>2</sub></span><b class="pu" id="r1v">2300</b><i>V</i></div>
+        <div><span>I<sub>2</sub></span><b class="pu" id="r1i2">8,7</b><i>A</i></div>
+        <div><span>I<sub>1</sub></span><b class="or" id="r1i1">87,0</b><i>A</i></div>
+      </div>
+      <canvas id="g1" width="640" height="150"></canvas>
+      <div class="status" id="st1"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Spændingen følger vindingerne, strømmen følger dem omvendt, og effekten er den samme. Høj spænding giver lille strøm, og derfor lille tab i ledningen.</span></div>
+</section>
+
+<!-- ============ 2 · DC-MOTOR ============ -->
+<section class="slide" id="s2" data-title="2 · DC-motor">
+  <div class="hd"><span class="tag b">IDÉ 2 · DC-MOTOR</span><h1>Modspændingen styrer strøm og hastighed</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Modspænding og ankerkreds</h3>
+      <div class="big" style="font-size:30px" data-tex="E_b=k_a\phi\,\omega_m,\qquad T=k_T\phi\,I_a"></div>
+      <div class="src">Rizzoni og Kearns (2022), lign. (13.8) og (13.6), s. 706</div>
+      <div class="big" style="font-size:30px" data-tex="V_a=R_aI_a+E_b"></div>
+      <div class="src">Lign. (13.14), s. 707 (KVL i ankerkredsen)</div>
+      <div class="big" style="font-size:26px" data-tex="\omega_m=\dfrac{V_s}{k_a\phi}-\dfrac{R_a}{(k_a\phi)^2}\,T"></div>
+      <div class="src">Lign. (13.24), s. 710. En ret linje</div>
+      <div class="terms">
+        <div class="term"><span class="s pu" data-tex="E_b"></span><span><b>Modspændingen</b> vokser med hastigheden og modvirker forsyningen. Ved stilstand er den 0</span></div>
+        <div class="term"><span class="s or" data-tex="R_aI_a"></span><span><b>Ankerets spændingsfald</b>: kun det, som modspændingen ikke tager, driver strøm gennem lille <span data-tex="R_a"></span></span></div>
+        <div class="term"><span class="s cy" data-tex="\omega_m"></span><span><b>Hastighed</b> falder lidt, når momentet stiger, fordi <span data-tex="R_a"></span> er lille</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n b">1</span><div class="t"><b>PM-motor</b>
+        <span class="m" data-tex="V_s=24\ \text{V},\ R_a=0{,}5\ \Omega,\ k_a\phi=0{,}1"></span></div></div>
+      <div class="step"><span class="n b">2</span><div class="t"><b>Tomgang og stilstand</b>
+        <span class="m" data-tex="\omega_{m0}=\dfrac{24}{0{,}1}=240\ \text{rad/s},\ \ T_0=4{,}8\ \text{N m}"></span>
+        <span class="note">Ved start er <span data-tex="E_b=0"></span>, så <span data-tex="I_a=24/0{,}5=48"></span> A</span></div></div>
+      <div class="step"><span class="n b">3</span><div class="t"><b>Last 1 N m</b>
+        <span class="m" data-tex="I_a=\dfrac{1}{0{,}1}=10\ \text{A},\ \ E_b=24-10\cdot0{,}5=19\ \text{V}"></span>
+        <span class="m" data-tex="\boxed{\omega_m=\dfrac{19}{0{,}1}=190\ \text{rad/s}}"></span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Effekter</b>
+        <span class="m" data-tex="P_{\text{mek}}=T\omega_m=190\ \text{W},\ P_{\text{el}}=24\cdot10=240\ \text{W}"></span>
+        <span class="m" data-tex="\eta=0{,}79,\ \text{tab}\ R_aI_a^2=50\ \text{W}"></span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Hastighed mod belastningsmoment</h3>
+      <canvas id="g2" width="640" height="340"></canvas>
+      <canvas id="b2" width="640" height="165"></canvas>
+      <div class="sl"><span>Moment T</span><input id="t2" type="range" min="0" max="4.8" step="0.05" value="1"><output id="t2o"></output></div>
+      <div class="ro r3">
+        <div><span>hastighed n</span><b class="cy" id="r2n">1814</b><i>o/min</i></div>
+        <div><span>ankerstrøm I<sub>a</sub></span><b class="or" id="r2i">10,0</b><i>A</i></div>
+        <div><span>modspænding E<sub>b</sub></span><b class="pu" id="r2e">19,0</b><i>V</i></div>
+      </div>
+      <div class="status" id="st2"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Mere last giver mere strøm, mere spændingsfald i ankeret og lavere modspænding, og derfor lavere hastighed. Ved start er modspændingen nul, og startstrømmen er stor.</span></div>
+</section>
+
+<!-- ============ 3 · INDUKTIONSMOTOR ============ -->
+<section class="slide" id="s3" data-title="3 · Induktionsmotor">
+  <div class="hd"><span class="tag p">IDÉ 3 · INDUKTIONSMOTOR</span><h1>Rotoren løber bagud efter feltet, og forskellen er slippet</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Synkron hastighed og slip</h3>
+      <div class="big" style="font-size:34px" data-tex="n_s=\dfrac{120\,f}{p}"></div>
+      <div class="src">Rizzoni og Kearns (2022), lign. (13.41), s. 724. <span data-tex="p"></span> er antal poler</div>
+      <div class="big" style="font-size:30px" data-tex="s=\dfrac{n_s-n}{n_s},\quad n=n_s(1-s)"></div>
+      <div class="src">Lign. (13.59) og (13.60), s. 733. Typisk 3 til 5 % ved fuld last</div>
+      <div class="terms">
+        <div class="term"><span class="s or" data-tex="n_s"></span><span><b>Feltets hastighed</b>, fast ved 50 Hz: 3000, 1500 eller 1000 o/min for 2, 4 og 6 poler</span></div>
+        <div class="term"><span class="s pu" data-tex="s"></span><span><b>Slip</b>: 0 ved synkron hastighed, 1 ved stilstand. Uden slip skærer feltet ikke rotoren, og momentet er 0</span></div>
+        <div class="term"><span class="s gr" data-tex="I_Y=\tfrac{I_\Delta}{3}"></span><span><b>Motorstart</b>: ved start er <span data-tex="s=1"></span> og strømmen stor. Stjerne-trekant giver en tredjedel af strøm og moment</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n p">1</span><div class="t"><b>4 poler, 50 Hz</b>
+        <span class="m" data-tex="n_s=\dfrac{120\cdot50}{4}=1500\ \text{o/min}"></span></div></div>
+      <div class="step"><span class="n p">2</span><div class="t"><b>Fuld last</b>, 1440 o/min
+        <span class="m" data-tex="s=\dfrac{1500-1440}{1500}=0{,}04,\ \ f_R=sf=2\ \text{Hz}"></span></div></div>
+      <div class="step"><span class="n p">3</span><div class="t"><b>Moment</b>, 7,5 kW, <span data-tex="\omega_m=\tfrac{2\pi n}{60}"></span>
+        <span class="m" data-tex="\omega_m=150{,}8\ \tfrac{\text{rad}}{\text{s}},\ \ \boxed{T=\dfrac{7500}{150{,}8}=49{,}7\ \text{N m}}"></span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Motorstart</b>, direkte start (DOL) giver 90 A
+        <span class="m" data-tex="\boxed{I_Y=\dfrac{90}{3}=30\ \text{A}}"></span>
+        <span class="note">Startmomentet falder også til en tredjedel</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Moment mod hastighed (typisk kurveform)</h3>
+      <div class="row" id="pb"><button class="btn" data-p="2">2 poler</button><button class="btn on" data-p="4">4 poler</button><button class="btn" data-p="6">6 poler</button></div>
+      <canvas id="g3" width="640" height="420"></canvas>
+      <div class="sl"><span>Slip s</span><input id="sl3" type="range" min="0" max="1" step="0.005" value="0.04"><output id="sl3o"></output></div>
+      <div class="row"><button class="btn pu" id="rat3">Mærkelast</button><button class="btn rd" id="str3">Start (s = 1)</button></div>
+      <div class="ro r3">
+        <div><span>n<sub>s</sub></span><b class="or" id="r3s">1500</b><i>o/min</i></div>
+        <div><span>rotor n</span><b class="pu" id="r3n">1440</b><i>o/min</i></div>
+        <div><span>f<sub>R</sub> = s·f</span><b class="cy" id="r3f">2,0</b><i>Hz</i></div>
+      </div>
+      <div class="status" id="st3"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Feltets hastighed følger frekvens og poltal, og rotoren løber lidt bagud. Ved start er slippet 1, strømmen stor og momentet moderat, og i drift ligger slippet få procent.</span></div>
+</section>
+
+<!-- ============ 4 · FALDGRUBER OG TJEK ============ -->
+<section class="slide" data-title="4 · Faldgruber og tjek">
+  <div class="hd"><span class="tag g">FALDGRUBER OG TJEK</span><h1>Hvor det typisk går galt</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Typiske fejl</h3>
+      <div class="fejl">
+        <div><span>Omsætningsforholdet vendes: strømmen ganges med <span data-tex="N"></span> som spændingen.<span class="ret"><span data-tex="\tilde V_2=N\tilde V_1"></span>, men <span data-tex="\tilde I_2=\tilde I_1/N"></span>. Spændingen op giver strømmen ned. 230 V til 12 V: <span data-tex="\tilde I_1=0{,}104"></span> A.</span></span></div>
+        <div><span>Typeskiltets effekt regnes som elektrisk.<span class="ret">Den er mekanisk: <span data-tex="P_{\text{el}}=P_{\text{mek}}/\eta"></span>. Her 190 W mek. og 79 % giver 240 W fra nettet.</span></span></div>
+        <div><span>Poltal og polpar blandes i den synkrone hastighed.<span class="ret"><span data-tex="n_s=120f/p"></span> med antal poler. 2 poler giver 3000 o/min, 4 giver 1500. Med polpar er det <span data-tex="60f/p"></span>.</span></span></div>
+        <div><span>o/min indsættes i <span data-tex="P=T\omega"></span> uden omregning.<span class="ret"><span data-tex="\omega=2\pi n/60"></span>. 1440 o/min er 150,8 rad/s, og 7,5 kW giver 49,7 N m, ikke 5,2.</span></span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Tjek dig selv</h3>
+      <div class="qa">
+        <details><summary>En 6 Ω lampe sidder bag 230 V/12 V. Hvilken modstand ser nettet?</summary><p><span data-tex="N=12/230"></span>, så <span data-tex="R_1=6/N^2=2204\ \Omega"></span>. Impedansen deles med <span data-tex="N^2"></span> og ikke med <span data-tex="N"></span>.</p></details>
+        <details><summary>En 2-polet motor kører 2940 o/min ved 50 Hz. Hvad er slippet?</summary><p><span data-tex="n_s=120\cdot50/2=3000"></span> o/min, så <span data-tex="s=(3000-2940)/3000=0{,}02"></span>, altså 2 %.</p></details>
+        <details><summary>En motor trækker 90 A ved direkte start. Hvad sker der med stjerne-trekant?</summary><p>Strømmen bliver 30 A, en tredjedel. Startmomentet falder også til en tredjedel, så den kun kan bruges til lette starter.</p></details>
+      </div>
+    </div>
+    <div class="card col">
+      <h3>Til eksamen</h3>
+      <div class="exlinks">
+        <a href="../../lab/dag08.html"><b>EMNE 9</b><span> Transformeren · omsætning, Z/N², elnettet</span></a>
+        <a href="../../lab/dag07.html"><b>EMNE 10</b><span> Elektriske maskiner · DC-motor, synkron hastighed, slip</span></a>
+        <a href="../../lab/dag12.html"><b>EMNE 12</b><span> Motorstart · startstrøm, DOL, stjerne-trekant</span></a>
+      </div>
+      <h3 style="margin-top:8px">Læs i bogen</h3>
+      <div style="display:grid;gap:6px;font-size:16px;line-height:1.35">
+        <div><b>Lign. (6.29) til (6.32), s. 329</b> ideel transformer</div>
+        <div><b>Eksempel 6.14, s. 335</b> ledningstab og høj spænding</div>
+        <div><b>Lign. (13.6) til (13.14), s. 706</b> DC-motor og modspænding</div>
+        <div><b>Lign. (13.41), s. 724</b> synkron hastighed</div>
+        <div><b>Lign. (13.59) og (13.60), s. 733</b> slip og momentkurve, s. 738</div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Tjek først, om tallet hører til spændingen eller strømmen, og om effekten er elektrisk eller mekanisk. Omregn hastighed til rad/s, før der regnes moment og effekt.</span></div>
+</section>
+
+</div></div>
+<script src="../assets/deck.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = D.$, fmt = D.fmt, PI = Math.PI;
+var CY = '#0a7fc2', OR = '#d97a00', PU = '#7b4fc9', GR = '#0a9a5c', RD = '#d63a3a', INK = '#14202d', MUT = '#5a6b7d';
+
+/* ---------- slide 0: transformer med pulserende flux og motor med slip ---------- */
+(function () {
+  var x = D.cv('c0').x, ph = 0, ang = 0, rot = 0;
+  var X0 = 40, X1 = 250, Y0 = 100, Y1 = 330, LX = 67.5, RX = 222.5, TY = 120, BY = 310;
+  function pathPt(u) { /* u i [0,1) rundt i kernens midterlinje, urets retning */
+    var w = RX - LX, h = BY - TY, per = 2 * (w + h), d = ((u % 1) + 1) % 1 * per;
+    if (d < w) return [LX + d, TY, 1, 0]; d -= w;
+    if (d < h) return [RX, TY + d, 0, 1]; d -= h;
+    if (d < w) return [RX - d, BY, -1, 0]; d -= w;
+    return [LX, BY - d, 0, -1];
+  }
+  D.anim(0, function (dt, t) {
+    x.clearRect(0, 0, 560, 440);
+    D.txt(x, 'Transformer', 145, 26, 24, INK, 'center', 'middle', 800);
+    D.txt(x, 'Induktionsmotor', 425, 26, 24, INK, 'center', 'middle', 800);
+    /* kerne */
+    x.fillStyle = '#c9d3de'; x.fillRect(X0, Y0, X1 - X0, Y1 - Y0);
+    x.fillStyle = '#fff'; x.fillRect(95, 150, 100, 130);
+    x.strokeStyle = '#9fb0c2'; x.lineWidth = 2; x.strokeRect(X0, Y0, X1 - X0, Y1 - Y0); x.strokeRect(95, 150, 100, 130);
+    /* spoler: få til venstre, mange til højre */
+    var i;
+    for (i = 0; i < 4; i++) D.line(x, [[X0 - 8, 168 + i * 24], [95 + 6, 168 + i * 24]], OR, 7);
+    for (i = 0; i < 11; i++) D.line(x, [[195 - 6, 160 + i * 11], [X1 + 8, 160 + i * 11]], PU, 4);
+    D.txt(x, 'få vindinger', 68, 356, 19, OR, 'center');
+    D.txt(x, 'mange vindinger', 222, 356, 19, PU, 'center');
+    D.txt(x, 'n₁', 68, 380, 22, OR, 'center', 'middle', 800);
+    D.txt(x, 'n₂', 222, 380, 22, PU, 'center', 'middle', 800);
+    /* flux */
+    var s = Math.sin(t * 3.2), a = Math.abs(s); ph += dt * s * 0.45;
+    var pts = [[LX, TY], [RX, TY], [RX, BY], [LX, BY], [LX, TY]], k;
+    x.globalAlpha = 0.25 + 0.6 * a; D.line(x, pts, CY, 5 + 7 * a); x.globalAlpha = 1;
+    for (k = 0; k < 4; k++) {
+      var q = pathPt(ph + k * 0.25), sg = s >= 0 ? 1 : -1, L = 16 + 10 * a;
+      D.arrow(x, q[0] - sg * q[2] * L, q[1] - sg * q[3] * L, q[0] + sg * q[2] * L * 0.6, q[1] + sg * q[3] * L * 0.6, CY, 6);
+    }
+    D.txt(x, 'flux Φ', 145, 215, 22, CY, 'center', 'middle', 800);
+    /* motor */
+    var cx = 425, cy = 225, R = 98, slip = 0.12;
+    ang += dt * 2.2; rot += dt * 2.2 * (1 - slip);
+    D.circ(x, cx, cy, R, '#eef2f6', '#7c8b9b', 9);
+    D.circ(x, cx, cy, 58, '#fff', '#9fb0c2', 3);
+    for (i = 0; i < 8; i++) { var rr = rot + i * PI / 4; D.circ(x, cx + 44 * Math.cos(rr), cy - 44 * Math.sin(rr), i ? 5 : 8, i ? '#9fb0c2' : PU); }
+    D.line(x, [[cx, cy], [cx + 44 * Math.cos(rot), cy - 44 * Math.sin(rot)]], PU, 4);
+    var fx = Math.cos(ang), fy = -Math.sin(ang);
+    D.line(x, [[cx - fx * 82, cy - fy * 82], [cx + fx * 82, cy + fy * 82]], OR, 8);
+    D.circ(x, cx + fx * 82, cy + fy * 82, 13, RD); D.circ(x, cx - fx * 82, cy - fy * 82, 13, CY);
+    D.txt(x, 'N', cx + fx * 82, cy + fy * 82, 15, '#fff', 'center', 'middle', 800);
+    D.txt(x, 'S', cx - fx * 82, cy - fy * 82, 15, '#fff', 'center', 'middle', 800);
+    D.txt(x, 'felt n_s', 425, 352, 21, OR, 'center', 'middle', 800);
+    D.txt(x, 'rotor n < n_s', 425, 380, 21, PU, 'center', 'middle', 800);
+    D.txt(x, 'slip s', 425, 408, 20, MUT, 'center');
+  });
+})();
+
+/* ---------- slide 1: transformer og ledningstab ---------- */
+var RL = 2, V1 = 230;
+function coil(x, cx, cy, h, turns, col, label) {
+  var i, gap = h / turns;
+  for (i = 0; i < turns; i++) D.line(x, [[cx - 26, cy - h / 2 + gap * (i + 0.5)], [cx + 26, cy - h / 2 + gap * (i + 0.5)]], col, Math.max(2, Math.min(6, gap * 0.55)));
+  D.txt(x, label, cx, cy + h / 2 + 18, 20, col, 'center', 'middle', 800);
+}
+function upd1() {
+  var n1 = +$('n1').value, n2 = +$('n2').value, Pk = +$('p1').value, P = Pk * 1000;
+  var N = n2 / n1, V2 = N * V1, I2 = P / V2, I1 = P / V1;
+  $('n1o').textContent = n1; $('n2o').textContent = n2; $('p1o').textContent = Pk + ' kW';
+  $('r1v').textContent = V2 < 100 ? fmt(V2, 1) : Math.round(V2); $('r1i2').textContent = fmt(I2, 1); $('r1i1').textContent = fmt(I1, 1);
+  var tUden = I1 * I1 * RL, tMed = I2 * I2 * RL;
+  /* tegning */
+  var G = D.cv('t1'), x = G.x;
+  x.clearRect(0, 0, G.W, G.H);
+  var cxL = 250, cxR = 390;
+  x.fillStyle = '#c9d3de'; x.fillRect(cxL - 50, 20, cxR - cxL + 100, 22); x.fillRect(cxL - 50, 118, cxR - cxL + 100, 22);
+  x.fillRect(cxL - 50, 20, 24, 120); x.fillRect(cxR + 26, 20, 24, 120);
+  var tl = Math.max(2, Math.min(12, Math.round(n1 / 100))), tr = Math.max(2, Math.min(12, Math.round(n2 / 420)));
+  coil(x, cxL - 38, 80, 90, tl, OR, 'n₁ = ' + n1);
+  coil(x, cxR + 38, 80, 90, tr, PU, 'n₂ = ' + n2);
+  D.txt(x, 'V₁ = 230 V', 20, 62, 24, OR, 'left', 'middle', 800);
+  D.txt(x, 'I₁ = ' + fmt(I1, 1) + ' A', 20, 96, 24, OR, 'left', 'middle', 700);
+  D.txt(x, 'V₂ = ' + (V2 < 100 ? fmt(V2, 1) : Math.round(V2)) + ' V', 620, 62, 24, PU, 'right', 'middle', 800);
+  D.txt(x, 'I₂ = ' + fmt(I2, 1) + ' A', 620, 96, 24, PU, 'right', 'middle', 700);
+  D.txt(x, 'N = ' + fmt(N, 2), 320, 80, 24, INK, 'center', 'middle', 800);
+  /* tabsøjler, logaritmisk */
+  var B = D.cv('g1'), y = B.x, L = 190, R = B.W - 16;
+  y.clearRect(0, 0, B.W, B.H);
+  D.txt(y, 'Tab i ledningen (2 Ω) ved samme last, log. skala', 4, 18, 22, MUT, 'left');
+  function lx(v) { return L + (Math.log10(Math.max(v, 1)) - 0) / 7 * (R - L); }
+  [1, 100, 10000, 1000000].forEach(function (v, i) { var px = lx(v); y.strokeStyle = 'rgba(159,176,194,.45)'; y.lineWidth = 1; y.beginPath(); y.moveTo(px, 40); y.lineTo(px, 118); y.stroke(); D.txt(y, ['1 W', '100 W', '10 kW', '1 MW'][i], px, 136, 18, MUT, i === 0 ? 'left' : 'center'); });
+  y.fillStyle = RD; y.fillRect(L, 46, lx(tUden) - L, 28); y.fillStyle = GR; y.fillRect(L, 84, Math.max(2, lx(tMed) - L), 28);
+  D.txt(y, 'direkte, 230 V', L - 8, 60, 20, RD, 'right', 'middle', 700);
+  D.txt(y, 'med transformer', L - 8, 98, 20, GR, 'right', 'middle', 700);
+  function lab(v) { return v >= 1e4 ? fmt(v / 1000, 1) + ' kW' : fmt(v, 0) + ' W'; }
+  function put(v, yy) { if (lx(v) > R - 100) D.txt(y, lab(v), lx(v) - 8, yy, 20, '#fff', 'right', 'middle', 700); else D.txt(y, lab(v), lx(v) + 8, yy, 20, INK, 'left', 'middle', 700); }
+  put(tUden, 60); put(tMed, 98);
+  var ratio = tUden / tMed;
+  $('st1').innerHTML = (N > 1.05 ? 'Optransformer: strømmen i ledningen er <b>' + fmt(N, 1) + ' gange mindre</b>, tabet <b>' + fmt(ratio, 0) + ' gange mindre</b>.' : (N < 0.95 ? 'Nedtransformer: strømmen i ledningen vokser, og tabet bliver <b>' + fmt(1 / ratio, 1) + ' gange større</b>.' : 'N ≈ 1: ingen forskel.')) + (tUden > P ? ' <span class="mu">Direkte tabes mere end ' + Pk + ' kW: umulig overførsel.</span>' : '');
+}
+['n1', 'n2', 'p1'].forEach(function (id) { $(id).oninput = upd1; });
+upd1();
+
+/* ---------- slide 2: DC-motor ---------- */
+var VS = 24, RA = 0.5, KK = 0.1;
+function wOfT(T) { return T > 4.8001 ? NaN : VS / KK - RA / (KK * KK) * T; }
+function upd2() {
+  var T = +$('t2').value, w = wOfT(T), Ia = T / KK, Eb = KK * w, n = w * 60 / (2 * PI);
+  $('t2o').textContent = fmt(T, 2) + ' N·m';
+  $('r2n').textContent = Math.round(n); $('r2i').textContent = fmt(Ia, 1); $('r2e').textContent = fmt(Eb, 1);
+  D.graph('g2', { f: wOfT, x0: 0, x1: 5.2, xt: [[0, '0'], [1, '1'], [2, '2'], [3, '3'], [4, '4'], [5, '5 N·m']], min: 0, max: 270, yt: [60, 120, 180, 240], yd: 0, lbl: 'ω (rad/s)', col: CY, d: 0, u: 'rad/s', xm: T, xl: 'belastningsmoment T' });
+  D.stack('b2', [{ v: Eb, col: PU, lbl: 'E_b' }, { v: RA * Ia, col: OR, lbl: 'R_a I_a' }], 1, { min: 0, max: 24, d: 1, u: 'V', note: ['', 'Eb (lilla) + Ra·Ia (orange) = Va'] });
+  var pm = T * w, pe = VS * Ia, eta = pe > 0 ? pm / pe * 100 : 0;
+  $('st2').innerHTML = T < 0.02 ? '<b>Tomgang</b>: næsten ingen strøm, modspændingen tager hele 24 V.' : (T > 4.74 ? '<b>Stilstand</b>: E<sub>b</sub> = 0 og I<sub>a</sub> = 24 / 0,5 = 48 A. Kun R<sub>a</sub> begrænser strømmen.' : 'P<sub>mek</sub> = ' + fmt(pm, 0) + ' W af P<sub>el</sub> = ' + fmt(pe, 0) + ' W, virkningsgrad <b>' + fmt(eta, 0) + ' %</b>. Resten ' + fmt(RA * Ia * Ia, 0) + ' W er varme i ankeret.');
+}
+$('t2').oninput = upd2; upd2();
+
+/* ---------- slide 3: induktionsmotor ---------- */
+var F = 50, P3 = 4, KIP = 260, SK = 0.2;
+function tOfS(s) { return 2 * KIP * s * SK / (s * s + SK * SK); }
+function upd3() {
+  var s = +$('sl3').value, ns = 120 * F / P3, n = ns * (1 - s), T = tOfS(s);
+  $('sl3o').textContent = fmt(s * 100, 1) + ' %';
+  $('r3s').textContent = Math.round(ns); $('r3n').textContent = Math.round(n); $('r3f').textContent = fmt(s * F, 1);
+  D.graph('g3', { f: function (nn) { return nn > ns + 0.5 ? NaN : tOfS((ns - nn) / ns); }, x0: 0, x1: 3200, xt: [[0, '0'], [1000, '1000'], [2000, '2000'], [3000, '3000']], min: 0, max: 300, yt: [100, 200, 300], yd: 0, lbl: 'T (% af mærkemoment)', col: PU, d: 0, u: '%', xm: n, xl: 'n (o/min)', vline: ns, hl: [100, 'mærkemoment'] });
+  var st;
+  if (s > 0.95) st = '<b>Start</b>: stort slip, stor startstrøm og moment ' + fmt(T, 0) + ' %. Direkte start (DOL) belaster nettet. Stjerne-trekant: en tredjedel af strøm og moment.';
+  else if (s < 0.005) st = '<b>Synkron hastighed</b>: ingen relativ bevægelse, ingen induceret strøm og intet moment.';
+  else if (s > SK) st = 'Ustabil gren efter kipmomentet (260 %): falder hastigheden, falder momentet også. Motoren kan gå i stå.';
+  else st = 'Driftsområdet: <b>' + fmt(n, 0) + ' o/min</b> giver ' + fmt(T, 0) + ' % af mærkemomentet. Mere last giver lidt mere slip, og hastigheden holder næsten.';
+  $('st3').innerHTML = st;
+}
+$('sl3').oninput = upd3;
+$('rat3').onclick = function () { $('sl3').value = 0.04; upd3(); };
+$('str3').onclick = function () { $('sl3').value = 1; upd3(); };
+document.querySelectorAll('#pb [data-p]').forEach(function (b) { b.onclick = function () { P3 = +b.dataset.p; document.querySelectorAll('#pb [data-p]').forEach(function (o) { o.classList.toggle('on', o === b); }); upd3(); }; });
+upd3();
+D.start();
+})();
+</script>
+</body></html>
