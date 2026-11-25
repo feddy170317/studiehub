@@ -1,0 +1,319 @@
+<!doctype html><html lang="da"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kap. 16 · Plan kinematik af et stift legeme</title>
+<meta name="description" content="Hurtigstart til DYN2 kap. 16: et stift legeme beskrives med ω og α, og alle punkter regnes ud fra dem med v = ωr, relativ hastighed og IC.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../assets/deck.css"><style>.sl{grid-template-columns:56px 1fr 128px}.sl output{font-size:17px}</style></head>
+<body>
+<div id="vp"><div id="deck">
+
+<!-- ============ 0 · FORSIDE ============ -->
+<section class="slide on" data-title="Forside">
+  <div style="flex:1;display:grid;grid-template-columns:1fr 600px;gap:34px;align-items:center;padding:0 10px">
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div>
+        <div class="tag" style="display:inline-block">DYN2 · HURTIGSTART · KAP. 16</div>
+        <h1 style="font-size:54px;margin-top:18px">Plan kinematik af et stift legeme</h1>
+        <div style="font-size:26px;color:var(--mut);margin-top:6px">Ét tal for drejningen (<span data-tex="\omega"></span>, <span data-tex="\alpha"></span>), og alle punkter på legemet kan regnes ud</div>
+      </div>
+      <div class="card qcard"><span class="lbl cy">KORT FORTALT</span>
+        Et cykelhjul ruller uden at glide. Punktet, der lige nu rører asfalten, står helt stille i det øjeblik. Navet kører med cyklens fart <span data-tex="v"></span>, og toppen af dækket kører med <span data-tex="2v"></span>. Hjulet drejer i et enkelt øjeblik om kontaktpunktet.</div>
+      <div class="plan">
+        <div><b class="cy">1 · Fast akse</b><span data-tex="v=\omega r"></span></div>
+        <div><b class="or">2 · Relativ fart</b>(16-16) og IC</div>
+        <div><b class="pu">3 · Relativ acc.</b>(16-19) og Coriolis</div>
+        <div><b class="gr">4 · Fejl og tjek</b>eksamen A26</div>
+      </div>
+      <div class="links"><a href="../../Kapitel16_Studienote.pdf">📖 Studienote PDF</a><a href="../../../../lab/dyn2/plan-bevaegelse.html">🧪 3D-lab</a><a href="../../eksamen/opg01/">📝 Opg. 1 Hacksaw</a><a href="../../eksamen/opg02/">📝 Opg. 2 Disk and slotted link</a><a href="../../eksamen/opg03/">📝 Opg. 3 Rods and collars</a></div>
+    </div>
+    <div class="card" style="padding:12px"><canvas id="c0" width="576" height="480"></canvas></div>
+  </div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm &nbsp;·&nbsp; ☰: alle kapitler</div>
+</section>
+
+<!-- ============ 1 · FAST AKSE ============ -->
+<section class="slide" id="s1" data-title="1 · Fast akse">
+  <div class="hd"><span class="tag">IDÉ 1 · ROTATION OM FAST AKSE</span><h1>Jo længere ude, jo hurtigere</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Fart og acceleration på en cirkelbane</h3>
+      <div class="big" style="font-size:32px;padding:2px 0" data-tex="v=\omega\,r"></div>
+      <div class="big" style="font-size:32px;padding:2px 0" data-tex="a_t=\alpha\,r"></div>
+      <div class="big" style="font-size:32px;padding:2px 0" data-tex="a_n=\omega^2 r"></div>
+      <div class="src">Hibbeler (2023), lign. (16-8) s. 334 · (16-11) og (16-12) s. 335</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="v"></span><span><b>Farten</b> langs banen. Tangent til cirklen, vokser med afstanden <span data-tex="r"></span> til aksen</span></div>
+        <div class="term"><span class="s pu" data-tex="a_t"></span><span><b>Tangentiel</b> acceleration: ændrer farten. Kræver <span data-tex="\alpha\neq0"></span></span></div>
+        <div class="term"><span class="s or" data-tex="a_n"></span><span><b>Normal</b> acceleration: peger mod aksen. Findes også ved <span data-tex="\alpha=0"></span></span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n">1</span><div class="t"><b>Hjul med <span data-tex="r=0{,}30"></span> m, <span data-tex="\omega=10"></span> rad/s</b>
+        <br><span class="note">Uden glid står kontaktpunktet stille. Navet er <span data-tex="r"></span> fra dette punkt (IC)</span></div></div>
+      <div class="step"><span class="n">2</span><div class="t"><b>Navets fart</b>
+        <span class="m" data-tex="\boxed{v_O=\omega r=10\cdot0{,}30=3{,}00\ \text{m/s}}"></span></div></div>
+      <div class="step"><span class="n">3</span><div class="t"><b>Et punkt på kanten set fra navet</b>
+        <span class="m" data-tex="v=\omega r=3{,}00\ \text{m/s}"></span>
+        <span class="m" data-tex="a_n=\omega^2 r=10^2\cdot0{,}30=30\ \text{m/s}^2"></span>
+        <span class="note">Afstanden skal være til aksen, ikke til legemets midte</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Træk i ω, r og α</h3>
+      <canvas id="c1" width="440" height="420"></canvas>
+      <div class="sl"><span>ω</span><input id="w1" type="range" min="0" max="6" step="0.1" value="4"><output id="w1o"></output></div>
+      <div class="sl"><span>r</span><input id="r1" type="range" min="0.1" max="1" step="0.05" value="0.8"><output id="r1o"></output></div>
+      <div class="sl"><span>α</span><input id="a1" type="range" min="0" max="20" step="0.5" value="8"><output id="a1o"></output></div>
+      <div class="ro r3">
+        <div><span>v</span><b class="cy" id="v1">0</b><i>m/s</i></div>
+        <div><span>a<sub>t</sub></span><b class="pu" id="t1">0</b><i>m/s²</i></div>
+        <div><span>a<sub>n</sub></span><b class="or" id="n1">0</b><i>m/s²</i></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Alle punkter drejer med samme ω. Et punkt dobbelt så langt fra aksen kører dobbelt så hurtigt, og normalaccelerationen peger altid ind mod aksen.</span></div>
+</section>
+
+<!-- ============ 2 · RELATIV HASTIGHED OG IC ============ -->
+<section class="slide" id="s2" data-title="2 · Relativ hastighed og IC">
+  <div class="hd"><span class="tag b">IDÉ 2 · RELATIV HASTIGHED OG IC</span><h1>Hvert punkt drejer om IC</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Relativ hastighed og IC-metoden</h3>
+      <div class="big" style="font-size:32px" data-tex="\mathbf{v}_B=\mathbf{v}_A+\boldsymbol{\omega}\times\mathbf{r}_{B/A}"></div>
+      <div class="src">Hibbeler (2023), lign. (16-16), s. 358</div>
+      <div class="big" style="font-size:32px;padding-top:0" data-tex="v_B=\omega\,r_{B/IC}"></div>
+      <div class="src">IC-metoden, §16.6, s. 369</div>
+      <div class="terms">
+        <div class="term"><span class="s" data-tex="\mathbf{v}_A"></span><span>Hastighed af et kendt punkt <span data-tex="A"></span> på samme legeme</span></div>
+        <div class="term"><span class="s gr" data-tex="\omega\,r_{B/A}"></span><span>Ekstra fart ved at dreje om <span data-tex="A"></span>. Retning: vinkelret på stangen <span data-tex="AB"></span></span></div>
+        <div class="term"><span class="s rd" data-tex="IC"></span><span>Punktet med <span data-tex="v=0"></span>. Hastigheden er vinkelret på linjen til IC</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n b">1</span><div class="t"><b>Toppen er <span data-tex="2r"></span> fra IC</b>
+        <span class="m" data-tex="v_{top}=\omega\cdot2r=10\cdot0{,}60=6{,}00\ \text{m/s}"></span></div></div>
+      <div class="step"><span class="n b">2</span><div class="t"><b>Sidepunkt B i navets højde</b>
+        <span class="m" data-tex="r_{B/IC}=\sqrt{r^2+r^2}=0{,}424\ \text{m}"></span></div></div>
+      <div class="step"><span class="n b">3</span><div class="t"><b>Farten af B</b>
+        <span class="m" data-tex="\boxed{v_B=10\cdot0{,}424=4{,}24\ \text{m/s}}"></span></div></div>
+      <div class="step"><span class="n b">4</span><div class="t"><b>Kontrol med (16-16)</b>
+        <span class="m" data-tex="\mathbf{v}_B=(3{,}00;\,0)+(0;\,{-3{,}00})"></span>
+        <span class="note">Samme 4,24 m/s, 45° nedad og fremad</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Vælg et punkt på hjulets kant</h3>
+      <canvas id="c2" width="440" height="390"></canvas>
+      <div class="sl"><span>vinkel</span><input id="p2" type="range" min="0" max="360" step="1" value="90"><output id="p2o"></output></div>
+      <div class="ro r3">
+        <div><span>r<sub>B/IC</sub></span><b class="rd" id="d2">0</b><i>m</i></div>
+        <div><span>v<sub>B</sub> = ω·r<sub>B/IC</sub></span><b class="gr" id="v2">0</b><i>m/s</i></div>
+        <div><span>v<sub>B</sub> / v<sub>navet</sub></span><b class="or" id="q2">0</b></div>
+      </div>
+      <div class="status" id="st2"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Hjulet drejer om IC lige nu. Afstanden til IC giver farten, og farten står altid vinkelret på linjen til IC.</span></div>
+</section>
+
+<!-- ============ 3 · RELATIV ACCELERATION ============ -->
+<section class="slide" id="s3" data-title="3 · Relativ acc. og Coriolis">
+  <div class="hd"><span class="tag p">IDÉ 3 · RELATIV ACCELERATION</span><h1>Tangentiel, normal og Coriolis</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Uden glidning: (16-19). Med glidning: 16-29</h3>
+      <div class="big" style="font-size:30px" data-tex="\mathbf{a}_B=\mathbf{a}_A+\boldsymbol{\alpha}\times\mathbf{r}_{B/A}-\omega^2\mathbf{r}_{B/A}"></div>
+      <div class="src">Hibbeler (2023), lign. (16-19), s. 382</div>
+      <div class="terms">
+        <div class="term"><span class="s" data-tex="\mathbf{a}_A"></span><span>Accelerationen af det kendte punkt <span data-tex="A"></span></span></div>
+        <div class="term"><span class="s pu" data-tex="\alpha\times r"></span><span><b>Tangentiel</b> del, størrelse <span data-tex="\alpha r"></span>, vinkelret på stangen</span></div>
+        <div class="term"><span class="s or" data-tex="-\omega^2 r"></span><span><b>Normal</b> del, størrelse <span data-tex="\omega^2 r"></span>, fra <span data-tex="B"></span> mod <span data-tex="A"></span></span></div>
+        <div class="term"><span class="s rd" data-tex="2\boldsymbol\Omega\times\mathbf{v}_{rel}"></span><span><b>Coriolis</b>: kommer med, når et punkt glider langs et led, der selv drejer med <span data-tex="\Omega"></span> (lign. 16-29, s. 398)</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n p">4</span><div class="t"><b>Navet på hjulet</b>
+        <span class="m" data-tex="a_O=0"></span>
+        <span class="note">Konstant <span data-tex="\omega"></span> og konstant fart, så navet accelererer ikke</span></div></div>
+      <div class="step"><span class="n p">5</span><div class="t"><b>Toppen: <span data-tex="\alpha=0"></span></b>
+        <span class="m" data-tex="\boxed{a_{top}=\omega^2 r=30\ \text{m/s}^2}"></span>
+        <span class="note">Nedad, mod navet</span></div></div>
+      <div class="step"><span class="n p">6</span><div class="t"><b>Kontaktpunktet (IC)</b>
+        <span class="m" data-tex="v=0,\quad a=\omega^2 r=30\ \text{m/s}^2"></span>
+        <span class="note">Opad mod navet. IC har ikke nul acceleration, så metoden gælder kun hastigheder</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Træk i ω og α</h3>
+      <canvas id="c3" width="440" height="390"></canvas>
+      <div class="sl"><span>ω</span><input id="w3" type="range" min="0" max="6" step="0.1" value="3"><output id="w3o"></output></div>
+      <div class="sl"><span>α</span><input id="a3" type="range" min="0" max="20" step="0.5" value="10"><output id="a3o"></output></div>
+      <div class="ro r3">
+        <div><span>a<sub>t</sub> = α·r</span><b class="pu" id="t3">0</b><i>m/s²</i></div>
+        <div><span>a<sub>n</sub> = ω²·r</span><b class="or" id="n3">0</b><i>m/s²</i></div>
+        <div><span>a<sub>B</sub> samlet</span><b class="cy" id="s3b">0</b><i>m/s²</i></div>
+      </div>
+      <div class="status" id="st3"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Tangentiel del ændrer farten, normal del bøjer banen. Glider punktet langs et drejende led, kommer Coriolis med.</span></div>
+</section>
+
+<!-- ============ 4 · FEJL OG TJEK ============ -->
+<section class="slide" data-title="4 · Faldgruber og tjek">
+  <div class="hd"><span class="tag g">FALDGRUBER OG TJEK</span><h1>Hvor det typisk går galt</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Typiske fejl</h3>
+      <div class="fejl" style="gap:8px">
+        <div><span>Der bruges <span data-tex="v=\omega r"></span> med afstanden til legemets midte<span class="ret">Afstanden skal være til omdrejningsaksen eller IC</span></span></div>
+        <div><span>Hjulets centrum antages at stå stille<span class="ret">Det er kontaktpunktet (IC), der står stille, ikke navet</span></span></div>
+        <div><span><span data-tex="a_n"></span> regnes som nul, fordi <span data-tex="\alpha=0"></span><span class="ret">Et roterende punkt har altid <span data-tex="\omega^2 r"></span> mod aksen</span></span></div>
+        <div><span>Coriolis-leddet glemmes, når et punkt glider langs et roterende led<span class="ret">Leddet <span data-tex="2\boldsymbol\Omega\times(\mathbf{v}_{B/A})_{xyz}"></span> er med i (16-29)</span></span></div>
+        <div><span>IC bruges til acceleration<span class="ret">IC har <span data-tex="v=0"></span>, men ikke <span data-tex="a=0"></span>. Kun til hastigheder</span></span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Tjek dig selv</h3>
+      <div class="qa">
+        <details><summary>Navfart 4 m/s, rulning uden glid. Hvad er farten af toppen?</summary><p>8 m/s, fordi toppen er dobbelt så langt fra IC som navet.</p></details>
+        <details><summary>Skive med konstant ω = 5 rad/s. Hvad er a<sub>t</sub> og a<sub>n</sub> i 0,2 m afstand?</summary><p>a<sub>t</sub> = 0 (da α = 0), og a<sub>n</sub> = ω²r = 5 m/s² mod aksen.</p></details>
+        <details><summary>Hvilken retning har ω × r<sub>B/A</sub> i lign. (16-16)?</summary><p>Vinkelret på stangen AB, med størrelsen ω·r<sub>B/A</sub>.</p></details>
+      </div>
+    </div>
+    <div class="card col">
+      <h3>Til eksamen (A26)</h3>
+      <div class="exlinks" style="gap:6px">
+        <a href="../../eksamen/opg01/"><b>OPG 1</b> Hacksaw · ω og α for stang med relativ fart og acc.</a>
+        <a href="../../eksamen/opg02/"><b>OPG 2</b> Disk and slotted link · roterende referencesystem og Coriolis</a>
+        <a href="../../eksamen/opg03/"><b>OPG 3</b> Rods and collars · roterende referencesystem og Coriolis</a>
+      </div>
+      <h3 style="margin-top:6px">Læs i bogen</h3>
+      <div style="font-size:17px;line-height:1.5;color:var(--ink)">
+        §16.3 Fast akse, s. 332 til 335<br>
+        §16.5 Relativ hastighed, s. 356 til 358<br>
+        §16.6 IC, s. 369<br>
+        §16.7 Relativ acceleration, s. 381 til 382<br>
+        §16.8 Roterende akser og Coriolis, s. 395 til 398<br>(16-26) s. 397, (16-29) s. 398
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Først ω og α for hver stang. Derefter relative hastigheder, IC som kontrol, og til sidst accelerationerne.</span></div>
+</section>
+
+</div></div>
+<script src="../assets/deck.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = D.$, fmt = D.fmt, PI = Math.PI;
+var CY = '#0a7fc2', OR = '#d97a00', PU = '#7b4fc9', GR = '#0a9a5c', RD = '#d63a3a', INK = '#14202d';
+
+function wheel(x, cx, cy, R, ang) {
+  D.circ(x, cx, cy, R, '#f6f9fc', INK, 8);
+  D.circ(x, cx, cy, R - 12, null, '#9fb0c2', 2);
+  for (var k = 0; k < 3; k++) { var a = ang + k * PI / 3; D.line(x, [[cx - (R - 10) * Math.cos(a), cy - (R - 10) * Math.sin(a)], [cx + (R - 10) * Math.cos(a), cy + (R - 10) * Math.sin(a)]], '#9fb0c2', 3); }
+  D.circ(x, cx + (R - 24) * Math.cos(ang), cy + (R - 24) * Math.sin(ang), 6, '#d97a00');
+  D.circ(x, cx, cy, 9, '#fff', INK, 3);
+}
+
+/* ---------- forside: rullende hjul ---------- */
+(function () {
+  var G = D.cv('c0'), x = G.x, W = G.W, H = G.H, s = 0, R = 100, cx = 220, gy = 400, cy = gy - R, k = 70;
+  D.anim(0, function (dt) {
+    s += dt * 110; x.clearRect(0, 0, W, H);
+    D.line(x, [[0, gy], [W, gy]], '#5a6b7d', 3);
+    for (var i = -(s % 28); i < W; i += 28) D.line(x, [[i, gy], [i - 11, gy + 13]], '#9fb0c2', 2);
+    D.txt(x, 'ruller uden glid', 16, 26, 24, '#5a6b7d');
+    D.line(x, [[cx, gy], [cx, cy - R]], 'rgba(214,58,58,.4)', 2, [6, 6]);
+    D.line(x, [[cx, gy], [cx + R, cy]], 'rgba(214,58,58,.4)', 2, [6, 6]);
+    wheel(x, cx, cy, R, s / R);
+    D.arrow(x, cx, cy - R, cx + 2 * k, cy - R, CY, 6); D.txt(x, '2v', cx + 2 * k - 6, cy - R - 24, 28, CY, 'center');
+    D.arrow(x, cx, cy, cx + k, cy, CY, 6); D.txt(x, 'v', cx + k - 4, cy - 22, 28, CY, 'center');
+    D.circ(x, cx + R, cy, 7, CY);
+    D.arrow(x, cx + R, cy, cx + R + k, cy + k, CY, 6); D.txt(x, '√2·v', cx + R + k + 6, cy + k + 6, 26, CY, 'left');
+    D.circ(x, cx, gy, 9, RD); D.txt(x, '0', cx, gy + 34, 30, RD, 'center');
+    D.txt(x, 'IC', cx + 24, gy + 34, 24, RD, 'left');
+  });
+})();
+
+/* ---------- slide 1: fast akse ---------- */
+(function () {
+  var G = D.cv('c1'), x = G.x, W = G.W, H = G.H, phi = 0.6, ox = 220, oy = 205, PX = 175, w = 4, r = 0.8, al = 8;
+  function draw() {
+    x.clearRect(0, 0, W, H);
+    var rp = r * PX, px = ox + rp * Math.cos(phi), py = oy - rp * Math.sin(phi);
+    D.circ(x, ox, oy, rp, null, 'rgba(90,107,125,.45)', 2);
+    D.line(x, [[ox, oy], [px, py]], '#a8703e', 8);
+    D.pin(x, ox, oy, 9); D.circ(x, px, py, 9, INK);
+    D.txt(x, 'O', ox - 24, oy + 6, 24, INK, 'center'); D.txt(x, 'r', (ox + px) / 2 - 16 * Math.sin(phi) - 4, (oy + py) / 2 - 16 * Math.cos(phi), 24, '#5a6b7d', 'center');
+    var tx = -Math.sin(phi), ty = -Math.cos(phi), nx = -Math.cos(phi), ny = Math.sin(phi);
+    var v = w * r, at = al * r, an = w * w * r;
+    if (an > 0.1) { D.arrow(x, px, py, px + nx * an * 3.6, py + ny * an * 3.6, OR, 5); D.txt(x, 'aₙ', px + nx * an * 3.6 + nx * 22, py + ny * an * 3.6 + ny * 22, 24, OR, 'center'); }
+    if (at > 0.1) { D.arrow(x, px, py, px + tx * at * 3.6, py + ty * at * 3.6, PU, 5); D.txt(x, 'aₜ', px + tx * at * 3.6 - ty * 24 * -1 * 0 + tx * 22, py + ty * at * 3.6 + ty * 22, 24, PU, 'center'); }
+    if (v > 0.05) { D.arrow(x, px, py, px + tx * v * 20 - nx * 0, py + ty * v * 20, CY, 6); D.txt(x, 'v', px + tx * v * 20 + tx * 20 + 18, py + ty * v * 20 + ty * 20, 26, CY, 'center'); }
+    D.marc(x, ox, oy, 26, true, '#5a6b7d', 3);
+    D.txt(x, 'ω', ox + 40, oy - 4, 24, '#5a6b7d', 'center');
+    D.txt(x, 'pilene: v · 20 px, a · 3,6 px', 8, H - 10, 17, '#5a6b7d');
+  }
+  function upd() {
+    w = +$('w1').value; r = +$('r1').value; al = +$('a1').value;
+    $('w1o').textContent = fmt(w, 1) + ' rad/s'; $('r1o').textContent = fmt(r, 2) + ' m'; $('a1o').textContent = fmt(al, 1) + ' rad/s²';
+    $('v1').textContent = fmt(w * r, 2); $('t1').textContent = fmt(al * r, 2); $('n1').textContent = fmt(w * w * r, 2);
+    draw();
+  }
+  ['w1', 'r1', 'a1'].forEach(function (id) { $(id).oninput = upd; }); upd();
+  D.anim(1, function (dt) { phi += w * dt * 0.4; draw(); });
+})();
+
+/* ---------- slide 2: IC ---------- */
+(function () {
+  var G = D.cv('c2'), x = G.x, W = G.W, H = G.H, cx = 220, R = 115, gy = 310, cy = gy - R, om = 10, rm = 0.3, th = 90;
+  function upd() {
+    th = +$('p2').value; $('p2o').textContent = th + '°';
+    var t = th * PI / 180, px = cx + R * Math.sin(t), py = cy - R * Math.cos(t), dx = px - cx, dy = py - gy;
+    var dm = Math.hypot(dx, dy) / R * rm, vB = om * dm, k = 0;
+    x.clearRect(0, 0, W, H);
+    D.ground(x, 20, 420, gy);
+    wheel(x, cx, cy, R, 0.3);
+    D.arrow(x, cx, cy, cx + 3 * 22, cy, 'rgba(10,127,194,.55)', 4); D.txt(x, 'v navet', cx - 50, cy + 24, 18, CY, 'center');
+    D.line(x, [[px, py], [cx, gy]], RD, 3, [8, 6]);
+    D.circ(x, cx, gy, 9, RD); D.txt(x, 'IC', cx + 24, gy + 24, 22, RD, 'left');
+    var ux = -dy, uy = dx, L = Math.hypot(ux, uy);
+    if (L > 3) { D.arrow(x, px, py, px + ux / L * vB * 22 * 1, py + uy / L * vB * 22, GR, 7); }
+    D.circ(x, px, py, 10, GR, '#fff', 3); D.txt(x, 'B', px + (dx >= 0 ? 24 : -24), py + (dy < -R ? -18 : 6) , 26, INK, 'center');
+    $('d2').textContent = fmt(dm, 3); $('v2').textContent = fmt(vB, 2); $('q2').textContent = '×' + fmt(vB / 3, 2);
+    $('st2').innerHTML = th === 0 || th === 360 ? '<b>Toppen:</b> 2r fra IC, derfor 6,00 m/s' : (th === 90 ? '<b>Punktet i navets højde:</b> 4,24 m/s, 45° nedad og fremad' : (th === 180 ? '<b>Kontaktpunktet:</b> r<sub>B/IC</sub> = 0, så v = 0' : 'Pilen står vinkelret på den røde linje til IC'));
+  }
+  $('p2').oninput = upd; upd();
+})();
+
+/* ---------- slide 3: relativ acceleration ---------- */
+(function () {
+  var G = D.cv('c3'), x = G.x, W = G.W, H = G.H, L = 0.6, PXM = 380, phi = 35 * PI / 180, ax = 90, ay = 310, K = 8;
+  function upd() {
+    var w = +$('w3').value, al = +$('a3').value; $('w3o').textContent = fmt(w, 1) + ' rad/s'; $('a3o').textContent = fmt(al, 1) + ' rad/s²';
+    var at = al * L, an = w * w * L, tot = Math.hypot(at, an);
+    $('t3').textContent = fmt(at, 2); $('n3').textContent = fmt(an, 2); $('s3b').textContent = fmt(tot, 2);
+    x.clearRect(0, 0, W, H);
+    var bx = ax + L * PXM * Math.cos(phi), by = ay - L * PXM * Math.sin(phi);
+    var tx = -Math.sin(phi), ty = -Math.cos(phi), nx = -Math.cos(phi), ny = Math.sin(phi);
+    D.line(x, [[ax, ay], [bx, by]], '#d9a06c', 14); D.line(x, [[ax, ay], [bx, by]], '#a8703e', 2);
+    D.pin(x, ax, ay, 10); D.circ(x, bx, by, 9, INK);
+    D.txt(x, 'A', ax - 26, ay + 8, 26, INK, 'center'); D.txt(x, 'B', bx + 22, by - 18, 26, INK, 'center');
+    D.txt(x, 'r = 0,60 m', (ax + bx) / 2 + 20, (ay + by) / 2 + 34, 20, '#5a6b7d', 'center');
+    D.marc(x, ax, ay, 30, true, '#5a6b7d', 3); D.txt(x, 'ω, α', ax - 52, ay - 30, 22, '#5a6b7d', 'center');
+    var ex = bx + tx * at * K + nx * an * K, ey = by + ty * at * K + ny * an * K;
+    if (an > 0.1) { D.arrow(x, bx, by, bx + nx * an * K, by + ny * an * K, OR, 6); D.txt(x, 'aₙ = ω²r', bx + nx * an * K * 0.5 + 8, by + ny * an * K * 0.5 + 26, 22, OR, 'center'); }
+    if (at > 0.1) { D.arrow(x, bx, by, bx + tx * at * K, by + ty * at * K, PU, 6); D.txt(x, 'aₜ = αr', bx + tx * at * K - 10, by + ty * at * K - 22, 22, PU, 'center'); }
+    if (an > 0.1 && at > 0.1) { D.arrow(x, bx, by, ex, ey, CY, 4); }
+    D.txt(x, 'a_A = 0 (A står fast)', 8, H - 10, 17, '#5a6b7d');
+    $('st3').innerHTML = w === 0 && al === 0 ? 'Ingen drejning, ingen acceleration' : (al === 0 ? '<b>Kun normal del:</b> a<sub>B</sub> peger mod A' : (w === 0 ? '<b>Kun tangentiel del:</b> a<sub>B</sub> vinkelret på stangen' : 'Blå pil = summen af de to dele'));
+  }
+  $('w3').oninput = upd; $('a3').oninput = upd; upd();
+})();
+
+D.start();
+})();
+</script>
+</body>
+</html>

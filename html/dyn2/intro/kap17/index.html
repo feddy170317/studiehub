@@ -1,0 +1,317 @@
+<!doctype html><html lang="da"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kap. 17 · Kraft og acceleration</title>
+<meta name="description" content="Hurtigstart til DYN2 kap. 17: massetræghedsmoment, de tre bevægelsesligninger for plan bevægelse og rotation om fast akse.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../assets/deck.css"></head>
+<body>
+<div id="vp"><div id="deck">
+
+<!-- ============ 0 · FORSIDE ============ -->
+<section class="slide on" data-title="Forside">
+  <div style="flex:1;display:grid;grid-template-columns:1fr 600px;gap:34px;align-items:center;padding:0 10px">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div>
+        <div class="tag" style="display:inline-block">DYN2 · HURTIGSTART · KAP. 17</div>
+        <h1 style="font-size:64px;margin-top:18px">Kraft og acceleration</h1>
+        <div style="font-size:26px;color:var(--mut);margin-top:6px">Kræfter og momenter bestemmer <span data-tex="a_G"></span> og <span data-tex="\alpha"></span>, når legemets <b>træghed</b> kendes</div>
+      </div>
+      <div class="card qcard"><span class="lbl cy">KORT FORTALT</span>
+        En tung dør skubbes med fingerspidsen helt tæt ved hængslet, og den rokker næsten ikke. Samme kraft ude ved håndtaget får den til at svinge let op. Kraften er den samme, men momentet om hængslet er langt større, og det er momentet, der giver vinkelaccelerationen.</div>
+      <div class="plan">
+        <div><b class="cy">1 · Træghed</b><span data-tex="I=\int r^2dm"></span> og parallelakse</div>
+        <div><b class="or">2 · Tre ligninger</b>FLD = kinetisk diagram</div>
+        <div><b class="pu">3 · Fast akse</b><span data-tex="\sum M_O=I_O\alpha"></span></div>
+        <div><b class="gr">4 · Tjek</b>fejl og eksamen</div>
+      </div>
+      <div class="links"><a href="../../Kapitel17_Studienote.pdf">📖 Studienote PDF</a><a href="../../../../lab/dyn2/inertimoment.html">🧪 3D-lab: inertimoment</a><a href="../../eksamen/opg04/">📝 Opg. 4 Cable break</a><a href="../../eksamen/opg05/">📝 Opg. 5 Truck</a><a href="../../eksamen/opg06/">📝 Opg. 6 Rod and cylinder</a><a href="../../eksamen/opg09/">📝 Opg. 9 Disk with rod</a></div>
+    </div>
+    <div class="card" style="padding:12px"><canvas id="c0" width="560" height="440"></canvas>
+      <div style="font-size:18px;color:var(--mut);text-align:center;margin-top:8px">Samme kraft <b>F</b> i begge døre. Momentet <b>M = F·r</b> afgør, hvor hurtigt den drejer</div></div>
+  </div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm &nbsp;·&nbsp; ☰: alle kapitler</div>
+</section>
+
+<!-- ============ 1 · TRÆGHEDSMOMENT ============ -->
+<section class="slide" id="s1" data-title="1 · Træghedsmoment">
+  <div class="hd"><span class="tag">IDÉ 1 · TRÆGHEDSMOMENT</span><h1>Massen langt fra aksen tæller mest</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Hvor svært er legemet at dreje?</h3>
+      <div class="big" style="font-size:30px" data-tex="I=\int r^2\,dm"></div>
+      <div class="src">Hibbeler (2023), lign. (17-1), s. 414</div>
+      <div class="big" style="font-size:30px" data-tex="I=I_G+m\,d^2"></div>
+      <div class="src">Hibbeler (2023), lign. (17-4), s. 419</div>
+      <div class="big" style="font-size:30px" data-tex="I=m\,k^2"></div>
+      <div class="src">Hibbeler (2023), lign. (17-5), s. 419</div>
+      <div class="terms">
+        <div class="term"><span class="s" data-tex="r"></span><span><b>Vinkelret afstand</b> fra aksen til massestykket <span data-tex="dm"></span>. Den indgår i anden potens</span></div>
+        <div class="term"><span class="s cy" data-tex="I_G"></span><span><b>Om tyngdepunktet</b>, slås op i bogens tabel for standardlegemer</span></div>
+        <div class="term"><span class="s pu" data-tex="m\,d^2"></span><span><b>Tillæg</b> fordi aksen er flyttet afstanden <span data-tex="d"></span> væk fra <span data-tex="G"></span></span></div>
+        <div class="term"><span class="s gr" data-tex="k"></span><span><b>Inertiradius</b>: hvor hele massen kunne sidde samlet og give samme <span data-tex="I"></span></span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n">1</span><div class="t"><b>Stang om tyngdepunktet</b>
+        <span class="m" data-tex="I_G=\tfrac1{12}\,m L^2=\tfrac1{12}\cdot3{,}0\cdot2{,}0^2=1{,}0\ \text{kg m}^2"></span></div></div>
+      <div class="step"><span class="n p">2</span><div class="t"><b>Aksen flyttes ud i enden</b>
+        <span class="m" data-tex="m\,d^2=3{,}0\cdot1{,}0^2=3{,}0\ \text{kg m}^2"></span>
+        <span class="note">Afstanden fra G til enden er <span data-tex="d=L/2=1{,}0"></span> m</span></div></div>
+      <div class="step"><span class="n">3</span><div class="t"><b>Træghedsmoment om hængslet</b>
+        <span class="m" data-tex="\boxed{I_O=1{,}0+3{,}0=4{,}0\ \text{kg m}^2}"></span>
+        <span class="note">Fire gange <span data-tex="I_G"></span>, selvom massen er den samme</span></div></div>
+      <div class="step"><span class="n g">4</span><div class="t"><b>Inertiradius</b>
+        <span class="m" data-tex="k=\sqrt{I_O/m}=\sqrt{4{,}0/3{,}0}=1{,}15\ \text{m}"></span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Træk aksen væk fra G</h3>
+      <canvas id="r1" width="640" height="250"></canvas>
+      <canvas id="s1c" width="640" height="200"></canvas>
+      <div class="sl n"><span>d</span><input id="d1" type="range" min="0" max="1" step="0.01" value="1"><output id="d1o"></output></div>
+      <div class="ro r3">
+        <div><span>I</span><b class="pu" id="v1I">4,00</b><i>kg m²</i></div>
+        <div><span>k</span><b class="gr" id="v1k">1,15</b><i>m</i></div>
+        <div><span>I / I<sub>G</sub></span><b class="cy" id="v1f">×4,00</b></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Massen langt fra aksen tæller i anden. Flyttes aksen ud, vokser I hurtigt, og legemet bliver sværere at sætte i drejning.</span></div>
+</section>
+
+<!-- ============ 2 · TRE LIGNINGER ============ -->
+<section class="slide" id="s2" data-title="2 · Tre ligninger">
+  <div class="hd"><span class="tag b">IDÉ 2 · BEVÆGELSESLIGNINGER</span><h1>Frit legeme-diagram = kinetisk diagram</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Plan bevægelse</h3>
+      <div class="big" style="font-size:30px;padding-top:2px" data-tex="\begin{aligned}\textstyle\sum F_x&=m(a_G)_x\\ \textstyle\sum F_y&=m(a_G)_y\\ \textstyle\sum M_G&=I_G\,\alpha\end{aligned}"></div>
+      <div class="src">Hibbeler (2023), lign. (17-17), s. 457</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="\sum F,\ \sum M_G"></span><span><b>Venstre side</b> kommer fra frit legeme-diagrammet. Kun ydre kræfter tæller</span></div>
+        <div class="term"><span class="s gr" data-tex="m\,a_G"></span><span><b>Højre side</b>: tyngdepunktets acceleration gange massen, en pil i kinetisk diagram</span></div>
+        <div class="term"><span class="s or" data-tex="I_G\alpha"></span><span><b>Drejningen</b>: træghedsmoment gange vinkelacceleration, en buepil i kinetisk diagram</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n b">1</span><div class="t"><b>Stangen slippes vandret</b>
+        <span class="m" data-tex="mg=3{,}0\cdot9{,}81=29{,}43\ \text{N}"></span><span class="m" data-tex="I_G=1{,}0\ \text{kg m}^2\ \text{(fra idé 1)}"></span></div></div>
+      <div class="step"><span class="n b">2</span><div class="t"><b>Moment om G</b> (kun hængselkraften har arm 1,0 m)
+        <span class="m" data-tex="A_y\cdot1{,}0=1{,}0\cdot\alpha\ \Rightarrow\ A_y=\alpha"></span></div></div>
+      <div class="step"><span class="n b">3</span><div class="t"><b>Kraft lodret</b>, med <span data-tex="a_G=\alpha\cdot1{,}0"></span> fra kap. 16
+        <span class="m" data-tex="mg-A_y=m\,a_G\ \Rightarrow\ 29{,}43=4{,}0\,\alpha"></span></div></div>
+      <div class="step"><span class="n b">4</span><div class="t"><b>Resultat</b>
+        <span class="m" data-tex="\boxed{\alpha=7{,}36\ \text{rad/s}^2,\ A_y=7{,}36\ \text{N}}"></span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Byg diagrammerne trin for trin</h3>
+      <div class="row"><button class="btn or on" data-l="0">1 · mg</button><button class="btn or on" data-l="1">2 · hængsel</button><button class="btn or on" data-l="2">3 · m·a<sub>G</sub></button><button class="btn or on" data-l="3">4 · I<sub>G</sub>α</button></div>
+      <canvas id="c2" width="640" height="400"></canvas>
+      <div class="status" id="st2"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Kræfterne tegnes til venstre og deres virkning til højre. Lighedstegnet giver tre ligninger, og intet led kan glemmes.</span></div>
+</section>
+
+<!-- ============ 3 · FAST AKSE ============ -->
+<section class="slide" id="s3" data-title="3 · Rotation om fast akse">
+  <div class="hd"><span class="tag p">IDÉ 3 · ROTATION OM FAST AKSE</span><h1>Tag momentet om hængslet</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Legeme hængslet i O</h3>
+      <div class="big" style="font-size:32px" data-tex="\sum M_O=I_O\,\alpha"></div>
+      <div class="src">Hibbeler (2023), lign. (17-16), s. 443</div>
+      <div class="big" style="font-size:28px" data-tex="\alpha(\theta)=\dfrac{3g}{2L}\cos\theta"></div>
+      <div class="src">stang hængslet i enden, sluppet fra hvile i vinklen θ (ω = 0)</div>
+      <div class="terms">
+        <div class="term"><span class="s pu" data-tex="\sum M_O"></span><span><b>Kun tyngden</b> har arm om O. Hængselkraften går gennem O og falder ud af ligningen</span></div>
+        <div class="term"><span class="s cy" data-tex="I_O"></span><span><b>Parallelakse</b>: <span data-tex="I_O=I_G+m\,r_G^{\,2}"></span>, jf. idé 1</span></div>
+        <div class="term"><span class="s gr" data-tex="a_G"></span><span><b>To dele</b>: <span data-tex="\omega^2r_G"></span> mod O og <span data-tex="\alpha\,r_G"></span> vinkelret på OG</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n p">1</span><div class="t"><b>Moment om O</b>, kun tyngden
+        <span class="m" data-tex="\sum M_O=mg\tfrac L2=3{,}0\cdot9{,}81\cdot1{,}0=29{,}43\ \text{Nm}"></span></div></div>
+      <div class="step"><span class="n p">2</span><div class="t"><b>Vinkelacceleration</b>, med <span data-tex="I_O=4{,}0"></span> fra idé 1
+        <span class="m" data-tex="\boxed{\alpha=\dfrac{29{,}43}{4{,}0}=7{,}36\ \text{rad/s}^2}"></span></div></div>
+      <div class="step"><span class="n p">3</span><div class="t"><b>Tyngdepunktet</b> (<span data-tex="\omega=0"></span>, så ingen normalacceleration)
+        <span class="m" data-tex="(a_G)_t=\alpha\,\tfrac L2=7{,}36\ \text{m/s}^2\ \text{nedad}"></span></div></div>
+      <div class="step"><span class="n p">4</span><div class="t"><b>Hængselkraften</b> fra <span data-tex="\sum F_y=m(a_G)_y"></span>
+        <span class="m" data-tex="\boxed{A_y=29{,}43-3{,}0\cdot7{,}36=7{,}36\ \text{N}=\tfrac{mg}{4}}"></span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Slip stangen ved vinklen θ under vandret</h3>
+      <canvas id="r3" width="640" height="320"></canvas>
+      <canvas id="g3" width="640" height="330"></canvas>
+      <div class="sl n"><span>θ</span><input id="t3" type="range" min="0" max="90" step="1" value="0"><output id="t3o"></output></div>
+      <div class="ro r3">
+        <div><span>α</span><b class="pu" id="v3a">7,36</b><i>rad/s²</i></div>
+        <div><span>A<sub>x</sub></span><b class="cy" id="v3x">0,00</b><i>N</i></div>
+        <div><span>A<sub>y</sub></span><b class="cy" id="v3y">7,36</b><i>N</i></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Tages momentet om hængslet, forsvinder den ukendte hængselkraft ud af ligningen. Den findes først bagefter.</span></div>
+</section>
+
+<!-- ============ 4 · FALDGRUBER OG TJEK ============ -->
+<section class="slide" data-title="4 · Faldgruber og tjek">
+  <div class="hd"><span class="tag g">FALDGRUBER OG TJEK</span><h1>Hvor det typisk går galt</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Typiske fejl</h3>
+      <div class="fejl">
+        <div><span>Kun frit legeme-diagram er tegnet.<span class="ret">Tegn også kinetisk diagram (m·a<sub>G</sub> og I<sub>G</sub>α) og sæt lighedstegn, så mangler intet led.</span></span></div>
+        <div><span>Momentsum om et vilkårligt punkt P med ΣM<sub>P</sub> = I<sub>G</sub>α.<span class="ret">Momentet af m·a<sub>G</sub> om P skal med (17-18). Vælg G eller et fast punkt O.</span></span></div>
+        <div><span>I<sub>G</sub> bruges i ΣM<sub>O</sub> = I<sub>O</sub>α.<span class="ret">Brug I<sub>O</sub> = I<sub>G</sub> + m·d², og mål d vinkelret mellem de parallelle akser.</span></span></div>
+        <div><span>Hængselkraften sættes lig mg, selvom legemet accelererer.<span class="ret">Kun i ligevægt. I mini-eksemplet er den mg/4.</span></span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Tjek dig selv</h3>
+      <div class="qa">
+        <details><summary>Hvorfor er I<sub>O</sub> for en stang hængslet i enden fire gange I<sub>G</sub>?</summary><p>I<sub>O</sub> = mL²/3 og I<sub>G</sub> = mL²/12. Massen sidder i gennemsnit dobbelt så langt fra aksen, og afstanden indgår i anden potens.</p></details>
+        <details><summary>Et legeme translaterer uden at dreje. Hvad er ΣM<sub>G</sub>?</summary><p>Nul, fordi α = 0. Men ΣF = m·a<sub>G</sub> gælder stadig. Momentligningen bruges til at finde, hvor normalkraften angriber, og om bilen vælter.</p></details>
+        <details><summary>Hvornår er hængselkraften i mini-eksemplet lig mg?</summary><p>Kun i ligevægt, hvor a<sub>G</sub> = 0. Når stangen accelererer, er den mindre, her mg/4.</p></details>
+      </div>
+    </div>
+    <div class="card col">
+      <h3>Til eksamen (A26)</h3>
+      <div style="font-size:16px;color:var(--mut)">Typisk: FLD plus kinetisk diagram, lign. (17-17) og I fra parallelaksen</div>
+      <div class="exlinks">
+        <a href="../../eksamen/opg04/"><b>OPG 4</b> Cable break</a>
+        <a href="../../eksamen/opg05/"><b>OPG 5</b> Truck</a>
+        <a href="../../eksamen/opg06/"><b>OPG 6</b> Rod and cylinder</a>
+        <a href="../../eksamen/opg09/"><b>OPG 9</b> Moment applied to disk w. attached rod</a>
+      </div>
+      <h3 style="margin-top:8px">Læs i bogen</h3>
+      <div style="display:grid;gap:6px;font-size:16px;line-height:1.35">
+        <div><b>§ 17.1, s. 413</b> træghedsmoment, parallelakse, inertiradius</div>
+        <div><b>§ 17.2, s. 427</b> de tre bevægelsesligninger</div>
+        <div><b>§ 17.3, s. 430</b> translation</div>
+        <div><b>§ 17.4, s. 443</b> rotation om fast akse</div>
+        <div><b>§ 17.5, s. 457</b> generel plan bevægelse</div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Først træghed, så diagrammerne, så ligningerne. Tag momentet om G eller om et fast punkt.</span></div>
+</section>
+
+</div></div>
+<script src="../assets/deck.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = D.$, fmt = D.fmt, PI = Math.PI;
+var CY = '#0a7fc2', OR = '#d97a00', PU = '#7b4fc9', GR = '#0a9a5c', RD = '#d63a3a', INK = '#14202d', MUT = '#5a6b7d';
+
+/* tekst med sænket indeks: sb(x, 'I', 'G', ...) */
+function sb(x, a, b, px, py, size, col, al) {
+  x.font = '600 ' + size + 'px system-ui,sans-serif'; var w1 = x.measureText(a).width;
+  x.font = '600 ' + (size * 0.7) + 'px system-ui,sans-serif'; var w2 = x.measureText(b).width, x0 = al === 'center' ? px - (w1 + w2) / 2 : px;
+  D.txt(x, a, x0, py, size, col, 'left'); D.txt(x, b, x0 + w1, py + size * 0.22, size * 0.7, col, 'left');
+}
+/* ---------- slide 0: to døre set ovenfra ---------- */
+(function () {
+  var L = 215, hy = 110, aB = 0.611, aA = aB * 0.15 / 0.9;
+  function door(x, hx, r, phi, push, lab1, lab2) {
+    var ex = hx + L * Math.cos(phi), ey = hy + L * Math.sin(phi);
+    D.line(x, [[hx, hy], [hx + L, hy]], 'rgba(90,107,125,.45)', 2, [6, 6]);
+    x.fillStyle = MUT; x.fillRect(hx - 18, hy - 16, 16, 32);
+    D.line(x, [[hx, hy], [ex, ey]], '#d9a06c', 14); D.line(x, [[hx, hy], [ex, ey]], '#a8703e', 2);
+    D.pin(x, hx, hy, 8);
+    var px = hx + r * L * Math.cos(phi), py = hy + r * L * Math.sin(phi), nx = -Math.sin(phi), ny = Math.cos(phi);
+    if (push) { D.arrow(x, px - nx * 66, py - ny * 66, px - nx * 6, py - ny * 6, RD, 7); D.txt(x, 'F', px - nx * 66 - 18, py - ny * 66 - 4, 26, RD, 'center'); }
+    D.txt(x, lab1, hx + 100, 352, 21, INK, 'center');
+    D.txt(x, lab2, hx + 100, 384, 24, OR, 'center', 'middle', 700);
+    D.txt(x, 'φ = ' + Math.round(phi * 180 / PI) + '°', hx + 100, 420, 22, MUT, 'center');
+  }
+  var x = D.cv('c0').x;
+  D.anim(0, function (dt, t) {
+    var cyc = t % 3.8, tt = Math.min(cyc, 2), push = cyc < 2;
+    var pB = Math.min(0.5 * aB * tt * tt, 1.3), pA = 0.5 * aA * tt * tt;
+    if (cyc > 3.4) { pA = 0; pB = 0; }
+    x.clearRect(0, 0, 560, 440);
+    D.txt(x, 'Set ovenfra: døren drejer om hængslet', 280, 22, 22, MUT, 'center');
+    door(x, 44, 0.15, pA, push && cyc <= 3.4, 'Skub nær hængslet', 'M = F · 0,15 L');
+    door(x, 304, 0.9, pB, push && cyc <= 3.4, 'Skub ved håndtaget', 'M = F · 0,90 L');
+  });
+})();
+
+/* ---------- slide 1: parallelakse ---------- */
+function upd1() {
+  var d = +$('d1').value, I = 1 + 3 * d * d, k = Math.sqrt(I / 3);
+  $('d1o').textContent = fmt(d, 2) + ' m';
+  $('v1I').textContent = fmt(I, 2); $('v1k').textContent = fmt(k, 2); $('v1f').textContent = '×' + fmt(I, 2);
+  var G = D.cv('r1'), x = G.x, pm = 280, y = 105, gx = 320, ax = gx - d * pm;
+  x.clearRect(0, 0, G.W, G.H);
+  D.line(x, [[40, y], [600, y]], '#d9a06c', 18); D.line(x, [[40, y], [600, y]], '#a8703e', 2);
+  D.circ(x, gx, y, 7, CY); D.txt(x, 'G', gx, y - 30, 26, CY, 'center');
+  D.pin(x, ax, y, 11); D.txt(x, 'akse', ax, y + 38, 22, PU, 'center');
+  D.line(x, [[ax + k * pm, y - 34], [ax + k * pm, y + 14]], GR, 4, [6, 4]); D.txt(x, 'k', ax + k * pm, y - 50, 24, GR, 'center');
+  if (d > 0.04) {
+    D.arrow(x, ax + 4, 178, gx - 4, 178, PU, 4); D.arrow(x, gx - 4, 178, ax + 4, 178, PU, 4);
+    D.txt(x, 'd = ' + fmt(d, 2) + ' m', (ax + gx) / 2, 208, 24, PU, 'center');
+  }
+  D.stack('s1c', [{ v: 1.0, col: CY, lbl: 'I_G' }, { v: 3 * d * d, col: PU, lbl: 'md²' }], 1, { min: 0, max: 4.2, d: 2, u: 'kg m²', note: [' ', ' '] });
+  var sx = D.cv('s1c').x; sb(sx, 'I = I', 'G', 14, 148, 24, MUT);
+  sx.font = '600 24px system-ui,sans-serif'; var w = sx.measureText('I = I').width;
+  D.txt(sx, '+ m·d²', 14 + w + 22, 148, 24, MUT);
+}
+$('d1').oninput = upd1; upd1();
+
+/* ---------- slide 2: FLD = KD ---------- */
+var L2 = 3;
+function arc(x, cx, cy, r, a0, a1, col) {
+  x.strokeStyle = col; x.lineWidth = 6; x.setLineDash([]); x.beginPath(); x.arc(cx, cy, r, a0, a1, false); x.stroke();
+  var ex = cx + r * Math.cos(a1), ey = cy + r * Math.sin(a1), tx = -Math.sin(a1), ty = Math.cos(a1);
+  D.arrow(x, ex - tx * 16, ey - ty * 16, ex + tx * 6, ey + ty * 6, col, 6);
+}
+function draw2() {
+  var G = D.cv('c2'), x = G.x, y = 150, s = 130;
+  x.clearRect(0, 0, G.W, G.H);
+  [[50, 'Frit legeme-diagram'], [390, 'Kinetisk diagram']].forEach(function (p, i) {
+    var o = p[0], gx = o + 120;
+    D.line(x, [[o, y], [o + 240, y]], '#d9a06c', 16); D.line(x, [[o, y], [o + 240, y]], '#a8703e', 2);
+    D.pin(x, o, y, 9); D.circ(x, gx, y, 6, INK); D.txt(x, 'G', gx + 14, y - 16, 22, INK, 'center'); D.txt(x, 'O', o - 4, y + 28, 22, MUT, 'center');
+    D.txt(x, p[1], o + 120, 350, 22, MUT, 'center');
+    if (!i) {
+      if (L2 >= 0) { D.arrow(x, gx, y + 6, gx, y + s, RD, 7); D.txt(x, 'mg', gx + 36, y + s - 6, 24, RD, 'center'); }
+      if (L2 >= 1) { D.arrow(x, o, y - 6, o, y - s * 0.25 - 6, CY, 7); sb(x, 'A', 'y', o + 24, y - 40, 26, CY, 'center'); }
+    } else {
+      if (L2 >= 2) { D.arrow(x, gx, y + 6, gx, y + s * 0.75, GR, 7); sb(x, 'm·a', 'G', gx + 56, y + s * 0.75 - 4, 26, GR, 'center'); }
+      if (L2 >= 3) { arc(x, gx, y, 48, -2.7, -0.45, OR); sb(x, 'I', 'G', gx - 12, y - 86, 26, OR, 'center'); D.txt(x, 'α', gx + 14, y - 86, 26, OR, 'center'); }
+    }
+  });
+  D.txt(x, '=', 340, y, 56, INK, 'center');
+  $('st2').innerHTML = [
+    '<b>Tyngden</b> mg virker i G, lodret ned.',
+    '<b>Hængslet</b> O yder A<sub>y</sub> opad (A<sub>x</sub> = 0 her). Frit legeme-diagram er færdigt.',
+    '<b>Kinetisk diagram:</b> G accelererer nedad, så der tegnes m·a<sub>G</sub> i G.',
+    '<b>Kinetisk diagram:</b> massen drejer med uret, så I<sub>G</sub>α tegnes som buepil. Lighedstegnet giver ΣF = m·a<sub>G</sub> og ΣM<sub>G</sub> = I<sub>G</sub>α.'][L2];
+}
+D.steps('#s2 [data-l]', function (l) { L2 = l; draw2(); }); draw2();
+
+/* ---------- slide 3: rotation om O ---------- */
+var AL0 = 3 * 9.81 / (2 * 2), MG = 3 * 9.81;
+function upd3() {
+  var th = +$('t3').value, r = th * PI / 180, al = AL0 * Math.cos(r), Ax = -3 * al * Math.sin(r), Ay = MG - 3 * al * Math.cos(r);
+  $('t3o').textContent = th + '°';
+  $('v3a').textContent = fmt(al, 2); $('v3x').textContent = fmt(Ax, 2); $('v3y').textContent = fmt(Ay, 2);
+  var G = D.cv('r3'), x = G.x, hx = 220, hy = 110, Lp = 190, ex = hx + Lp * Math.cos(r), ey = hy + Lp * Math.sin(r), gx = hx + Lp / 2 * Math.cos(r), gy = hy + Lp / 2 * Math.sin(r), sc = 100 / MG;
+  x.clearRect(0, 0, G.W, G.H);
+  D.line(x, [[hx - 70, hy], [hx + 240, hy]], 'rgba(90,107,125,.45)', 2, [6, 6]);
+  D.line(x, [[hx, hy], [ex, ey]], '#d9a06c', 16); D.line(x, [[hx, hy], [ex, ey]], '#a8703e', 2);
+  D.arrow(x, gx, gy, gx, gy + 100, RD, 7); D.txt(x, 'mg', gx + 36, gy + 94, 24, RD, 'center');
+  D.arrow(x, hx, hy, hx + Ax * sc, hy - Ay * sc, CY, 7);
+  D.txt(x, 'A', hx + Ax * sc - 20, hy - Ay * sc - 16, 28, CY, 'center');
+  D.pin(x, hx, hy, 10); D.circ(x, gx, gy, 6, INK);
+  if (th > 4) { x.strokeStyle = PU; x.lineWidth = 3; x.beginPath(); x.arc(hx, hy, 60, 0, r, false); x.stroke(); D.txt(x, 'θ', hx + 82 * Math.cos(r / 2), hy + 82 * Math.sin(r / 2), 24, PU, 'center'); }
+  D.txt(x, 'O', hx - 24, hy - 4, 24, MUT, 'center');
+  D.graph('g3', { f: function (q) { return AL0 * Math.cos(q * PI / 180); }, x0: 0, x1: 90, xt: [[0, '0°'], [30, '30°'], [60, '60°'], [90, '90°']], min: 0, max: 8.5, yt: [0, 2, 4, 6, 8], yd: 0, lbl: 'α (rad/s²)', col: PU, d: 2, xm: th, xl: 'θ under vandret' });
+}
+$('t3').oninput = upd3; upd3();
+D.start();
+})();
+</script>
+</body></html>

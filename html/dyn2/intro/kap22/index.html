@@ -1,0 +1,322 @@
+<!doctype html><html lang="da"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kap. 22 · Vibrationer</title>
+<meta name="description" content="Hurtigstart til DYN2 kapitel 22: egenfrekvens, dæmpning og resonans, med sliders der viser hvad m, k og ζ gør.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../assets/deck.css"></head>
+<body>
+<div id="vp"><div id="deck">
+
+<!-- ============ 0 · FORSIDE ============ -->
+<section class="slide on" data-title="Forside">
+  <div style="flex:1;display:grid;grid-template-columns:1fr 600px;gap:34px;align-items:center;padding:0 10px">
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div>
+        <div class="tag" style="display:inline-block">DYN2 · HURTIGSTART · KAP. 22</div>
+        <h1 style="font-size:64px;margin-top:18px">Vibrationer</h1>
+        <div style="font-size:26px;color:var(--mut);margin-top:6px">Stil bevægelsesligningen op, skriv den som <span data-tex="\ddot x+\omega_n^2x=0"></span>, og aflæs <span data-tex="\omega_n"></span></div>
+      </div>
+      <div class="card qcard" style="font-size:21px"><span class="lbl cy">KORT FORTALT</span>
+        En gynge svinger i samme takt, uanset om den skubbes højt eller lavt. Højden ændrer kun, hvor langt den når, ikke hvor lang tid én tur tager. Bilens støddæmper trækker energien ud efter et bump, så bilen ikke bliver ved at gynge.</div>
+      <div class="plan">
+        <div><b class="cy">1 · Fri svingning</b><span data-tex="\omega_n,\ f,\ \tau"></span></div>
+        <div><b class="or">2 · Dæmpning</b><span data-tex="\zeta,\ \omega_d"></span></div>
+        <div><b class="pu">3 · Resonans</b>forstærkning MF</div>
+        <div><b class="gr">4 · Tjek</b>fejl og eksamen</div>
+      </div>
+      <div class="links"><a href="../../Kapitel22_Studienote.pdf">📖 Studienote PDF</a><a href="../../../../lab/dyn2/vibrationer.html">🧪 3D-lab</a><a href="../../eksamen/opg07/">📝 Opg. 7</a><a href="../../eksamen/opg08/">📝 Opg. 8</a><a href="../../eksamen/opg10/">📝 Opg. 10</a></div>
+    </div>
+    <div class="card" style="padding:12px"><canvas id="a0" width="576" height="520" style="width:100%;display:block"></canvas></div>
+  </div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm &nbsp;·&nbsp; ☰: alle kapitler</div>
+</section>
+
+<!-- ============ 1 · FRI SVINGNING ============ -->
+<section class="slide" id="s1" data-title="1 · Fri svingning">
+  <div class="hd"><span class="tag">IDÉ 1 · FRI UDÆMPET SVINGNING</span><h1>Massen og fjederen bestemmer takten</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Bevægelsesligning og takt</h3>
+      <div class="big" style="font-size:34px" data-tex="\ddot x+\omega_n^2\,x=0,\quad \omega_n=\sqrt{\dfrac km}"></div>
+      <div class="src">Hibbeler (2023), lign. (22-1) og (22-2), s. 638</div>
+      <div class="big" style="font-size:32px" data-tex="\tau=\dfrac{2\pi}{\omega_n},\quad f=\dfrac1\tau"></div>
+      <div class="src">lign. (22-12) og (22-14), s. 640</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="\omega_n"></span><span><b>Egenvinkelfrekvens</b> i <b>rad/s</b>. Stivere fjeder giver hurtigere svingning, tungere masse langsommere</span></div>
+        <div class="term"><span class="s pu" data-tex="\tau"></span><span><b>Periode</b> i s: tiden for én hel svingning frem og tilbage</span></div>
+        <div class="term"><span class="s or" data-tex="f"></span><span><b>Frekvens</b> i <b>Hz</b>: svingninger pr. sekund. Omregning er faktoren <span data-tex="2\pi"></span></span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n">1</span><div class="t"><b>Mini-eksempel</b> (m = 2,0 kg, k = 800 N/m)
+        <span class="m" data-tex="\omega_n=\sqrt{800/2{,}0}=20\ \text{rad/s}"></span>
+        <span class="m" data-tex="\boxed{f_n=\omega_n/2\pi=3{,}18\ \text{Hz}}"></span>
+        <span class="note">Tyngden indgår ikke, når udsvinget måles fra ligevægten</span></div></div>
+      <div class="step"><span class="n b">2</span><div class="t"><b>Stive legemer: moment i stedet for kraft</b>
+        <span class="m" data-tex="\textstyle\sum M_O=I_O\,\ddot\theta"></span>
+        <span class="note">Små vinkler: <span data-tex="\sin\theta\approx\theta"></span></span></div></div>
+      <div class="step"><span class="n b">3</span><div class="t"><b>Skriv på standardform og aflæs</b>
+        <span class="m" data-tex="\ddot\theta+\omega_n^2\,\theta=0"></span>
+        <span class="note">Koefficienten foran <span data-tex="\theta"></span> er <span data-tex="\omega_n^2"></span>, så roden er direkte svaret</span></div></div>
+      <div class="step"><span class="n g">✓</span><div class="t"><b>Tjek med firedobbelt masse</b> (m = 8 kg)
+        <span class="m" data-tex="\omega_n=\sqrt{800/8}=10\ \text{rad/s}"></span>
+        <span class="note">Halv takt, så perioden fordobles. Prøv på slideren</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Træk i m og k</h3>
+      <canvas id="a1" width="640" height="150"></canvas>
+      <canvas id="g1" width="640" height="250"></canvas>
+      <div class="sl"><span>Masse m</span><input id="m1" type="range" min="0.5" max="5" step="0.1" value="2"><output id="m1o"></output></div>
+      <div class="sl"><span>Fjeder k</span><input id="k1" type="range" min="200" max="2000" step="20" value="800"><output id="k1o"></output></div>
+      <div class="ro r3">
+        <div><span>ω<sub>n</sub></span><b class="cy" id="r1w">20,0</b><i>rad/s</i></div>
+        <div><span>f</span><b class="or" id="r1f">3,18</b><i>Hz</i></div>
+        <div><span>τ</span><b class="pu" id="r1t">0,314</b><i>s</i></div>
+      </div>
+      <div class="status" style="font-size:15px;padding:6px 10px">rad/s er ikke Hz: <b>f = ω<sub>n</sub> / 2π</b>, cirka ω<sub>n</sub> delt med 6,28. Animationen går 5 gange langsommere end virkeligheden.</div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Tungere masse giver langsommere svingning, stivere fjeder giver hurtigere. Udsvingets størrelse betyder ingenting for perioden.</span></div>
+</section>
+
+<!-- ============ 2 · DÆMPNING ============ -->
+<section class="slide" id="s2" data-title="2 · Dæmpning">
+  <div class="hd"><span class="tag b">IDÉ 2 · VISKOS DÆMPNING</span><h1>ζ afgør, om systemet svinger</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Kritisk dæmpning og ζ</h3>
+      <div class="big" style="font-size:32px" data-tex="c_c=2m\,\omega_n,\quad \zeta=\dfrac{c}{c_c}"></div>
+      <div class="src">Hibbeler (2023), lign. (22-29), s. 662</div>
+      <div class="big" style="font-size:32px" data-tex="\omega_d=\omega_n\sqrt{1-\zeta^2}"></div>
+      <div class="src">lign. (22-33), s. 663</div>
+      <div class="terms">
+        <div class="term"><span class="s or" data-tex="\zeta<1"></span><span><b>Underdæmpet</b>: svinger med aftagende udsving</span></div>
+        <div class="term"><span class="s" data-tex="\zeta=1"></span><span><b>Kritisk</b>: hurtigst tilbage uden at svinge</span></div>
+        <div class="term"><span class="s" data-tex="\zeta>1"></span><span><b>Overdæmpet</b>: kryber langsomt tilbage</span></div>
+        <div class="term"><span class="s cy" data-tex="c"></span><span>Enhed N·s/m. <span data-tex="\zeta"></span> har ingen enhed og er det, der afgør typen</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n b">2</span><div class="t"><b>Kritisk dæmpning</b> (c = 20 N·s/m)
+        <span class="m" data-tex="c_c=2\cdot2{,}0\cdot20=80\ \text{N s/m}"></span></div></div>
+      <div class="step"><span class="n b">3</span><div class="t"><b>Dæmpningsforhold og type</b>
+        <span class="m" data-tex="\zeta=\dfrac{20}{80}=0{,}25<1"></span>
+        <span class="note">Dermed underdæmpet</span></div></div>
+      <div class="step"><span class="n b">4</span><div class="t"><b>Dæmpet frekvens og periode</b>
+        <span class="m" data-tex="\omega_d=20\sqrt{1-0{,}0625}=19{,}4\ \text{rad/s}"></span>
+        <span class="m" data-tex="\boxed{\tau_d=2\pi/\omega_d=0{,}324\ \text{s}}"></span></div></div>
+      <div class="step"><span class="n g">✓</span><div class="t"><b>Rimelighedstjek</b>
+        <span class="m" data-tex="\omega_d/\omega_n=0{,}968"></span>
+        <span class="note">Dæmpningen sænker frekvensen kun cirka 3 %, så ω_d er lidt under ω_n</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Udsvinget over tid</h3>
+      <canvas id="g2" width="640" height="420"></canvas>
+      <div class="sl n"><span>ζ</span><input id="z2" type="range" min="0" max="2" step="0.01" value="0.25"><output id="z2o"></output></div>
+      <div class="ro r3">
+        <div><span>ζ</span><b class="or" id="r2z">0,25</b></div>
+        <div><span>c</span><b class="cy" id="r2c">20</b><i>N·s/m</i></div>
+        <div><span>ω<sub>d</sub></span><b class="pu" id="r2w">19,4</b><i>rad/s</i></div>
+      </div>
+      <div class="status" id="st2"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Dæmperen sammenlignes med den dæmpning, der lige stopper svingningen. Her er den en fjerdedel af den, så systemet svinger, men dør ud.</span></div>
+</section>
+
+<!-- ============ 3 · RESONANS ============ -->
+<section class="slide" id="s3" data-title="3 · Resonans">
+  <div class="hd"><span class="tag p">IDÉ 3 · PÅTVUNGEN SVINGNING</span><h1>Rammer takten egenfrekvensen, vokser udsvinget</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Forstærkningsfaktor MF</h3>
+      <div class="big" style="font-size:30px" data-tex="\text{MF}=\dfrac{1}{\sqrt{\left[1-r^2\right]^2+\left[2\zeta r\right]^2}}"></div>
+      <div class="src">Hibbeler (2023), lign. (22-40), s. 665</div>
+      <div class="terms">
+        <div class="term"><span class="s pu" data-tex="r=\tfrac{\omega_0}{\omega_n}"></span><span>Frekvensforholdet. <span data-tex="\omega_0"></span> er frekvensen på den ydre kraft <span data-tex="F_0\sin\omega_0 t"></span></span></div>
+        <div class="term"><span class="s" data-tex="F_0/k"></span><span>Det statiske udsving: hvor langt kraften ville trække fjederen, hvis den stod stille</span></div>
+        <div class="term"><span class="s or" data-tex="\text{MF}=X'/(F_0/k)"></span><span>Hvor mange gange større det dynamiske udsving X′ er end det statiske</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n p">1</span><div class="t"><b>Langsom kraft</b> (<span data-tex="\omega_0\ll\omega_n"></span>)
+        <span class="m" data-tex="\text{MF}\approx1"></span>
+        <span class="note">Massen følger blot kraften som statisk belastning</span></div></div>
+      <div class="step"><span class="n p">2</span><div class="t"><b>Resonans</b> (<span data-tex="\omega_0=\omega_n"></span>)
+        <span class="m" data-tex="\boxed{\text{MF}\approx\dfrac{1}{2\zeta}}"></span>
+        <span class="note">Ved ζ = 0,1 giver det MF = 5. Uden dæmpning går MF mod uendelig</span></div></div>
+      <div class="step"><span class="n p">3</span><div class="t"><b>Hurtig kraft</b> (<span data-tex="\omega_0\gg\omega_n"></span>)
+        <span class="m" data-tex="\text{MF}\to0"></span>
+        <span class="note">Massen når ikke at følge med</span></div></div>
+      <div class="step"><span class="n g">✓</span><div class="t"><b>Tjek med eksemplets dæmpning</b>
+        <span class="m" data-tex="\zeta=0{,}25\ \Rightarrow\ \text{MF}=\dfrac{1}{2\cdot0{,}25}=2"></span>
+        <span class="note">Prøv ζ = 0,25 på slideren</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Forstærkning mod frekvensforhold</h3>
+      <canvas id="g3" width="640" height="400"></canvas>
+      <div class="sl n"><span>ζ</span><input id="z3" type="range" min="0.05" max="1.5" step="0.01" value="0.1"><output id="z3o"></output></div>
+      <div class="sl n"><span>ω₀/ω<sub>n</sub></span><input id="r3" type="range" min="0" max="3" step="0.01" value="1"><output id="r3o"></output></div>
+      <div class="ro r3">
+        <div><span>MF her</span><b class="pu" id="q3a">5,0</b></div>
+        <div><span>MF ved resonans</span><b class="or" id="q3b">5,0</b></div>
+        <div><span>1/(2ζ)</span><b class="cy" id="q3c">5,0</b></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Skubbes en gynge i dens egen takt, vokser udsvinget. Dæmpning begrænser toppen til cirka 1 over 2ζ.</span></div>
+</section>
+
+<!-- ============ 4 · FALDGRUBER OG TJEK ============ -->
+<section class="slide" data-title="4 · Faldgruber og tjek">
+  <div class="hd"><span class="tag g">FALDGRUBER OG TJEK</span><h1>Hvor det typisk går galt</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Typiske fejl</h3>
+      <div class="fejl">
+        <div><span style="display:block">rad/s og Hz blandes sammen<span class="ret">f = ω<sub>n</sub>/(2π). Glemmes 2π, bliver Hz cirka seks gange for stort</span></span></div>
+        <div><span style="display:block">Statisk fjederforlængelse og tyngde tages med<span class="ret">Måles x fra ligevægten, går ks<sub>eq</sub> = mg ud, og kun −kx er tilbage</span></span></div>
+        <div><span style="display:block">I<sub>O</sub> glemmes ved stive legemer<span class="ret">ΣM<sub>O</sub> = I<sub>O</sub>θ̈, og fjederens moment er ka²θ (armen i anden)</span></span></div>
+        <div><span style="display:block">c og ζ forveksles<span class="ret">Typen afgøres af ζ = c/c<sub>c</sub>, og ω<sub>d</sub> regnes med ζ</span></span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Tjek dig selv</h3>
+      <div class="qa">
+        <details><summary>Massen skiftes til én, der er fire gange så tung. Hvad sker der med perioden?</summary><p>ω<sub>n</sub> ∝ 1/√m halveres, så perioden τ fordobles.</p></details>
+        <details><summary>Et system har ζ = 1,3. Svinger det?</summary><p>Nej. ζ &gt; 1 er overdæmpet, og systemet kryber langsomt tilbage mod ligevægt.</p></details>
+        <details><summary>Hvad er MF ved resonans med ζ = 0,1?</summary><p>ω<sub>0</sub> = ω<sub>n</sub> giver MF = 1/(2ζ) = 5.</p></details>
+      </div>
+    </div>
+    <div class="card col">
+      <h3>Til eksamen (A26)</h3>
+      <div class="exlinks">
+        <a href="../../eksamen/opg07/"><b>OPG 7</b> Egenfrekvens · (b) f = 0,890 Hz</a>
+        <a href="../../eksamen/opg08/"><b>OPG 8</b> Rod with spring and damper · ζ = 1/3, τd = 0,666 s</a>
+        <a href="../../eksamen/opg10/"><b>OPG 10</b> Rod w. three springs · τ = 2π√(7m/33k)</a>
+      </div>
+      <h3 style="margin-top:6px">Læs i bogen (Hibbeler 2023)</h3>
+      <div style="font-size:16px;line-height:1.5">
+        <b>22.1</b> Fri udæmpet svingning, s. 638 til 640<br>
+        <b>22.2</b> Energimetoden, s. 651<br>
+        <b>22.3</b> Påtvungen svingning, s. 657 til 659<br>
+        <b>22.4</b> Fri dæmpet svingning, s. 661 til 663<br>
+        <b>22.5</b> Påtvungen dæmpet svingning, s. 664 til 665
+      </div>
+      <div class="status" style="font-size:15px">Med dæmper på en stang: <span data-tex="I_O\ddot\theta+c d^2\dot\theta+k a^2\theta=0"></span>, og så er <span data-tex="m\to I_O,\ c\to cd^2,\ k\to ka^2"></span>.</div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Stil ligningen op, skriv den på standardform, aflæs ω<sub>n</sub>. Med dæmper afgør ζ, om der svinges.</span></div>
+</section>
+
+</div></div>
+<script src="../assets/deck.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = D.$, fmt = D.fmt, PI = Math.PI;
+var CY = '#0a7fc2', OR = '#d97a00', PU = '#7b4fc9', GR = '#0a9a5c';
+
+/* udsving fra x0 = 1, x'0 = 0 */
+function resp(z, wn) {
+  return function (t) {
+    if (z < 0.999) { var wd = wn * Math.sqrt(1 - z * z); return Math.exp(-z * wn * t) * (Math.cos(wd * t) + z * wn / wd * Math.sin(wd * t)); }
+    if (z < 1.001) return Math.exp(-wn * t) * (1 + wn * t);
+    var s = Math.sqrt(z * z - 1), r1 = -wn * (z - s), r2 = -wn * (z + s), A = r2 / (r2 - r1), B = 1 - A; return A * Math.exp(r1 * t) + B * Math.exp(r2 * t);
+  };
+}
+function MF(r, z) { return 1 / Math.sqrt(Math.pow(1 - r * r, 2) + Math.pow(2 * z * r, 2)); }
+
+/* ---------- forside: masse på fjeder + bil over bump ---------- */
+(function () {
+  var G = D.cv('a0'), x = G.x, W = G.W, H = G.H;
+  var tt = 0, zz = 0, vv = 0, wnC = 2 * PI / 1.0, zC = 0.22, hb = 38, xw = 430, road = 440, bw = 34, speed = 190, T = 4.2;
+  function Hb(t) { var p = t % T, xb = 700 - p * speed; return hb * Math.exp(-Math.pow((xb - xw) / bw, 2)); }
+  D.anim(0, function (dt, t) {
+    x.clearRect(0, 0, W, H);
+    /* venstre: masse på fjeder */
+    var cx = 130, ceil = 60;
+    x.fillStyle = '#9fb0c2'; x.fillRect(cx - 60, ceil - 14, 120, 14);
+    var my = 270 + 62 * Math.cos(2 * PI * t / 1.7), bh = 64;
+    D.spring(x, cx, ceil, cx, my - bh / 2, CY, 9);
+    x.fillStyle = PU; x.fillRect(cx - 44, my - bh / 2, 88, bh);
+    D.txt(x, 'm', cx, my, 30, '#fff', 'center', 'middle', 700);
+    D.txt(x, 'k', cx + 56, 150, 28, CY, 'left');
+    D.line(x, [[cx - 66, 270], [cx + 66, 270]], 'rgba(90,107,125,.45)', 2, [6, 6]);
+    D.txt(x, 'ligevægt', cx + 70, 270, 18, '#5a6b7d', 'left');
+    D.txt(x, 'Fri svingning', cx, 500, 24, '#14202d', 'center');
+    /* højre: bil */
+    var sub = 20, ds = dt / sub;
+    for (var i = 0; i < sub && dt > 0; i++) {
+      var h1 = Hb(tt), h2 = Hb(tt + ds), hd = (h2 - h1) / ds;
+      var a = -wnC * wnC * (zz - h1) - 2 * zC * wnC * (vv - hd);
+      vv += a * ds; zz += vv * ds; tt += ds;
+    }
+    var hub = road - 26 - Hb(tt), bodyB = 300 - zz;
+    /* vej */
+    var pts = []; for (var px = 260; px <= W; px += 4) { var xb = 700 - (tt % T) * speed; pts.push([px, road - hb * Math.exp(-Math.pow((px - xb) / bw, 2))]); }
+    D.line(x, pts, '#5a6b7d', 4);
+    for (var q = 0; q < 8; q++) { var dx = ((q * 80 - tt * speed) % 640 + 640) % 640 + 250; if (dx < W - 10) D.line(x, [[dx, road + 26], [dx + 26, road + 26]], '#c3d0dd', 4); }
+    /* hjul og ophæng */
+    D.circ(x, xw, hub, 26, '#14202d'); D.circ(x, xw, hub, 11, '#9fb0c2');
+    D.spring(x, xw - 22, hub, xw - 22, bodyB, CY, 7);
+    D.line(x, [[xw + 22, hub], [xw + 22, (hub + bodyB) / 2 + 6]], GR, 8);
+    D.line(x, [[xw + 22, bodyB], [xw + 22, (hub + bodyB) / 2 - 10]], GR, 14);
+    x.fillStyle = OR; x.fillRect(xw - 90, bodyB - 70, 180, 70);
+    x.fillStyle = '#fff'; x.fillRect(xw - 50, bodyB - 62, 100, 28);
+    D.txt(x, 'støddæmper', xw + 34, bodyB + 40, 17, GR, 'left');
+    D.txt(x, 'Bil over et bump', 425, 500, 24, '#14202d', 'center');
+  });
+})();
+
+/* ---------- slide 1: fri svingning ---------- */
+var ph1 = 0, W1 = 20;
+function par1() { var m = +$('m1').value, k = +$('k1').value; return { m: m, k: k, w: Math.sqrt(k / m) }; }
+function upd1() {
+  var p = par1(), tau = 2 * PI / p.w; W1 = p.w;
+  $('m1o').textContent = fmt(p.m, 1) + ' kg'; $('k1o').textContent = Math.round(p.k) + ' N/m';
+  $('r1w').textContent = fmt(p.w, 1); $('r1f').textContent = fmt(p.w / (2 * PI), 2); $('r1t').textContent = fmt(tau, 3);
+  D.graph('g1', { f: function (t) { return Math.cos(p.w * t); }, x0: 0, x1: 4 * tau, xt: [[0, '0'], [tau, 'τ'], [2 * tau, '2τ'], [4 * tau, '4τ']], min: -1.25, max: 1.25, yt: [-1, 1], yd: 0, lbl: 'x / x₁', col: CY, d: 2, xl: 't', vline: tau });
+}
+$('m1').oninput = upd1; $('k1').oninput = upd1; upd1();
+(function () {
+  var G = D.cv('a1'), x = G.x, W = G.W, H = G.H;
+  D.anim(1, function (dt) {
+    ph1 += dt * W1 * 0.2;
+    var p = par1(), s = 46 + 14 * Math.cbrt(p.m), cxm = 330 + 120 * Math.cos(ph1);
+    x.clearRect(0, 0, W, H);
+    x.fillStyle = '#9fb0c2'; x.fillRect(10, 20, 14, 100);
+    D.line(x, [[10, 124], [W - 10, 124]], '#5a6b7d', 3);
+    D.line(x, [[330, 20], [330, 118]], 'rgba(90,107,125,.45)', 2, [5, 6]);
+    D.spring(x, 24, 72, cxm - s / 2, 72, CY, 12 + Math.round(p.k / 400));
+    x.fillStyle = PU; x.fillRect(cxm - s / 2, 124 - s, s, s);
+    D.txt(x, 'm', cxm, 124 - s / 2, 24, '#fff', 'center', 'middle', 700);
+    D.txt(x, 'k', 70, 36, 22, CY, 'left');
+  });
+})();
+
+/* ---------- slide 2: dæmpning ---------- */
+function upd2() {
+  var z = +$('z2').value, c = z * 80, wd = z < 1 ? 20 * Math.sqrt(1 - z * z) : NaN;
+  $('z2o').textContent = fmt(z, 2);
+  $('r2z').textContent = fmt(z, 2); $('r2c').textContent = fmt(c, 0); $('r2w').textContent = isFinite(wd) ? fmt(wd, 1) : 'ingen';
+  D.graph('g2', { f: resp(z, 20), ref: resp(0.25, 20), x0: 0, x1: 1.5, xt: [[0, '0'], [0.5, '0,5'], [1, '1'], [1.5, '1,5 s']], min: -1.1, max: 1.1, yt: [-1, -0.5, 0.5, 1], yd: 1, lbl: 'x / x₁', col: OR, d: 2 });
+  $('st2').innerHTML = z < 0.005 ? '<b>Uden dæmpning</b> (ζ = 0): svinger for evigt. Stiplet = eksemplets ζ = 0,25' : z < 0.995 ? '<b>Underdæmpet</b> (ζ &lt; 1): svinger over ligevægten, amplituden aftager. Stiplet = eksemplets ζ = 0,25' : (z < 1.005 ? '<b>Kritisk</b> (ζ = 1): hurtigst tilbage uden at svinge' : '<b>Overdæmpet</b> (ζ &gt; 1): kryber langsomt tilbage');
+}
+$('z2').oninput = upd2; upd2();
+
+/* ---------- slide 3: resonans ---------- */
+function upd3() {
+  var z = +$('z3').value, r = +$('r3').value;
+  $('z3o').textContent = fmt(z, 2); $('r3o').textContent = fmt(r, 2);
+  var res = Math.min(MF(1, z), 1e6);
+  $('q3a').textContent = fmt(MF(r, z), 1); $('q3b').textContent = fmt(res, 1); $('q3c').textContent = fmt(1 / (2 * z), 1);
+  D.graph('g3', { f: function (q) { return MF(q, z); }, x0: 0, x1: 3, xt: [[0, '0'], [1, '1'], [2, '2'], [3, '3']], min: 0, max: 10.5, yt: [1, 5, 10], yd: 0, lbl: 'MF', col: PU, d: 1, xl: 'ω₀ / ωₙ', xm: r, vline: 1, hl: [1, 'MF = 1'] });
+}
+$('z3').oninput = upd3; $('r3').oninput = upd3; upd3();
+
+D.start();
+})();
+</script>
+</body></html>

@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DYN2 hurtigstart</title>
+<meta name="description" content="Hurtigstart til Dynamik 2: kort over de fire pensumkapitler, værktøjsvælger og et interaktivt intro-deck pr. kapitel, før bogen læses.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<style>
+:root{--bg:#ffffff;--panel:#f6f9fc;--panel2:#ebf1f7;--line:#d3dde8;--ink:#14202d;--mut:#5a6b7d;--cy:#0a7fc2;--or:#d97a00;--gr:#0a9a5c;--pu:#7b4fc9;--ye:#a86b00}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:radial-gradient(1200px 600px at 85% -10%,#e6f1fa 0%,transparent 60%),var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.45}
+.wrap{max-width:1240px;margin:0 auto;padding:28px 16px 48px}
+.top{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.top a{color:var(--cy);text-decoration:none;font-size:15px}
+.tag{display:inline-block;font:700 14px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:#fff;background:var(--ink);padding:7px 10px;border-radius:6px}
+h1{font-size:clamp(30px,5vw,46px);font-weight:750;letter-spacing:-.01em;margin:14px 0 6px}
+h2{font-size:clamp(22px,3vw,28px);margin:38px 0 6px;letter-spacing:-.01em}
+.lead{color:var(--mut);font-size:18px;max-width:860px}
+.sub{color:var(--mut);font-size:16px;margin-bottom:14px;max-width:860px}
+.three{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:20px}
+.three div{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;font-size:16px}
+.three b{display:block;font-size:19px;margin-bottom:4px}
+.k16{--k:var(--cy)}.k17{--k:var(--or)}.k18{--k:var(--gr)}.k22{--k:var(--pu)}
+.three div{border-top:5px solid var(--k)}
+/* kort */
+.map{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:18px;align-items:stretch}
+.map svg{width:100%;height:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px}
+.node{cursor:pointer}
+.node rect{fill:#fff;stroke:var(--k);stroke-width:2.5;transition:fill .15s}
+.node.on rect,.node:hover rect{fill:color-mix(in srgb,var(--k) 12%,white)}
+.node text{font-family:system-ui,sans-serif;fill:var(--ink)}
+.node .t1{font-weight:750;font-size:17px}.node .t2{font-size:14px;fill:var(--mut)}
+.edge{stroke:#9fb0c2;stroke-width:2.5;fill:none;transition:stroke .15s,stroke-width .15s}
+.edge.on{stroke:var(--ink);stroke-width:4}
+.elbl{font:italic 13px system-ui,sans-serif;fill:var(--mut)}
+.elbl.on{fill:var(--ink);font-weight:650}
+.info{background:var(--panel);border:1px solid var(--line);border-top:5px solid var(--k,var(--line));border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.info h3{font-size:21px}
+.info p{font-size:16px}
+.info ul{padding-left:20px;font-size:15.5px;display:grid;gap:3px}
+.info .go{margin-top:auto;align-self:flex-start;background:var(--k,var(--cy));color:#fff;text-decoration:none;font-weight:650;border-radius:10px;padding:9px 14px}
+.info .go[hidden]{display:none}
+/* værktøjsvælger */
+.picker{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+.qs{display:grid;gap:8px;align-content:start}
+.qs button{text-align:left;font:500 16px/1.35 system-ui,sans-serif;color:var(--ink);background:#fff;border:1px solid var(--line);border-left:5px solid var(--k);border-radius:10px;padding:10px 13px;cursor:pointer}
+.qs button:hover{border-color:var(--k)}
+.qs button.on{background:color-mix(in srgb,var(--k) 10%,white);border-color:var(--k)}
+.ans{background:var(--panel);border:1px solid var(--line);border-top:5px solid var(--k,var(--line));border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:12px;min-height:260px}
+.ans .m{font-size:24px;text-align:center;padding:8px 0;overflow-x:auto}
+.ans .why{font-size:16px}
+.ans .ex{font-size:15px;color:var(--mut)}
+.ans .ex a{color:var(--cy)}
+.ans .go{align-self:flex-start;background:var(--k);color:#fff;text-decoration:none;font-weight:650;border-radius:10px;padding:9px 14px}
+.tip{margin-top:12px;font-size:16px;background:#fff8e8;border:1px solid #ecd9a8;border-radius:10px;padding:10px 14px}
+/* decks */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px}
+a.card{display:flex;flex-direction:column;gap:8px;background:var(--panel);border:1px solid var(--line);border-top:6px solid var(--k);border-radius:14px;padding:16px 18px;color:inherit;text-decoration:none;box-shadow:0 1px 3px rgba(20,32,45,.06);transition:transform .15s,border-color .15s}
+a.card:hover{transform:translateY(-2px);border-color:var(--k)}
+.card .nr{font:700 13px ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--k)}
+.card h3{font-size:22px;line-height:1.2}
+.card p{font-size:15px;color:var(--mut)}
+.card .f{margin-top:auto;font-size:18px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 9px;text-align:center}
+.card .meta{font:600 13px ui-monospace,Consolas,monospace;color:var(--mut)}
+table{width:100%;border-collapse:collapse;font-size:15.5px;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--panel2);font-size:14px;letter-spacing:.04em;color:var(--mut)}
+td a{color:var(--cy);text-decoration:none}
+td b{color:var(--k)}
+footer{margin-top:30px;color:var(--mut);font-size:14px}
+@media (max-width:820px){.map,.picker{grid-template-columns:1fr}th:nth-child(3),td:nth-child(3){display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a href="../../../index.html">← Studiehub</a><a href="../eksamen/">Eksamensopgaver A26 →</a></div>
+  <span class="tag">DYN2 · HURTIGSTART</span>
+  <h1>Dynamik 2 på fire kapitler</h1>
+  <p class="lead">Formen på faget, før bogen åbnes. Et cykelhjul flytter sig og drejer på samme tid: Kontaktpunktet står stille, og toppen kører dobbelt så hurtigt som cyklen. I DYN1 var genstande punkter. I DYN2 får de en udstrækning, og rotationen bliver lige så vigtig som flytningen.</p>
+
+  <div class="three">
+    <div class="k16"><b>Hvordan bevæger det sig?</b>Hastighed og acceleration af punkter på legemet. Kap. 16.</div>
+    <div class="k17"><b>Hvorfor bevæger det sig sådan?</b>Kræfter og momenter giver acceleration (kap. 17), og arbejde ændrer energien (kap. 18).</div>
+    <div class="k22"><b>Hvordan svinger det?</b>Fjedre og dæmpere giver svingning med en bestemt frekvens. Kap. 22.</div>
+  </div>
+
+  <h2>Det store billede</h2>
+  <p class="sub">Klik på et kapitel for at se, hvad det henter fra de andre. Kinematikken i kap. 16 er sproget, som resten bruger.</p>
+  <div class="map">
+    <svg viewBox="0 0 760 420" role="img" aria-label="Kort over hvordan kapitel 16, 17, 18 og 22 bygger på hinanden">
+      <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7d8fa3"/></marker></defs>
+      <path class="edge" data-e="d1-16" d="M115,98 L115,168" marker-end="url(#ah)"/>
+      <path class="edge" data-e="16-17" d="M200,190 L300,120" marker-end="url(#ah)"/>
+      <path class="edge" data-e="16-18" d="M200,250 L300,320" marker-end="url(#ah)"/>
+      <path class="edge" data-e="17-18" d="M380,140 L380,292" marker-end="url(#ah)" stroke-dasharray="7 6"/>
+      <path class="edge" data-e="17-22" d="M460,120 L560,190" marker-end="url(#ah)"/>
+      <path class="edge" data-e="18-22" d="M460,320 L560,250" marker-end="url(#ah)"/>
+      <text class="elbl" data-e="d1-16" x="106" y="138" text-anchor="end">nu med rotation</text>
+      <text class="elbl" data-e="16-17" x="226" y="140">a<tspan baseline-shift="sub" font-size="10">G</tspan> og α</text>
+      <text class="elbl" data-e="16-18" x="196" y="312">v<tspan baseline-shift="sub" font-size="10">G</tspan> og ω</text>
+      <text class="elbl" data-e="17-18" x="390" y="222">I<tspan baseline-shift="sub" font-size="10">G</tspan></text>
+      <text class="elbl" data-e="17-22" x="500" y="140">bevægelsesligning</text>
+      <text class="elbl" data-e="18-22" x="508" y="312">energimetode</text>
+      <g class="node" data-n="d1" style="--k:#9fb0c2"><rect x="40" y="30" width="150" height="66" rx="10" stroke-dasharray="6 5"/><text class="t1" x="115" y="58" text-anchor="middle">DYN1</text><text class="t2" x="115" y="80" text-anchor="middle">partikler, ΣF = ma</text></g>
+      <g class="node k16" data-n="16"><rect x="30" y="170" width="170" height="100" rx="12"/><text class="t1" x="115" y="205" text-anchor="middle">Kap. 16</text><text class="t1" x="115" y="227" text-anchor="middle">Kinematik</text><text class="t2" x="115" y="251" text-anchor="middle">ω, α, relativ v og a</text></g>
+      <g class="node k17" data-n="17"><rect x="300" y="40" width="160" height="100" rx="12"/><text class="t1" x="380" y="75" text-anchor="middle">Kap. 17</text><text class="t1" x="380" y="97" text-anchor="middle">Kraft og acc.</text><text class="t2" x="380" y="121" text-anchor="middle">ΣM<tspan baseline-shift="sub" font-size="10">G</tspan> = I<tspan baseline-shift="sub" font-size="10">G</tspan>α</text></g>
+      <g class="node k18" data-n="18"><rect x="300" y="294" width="160" height="100" rx="12"/><text class="t1" x="380" y="329" text-anchor="middle">Kap. 18</text><text class="t1" x="380" y="351" text-anchor="middle">Arbejde og energi</text><text class="t2" x="380" y="375" text-anchor="middle">T₁ + ΣU = T₂</text></g>
+      <g class="node k22" data-n="22"><rect x="560" y="170" width="170" height="100" rx="12"/><text class="t1" x="645" y="205" text-anchor="middle">Kap. 22</text><text class="t1" x="645" y="227" text-anchor="middle">Vibrationer</text><text class="t2" x="645" y="251" text-anchor="middle">ωₙ, ζ, resonans</text></g>
+    </svg>
+    <div class="info" id="info"></div>
+  </div>
+
+  <h2>Hvilket værktøj passer til spørgsmålet?</h2>
+  <p class="sub">Det meste af en eksamensopgave er afgjort, når metoden er valgt. Vælg, hvad opgaven spørger om.</p>
+  <div class="picker">
+    <div class="qs" id="qs"></div>
+    <div class="ans" id="ans"></div>
+  </div>
+  <div class="tip"><b>Tommelfingerregel:</b> Står der „<i>after it has travelled</i>“ eller „<i>when it reaches</i>“, er energi næsten altid hurtigst. Står der „<i>at this instant</i>“, og spørges der efter en kraft, er det kap. 17.</div>
+
+  <h2>Intro-decks: ét pr. kapitel</h2>
+  <p class="sub">Fem slides pr. kapitel: hverdagsbillede, tre kerneidéer med formel, tal og en graf at lege med, og til sidst typiske fejl og koblingen til eksamen. → / mellemrum: næste · F: fuld skærm.</p>
+  <div class="grid" id="decks"></div>
+
+  <h2>Eksamenssættet A26 fordelt på kapitler</h2>
+  <table>
+    <thead><tr><th>Kapitel</th><th>Opgaver</th><th>Hvad der regnes</th></tr></thead>
+    <tbody id="ex"></tbody>
+  </table>
+
+  <footer>Kilde: Hibbeler, R. C. (2023). <i>Engineering mechanics: Dynamics</i> (15. udg., SI). Pearson. Lavet med hjælp fra Claude (Anthropic). Tallene i eksemplerne er regnet efter.</footer>
+</div>
+<script>
+(function () {
+'use strict';
+function $(id) { return document.getElementById(id); }
+function tex(root) {
+  if (!window.katex) return setTimeout(function () { tex(root); }, 80);
+  root.querySelectorAll('[data-tex]').forEach(function (el) { katex.render(el.getAttribute('data-tex'), el, { throwOnError: false, displayMode: false }); });
+}
+var COL = { d1: '#9fb0c2', 16: 'var(--cy)', 17: 'var(--or)', 18: 'var(--gr)', 22: 'var(--pu)' };
+
+/* ---------- kort ---------- */
+var N = {
+  d1: { t: 'DYN1: partikler', p: 'Udgangspunktet. Genstande er punkter uden udstrækning, så der findes ingen rotation.', l: ['v = ds/dt, a = dv/dt', 'ΣF = ma', 'arbejde og energi for en partikel'], e: ['d1-16'] },
+  16: { t: 'Kap. 16 · Kinematik', p: 'Hvordan legemet bevæger sig, uden at spørge hvorfor. Leverer ω, α, v<sub>G</sub> og a<sub>G</sub> til de andre kapitler.', l: ['rotation om fast akse: v = ωr, a<sub>t</sub> = αr, a<sub>n</sub> = ω²r', 'relativ hastighed og øjeblikkeligt hastighedscenter (IC)', 'relativ acceleration', 'roterende referencesystem og Coriolis (A26 opg. 2 og 3)'], e: ['d1-16', '16-17', '16-18'] },
+  17: { t: 'Kap. 17 · Kraft og acceleration', p: 'Hvorfor legemet accelererer. Frit legeme-diagram er lig kinetisk diagram, i ét bestemt øjeblik.', l: ['massetræghedsmoment og parallelakse-sætningen', 'ΣF = m a<sub>G</sub> og ΣM<sub>G</sub> = I<sub>G</sub> α', 'rotation om fast akse: ΣM<sub>O</sub> = I<sub>O</sub> α'], e: ['16-17', '17-18', '17-22'] },
+  18: { t: 'Kap. 18 · Arbejde og energi', p: 'Fra én position til en anden uden at kende accelerationen undervejs. Energien deles mellem translation og rotation.', l: ['T = ½ m v<sub>G</sub>² + ½ I<sub>G</sub> ω²', 'arbejde af vægt, fjeder og kraftpar', 'T₁ + ΣU₁₋₂ = T₂ og energibevarelse'], e: ['16-18', '17-18', '18-22'] },
+  22: { t: 'Kap. 22 · Vibrationer', p: 'Små svingninger om en ligevægt. Bevægelsesligningen fra kap. 17 eller energien fra kap. 18 skrives på formen θ″ + ωₙ²θ = 0.', l: ['ωₙ = √(k/m), f = ωₙ/2π', 'dæmpning: c<sub>c</sub> = 2mωₙ, ζ = c/c<sub>c</sub>', 'påtvungen svingning og resonans'], e: ['17-22', '18-22'] }
+};
+function show(n) {
+  var d = N[n];
+  document.querySelectorAll('.node').forEach(function (g) { g.classList.toggle('on', g.dataset.n === String(n)); });
+  document.querySelectorAll('.edge,.elbl').forEach(function (e) { e.classList.toggle('on', d.e.indexOf(e.dataset.e) >= 0); });
+  var info = $('info'); info.style.setProperty('--k', COL[n]);
+  info.innerHTML = '<h3>' + d.t + '</h3><p>' + d.p + '</p><ul>' + d.l.map(function (s) { return '<li>' + s + '</li>'; }).join('') + '</ul>' +
+    (n === 'd1' ? '' : '<a class="go" href="kap' + n + '/">Åbn intro-decket →</a>');
+}
+document.querySelectorAll('.node').forEach(function (g) { g.addEventListener('click', function () { show(g.dataset.n); }); });
+show(16);
+
+/* ---------- værktøjsvælger ---------- */
+var Q = [
+  { k: 16, q: 'Hastighed eller vinkelhastighed i et bestemt øjeblik', m: 'v_B = v_A + \\omega \\times r_{B/A}', w: 'Relativ hastighed. Ruller noget uden glid, er øjeblikkeligt hastighedscenter (IC) ofte hurtigst: v = ω·r_IC.', x: [1, 'Hacksaw'] },
+  { k: 16, q: 'Acceleration eller vinkelacceleration, uden kræfter', m: 'a_B = a_A + \\alpha \\times r_{B/A} - \\omega^2 r_{B/A}', w: 'Relativ acceleration. Regn hastighederne først, for ω skal bruges i normalleddet.', x: [1, 'Hacksaw'] },
+  { k: 16, q: 'Et punkt glider langs et led, der selv drejer', m: 'a_B = a_A + \\dot\\Omega \\times r - \\Omega^2 r + 2\\Omega \\times v_{rel} + a_{rel}', w: 'Roterende referencesystem. Coriolis-leddet 2Ω × v_rel er det, der oftest glemmes.', x: [2, 'Disk and slotted link'] },
+  { k: 17, q: 'En kraft, en reaktion eller en friktionskraft lige nu', m: '\\Sigma F = m a_G,\\quad \\Sigma M_G = I_G \\alpha', w: 'Tegn frit legeme-diagram og kinetisk diagram side om side. Tre ligninger, tre ubekendte.', x: [5, 'Truck'] },
+  { k: 18, q: 'Fart eller vinkelhastighed efter en strækning eller en vinkel', m: 'T_1 + \\Sigma U_{1-2} = T_2', w: 'Arbejde og energi. Accelerationen undervejs er ligegyldig. Husk rotationsenergien ½ I_G ω².', x: [7, 'Car on inclined plane'] },
+  { k: 22, q: 'Egenfrekvens, periode eller svingningstid', m: '\\ddot\\theta + \\omega_n^2 \\theta = 0', w: 'Opstil bevægelsesligningen for en lille vinkel (sin θ ≈ θ), og aflæs ω_n som kvadratroden af leddet foran θ.', x: [10, 'Rod with three springs'] },
+  { k: 22, q: 'Om systemet er under-, kritisk eller overdæmpet', m: '\\zeta = \\dfrac{c}{c_c},\\quad c_c = 2 m \\omega_n', w: 'ζ < 1 svinger, ζ = 1 er kritisk, ζ > 1 kryber tilbage uden at svinge.', x: [8, 'Rod with spring and damper'] }
+];
+$('qs').innerHTML = Q.map(function (o, i) { return '<button class="k' + o.k + '" data-i="' + i + '">' + o.q + '</button>'; }).join('');
+function pick(i) {
+  var o = Q[i], a = $('ans');
+  document.querySelectorAll('#qs button').forEach(function (b) { b.classList.toggle('on', +b.dataset.i === i); });
+  a.className = 'ans k' + o.k;
+  var nn = (o.x[0] < 10 ? '0' : '') + o.x[0];
+  a.innerHTML = '<div class="ex">Kapitel ' + o.k + '</div><div class="m" data-tex="' + o.m.replace(/"/g, '&quot;') + '"></div><div class="why">' + o.w + '</div>' +
+    '<div class="ex">Eksempel til eksamen: <a href="../eksamen/opg' + nn + '/">A26 opg. ' + o.x[0] + ' · ' + o.x[1] + '</a></div>' +
+    '<a class="go" href="kap' + o.k + '/">Intro til kap. ' + o.k + ' →</a>';
+  tex(a);
+}
+document.querySelectorAll('#qs button').forEach(function (b) { b.addEventListener('click', function () { pick(+b.dataset.i); }); });
+pick(0);
+
+/* ---------- decks ---------- */
+var K = [
+  [16, 'Plan kinematik', 'Rullende hjul, rotation om fast akse, relativ hastighed og acceleration, IC og Coriolis.', 'v = \\omega r'],
+  [17, 'Kraft og acceleration', 'Massetræghedsmoment, de tre bevægelsesligninger og rotation om fast akse.', '\\Sigma M_G = I_G\\alpha'],
+  [18, 'Arbejde og energi', 'Kinetisk energi for et stift legeme, arbejde og energibevarelse. Hvem vinder kapløbet ned ad skråningen?', 'T_1+\\Sigma U_{1-2}=T_2'],
+  [22, 'Vibrationer', 'Egenfrekvens, dæmpning og resonans. Fra gynge til støddæmper.', '\\omega_n=\\sqrt{k/m}']
+];
+$('decks').innerHTML = K.map(function (k) {
+  return '<a class="card k' + k[0] + '" href="kap' + k[0] + '/"><div class="nr">KAP. ' + k[0] + '</div><h3>' + k[1] + '</h3><p>' + k[2] + '</p><div class="f" data-tex="' + k[3] + '"></div><div class="meta">5 slides · ca. 5 min</div></a>';
+}).join('');
+tex($('decks'));
+
+/* ---------- eksamen ---------- */
+var E = [
+  [16, 'Kinematik', [[1, 'Hacksaw'], [2, 'Disk and slotted link'], [3, 'Rods and collars']], 'ω og α i mekanismer, Coriolis'],
+  [17, 'Kraft og acceleration', [[4, 'Cable break'], [5, 'Truck'], [6, 'Rod and cylinder'], [9, 'Disk w. rod']], 'kræfter, α og friktion'],
+  [18, 'Arbejde og energi', [[7, 'Car on inclined plane (a)']], 'fart efter en strækning'],
+  [22, 'Vibrationer', [[7, 'Car on inclined plane (b)'], [8, 'Rod w. spring and damper'], [10, 'Rod w. three springs']], 'f_n, ζ og τ_d']
+];
+$('ex').innerHTML = E.map(function (e) {
+  return '<tr class="k' + e[0] + '"><td><b>Kap. ' + e[0] + '</b> ' + e[1] + '</td><td>' + e[2].map(function (o) {
+    return '<a href="../eksamen/opg' + (o[0] < 10 ? '0' : '') + o[0] + '/">' + o[0] + ' ' + o[1] + '</a>'; }).join(', ') + '</td><td>' + e[3] + '</td></tr>';
+}).join('');
+})();
+</script>
+</body>
+</html>

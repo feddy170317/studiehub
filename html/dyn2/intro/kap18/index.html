@@ -1,0 +1,284 @@
+<!doctype html><html lang="da"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kap. 18 · Arbejde og energi</title>
+<meta name="description" content="Hurtigstart til DYN2 kap. 18: energi i stedet for kræfter og tid. Kinetisk energi, arbejde og energibevarelse, med et kapløb ned ad en skråning.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../assets/deck.css"></head>
+<body>
+<div id="vp"><div id="deck">
+
+<!-- ============ 0 · FORSIDE ============ -->
+<section class="slide on" data-title="Forside">
+  <div style="flex:1;display:grid;grid-template-columns:1fr 600px;gap:34px;align-items:center;padding:0 10px">
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div>
+        <div class="tag" style="display:inline-block">DYN2 · HURTIGSTART · KAP. 18</div>
+        <h1 style="font-size:60px;margin-top:18px">Arbejde og energi</h1>
+        <div style="font-size:26px;color:var(--mut);margin-top:6px">Regn på energi i stedet for kræfter og tid, så accelerationen slet ikke skal findes</div>
+      </div>
+      <div class="card qcard" style="font-size:20px"><span class="lbl cy">KORT FORTALT</span>
+        En tom dåse og en massiv cylinder slippes samtidig øverst på en skråning. Begge har det samme højdefald at bruge af, men dåsens masse sidder ude i kanten og skal bruge en stor del af energien på at dreje rundt. Cylinderen bruger mindre på rotation, så mere bliver til fart fremad, og den vinder. En glidende kasse uden friktion er hurtigst af alle.</div>
+      <div class="plan">
+        <div><b class="cy">1 · Kinetisk energi</b>translation + rotation</div>
+        <div><b class="or">2 · Arbejde</b>vægt, fjeder, kraftpar</div>
+        <div><b class="pu">3 · Energibevarelse</b><span data-tex="T_1+V_1=T_2+V_2"></span></div>
+        <div><b class="gr">4 · Faldgruber og tjek</b></div>
+      </div>
+      <div class="links"><a href="../../Kapitel18_Studienote.pdf">📖 Studienote PDF</a><a href="../../../../lab/dyn2/energi.html">🧪 3D-lab</a><a href="../../eksamen/opg07/">📝 Eksamen opg. 7</a></div>
+    </div>
+    <div class="card" style="padding:12px"><canvas id="race" width="576" height="640" style="width:100%;display:block"></canvas></div>
+  </div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm &nbsp;·&nbsp; ☰: alle kapitler</div>
+</section>
+
+<!-- ============ 1 · KINETISK ENERGI ============ -->
+<section class="slide" id="s1" data-title="1 · Kinetisk energi">
+  <div class="hd"><span class="tag">IDÉ 1 · KINETISK ENERGI</span><h1>Energi i at flytte og energi i at dreje</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>To led i generel plan bevægelse</h3>
+      <div class="big" data-tex="T=\tfrac12\,m\,v_G^{\,2}+\tfrac12\,I_G\,\omega^2"></div>
+      <div class="src">Hibbeler (2023), lign. (18-4), s. 475</div>
+      <div class="big" style="font-size:30px" data-tex="T=\tfrac12\,I_O\,\omega^2"></div>
+      <div class="src">lign. (18-5), s. 475 · rotation om fast akse O</div>
+      <div class="terms">
+        <div class="term"><span class="s cy" data-tex="\tfrac12 m v_G^2"></span><span><b>Translation</b>: energien i at flytte hele legemet frem</span></div>
+        <div class="term"><span class="s pu" data-tex="\tfrac12 I_G\omega^2"></span><span><b>Rotation</b>: energien i at dreje det rundt om tyngdepunktet</span></div>
+        <div class="term"><span class="s" data-tex="I_O"></span><span><b>Fast akse</b>: al bevægelse er rotation, så kun ét led</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n">1</span><div class="t"><b>Kassen</b> glider og drejer ikke
+        <span class="m" data-tex="T=\tfrac12 m v^2"></span>
+        <span class="note">Al energi er translation</span></div></div>
+      <div class="step"><span class="n">2</span><div class="t"><b>Cylinderen</b> ruller uden glid
+        <span class="m" data-tex="T=\tfrac12 m v^2+\tfrac14 m v^2=\tfrac34 m v^2"></span>
+        <span class="note">med <span data-tex="I_G=\tfrac12 mr^2"></span> og <span data-tex="\omega=v/r"></span></span></div></div>
+      <div class="step"><span class="n">3</span><div class="t"><b>Ringen</b> (dåsen) har massen i kanten
+        <span class="m" data-tex="T=\tfrac12 m v^2+\tfrac12 m v^2=m v^2"></span>
+        <span class="note">med <span data-tex="I_G=mr^2"></span>: halvdelen går til rotation</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Samme fart, forskellig energi</h3>
+      <div class="row"><button class="btn on" data-b="0">Kasse</button><button class="btn" data-b="1">Cylinder</button><button class="btn" data-b="2">Ring</button></div>
+      <canvas id="b1" width="640" height="190"></canvas>
+      <div class="sl n"><span>v</span><input id="v1" type="range" min="0.5" max="4" step="0.1" value="2"><output id="v1o"></output></div>
+      <div class="ro"><div><span>I alt pr. kg</span><b class="cy" id="r1t">2,00</b><i>J/kg</i></div><div><span>Andel til rotation</span><b class="pu" id="r1r">0</b><i>%</i></div></div>
+      <div class="status" id="st1"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Samme fart kræver mere energi, når legemet også drejer. Med samme energi at gøre godt med bliver farten derfor lavere.</span></div>
+</section>
+
+<!-- ============ 2 · ARBEJDE ============ -->
+<section class="slide" id="s2" data-title="2 · Arbejde">
+  <div class="hd"><span class="tag b">IDÉ 2 · ARBEJDE</span><h1>Kun kræfter, der flytter sit angrebspunkt, udfører arbejde</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Fjederens arbejde</h3>
+      <div class="big" style="font-size:32px" data-tex="U_s=-\Big(\tfrac12 k s_2^{\,2}-\tfrac12 k s_1^{\,2}\Big)"></div>
+      <div class="src">Hibbeler (2023), lign. (18-11), s. 477</div>
+      <div class="terms">
+        <div class="term"><span class="s" data-tex="U_W=-W\,\Delta y"></span><span><b>Vægt</b> (18-10): negativt, når legemet løftes (<span data-tex="\Delta y"></span> opad)</span></div>
+        <div class="term"><span class="s" data-tex="U_M=M(\theta_2-\theta_1)"></span><span><b>Kraftpar</b> (18-13): moment gange vinkeldrejning i radianer</span></div>
+        <div class="term"><span class="s" data-tex="U=0"></span><span><b>Normalkraft og friktion</b> ved rul uden glid: kontaktpunktet står stille</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n b">1</span><div class="t"><b>Princippet om arbejde og energi</b>
+        <span class="m" data-tex="\boxed{T_1+\Sigma U_{1\text{-}2}=T_2}"></span>
+        <span class="note">Lign. (18-14), s. 480</span></div></div>
+      <div class="step"><span class="n b">2</span><div class="t"><b>Fjeder med <span data-tex="k=400"></span> N/m</b>, strakt fra 0,10 til 0,30 m
+        <span class="m" data-tex="U_s=-(\tfrac12\cdot400\cdot0{,}30^2-\tfrac12\cdot400\cdot0{,}10^2)"></span>
+        <span class="m" data-tex="\boxed{U_s=-16\ \text{J}}"></span></div></div>
+      <div class="step"><span class="n b">3</span><div class="t"><b>Fortegn</b>
+        <span class="note">Strækkes fjederen mere, tager den energi fra legemet. Slækkes den, giver den energi tilbage.</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Arbejde = areal under fjederkraften</h3>
+      <canvas id="g2" width="640" height="360"></canvas>
+      <div class="sl n"><span>s<sub>1</sub></span><input id="sl1" type="range" min="0" max="0.5" step="0.01" value="0.10"><output id="s1o"></output></div>
+      <div class="sl n"><span>s<sub>2</sub></span><input id="sl2" type="range" min="0" max="0.5" step="0.01" value="0.30"><output id="s2o"></output></div>
+      <div class="ro"><div><span>Areal</span><b class="or" id="r2a">16,0</b><i>J</i></div><div><span>U<sub>s</sub></span><b class="cy" id="r2u">−16,0</b><i>J</i></div></div>
+      <div class="status" id="st2"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Arbejdet er arealet under kraften. Fjederen er den eneste kraft, hvor kraften selv ændrer sig undervejs, så arealet er en trekant eller trapez.</span></div>
+</section>
+
+<!-- ============ 3 · ENERGIBEVARELSE ============ -->
+<section class="slide" id="s3" data-title="3 · Energibevarelse">
+  <div class="hd"><span class="tag p">IDÉ 3 · ENERGIBEVARELSE</span><h1>Tyngden gør det hele: v<sub>G</sub> = 2,80 m/s for cylinderen</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Når kun tyngde og fjedre arbejder</h3>
+      <div class="big" data-tex="T_1+V_1=T_2+V_2"></div>
+      <div class="src">Hibbeler (2023), lign. (18-19), s. 496</div>
+      <div class="terms">
+        <div class="term"><span class="s pu" data-tex="V_g=W\,y_G"></span><span><b>Tyngde</b> (18-15): <span data-tex="y_G"></span> er højden over et selvvalgt nulniveau</span></div>
+        <div class="term"><span class="s" data-tex="V_e=\tfrac12 k s^2"></span><span><b>Fjeder</b> (18-16): <span data-tex="s"></span> er forlængelsen fra uspændt længde</span></div>
+        <div class="term"><span class="s or" data-tex="\omega=v_G/r"></span><span><b>Rul uden glid</b>: kontaktpunktet står stille, så fart og drejning hænger sammen</span></div>
+      </div>
+    </div>
+    <div class="card steps">
+      <div class="step"><span class="n p">1</span><div class="t"><b>Opstil</b>, hvile i toppen, nul ved bunden
+        <span class="m" data-tex="mgh=\tfrac12 m v_G^2+\tfrac12 I_G\omega^2"></span></div></div>
+      <div class="step"><span class="n p">2</span><div class="t"><b>Indsæt</b> <span data-tex="I_G=\tfrac12 mr^2"></span> og <span data-tex="\omega=v_G/r"></span>
+        <span class="m" data-tex="gh=\tfrac12 v_G^2+\tfrac14 v_G^2=\tfrac34 v_G^2"></span>
+        <span class="note">m og r forsvinder</span></div></div>
+      <div class="step"><span class="n p">3</span><div class="t"><b>Isolér</b> med <span data-tex="h=0{,}60"></span> m
+        <span class="m" data-tex="\boxed{v_G=\sqrt{\tfrac{4gh}{3}}=2{,}80\ \text{m/s}}"></span>
+        <span class="note">Kassen: <span data-tex="\sqrt{2gh}=3{,}43"></span> m/s</span></div></div>
+    </div>
+    <div class="card col">
+      <h3>Fart ved bunden mod højdefald</h3>
+      <canvas id="g3" width="640" height="400"></canvas>
+      <div class="sl n"><span>h</span><input id="h3" type="range" min="0.1" max="2" step="0.01" value="0.60"><output id="h3o"></output></div>
+      <div class="ro r3">
+        <div><span>Kasse</span><b class="cy" id="r3k">3,43</b><i>m/s</i></div>
+        <div><span>Cylinder</span><b class="pu" id="r3c">2,80</b><i>m/s</i></div>
+        <div><span>Ring</span><b class="or" id="r3r">2,43</b><i>m/s</i></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Kassen bruger al energien på fart, cylinderen en tredjedel på rotation, ringen halvdelen. Rækkefølgen ændrer sig aldrig, uanset højden.</span></div>
+</section>
+
+<!-- ============ 4 · FALDGRUBER OG TJEK ============ -->
+<section class="slide" data-title="4 · Faldgruber og tjek">
+  <div class="hd"><span class="tag g">FALDGRUBER OG TJEK</span><h1>Hvor det typisk går galt</h1></div>
+  <div class="body c3">
+    <div class="card">
+      <h3>Typiske fejl</h3>
+      <div class="fejl">
+        <div><p style="margin:0">Glemt rotationsenergi: kun <span data-tex="\tfrac12 m v_G^2"></span> for et rullende legeme<span class="ret">begge led i (18-4) skal med</span></p></div>
+        <div><p style="margin:0">Normalkraft og friktion regnes med som arbejde ved rul uden glid<span class="ret">de udfører intet, for kontaktpunktet står stille. Glider legemet, arbejder friktionen</span></p></div>
+        <div><p style="margin:0">Forkert fortegn på fjederarbejdet<span class="ret">strækkes fjederen mere, er <span data-tex="U_s"></span> negativ. Slækkes den, er den positiv</span></p></div>
+        <div><p style="margin:0">Nulniveauet for <span data-tex="V_g"></span> skiftes midt i opgaven<span class="ret">ét niveau, målt til tyngdepunktet, i både position 1 og 2</span></p></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Tjek dig selv</h3>
+      <div class="qa">
+        <details><summary>Hvilket udtryk for T bruges, når en stang drejer om en fast hængsel O?</summary><p><span data-tex="T=\tfrac12 I_O\omega^2"></span>, lign. (18-5).</p></details>
+        <details><summary>Hvorfor udfører friktionen ved rul uden glid intet arbejde?</summary><p>Kontaktpunktet har fart nul, så kraftens angrebspunkt flytter sig ikke.</p></details>
+        <details><summary>En dåse (ring, <span data-tex="I_G=mr^2"></span>) ruller fra højden h. Hvad bliver <span data-tex="v_G"></span>?</summary><p><span data-tex="gh=\tfrac12 v^2+\tfrac12 v^2"></span>, så <span data-tex="v_G=\sqrt{gh}"></span>. Det er langsommere end cylinderen.</p></details>
+      </div>
+    </div>
+    <div class="card col">
+      <h3>Til eksamen (A26)</h3>
+      <div class="exlinks">
+        <a href="../../eksamen/opg07/"><b>OPG 7</b> Car on inclined plane · a) fart efter 0,100 m: facit 0,739 m/s</a>
+      </div>
+      <div style="font-size:17px;line-height:1.45;color:var(--ink)">Opskriften er <span data-tex="T_1+\Sigma U_{1\text{-}2}=T_2"></span> med tyngdens arbejde langs den givne strækning.</div>
+      <h3 style="margin-top:6px">Læs i bogen (Hibbeler kap. 18)</h3>
+      <div style="font-size:17px;line-height:1.5;color:var(--ink)">
+        <b>§18.1, s. 474</b> kinetisk energi<br>
+        <b>§18.2, s. 476</b> en krafts arbejde<br>
+        <b>§18.3, s. 478</b> kraftpars arbejde<br>
+        <b>§18.4, s. 480</b> arbejde og energi<br>
+        <b>§18.5, s. 495</b> energibevarelse
+      </div>
+      <div class="exlinks"><a href="../kap22/"><b>KAP 22</b> Energimetoden genbruges: T + V giver egenfrekvensen</a></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Først kinetisk energi for alle bevægelige dele, så kun de kræfter, der flytter sig, til sidst ét nulniveau.</span></div>
+</section>
+
+</div></div>
+<script src="../assets/deck.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = D.$, fmt = D.fmt, G = 9.81, BLUE = '#0a7fc2', PURP = '#7b4fc9', ORG = '#d97a00';
+
+/* ---------- forside: kapløb ---------- */
+(function () {
+  var cv = D.cv('race'), x = cv.x, W = cv.W;
+  var LH = 210, X0 = 24, X1 = 548, DROP = 120, Ls = Math.hypot(X1 - X0, DROP), al = Math.atan2(DROP, X1 - X0);
+  var ca = Math.cos(al), sa = Math.sin(al), UMAX = Ls - 56, T0 = 3.2;
+  var kind = [{ n: 'Kasse uden friktion', a: 'a = g·sinθ', f: 1, c: BLUE }, { n: 'Massiv cylinder', a: 'a = ⅔·g·sinθ', f: 2 / 3, c: PURP }, { n: 'Tynd ring (dåse)', a: 'a = ½·g·sinθ', f: 1 / 2, c: ORG }];
+  var A0 = 2 * UMAX / (T0 * T0), clock = 0, fin = [null, null, null], nfin = 0, hold = 0;
+  function pt(i, u) { var by = 52 + i * LH; return [X0 + u * ca, by + u * sa]; }
+  function draw() {
+    x.clearRect(0, 0, W, cv.H);
+    kind.forEach(function (k, i) {
+      var by = 52 + i * LH, tf = Math.sqrt(2 * UMAX / (A0 * k.f));
+      D.txt(x, k.n, 10, by - 30, 24, k.c, 'left', 'middle', 700);
+      D.txt(x, k.a, W - 10, by - 30, 22, '#5a6b7d', 'right');
+      x.fillStyle = 'rgba(159,176,194,.35)'; x.beginPath(); x.moveTo(X0, by); x.lineTo(X1, by + DROP); x.lineTo(X0, by + DROP); x.closePath(); x.fill();
+      D.line(x, [[X0, by], [X1, by + DROP]], '#5a6b7d', 4);
+      D.line(x, [[X1 - 26 * ca - 32 * sa, by + DROP - 26 * sa + 32 * ca], [X1 - 26 * ca + 40 * sa, by + DROP - 26 * sa - 40 * ca]], '#d63a3a', 3, [5, 5]);
+      var t = Math.min(clock, tf), u = 0.5 * A0 * k.f * t * t, p = pt(i, u), r = 24, c = [p[0] + sa * r, p[1] - ca * r], th = u / r;
+      if (i === 0) {
+        x.save(); x.translate(c[0], c[1]); x.rotate(al); x.fillStyle = k.c; x.fillRect(-r, -r, 2 * r, 2 * r); x.fillStyle = 'rgba(255,255,255,.35)'; x.fillRect(-r + 6, -r + 6, 2 * r - 12, 8); x.restore();
+      } else {
+        if (i === 1) D.circ(x, c[0], c[1], r, 'rgba(123,79,201,.25)', k.c, 4);
+        else D.circ(x, c[0], c[1], r - 3, null, k.c, 7);
+        D.line(x, [[c[0], c[1]], [c[0] + r * Math.cos(th), c[1] + r * Math.sin(th)]], k.c, 4);
+        if (i === 1) D.line(x, [[c[0], c[1]], [c[0] - r * Math.cos(th), c[1] - r * Math.sin(th)]], k.c, 4);
+        D.circ(x, c[0], c[1], 3.5, k.c);
+      }
+      if (clock >= tf && fin[i] === null) { fin[i] = ++nfin; }
+      if (fin[i] !== null) D.txt(x, 'nr. ' + fin[i], X0 + 150, by + 100, 34, k.c, 'left', 'middle', 800);
+    });
+  }
+  D.anim(0, function (dt) {
+    if (nfin === 3) { hold += dt; if (hold > 1.6) { clock = 0; fin = [null, null, null]; nfin = 0; hold = 0; } }
+    else clock += dt;
+    draw();
+  });
+  draw();
+})();
+
+/* ---------- slide 1: kinetisk energi ---------- */
+var B1 = 0, KR = [0, 0.5, 1], KN = ['Kassen glider: al energi er translation', 'Cylinderen: en tredjedel af energien er rotation', 'Ringen: halvdelen af energien er rotation'];
+function upd1() {
+  var v = +$('v1').value, tr = 0.5 * v * v, ro = KR[B1] * tr, tot = tr + ro;
+  $('v1o').textContent = fmt(v, 1) + ' m/s';
+  D.stack('b1', [{ v: tr, col: BLUE }, { v: ro, col: PURP }], 1, { min: 0, max: 1.05 * v * v, d: 2, u: 'J/kg', note: [0, 1].map(function () { return 'blå = translation · lilla = rotation'; }) });
+  $('r1t').textContent = fmt(tot, 2); $('r1r').textContent = fmt(100 * ro / tot, 0);
+  $('st1').innerHTML = KN[B1];
+}
+(function () {
+  var bb = document.querySelectorAll('#s1 [data-b]');
+  bb.forEach(function (b) { b.onclick = function () { B1 = +b.dataset.b; bb.forEach(function (o) { o.classList.toggle('on', o === b); }); upd1(); }; });
+})();
+$('v1').oninput = upd1; upd1();
+
+/* ---------- slide 2: fjederarbejde ---------- */
+var K2 = 400;
+function upd2() {
+  var s1 = +$('sl1').value, s2 = +$('sl2').value; $('s1o').textContent = fmt(s1, 2) + ' m'; $('s2o').textContent = fmt(s2, 2) + ' m';
+  var area = 0.5 * K2 * (s2 * s2 - s1 * s1), Us = -area, neg = Us < 0;
+  var g = D.graph('g2', { f: function (s) { return K2 * s; }, x0: 0, x1: 0.5, xt: [[0, '0'], [0.25, '0,25'], [0.5, '0,5 m']], min: 0, max: 220, yt: [100, 200], yd: 0, lbl: 'F = k·s  (N)', col: BLUE, d: 0, xl: 'forlængelse s' }), x = g.x;
+  if (Math.abs(s2 - s1) > 1e-9) {
+    var col = neg ? 'rgba(217,122,0,.45)' : 'rgba(10,154,92,.45)';
+    x.fillStyle = col; x.beginPath(); x.moveTo(g.X(s1), g.Y(0)); x.lineTo(g.X(s1), g.Y(K2 * s1)); x.lineTo(g.X(s2), g.Y(K2 * s2)); x.lineTo(g.X(s2), g.Y(0)); x.closePath(); x.fill();
+  }
+  D.line(x, [[g.X(s1), g.Y(0)], [g.X(s1), g.Y(K2 * s1)]], '#5a6b7d', 3, [6, 5]); D.line(x, [[g.X(s2), g.Y(0)], [g.X(s2), g.Y(K2 * s2)]], ORG, 3, [6, 5]);
+  D.circ(x, g.X(s1), g.Y(K2 * s1), 8, '#5a6b7d'); D.circ(x, g.X(s2), g.Y(K2 * s2), 8, ORG);
+  D.txt(x, 's₁', g.X(s1), g.Y(0) - 14, 22, '#5a6b7d', 'center'); D.txt(x, 's₂', g.X(s2), g.Y(0) - 14, 22, ORG, 'center');
+  $('r2a').textContent = fmt(Math.abs(area), 1); $('r2u').textContent = fmt(Us, 1);
+  $('st2').innerHTML = Math.abs(area) < 0.05 ? 'Samme forlængelse: intet arbejde' : (neg ? '<b>Fjederen strækkes mere</b>: U<sub>s</sub> er negativ' : '<b>Fjederen slækkes</b>: U<sub>s</sub> er positiv');
+}
+$('sl1').oninput = upd2; $('sl2').oninput = upd2; upd2();
+
+/* ---------- slide 3: v mod h ---------- */
+function vk(h) { return Math.sqrt(2 * G * h); } function vc(h) { return Math.sqrt(4 * G * h / 3); } function vr(h) { return Math.sqrt(G * h); }
+function upd3() {
+  var h = +$('h3').value; $('h3o').textContent = fmt(h, 2) + ' m';
+  $('r3k').textContent = fmt(vk(h), 2); $('r3c').textContent = fmt(vc(h), 2); $('r3r').textContent = fmt(vr(h), 2);
+  var g = D.graph('g3', { f: vc, more: [{ f: vk, col: BLUE, w: 5 }, { f: vr, col: ORG, w: 5 }], x0: 0, x1: 2, xt: [[0, '0'], [0.6, '0,6'], [1, '1'], [2, '2 m']], min: 0, max: 7, yt: [2, 4, 6], yd: 0, lbl: 'v (m/s) ved bunden', col: PURP, d: 2, vline: h, xl: 'højdefald h' }), x = g.x;
+  [[vk, BLUE], [vc, PURP], [vr, ORG]].forEach(function (p) { D.circ(x, g.X(h), g.Y(p[0](h)), 9, p[1]); });
+  D.txt(x, 'kasse', g.X(2) - 8, g.Y(vk(2)) - 14, 22, BLUE, 'right', 'middle', 700);
+  D.txt(x, 'cylinder', g.X(2) - 8, g.Y(vc(2)) - 14, 22, PURP, 'right', 'middle', 700);
+  D.txt(x, 'ring', g.X(2) - 8, g.Y(vr(2)) + 32, 22, ORG, 'right', 'middle', 700);
+}
+$('h3').oninput = upd3; upd3();
+
+D.start();
+})();
+</script>
+</body></html>
