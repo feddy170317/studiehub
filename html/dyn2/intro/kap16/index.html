@@ -208,25 +208,33 @@
 var $ = D.$, fmt = D.fmt, PI = Math.PI;
 var CY = '#0a7fc2', OR = '#d97a00', PU = '#7b4fc9', GR = '#0a9a5c', RD = '#d63a3a', INK = '#14202d';
 
-function wheel(x, cx, cy, R, ang) {
+function wheel(x, cx, cy, R, ang, noDot) {
   D.circ(x, cx, cy, R, '#f6f9fc', INK, 8);
   D.circ(x, cx, cy, R - 12, null, '#9fb0c2', 2);
   for (var k = 0; k < 3; k++) { var a = ang + k * PI / 3; D.line(x, [[cx - (R - 10) * Math.cos(a), cy - (R - 10) * Math.sin(a)], [cx + (R - 10) * Math.cos(a), cy + (R - 10) * Math.sin(a)]], '#9fb0c2', 3); }
-  D.circ(x, cx + (R - 24) * Math.cos(ang), cy + (R - 24) * Math.sin(ang), 6, '#d97a00');
+  if (!noDot) D.circ(x, cx + (R - 24) * Math.cos(ang), cy + (R - 24) * Math.sin(ang), 6, '#d97a00');
   D.circ(x, cx, cy, 9, '#fff', INK, 3);
 }
 
-/* ---------- forside: rullende hjul ---------- */
+/* ---------- forside: rullende hjul (kører hen ad vejen, punkt på dækket tegner en cykloide) ---------- */
 (function () {
-  var G = D.cv('c0'), x = G.x, W = G.W, H = G.H, s = 0, R = 100, cx = 220, gy = 400, cy = gy - R, k = 70;
+  var G = D.cv('c0'), x = G.x, W = G.W, H = G.H, R = 72, k = 52, gy = 400, cy = gy - R, x0 = 92, x1 = 366, sp = 75, s = 0;
+  var a0 = PI / 2 - (x1 - x0) / 2 / R, trail = [];
   D.anim(0, function (dt) {
-    s += dt * 110; x.clearRect(0, 0, W, H);
+    s += dt * sp; if (s > x1 - x0 + 90) { s = 0; trail = []; }
+    var ss = Math.min(s, x1 - x0), cx = x0 + ss, a = a0 + ss / R;
+    var px = cx + R * Math.cos(a), py = cy + R * Math.sin(a);
+    if (s <= x1 - x0) trail.push([px, py]);
+    x.clearRect(0, 0, W, H);
     D.line(x, [[0, gy], [W, gy]], '#5a6b7d', 3);
-    for (var i = -(s % 28); i < W; i += 28) D.line(x, [[i, gy], [i - 11, gy + 13]], '#9fb0c2', 2);
+    for (var i = 8; i < W; i += 28) D.line(x, [[i, gy], [i - 11, gy + 13]], '#9fb0c2', 2);
     D.txt(x, 'ruller uden glid', 16, 26, 24, '#5a6b7d');
+    D.txt(x, 'orange spor: et punkt på dækket', 16, 54, 18, OR);
+    if (trail.length > 1) D.line(x, trail, 'rgba(217,122,0,.6)', 3);
     D.line(x, [[cx, gy], [cx, cy - R]], 'rgba(214,58,58,.4)', 2, [6, 6]);
     D.line(x, [[cx, gy], [cx + R, cy]], 'rgba(214,58,58,.4)', 2, [6, 6]);
-    wheel(x, cx, cy, R, s / R);
+    wheel(x, cx, cy, R, a, true);
+    D.circ(x, px, py, 8, OR, '#fff', 2);
     D.arrow(x, cx, cy - R, cx + 2 * k, cy - R, CY, 6); D.txt(x, '2v', cx + 2 * k - 6, cy - R - 24, 28, CY, 'center');
     D.arrow(x, cx, cy, cx + k, cy, CY, 6); D.txt(x, 'v', cx + k - 4, cy - 22, 28, CY, 'center');
     D.circ(x, cx + R, cy, 7, CY);
@@ -305,7 +313,7 @@ function wheel(x, cx, cy, R, ang) {
     var ex = bx + tx * at * K + nx * an * K, ey = by + ty * at * K + ny * an * K;
     if (an > 0.1) { D.arrow(x, bx, by, bx + nx * an * K, by + ny * an * K, OR, 6); D.txt(x, 'aₙ = ω²r', bx + nx * an * K * 0.5 + 8, by + ny * an * K * 0.5 + 26, 22, OR, 'center'); }
     if (at > 0.1) { D.arrow(x, bx, by, bx + tx * at * K, by + ty * at * K, PU, 6); D.txt(x, 'aₜ = αr', bx + tx * at * K - 10, by + ty * at * K - 22, 22, PU, 'center'); }
-    if (an > 0.1 && at > 0.1) { D.arrow(x, bx, by, ex, ey, CY, 4); }
+    if (an > 0.1 && at > 0.1) { D.arrow(x, bx, by, ex, ey, CY, 4); D.txt(x, 'a_B', ex - 10, ey + 6, 22, CY, 'right'); }
     D.txt(x, 'a_A = 0 (A står fast)', 8, H - 10, 17, '#5a6b7d');
     $('st3').innerHTML = w === 0 && al === 0 ? 'Ingen drejning, ingen acceleration' : (al === 0 ? '<b>Kun normal del:</b> a<sub>B</sub> peger mod A' : (w === 0 ? '<b>Kun tangentiel del:</b> a<sub>B</sub> vinkelret på stangen' : 'Blå pil = summen af de to dele'));
   }
