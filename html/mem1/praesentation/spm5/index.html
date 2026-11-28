@@ -4,165 +4,146 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Spm. 5 · Tandhjul og Lewis</title>
-<meta name="description" content="Fremlæggelse af MEM1 eksamensspørgsmål 5: tandhjulsgeometri og Lewis-ligningen for tandens bøjespænding, med 3D-lab indlejret.">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta name="description" content="Fremlæggelse af MEM1 eksamensspørgsmål 5: tandhjulsgeometri (modul, delediameter, trykvinkel) og Lewis' bøjespænding i tandfoden, med 3D-lab indlejret.">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-<style>
-/* Design: magasin/redaktionelt. Cremepapir, stor serif, smalle spalter, tynde linjer, citat-blokke. Dyb grøn + terrakotta. */
-:root{--paper:#faf7f2;--ink:#1d1b18;--mut:#7a736a;--rule:#d8d0c4;--grn:#1f4d3a;--ter:#c4572e;--sand:#efe7da;--chart-font:Inter,sans-serif}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--paper);color:var(--ink);font-family:Inter,sans-serif;overflow:hidden}
-.vp{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
-.deck{position:relative;width:1600px;height:900px;flex:none;transform-origin:center}
-.slide{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .4s;padding:44px 70px 30px;display:grid;grid-template-rows:auto 1fr auto;gap:20px;background:var(--paper)}
-.slide.on{opacity:1;visibility:visible}
-.kick{font:600 14px Inter,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:var(--ter);display:flex;gap:18px;align-items:center}
-.kick::after{content:"";flex:1;height:1px;background:var(--rule)}
-h1{font-family:Fraunces,serif;font-weight:800;font-size:58px;line-height:1.02;letter-spacing:-.015em;margin-top:8px}
-h1 em{font-style:italic;font-weight:400;color:var(--grn)}
-.cols{display:grid;gap:44px;min-height:0}
-.col{min-height:0;display:flex;flex-direction:column;gap:12px}
-.lead{font-family:Fraunces,serif;font-size:25px;line-height:1.38}
-.lead::first-letter{font-size:74px;float:left;line-height:.8;padding:6px 10px 0 0;color:var(--grn);font-weight:800}
-p.t{font-size:19px;line-height:1.5}
-.f{font-size:40px;text-align:center;padding:12px 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
-dl.g{display:grid;grid-template-columns:70px 1fr;gap:10px 16px;font-size:19px;line-height:1.4}
-dl.g dt{font-size:24px;text-align:center;color:var(--grn)}
-.quote{font-family:Fraunces,serif;font-style:italic;font-size:22px;line-height:1.35;border-left:4px solid var(--ter);padding:4px 0 4px 18px;color:var(--ink)}
-.foot{display:flex;gap:18px;align-items:baseline;border-top:2px solid var(--ink);padding:12px 240px 0 0;font-family:Fraunces,serif;font-size:21px;line-height:1.35}
-.foot b.s{font:700 13px Inter,sans-serif;letter-spacing:.2em;color:var(--ter);white-space:nowrap}
-.nt{text-transform:none!important}
-.sl{display:grid;grid-template-columns:140px 1fr 130px;gap:14px;align-items:center;font-size:17px;font-weight:600}
-.sl input{width:100%;accent-color:var(--grn)}
-.sl output{font-family:Fraunces,serif;font-size:26px;font-weight:600;text-align:right;color:var(--grn)}
-.chips{display:flex;gap:10px;flex-wrap:wrap}
-.chips button{font:600 15px Inter,sans-serif;background:transparent;color:var(--ink);border:1px solid var(--ink);border-radius:30px;padding:8px 14px;cursor:pointer}
-.chips button.on{background:var(--grn);border-color:var(--grn);color:#fff}
-.stat{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--ink)}
-.stat div{padding:10px 14px 0 0}
-.stat span{display:block;font:600 12px Inter,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--mut)}
-.stat b{font-family:Fraunces,serif;font-size:42px;font-weight:800}
-.stat i{font-style:normal;font-size:15px;font-weight:600;margin-left:6px}
-.up{color:var(--ter)}.dn{color:var(--grn)}.eq{color:var(--mut)}
-.st{display:grid;grid-template-columns:70px 1fr;gap:6px;padding:12px 0;border-bottom:1px solid var(--rule)}
-.st:last-child{border-bottom:0}
-.st .n{font-family:Fraunces,serif;font-size:56px;font-weight:800;color:var(--sand);-webkit-text-stroke:1.5px var(--grn);line-height:.9}
-.st h4{font-family:Fraunces,serif;font-size:23px;font-weight:600}
-.st .e{font-size:28px}
-.st .c{font-size:17px;color:var(--mut)}
-.ans{display:inline-block;background:var(--grn);color:#fff;padding:6px 16px;font-size:30px;margin-top:6px}
-canvas{display:block;width:100%}
-iframe.lab{width:100%;border:1px solid var(--rule);display:block;background:#f4f7fa}
-.dnav{position:fixed;right:24px;bottom:16px;display:flex;gap:8px;align-items:center;font:600 13px Inter,sans-serif;color:var(--mut);z-index:9}
-.dnav .dots{display:flex;gap:6px}.dnav .dots i{width:22px;height:2px;background:var(--rule);cursor:pointer}.dnav .dots i.on{background:var(--ter);height:3px}
-.dnav button{width:34px;height:30px;border:1px solid var(--ink);border-radius:30px;background:transparent;cursor:pointer;font-size:15px}
-</style>
+<link rel="stylesheet" href="../assets/s7.css">
 </head>
 <body>
 <div class="vp"><div class="deck">
 
-<!-- 0 · forside -->
-<section class="slide on" data-title="Forside" style="grid-template-rows:1fr auto">
-  <div style="display:grid;grid-template-columns:1fr 600px;gap:50px;align-items:center">
+<!-- ============ 0 · FORSIDE ============ -->
+<section class="slide on" data-title="Forside">
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:34px;padding:0 30px">
     <div>
-      <div class="kick">MEM1 · Kapitel 14 · Eksamensspørgsmål nr. 5</div>
-      <h1 style="font-size:116px;margin-top:22px">Tænder<br><em>under pres</em></h1>
-      <p class="lead" style="margin-top:26px;max-width:780px">Et tandhjul overfører kraft gennem én tand ad gangen. Lewis så tanden som en lille bjælke og spurgte, hvor den knækker.</p>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:34px;margin-top:36px;max-width:900px">
-        <div><div class="kick" style="color:var(--grn)">Del A</div><p class="t" style="margin-top:8px">Geometrien: <span data-tex="m"></span>, <span data-tex="d"></span>, <span data-tex="\phi"></span>. Lewis-ligningen <span data-tex="\sigma_b=\tfrac{F_t}{bmY}"></span> og formfaktoren <span data-tex="Y"></span>.</p></div>
-        <div><div class="kick" style="color:var(--grn)">Del B</div><p class="t" style="margin-top:8px"><span data-tex="m=4"></span> mm, <span data-tex="b=40"></span> mm, 20 tænder, <span data-tex="F_t=1600"></span> N, <span data-tex="Y=0{,}32"></span>. Find <span data-tex="\sigma_b"></span>.</p></div>
+      <div class="tag" style="display:inline-block">MEM1 · KAP. 14 · EKSAMENSSPØRGSMÅL 5</div>
+      <h1 style="font-size:76px;margin-top:22px">Tandhjul og Lewis-ligningen</h1>
+      <div style="font-size:30px;color:var(--mut);margin-top:8px">Kraften går gennem én tand ad gangen. Lewis så tanden som en lille <b class="or">udkraget bjælke</b></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:26px">
+      <div class="card qcard" id="qa"><span class="lbl cy">(a) FORKLAR · 2 SLIDES</span>
+        Geometrien: modul <span data-tex="m"></span>, delediameter <span data-tex="d"></span> og trykvinkel <span data-tex="\phi"></span>. Lewis-ligningen <span data-tex="\sigma_b=\dfrac{F_t}{b\,m\,Y}"></span> og formfaktoren <span data-tex="Y"></span>.</div>
+      <div class="card qcard" id="qb"><span class="lbl or">(b) BEREGN · 2 SLIDES</span>
+        Lige tandhjul, 20 tænder:<br><span data-tex="m=4\text{ mm},\ b=40\text{ mm},\ F_t=1600\text{ N},\ Y=0{,}32"></span><br>Find bøjespændingen <span data-tex="\sigma_b"></span> i tandfoden.</div>
+    </div>
+  </div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum / klikker: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm &nbsp;·&nbsp; 3D-hjulene kan drejes med musen</div>
+</section>
+
+<!-- ============ 1 · (a) Geometri ============ -->
+<section class="slide" data-title="(a) Geometri">
+  <div class="hd"><span class="tag">SPM. 5 (a) · 1/2</span><h1>Tandhjulets sprog: modul, delediameter, trykvinkel</h1></div>
+  <div class="body" style="grid-template-columns:380px 600px 1fr">
+    <div class="card fl" id="fig">
+      <h3>To hjul i indgreb</h3>
+      <canvas id="c0" width="700" height="760"></canvas>
+      <div class="txt" style="text-align:center">Delecirklerne (stiplet) <b class="cy">ruller på hinanden</b> uden at glide. Kraften går skråt langs <b class="gr">indgrebslinjen</b>.</div>
+    </div>
+
+    <div class="card" id="fG">
+      <h3>Geometri (§14.3)</h3>
+      <div class="big" data-tex="\color{#0a7fc2}{d}=\color{#d97a00}{m}\,N\qquad p=\pi\,\color{#d97a00}{m}"></div>
+      <div class="terms">
+        <div class="term" id="tm"><span class="s or" data-tex="m"></span><span><b>Modul</b> [mm]: tandens størrelse. To hjul skal have <b>samme modul</b> for at gå i indgreb</span></div>
+        <div class="term" id="td"><span class="s cy" data-tex="d"></span><span><b>Delediameter</b>: de to cirkler, der ruller på hinanden. Momentet giver <span data-tex="F_t=2T/d"></span></span></div>
+        <div class="term" id="tp"><span class="s" data-tex="p"></span><span><b>Deling</b>: afstanden fra tand til tand, målt på delecirklen</span></div>
+        <div class="term" id="tphi"><span class="s gr" data-tex="\phi"></span><span><b>Trykvinkel</b>, typisk 20°. <span data-tex="F_t"></span> drejer hjulet, <span data-tex="F_r=F_t\tan\phi"></span> skubber akslerne fra hinanden</span></div>
+      </div>
+      <div class="status" style="margin-top:12px" id="gEx">Eksempel fra del (b): <span data-tex="T=64"></span> N·m på <span data-tex="d=80"></span> mm giver <span data-tex="F_t=1600"></span> N og <span data-tex="F_r=1600\cdot\tan20^\circ=582"></span> N.</div>
+    </div>
+
+    <div class="card fl" id="cGe">
+      <h3>Skru på modul og tandtal</h3>
+      <canvas id="cG" width="1000" height="740"></canvas>
+      <div class="sl" id="slm"><span>Modul m</span><input id="gM" type="range" min="2" max="5" step="0.5" value="4"><output id="gMo"></output></div>
+      <div class="sl" id="slN"><span>Tænder N</span><input id="gN" type="range" min="12" max="30" step="1" value="20"><output id="gNo"></output></div>
+      <div class="ro">
+        <div><span>DELEDIAMETER d</span><b class="cy" id="gD">80</b><i>mm</i></div>
+        <div><span>DELING p</span><b id="gP">12,6</b><i>mm</i></div>
+        <div><span>TANDHØJDE ≈ 2,25m</span><b id="gH">9,0</b><i>mm</i></div>
       </div>
     </div>
-    <canvas id="c0" width="1200" height="1200"></canvas>
   </div>
-  <div class="foot" style="font-family:Inter;font-size:15px;color:var(--mut)">→ / mellemrum / klikker: næste · ←: forrige · F: fuld skærm</div>
+  <div class="ft"><b class="say">SIG</b><span><b class="or">Modulet</b> er tandens størrelse i mm. Delediameteren er modul gange tandtal. <b class="gr">Trykvinklen</b> siger, hvor skråt kraften går.</span></div>
 </section>
 
-<!-- 1 · A1 geometri -->
-<section class="slide" data-title="A · Geometri">
-  <div><div class="kick">Del A · 1 af 2 · Geometri</div><h1>Modul, delediameter og trykvinkel: <em>tandhjulets sprog</em></h1></div>
-  <div class="cols" style="grid-template-columns:580px 1fr">
-    <div class="col">
-      <div class="f" data-tex="d=m\,N\qquad p=\pi m"></div>
-      <dl class="g">
-        <dt data-tex="m"></dt><dd><b>Modul</b> [mm]: tandens størrelse. Delediameteren delt med antal tænder. To hjul skal have <b>samme modul</b> for at gå i indgreb</dd>
-        <dt data-tex="d"></dt><dd><b>Delediameter</b>: de to "rullende" cirkler, der rører hinanden. Momentet giver <span data-tex="F_t=2T/d"></span></dd>
-        <dt data-tex="p"></dt><dd><b>Deling</b>: afstanden fra tand til tand på delecirklen</dd>
-        <dt data-tex="\phi"></dt><dd><b>Trykvinkel</b>, typisk 20°. Kraften mellem tænderne går skråt. <span data-tex="F_t"></span> drejer hjulet, <span data-tex="F_r=F_t\tan\phi"></span> skubber akslerne fra hinanden</dd>
-      </dl>
+<!-- ============ 2 · (a) Lewis ============ -->
+<section class="slide" data-title="(a) Lewis">
+  <div class="hd"><span class="tag">SPM. 5 (a) · 2/2</span><h1>Lewis: tanden er en lille udkraget bjælke</h1></div>
+  <div class="body" style="grid-template-columns:620px 1fr">
+    <div class="card fl" id="fLw">
+      <h3>Bøjespænding i tandfoden (Lewis)</h3>
+      <div class="big" style="font-size:44px;padding:2px 0" data-tex="\sigma_b=\dfrac{\color{#d97a00}{F_t}}{\color{#0a7fc2}{b}\,\color{#0a9a5c}{m}\,\color{#d63a3a}{Y}}"></div>
+      <div class="terms" style="margin-top:0">
+        <div class="term" id="tFt"><span class="s or" data-tex="F_t"></span><span><b>Tangentialkraft</b> på delecirklen. Antages at sidde yderst på tanden (værst tænkelige)</span></div>
+        <div class="term" id="tb"><span class="s cy" data-tex="b"></span><span><b>Tandbredde:</b> en bredere tand fordeler kraften</span></div>
+        <div class="term" id="tm2"><span class="s gr" data-tex="m"></span><span><b>Modul:</b> større tand, tykkere tandfod</span></div>
+        <div class="term" id="tY"><span class="s rd" data-tex="Y"></span><span><b>Formfaktor:</b> tandens form i ét tal (tabel 14.7). Lewis indskrev en parabel af konstant styrke; hvor den rører tandfoden, sidder det farlige snit</span></div>
+      </div>
+      <canvas id="cY" width="1100" height="300"></canvas>
     </div>
-    <div class="col">
-      <canvas id="cG" width="1700" height="1080"></canvas>
-      <div class="sl"><span>Modul m</span><input id="gM" type="range" min="2" max="5" step="0.5" value="4"><output id="gMo"></output></div>
-      <div class="sl"><span>Tænder N</span><input id="gN" type="range" min="12" max="30" step="1" value="20"><output id="gNo"></output></div>
-    </div>
-  </div>
-  <div class="foot"><b class="s">SIG TIL CENSOR</b><span>Modulet er tandens størrelse i millimeter. Delediameteren er modul gange tandtal. Trykvinklen siger, hvor skråt kraften går mellem tænderne.</span></div>
-</section>
-
-<!-- 2 · A2 Lewis + lab -->
-<section class="slide" data-title="A · Lewis">
-  <div><div class="kick">Del A · 2 af 2 · Lewis</div><h1>Tanden er en lille <em>udkraget bjælke</em></h1></div>
-  <div class="cols" style="grid-template-columns:560px 1fr">
-    <div class="col">
-      <div class="f" style="font-size:44px" data-tex="\sigma_b=\dfrac{F_t}{b\,m\,Y}"></div>
-      <dl class="g">
-        <dt data-tex="F_t"></dt><dd><b>Tangentialkraft</b> på delecirklen. Antages at sidde yderst på tanden (værst)</dd>
-        <dt data-tex="b"></dt><dd><b>Tandbredde</b>: bredere tand fordeler kraften</dd>
-        <dt data-tex="m"></dt><dd><b>Modul</b>: større tand, stærkere tand</dd>
-        <dt data-tex="Y"></dt><dd><b>Lewis' formfaktor</b>: tandens form samlet i ét tal (fra tabel)</dd>
-      </dl>
-      <div class="quote" style="font-size:20px">Lewis indskrev en parabel af konstant styrke i tanden. Hvor den rører tandfoden, sidder det farlige snit.</div>
-      <canvas id="cY" width="1100" height="330"></canvas>
-    </div>
-    <div class="col">
+    <div class="card fl" style="padding:16px 18px" id="cLab">
       <iframe class="lab" id="lab" style="flex:1;min-height:0" title="3D-tandhjul"></iframe>
-      <div class="sl"><span>Tænder N</span><input id="yN" type="range" min="12" max="60" step="1" value="20"><output id="yNo"></output></div>
-      <div class="stat"><div><span>Formfaktor Y</span><b id="yY">0,322</b></div><div><span><span class="nt">σ<sub>b</sub></span> (samme <span class="nt">F<sub>t</sub></span>)</span><b id="yS">31,1</b> <span style="display:inline;letter-spacing:0">MPa</span><i id="ySr"></i></div><div><span>Delediameter</span><b id="yD">80</b> <span style="display:inline;letter-spacing:0">mm</span></div></div>
+      <div class="sl" id="slY"><span>Tænder N</span><input id="yN" type="range" min="12" max="60" step="1" value="20"><output id="yNo"></output></div>
+      <div class="ro">
+        <div><span>FORMFAKTOR Y</span><b class="rd" id="yY">0,322</b></div>
+        <div><span>σ<sub>b</sub> (SAMME F<sub>t</sub>)</span><b class="cy" id="yS">31,1</b><i id="ySr"></i></div>
+        <div><span>DELEDIAMETER</span><b id="yD">80</b><i>mm</i></div>
+      </div>
     </div>
   </div>
-  <div class="foot"><b class="s">SIG TIL CENSOR</b><span>Flere tænder giver en bredere tandfod og dermed større Y. Små drev med få tænder er de svage, derfor regnes på det mindste hjul.</span></div>
+  <div class="ft"><b class="say">SIG</b><span>Flere tænder giver bredere tandfod og større Y. Små drev med få tænder er de svage, så vi regner på det mindste hjul.</span></div>
 </section>
 
-<!-- 3 · B1 beregning -->
-<section class="slide" data-title="B · Beregning">
-  <div><div class="kick">Del B · 1 af 2 · Beregning</div><h1>Bøjespændingen i <em>én tand</em></h1></div>
-  <div class="cols" style="grid-template-columns:1fr 560px">
-    <div class="col">
-      <div class="st"><span class="n">1</span><div><h4>Geometri</h4><div class="e" data-tex="d=m\,N=4\cdot20=80\ \text{mm},\qquad p=\pi m=12{,}6\ \text{mm}"></div></div></div>
-      <div class="st"><span class="n">2</span><div><h4>Lewis</h4><div class="e" data-tex="\sigma_b=\dfrac{F_t}{b\,m\,Y}=\dfrac{1600}{40\cdot4\cdot0{,}32}=\dfrac{1600}{51{,}2}"></div><span class="ans" data-tex="\sigma_b\approx31{,}3\ \text{MPa}"></span></div></div>
-      <div class="st"><span class="n">3</span><div><h4>Hvilket moment er det?</h4><div class="e" data-tex="T=F_t\cdot\dfrac d2=1600\cdot0{,}040=64\ \text{N}\cdot\text{m}"></div><div class="c">Omtrent som en kraftig skruemaskine i lavt gear</div></div></div>
+<!-- ============ 3 · (b) Beregning ============ -->
+<section class="slide" data-title="(b) Beregning">
+  <div class="hd"><span class="tag b">SPM. 5 (b) · 1/2</span><h1>Beregning: bøjespændingen i én tand</h1></div>
+  <div class="chips" id="chips">
+    <span class="chip">m = 4 mm</span><span class="chip">b = 40 mm</span><span class="chip">N = 20 tænder</span><span class="chip or">F<sub>t</sub> = 1600 N<small>≈ 160 kg</small></span><span class="chip">Y = 0,32<small>20° fuld tandhøjde</small></span>
+  </div>
+  <div class="body" style="grid-template-columns:800px 1fr">
+    <div class="card steps" style="padding:8px 24px">
+      <div class="step" id="b1"><span class="n">1</span><div class="t"><b>Geometri</b>
+        <span class="m" data-tex="d=m\,N=4\cdot20=80\ \text{mm},\qquad p=\pi m=12{,}6\ \text{mm}"></span></div></div>
+      <div class="step" id="b2"><span class="n">2</span><div class="t"><b>Lewis</b>
+        <span class="m" data-tex="\sigma_b=\dfrac{F_t}{b\,m\,Y}=\dfrac{1600}{40\cdot4\cdot0{,}32}=\dfrac{1600}{51{,}2}\ \Rightarrow\ \boxed{\sigma_b\approx31{,}3\ \text{MPa}}"></span>
+        <span class="note">N delt med mm·mm giver N/mm² = MPa. Y har ingen enhed</span></div></div>
+      <div class="step" id="b3"><span class="n">3</span><div class="t"><b>Hvilket moment svarer det til?</b>
+        <span class="m" data-tex="T=F_t\cdot\dfrac d2=1600\cdot0{,}040=64\ \text{N}\cdot\text{m}"></span>
+        <span class="note">Omtrent en kraftig skruemaskine i lavt gear</span></div></div>
     </div>
-    <div class="col">
-      <div class="kick" style="color:var(--grn)">Enhederne går op</div>
-      <canvas id="cB" width="1100" height="900"></canvas>
-      <div class="quote">N delt med mm · mm giver N/mm², og det er MPa. Y har ingen enhed.</div>
+    <div class="card fl" id="cTand">
+      <h3>Tanden som bjælke</h3>
+      <canvas id="cB" width="900" height="640"></canvas>
+      <div class="status mid"><b>b·m·Y = 51,2 mm²</b> virker som et "effektivt areal": kraften delt med det giver spændingen.</div>
     </div>
   </div>
-  <div class="foot"><b class="s">SIG TIL CENSOR</b><span>1600 N fordelt på 40 mm bredde, modul 4 og formfaktor 0,32 giver 31 MPa i tandfoden.</span></div>
+  <div class="ft"><b class="say">SIG</b><span>1600 N fordelt på 40 mm bredde, modul 4 og formfaktor 0,32 giver 31 MPa i tandfoden.</span></div>
 </section>
 
-<!-- 4 · B2 rimelighed -->
-<section class="slide" data-title="B · Rimelighed">
-  <div><div class="kick">Del B · 2 af 2 · Vurdering</div><h1>31 MPa: <em>er det meget?</em></h1></div>
-  <div class="cols" style="grid-template-columns:520px 1fr">
-    <div class="col">
-      <p class="lead">Tilladelig bøjespænding for stål er typisk 100–200 MPa. 31 MPa er altså lavt, og tanden er rigeligt stærk.</p>
-      <p class="t"><b>Men Lewis er en simpel model:</b></p>
-      <p class="t">· Kraften antages på spidsen af én tand. I virkeligheden deler 1–2 tænder ofte lasten.</p>
-      <p class="t">· Ingen stød fra hastighed: ved høj omkredshastighed ganges med en <b>dynamisk faktor</b> <span data-tex="K_v>1"></span>.</p>
-      <p class="t">· Ingen kærvvirkning og ingen kontakttryk (pitting) på flanken.</p>
-      <p class="t" style="color:var(--mut);font-size:16px">100–200 MPa er en typisk størrelsesorden, ikke opgivet i opgaven.</p>
+<!-- ============ 4 · (b) Rimelighed ============ -->
+<section class="slide" data-title="(b) Rimelighed">
+  <div class="hd"><span class="tag b">SPM. 5 (b) · 2/2</span><h1>31 MPa: er det meget?</h1></div>
+  <div class="body" style="grid-template-columns:600px 1fr">
+    <div class="card steps tight" style="padding:6px 22px">
+      <div class="step" id="b4"><span class="n">4</span><div class="t"><b>Sammenlign</b><br>Tilladelig bøjespænding for stål er typisk <b>100–200 MPa</b>. 31 MPa er lavt: tanden er rigeligt stærk <span class="ok">✓</span>
+        <span class="note">Størrelsesorden, ikke opgivet i opgaven</span></div></div>
+      <div class="step" id="b5"><span class="n">5</span><div class="t"><b>Lewis er en simpel model</b>
+        <span class="note">· Kraften på spidsen af én tand; i virkeligheden deler 1–2 tænder ofte lasten<br>· Ingen stød fra hastighed: ved høj omkredshastighed ganges med en dynamisk faktor <span data-tex="K_v>1"></span><br>· Ingen kærvvirkning og intet kontakttryk (pitting) på flanken</span></div></div>
+      <div class="step" id="b6"><span class="n">6</span><div class="t"><b>Hvorfor det lille hjul?</b><br><span class="note">Samme F<sub>t</sub> på begge hjul, men det lille har færrest tænder og dermed mindst Y: størst spænding</span></div></div>
     </div>
-    <div class="col">
-      <div class="chips" id="hv"><button data-h="0" class="on">Opgaven</button><button data-h="1">m = 2 mm</button><button data-h="2">b = 20 mm</button><button data-h="3">40 tænder, samme F<sub>t</sub></button><button data-h="4">40 tænder, samme moment</button></div>
-      <canvas id="cH" width="1700" height="700"></canvas>
-      <div class="stat"><div><span class="nt">σ<sub>b</sub></span><b id="hS">31,3</b> <span style="display:inline;letter-spacing:0">MPa</span><i id="hSr"></i></div><div><span class="nt">F<sub>t</sub></span><b id="hF">1600</b> <span style="display:inline;letter-spacing:0">N</span><i id="hFr"></i></div><div><span>Y</span><b id="hY">0,32</b><i id="hYr"></i></div></div>
+    <div class="card fl" id="cHv">
+      <h3>Hvad nu hvis …</h3>
+      <div class="row" id="hv"><button class="btn on" data-h="0">Opgaven</button><button class="btn" data-h="1">m = 2 mm</button><button class="btn" data-h="2">b = 20 mm</button><button class="btn" data-h="3">40 tænder, samme F<sub>t</sub></button><button class="btn" data-h="4">40 tænder, samme moment</button></div>
+      <canvas id="cH" width="1700" height="760"></canvas>
+      <div class="ro">
+        <div><span>σ<sub>b</sub> [MPa]</span><b class="cy" id="hS">31,3</b><i id="hSr"></i></div>
+        <div><span>F<sub>t</sub> [N]</span><b class="or" id="hF">1600</b><i id="hFr"></i></div>
+        <div><span>Y</span><b class="rd" id="hY">0,32</b><i id="hYr"></i></div>
+      </div>
     </div>
   </div>
-  <div class="foot"><b class="s">SIG TIL CENSOR</b><span>Halvt modul eller halv bredde fordobler spændingen. Med flere tænder og samme moment falder den meget, fordi både Y stiger og F<sub>t</sub> falder.</span></div>
+  <div class="ft"><b class="say">SIG</b><span>Halvt modul eller halv bredde fordobler spændingen. Flere tænder og samme moment: Y stiger og F<sub>t</sub> falder.</span></div>
 </section>
 
 </div></div>
@@ -170,7 +151,8 @@ iframe.lab{width:100%;border:1px solid var(--rule);display:block;background:#f4f
 <script>
 (function () {
 'use strict';
-var $ = Deck.$, fmt = Deck.fmt, PI = Math.PI, INK = '#1d1b18', MUT = '#7a736a', RULE = '#d8d0c4', GRN = '#1f4d3a', TER = '#c4572e', SAND = '#efe7da';
+var $ = Deck.$, fmt = Deck.fmt, PI = Math.PI;
+var CY = '#0a7fc2', OR = '#d97a00', RD = '#d63a3a', GR = '#0a9a5c', INK = '#14202d', MUT = '#5a6b7d', LINE = '#d3dde8', GRID = '#e3eaf1', P2 = '#ebf1f7', MET = '#c9d5e1', MET2 = '#dfe6ee';
 var YT = [[12, .245], [13, .261], [14, .277], [15, .290], [16, .296], [17, .303], [18, .309], [19, .314], [20, .322], [21, .328], [22, .331], [24, .337], [26, .346], [28, .353], [30, .359], [34, .371], [38, .384], [43, .397], [50, .409], [60, .422], [75, .435], [100, .447], [150, .460], [300, .472]];
 function Yof(N) { for (var i = 1; i < YT.length; i++) if (N <= YT[i][0]) { var a = YT[i - 1], b = YT[i]; return a[1] + (b[1] - a[1]) * (N - a[0]) / (b[0] - a[0]); } return .472; }
 
@@ -182,40 +164,42 @@ function gear(g, cx, cy, sc, m, N, rot, fill, stroke) {
     [[rf, -0.5], [rf, -0.27], [ra, -0.15], [ra, 0.15], [rf, 0.27], [rf, 0.5]].forEach(function (q) { pts.push([cx + Math.cos(b + q[1] * a) * q[0] * sc, cy + Math.sin(b + q[1] * a) * q[0] * sc]); });
   }
   g.poly(pts, fill, stroke, 3);
-  g.x.beginPath(); g.x.arc(cx, cy, Math.max(4, rf * 0.35 * sc), 0, 2 * PI); g.x.fillStyle = '#faf7f2'; g.x.fill(); g.x.strokeStyle = stroke; g.x.stroke();
+  g.x.beginPath(); g.x.arc(cx, cy, Math.max(4, rf * 0.35 * sc), 0, 2 * PI); g.x.fillStyle = '#fff'; g.x.fill(); g.x.strokeStyle = stroke; g.x.stroke();
   return r * sc;
 }
+function pitch(g, cx, cy, r) { g.x.strokeStyle = CY; g.x.lineWidth = 3; g.x.setLineDash([10, 8]); g.x.beginPath(); g.x.arc(cx, cy, r, 0, 2 * PI); g.x.stroke(); g.x.setLineDash([]); }
 
-/* forside */
-(function () { var g = Deck.cv('c0'), sc = 8; g.clear(); gear(g, 400, 600, sc, 4, 20, 0, SAND, INK); gear(g, 400 + 60 * sc, 600, sc, 4, 10, PI, GRN, INK);
-  g.x.strokeStyle = TER; g.x.lineWidth = 3; g.x.setLineDash([10, 8]); g.x.beginPath(); g.x.arc(400, 600, 40 * sc, 0, 2 * PI); g.x.stroke(); g.x.setLineDash([]); })();
+/* figur: to hjul i indgreb (lodret) */
+(function () {
+  var g = Deck.cv('c0'), sc = 5.2, c1 = 255; g.clear();
+  var r1 = gear(g, 350, c1, sc, 4, 20, PI / 20, MET2, '#44586e'); pitch(g, 350, c1, r1);
+  var r2 = gear(g, 350, c1 + 60 * sc, sc, 4, 10, -PI / 2, MET, '#44586e'); pitch(g, 350, c1 + 60 * sc, r2);
+  var px = 350, py = c1 + r1, phi = 20 * PI / 180, L = 200;
+  g.arrow(px - Math.cos(phi) * L, py - Math.sin(phi) * L, px + Math.cos(phi) * L, py + Math.sin(phi) * L, GR, 6);
+  g.txt('φ', px + 150, py + 20, 40, GR, 'left', 'middle', 800);
+  g.dot(px, py, 10, RD);
+  g.txt('20 tænder', 350, c1 - 70, 30, INK, 'center', 'middle', 700); g.txt('10', 350, c1 + 60 * sc, 30, INK, 'center', 'middle', 800);
+})();
 
-/* ===== A1: geometri ===== */
+/* ===== (a) 1/2: geometri ===== */
 var G = { m: 4, N: 20 };
 Deck.range('gM', function (v) { G.m = v; drawG(); }, function (v) { return fmt(v, 1) + ' mm'; });
 Deck.range('gN', function (v) { G.N = v; drawG(); }, function (v) { return String(v); });
 function drawG() {
   var g = Deck.cv('cG'); g.clear();
-  var sc = 6.4, cx = 480, cy = 560, r = gear(g, cx, cy, sc, G.m, G.N, -PI / 2, SAND, INK);
-  g.x.strokeStyle = TER; g.x.lineWidth = 3; g.x.setLineDash([10, 8]); g.x.beginPath(); g.x.arc(cx, cy, r, 0, 2 * PI); g.x.stroke(); g.x.setLineDash([]);
-  g.line([[cx - r, cy], [cx + r, cy]], TER, 2); g.txt('d = ' + fmt(G.m * G.N, 0) + ' mm', cx, cy - 22, 34, TER, 'center', 'middle', 700);
-  /* trykvinkel ved delepunkt (top) */
-  var px = cx, py = cy - r, phi = 20 * PI / 180, L = 160;
-  g.line([[px - 200, py], [px + 200, py]], RULE, 2);
-  g.arrow(px + Math.cos(phi) * -L, py - Math.sin(phi) * -L, px + Math.cos(phi) * L, py - Math.sin(phi) * L, GRN, 5);
-  g.txt('φ = 20°', px + 170, py - 44, 28, GRN, 'left', 'middle', 700);
-  /* tal-panel */
-  var bx = 1020;
-  g.txt('Modul m', bx, 120, 26, MUT, 'left', 'middle', 600); g.txt(fmt(G.m, 1) + ' mm', bx, 170, 52, INK, 'left', 'middle', 700);
-  g.txt('Delediameter d = m·N', bx, 260, 26, MUT, 'left', 'middle', 600); g.txt(fmt(G.m * G.N, 0) + ' mm', bx, 310, 52, TER, 'left', 'middle', 700);
-  g.txt('Deling p = π·m', bx, 400, 26, MUT, 'left', 'middle', 600); g.txt(fmt(PI * G.m, 1) + ' mm', bx, 450, 52, INK, 'left', 'middle', 700);
-  g.txt('Tandhøjde ≈ 2,25·m', bx, 540, 26, MUT, 'left', 'middle', 600); g.txt(fmt(2.25 * G.m, 1) + ' mm', bx, 590, 52, INK, 'left', 'middle', 700);
-  g.txt('Samme modul → samme tandstørrelse,', bx, 700, 24, GRN, 'left', 'middle', 600);
-  g.txt('uanset antal tænder', bx, 734, 24, GRN, 'left', 'middle', 600);
+  var sc = Math.min(6.2, 330 / (G.m * G.N / 2 + G.m)), cx = 500, cy = 400, r = gear(g, cx, cy, sc, G.m, G.N, -PI / 2, MET2, '#44586e');
+  pitch(g, cx, cy, r);
+  g.line([[cx - r, cy], [cx + r, cy]], CY, 3); g.txt('d = ' + fmt(G.m * G.N, 0) + ' mm', cx, cy + 40, 40, CY, 'center', 'middle', 800);
+  var px = cx, py = cy - r, phi = 20 * PI / 180, L = 150;
+  g.line([[px - 210, py], [px + 210, py]], LINE, 2);
+  g.arrow(px - Math.cos(phi) * L, py + Math.sin(phi) * L, px + Math.cos(phi) * L, py - Math.sin(phi) * L, GR, 5);
+  g.txt('φ = 20°', px + 160, py - 64, 34, GR, 'left', 'middle', 800);
+  g.txt('m = ' + fmt(G.m, 1) + ' mm', 20, 40, 36, OR, 'left', 'middle', 800);
+  $('gD').textContent = fmt(G.m * G.N, 0); $('gP').textContent = fmt(PI * G.m, 1); $('gH').textContent = fmt(2.25 * G.m, 1);
 }
 drawG();
 
-/* ===== A2: Y-kurve + lab ===== */
+/* ===== (a) 2/2: Y-kurve + lab ===== */
 var YA = { N: 20 }, S0 = 1600 / (40 * 4 * Yof(20));
 var send = Deck.lab('lab', 'tandhjul-lewis', function () { return { 'modul': 4, 'tandbredde': 40, 'tandtal, drev': YA.N, 'tangentialkraft': 1600, 'slå y op': true }; });
 Deck.range('yN', function (v) { YA.N = v; updY(); }, function (v) { return String(v); });
@@ -223,53 +207,53 @@ function updY() {
   var Y = Yof(YA.N), s = 1600 / (40 * 4 * Y);
   $('yY').textContent = fmt(Y, 3); $('yS').textContent = fmt(s, 1); Deck.rel('ySr', s, S0); $('yD').textContent = fmt(4 * YA.N, 0);
   var g = Deck.cv('cY'); g.clear();
-  var F = g.frame({ l: 90, r: 1080, t: 16, b: 262, x0: 12, x1: 100, y0: 0.2, y1: 0.46 });
-  g.line([[F.X(12), F.Y(0.2)], [F.X(100), F.Y(0.2)]], INK, 2);
-  [12, 20, 40, 60, 80, 100].forEach(function (v) { g.txt(String(v), F.X(v), F.Y(0.2) + 28, 22, MUT, 'center', 'middle', 500); });
-  [0.25, 0.35, 0.45].forEach(function (v) { g.txt(fmt(v, 2), F.X(12) - 12, F.Y(v), 22, MUT, 'right', 'middle', 500); g.line([[F.X(12), F.Y(v)], [F.X(100), F.Y(v)]], '#ece5da', 1); });
-  g.fn(F, Yof, 12, 100, GRN, 5);
-  g.dot(F.X(YA.N), F.Y(Y), 11, TER);
-  g.txt('Y', F.X(12) + 10, F.Y(0.46) + 10, 26, MUT, 'left', 'middle', 700); g.txt('antal tænder N →', F.X(100), F.Y(0.2) - 20, 22, MUT, 'right', 'middle', 600);
+  var F = g.frame({ l: 90, r: 1080, t: 20, b: 240, x0: 12, x1: 100, y0: 0.2, y1: 0.46 });
+  [0.25, 0.35, 0.45].forEach(function (v) { g.line([[F.X(12), F.Y(v)], [F.X(100), F.Y(v)]], GRID, 2); g.txt(fmt(v, 2), F.X(12) - 12, F.Y(v), 26, MUT, 'right', 'middle', 600); });
+  g.line([[F.X(12), F.Y(0.2)], [F.X(100), F.Y(0.2)]], '#9fb0c2', 2);
+  [12, 20, 40, 60, 80, 100].forEach(function (v) { g.txt(String(v), F.X(v), F.Y(0.2) + 28, 26, MUT, 'center', 'middle', 600); });
+  g.fn(F, Yof, 12, 100, RD, 5);
+  g.dot(F.X(YA.N), F.Y(Y), 12, OR);
+  g.txt('Y', F.X(12) + 12, F.Y(0.46) + 8, 30, MUT, 'left', 'middle', 700); g.txt('antal tænder N →', F.X(100), F.Y(0.2) - 24, 26, MUT, 'right', 'middle', 600);
   send();
 }
 updY();
 
-/* ===== B1: enhedsdiagram ===== */
+/* ===== (b) 1/2: tand som bjælke ===== */
 (function () {
   var g = Deck.cv('cB'); g.clear();
-  /* tand som trapez med kraft på spidsen og parabel */
-  var bx = 330, by = 780, w = 300, h = 520;
-  g.poly([[bx - w / 2, by], [bx - w / 4.2, by - h], [bx + w / 4.2, by - h], [bx + w / 2, by]], SAND, INK, 4);
+  var bx = 290, by = 610, w = 280, h = 470;
+  g.poly([[bx - w / 2, by], [bx - w / 4.2, by - h], [bx + w / 4.2, by - h], [bx + w / 2, by]], MET2, '#44586e', 4);
   var pts = []; for (var i = 0; i <= 40; i++) { var t = i / 40, yy = by - h + t * h * 0.92, half = (w / 2.1) * Math.sqrt(t); pts.push([bx - half, yy]); }
   var pts2 = pts.map(function (p) { return [2 * bx - p[0], p[1]]; }).reverse();
-  g.line(pts.concat(pts2), TER, 3, [8, 6]);
-  g.arrow(bx + 250, by - h + 10, bx + 18, by - h + 10, GRN, 7); g.txt('F_t = 1600 N', bx + 120, by - h - 36, 34, GRN, 'center', 'middle', 700);
-  g.line([[bx - w / 2 - 20, by - h * 0.08], [bx + w / 2 + 20, by - h * 0.08]], TER, 3);
-  g.txt('farligt snit', bx + w / 2 + 30, by - h * 0.08, 28, TER, 'left', 'middle', 700);
-  var X0 = 700;
-  g.txt('b = 40 mm', X0, 300, 40, INK, 'left', 'middle', 700);
-  g.txt('m = 4 mm', X0, 370, 40, INK, 'left', 'middle', 700);
-  g.txt('Y = 0,32', X0, 440, 40, INK, 'left', 'middle', 700);
-  g.line([[X0, 490], [1060, 490]], INK, 2);
-  g.txt('b·m·Y = 51,2 mm²', X0, 545, 38, GRN, 'left', 'middle', 700);
-  g.txt('"effektivt areal"', X0, 600, 30, MUT, 'left', 'middle', 500);
+  g.line(pts.concat(pts2), RD, 3, [8, 6]);
+  g.arrow(bx + 260, by - h + 10, bx + 18, by - h + 10, OR, 7); g.txt('F_t = 1600 N', bx + 130, by - h - 38, 36, OR, 'center', 'middle', 800);
+  g.line([[bx - w / 2 - 20, by - h * 0.08], [bx + w / 2 + 20, by - h * 0.08]], RD, 4);
+  g.txt('farligt snit', bx + w / 2 + 30, by - h * 0.08, 32, RD, 'left', 'middle', 800);
+  g.txt('parabel af', bx + w / 2 - 10, by - h * 0.55, 26, RD, 'left', 'middle', 600);
+  g.txt('konstant styrke', bx + w / 2 - 10, by - h * 0.55 + 32, 26, RD, 'left', 'middle', 600);
+  var X0 = 620;
+  g.txt('b = 40', X0, 180, 40, CY, 'left', 'middle', 800);
+  g.txt('m = 4', X0, 240, 40, GR, 'left', 'middle', 800);
+  g.txt('Y = 0,32', X0, 300, 40, RD, 'left', 'middle', 800);
+  g.line([[X0, 340], [880, 340]], INK, 2);
+  g.txt('51,2 mm²', X0, 390, 42, INK, 'left', 'middle', 800);
 })();
 
-/* ===== B2: hvad nu hvis ===== */
+/* ===== (b) 2/2: hvad nu hvis ===== */
 var HV = [[4, 40, 20, 1600, 'Opgaven'], [2, 40, 20, 1600, 'm = 2'], [4, 20, 20, 1600, 'b = 20'], [4, 40, 40, 1600, '40 t., samme Ft'], [4, 40, 40, 800, '40 t., samme T']], hi = 0;
 function sb(h) { var Y = h[2] === 20 ? 0.32 : Yof(h[2]); return { Y: Y, s: h[3] / (h[1] * h[0] * Y) }; }
 var B0 = sb(HV[0]);
 Deck.group('[data-h]', function (v) { hi = +v; drawH(); });
 function drawH() {
   var g = Deck.cv('cH'); g.clear();
-  var L = 330, R = 1640, sc = (R - L) / 70;
-  [0, 10, 20, 30, 40, 50, 60, 70].forEach(function (v) { g.line([[L + v * sc, 20], [L + v * sc, 610]], v ? '#ece5da' : INK, v ? 1 : 2); g.txt(String(v), L + v * sc, 640, 22, MUT, 'center', 'middle', 500); });
-  g.txt('σ_b [MPa]', R, 676, 22, MUT, 'right', 'middle', 600);
+  var L = 330, R = 1560, sc = (R - L) / 70;
+  [0, 10, 20, 30, 40, 50, 60, 70].forEach(function (v) { g.line([[L + v * sc, 20], [L + v * sc, 660]], v ? GRID : '#9fb0c2', 2); g.txt(String(v), L + v * sc, 694, 28, MUT, 'center', 'middle', 600); });
+  g.txt('σ_b [MPa]', R + 120, 694, 28, MUT, 'right', 'middle', 700);
   HV.forEach(function (h, i) {
-    var K = sb(h), y = 40 + i * 116, on = i === hi;
-    g.txt(h[4], L - 20, y + 36, 28, on ? INK : MUT, 'right', 'middle', on ? 700 : 500);
-    g.rect(L, y + 8, K.s * sc, 56, on ? TER : (i ? SAND : GRN));
-    g.txt(fmt(K.s, 1), L + K.s * sc + 14, y + 36, 32, INK, 'left', 'middle', 700);
+    var K = sb(h), y = 40 + i * 126, on = i === hi;
+    g.txt(h[4], L - 20, y + 40, 34, on ? INK : MUT, 'right', 'middle', on ? 800 : 600);
+    g.rect(L, y + 8, K.s * sc, 64, on ? CY : (i ? MET : '#7d8fa3'));
+    g.txt(fmt(K.s, 1), L + K.s * sc + 14, y + 40, 36, on ? CY : INK, 'left', 'middle', 800);
   });
   var h = HV[hi], K = sb(h);
   $('hS').textContent = fmt(K.s, 1); Deck.rel('hSr', K.s, B0.s);

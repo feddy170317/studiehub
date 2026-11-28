@@ -5,189 +5,184 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Spm. 1 · Søjleknækning</title>
 <meta name="description" content="Fremlæggelse af MEM1 eksamensspørgsmål 1: Eulers knæklast, slankhed og overgangen til Johnson, med 3D-lab indlejret.">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-<style>
-/* Design: schweizisk/international typografi. Hvidt, sort, ét rødt signal. Hårde linjer, ingen skygger, ingen runde hjørner. */
-:root{--bg:#fff;--ink:#0b0b0b;--mut:#6d6d6d;--rule:#0b0b0b;--hair:#d9d9d9;--red:#e2001a;--blue:#0047ab;--soft:#f3f3f3;--chart-font:"Inter Tight",Arial,sans-serif}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--bg);color:var(--ink);font-family:"Inter Tight",Arial,sans-serif;overflow:hidden}
-.vp{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
-.deck{position:relative;width:1600px;height:900px;flex:none;transform-origin:center}
-.slide{position:absolute;inset:0;padding:40px 56px 0;display:grid;grid-template-rows:auto 1fr 64px;opacity:0;visibility:hidden;transition:opacity .25s;background:var(--bg)}
-.slide.on{opacity:1;visibility:visible}
-.top{display:grid;grid-template-columns:150px 1fr auto;align-items:end;border-bottom:4px solid var(--rule);padding-bottom:14px}
-.num{font-size:96px;font-weight:900;line-height:.8;color:var(--red);letter-spacing:-.05em}
-.top h1{font-size:50px;font-weight:800;letter-spacing:-.03em;line-height:1}
-.top .part{font-size:17px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;text-align:right;line-height:1.4}
-.top .part b{color:var(--red)}
-.main{display:grid;gap:0;min-height:0;padding-top:26px}
-.col{padding:0 30px;border-left:1px solid var(--hair);min-height:0;display:flex;flex-direction:column;gap:14px}
-.col:first-child{padding-left:0;border-left:0}
-.col:last-child{padding-right:0}
-.lbl{font-size:14px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--mut)}
-.f{font-size:44px;padding:6px 0 4px}
-table.t{width:100%;border-collapse:collapse;font-size:20px;line-height:1.3}
-table.t td{border-top:1px solid var(--hair);padding:11px 10px 11px 0;vertical-align:top}
-table.t tr:last-child td{border-bottom:1px solid var(--hair)}
-table.t td:first-child{width:86px;font-size:25px;font-weight:700}
-.foot{border-top:1px solid var(--rule);display:flex;align-items:center;gap:22px;font-size:21px;padding-right:280px}
-.foot b.s{background:var(--red);color:#fff;font-size:14px;letter-spacing:.14em;padding:6px 9px;font-weight:800}
-.r{color:var(--red)}.bl{color:var(--blue)}.m{color:var(--mut)}
-.btns{display:flex;flex-wrap:wrap;gap:0;border:2px solid var(--ink)}
-.btns button{flex:1;font:700 16px "Inter Tight",sans-serif;background:#fff;color:var(--ink);border:0;border-left:2px solid var(--ink);padding:11px 8px;cursor:pointer}
-.btns button:first-child{border-left:0}
-.btns button.on{background:var(--ink);color:#fff}
-.btns.v{flex-direction:column}.btns.v button{border-left:0;border-top:2px solid var(--ink);text-align:left;padding:12px 14px}.btns.v button:first-child{border-top:0}
-.sl{display:grid;grid-template-columns:150px 1fr 110px;gap:14px;align-items:center;font-size:18px;font-weight:600}
-.sl input{width:100%;accent-color:var(--red)}
-.sl output{font-weight:800;text-align:right;font-variant-numeric:tabular-nums}
-.big{display:grid;grid-template-columns:repeat(3,1fr);border-top:2px solid var(--ink)}
-.big div{padding:10px 14px 4px 0}
-.big span{display:block;font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
-.big b{font-size:40px;font-weight:900;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
-.big i{font-style:normal;font-size:15px;font-weight:700;margin-left:6px}
-.up{color:var(--red)}.dn{color:var(--blue)}.eq{color:var(--mut)}
-.step{display:grid;grid-template-columns:64px 1fr;border-top:1px solid var(--hair);padding:14px 0}
-.step .n{font-size:44px;font-weight:900;color:var(--red);line-height:1}
-.step h4{font-size:20px;font-weight:800;margin-bottom:6px}
-.step .e{font-size:28px}
-.step .c{font-size:18px;color:var(--mut);margin-top:4px}
-.res{display:inline-block;background:var(--ink);color:#fff;padding:6px 14px;font-size:28px;margin-top:6px}
-.res .katex{color:#fff}
-canvas{display:block;width:100%}
-iframe.lab{width:100%;border:2px solid var(--ink);display:block;background:#f4f7fa}
-.verdict{font-size:22px;font-weight:800;padding:12px 14px;border:2px solid var(--ink)}
-.verdict.ok{background:var(--ink);color:#fff}.verdict.j{background:var(--red);color:#fff;border-color:var(--red)}
-.chips{display:flex;border:2px solid var(--ink)}
-.chips span{flex:1;padding:10px 12px;font-size:19px;font-weight:700;border-left:2px solid var(--ink)}
-.chips span:first-child{border-left:0}
-.chips small{display:block;font-size:12px;letter-spacing:.14em;color:var(--mut);font-weight:700}
-.dnav{position:fixed;right:20px;bottom:14px;display:flex;gap:8px;align-items:center;font:800 14px "Inter Tight",sans-serif;z-index:9}
-.dnav .dots{display:flex;gap:4px}.dnav .dots i{width:18px;height:4px;background:var(--hair);cursor:pointer}.dnav .dots i.on{background:var(--red)}
-.dnav button{width:38px;height:34px;border:2px solid var(--ink);background:#fff;font-size:17px;font-weight:800;cursor:pointer}
-.katex{font-size:1.03em}
-.b2 .step{padding:9px 0}.b2 .step .e{font-size:23px}.b2 .step .n{font-size:36px}.b2 .step h4{font-size:18px;margin-bottom:2px}
-.b2 .btns.v{display:grid;grid-template-columns:1fr 1fr}.b2 .btns.v button{border:0;border-top:2px solid var(--ink);font-size:15px;padding:10px 12px}
-.b2 .btns.v button:first-child{grid-column:1/3;border-top:0}.b2 .btns.v button:nth-child(odd):not(:first-child){border-left:2px solid var(--ink)}
-</style>
+<link rel="stylesheet" href="../assets/s7.css">
 </head>
 <body>
 <div class="vp"><div class="deck">
 
-<!-- 0 · forside -->
-<section class="slide on" data-title="Forside" style="grid-template-rows:1fr 64px">
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;align-content:center">
-    <div style="border-right:4px solid var(--ink);padding-right:48px">
-      <div class="num" style="font-size:260px">01</div>
-      <h1 style="font-size:104px;font-weight:900;letter-spacing:-.05em;line-height:.9;margin-top:18px">Søjle&shy;knækning</h1>
-      <p style="font-size:28px;font-weight:500;margin-top:22px">Euler, Johnson og overgangen <span class="r">S<sub>y</sub>/2</span> imellem dem.</p>
-      <p class="m" style="font-size:18px;font-weight:700;letter-spacing:.14em;margin-top:26px">MEM1 · KAPITEL 9 · MUNDTLIG EKSAMEN</p>
+<!-- ============ 0 · FORSIDE ============ -->
+<section class="slide on" data-title="Forside">
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:34px;padding:0 30px">
+    <div>
+      <div class="tag" style="display:inline-block">MEM1 · KAP. 9 · EKSAMENSSPØRGSMÅL 1</div>
+      <h1 style="font-size:76px;margin-top:22px">Søjleknækning</h1>
+      <div style="font-size:30px;color:var(--mut);margin-top:8px">Euler, Johnson og grænsen <span data-tex="S_y/2"></span>: søjlen <b class="or">knækker ud</b> til siden, den bliver ikke knust</div>
     </div>
-    <div style="padding-left:48px;display:flex;flex-direction:column;justify-content:center;gap:34px">
-      <div><div class="lbl r">A · Redegør</div><p style="font-size:24px;line-height:1.45;margin-top:8px">Eulers knæklast <span data-tex="P_{cr}=\dfrac{\pi^2EI}{L_e^2}"></span>, betydningen af <span data-tex="E"></span>, <span data-tex="I"></span> og <span data-tex="L_e"></span>. Overgangskriteriet <span data-tex="\sigma_{cr}=S_y/2"></span> og det kritiske slankhedsforhold.</p></div>
-      <div style="border-top:1px solid var(--hair);padding-top:26px"><div class="lbl r">B · Beregn</div><p style="font-size:24px;line-height:1.45;margin-top:8px">Rund stålsøjle, leddet i begge ender, <span data-tex="d=20"></span> mm, <span data-tex="L_e=1"></span> m. Find <span data-tex="P_{cr}"></span>, <span data-tex="\sigma_{cr}"></span>, og afgør: Euler eller Johnson?</p></div>
-    </div>
-  </div>
-  <div class="foot" style="color:var(--mut);font-size:16px;font-weight:600">→ / mellemrum / klikker: næste &nbsp;&nbsp; ←: forrige &nbsp;&nbsp; F: fuld skærm</div>
-</section>
-
-<!-- 1 · A1 Euler -->
-<section class="slide" data-title="A · Euler">
-  <div class="top"><div class="num">A1</div><h1>Eulers knæklast: lang og slank</h1><div class="part">Spørgsmål 1<br><b>Del A · 1/2</b></div></div>
-  <div class="main" style="grid-template-columns:640px 1fr">
-    <div class="col">
-      <div class="lbl">Kritisk knæklast (Euler)</div>
-      <div class="f" data-tex="P_{cr}=\dfrac{\pi^2\,\color{#0047ab}{E}\,\color{#0047ab}{I}}{\color{#e2001a}{L_e}^{\,2}}"></div>
-      <table class="t">
-        <tr><td class="bl" data-tex="E"></td><td><b>Elasticitetsmodul.</b> Materialets stivhed, ikke styrke. Stål 200 GPa. Et stærkere stål knækker ved samme last</td></tr>
-        <tr><td class="bl" data-tex="I"></td><td><b>Inertimoment.</b> Tværsnittets modstand mod at bøje ud. Rund: <span data-tex="\pi d^4/64"></span>, så d står i 4. potens. Et rør er bedre end en massiv stang</td></tr>
-        <tr><td class="r" data-tex="L_e"></td><td><b>Effektiv længde</b> = K·L, afstanden mellem bøjningens nulpunkter. Står i 2. potens: dobbelt længde, en fjerdedel af lasten</td></tr>
-      </table>
-      <p style="font-size:19px;line-height:1.4;margin-top:4px">Søjlen knækker <b>før</b> materialet flyder: den <span class="r">bøjer ud til siden</span>, fordi det er lettere end at blive trykket sammen.</p>
-    </div>
-    <div class="col">
-      <div class="lbl">Understøtning bestemmer <span data-tex="L_e"></span></div>
-      <div class="btns" id="ends">
-        <button data-e="0" class="on">Leddet–leddet</button><button data-e="1">Indspændt–fri</button><button data-e="2">Indspændt–leddet</button><button data-e="3">Indspændt–indsp.</button>
-      </div>
-      <canvas id="cE" width="1500" height="900"></canvas>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:26px">
+      <div class="card qcard" id="qa"><span class="lbl cy">(a) FORKLAR · 2 SLIDES</span>
+        Eulers knæklast <span data-tex="P_{cr}=\dfrac{\pi^2EI}{L_e^2}"></span> og betydningen af <span data-tex="E"></span>, <span data-tex="I"></span> og <span data-tex="L_e"></span>. Overgangskriteriet <span data-tex="\sigma_{cr}=S_y/2"></span> og det kritiske slankhedsforhold.</div>
+      <div class="card qcard" id="qb"><span class="lbl or">(b) BEREGN · 2 SLIDES</span>
+        Rund stålsøjle, leddet i begge ender:<br><span data-tex="d=20\text{ mm},\ L_e=1\text{ m},\ E=200\text{ GPa},\ S_y=400\text{ MPa}"></span><br>Find <span data-tex="P_{cr}"></span> og <span data-tex="\sigma_{cr}"></span>, og afgør: Euler eller Johnson?</div>
     </div>
   </div>
-  <div class="foot"><b class="s">SIG</b><span>Euler gælder for lange, slanke søjler. Kun stivheden E tæller, ikke styrken. <span class="r">L<sub>e</sub></span> i anden: understøtningen kan ændre lasten 16 gange.</span></div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum / klikker: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm &nbsp;·&nbsp; 3D-søjlen kan drejes med musen</div>
 </section>
 
-<!-- 2 · A2 slankhed -->
-<section class="slide" data-title="A · Slankhed">
-  <div class="top"><div class="num">A2</div><h1>Slankhed: Euler eller Johnson?</h1><div class="part">Spørgsmål 1<br><b>Del A · 2/2</b></div></div>
-  <div class="main" style="grid-template-columns:600px 1fr">
-    <div class="col">
-      <div class="lbl">Del med arealet A</div>
-      <div class="f" style="font-size:38px" data-tex="\sigma_{cr}=\dfrac{P_{cr}}{A}=\dfrac{\pi^2E}{(L_e/k)^2}"></div>
-      <table class="t">
-        <tr><td data-tex="k"></td><td><b>Inertiradius</b> <span data-tex="k=\sqrt{I/A}"></span>. Hvor langt materialet i gennemsnit sidder fra midten. Rund stang: <span data-tex="k=d/4"></span></td></tr>
-        <tr><td data-tex="L_e/k"></td><td><b>Slankhedsforhold.</b> Ét tal for, hvor tynd søjlen er i forhold til længden</td></tr>
-        <tr><td class="r" data-tex="\tfrac{S_y}{2}"></td><td><b>Overgang.</b> Over <span data-tex="S_y/2"></span> passer Euler ikke (flydning, skævheder). Sæt <span data-tex="\sigma_{cr}=S_y/2"></span>:</td></tr>
-      </table>
-      <div class="f" style="font-size:36px;border:2px solid var(--ink);padding:8px 14px;text-align:center" data-tex="\left(\dfrac{L_e}{k}\right)_{cr}=\sqrt{\dfrac{2\pi^2E}{S_y}}"></div>
-      <p style="font-size:18px;line-height:1.4">Kortere end det: <b class="r">Johnson-parablen</b> <span data-tex="\sigma_{cr}=S_y-\frac{1}{E}\left(\frac{S_y}{2\pi}\frac{L_e}{k}\right)^2"></span></p>
+<!-- ============ 1 · (a) Euler ============ -->
+<section class="slide" data-title="(a) Euler">
+  <div class="hd"><span class="tag">SPM. 1 (a) · 1/2</span><h1>Søjlen knækker ud, før materialet flyder<small>stabilitet, ikke styrke</small></h1></div>
+  <div class="body" style="grid-template-columns:380px 580px 1fr">
+    <div class="card fl" id="fig">
+      <h3>Linealen i hånden</h3>
+      <svg viewBox="0 0 340 520" style="width:100%;flex:1">
+        <defs><marker id="aO" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#d97a00"/></marker>
+          <marker id="aR" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#d63a3a"/></marker></defs>
+        <!-- lige søjle -->
+        <line x1="85" y1="30" x2="85" y2="92" stroke="#d97a00" stroke-width="5" marker-end="url(#aO)"/><text x="98" y="62" fill="#d97a00" font-size="24" font-weight="700">P</text>
+        <path d="M60 100 L85 100 L110 100" stroke="#44586e" stroke-width="4"/>
+        <line x1="85" y1="104" x2="85" y2="440" stroke="#7d8fa3" stroke-width="12" stroke-linecap="round"/>
+        <path d="M60 446 L85 446 L110 446" stroke="#44586e" stroke-width="4"/>
+        <text x="85" y="478" fill="#5a6b7d" font-size="17" text-anchor="middle">P &lt; P<tspan font-size="12" dy="5">cr</tspan></text>
+        <text x="85" y="502" fill="#5a6b7d" font-size="17" text-anchor="middle">lige: kun tryk</text>
+        <!-- knækket søjle -->
+        <line x1="250" y1="30" x2="250" y2="92" stroke="#d97a00" stroke-width="5" marker-end="url(#aO)"/><text x="263" y="62" fill="#d97a00" font-size="24" font-weight="700">P</text>
+        <path d="M225 100 L250 100 L275 100" stroke="#44586e" stroke-width="4"/>
+        <line x1="250" y1="104" x2="250" y2="440" stroke="#d3dde8" stroke-width="3" stroke-dasharray="6 6"/>
+        <path d="M250 104 C 318 190, 318 354, 250 440" fill="none" stroke="#0a7fc2" stroke-width="12" stroke-linecap="round"/>
+        <path d="M225 446 L250 446 L275 446" stroke="#44586e" stroke-width="4"/>
+        <line x1="256" y1="272" x2="296" y2="272" stroke="#d63a3a" stroke-width="3" marker-end="url(#aR)"/><text x="268" y="300" fill="#d63a3a" font-size="20" font-weight="700">v</text>
+        <text x="250" y="478" fill="#0a7fc2" font-size="17" text-anchor="middle">P = P<tspan font-size="12" dy="5">cr</tspan></text>
+        <text x="250" y="502" fill="#0a7fc2" font-size="17" text-anchor="middle">bøjer pludselig ud</text>
+      </svg>
+      <div class="txt" style="text-align:center">Ved <span data-tex="P_{cr}"></span> er den bøjede form lige så god som den lige. Et lille skub, og den <b class="rd">springer ud</b>.</div>
     </div>
-    <div class="col">
-      <canvas id="cS" width="1700" height="980"></canvas>
-      <div class="sl"><span>Slankhed <span data-tex="L_e/k"></span></span><input id="sL" type="range" min="10" max="250" step="1" value="200"><output id="sLo"></output></div>
-      <div class="sl"><span>Flydespænding</span><input id="sS" type="range" min="200" max="1000" step="10" value="400"><output id="sSo"></output></div>
-      <div class="verdict ok" id="sV"></div>
-    </div>
-  </div>
-  <div class="foot"><b class="s">SIG</b><span>Overgangen ligger, hvor Euler giver <b>halvdelen af S<sub>y</sub></b>. Stærkere stål flytter grænsen mod slankere søjler, men hjælper ikke en slank søjle.</span></div>
-</section>
 
-<!-- 3 · B1 beregning -->
-<section class="slide" data-title="B · Beregning">
-  <div class="top"><div class="num">B1</div><h1>Beregning: knæklast og spænding</h1><div class="part">Spørgsmål 1<br><b>Del B · 1/2</b></div></div>
-  <div class="main" style="grid-template-columns:1fr 560px">
-    <div class="col">
-      <div class="chips"><span><small>STÅL</small>E = 200 GPa</span><span><small>FLYDNING</small>S<sub>y</sub> = 400 MPa</span><span><small>DIAMETER</small>d = 20 mm</span><span><small>EFF. LÆNGDE</small>L<sub>e</sub> = 1 m</span><span><small>ENDER</small>leddet–leddet</span></div>
-      <div class="step"><div class="n">1</div><div><h4>Inertimoment</h4><div class="e" data-tex="I=\dfrac{\pi}{64}d^4=\dfrac{\pi}{64}\cdot20^4=2500\pi=7854\ \text{mm}^4"></div></div></div>
-      <div class="step"><div class="n">2</div><div><h4>Eulers knæklast</h4><div class="e" data-tex="P_{cr}=\dfrac{\pi^2\cdot200\,000\cdot7854}{1000^2}=15\,503\ \text{N}"></div><div class="res" data-tex="P_{cr}\approx15{,}5\ \text{kN}"></div><div class="c">≈ 1,6 ton. Mm, MPa og N passer sammen, så husk 1 m = 1000 mm.</div></div></div>
-      <div class="step"><div class="n">3</div><div><h4>Kritisk spænding</h4><div class="e" data-tex="A=\dfrac{\pi}{4}\cdot20^2=314{,}2\ \text{mm}^2,\qquad \sigma_{cr}=\dfrac{15\,503}{314{,}2}"></div><div class="res" data-tex="\sigma_{cr}\approx49{,}3\ \text{MPa}"></div></div></div>
-    </div>
-    <div class="col">
-      <div class="lbl">Hvad betyder tallet?</div>
-      <canvas id="cB" width="1100" height="900"></canvas>
-      <p style="font-size:19px;line-height:1.4">Søjlen knækker ved <b>49 MPa</b>, kun <b class="r">12 %</b> af flydespændingen. Det er <b>formen</b> og ikke materialet, der sætter grænsen.</p>
-    </div>
-  </div>
-  <div class="foot"><b class="s">SIG</b><span>15,5 kN svarer til godt halvanden ton. Spændingen er kun 49 MPa, langt under S<sub>y</sub> = 400. Den knækker, længe før den flyder.</span></div>
-</section>
-
-<!-- 4 · B2 verifikation + lab -->
-<section class="slide b2" data-title="B · Euler eller Johnson">
-  <div class="top"><div class="num">B2</div><h1>Verifikation: Euler eller Johnson?</h1><div class="part">Spørgsmål 1<br><b>Del B · 2/2</b></div></div>
-  <div class="main" style="grid-template-columns:560px 1fr">
-    <div class="col">
-      <div class="step" style="border-top:0;padding-top:0"><div class="n">4</div><div><h4>Søjlens slankhed</h4><div class="e" data-tex="k=\tfrac d4=5\ \text{mm},\quad \tfrac{L_e}{k}=\tfrac{1000}{5}=200"></div></div></div>
-      <div class="step"><div class="n">5</div><div><h4>Grænsen fra del A</h4><div class="e" data-tex="\left(\dfrac{L_e}{k}\right)_{cr}=\sqrt{\dfrac{2\pi^2\cdot200\,000}{400}}=99{,}3"></div></div></div>
-      <div class="step"><div class="n">6</div><div><h4>Sammenlign</h4><div class="e" data-tex="200>99{,}3\ \Rightarrow\ \textbf{Euler}"></div><div class="c">Kontrol: <span data-tex="\sigma_{cr}=49{,}3<S_y/2=200"></span> MPa ✓</div></div></div>
-      <div class="lbl" style="margin-top:4px">Hvad nu hvis …</div>
-      <div class="btns v" id="hv">
-        <button data-h="0" class="on">Opgaven: L = 1 m</button><button data-h="1">L = 0,5 m (lige på grænsen)</button><button data-h="2">L = 0,3 m (kort søjle)</button><button data-h="3">d = 40 mm (dobbelt så tyk)</button><button data-h="4">Indspændt–fri (flagstang)</button>
+    <div class="card" id="fE">
+      <h3>Eulers knæklast (9.12)</h3>
+      <div class="big" id="fP" data-tex="P_{cr}=\dfrac{\pi^2\,\color{#0a9a5c}{E}\,\color{#0a7fc2}{I}}{\color{#d63a3a}{L_e}^{\,2}}"></div>
+      <div class="terms">
+        <div class="term" id="tE"><span class="s gr" data-tex="E"></span><span><b>Elasticitetsmodul.</b> Stivhed, ikke styrke. Alt stål ≈ 200 GPa, så et <em>stærkere</em> stål knækker ved samme last</span></div>
+        <div class="term" id="tI"><span class="s cy" data-tex="I"></span><span><b>Inertimoment.</b> Tværsnittets modstand mod at bøje ud. Rund: <span data-tex="\pi d^4/64"></span>, så d i 4. potens. Et rør er bedre end en massiv stang</span></div>
+        <div class="term" id="tL"><span class="s rd" data-tex="L_e^{\,2}"></span><span><b>Effektiv længde</b> <span data-tex="L_e=K\cdot L"></span>: afstanden mellem bøjningens nulpunkter. Dobbelt længde giver en fjerdedel af lasten</span></div>
+        <div class="term" id="tPi"><span class="s" data-tex="\pi^2"></span><span><b>Formen.</b> Den knækkede søjle er en halv sinusbue, og π kommer fra sinus</span></div>
       </div>
     </div>
-    <div class="col">
-      <iframe class="lab" id="lab" style="flex:1;min-height:0" title="3D-søjle"></iframe>
-      <div class="sl"><span>Last P / P<sub>cr</sub></span><input id="bP" type="range" min="0" max="105" step="1" value="60"><output id="bPo"></output></div>
-      <div class="big">
-        <div><span>Slankhed L<sub>e</sub>/k</span><b id="oS">200</b><i id="oSr"></i></div>
-        <div><span>Knæklast P<sub>cr</sub></span><b id="oP">15,5</b><i id="oPr"></i></div>
-        <div><span>σ<sub>cr</sub></span><b id="oT">49</b><i id="oTr"></i></div>
+
+    <div class="card fl" id="cEnd">
+      <h3>Understøtningen bestemmer L<sub>e</sub></h3>
+      <div class="row" id="ends">
+        <button class="btn on" data-e="0">Leddet–leddet</button>
+        <button class="btn" data-e="1">Indspændt–fri</button>
+        <button class="btn" data-e="2">Indspændt–leddet</button>
+        <button class="btn" data-e="3">Indsp.–indsp.</button>
       </div>
-      <div class="verdict ok" id="oV">Euler: L<sub>e</sub>/k = 200 &gt; 99,3</div>
+      <canvas id="cE" width="1000" height="780"></canvas>
+      <div class="ro">
+        <div><span>EFFEKTIV LÆNGDE</span><b class="rd" id="eLe">1,0 · L</b></div>
+        <div><span>P<sub>cr</sub> I FORHOLD TIL L–L</span><b id="eR">× 1,00</b></div>
+        <div><span>EKSEMPEL</span><b id="eEx" style="font-size:19px;font-family:system-ui">stempelstang</b></div>
+      </div>
     </div>
   </div>
-  <div class="foot"><b class="s">SIG</b><span>200 er dobbelt så slank som grænsen på 99, så det er en Euler-søjle. Var den under 0,5 m lang, skulle Johnson bruges.</span></div>
+  <div class="ft"><b class="say">SIG</b><span>Euler gælder for slanke søjler. Kun stivheden <b class="gr">E</b> tæller, ikke styrken. <b class="rd">L<sub>e</sub></b> i anden: enderne ændrer lasten 16 gange.</span></div>
+</section>
+
+<!-- ============ 2 · (a) Slankhed ============ -->
+<section class="slide" data-title="(a) Slankhed">
+  <div class="hd"><span class="tag">SPM. 1 (a) · 2/2</span><h1>Slankhed: Euler eller Johnson?<small>grænsen ligger ved S<sub>y</sub>/2</small></h1></div>
+  <div class="body" style="grid-template-columns:620px 1fr">
+    <div class="card" id="fS">
+      <h3>Kritisk spænding (9.13)</h3>
+      <div class="big" id="fSig" data-tex="\sigma_{cr}=\dfrac{P_{cr}}{A}=\dfrac{\pi^2\color{#0a9a5c}{E}}{\left(\color{#d63a3a}{L_e}/\color{#0a7fc2}{k}\right)^2}"></div>
+      <div class="terms">
+        <div class="term" id="tk"><span class="s cy" data-tex="k"></span><span><b>Inertiradius</b> <span data-tex="k=\sqrt{I/A}"></span>: hvor langt materialet i snit sidder fra midten. Rund stang: <span data-tex="k=d/4"></span> <em>(ikke d/2)</em></span></div>
+        <div class="term" id="tsl"><span class="s rd" data-tex="L_e/k"></span><span><b>Slankhedsforhold.</b> Ét tal for, hvor tynd søjlen er i forhold til længden. Større tal, mindre spænding</span></div>
+        <div class="term" id="tSy"><span class="s or" data-tex="\tfrac{S_y}{2}"></span><span><b>Overgangen</b> (9.15). Over <span data-tex="S_y/2"></span> passer Euler ikke: flydning og små skævheder tager over. Sæt <span data-tex="\sigma_{cr}=S_y/2"></span>:</span></div>
+      </div>
+      <div id="fCr" style="margin-top:12px;border:2px solid var(--or);border-radius:12px;padding:6px 10px;background:#fff">
+        <div class="big" style="font-size:34px;padding:4px 0" data-tex="\left(\dfrac{L_e}{k}\right)_{cr}=\sqrt{\dfrac{2\pi^2E}{S_y}}"></div>
+      </div>
+      <div class="txt" id="fJ" style="margin-top:10px">Kortere søjle: <b class="or">Johnson-parablen</b> (9.16) <span data-tex="\sigma_{cr}=S_y-\dfrac1E\left(\dfrac{S_y}{2\pi}\dfrac{L_e}{k}\right)^2"></span></div>
+    </div>
+    <div class="card fl" id="cSl">
+      <h3>Spænding mod slankhed</h3>
+      <canvas id="cS" width="1700" height="860"></canvas>
+      <div class="sl" id="slL"><span>Slankhed <span data-tex="L_e/k"></span></span><input id="sL" type="range" min="10" max="250" step="1" value="200"><output id="sLo"></output></div>
+      <div class="sl" id="slS"><span>Flydespænding</span><input id="sS" type="range" min="200" max="1000" step="10" value="400"><output id="sSo"></output></div>
+      <div class="status good" id="sV"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Overgangen ligger, hvor Euler giver <b class="or">halvdelen af S<sub>y</sub></b>. Stærkere stål flytter kun grænsen mod kortere søjler.</span></div>
+</section>
+
+<!-- ============ 3 · (b) P_cr og σ_cr ============ -->
+<section class="slide" data-title="(b) Knæklast">
+  <div class="hd"><span class="tag b">SPM. 1 (b) · 1/2</span><h1>Beregning: knæklast og spænding</h1></div>
+  <div class="chips" id="chips">
+    <span class="chip">E = 200 GPa<small>stål</small></span><span class="chip">S<sub>y</sub> = 400 MPa</span><span class="chip">d = 20 mm<small>massiv, rund</small></span>
+    <span class="chip or">L<sub>e</sub> = 1 m<small>= 1000 mm</small></span><span class="chip">leddet–leddet<small>K = 1</small></span>
+  </div>
+  <div class="body" style="grid-template-columns:780px 1fr">
+    <div class="card steps" style="padding:8px 24px">
+      <div class="step" id="b1"><span class="n">1</span><div class="t"><b>Inertimoment</b>
+        <span class="m" data-tex="I=\dfrac{\pi}{64}d^4=\dfrac{\pi}{64}\cdot20^4=7854\ \text{mm}^4"></span>
+        <span class="note">20⁴ = 160 000. Regn i mm, N og MPa hele vejen (1 MPa = 1 N/mm²)</span></div></div>
+      <div class="step" id="b2"><span class="n">2</span><div class="t"><b>Eulers knæklast (9.12)</b>
+        <span class="m" data-tex="P_{cr}=\dfrac{\pi^2\cdot200\,000\cdot7854}{1000^2}=15\,503\ \text{N}"></span>
+        <span class="m" data-tex="\boxed{P_{cr}\approx15{,}5\ \text{kN}}"></span>
+        <span class="note">svarer til godt 1,5 ton</span></div></div>
+      <div class="step" id="b3"><span class="n">3</span><div class="t"><b>Kritisk spænding</b>
+        <span class="m" data-tex="A=\dfrac{\pi}{4}\cdot20^2=314{,}2\ \text{mm}^2,\quad\sigma_{cr}=\dfrac{15\,503}{314{,}2}"></span>
+        <span class="m" data-tex="\boxed{\sigma_{cr}\approx49{,}3\ \text{MPa}}"></span></div></div>
+    </div>
+    <div class="card fl" id="cBc">
+      <h3>Hvad betyder tallet?</h3>
+      <canvas id="cB" width="1300" height="560"></canvas>
+      <h3 style="margin-top:6px">Hvad flytter P<sub>cr</sub>? Gør én ting dobbelt så stor</h3>
+      <canvas id="cB2" width="1300" height="300"></canvas>
+      <div class="status mid" id="bSt">Søjlen knækker ved <b>49 MPa</b>, kun <b>12 %</b> af flydespændingen. Det er <b>formen</b>, ikke materialet, der sætter grænsen.</div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>15,5 kN svarer til godt halvanden ton. Spændingen er kun 49 MPa, langt under S<sub>y</sub> = 400. Den knækker, længe før den flyder.</span></div>
+</section>
+
+<!-- ============ 4 · (b) Euler eller Johnson ============ -->
+<section class="slide" data-title="(b) Euler eller Johnson">
+  <div class="hd"><span class="tag b">SPM. 1 (b) · 2/2</span><h1>Kontrol: Euler eller Johnson?</h1></div>
+  <div class="body" style="grid-template-columns:600px 1fr">
+    <div class="card steps" style="padding:8px 24px">
+      <div class="step" id="b4"><span class="n">4</span><div class="t"><b>Søjlens slankhed</b>
+        <span class="m" data-tex="k=\dfrac d4=5\ \text{mm},\qquad\dfrac{L_e}{k}=\dfrac{1000}{5}=200"></span></div></div>
+      <div class="step" id="b5"><span class="n">5</span><div class="t"><b>Grænsen fra del (a)</b>
+        <span class="m" data-tex="\left(\dfrac{L_e}{k}\right)_{cr}=\sqrt{\dfrac{2\pi^2\cdot200\,000}{400}}=99{,}3"></span></div></div>
+      <div class="step" id="b6"><span class="n">6</span><div class="t"><b>Sammenlign</b>
+        <span class="m" data-tex="200>99{,}3\ \Rightarrow\ \textbf{Euler}"></span>
+        <span class="note">Kontrol: <span data-tex="\sigma_{cr}=49{,}3<S_y/2=200"></span> MPa <span class="ok">✓</span> · Underviserens slides bruger <span data-tex="\sqrt{\pi^2E/S_y}=70{,}2"></span> (overgang ved S<sub>y</sub>): også Euler</span></div></div>
+    </div>
+    <div class="card fl" style="padding:16px 18px">
+      <div style="display:grid;grid-template-columns:1fr 320px;gap:14px;flex:1;min-height:0">
+        <iframe class="lab" id="lab" style="height:100%" title="3D-søjle"></iframe>
+        <div class="col2" id="hv">
+          <h3 style="margin:0">Hvad nu hvis …</h3>
+          <button class="btn on" data-h="0">Opgaven: L = 1 m</button>
+          <button class="btn" data-h="1">L = 0,5 m (på grænsen)</button>
+          <button class="btn" data-h="2">L = 0,3 m (kort søjle)</button>
+          <button class="btn" data-h="3">d = 40 mm (dobbelt så tyk)</button>
+          <button class="btn" data-h="4">Indspændt–fri (flagstang)</button>
+          <div class="sl" id="slP" style="grid-template-columns:70px 1fr 64px;font-size:16px;margin-top:6px"><span>P/P<sub>cr</sub></span><input id="bP" type="range" min="0" max="105" step="1" value="60"><output id="bPo"></output></div>
+        </div>
+      </div>
+      <div class="ro" id="ro">
+        <div><span>SLANKHED L<sub>e</sub>/k</span><b id="oS">200</b><i id="oSr"></i></div>
+        <div><span>KNÆKLAST P<sub>cr</sub></span><b class="cy" id="oP">15,5</b><i id="oPr"></i></div>
+        <div><span>SPÆNDING σ<sub>cr</sub></span><b id="oT">49</b><i id="oTr"></i></div>
+      </div>
+      <div class="status good" id="oV">Euler: L<sub>e</sub>/k = 200 &gt; 99,3</div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>200 er dobbelt så slank som grænsen på 99, så det er en Euler-søjle. Var den under en halv meter, skulle Johnson bruges.</span></div>
 </section>
 
 </div></div>
@@ -195,117 +190,117 @@ iframe.lab{width:100%;border:2px solid var(--ink);display:block;background:#f4f7
 <script>
 (function () {
 'use strict';
-var $ = Deck.$, fmt = Deck.fmt, PI = Math.PI, RED = '#e2001a', BLUE = '#0047ab', INK = '#0b0b0b', MUT = '#6d6d6d', HAIR = '#d9d9d9';
+var $ = Deck.$, fmt = Deck.fmt, PI = Math.PI;
+var CY = '#0a7fc2', OR = '#d97a00', RD = '#d63a3a', GR = '#0a9a5c', INK = '#14202d', MUT = '#5a6b7d', LINE = '#d3dde8', P2 = '#ebf1f7';
 
-/* ===== A1: understøtninger ===== */
-var ENDS = [['Leddet–leddet', 1.0, function (s) { return Math.sin(PI * s); }],
-            ['Indspændt–fri', 2.0, function (s) { return 1 - Math.cos(PI * s / 2); }],
-            ['Indspændt–leddet', 0.7, function (s) { return 3.3 * s * s * (1 - s); }],
-            ['Indspændt–indspændt', 0.5, function (s) { return (1 - Math.cos(2 * PI * s)) / 2; }]];
+/* ===== (a) 1/2: understøtninger ===== */
+var ENDS = [['Leddet–leddet', 1.0, function (s) { return Math.sin(PI * s); }, 'stempelstang'],
+            ['Indspændt–fri', 2.0, function (s) { return 1 - Math.cos(PI * s / 2); }, 'flagstang'],
+            ['Indspændt–leddet', 0.7, function (s) { return 3.3 * s * s * (1 - s); }, 'svejst stiver'],
+            ['Indspændt–indspændt', 0.5, function (s) { return (1 - Math.cos(2 * PI * s)) / 2; }, 'støbt søjle']];
 var ei = 0;
 Deck.group('[data-e]', function (v) { ei = +v; drawE(); });
 function drawE() {
-  var g = Deck.cv('cE'), x = g.x, H = g.H; g.clear();
-  var e = ENDS[ei], cx = 300, top = 120, bot = H - 110, amp = 120;
-  /* ender */
-  function pin(y, up) { g.poly([[cx, y], [cx - 34, y + (up ? -44 : 44)], [cx + 34, y + (up ? -44 : 44)]], null, INK, 4); g.line([[cx - 56, y + (up ? -44 : 44)], [cx + 56, y + (up ? -44 : 44)]], INK, 4); }
-  function fixw(y, up) { g.rect(cx - 70, up ? y - 22 : y, 140, 22, INK); }
+  var g = Deck.cv('cE'); g.clear();
+  var e = ENDS[ei], cx = 230, top = 110, bot = g.H - 90, amp = 110;
+  function pin(y, up) { var d = up ? -40 : 40; g.poly([[cx, y], [cx - 30, y + d], [cx + 30, y + d]], P2, '#44586e', 4); g.line([[cx - 52, y + d], [cx + 52, y + d]], '#44586e', 4); }
+  function fixw(y, up) { g.rect(cx - 66, up ? y - 22 : y, 132, 22, '#44586e'); }
   if (ei === 0) { pin(bot, false); pin(top, true); }
-  if (ei === 1) { fixw(bot, false); }
+  if (ei === 1) fixw(bot, false);
   if (ei === 2) { fixw(bot, false); pin(top, true); }
   if (ei === 3) { fixw(bot, false); fixw(top, true); }
-  /* lige søjle (stiplet) og knækket form */
-  g.line([[cx, bot], [cx, top]], HAIR, 14);
+  g.line([[cx, bot], [cx, top]], LINE, 4, [8, 8]);
   var pts = []; for (var i = 0; i <= 80; i++) { var s = i / 80; pts.push([cx + amp * e[2](s), bot - s * (bot - top)]); }
-  g.line(pts, INK, 14);
-  /* P-pil */
-  var tx = cx + amp * e[2](1); g.arrow(tx, top - 110, tx, top - 8, RED, 7); g.txt('P', tx + 22, top - 70, 40, RED, 'left', 'middle', 800);
-  /* L_e markering */
-  var Le = e[1];
-  g.txt('L', 80, (top + bot) / 2, 40, MUT, 'left', 'middle', 800);
-  g.line([[120, top], [120, bot]], MUT, 2);
-  /* højre: tal */
-  var X0 = 620;
-  g.txt(e[0], X0, 170, 52, INK, 'left', 'middle', 800);
-  g.txt('Lₑ = ' + fmt(Le, 1) + ' · L', X0, 260, 72, RED, 'left', 'middle', 900);
-  g.txt('P_cr i forhold til leddet–leddet', X0, 380, 30, MUT, 'left', 'middle', 700);
-  var r = 1 / (Le * Le);
-  g.txt('× ' + fmt(r, 2), X0, 470, 110, INK, 'left', 'middle', 900);
-  /* søjlediagram for de fire */
-  var bx = X0, by = 760, bw = 150, sc = 52;
+  g.line(pts, CY, 14);
+  var tx = cx + amp * e[2](1); g.arrow(tx, top - 96, tx, top - 8, OR, 7); g.txt('P', tx + 22, top - 60, 38, OR, 'left', 'middle', 800);
+  g.line([[70, top], [70, bot]], MUT, 2); g.txt('L', 40, (top + bot) / 2, 36, MUT, 'left', 'middle', 700);
+  /* søjlediagram: P_cr i forhold til leddet–leddet */
+  var bx = 470, by = g.H - 90, bw = 100, sc = 125;
+  g.txt('P_cr i forhold til leddet–leddet', bx, 90, 30, MUT, 'left', 'middle', 600);
   ENDS.forEach(function (o, j) {
-    var rr = 1 / (o[1] * o[1]), h = rr * sc, px = bx + j * (bw + 30);
-    g.rect(px, by - h, bw, h, j === ei ? RED : HAIR);
-    g.txt(fmt(rr, 2), px + bw / 2, by - h - 22, 28, j === ei ? RED : MUT, 'center', 'middle', 800);
-    g.txt(['L–L', 'I–F', 'I–L', 'I–I'][j], px + bw / 2, by + 30, 26, INK, 'center', 'middle', 700);
+    var rr = 1 / (o[1] * o[1]), h = rr * sc, px = bx + j * (bw + 26);
+    g.rect(px, by - h, bw, h, j === ei ? RD : '#c9d5e1');
+    g.txt('×' + fmt(rr, rr < 1 ? 2 : 0), px + bw / 2, by - h - 24, 28, j === ei ? RD : MUT, 'center', 'middle', 800);
+    g.txt(['L–L', 'I–F', 'I–L', 'I–I'][j], px + bw / 2, by + 32, 26, INK, 'center', 'middle', 700);
   });
-  g.line([[bx - 10, by], [bx + 4 * (bw + 30), by]], INK, 3);
+  g.line([[bx - 10, by], [bx + 4 * (bw + 26) - 16, by]], INK, 3);
+  $('eLe').textContent = fmt(e[1], 1) + ' · L';
+  $('eR').textContent = '× ' + fmt(1 / (e[1] * e[1]), 2);
+  $('eEx').textContent = e[3];
 }
 drawE();
 
-/* ===== A2: Euler-hyperbel og Johnson-parabel ===== */
+/* ===== (a) 2/2: Euler-hyperbel og Johnson-parabel ===== */
 var SA = { sl: 200, Sy: 400 }, E = 200000;
-var rSL = Deck.range('sL', function (v) { SA.sl = v; drawS(); }, function (v) { return fmt(v, 0); });
+Deck.range('sL', function (v) { SA.sl = v; drawS(); }, function (v) { return fmt(v, 0); });
 Deck.range('sS', function (v) { SA.Sy = v; drawS(); }, function (v) { return fmt(v, 0) + ' MPa'; });
 function sigE(sl) { return PI * PI * E / (sl * sl); }
 function sigJ(sl, Sy) { return Sy - Math.pow(Sy * sl / (2 * PI), 2) / E; }
 function drawS() {
   var g = Deck.cv('cS'), x = g.x; g.clear();
-  var F = g.frame({ l: 150, r: 1650, t: 60, b: 920, x0: 0, x1: 250, y0: 0, y1: 1100 });
+  var F = g.frame({ l: 150, r: 1660, t: 50, b: 770, x0: 0, x1: 250, y0: 0, y1: 1100 });
   var Sy = SA.Sy, slc = Math.sqrt(2 * PI * PI * E / Sy);
-  /* akser */
-  g.line([[F.X(0), F.Y(1100)], [F.X(0), F.Y(0)], [F.X(250), F.Y(0)]], INK, 3);
-  [0, 50, 100, 150, 200, 250].forEach(function (v) { g.txt(String(v), F.X(v), F.Y(0) + 36, 28, MUT, 'center', 'middle', 600); });
-  [0, 200, 400, 600, 800, 1000].forEach(function (v) { g.txt(String(v), F.X(0) - 16, F.Y(v), 26, MUT, 'right', 'middle', 600); g.line([[F.X(0), F.Y(v)], [F.X(250), F.Y(v)]], v ? '#eeeeee' : INK, 1); });
-  g.txt('σ_cr [MPa]', F.X(0) + 12, F.Y(1100) + 6, 28, MUT, 'left', 'middle', 700);
-  g.txt('slankhed Lₑ/k', F.X(250), F.Y(0) + 76, 30, MUT, 'right', 'middle', 700);
+  [0, 200, 400, 600, 800, 1000].forEach(function (v) { g.line([[F.X(0), F.Y(v)], [F.X(250), F.Y(v)]], v ? '#e6ecf2' : LINE, 2); g.txt(String(v), F.X(0) - 16, F.Y(v), 26, MUT, 'right', 'middle', 600); });
+  [0, 50, 100, 150, 200, 250].forEach(function (v) { g.txt(String(v), F.X(v), F.Y(0) + 32, 26, MUT, 'center', 'middle', 600); });
+  g.line([[F.X(0), F.Y(1100)], [F.X(0), F.Y(0)], [F.X(250), F.Y(0)]], '#9fb0c2', 3);
+  g.txt('σ_cr [MPa]', F.X(0) + 14, F.Y(1100) + 8, 28, MUT, 'left', 'middle', 700);
+  g.txt('slankhed Lₑ/k', F.X(250), F.Y(0) + 70, 28, MUT, 'right', 'middle', 700);
   x.save(); x.beginPath(); x.rect(F.X(0), F.Y(1100), F.X(250) - F.X(0), F.Y(0) - F.Y(1100)); x.clip();
-  /* Sy og Sy/2 */
-  g.line([[F.X(0), F.Y(Sy)], [F.X(250), F.Y(Sy)]], MUT, 2, [10, 8]); g.txt('S_y', F.X(244), F.Y(Sy) - 20, 28, MUT, 'right', 'middle', 700);
-  g.line([[F.X(0), F.Y(Sy / 2)], [F.X(slc), F.Y(Sy / 2)]], RED, 2, [4, 6]);
-  /* Euler: ugyldig del stiplet, gyldig del fuld */
-  g.fn(F, sigE, 30, slc, HAIR, 5, [12, 10]);
-  g.fn(F, sigE, slc, 250, INK, 7);
-  g.fn(F, function (s) { return sigJ(s, Sy); }, 0, slc, RED, 7);
+  g.line([[F.X(0), F.Y(Sy)], [F.X(250), F.Y(Sy)]], MUT, 2, [10, 8]); g.txt('S_y = ' + Sy, F.X(246), F.Y(Sy) - 20, 26, MUT, 'right', 'middle', 700);
+  g.line([[F.X(0), F.Y(Sy / 2)], [F.X(slc), F.Y(Sy / 2)]], OR, 3, [4, 6]);
+  g.fn(F, sigE, 30, slc, '#b9c6d3', 5, [12, 10]);
+  g.fn(F, sigE, slc, 250, CY, 7);
+  g.fn(F, function (s) { return sigJ(s, Sy); }, 0, slc, OR, 7);
   x.restore();
-  /* overgang */
-  g.line([[F.X(slc), F.Y(0)], [F.X(slc), F.Y(Sy / 2)]], RED, 3, [6, 6]); g.dot(F.X(slc), F.Y(Sy / 2), 12, RED);
-  g.txt('(Lₑ/k)_cr = ' + fmt(slc, 1), F.X(slc) + 18, F.Y(Sy / 2) - 34, 32, RED, 'left', 'middle', 800);
-  g.txt('Johnson', F.X(slc * 0.35), F.Y(sigJ(slc * 0.35, Sy)) - 30, 32, RED, 'center', 'middle', 800);
-  var ex = slc + (250 - slc) * 0.3; g.txt('Euler', F.X(ex) + 10, F.Y(sigE(ex)) - 40, 32, INK, 'left', 'middle', 800);
-  /* markør */
+  g.line([[F.X(slc), F.Y(0)], [F.X(slc), F.Y(Sy / 2)]], OR, 3, [6, 6]); g.dot(F.X(slc), F.Y(Sy / 2), 12, OR);
+  g.txt('(Lₑ/k)_cr = ' + fmt(slc, 1), F.X(slc) + 18, F.Y(Sy / 2) - 32, 30, OR, 'left', 'middle', 800);
+  g.txt('Johnson', F.X(slc * 0.38), F.Y(sigJ(slc * 0.38, Sy)) - 30, 30, OR, 'center', 'middle', 800);
+  var ex = slc + (250 - slc) * 0.3; g.txt('Euler', F.X(ex) + 12, F.Y(sigE(ex)) - 38, 30, CY, 'left', 'middle', 800);
+  g.txt('Euler for kort: over S_y', F.X(48), F.Y(1040), 24, '#9fb0c2', 'left', 'middle', 600);
   var sl = SA.sl, eu = sl >= slc, s = eu ? sigE(sl) : sigJ(sl, Sy);
-  g.dot(F.X(sl), F.Y(s), 16, eu ? INK : RED); g.dot(F.X(sl), F.Y(s), 7, '#fff');
-  var v = $('sV'); v.className = 'verdict ' + (eu ? 'ok' : 'j');
-  v.innerHTML = (eu ? 'EULER' : 'JOHNSON') + ': L<sub>e</sub>/k = ' + fmt(sl, 0) + (eu ? ' &gt; ' : ' &lt; ') + fmt(slc, 1) + ' &nbsp;·&nbsp; σ<sub>cr</sub> = ' + fmt(s, 0) + ' MPa';
+  g.dot(F.X(sl), F.Y(s), 16, eu ? CY : OR); g.dot(F.X(sl), F.Y(s), 7, '#fff');
+  var v = $('sV'); v.className = 'status ' + (eu ? 'good' : 'mid');
+  v.innerHTML = '<b>' + (eu ? 'EULER' : 'JOHNSON') + '</b>: L<sub>e</sub>/k = ' + fmt(sl, 0) + (eu ? ' &gt; ' : ' &lt; ') + fmt(slc, 1) + ' &nbsp;·&nbsp; σ<sub>cr</sub> = ' + fmt(s, 0) + ' MPa';
 }
 drawS();
 
-/* ===== B1: hvor ligger 49 MPa ===== */
+/* ===== (b) 1/2: hvor ligger 49 MPa ===== */
 (function () {
   var g = Deck.cv('cB'); g.clear();
-  var L = 60, R = 1060, y = 120, h = 110, S = (R - L) / 420;
-  g.rect(L, y, 400 * S, h, '#f3f3f3'); g.rect(L, y, 49.3 * S, h, RED);
-  g.line([[L + 200 * S, y - 20], [L + 200 * S, y + h + 20]], INK, 3, [8, 6]);
-  g.line([[L + 400 * S, y - 20], [L + 400 * S, y + h + 20]], INK, 4);
-  g.txt('49,3', L + 49.3 * S + 14, y + h / 2, 44, INK, 'left', 'middle', 900);
-  g.txt('S_y/2 = 200', L + 200 * S, y + h + 52, 30, INK, 'center', 'middle', 700);
-  g.txt('S_y = 400 MPa', L + 400 * S, y - 46, 30, INK, 'right', 'middle', 700);
-  /* last-sammenligning */
-  var y2 = 520;
-  g.txt('LAST', L, y2 - 60, 26, MUT, 'left', 'middle', 800);
-  var Py = 400 * 314.16 / 1000; /* kN før flydning */
-  g.rect(L, y2, (R - L), 90, '#f3f3f3'); g.rect(L, y2, (R - L) * 15.5 / Py, 90, INK);
-  g.txt('P_cr = 15,5 kN', L + (R - L) * 15.5 / Py + 16, y2 + 45, 34, INK, 'left', 'middle', 800);
-  g.txt('Last til flydning: S_y · A = ' + fmt(Py, 0) + ' kN', L, y2 + 150, 30, MUT, 'left', 'middle', 700);
-  g.txt('knæk ved 12 % af det, materialet kan tåle', L, y2 + 200, 30, RED, 'left', 'middle', 800);
+  var L = 40, R = 1250, y = 110, h = 96, S = (R - L) / 420;
+  g.txt('SPÆNDING', L, 50, 24, MUT, 'left', 'middle', 700);
+  g.rect(L, y, 400 * S, h, P2); g.rect(L, y, 49.3 * S, h, CY);
+  g.line([[L + 200 * S, y - 16], [L + 200 * S, y + h + 16]], OR, 4, [8, 6]);
+  g.line([[L + 400 * S, y - 16], [L + 400 * S, y + h + 16]], RD, 4);
+  g.txt('σ_cr = 49,3', L + 49.3 * S + 14, y + h / 2, 38, INK, 'left', 'middle', 800);
+  g.txt('S_y/2 = 200', L + 200 * S, y + h + 44, 28, OR, 'center', 'middle', 700);
+  g.txt('S_y = 400 MPa', L + 400 * S, y - 34, 28, RD, 'right', 'middle', 700);
+  var y2 = 380, Py = 400 * 314.16 / 1000;
+  g.txt('LAST', L, y2 - 40, 24, MUT, 'left', 'middle', 700);
+  g.rect(L, y2, R - L, 80, P2); g.rect(L, y2, (R - L) * 15.5 / Py, 80, CY);
+  g.txt('P_cr = 15,5 kN', L + (R - L) * 15.5 / Py + 16, y2 + 40, 32, INK, 'left', 'middle', 800);
+  g.txt('flydning: S_y · A = ' + fmt(Py, 0) + ' kN', R - 10, y2 + 40, 28, MUT, 'right', 'middle', 700);
+  g.txt('knæk ved 12 % af det, materialet kan tåle', L, y2 + 130, 30, RD, 'left', 'middle', 800);
 })();
 
-/* ===== B2: hvad nu hvis + lab ===== */
+(function () {
+  var g = Deck.cv('cB2'); g.clear();
+  var R = [['d (tykkelse)', 16, CY, 'd i 4. potens'], ['E (stivhed)', 2, GR, 'lineært'], ['S_y (styrke)', 1, MUT, 'står ikke i formlen'], ['Lₑ (længde)', 0.25, RD, 'i anden, under brøkstregen']];
+  var L = 250, S = 42, h = 46;
+  R.forEach(function (r, i) {
+    var y = 20 + i * 70, w = Math.max(6, r[1] * S);
+    g.txt(r[0], L - 16, y + h / 2, 28, INK, 'right', 'middle', 700);
+    g.rect(L, y, w, h, r[2]);
+    g.txt('×' + fmt(r[1], r[1] < 1 ? 2 : 0) + '  ' + r[3], L + w + 14, y + h / 2, 26, r[2] === MUT ? MUT : r[2], 'left', 'middle', 700);
+  });
+  g.line([[L + S, 10], [L + S, 290]], '#9fb0c2', 2, [6, 6]);
+})();
+
+/* ===== (b) 2/2: hvad nu hvis + lab ===== */
 var KE = { pp: 1, ff: 2 }, HV = [{ L: 1, d: 20, end: 'pp' }, { L: 0.5, d: 20, end: 'pp' }, { L: 0.3, d: 20, end: 'pp' }, { L: 1, d: 40, end: 'pp' }, { L: 1, d: 20, end: 'ff' }];
 var B = { L: 1, d: 20, end: 'pp', frac: 0.6 };
 function calc(b) {
-  var A = PI * b.d * b.d / 4, I = PI * Math.pow(b.d, 4) / 64, k = b.d / 4, Le = KE[b.end] * b.L * 1000, sl = Le / k, Sy = 400;
+  var A = PI * b.d * b.d / 4, k = b.d / 4, Le = KE[b.end] * b.L * 1000, sl = Le / k, Sy = 400;
   var slc = Math.sqrt(2 * PI * PI * E / Sy), eu = sl >= slc, s = eu ? sigE(sl) : sigJ(sl, Sy);
   return { sl: sl, slc: slc, eu: eu, s: s, P: s * A };
 }
@@ -322,9 +317,9 @@ function upd() {
   $('oP').textContent = fmt(K.P / 1000, K.P < 1e5 ? 1 : 0) + ' kN'; Deck.rel('oPr', K.P, B0.P);
   $('oT').textContent = fmt(K.s, 0) + ' MPa'; Deck.rel('oTr', K.s, B0.s);
   var v = $('oV');
-  v.className = 'verdict ' + (K.eu ? 'ok' : 'j');
-  v.innerHTML = K.eu ? 'EULER: L<sub>e</sub>/k = ' + fmt(K.sl, 0) + ' &gt; ' + fmt(K.slc, 1) + (K.sl < 1.05 * K.slc ? ' (lige på grænsen)' : '')
-                     : 'JOHNSON: L<sub>e</sub>/k = ' + fmt(K.sl, 0) + ' &lt; ' + fmt(K.slc, 1) + '. Euler ville give ' + fmt(sigE(K.sl), 0) + ' MPa &gt; S<sub>y</sub>';
+  v.className = 'status ' + (K.eu ? 'good' : 'mid');
+  v.innerHTML = K.eu ? '<b>EULER</b>: L<sub>e</sub>/k = ' + fmt(K.sl, 0) + ' &gt; ' + fmt(K.slc, 1) + (K.sl < 1.05 * K.slc ? ' (lige på grænsen)' : '')
+                     : '<b>JOHNSON</b>: L<sub>e</sub>/k = ' + fmt(K.sl, 0) + ' &lt; ' + fmt(K.slc, 1) + '. Euler ville give ' + fmt(sigE(K.sl), 0) + ' MPa &gt; S<sub>y</sub>';
   send();
 }
 upd();

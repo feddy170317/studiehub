@@ -5,185 +5,152 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Spm. 2 · Trykbeholder</title>
 <meta name="description" content="Fremlæggelse af MEM1 eksamensspørgsmål 2: Lamés ligninger for tykvæggede cylindre, med 3D-lab indlejret.">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-<style>
-/* Design: blueprint / teknisk tegning. Lyseblåt kvadratpapir, navy streg, tegningshoved nederst til højre, mono-etiketter. */
-:root{--paper:#eef4fb;--grid:#d6e3f1;--grid2:#c3d5ea;--ink:#12355b;--mut:#56708e;--line:#12355b;--acc:#1f78d1;--hot:#e8590c;--cold:#1f9d8f;--card:#f8fbfe;--chart-font:"IBM Plex Sans Condensed",sans-serif}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--paper);color:var(--ink);font-family:"IBM Plex Sans Condensed",sans-serif;overflow:hidden}
-.vp{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
-.deck{position:relative;width:1600px;height:900px;flex:none;transform-origin:center}
-.slide{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .3s;padding:28px 30px;
-  background-color:var(--paper);
-  background-image:linear-gradient(var(--grid2) 1px,transparent 1px),linear-gradient(90deg,var(--grid2) 1px,transparent 1px),linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
-  background-size:100px 100px,100px 100px,20px 20px,20px 20px}
-.slide.on{opacity:1;visibility:visible}
-.frame{position:absolute;inset:22px;border:2px solid var(--line);outline:1px solid var(--line);outline-offset:-8px;display:grid;grid-template-rows:84px 1fr 92px}
-.hd{display:flex;align-items:center;gap:22px;padding:0 30px;border-bottom:1px solid var(--line)}
-.hd .id{font:600 15px "IBM Plex Mono",monospace;border:1.5px solid var(--line);padding:6px 10px;letter-spacing:.06em}
-.hd h1{font-size:40px;font-weight:700;letter-spacing:.01em;text-transform:uppercase}
-.bd{display:grid;gap:22px;padding:22px 30px;min-height:0}
-.pnl{background:var(--card);border:1.5px solid var(--line);position:relative;padding:16px 18px;min-height:0;display:flex;flex-direction:column;gap:10px}
-.pnl::before,.pnl::after{content:"";position:absolute;width:14px;height:14px;border:3px solid var(--acc)}
-.pnl::before{left:-5px;top:-5px;border-right:0;border-bottom:0}.pnl::after{right:-5px;bottom:-5px;border-left:0;border-top:0}
-.cap{font:600 13px "IBM Plex Mono",monospace;letter-spacing:.08em;color:var(--mut);text-transform:uppercase}
-.fq{font-size:36px;text-align:center;padding:4px 0}
-.leg{display:grid;grid-template-columns:70px 1fr;gap:6px 12px;font-size:20px;line-height:1.3;align-items:baseline}
-.leg .s{font-size:24px;text-align:center}
-.tb{display:grid;grid-template-columns:1fr 330px 160px 160px;border-top:1px solid var(--line)}
-.tb>div{border-left:1px solid var(--line);padding:10px 14px;display:flex;flex-direction:column;justify-content:center}
-.tb>div:first-child{border-left:0;font-size:20px;line-height:1.35;flex-direction:row;align-items:center;gap:14px;justify-content:flex-start}
-.tb small{font:600 11px "IBM Plex Mono",monospace;letter-spacing:.1em;color:var(--mut)}
-.tb b{font-size:20px}
-.tb .say{font:600 13px "IBM Plex Mono",monospace;background:var(--ink);color:var(--paper);padding:6px 8px;white-space:nowrap}
-.hot{color:var(--hot)}.cold{color:var(--cold)}.acc{color:var(--acc)}.m{color:var(--mut)}
-.tabs{display:flex;gap:8px;flex-wrap:wrap}
-.tabs button{font:600 15px "IBM Plex Mono",monospace;background:var(--card);color:var(--ink);border:1.5px solid var(--line);padding:9px 12px;cursor:pointer}
-.tabs button.on{background:var(--ink);color:var(--paper)}
-.sl{display:grid;grid-template-columns:170px 1fr 120px;gap:12px;align-items:center;font-size:18px}
-.sl input{width:100%;accent-color:var(--acc)}
-.sl output{font:600 18px "IBM Plex Mono",monospace;text-align:right}
-.ro{display:grid;grid-template-columns:repeat(4,1fr);border:1.5px solid var(--line)}
-.ro div{padding:8px 12px;border-left:1px solid var(--line)}.ro div:first-child{border-left:0}
-.ro span{display:block;font:600 11px "IBM Plex Mono",monospace;letter-spacing:.08em;color:var(--mut)}
-.ro b{font:600 26px "IBM Plex Mono",monospace}
-.ro i{display:block;font:normal 13px "IBM Plex Mono",monospace}
-.up{color:var(--hot)}.dn{color:var(--cold)}i.eq{color:var(--mut)}
-.rw{display:grid;grid-template-columns:44px 1fr;gap:12px;padding:12px 0;border-bottom:1px dashed var(--grid2)}
-.rw:last-child{border-bottom:0}
-.rw .k{font:600 22px "IBM Plex Mono",monospace;color:var(--acc);border:1.5px solid var(--acc);height:40px;display:flex;align-items:center;justify-content:center}
-.rw h4{font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
-.rw .e{font-size:27px;margin-top:2px}
-.rw .c{font-size:18px;color:var(--mut)}
-.box{display:inline-block;border:2px solid var(--hot);padding:3px 12px;margin-top:4px;font-size:28px}
-canvas{display:block;width:100%}
-.nt{text-transform:none}
-.b2s .rw .e{font-size:23px}
-iframe.lab{width:100%;border:1.5px solid var(--line);display:block;background:#f4f7fa}
-.dnav{position:fixed;left:50%;transform:translateX(-50%);bottom:4px;display:flex;gap:6px;align-items:center;font:600 13px "IBM Plex Mono",monospace;color:var(--mut);z-index:9;opacity:.85}
-.dnav .dots{display:flex;gap:5px}.dnav .dots i{width:9px;height:9px;border:1.5px solid var(--ink);cursor:pointer}.dnav .dots i.on{background:var(--ink)}
-.dnav button{width:30px;height:24px;border:1.5px solid var(--ink);background:var(--card);cursor:pointer;font-size:14px;color:var(--ink)}
-</style>
+<link rel="stylesheet" href="../assets/s7.css">
 </head>
 <body>
 <div class="vp"><div class="deck">
 
-<!-- 0 · forside -->
+<!-- ============ 0 · FORSIDE ============ -->
 <section class="slide on" data-title="Forside">
-  <div class="frame" style="grid-template-rows:1fr 92px">
-    <div style="display:grid;grid-template-columns:1fr 520px;gap:40px;padding:60px 60px 30px;align-items:center">
-      <div>
-        <div class="cap">MEM1 · KAP. 10 · CYLINDRE · EKSAMENSSPØRGSMÅL 02</div>
-        <h1 style="font-size:96px;line-height:.95;font-weight:700;text-transform:uppercase;margin-top:18px">Tykvæggede<br>trykbeholdere</h1>
-        <p style="font-size:28px;margin-top:20px">Lamés ligninger: hvorfor <span class="hot">indersiden</span> af væggen tager det hårdeste slæb.</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:40px">
-          <div class="pnl"><div class="cap acc">Del A · Redegør</div><div style="font-size:20px;line-height:1.4">Lamés ligninger for <span data-tex="\sigma_\theta"></span> og <span data-tex="\sigma_r"></span> under indvendigt tryk <span data-tex="p_i"></span>. Hvor er omkredsspændingen størst?</div></div>
-          <div class="pnl"><div class="cap acc">Del B · Beregn</div><div style="font-size:20px;line-height:1.4"><span data-tex="r_i=40"></span> mm, <span data-tex="r_o=60"></span> mm, <span data-tex="p_i=50"></span> MPa, <span data-tex="p_o=0"></span>. Find <span data-tex="\sigma_\theta"></span> og <span data-tex="\sigma_r"></span> ved <span data-tex="r=r_i"></span>.</div></div>
-        </div>
-      </div>
-      <canvas id="c0" width="1040" height="1040"></canvas>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:34px;padding:0 30px">
+    <div>
+      <div class="tag" style="display:inline-block">MEM1 · KAP. 10 · EKSAMENSSPØRGSMÅL 2</div>
+      <h1 style="font-size:76px;margin-top:22px">Tykvæggede trykbeholdere</h1>
+      <div style="font-size:30px;color:var(--mut);margin-top:8px">Lamés ligninger: hvorfor <b class="rd">indersiden</b> af væggen tager det hårdeste slæb</div>
     </div>
-    <div class="tb"><div class="m" style="font-size:16px">→ / mellemrum / klikker: næste · ←: forrige · F: fuld skærm</div><div><small>EMNE</small><b>Hydraulikcylinder</b></div><div><small>ARK</small><b>0 / 4</b></div><div><small>SPM.</small><b>02</b></div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:26px">
+      <div class="card qcard" id="qa"><span class="lbl cy">(a) FORKLAR · 2 SLIDES</span>
+        Lamés ligninger for omkredsspændingen <span data-tex="\sigma_\theta"></span> og radialspændingen <span data-tex="\sigma_r"></span> under indvendigt tryk <span data-tex="p_i"></span>. Hvor i væggen er <span data-tex="\sigma_\theta"></span> størst, og hvorfor?</div>
+      <div class="card qcard" id="qb"><span class="lbl or">(b) BEREGN · 2 SLIDES</span>
+        Hydraulikcylinder:<br><span data-tex="r_i=40\text{ mm},\ r_o=60\text{ mm},\ p_i=50\text{ MPa},\ p_o=0"></span><br>Find <span data-tex="\sigma_\theta"></span> og <span data-tex="\sigma_r"></span> på indersiden, <span data-tex="r=r_i"></span>.</div>
+    </div>
   </div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum / klikker: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm &nbsp;·&nbsp; 3D-cylinderen kan drejes med musen</div>
 </section>
 
-<!-- 1 · A1 Lamé -->
-<section class="slide" data-title="A · Lamé">
-  <div class="frame">
-    <div class="hd"><span class="id">A-01</span><h1>Lamés ligninger: spændingen gennem væggen</h1></div>
-    <div class="bd" style="grid-template-columns:640px 1fr">
-      <div class="pnl">
-        <div class="cap">Indvendigt tryk, p<sub>o</sub> = 0</div>
-        <div class="fq" data-tex="\sigma_\theta=\color{#1f78d1}{\dfrac{p_i r_i^2}{r_o^2-r_i^2}}\left(1\color{#e8590c}{+}\dfrac{r_o^2}{r^2}\right)"></div>
-        <div class="fq" data-tex="\sigma_r=\color{#1f78d1}{\dfrac{p_i r_i^2}{r_o^2-r_i^2}}\left(1\color{#1f9d8f}{-}\dfrac{r_o^2}{r^2}\right)"></div>
-        <div class="leg">
-          <span class="s hot" data-tex="\sigma_\theta"></span><span><b>Omkredsspænding</b> (tangentiel). Træk, der vil flække røret på langs, som båndene om en tønde</span>
-          <span class="s cold" data-tex="\sigma_r"></span><span><b>Radialspænding.</b> Tryk gennem væggen: <span data-tex="-p_i"></span> inde, 0 ude</span>
-          <span class="s acc" data-tex="\tfrac{p_ir_i^2}{r_o^2-r_i^2}"></span><span><b>Fælles niveau.</b> Trykket fordelt på vægarealet (det er også <span data-tex="\sigma_z"></span> med lukkede ender)</span>
-          <span class="s" data-tex="\tfrac{r_o^2}{r^2}"></span><span><b>Afstandsleddet.</b> Størst ved <span data-tex="r=r_i"></span>, falder med <span data-tex="1/r^2"></span> ud gennem væggen</span>
-        </div>
-      </div>
-      <div class="pnl">
-        <div class="cap">Snit gennem væggen · træk i r</div>
-        <canvas id="cA" width="1560" height="860"></canvas>
-        <div class="sl"><span>Radius r</span><input id="aR" type="range" min="40" max="60" step="0.5" value="40"><output id="aRo"></output></div>
-        <div class="ro"><div><span>σθ(r)</span><b class="hot" id="aT">130</b></div><div><span>σr(r)</span><b class="cold" id="aS">−50</b></div><div><span>σθ − σr</span><b id="aD">180</b></div><div><span>STED</span><b id="aW" style="font-size:20px">inderside</b></div></div>
+<!-- ============ 1 · (a) Lamé ============ -->
+<section class="slide" data-title="(a) Lamé">
+  <div class="hd"><span class="tag">SPM. 2 (a) · 1/2</span><h1>Lamés ligninger: spændingen gennem væggen</h1></div>
+  <div class="body" style="grid-template-columns:400px 600px 1fr">
+    <div class="card fl" id="fig">
+      <h3>Røret er ringe i ringe</h3>
+      <canvas id="cRing" width="760" height="760"></canvas>
+      <div class="txt" style="text-align:center">Trykket <b class="cy">skubber</b> hver ring udad. Ringen <b class="rd">strækkes</b> på langs af omkredsen og <b class="gr">klemmes</b> gennem tykkelsen. Farven viser <span data-tex="\sigma_\theta"></span>.</div>
+    </div>
+
+    <div class="card" id="fL">
+      <h3>Indvendigt tryk, p<sub>o</sub> = 0 (10.23–10.24)</h3>
+      <div class="big" style="font-size:34px;padding:6px 0 0" data-tex="\color{#d63a3a}{\sigma_\theta}=\color{#0a7fc2}{\dfrac{p_i r_i^2}{r_o^2-r_i^2}}\left(1+\color{#d97a00}{\dfrac{r_o^2}{r^2}}\right)"></div>
+      <div class="big" style="font-size:34px;padding:2px 0 4px" data-tex="\color{#0a9a5c}{\sigma_r}=\color{#0a7fc2}{\dfrac{p_i r_i^2}{r_o^2-r_i^2}}\left(1-\color{#d97a00}{\dfrac{r_o^2}{r^2}}\right)"></div>
+      <div class="terms">
+        <div class="term" id="tT"><span class="s rd" data-tex="\sigma_\theta"></span><span><b>Omkredsspænding.</b> Træk, der vil flække røret på langs, som båndene om en tønde</span></div>
+        <div class="term" id="tR"><span class="s gr" data-tex="\sigma_r"></span><span><b>Radialspænding.</b> Tryk gennem væggen: <span data-tex="-p_i"></span> inde, 0 ude</span></div>
+        <div class="term" id="tA"><span class="s cy" data-tex="\tfrac{p_ir_i^2}{r_o^2-r_i^2}"></span><span><b>Fælles niveau.</b> Trykket fordelt på vægarealet. Det er også <span data-tex="\sigma_z"></span> med lukkede ender</span></div>
+        <div class="term" id="tB"><span class="s or" data-tex="\tfrac{r_o^2}{r^2}"></span><span><b>Afstandsleddet.</b> Størst ved <span data-tex="r=r_i"></span>, falder med <span data-tex="1/r^2"></span> ud gennem væggen. Plus i <span data-tex="\sigma_\theta"></span>, minus i <span data-tex="\sigma_r"></span></span></div>
       </div>
     </div>
-    <div class="tb"><div><span class="say">SIG</span><span>Røret er et sæt ringe inden i hinanden. Trykket strækker dem (σ<sub>θ</sub>, træk) og klemmer dem (σ<sub>r</sub>, tryk). Begge er numerisk størst inderst.</span></div><div><small>EMNE</small><b>Lamé · del A</b></div><div><small>ARK</small><b>1 / 4</b></div><div><small>SPM.</small><b>02</b></div></div>
+
+    <div class="card fl" id="cRr">
+      <h3>Spændingerne hen gennem væggen</h3>
+      <canvas id="cA" width="720" height="560"></canvas>
+      <div class="sl" id="slR"><span>Radius r</span><input id="aR" type="range" min="40" max="60" step="0.5" value="40"><output id="aRo"></output></div>
+      <div class="ro">
+        <div><span>σ<sub>θ</sub>(r)</span><b class="rd" id="aT">130</b></div>
+        <div><span>σ<sub>r</sub>(r)</span><b class="gr" id="aS">−50</b></div>
+        <div><span>STED</span><b id="aW" style="font-size:21px;font-family:system-ui">inderside</b></div>
+      </div>
+    </div>
   </div>
+  <div class="ft"><b class="say">SIG</b><span>Røret er ringe i ringe. Trykket strækker dem (<b class="rd">σ<sub>θ</sub></b>, træk) og klemmer dem (<b class="gr">σ<sub>r</sub></b>, tryk). Begge er størst inderst.</span></div>
 </section>
 
-<!-- 2 · A2 maks + lab -->
-<section class="slide" data-title="A · Hvor er max">
-  <div class="frame">
-    <div class="hd"><span class="id">A-02</span><h1>Hvor er <span class="nt">σ<sub>θ</sub></span> størst, og hvorfor?</h1></div>
-    <div class="bd" style="grid-template-columns:560px 1fr">
-      <div class="pnl">
-        <div class="cap">Svaret: på indersiden, <span class="nt">r = r<sub>i</sub></span></div>
-        <div class="fq" style="font-size:32px" data-tex="\sigma_{\theta,max}=p_i\,\dfrac{r_o^2+r_i^2}{r_o^2-r_i^2}"></div>
-        <div style="font-size:20px;line-height:1.42">
-          <p><b>1 · Leddet <span data-tex="r_o^2/r^2"></span></b> er størst, hvor <span data-tex="r"></span> er mindst.</p>
-          <p style="margin-top:8px"><b>2 · Fysisk:</b> alle ringe skubbes næsten lige langt ud. Den inderste ring er kortest, så den <span class="hot">strækkes mest i procent</span>.</p>
-          <p style="margin-top:8px"><b>3 · Tykkere væg hjælper mindre og mindre:</b> <span data-tex="\sigma_{\theta,max}"></span> kommer aldrig under <span data-tex="p_i"></span>.</p>
-        </div>
-        <canvas id="cW" width="1040" height="470"></canvas>
+<!-- ============ 2 · (a) Hvor er max ============ -->
+<section class="slide" data-title="(a) Hvor er max">
+  <div class="hd"><span class="tag">SPM. 2 (a) · 2/2</span><h1>Hvor er σ<sub>θ</sub> størst, og hvorfor?<small>altid på indersiden</small></h1></div>
+  <div class="body" style="grid-template-columns:600px 1fr">
+    <div class="card" id="fM">
+      <h3>Maksimum ved r = r<sub>i</sub> (10.26)</h3>
+      <div class="big" style="font-size:36px" data-tex="\sigma_{\theta,max}=p_i\,\dfrac{\color{#0a7fc2}{r_o^2}+r_i^2}{\color{#0a7fc2}{r_o^2}-r_i^2}"></div>
+      <div class="terms">
+        <div class="term" id="m1"><span class="s or" data-tex="r_o^2/r^2"></span><span><b>Matematisk:</b> leddet er størst, hvor <span data-tex="r"></span> er mindst, altså inderst</span></div>
+        <div class="term" id="m2"><span class="s rd">ring</span><span><b>Fysisk:</b> alle ringe skubbes næsten lige langt ud. Den inderste ring er kortest, så den <b class="rd">strækkes mest i procent</b></span></div>
+        <div class="term" id="m3"><span class="s cy" data-tex="r_o\uparrow"></span><span><b>Tykkere væg</b> hjælper mindre og mindre: <span data-tex="\sigma_{\theta,max}"></span> kommer aldrig under <span data-tex="p_i"></span></span></div>
       </div>
-      <div class="pnl">
-        <iframe class="lab" id="labA" style="flex:1;min-height:0" title="3D-trykbeholder"></iframe>
-        <div class="sl"><span>Yderradius r<sub>o</sub></span><input id="wO" type="range" min="44" max="140" step="1" value="60"><output id="wOo"></output></div>
-        <div class="ro"><div><span>σθ INDERST</span><b class="hot" id="wI">130</b><i id="wIr"></i></div><div><span>σθ YDERST</span><b id="wY">80</b><i id="wYr"></i></div><div><span>TYNDVÆGGET p·r/t</span><b id="wT">100</b></div><div><span>FEJL VED TYNDV.</span><b id="wF">−23 %</b></div></div>
+      <canvas id="cW" width="1040" height="400" style="margin-top:10px"></canvas>
+    </div>
+    <div class="card fl" style="padding:16px 18px" id="cLab">
+      <iframe class="lab" id="labA" style="flex:1;min-height:0" title="3D-trykbeholder"></iframe>
+      <div class="sl" id="slO"><span>Yderradius r<sub>o</sub></span><input id="wO" type="range" min="44" max="140" step="1" value="60"><output id="wOo"></output></div>
+      <div class="ro r4">
+        <div><span>σ<sub>θ</sub> INDERST</span><b class="rd" id="wI">130</b><i id="wIr"></i></div>
+        <div><span>σ<sub>θ</sub> YDERST</span><b id="wY">80</b><i id="wYr"></i></div>
+        <div><span>TYNDVÆGGET p·r/t</span><b class="gr" id="wT">100</b></div>
+        <div><span>FEJL VED TYNDV.</span><b id="wF">−23 %</b></div>
       </div>
     </div>
-    <div class="tb"><div><span class="say">SIG</span><span>Maksimum ligger altid inderst. Den tyndvæggede formel undervurderer det, når væggen er tyk, og ekstra tykkelse kan aldrig få spændingen under p<sub>i</sub>.</span></div><div><small>EMNE</small><b>Maksimum · del A</b></div><div><small>ARK</small><b>2 / 4</b></div><div><small>SPM.</small><b>02</b></div></div>
   </div>
+  <div class="ft"><b class="say">SIG</b><span>Maksimum ligger altid inderst. Tyndvæggede formler undervurderer det, og ekstra tykkelse får aldrig spændingen under p<sub>i</sub>.</span></div>
 </section>
 
-<!-- 3 · B1 beregning -->
-<section class="slide" data-title="B · Beregning">
-  <div class="frame">
-    <div class="hd"><span class="id">B-01</span><h1>Beregning på indersiden, <span class="nt">r = r<sub>i</sub> = 40 mm</span></h1></div>
-    <div class="bd" style="grid-template-columns:1fr 560px">
-      <div class="pnl" style="padding:8px 22px">
-        <div class="rw"><span class="k">1</span><div><h4>Kvadrater og fælles niveau</h4><div class="e" data-tex="r_i^2=1600,\quad r_o^2=3600,\quad \dfrac{p_ir_i^2}{r_o^2-r_i^2}=\dfrac{50\cdot1600}{2000}=40\ \text{MPa}"></div></div></div>
-        <div class="rw"><span class="k">2</span><div><h4>Afstandsleddet ved <span class="nt">r = r<sub>i</sub></span></h4><div class="e" data-tex="\dfrac{r_o^2}{r_i^2}=\dfrac{3600}{1600}=2{,}25"></div></div></div>
-        <div class="rw"><span class="k">3</span><div><h4>Omkredsspænding</h4><div class="e" data-tex="\sigma_\theta=40\,(1+2{,}25)"></div><div class="box hot" data-tex="\sigma_\theta=+130\ \text{MPa}\ \ (\text{træk})"></div></div></div>
-        <div class="rw"><span class="k">4</span><div><h4>Radialspænding</h4><div class="e" data-tex="\sigma_r=40\,(1-2{,}25)"></div><div class="box" style="border-color:var(--cold)" data-tex="\sigma_r=-50\ \text{MPa}=-p_i\ \checkmark"></div><div class="c">Randbetingelse: inderst må σ<sub>r</sub> være lig med trykket. Det er en god kontrol.</div></div></div>
-      </div>
-      <div class="pnl">
-        <div class="cap">Element på indersiden</div>
-        <canvas id="cB" width="1040" height="1040"></canvas>
-        <div style="font-size:19px;line-height:1.4">130 MPa svarer til, at <b>hver mm²</b> af væggen trækkes med 13 kg. Trykket på 50 MPa = 500 bar er hydraulik i den tunge ende.</div>
-      </div>
-    </div>
-    <div class="tb"><div><span class="say">SIG</span><span>Først det fælles niveau 40 MPa, så afstandsleddet 2,25. Plus giver 130 MPa træk, minus giver −50 MPa, præcis trykket.</span></div><div><small>EMNE</small><b>Beregning · del B</b></div><div><small>ARK</small><b>3 / 4</b></div><div><small>SPM.</small><b>02</b></div></div>
+<!-- ============ 3 · (b) Beregning ============ -->
+<section class="slide" data-title="(b) Beregning">
+  <div class="hd"><span class="tag b">SPM. 2 (b) · 1/2</span><h1>Beregning på indersiden, r = r<sub>i</sub> = 40 mm</h1></div>
+  <div class="chips" id="chips">
+    <span class="chip">r<sub>i</sub> = 40 mm</span><span class="chip">r<sub>o</sub> = 60 mm<small>væg 20 mm</small></span>
+    <span class="chip or">p<sub>i</sub> = 50 MPa<small>= 500 bar</small></span><span class="chip">p<sub>o</sub> = 0<small>atmosfære</small></span>
   </div>
+  <div class="body" style="grid-template-columns:820px 1fr">
+    <div class="card steps tight" style="padding:4px 24px">
+      <div class="step" id="b1"><span class="n">1</span><div class="t"><b>Kvadrater og fælles niveau</b>
+        <span class="m" data-tex="r_i^2=1600,\ \ r_o^2=3600,\quad\dfrac{p_ir_i^2}{r_o^2-r_i^2}=\dfrac{50\cdot1600}{2000}=40\ \text{MPa}"></span></div></div>
+      <div class="step" id="b2"><span class="n">2</span><div class="t"><b>Afstandsleddet ved r = r<sub>i</sub></b>
+        <span class="m" data-tex="\dfrac{r_o^2}{r_i^2}=\dfrac{3600}{1600}=2{,}25"></span></div></div>
+      <div class="step" id="b3"><span class="n">3</span><div class="t"><b>Omkredsspænding</b>
+        <span class="m" data-tex="\sigma_\theta=40\,(1+2{,}25)\ \Rightarrow\ \boxed{\sigma_\theta=+130\ \text{MPa (træk)}}"></span></div></div>
+      <div class="step" id="b4"><span class="n">4</span><div class="t"><b>Radialspænding</b>
+        <span class="m" data-tex="\sigma_r=40\,(1-2{,}25)\ \Rightarrow\ \boxed{\sigma_r=-50\ \text{MPa}=-p_i}\ \checkmark"></span>
+        <span class="note">Randbetingelse: inderst må σ<sub>r</sub> være lig med trykket. Det er en gratis kontrol</span></div></div>
+    </div>
+    <div class="card fl" id="cEl">
+      <h3>Et lille element på indersiden</h3>
+      <canvas id="cB" width="900" height="680"></canvas>
+      <div class="status mid">130 MPa: hver mm² af væggen trækkes med godt 13 kg. 50 MPa = 500 bar er hydraulik i den tunge ende.</div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Først det fælles niveau 40 MPa, så afstandsleddet 2,25. Plus giver 130 MPa træk, minus giver −50, præcis trykket.</span></div>
 </section>
 
-<!-- 4 · B2 vurdering -->
-<section class="slide b2s" data-title="B · Vurdering">
-  <div class="frame">
-    <div class="hd"><span class="id">B-02</span><h1>Er det rimeligt? Hele væggen og "hvad nu hvis"</h1></div>
-    <div class="bd" style="grid-template-columns:520px 1fr">
-      <div class="pnl" style="padding:8px 22px">
-        <div class="rw"><span class="k">5</span><div><h4>Ydersiden, <span class="nt">r = 60 mm</span></h4><div class="e" data-tex="\sigma_\theta=40(1+1)=80\ \text{MPa},\ \ \sigma_r=0"></div><div class="c">Kun 62 % af indersiden. Ydervæggen arbejder mindre.</div></div></div>
-        <div class="rw"><span class="k">6</span><div><h4>Tyndvægget estimat</h4><div class="e" data-tex="\tfrac{p\,r_i}{t}=\tfrac{50\cdot40}{20}=100\ \text{MPa}"></div><div class="c">23 % for lavt: t/r = 0,5 er langt fra tyndvægget (&lt; 0,1).</div></div></div>
-        <div class="rw"><span class="k">7</span><div><h4>Største forskydning</h4><div class="e" data-tex="\tau_{max}=\tfrac{\sigma_\theta-\sigma_r}{2}=\tfrac{130+50}{2}=90\ \text{MPa}"></div><div class="c">Det er den, et flydekriterium (Tresca) bruger.</div></div></div>
-        <div class="rw"><span class="k">8</span><div><h4>Von Mises (lukkede ender)</h4><div class="e" data-tex="\sigma_z=40,\ \ \sigma_{vM}=\sqrt{\tfrac12\left[180^2+90^2+90^2\right]}=156\ \text{MPa}"></div><div class="c">Det tal sammenlignes med S<sub>y</sub>. Konstruktionsstål på 350 MPa giver sikkerhed ≈ 2,2.</div></div></div>
+<!-- ============ 4 · (b) Vurdering ============ -->
+<section class="slide" data-title="(b) Vurdering">
+  <div class="hd"><span class="tag b">SPM. 2 (b) · 2/2</span><h1>Er det rimeligt? Hele væggen og "hvad nu hvis"</h1></div>
+  <div class="body" style="grid-template-columns:620px 1fr">
+    <div class="card steps tight" style="padding:4px 22px">
+      <div class="step" id="b5"><span class="n">5</span><div class="t"><b>Ydersiden, r = 60 mm</b>
+        <span class="m" data-tex="\sigma_\theta=40(1+1)=80\ \text{MPa},\ \ \sigma_r=0"></span><span class="note">Kun 62 % af indersiden: ydervæggen arbejder mindre</span></div></div>
+      <div class="step" id="b6"><span class="n">6</span><div class="t"><b>Tyndvægget estimat</b>
+        <span class="m" data-tex="\dfrac{p\,r_i}{t}=\dfrac{50\cdot40}{20}=100\ \text{MPa}"></span><span class="note">23 % for lavt: t/r = 0,5 er langt fra tyndvægget (&lt; 0,1)</span></div></div>
+      <div class="step" id="b7"><span class="n">7</span><div class="t"><b>Største forskydning</b>
+        <span class="m" data-tex="\tau_{max}=\tfrac{\sigma_\theta-\sigma_r}{2}=\tfrac{130+50}{2}=90\ \text{MPa}"></span><span class="note">Den bruger Tresca-kriteriet</span></div></div>
+      <div class="step" id="b8"><span class="n">8</span><div class="t"><b>Von Mises (lukkede ender, σ<sub>z</sub> = 40)</b>
+        <span class="m" data-tex="\sigma_{vM}=\sqrt{\tfrac12\left[180^2+90^2+90^2\right]}=156\ \text{MPa}"></span><span class="note">Sammenlignes med S<sub>y</sub>. Stål med 350 MPa giver sikkerhed ≈ 2,2 (antaget)</span></div></div>
+    </div>
+    <div class="card fl" id="cHv">
+      <h3>Hvad nu hvis …</h3>
+      <div class="row" id="hv">
+        <button class="btn on" data-h="0">Opgaven</button><button class="btn" data-h="1">r<sub>o</sub> = 80 mm</button><button class="btn" data-h="2">r<sub>o</sub> = 120 mm</button><button class="btn" data-h="3">p<sub>i</sub> = 100 MPa</button><button class="btn" data-h="4">Tyndere: r<sub>i</sub> = 50</button>
       </div>
-      <div class="pnl">
-        <div class="tabs" id="hv">
-          <button data-h="0" class="on">Opgaven</button><button data-h="1">r<sub>o</sub> = 80 mm</button><button data-h="2">r<sub>o</sub> = 120 mm</button><button data-h="3">p<sub>i</sub> = 100 MPa</button><button data-h="4">Tyndere: r<sub>i</sub> = 50</button>
-        </div>
-        <canvas id="cH" width="1700" height="760"></canvas>
-        <div class="ro"><div><span>σθ(ri)</span><b class="hot" id="hT">130</b><i id="hTr"></i></div><div><span>σr(ri)</span><b class="cold" id="hS">−50</b><i id="hSr"></i></div><div><span>σθ(ro)</span><b id="hY">80</b><i id="hYr"></i></div><div><span>TYNDV. ESTIMAT</span><b id="hE">100</b><i id="hEr"></i></div></div>
+      <canvas id="cH" width="1700" height="900"></canvas>
+      <div class="ro r4">
+        <div><span>σ<sub>θ</sub>(r<sub>i</sub>)</span><b class="rd" id="hT">130</b><i id="hTr"></i></div>
+        <div><span>σ<sub>r</sub>(r<sub>i</sub>)</span><b class="gr" id="hS">−50</b><i id="hSr"></i></div>
+        <div><span>σ<sub>θ</sub>(r<sub>o</sub>)</span><b id="hY">80</b><i id="hYr"></i></div>
+        <div><span>TYNDV. ESTIMAT</span><b id="hE">100</b><i id="hEr"></i></div>
       </div>
     </div>
-    <div class="tb"><div><span class="say">SIG</span><span>Ydersiden har 80 MPa og indersiden 130. Den tyndvæggede formel siger 100. Dobbelt vægtykkelse giver ikke halv spænding.</span></div><div><small>EMNE</small><b>Vurdering · del B</b></div><div><small>ARK</small><b>4 / 4</b></div><div><small>SPM.</small><b>02</b></div></div>
   </div>
+  <div class="ft"><b class="say">SIG</b><span>Ydersiden har 80 MPa, indersiden 130. Tyndvægget siger 100. Dobbelt vægtykkelse giver ikke halv spænding.</span></div>
 </section>
 
 </div></div>
@@ -192,51 +159,47 @@ iframe.lab{width:100%;border:1.5px solid var(--line);display:block;background:#f
 (function () {
 'use strict';
 var $ = Deck.$, fmt = Deck.fmt, PI = Math.PI;
-var INK = '#12355b', MUT = '#56708e', ACC = '#1f78d1', HOT = '#e8590c', COLD = '#1f9d8f', GRID = '#c3d5ea';
+var CY = '#0a7fc2', OR = '#d97a00', RD = '#d63a3a', GR = '#0a9a5c', INK = '#14202d', MUT = '#5a6b7d', LINE = '#d3dde8', GRID = '#e3eaf1';
 function L(ri, ro, p) { var A = p * ri * ri / (ro * ro - ri * ri); return { A: A, th: function (r) { return A * (1 + ro * ro / (r * r)); }, rr: function (r) { return A * (1 - ro * ro / (r * r)); } }; }
 function sgn(v) { return (v < 0 ? '−' : '') + fmt(Math.abs(v), 0); }
-/* varmekort-farve for σθ (lav → høj) */
-function heat(t) { t = Math.max(0, Math.min(1, t)); var a = [31, 120, 209], b = [232, 89, 12]; return 'rgb(' + a.map(function (v, i) { return Math.round(v + (b[i] - v) * t); }).join(',') + ')'; }
+function heat(t) { t = Math.max(0, Math.min(1, t)); var a = [10, 127, 194], b = [214, 58, 58]; return 'rgb(' + a.map(function (v, i) { return Math.round(v + (b[i] - v) * t); }).join(',') + ')'; }
 
 /* ring (tværsnit) farvet efter σθ */
 function ring(g, cx, cy, sc, ri, ro, p, marker) {
   var K = L(ri, ro, p), mx = K.th(ri), mn = K.th(ro), n = 40;
   for (var i = 0; i < n; i++) {
     var r0 = ri + (ro - ri) * i / n, r1 = ri + (ro - ri) * (i + 1) / n, t = (K.th((r0 + r1) / 2) - mn) / Math.max(1e-6, mx - mn);
-    g.x.beginPath(); g.x.arc(cx, cy, r1 * sc, 0, 2 * PI); g.x.arc(cx, cy, r0 * sc, 0, 2 * PI, true); g.x.fillStyle = heat(0.15 + 0.85 * t); g.x.fill();
+    g.x.beginPath(); g.x.arc(cx, cy, r1 * sc, 0, 2 * PI); g.x.arc(cx, cy, r0 * sc, 0, 2 * PI, true); g.x.fillStyle = heat(0.1 + 0.9 * t); g.x.fill();
   }
-  g.x.strokeStyle = INK; g.x.lineWidth = 3; g.x.beginPath(); g.x.arc(cx, cy, ro * sc, 0, 2 * PI); g.x.stroke(); g.x.beginPath(); g.x.arc(cx, cy, ri * sc, 0, 2 * PI); g.x.stroke();
-  /* trykpile indvendigt */
-  for (var k = 0; k < 12; k++) { var a = k * PI / 6; g.arrow(cx + Math.cos(a) * ri * sc * 0.45, cy + Math.sin(a) * ri * sc * 0.45, cx + Math.cos(a) * ri * sc * 0.92, cy + Math.sin(a) * ri * sc * 0.92, ACC, 3); }
-  if (marker) { g.line([[cx + ri * sc, cy], [cx + ro * sc, cy]], INK, 2, [6, 5]); g.dot(cx + marker * sc, cy, 12, INK); g.dot(cx + marker * sc, cy, 5, '#fff'); }
+  g.x.strokeStyle = '#44586e'; g.x.lineWidth = 3; g.x.beginPath(); g.x.arc(cx, cy, ro * sc, 0, 2 * PI); g.x.stroke(); g.x.beginPath(); g.x.arc(cx, cy, ri * sc, 0, 2 * PI); g.x.stroke();
+  for (var k = 0; k < 12; k++) { var a = k * PI / 6; g.arrow(cx + Math.cos(a) * ri * sc * 0.42, cy + Math.sin(a) * ri * sc * 0.42, cx + Math.cos(a) * ri * sc * 0.92, cy + Math.sin(a) * ri * sc * 0.92, OR, 3); }
+  if (marker) { g.line([[cx + ri * sc, cy], [cx + ro * sc, cy]], '#fff', 2, [6, 5]); g.dot(cx + marker * sc, cy, 13, INK); g.dot(cx + marker * sc, cy, 6, '#fff'); }
 }
 
-/* forside-ring */
-(function () { var g = Deck.cv('c0'); g.clear(); ring(g, 520, 520, 7.2, 40, 60, 50);
-  g.txt('r_i = 40', 520, 520, 34, INK, 'center', 'middle', 700);
-  g.line([[520, 520 - 60 * 7.2 - 30], [520 + 60 * 7.2 + 40, 520 - 60 * 7.2 - 30]], INK, 2); g.txt('Ø120', 520 + 200, 520 - 60 * 7.2 - 52, 30, INK, 'center', 'middle', 600); })();
-
-/* ===== A1: snit + kurver, r-markør ===== */
+/* ===== (a) 1/2 ===== */
 var aR = 40;
 Deck.range('aR', function (v) { aR = v; drawA(); }, function (v) { return fmt(v, 1) + ' mm'; });
 function drawA() {
-  var g = Deck.cv('cA'), K = L(40, 60, 50); g.clear();
-  ring(g, 330, 430, 6.2, 40, 60, 50, aR);
-  var F = g.frame({ l: 820, r: 1520, t: 60, b: 780, x0: 40, x1: 60, y0: -60, y1: 140 });
-  g.line([[F.X(40), F.Y(-60)], [F.X(40), F.Y(140)]], INK, 2); g.line([[F.X(40), F.Y(0)], [F.X(60), F.Y(0)]], INK, 2);
-  [-50, 0, 50, 100].forEach(function (v) { g.txt(String(v), F.X(40) - 12, F.Y(v), 24, MUT, 'right', 'middle', 500); g.line([[F.X(40), F.Y(v)], [F.X(60), F.Y(v)]], GRID, 1); });
-  [40, 45, 50, 55, 60].forEach(function (v) { g.txt(String(v), F.X(v), F.Y(-60) + 28, 24, MUT, 'center', 'middle', 500); });
-  g.txt('r [mm]', F.X(60), F.Y(-60) + 58, 24, MUT, 'right', 'middle', 600); g.txt('MPa', F.X(40) - 12, F.Y(140) - 14, 22, MUT, 'right', 'middle', 600);
-  g.fn(F, K.th, 40, 60, HOT, 6); g.fn(F, K.rr, 40, 60, COLD, 6);
-  g.txt('σθ', F.X(58), F.Y(K.th(58)) - 26, 32, HOT, 'center', 'middle', 700); g.txt('σr', F.X(58), F.Y(K.rr(58)) + 30, 32, COLD, 'center', 'middle', 700);
+  var K = L(40, 60, 50), gr = Deck.cv('cRing'); gr.clear();
+  ring(gr, 380, 380, 5.9, 40, 60, 50, aR);
+  gr.txt('p_i', 380, 380, 40, OR, 'center', 'middle', 800);
+  var g = Deck.cv('cA'); g.clear();
+  var F = g.frame({ l: 84, r: 700, t: 30, b: 470, x0: 40, x1: 60, y0: -60, y1: 140 });
+  [-50, 0, 50, 100].forEach(function (v) { g.line([[F.X(40), F.Y(v)], [F.X(60), F.Y(v)]], v ? GRID : '#9fb0c2', 2); g.txt(String(v), F.X(40) - 10, F.Y(v), 26, MUT, 'right', 'middle', 600); });
+  [40, 45, 50, 55, 60].forEach(function (v) { g.txt(String(v), F.X(v), F.Y(-60) + 28, 26, MUT, 'center', 'middle', 600); });
+  g.line([[F.X(40), F.Y(-60)], [F.X(40), F.Y(140)]], '#9fb0c2', 2);
+  g.txt('r [mm]', F.X(60), F.Y(-60) + 64, 28, MUT, 'right', 'middle', 600); g.txt('MPa', F.X(40) + 10, F.Y(140) + 4, 26, MUT, 'left', 'middle', 600);
+  g.txt('inderside', F.X(40) + 6, F.Y(-60) + 64, 28, RD, 'left', 'middle', 700);
+  g.fn(F, K.th, 40, 60, RD, 6); g.fn(F, K.rr, 40, 60, GR, 6);
+  g.txt('σθ (træk)', F.X(54), F.Y(K.th(54)) - 32, 34, RD, 'center', 'middle', 800); g.txt('σr (tryk)', F.X(54), F.Y(K.rr(54)) + 36, 34, GR, 'center', 'middle', 800);
   g.line([[F.X(aR), F.Y(-60)], [F.X(aR), F.Y(140)]], INK, 2, [6, 5]);
-  g.dot(F.X(aR), F.Y(K.th(aR)), 10, HOT); g.dot(F.X(aR), F.Y(K.rr(aR)), 10, COLD);
-  $('aT').textContent = sgn(K.th(aR)); $('aS').textContent = sgn(K.rr(aR)); $('aD').textContent = fmt(K.th(aR) - K.rr(aR), 0);
+  g.dot(F.X(aR), F.Y(K.th(aR)), 11, RD); g.dot(F.X(aR), F.Y(K.rr(aR)), 11, GR);
+  $('aT').textContent = sgn(K.th(aR)); $('aS').textContent = sgn(K.rr(aR));
   $('aW').textContent = aR <= 40.5 ? 'inderside' : aR >= 59.5 ? 'yderside' : 'i væggen';
 }
 drawA();
 
-/* ===== A2: tykkelse + lab ===== */
+/* ===== (a) 2/2: tykkelse + lab ===== */
 var W = { ro: 60 }, W0 = L(40, 60, 50);
 var sendA = Deck.lab('labA', 'trykbeholder', function () { return { 'inderradius': 40, 'yderradius': W.ro, 'indvendigt tryk': 50, 'udvendigt tryk': 0 }; });
 Deck.range('wO', function (v) { W.ro = v; updW(); }, function (v) { return fmt(v, 0) + ' mm'; });
@@ -249,61 +212,60 @@ function updW() {
 }
 function drawW() {
   var g = Deck.cv('cW'); g.clear();
-  var F = g.frame({ l: 110, r: 1010, t: 30, b: 390, x0: 1, x1: 3.5, y0: 0, y1: 6 });
-  g.line([[F.X(1), F.Y(6)], [F.X(1), F.Y(0)], [F.X(3.5), F.Y(0)]], INK, 2);
-  [1, 1.5, 2, 2.5, 3, 3.5].forEach(function (v) { g.txt(fmt(v, 1), F.X(v), F.Y(0) + 28, 22, MUT, 'center', 'middle', 500); });
-  [0, 1, 2, 4, 6].forEach(function (v) { g.txt(String(v), F.X(1) - 12, F.Y(v), 22, MUT, 'right', 'middle', 500); g.line([[F.X(1), F.Y(v)], [F.X(3.5), F.Y(v)]], GRID, 1); });
-  g.txt('r_o / r_i', F.X(3.5), F.Y(0) + 62, 24, MUT, 'right', 'middle', 600); g.txt('σθ,max / p_i', F.X(1) + 10, F.Y(6) + 4, 24, MUT, 'left', 'middle', 600);
+  var F = g.frame({ l: 90, r: 1020, t: 24, b: 330, x0: 1, x1: 3.5, y0: 0, y1: 6 });
+  [0, 1, 2, 4, 6].forEach(function (v) { g.line([[F.X(1), F.Y(v)], [F.X(3.5), F.Y(v)]], v ? GRID : '#9fb0c2', 2); g.txt(String(v), F.X(1) - 12, F.Y(v), 22, MUT, 'right', 'middle', 600); });
+  [1, 1.5, 2, 2.5, 3, 3.5].forEach(function (v) { g.txt(fmt(v, 1), F.X(v), F.Y(0) + 26, 22, MUT, 'center', 'middle', 600); });
+  g.txt('r_o / r_i', F.X(3.5), F.Y(0) + 58, 24, MUT, 'right', 'middle', 600); g.txt('σθ,max / p_i', F.X(1) + 10, F.Y(6) + 6, 24, MUT, 'left', 'middle', 600);
   g.x.save(); g.x.beginPath(); g.x.rect(F.X(1), F.Y(6), F.X(3.5) - F.X(1), F.Y(0) - F.Y(6)); g.x.clip();
   g.line([[F.X(1), F.Y(1)], [F.X(3.5), F.Y(1)]], INK, 2, [8, 6]);
-  g.fn(F, function (k) { return (k * k + 1) / (k * k - 1); }, 1.05, 3.5, HOT, 5);
-  g.fn(F, function (k) { return 1 / (k - 1); }, 1.05, 3.5, COLD, 4, [10, 7]);
+  g.fn(F, function (k) { return (k * k + 1) / (k * k - 1); }, 1.05, 3.5, RD, 5);
+  g.fn(F, function (k) { return 1 / (k - 1); }, 1.05, 3.5, GR, 4, [10, 7]);
   g.x.restore();
-  g.txt('Lamé (tykvægget)', F.X(1.55), F.Y(3.6), 24, HOT, 'left', 'middle', 700);
-  g.txt('p·r/t (tyndvægget)', F.X(2.25), F.Y(0.42), 24, COLD, 'left', 'middle', 700);
+  g.txt('Lamé (tykvægget)', F.X(1.5), F.Y(3.8), 24, RD, 'left', 'middle', 700);
+  g.txt('p·r/t (tyndvægget)', F.X(2.3), F.Y(0.45), 24, GR, 'left', 'middle', 700);
   g.txt('grænse: p_i', F.X(3.45), F.Y(1) - 18, 22, INK, 'right', 'middle', 600);
-  var k = W.ro / 40; g.dot(F.X(k), F.Y((k * k + 1) / (k * k - 1)), 11, HOT);
+  var k = W.ro / 40; g.dot(F.X(k), F.Y((k * k + 1) / (k * k - 1)), 11, RD);
 }
 updW();
 
-/* ===== B1: element ===== */
+/* ===== (b) 1/2: element ===== */
 (function () {
-  var g = Deck.cv('cB'); g.clear(); var cx = 520, cy = 520, s = 300;
-  /* lille udsnit af ringen bagved */
-  g.x.strokeStyle = GRID; g.x.lineWidth = 3; g.x.beginPath(); g.x.arc(cx, cy + 900, 900 - s / 2, -PI * 0.62, -PI * 0.38); g.x.stroke();
-  g.poly([[cx - s / 2, cy - s / 2], [cx + s / 2, cy - s / 2], [cx + s / 2, cy + s / 2], [cx - s / 2, cy + s / 2]], '#ffffff', INK, 4);
-  g.arrow(cx + s / 2 + 10, cy, cx + s / 2 + 190, cy, HOT, 8); g.arrow(cx - s / 2 - 10, cy, cx - s / 2 - 190, cy, HOT, 8);
-  g.txt('σθ = +130', cx + s / 2 + 30, cy - 50, 40, HOT, 'left', 'middle', 700);
-  g.arrow(cx, cy - s / 2 - 150, cx, cy - s / 2 - 10, COLD, 7); g.arrow(cx, cy + s / 2 + 150, cx, cy + s / 2 + 10, COLD, 7);
-  g.txt('σr = −50', cx + 24, cy - s / 2 - 110, 40, COLD, 'left', 'middle', 700);
-  g.txt('træk', cx + s / 2 + 100, cy + 42, 28, HOT, 'center', 'middle', 600); g.txt('tryk', cx + 24, cy + s / 2 + 100, 28, COLD, 'left', 'middle', 600);
+  var g = Deck.cv('cB'); g.clear(); var cx = 450, cy = 340, s = 230;
+  g.x.strokeStyle = LINE; g.x.lineWidth = 3; g.x.beginPath(); g.x.arc(cx, cy + 800, 800 - s / 2, -PI * 0.64, -PI * 0.36); g.x.stroke();
+  g.poly([[cx - s / 2, cy - s / 2], [cx + s / 2, cy - s / 2], [cx + s / 2, cy + s / 2], [cx - s / 2, cy + s / 2]], '#ffffff', '#44586e', 4);
+  g.arrow(cx + s / 2 + 10, cy, cx + s / 2 + 170, cy, RD, 8); g.arrow(cx - s / 2 - 10, cy, cx - s / 2 - 170, cy, RD, 8);
+  g.txt('σθ = +130', cx + s / 2 + 20, cy - 44, 36, RD, 'left', 'middle', 800);
+  g.arrow(cx, cy - s / 2 - 140, cx, cy - s / 2 - 10, GR, 7); g.arrow(cx, cy + s / 2 + 140, cx, cy + s / 2 + 10, GR, 7);
+  g.txt('σr = −50', cx + 22, cy - s / 2 - 100, 36, GR, 'left', 'middle', 800);
+  g.txt('træk', cx + s / 2 + 90, cy + 40, 28, RD, 'center', 'middle', 600); g.txt('tryk', cx + 22, cy + s / 2 + 100, 28, GR, 'left', 'middle', 600);
   g.txt('r = r_i', cx, cy, 32, INK, 'center', 'middle', 700);
+  g.txt('omkreds →', cx + s / 2 + 90, cy + 280, 26, MUT, 'center', 'middle', 600);
 })();
 
-/* ===== B2: hvad nu hvis ===== */
+/* ===== (b) 2/2: hvad nu hvis ===== */
 var HV = [[40, 60, 50], [40, 80, 50], [40, 120, 50], [40, 60, 100], [50, 60, 50]], cur = HV[0], O = L(40, 60, 50);
 Deck.group('[data-h]', function (v) { cur = HV[+v]; drawH(); });
 function drawH() {
   var ri = cur[0], ro = cur[1], p = cur[2], K = L(ri, ro, p), g = Deck.cv('cH'); g.clear();
-  var F = g.frame({ l: 120, r: 1660, t: 40, b: 680, x0: 0, x1: 1, y0: -110, y1: 300 });
-  g.line([[F.X(0), F.Y(-110)], [F.X(0), F.Y(300)]], INK, 2); g.line([[F.X(0), F.Y(0)], [F.X(1), F.Y(0)]], INK, 2);
-  [-100, 0, 100, 200, 300].forEach(function (v) { g.txt(String(v), F.X(0) - 12, F.Y(v), 24, MUT, 'right', 'middle', 500); g.line([[F.X(0), F.Y(v)], [F.X(1), F.Y(v)]], GRID, 1); });
-  g.txt('inderside', F.X(0), F.Y(-110) + 30, 26, MUT, 'left', 'middle', 600); g.txt('yderside', F.X(1), F.Y(-110) + 30, 26, MUT, 'right', 'middle', 600);
-  g.txt('MPa', F.X(0) + 12, F.Y(300) + 4, 22, MUT, 'left', 'middle', 600);
+  var F = g.frame({ l: 120, r: 1660, t: 50, b: 800, x0: 0, x1: 1, y0: -110, y1: 300 });
+  [-100, 0, 100, 200, 300].forEach(function (v) { g.line([[F.X(0), F.Y(v)], [F.X(1), F.Y(v)]], v ? GRID : '#9fb0c2', 2); g.txt(String(v), F.X(0) - 12, F.Y(v), 26, MUT, 'right', 'middle', 600); });
+  g.line([[F.X(0), F.Y(-110)], [F.X(0), F.Y(300)]], '#9fb0c2', 2);
+  g.txt('inderside', F.X(0), F.Y(-110) + 34, 28, MUT, 'left', 'middle', 600); g.txt('yderside', F.X(1), F.Y(-110) + 34, 28, MUT, 'right', 'middle', 600);
+  g.txt('MPa', F.X(0) + 12, F.Y(300) + 6, 24, MUT, 'left', 'middle', 600);
   function u2r(u, a, b) { return a + (b - a) * u; }
-  /* opgaven som spøgelse */
-  g.fn(F, function (u) { return O.th(u2r(u, 40, 60)); }, 0, 1, 'rgba(232,89,12,.3)', 4, [10, 8]);
-  g.fn(F, function (u) { return O.rr(u2r(u, 40, 60)); }, 0, 1, 'rgba(31,157,143,.3)', 4, [10, 8]);
-  g.fn(F, function (u) { return K.th(u2r(u, ri, ro)); }, 0, 1, HOT, 6);
-  g.fn(F, function (u) { return K.rr(u2r(u, ri, ro)); }, 0, 1, COLD, 6);
-  g.line([[F.X(0), F.Y(p)], [F.X(1), F.Y(p)]], INK, 1.5, [4, 6]); g.txt('p_i', F.X(1) - 6, F.Y(p) - 16, 22, INK, 'right', 'middle', 600);
-  g.txt('σθ = ' + fmt(K.th(ri), 0), F.X(0) + 18, F.Y(K.th(ri)) - 24, 30, HOT, 'left', 'middle', 700);
-  g.txt('væg: ' + ri + '→' + ro + ' mm, p_i = ' + p + ' MPa', F.X(1), F.Y(300) + 4, 26, INK, 'right', 'middle', 600);
-  var thin = p * ri / (ro - ri), thin0 = 100;
+  g.fn(F, function (u) { return O.th(u2r(u, 40, 60)); }, 0, 1, 'rgba(214,58,58,.3)', 4, [10, 8]);
+  g.fn(F, function (u) { return O.rr(u2r(u, 40, 60)); }, 0, 1, 'rgba(10,154,92,.3)', 4, [10, 8]);
+  g.fn(F, function (u) { return K.th(u2r(u, ri, ro)); }, 0, 1, RD, 6);
+  g.fn(F, function (u) { return K.rr(u2r(u, ri, ro)); }, 0, 1, GR, 6);
+  g.line([[F.X(0), F.Y(p)], [F.X(1), F.Y(p)]], INK, 1.5, [4, 6]); g.txt('p_i', F.X(1) - 6, F.Y(p) - 18, 24, INK, 'right', 'middle', 600);
+  g.txt('σθ = ' + fmt(K.th(ri), 0), F.X(0) + 18, F.Y(K.th(ri)) - 26, 32, RD, 'left', 'middle', 800);
+  g.txt('væg ' + ri + ' → ' + ro + ' mm, p_i = ' + p + ' MPa', F.X(1), F.Y(300) + 6, 28, INK, 'right', 'middle', 700);
+  g.txt('stiplet = opgaven', F.X(1), F.Y(300) + 44, 24, MUT, 'right', 'middle', 600);
+  var thin = p * ri / (ro - ri);
   $('hT').textContent = fmt(K.th(ri), 0); Deck.rel('hTr', K.th(ri), O.th(40));
   $('hS').textContent = sgn(K.rr(ri)); Deck.rel('hSr', K.rr(ri), O.rr(40));
   $('hY').textContent = fmt(K.th(ro), 0); Deck.rel('hYr', K.th(ro), O.th(60));
-  $('hE').textContent = fmt(thin, 0); Deck.rel('hEr', thin, thin0);
+  $('hE').textContent = fmt(thin, 0); Deck.rel('hEr', thin, 100);
 }
 drawH();
 Deck.init();

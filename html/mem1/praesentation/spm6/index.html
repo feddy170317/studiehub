@@ -4,163 +4,175 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Spm. 6 · Kraftskruer</title>
-<meta name="description" content="Fremlæggelse af MEM1 eksamensspørgsmål 6: løftemoment og selvlåsning for kraftskruer med firkantgevind, med 3D-lab indlejret.">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<meta name="description" content="Fremlæggelse af MEM1 eksamensspørgsmål 6: løftemoment for en kraftskrue, gevindvinklen λ, selvlåsning og virkningsgrad, med 3D-lab indlejret.">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-<style>
-/* Design: minimal tech. Rent hvidt, tynd stor typografi, bløde runde kort, én violet gradient som accent. */
-:root{--bg:#ffffff;--ink:#111114;--mut:#8a8a94;--soft:#f5f5f8;--line:#ececf1;--a1:#5b5bd6;--a2:#a855f7;--ok:#16a34a;--bad:#e11d48;--chart-font:Manrope,sans-serif}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--bg);color:var(--ink);font-family:Manrope,sans-serif;overflow:hidden}
-.vp{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
-.deck{position:relative;width:1600px;height:900px;flex:none;transform-origin:center}
-.slide{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .5s,transform .5s;transform:translateY(8px);padding:46px 64px 34px;display:grid;grid-template-rows:auto 1fr auto;gap:24px;background:var(--bg)}
-.slide.on{opacity:1;visibility:visible;transform:none}
-.eyebrow{font-weight:700;font-size:15px;letter-spacing:.06em;background:linear-gradient(90deg,var(--a1),var(--a2));-webkit-background-clip:text;background-clip:text;color:transparent}
-h1{font-weight:300;font-size:56px;letter-spacing:-.03em;line-height:1.05;margin-top:6px}
-h1 b{font-weight:800}
-.g{display:grid;gap:24px;min-height:0}
-.card{background:var(--soft);border-radius:28px;padding:24px 28px;min-height:0;display:flex;flex-direction:column;gap:12px}
-.card.w{background:#fff;border:1px solid var(--line);box-shadow:0 20px 50px -30px rgba(40,40,90,.25)}
-.lab-c{font-size:13px;font-weight:700;letter-spacing:.08em;color:var(--mut);text-transform:uppercase}
-.f{font-size:38px;text-align:center;padding:6px 0}
-.terms{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.terms div{background:#fff;border-radius:18px;padding:12px 14px;font-size:17px;line-height:1.35}
-.terms .s{font-size:24px;display:block;margin-bottom:2px}
-.say{display:flex;gap:16px;align-items:center;font-size:21px;font-weight:400;color:var(--ink);padding-right:240px}
-.say span.p{flex:none;font-weight:800;font-size:13px;letter-spacing:.1em;color:#fff;background:linear-gradient(90deg,var(--a1),var(--a2));padding:7px 12px;border-radius:30px}
-.sl{display:grid;grid-template-columns:150px 1fr 110px;gap:14px;align-items:center;font-size:17px;font-weight:600;color:var(--mut)}
-.sl input{width:100%;accent-color:var(--a1)}
-.sl output{font-size:24px;font-weight:800;color:var(--ink);text-align:right}
-.seg{display:inline-flex;background:var(--soft);border-radius:40px;padding:5px;gap:4px;flex-wrap:wrap}
-.seg button{font:700 15px Manrope,sans-serif;border:0;background:transparent;color:var(--mut);padding:9px 16px;border-radius:30px;cursor:pointer}
-.seg button.on{background:#fff;color:var(--ink);box-shadow:0 4px 14px -6px rgba(40,40,90,.35)}
-.nums{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.nums div{background:#fff;border-radius:20px;padding:12px 16px}
-.nums span{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--mut);text-transform:uppercase}
-.nums b{font-size:38px;font-weight:800;letter-spacing:-.02em}
-.nums i{font-style:normal;font-size:14px;font-weight:700;margin-left:6px}
-.up{color:var(--bad)}.dn{color:var(--ok)}.eq{color:var(--mut)}
-.pill{display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:18px;padding:9px 16px;border-radius:30px}
-.pill.ok{background:#dcfce7;color:var(--ok)}.pill.bad{background:#ffe4e6;color:var(--bad)}
-.st{display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:start}
-.st .n{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--a1),var(--a2));color:#fff;font-weight:800;font-size:20px;display:flex;align-items:center;justify-content:center}
-.st h4{font-size:19px;font-weight:700}
-.st .e{font-size:27px;margin-top:2px}
-.st .c{font-size:16px;color:var(--mut)}
-.bb .st .e{font-size:34px}.bb .st h4{font-size:22px}.bb .card{gap:34px!important;justify-content:center}
-.big{font-size:84px;font-weight:800;letter-spacing:-.04em;background:linear-gradient(90deg,var(--a1),var(--a2));-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1}
-canvas{display:block;width:100%}
-iframe.lab{width:100%;border:0;border-radius:20px;display:block;background:#f4f7fa}
-.dnav{position:fixed;right:24px;bottom:18px;display:flex;gap:8px;align-items:center;font:700 13px Manrope,sans-serif;color:var(--mut);z-index:9}
-.dnav .dots{display:flex;gap:6px}.dnav .dots i{width:7px;height:7px;border-radius:50%;background:#d9d9e3;cursor:pointer;transition:width .3s}.dnav .dots i.on{width:22px;border-radius:5px;background:linear-gradient(90deg,var(--a1),var(--a2))}
-.dnav button{width:36px;height:36px;border:0;border-radius:50%;background:var(--soft);cursor:pointer;font-size:16px;color:var(--ink)}
-</style>
+<link rel="stylesheet" href="../assets/s7.css">
 </head>
 <body>
 <div class="vp"><div class="deck">
 
-<!-- 0 · forside -->
-<section class="slide on" data-title="Forside" style="grid-template-rows:1fr auto">
-  <div style="display:grid;grid-template-columns:1fr 560px;gap:40px;align-items:center">
+<!-- ============ 0 · FORSIDE ============ -->
+<section class="slide on" data-title="Forside">
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:34px;padding:0 30px">
     <div>
-      <div class="eyebrow">MEM1 · KAPITEL 16 · EKSAMENSSPØRGSMÅL 6</div>
-      <h1 style="font-size:118px;margin-top:14px">Kraft&shy;skruer.<br><b>Løft, og hold.</b></h1>
-      <p style="font-size:28px;font-weight:300;margin-top:22px;color:#444;max-width:820px">Et kileplan rullet op omkring en aksel. Friktionen koster moment, men holder også lasten.</p>
-      <div class="g" style="grid-template-columns:1fr 1fr;margin-top:38px;max-width:900px">
-        <div class="card"><div class="lab-c">Del a</div><div style="font-size:19px;line-height:1.45">Løftemomentet <span data-tex="T=\tfrac{Wd_m}{2}\cdot\tfrac{l+\pi\mu d_m}{\pi d_m-\mu l}"></span>, leddene og betingelsen for selvlåsning.</div></div>
-        <div class="card"><div class="lab-c">Del b</div><div style="font-size:19px;line-height:1.45"><span data-tex="d_m=20"></span> mm, <span data-tex="l=5"></span> mm, <span data-tex="\mu=0{,}10"></span>, <span data-tex="W=10"></span> kN. Find <span data-tex="T"></span>.</div></div>
-      </div>
+      <div class="tag" style="display:inline-block">MEM1 · KAP. 16 · EKSAMENSSPØRGSMÅL 6</div>
+      <h1 style="font-size:76px;margin-top:22px">Kraftskruer: løft, og hold</h1>
+      <div style="font-size:30px;color:var(--mut);margin-top:8px">Et gevind er et <b class="or">kileplan rullet op</b>. Friktionen koster moment, men holder også lasten</div>
     </div>
-    <canvas id="c0" width="1100" height="1300"></canvas>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:26px">
+      <div class="card qcard" id="qa"><span class="lbl cy">(a) FORKLAR · 2 SLIDES</span>
+        Løftemomentet <span data-tex="T=\dfrac{Wd_m}{2}\cdot\dfrac{l+\pi\mu d_m}{\pi d_m-\mu l}"></span>, leddenes betydning, gevindvinklen <span data-tex="\lambda"></span> og betingelsen for selvlåsning.</div>
+      <div class="card qcard" id="qb"><span class="lbl or">(b) BEREGN · 2 SLIDES</span>
+        Kraftskrue (donkraft):<br><span data-tex="d_m=20\text{ mm},\ l=5\text{ mm},\ \mu=0{,}10,\ W=10\text{ kN}"></span><br>Find løftemomentet <span data-tex="T"></span>. Er skruen selvlåsende?</div>
+    </div>
   </div>
-  <div class="say" style="color:var(--mut);font-size:15px">→ / mellemrum / klikker: næste · ←: forrige · F: fuld skærm</div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum / klikker: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm &nbsp;·&nbsp; 3D-skruen kan drejes med musen</div>
 </section>
 
-<!-- 1 · a1 kileplan -->
-<section class="slide" data-title="a · Løftemoment">
-  <div><div class="eyebrow">DEL A · 1/2</div><h1>Et gevind er <b>et kileplan</b>, rullet op.</h1></div>
-  <div class="g" style="grid-template-columns:640px 1fr">
-    <div class="card">
-      <div class="f" data-tex="T=\dfrac{W d_m}{2}\cdot\dfrac{l+\pi\mu d_m}{\pi d_m-\mu l}"></div>
+<!-- ============ 1 · (a) Løftemoment ============ -->
+<section class="slide" data-title="(a) Løftemoment">
+  <div class="hd"><span class="tag">SPM. 6 (a) · 1/2</span><h1>Et gevind er et kileplan, rullet op</h1></div>
+  <div class="body" style="grid-template-columns:380px 620px 1fr">
+    <div class="card fl" id="fig">
+      <h3>Fold én omgang ud</h3>
+      <svg viewBox="0 0 340 520" style="width:100%;flex:1">
+        <defs>
+          <marker id="aO" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#d97a00"/></marker>
+          <marker id="aC" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#0a7fc2"/></marker>
+        </defs>
+        <!-- skrue -->
+        <rect x="120" y="40" width="70" height="230" fill="#dfe6ee" stroke="#44586e" stroke-width="3"/>
+        <g stroke="#0a7fc2" stroke-width="6" stroke-linecap="round">
+          <line x1="120" y1="78" x2="190" y2="62"/><line x1="120" y1="118" x2="190" y2="102"/><line x1="120" y1="158" x2="190" y2="142"/>
+          <line x1="120" y1="198" x2="190" y2="182"/><line x1="120" y1="238" x2="190" y2="222"/>
+        </g>
+        <rect x="80" y="130" width="150" height="40" fill="#44586e" rx="4"/>
+        <text x="155" y="157" fill="#fff" font-size="16" text-anchor="middle">møtrik</text>
+        <line x1="155" y1="10" x2="155" y2="36" stroke="#d97a00" stroke-width="5" marker-end="url(#aO)"/>
+        <text x="168" y="26" fill="#d97a00" font-size="22" font-weight="700">W</text>
+        <line x1="155" y1="290" x2="155" y2="320" stroke="#9fb0c2" stroke-width="2" stroke-dasharray="4 4"/>
+        <text x="170" y="312" fill="#5a6b7d" font-size="15">fold ud</text>
+        <!-- kileplan -->
+        <polygon points="20,480 320,480 320,400" fill="#ebf1f7" stroke="#44586e" stroke-width="3"/>
+        <line x1="20" y1="480" x2="320" y2="400" stroke="#0a7fc2" stroke-width="6" stroke-linecap="round"/>
+        <text x="170" y="508" fill="#5a6b7d" font-size="18" text-anchor="middle">π·d<tspan font-size="12" dy="4">m</tspan><tspan dy="-4"> (én omgang)</tspan></text>
+        <text x="328" y="446" fill="#5a6b7d" font-size="18">l</text>
+        <path d="M 80 480 A 60 60 0 0 0 78 465" fill="none" stroke="#d63a3a" stroke-width="3"/>
+        <text x="90" y="472" fill="#d63a3a" font-size="20" font-weight="700">λ</text>
+        <rect x="190" y="402" width="44" height="36" fill="#fff" stroke="#44586e" stroke-width="3" transform="rotate(-15 212 420)"/>
+        <line x1="120" y1="452" x2="182" y2="436" stroke="#0a7fc2" stroke-width="5" marker-end="url(#aC)"/>
+        <text x="122" y="432" fill="#0a7fc2" font-size="20" font-weight="700">P</text>
+      </svg>
+      <div class="txt" style="text-align:center">At dreje skruen er det samme som at <b class="cy">skubbe lasten op ad et skråplan</b> med friktion.</div>
+    </div>
+
+    <div class="card" id="fT">
+      <h3>Løftemoment (§16.3.1)</h3>
+      <div class="big" style="font-size:36px" data-tex="T=\dfrac{\color{#d97a00}{W}\,d_m}{2}\cdot\dfrac{\color{#0a7fc2}{l}+\color{#d63a3a}{\pi\mu d_m}}{\pi d_m-\color{#d63a3a}{\mu l}}"></div>
       <div class="terms">
-        <div><span class="s" data-tex="W"></span><b>Lasten</b> der løftes. T er proportional med W</div>
-        <div><span class="s" data-tex="\tfrac{d_m}{2}"></span><b>Armen</b>: kraften virker på middeldiameteren</div>
-        <div><span class="s" data-tex="l"></span><b>Stigning</b>: hvor langt møtrikken flytter sig pr. omgang (kilens højde)</div>
-        <div><span class="s" data-tex="\pi d_m"></span><b>Én omgang</b> foldet ud: kilens vandrette længde</div>
-        <div><span class="s" data-tex="\pi\mu d_m"></span><b>Friktion</b> i tælleren: koster ekstra moment</div>
-        <div><span class="s" data-tex="\mu l"></span><b>Friktion</b> i nævneren: lille korrektion for hældningen</div>
+        <div class="term" id="tW"><span class="s or" data-tex="W"></span><span><b>Lasten</b>, der løftes. T er proportional med W</span></div>
+        <div class="term" id="tdm"><span class="s" data-tex="\tfrac{d_m}{2}"></span><span><b>Armen:</b> kraften P virker på middeldiameteren, så <span data-tex="T=P\,d_m/2"></span></span></div>
+        <div class="term" id="tl"><span class="s cy" data-tex="l"></span><span><b>Stigning:</b> hvor langt møtrikken flytter sig pr. omgang (kilens højde). <span data-tex="\tan\lambda=l/(\pi d_m)"></span></span></div>
+        <div class="term" id="tmu"><span class="s rd" data-tex="\pi\mu d_m"></span><span><b>Friktion</b> i tælleren: koster ekstra moment. <span data-tex="\mu l"></span> i nævneren er en lille rettelse for hældningen</span></div>
+        <div class="term" id="tpd"><span class="s" data-tex="\pi d_m"></span><span><b>Én omgang</b> foldet ud: kilens vandrette længde</span></div>
       </div>
     </div>
-    <div class="card w">
-      <div class="lab-c">Fold én omgang ud</div>
-      <canvas id="cK" width="1580" height="760"></canvas>
-      <div class="sl"><span>Friktion μ</span><input id="kM" type="range" min="0" max="0.3" step="0.01" value="0.1"><output id="kMo"></output></div>
-      <div class="sl"><span>Stigning l</span><input id="kL" type="range" min="1" max="20" step="0.5" value="5"><output id="kLo"></output></div>
+
+    <div class="card fl" id="cKl">
+      <h3>Klodsen på skråplanet</h3>
+      <canvas id="cK" width="1000" height="640"></canvas>
+      <div class="sl" id="slKm"><span>Friktion μ</span><input id="kM" type="range" min="0" max="0.3" step="0.01" value="0.1"><output id="kMo"></output></div>
+      <div class="sl" id="slKl"><span>Stigning l</span><input id="kL" type="range" min="1" max="20" step="0.5" value="5"><output id="kLo"></output></div>
+      <div class="ro">
+        <div><span>tan λ</span><b id="kTl">0,080</b></div>
+        <div><span>T (W = 10 kN)</span><b class="cy" id="kT">18,1</b><i>N·m</i></div>
+        <div><span>FRIKTIONENS ANDEL</span><b class="rd" id="kF">56 %</b></div>
+      </div>
     </div>
   </div>
-  <div class="say"><span class="p">SIG</span><span>Fold én omgang ud, så er det at dreje skruen det samme som at skubbe lasten op ad et skråplan med friktion. Armen d<sub>m</sub>/2 gør kraften til et moment.</span></div>
+  <div class="ft"><b class="say">SIG</b><span>Fold én omgang ud: at dreje skruen er at skubbe lasten op ad et skråplan med friktion. Armen d<sub>m</sub>/2 gør kraften til et moment.</span></div>
 </section>
 
-<!-- 2 · a2 selvlåsning + lab -->
-<section class="slide" data-title="a · Selvlåsning">
-  <div><div class="eyebrow">DEL A · 2/2</div><h1>Selvlåsning: <b>bliver lasten hængende?</b></h1></div>
-  <div class="g" style="grid-template-columns:560px 1fr">
-    <div class="card">
-      <div class="lab-c">Moment for at sænke</div>
-      <div class="f" style="font-size:32px" data-tex="T_{\text{sænk}}=\dfrac{W d_m}{2}\cdot\dfrac{\pi\mu d_m-l}{\pi d_m+\mu l}"></div>
-      <div style="font-size:19px;line-height:1.45">Er det <b>positivt</b>, skal man aktivt dreje for at sænke. Lasten kan ikke selv skrue sig ned:</div>
-      <div class="f" style="font-size:40px;background:#fff;border-radius:20px" data-tex="\mu\ \ge\ \dfrac{l}{\pi d_m}=\tan\lambda"></div>
-      <div style="font-size:18px;line-height:1.45;color:#444">Friktionen skal være større end hældningen. Bagsiden er, at selvlåsende skruer har en <b>virkningsgrad under 50 %</b>.</div>
+<!-- ============ 2 · (a) Selvlåsning ============ -->
+<section class="slide" data-title="(a) Selvlåsning">
+  <div class="hd"><span class="tag">SPM. 6 (a) · 2/2</span><h1>Selvlåsning: bliver lasten hængende?</h1></div>
+  <div class="body" style="grid-template-columns:620px 1fr">
+    <div class="card" id="fS">
+      <h3>Moment for at sænke (§16.3.3)</h3>
+      <div class="big" style="font-size:34px" data-tex="T_{\text{sænk}}=\dfrac{W d_m}{2}\cdot\dfrac{\color{#d63a3a}{\pi\mu d_m}-\color{#0a7fc2}{l}}{\pi d_m+\mu l}"></div>
+      <div class="terms">
+        <div class="term" id="sPos"><span class="s gr">&gt; 0</span><span>Man skal <b>aktivt dreje</b> for at sænke. Lasten kan ikke selv skrue sig ned</span></div>
+        <div class="term" id="sNeg"><span class="s rd">&lt; 0</span><span>Lasten <b>skruer sig selv ned</b>, når man slipper håndtaget</span></div>
+      </div>
+      <div id="sBox" style="margin-top:14px;border:2px solid var(--gr);border-radius:12px;padding:4px 10px;background:#fff">
+        <div class="big" style="font-size:38px;padding:4px 0" data-tex="\color{#d63a3a}{\mu}\ \ge\ \dfrac{\color{#0a7fc2}{l}}{\pi d_m}=\tan\lambda"></div>
+      </div>
+      <div class="txt" id="sEff" style="margin-top:12px">Friktionen skal være større end gevindets hældning. Prisen: en selvlåsende skrue har <b class="rd">virkningsgrad under 50 %</b>.</div>
     </div>
-    <div class="card w" style="padding:14px">
+    <div class="card fl" style="padding:16px 18px" id="cLab">
       <iframe class="lab" id="lab" style="flex:1;min-height:0" title="3D-kraftskrue"></iframe>
-      <div class="sl"><span>Friktion μ</span><input id="aM" type="range" min="0.02" max="0.25" step="0.005" value="0.1"><output id="aMo"></output></div>
-      <div class="sl"><span>Stigning l</span><input id="aL" type="range" min="2" max="15" step="0.5" value="5"><output id="aLo"></output></div>
-      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><span class="pill ok" id="aS">Selvlåsende</span><span style="font-size:18px;color:var(--mut)" id="aT"></span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 28px">
+        <div class="sl" id="slAm"><span>Friktion μ</span><input id="aM" type="range" min="0.02" max="0.25" step="0.005" value="0.1"><output id="aMo"></output></div>
+        <div class="sl" id="slAl"><span>Stigning l</span><input id="aL" type="range" min="2" max="15" step="0.5" value="5"><output id="aLo"></output></div>
+      </div>
+      <div class="status good" id="aS">✓ Selvlåsende</div>
     </div>
   </div>
-  <div class="say"><span class="p">SIG</span><span>Selvlåsning betyder, at friktionen er større end gevindets hældning. Så bliver en donkraft stående, når du slipper håndtaget.</span></div>
+  <div class="ft"><b class="say">SIG</b><span>Selvlåsning betyder, at friktionen er større end gevindets hældning. Så bliver en donkraft stående, når du slipper.</span></div>
 </section>
 
-<!-- 3 · b1 beregning -->
-<section class="slide bb" data-title="b · Beregning">
-  <div><div class="eyebrow">DEL B · 1/2</div><h1>Beregning: <b>løftemomentet</b></h1></div>
-  <div class="g" style="grid-template-columns:1fr 520px">
-    <div class="card" style="gap:18px">
-      <div class="st"><span class="n">1</span><div><h4>Én omgang foldet ud</h4><div class="e" data-tex="\pi d_m=\pi\cdot20=62{,}83\ \text{mm},\qquad \pi\mu d_m=6{,}283\ \text{mm}"></div></div></div>
-      <div class="st"><span class="n">2</span><div><h4>Brøken</h4><div class="e" data-tex="\dfrac{l+\pi\mu d_m}{\pi d_m-\mu l}=\dfrac{5+6{,}283}{62{,}83-0{,}5}=\dfrac{11{,}283}{62{,}33}=0{,}1810"></div></div></div>
-      <div class="st"><span class="n">3</span><div><h4>Momentet</h4><div class="e" data-tex="T=\dfrac{10\,000\cdot20}{2}\cdot0{,}1810=18\,100\ \text{N}\cdot\text{mm}"></div><div class="c">W i N og d<sub>m</sub> i mm giver N·mm. Del med 1000 for N·m</div></div></div>
+<!-- ============ 3 · (b) Beregning ============ -->
+<section class="slide" data-title="(b) Beregning">
+  <div class="hd"><span class="tag b">SPM. 6 (b) · 1/2</span><h1>Beregning: løftemomentet</h1></div>
+  <div class="chips" id="chips">
+    <span class="chip">d<sub>m</sub> = 20 mm</span><span class="chip">l = 5 mm<small>stigning</small></span><span class="chip">μ = 0,10<small>stål mod stål, smurt</small></span><span class="chip or">W = 10 kN<small>≈ 1 ton</small></span>
+  </div>
+  <div class="body" style="grid-template-columns:840px 1fr">
+    <div class="card steps" style="padding:8px 24px">
+      <div class="step" id="b1"><span class="n">1</span><div class="t"><b>Én omgang foldet ud</b>
+        <span class="m" data-tex="\pi d_m=\pi\cdot20=62{,}83\ \text{mm},\qquad\pi\mu d_m=6{,}283\ \text{mm}"></span></div></div>
+      <div class="step" id="b2"><span class="n">2</span><div class="t"><b>Brøken</b>
+        <span class="m" data-tex="\dfrac{l+\pi\mu d_m}{\pi d_m-\mu l}=\dfrac{5+6{,}283}{62{,}83-0{,}5}=\dfrac{11{,}283}{62{,}33}=0{,}1810"></span></div></div>
+      <div class="step" id="b3"><span class="n">3</span><div class="t"><b>Momentet</b>
+        <span class="m" data-tex="T=\dfrac{10\,000\cdot20}{2}\cdot0{,}1810=18\,100\ \text{N}\cdot\text{mm}"></span><span class="m" data-tex="\boxed{T\approx18{,}1\ \text{N}\cdot\text{m}}"></span>
+        <span class="note">W i N og d<sub>m</sub> i mm giver N·mm. Del med 1000 for N·m</span></div></div>
     </div>
-    <div class="card w" style="align-items:center;justify-content:center;text-align:center;gap:6px">
-      <div class="lab-c">Løftemoment</div>
-      <div class="big">18,1 N·m</div>
-      <div style="font-size:19px;color:#444;margin-top:8px">Med et 30 cm håndtag:</div>
-      <div style="font-size:44px;font-weight:800">≈ 60 N</div>
-      <div style="font-size:17px;color:var(--mut)">≈ 6 kg i hånden for at løfte 1 ton</div>
+    <div class="card fl" id="cHa">
+      <h3>Hvad betyder 18,1 N·m?</h3>
+      <canvas id="cB" width="900" height="640"></canvas>
+      <div class="status mid">Med et 30 cm håndtag skal man trække med ca. <b>60 N</b>: kraften fra 6 kg i hånden løfter 1 ton.</div>
     </div>
   </div>
-  <div class="say"><span class="p">SIG</span><span>Med de givne tal er brøken 0,181. Gange W·d<sub>m</sub>/2 giver 18,1 N·m. Et 30 cm håndtag løfter 1 ton med kraften fra 6 kg.</span></div>
+  <div class="ft"><b class="say">SIG</b><span>Brøken er 0,181. Gange W·d<sub>m</sub>/2 giver 18,1 N·m. Et 30 cm håndtag løfter 1 ton med kraften fra 6 kg.</span></div>
 </section>
 
-<!-- 4 · b2 selvlåsning og virkningsgrad -->
-<section class="slide" data-title="b · Kontrol">
-  <div><div class="eyebrow">DEL B · 2/2</div><h1>Holder den lasten? <b>Og hvad koster det?</b></h1></div>
-  <div class="g" style="grid-template-columns:520px 1fr">
-    <div class="card" style="gap:16px">
-      <div class="st"><span class="n">4</span><div><h4>Selvlåsning</h4><div class="e" data-tex="\tan\lambda=\tfrac{5}{62{,}83}=0{,}080<\mu=0{,}10\ \checkmark"></div><div class="c">Skruen holder lasten selv</div></div></div>
-      <div class="st"><span class="n">5</span><div><h4>Uden friktion</h4><div class="e" data-tex="T_0=\tfrac{W\,l}{2\pi}=\tfrac{10\,000\cdot5}{2\pi}=7{,}96\ \text{N}\cdot\text{m}"></div></div></div>
-      <div class="st"><span class="n">6</span><div><h4>Virkningsgrad</h4><div class="e" data-tex="e=\dfrac{T_0}{T}=\dfrac{7{,}96}{18{,}1}=44\ \%"></div><div class="c">Under 50 %, som det skal være for en selvlåsende skrue</div></div></div>
+<!-- ============ 4 · (b) Kontrol ============ -->
+<section class="slide" data-title="(b) Kontrol">
+  <div class="hd"><span class="tag b">SPM. 6 (b) · 2/2</span><h1>Holder den lasten? Og hvad koster det?</h1></div>
+  <div class="body" style="grid-template-columns:600px 1fr">
+    <div class="card steps" style="padding:8px 24px">
+      <div class="step" id="b4"><span class="n">4</span><div class="t"><b>Gevindvinkel og selvlåsning</b>
+        <span class="m" data-tex="\tan\lambda=\dfrac{5}{62{,}83}=0{,}080\ \Rightarrow\ \lambda=4{,}55^\circ"></span>
+        <span class="note"><span data-tex="\mu=0{,}10>0{,}080"></span>: skruen holder lasten selv <span class="ok">✓</span></span></div></div>
+      <div class="step" id="b5"><span class="n">5</span><div class="t"><b>Uden friktion</b>
+        <span class="m" data-tex="T_0=\dfrac{W\,l}{2\pi}=\dfrac{10\,000\cdot5}{2\pi}=7{,}96\ \text{N}\cdot\text{m}"></span></div></div>
+      <div class="step" id="b6"><span class="n">6</span><div class="t"><b>Virkningsgrad</b>
+        <span class="m" data-tex="e=\dfrac{T_0}{T}=\dfrac{7{,}96}{18{,}1}=44\ \%"></span>
+        <span class="note">Under 50 %, som det skal være for en selvlåsende skrue</span></div></div>
     </div>
-    <div class="card w">
-      <div class="seg" id="hv"><button data-h="0" class="on">Opgaven</button><button data-h="1">Smurt, μ = 0,05</button><button data-h="2">To-løbet, l = 10</button><button data-h="3">W = 20 kN</button><button data-h="4">Ingen friktion</button></div>
-      <canvas id="cH" width="1700" height="560"></canvas>
-      <div class="nums"><div><span>Løftemoment T</span><b id="hT">18,1</b> N·m<i id="hTr"></i></div><div><span>Virkningsgrad</span><b id="hE">44</b> %</div><div><span>Selvlåsning</span><b id="hS" style="font-size:28px">ja</b></div></div>
+    <div class="card fl" id="cHv">
+      <h3>Hvad nu hvis …</h3>
+      <div class="row" id="hv"><button class="btn on" data-h="0">Opgaven</button><button class="btn" data-h="1">Smurt, μ = 0,05</button><button class="btn" data-h="2">To-løbet, l = 10</button><button class="btn" data-h="3">W = 20 kN</button><button class="btn" data-h="4">Ingen friktion</button></div>
+      <canvas id="cH" width="1700" height="640"></canvas>
+      <div class="ro">
+        <div><span>LØFTEMOMENT T</span><b class="cy" id="hT">18,1</b><i id="hTr"></i></div>
+        <div><span>VIRKNINGSGRAD</span><b id="hE">44 %</b></div>
+        <div><span>SELVLÅSENDE?</span><b id="hS">Ja</b></div>
+      </div>
     </div>
   </div>
-  <div class="say"><span class="p">SIG</span><span>Over halvdelen af momentet går til friktion. Det er prisen for, at skruen holder lasten. Smøres den til μ = 0,05, falder momentet, men lasten glider ned.</span></div>
+  <div class="ft"><b class="say">SIG</b><span>Over halvdelen af momentet går til friktion. Det er prisen for, at skruen holder. Smøres den til μ = 0,05, glider lasten ned.</span></div>
 </section>
 
 </div></div>
@@ -168,91 +180,90 @@ iframe.lab{width:100%;border:0;border-radius:20px;display:block;background:#f4f7
 <script>
 (function () {
 'use strict';
-var $ = Deck.$, fmt = Deck.fmt, PI = Math.PI, INK = '#111114', MUT = '#8a8a94', A1 = '#5b5bd6', A2 = '#a855f7', OK = '#16a34a', BAD = '#e11d48', SOFT = '#f5f5f8';
+var $ = Deck.$, fmt = Deck.fmt, PI = Math.PI;
+var CY = '#0a7fc2', OR = '#d97a00', RD = '#d63a3a', GR = '#0a9a5c', INK = '#14202d', MUT = '#5a6b7d', LINE = '#d3dde8', GRID = '#e3eaf1', P2 = '#ebf1f7', MET = '#c9d5e1';
 function scr(W, dm, l, mu) {
   var c = PI * dm, T = W * dm / 2 * (l + PI * mu * dm) / (c - mu * l), Ts = W * dm / 2 * (PI * mu * dm - l) / (c + mu * l), T0 = W * l / (2 * PI);
   return { T: T / 1000, Ts: Ts / 1000, T0: T0 / 1000, tl: l / c, lock: mu >= l / c, e: T0 / T };
 }
-function grad(x, x0, x1) { var g = x.createLinearGradient(x0, 0, x1, 0); g.addColorStop(0, A1); g.addColorStop(1, A2); return g; }
 
-/* forside: skrue */
-(function () {
-  var g = Deck.cv('c0'), x = g.x; g.clear();
-  var cx = 560, top = 160, bot = 1200, R = 150;
-  x.fillStyle = '#eef0f6'; x.fillRect(cx - R, top, 2 * R, bot - top);
-  for (var y = top; y < bot; y += 60) { x.strokeStyle = grad(x, cx - R, cx + R); x.lineWidth = 16; x.lineCap = 'round'; x.beginPath(); x.moveTo(cx - R, y + 30); x.lineTo(cx + R, y); x.stroke(); }
-  x.fillStyle = INK; x.fillRect(cx - 270, 520, 540, 120);
-  g.arrow(cx, 140, cx, 40, A1, 10);
-  g.txt('W', cx + 40, 90, 70, INK, 'left', 'middle', 800);
-})();
-
-/* ===== a1: kileplan ===== */
+/* ===== (a) 1/2: kileplan ===== */
 var K = { mu: 0.1, l: 5 };
 Deck.range('kM', function (v) { K.mu = v; drawK(); }, function (v) { return fmt(v, 2); });
 Deck.range('kL', function (v) { K.l = v; drawK(); }, function (v) { return fmt(v, 1) + ' mm'; });
 function drawK() {
   var g = Deck.cv('cK'), x = g.x; g.clear();
-  var dm = 20, c = PI * dm, sx = 13, sy = Math.min(40, 470 / K.l), ox = 100, oy = 700, lam = Math.atan(K.l * sy / (c * sx));
-  /* trekant */
-  x.fillStyle = SOFT; x.beginPath(); x.moveTo(ox, oy); x.lineTo(ox + c * sx, oy); x.lineTo(ox + c * sx, oy - K.l * sy); x.closePath(); x.fill();
-  x.strokeStyle = INK; x.lineWidth = 3; x.stroke();
-  g.txt('π·d_m = ' + fmt(c, 1) + ' mm', ox + c * sx / 2, oy + 38, 30, MUT, 'center', 'middle', 700);
-  g.txt('l = ' + fmt(K.l, 1), ox + c * sx + 18, oy - K.l * sy / 2, 30, MUT, 'left', 'middle', 700);
-  g.txt('λ', ox + 120, oy - 22, 32, INK, 'left', 'middle', 700); g.txt('lodret skala forstørret', ox + c * sx, oy - K.l * sy - 24, 22, MUT, 'right', 'middle', 600);
-  /* klods på skråplanet */
-  var t = 0.55, bx = ox + c * sx * t, by = oy - K.l * sy * t, ca = Math.cos(lam), sa = Math.sin(lam), s = 70;
+  var dm = 20, c = PI * dm, sx = 14, sy = Math.min(40, 400 / K.l), ox = 50, oy = 560, lam = Math.atan(K.l * sy / (c * sx));
+  x.fillStyle = P2; x.beginPath(); x.moveTo(ox, oy); x.lineTo(ox + c * sx, oy); x.lineTo(ox + c * sx, oy - K.l * sy); x.closePath(); x.fill();
+  x.strokeStyle = '#44586e'; x.lineWidth = 3; x.stroke();
+  g.line([[ox, oy], [ox + c * sx, oy - K.l * sy]], CY, 7);
+  g.txt('π·d_m = ' + fmt(c, 1) + ' mm', ox + c * sx / 2, oy + 40, 34, MUT, 'center', 'middle', 700);
+  g.txt('l = ' + fmt(K.l, 1), ox + c * sx - 14, oy - K.l * sy / 2, 34, CY, 'right', 'middle', 800);
+  g.txt('λ', ox + 150, oy - 26, 38, RD, 'left', 'middle', 800);
+  g.txt('lodret skala forstørret', ox + c * sx, 30, 26, MUT, 'right', 'middle', 600);
+  var t = 0.5, bx = ox + c * sx * t, by = oy - K.l * sy * t, ca = Math.cos(lam), sa = Math.sin(lam), s = 56;
   function P(u, v) { return [bx + u * ca - v * sa, by - u * sa - v * ca]; }
-  g.poly([P(-s, 0), P(s, 0), P(s, 2 * s), P(-s, 2 * s)], '#fff', INK, 3);
+  g.poly([P(-s, 0), P(s, 0), P(s, 2 * s), P(-s, 2 * s)], '#fff', '#44586e', 3);
   var cxb = P(0, s);
-  g.txt('W', cxb[0], cxb[1], 36, INK, 'center', 'middle', 800);
-  /* kræfter */
-  var top = P(0, 2 * s); g.arrow(top[0], top[1] - 130, top[0], top[1] - 6, INK, 5);
-  var R = scr(10000, dm, K.l, K.mu), Pk = R.T * 1000 / (dm / 2) / 10000; /* P/W */
-  g.arrow(cxb[0] - 330, cxb[1], cxb[0] - 90, cxb[1], A1, 7); g.txt('P = ' + fmt(Pk, 3) + '·W', cxb[0] - 340, cxb[1] - 36, 30, A1, 'left', 'middle', 800);
-  var fr = P(-s - 8, 0.4 * s); g.arrow(fr[0], fr[1], fr[0] - 130 * Math.cos(lam), fr[1] + 130 * Math.sin(lam), BAD, 5); g.txt('friktion μN', fr[0] - 150, fr[1] - 30, 26, BAD, 'right', 'middle', 700);
-  /* tal */
-  var X0 = 1120;
-  g.txt('tan λ = l/(πd_m)', X0, 120, 26, MUT, 'left', 'middle', 700); g.txt(fmt(R.tl, 3), X0, 165, 46, INK, 'left', 'middle', 800);
-  g.txt('T (W = 10 kN)', X0, 240, 26, MUT, 'left', 'middle', 700); g.txt(fmt(R.T, 1) + ' N·m', X0, 285, 46, A1, 'left', 'middle', 800);
-  g.txt('uden friktion', X0, 360, 26, MUT, 'left', 'middle', 700); g.txt(fmt(R.T0, 1) + ' N·m', X0, 405, 46, INK, 'left', 'middle', 800);
-  g.txt('friktionens andel', X0, 480, 26, MUT, 'left', 'middle', 700); g.txt(fmt((1 - R.e) * 100, 0) + ' %', X0, 525, 46, BAD, 'left', 'middle', 800);
+  g.txt('W', cxb[0], cxb[1], 36, OR, 'center', 'middle', 800);
+  var top = P(0, 2 * s); g.arrow(top[0], top[1] - 110, top[0], top[1] - 6, OR, 6);
+  var R = scr(10000, dm, K.l, K.mu), Pk = R.T * 1000 / (dm / 2) / 10000;
+  g.arrow(cxb[0] - 300, cxb[1], cxb[0] - 70, cxb[1], CY, 7); g.txt('P = ' + fmt(Pk, 3) + '·W', cxb[0] - 300, cxb[1] - 40, 34, CY, 'left', 'middle', 800);
+  var f0 = P(-s - 6, 0.3 * s); if (K.mu > 0) { g.arrow(f0[0], f0[1], f0[0] - 140 * Math.cos(lam), f0[1] + 140 * Math.sin(lam), RD, 6); g.txt('friktion μN', f0[0] - 120, f0[1] + 70, 30, RD, 'center', 'middle', 800); }
+  $('kTl').textContent = fmt(R.tl, 3); $('kT').textContent = fmt(R.T, 1); $('kF').textContent = fmt((1 - R.e) * 100, 0) + ' %';
 }
 drawK();
 
-/* ===== a2: selvlåsning + lab ===== */
+/* ===== (a) 2/2: selvlåsning + lab ===== */
 var A = { mu: 0.1, l: 5 };
 var send = Deck.lab('lab', 'kraftskrue', function () { return { 'middeldiameter': 20, 'stigning': A.l, 'gevindfriktion': A.mu, 'last w': 10 }; });
 Deck.range('aM', function (v) { A.mu = v; updA(); }, function (v) { return fmt(v, 3); });
 Deck.range('aL', function (v) { A.l = v; updA(); }, function (v) { return fmt(v, 1) + ' mm'; });
 function updA() {
   var R = scr(10000, 20, A.l, A.mu), p = $('aS');
-  p.className = 'pill ' + (R.lock ? 'ok' : 'bad'); p.textContent = R.lock ? '✓ Selvlåsende' : '✕ Glider ned af sig selv';
-  $('aT').innerHTML = 'μ = ' + fmt(A.mu, 3) + (R.lock ? ' ≥ ' : ' &lt; ') + 'tan λ = ' + fmt(R.tl, 3) + ' &nbsp;·&nbsp; T<sub>hæv</sub> = ' + fmt(R.T, 1) + ' N·m &nbsp;·&nbsp; T<sub>sænk</sub> = ' + fmt(R.Ts, 1) + ' N·m';
+  p.className = 'status ' + (R.lock ? 'good' : 'bad');
+  p.innerHTML = (R.lock ? '<b>✓ Selvlåsende</b>: μ = ' + fmt(A.mu, 3) + ' ≥ ' : '<b>✕ Glider ned af sig selv</b>: μ = ' + fmt(A.mu, 3) + ' &lt; ') + 'tan λ = ' + fmt(R.tl, 3) +
+    ' &nbsp;·&nbsp; T<sub>hæv</sub> = ' + fmt(R.T, 1) + ' N·m &nbsp;·&nbsp; T<sub>sænk</sub> = ' + fmt(R.Ts, 1) + ' N·m &nbsp;·&nbsp; e = ' + fmt(R.e * 100, 0) + ' %';
   send();
 }
 updA();
 
-/* ===== b2: hvad nu hvis ===== */
+/* ===== (b) 1/2: håndtag ===== */
+(function () {
+  var g = Deck.cv('cB'), x = g.x; g.clear();
+  var cx = 180, cy = 330;
+  g.rect(cx - 50, cy - 240, 100, 480, '#dfe6ee'); x.strokeStyle = '#44586e'; x.lineWidth = 3; x.strokeRect(cx - 50, cy - 240, 100, 480);
+  for (var y = cy - 220; y < cy + 230; y += 50) g.line([[cx - 50, y + 18], [cx + 50, y]], CY, 6);
+  g.rect(cx - 20, cy - 20, 680, 40, '#44586e');
+  g.dot(cx + 660, cy, 34, OR);
+  g.arrow(cx + 660, cy + 50, cx + 660, cy + 190, OR, 8); g.txt('F ≈ 60 N', cx + 690, cy + 140, 40, OR, 'left', 'middle', 800);
+  g.line([[cx, cy - 80], [cx + 660, cy - 80]], MUT, 2); g.txt('30 cm', cx + 330, cy - 110, 34, MUT, 'center', 'middle', 700);
+  g.arrow(cx, cy - 330, cx, cy - 250, OR, 8); g.txt('W = 10 kN', cx + 30, cy - 296, 36, OR, 'left', 'middle', 800);
+  g.txt('T = 18,1 N·m', 520, 580, 52, CY, 'center', 'middle', 800);
+  g.txt('60 N · 0,30 m = 18 N·m', 520, 630, 30, MUT, 'center', 'middle', 700);
+})();
+
+/* ===== (b) 2/2: hvad nu hvis ===== */
 var HV = [[10000, 5, 0.1, 'Opgaven'], [10000, 5, 0.05, 'μ = 0,05'], [10000, 10, 0.1, 'l = 10 mm'], [20000, 5, 0.1, 'W = 20 kN'], [10000, 5, 0, 'μ = 0']], H0 = scr(10000, 20, 5, 0.1), hi = 0;
 Deck.group('[data-h]', function (v) { hi = +v; drawH(); });
 function drawH() {
   var g = Deck.cv('cH'), x = g.x; g.clear();
-  var L = 250, R = 1660, sc = (R - L) / 46;
+  var L = 260, R = 1380, sc = (R - L) / 46;
   HV.forEach(function (h, i) {
-    var K = scr(h[0], 20, h[1], h[2]), y = 20 + i * 104, on = i === hi;
-    x.globalAlpha = on ? 1 : 0.35;
-    g.txt(h[3], L - 20, y + 31, 28, INK, 'right', 'middle', on ? 800 : 600);
-    x.fillStyle = '#d9d9e3'; x.beginPath(); x.roundRect(L, y, K.T0 * sc, 62, 14); x.fill();
-    x.fillStyle = grad(x, L, R); x.beginPath(); x.roundRect(L + K.T0 * sc + 4, y, Math.max(0, (K.T - K.T0) * sc - 4), 62, 14); x.fill();
-    g.txt(fmt(K.T, 1) + ' N·m', L + K.T * sc + 16, y + 31, 30, INK, 'left', 'middle', 800);
-    g.txt(K.lock ? 'holder' : 'glider', L + K.T * sc + 190, y + 31, 24, K.lock ? OK : BAD, 'left', 'middle', 800);
+    var K = scr(h[0], 20, h[1], h[2]), y = 20 + i * 112, on = i === hi;
+    x.globalAlpha = on ? 1 : 0.4;
+    g.txt(h[3], L - 20, y + 36, 34, INK, 'right', 'middle', on ? 800 : 600);
+    g.rect(L, y, K.T0 * sc, 72, MET);
+    g.rect(L + K.T0 * sc + 3, y, Math.max(0, (K.T - K.T0) * sc - 3), 72, RD);
+    g.txt(fmt(K.T, 1) + ' N·m', L + K.T * sc + 16, y + 36, 34, INK, 'left', 'middle', 800);
+    g.txt(K.lock ? 'holder' : 'glider', L + K.T * sc + 190, y + 36, 30, K.lock ? GR : RD, 'left', 'middle', 800);
     x.globalAlpha = 1;
   });
-  g.txt('grå = løft (W·l/2π)    farve = friktion', R, 545, 22, MUT, 'right', 'middle', 700);
+  g.txt('grå = selve løftet (W·l/2π)   rød = friktion', R + 300, 612, 28, MUT, 'right', 'middle', 700);
   var h = HV[hi], K = scr(h[0], 20, h[1], h[2]);
-  $('hT').textContent = fmt(K.T, 1); Deck.rel('hTr', K.T, H0.T);
-  $('hE').textContent = fmt(K.e * 100, 0);
-  var s = $('hS'); s.textContent = K.lock ? 'Ja' : 'Nej'; s.style.color = K.lock ? OK : BAD;
+  $('hT').textContent = fmt(K.T, 1) + ' N·m'; Deck.rel('hTr', K.T, H0.T);
+  $('hE').textContent = fmt(K.e * 100, 0) + ' %';
+  var s = $('hS'); s.textContent = K.lock ? 'Ja' : 'Nej'; s.style.color = K.lock ? GR : RD;
 }
 drawH();
 Deck.init();
