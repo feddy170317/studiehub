@@ -77,6 +77,19 @@ button.pri{background:var(--cy);border-color:var(--cy);color:#fff}
 .st .n{width:26px;height:26px;border-radius:50%;background:var(--cy);color:#fff;font:800 13px/26px system-ui;text-align:center}
 .st .m{display:block;margin-top:2px;overflow-x:auto;overflow-y:hidden}
 .st .katex-display{margin:.35em 0}
+.st > div{min-width:0}
+.st .sh{font-weight:750;font-size:16.5px;margin:1px 0 6px}
+.st .fx{background:#eef6fc;border:1px solid #c6e0f2;border-left:4px solid var(--cy);border-radius:9px;padding:7px 12px 2px;margin:6px 0;overflow-x:auto}
+.st .fl{display:flex;gap:10px;flex-wrap:wrap;align-items:baseline;font-size:13px;color:var(--mut)}
+.st .fl b{font:800 11px ui-monospace,monospace;letter-spacing:.08em;color:var(--cy)}
+.st .hv,.st .rr,.st .nt{border-radius:9px;padding:7px 12px;margin:6px 0;font-size:15.5px}
+.st .hv{background:#f4f1fb;border:1px solid #ddd2f1}
+.st .rr{background:#fff8e8;border:1px solid #f0d9a8}
+.st .nt{background:#ecf8f2;border:1px solid #bfe5d2}
+.st .k{font:800 11px ui-monospace,monospace;letter-spacing:.1em;margin-right:7px}
+.st .hv .k{color:#7a4fc2}.st .rr .k{color:#b06a00}.st .nt .k{color:#0a9a5c}
+.st .so{margin:6px 0;overflow-x:auto}
+.st .rr .katex,.st .hv .katex,.st .nt .katex{font-size:1.14em}
 .lb{display:flex;gap:8px;margin-top:6px}
 .tip{font-size:13px;color:var(--mut);margin-top:30px;text-align:center}
 .katex{font-size:1.06em}
@@ -98,6 +111,10 @@ button.pri{background:var(--cy);border-color:var(--cy);color:#fff}
 </div>
 <script src="../assets/ele.js"></script>
 <script src="opgaver.js"></script>
+<script src="los_1.js"></script>
+<script src="los_2.js"></script>
+<script src="los_3.js"></script>
+<script src="los_4.js"></script>
 <script>
 (function () {
 'use strict';
@@ -139,6 +156,22 @@ function rich(s, R) {
     return fill(p, R, false);
   }).join('');
 }
+/* et løsningstrin: streng (gammelt format) eller { h, f, hv, s, r, n } */
+function arr(v) { return v == null ? [] : [].concat(v); }
+function step(s, R) {
+  if (typeof s === 'string') return rich(s, R);
+  var h = '';
+  if (s.h) h += '<div class="sh">' + rich(s.h, R) + '</div>';
+  arr(s.f).forEach(function (k) {
+    var F = typeof k === 'string' ? (window.FORM || {})[k] : k; if (!F) return;
+    h += '<div class="fx"><div class="fl"><b>FORMEL ' + F[2] + '</b><span>' + F[1] + '</span></div>' + tex(F[0], true) + '</div>';
+  });
+  if (s.hv) h += '<div class="hv"><b class="k">HVORFOR</b>' + rich(s.hv, R) + '</div>';
+  arr(s.s).forEach(function (t) { h += '<div class="so">' + rich(t, R) + '</div>'; });
+  arr(s.r).forEach(function (t) { h += '<div class="rr"><b class="k">REGNEREGEL</b>' + rich(t, R) + '</div>'; });
+  if (s.n) h += '<div class="nt"><b class="k">' + (/^Tjek/.test(s.n) ? 'TJEK' : 'BEMÆRK') + '</b>' + rich(s.n.replace(/^Tjek:\s*/, ''), R) + '</div>';
+  return h;
+}
 function tex(s, disp) { try { return katex.renderToString(s, { throwOnError: false, displayMode: disp }); } catch (e) { return s; } }
 
 /* formelkort */
@@ -148,7 +181,10 @@ document.getElementById('fk').innerHTML = T.formler.map(function (f) { return '<
 var list = document.getElementById('list'), done = store['t' + ti] = store['t' + ti] || {};
 var lastLv = 0;
 T.opg.forEach(function (o, i) {
+  var L = window.LOS && LOS[ti] && LOS[ti][i];
+  if (L) { if (L.los) { o.los = L.los; o.x = L.x; } else o.los = L; }
   var R = o.calc ? o.calc() : {};
+  if (o.x) o.x(R);
   if (o.lvl !== lastLv) { var h = document.createElement('div'); h.className = 'sec'; h.textContent = ['', 'LET · KOM I GANG', 'MELLEM · BYG OVENPÅ', 'SVÆR · SOM TIL EKSAMEN'][o.lvl]; list.appendChild(h); lastLv = o.lvl; }
   var el = document.createElement('section'); el.className = 'opg l' + o.lvl + (done[i + 1] ? ' solved' : ''); el.id = 'o' + (i + 1);
   var html = '<div class="oh"><span class="nr">' + (i + 1) + '/10</span><span class="lv l' + o.lvl + '">' + LV[o.lvl] + '</span><h2>' + rich(o.titel, R) + '</h2>' +
@@ -160,7 +196,7 @@ T.opg.forEach(function (o, i) {
   }).join('') + '</div>';
   html += '<div class="btns"><button class="pri" data-a="chk">Tjek svar</button><button data-a="hint">Hint</button><button data-a="los">Vis løsning</button></div>';
   html += '<div class="hint"><b class="k">HINT</b>' + rich(o.hint, R) + '</div>';
-  html += '<div class="los">' + o.los.map(function (s, j) { return '<div class="st"><span class="n">' + (j + 1) + '</span><div>' + rich(s, R) + '</div></div>'; }).join('') +
+  html += '<div class="los">' + o.los.map(function (s, j) { return '<div class="st"><span class="n">' + (j + 1) + '</span><div>' + step(s, R) + '</div></div>'; }).join('') +
     '<div class="lb"><button data-a="next">Næste trin ▸</button><button data-a="all">Vis alle trin</button></div></div>';
   el.innerHTML = html;
   if (o.fig) { var f = typeof o.fig === 'function' ? o.fig(R) : o.fig; el.querySelector('.fig').appendChild(Ckt.make(f, o.figH || 260).el); }
