@@ -114,7 +114,8 @@ Ckt.ladder = function (items, o) {
     if (t === 'ACr') { t = 'AC'; rev = true; }
     return { t: t, a: rev ? b : a, b: rev ? a : b, label: lab, side: side, id: id };
   }
-  var lastWasP = false;
+  var lastWasP = false, pendN = null;
+  function nodeLabel(it, x) { if (it.n) parts.push({ t: 'txt', at: [x - 8, top - 16], s: it.n, color: '#0a7fc2', size: 17, anchor: 'end', id: it.id }); }
   items.forEach(function (it, k) {
     if (it.p) {
       var x = cur == null ? 60 : (lastWasP ? cur + GAP : cur);
@@ -124,6 +125,7 @@ Ckt.ladder = function (items, o) {
       if (arr.length === 1) parts.push(el(arr[0], [x, bot], [x, top], side));
       else { var mid = (top + bot) / 2; parts.push(el(arr[0], [x, mid], [x, top], side)); parts.push(el(arr[1], [x, bot], [x, mid], side)); }
       if (k > 0) parts.push({ t: 'node', at: [x, top] });
+      if (pendN) { nodes.push(x); nodeLabel(pendN, x); pendN = null; }
       cur = x; lastWasP = true;
     } else if (it.s) {
       if (cur == null) cur = 60, x0 = 60;
@@ -137,9 +139,11 @@ Ckt.ladder = function (items, o) {
       }
       cur += SL; lastWasP = false;
     } else if (it.n != null) {
+      /* knude mellem to parallelle grene: mærket hører til forgreningen ved den NÆSTE gren, ikke til hjørnet ved kilden */
+      if (lastWasP && items[k + 1] && items[k + 1].p) { pendN = it; return; }
       nodes.push(cur);
       parts.push({ t: 'node', at: [cur, top] });
-      if (it.n) parts.push({ t: 'txt', at: [cur - 8, top - 16], s: it.n, color: '#0a7fc2', size: 17, anchor: 'end', id: it.id });
+      nodeLabel(it, cur);
     }
   });
   if (!lastWasP) { parts.push({ t: 'w', pts: [[cur, top], [cur + 30, top], [cur + 30, bot]] }); cur += 30; }
