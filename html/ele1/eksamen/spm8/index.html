@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spm. 8 · Trefase</title>
+<meta name="description" content="ELE1 eksamensspørgsmål 8: trefaset effekt i en ubalanceret Y-last med modstand i nullederen. Fasestrømme, nulleder-strøm, S, P, Q og PF.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../assets/s7.css">
+<style>#ckW svg text{font-size:19px}</style>
+</head>
+<body>
+<div class="home"><a href="../index.html">☰ Oversigt</a><a href="../traening/index.html#8">✎ Træn 10 opgaver</a></div>
+<div class="vp"><div class="deck">
+
+<!-- ============ 0 · FORSIDE ============ -->
+<section class="slide on" data-title="Forside">
+  <div style="flex:1;display:grid;grid-template-columns:1fr 700px;gap:40px;align-items:center;padding:0 20px">
+    <div style="display:flex;flex-direction:column;gap:30px">
+      <div>
+        <div class="tag" style="display:inline-block">ELE1 · EKSAMENSSPØRGSMÅL 8</div>
+        <h1 style="font-size:72px;margin-top:22px">Trefaset effekt</h1>
+        <div style="font-size:29px;color:var(--mut);margin-top:8px">Tre sinusser forskudt <b class="cy">120°</b>. Er lasten ens i alle faser, går strømmene i nul i nullederen.</div>
+      </div>
+      <div class="card qcard"><span class="lbl cy">(a) FORKLAR · 2 SLIDES</span>
+        Trefase og Y-forbindelse. Hvorfor nullederen er strømløs ved balance, og hvad der sker, når den ikke er det.</div>
+      <div class="card qcard"><span class="lbl or">(b) BEREGN · 2 SLIDES</span>
+        Fasestrømme, strømmen i nullederen, S, P, Q og PF for lasten. <span data-tex="V=220\text{ V RMS}"></span>, 50 Hz.</div>
+    </div>
+    <div class="card fl"><h3>Opgavens kredsløb</h3><img class="exfig" src="fig.png" alt="Trefase-kilde V1 V2 V3 på 220 V og Y-last: C1 120 µF og R1 100 ohm, R2 200 ohm, R3 50 ohm og L3 50 mH, RN 2 ohm i nullederen"></div>
+  </div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm</div>
+</section>
+
+<!-- ============ 1 · (a) Tre faser ============ -->
+<section class="slide" data-title="(a) Tre faser">
+  <div class="hd"><span class="tag">SPM. 8 (a) · 1/2</span><h1>Tre cyklister på én tandem<small>hver sit tryk, 120° forskudt</small></h1></div>
+  <div class="body" style="grid-template-columns:560px 1fr">
+    <div class="card">
+      <h3>Trefase i Y</h3>
+      <div class="big" style="font-size:34px" data-tex="\mathbf V_1=V\angle0^\circ,\ \ \mathbf V_2=V\angle{120^\circ},\ \ \mathbf V_3=V\angle{-120^\circ}"></div>
+      <div class="sub">(opgavens fasefølge, alle RMS)</div>
+      <div class="terms">
+        <div class="term"><span class="s cy">hvorfor 3</span><span><b>Jævn effekt.</b> Én cyklist giver ryk. Tre, der skiftes, giver et jævnt træk. En trefasemotor kører derfor roligt.</span></div>
+        <div class="term"><span class="s" data-tex="\mathbf I_N"></span><span><b>Nullederen</b> fører summen tilbage: <span data-tex="\mathbf I_N=\mathbf I_1+\mathbf I_2+\mathbf I_3"></span> (KCL i stjernepunktet).</span></div>
+        <div class="term"><span class="s gr">balance</span><span><b>Ens last</b>: tre lige store pile 120° fra hinanden danner en lukket trekant, så <span data-tex="\mathbf I_N=0"></span>.</span></div>
+        <div class="term"><span class="s or" data-tex="V_L"></span><span><b>Linjespænding</b> mellem to faser: <span data-tex="V_L=\sqrt3\,V_f"></span> (220 → 381 V).</span></div>
+      </div>
+    </div>
+    <div class="card fl">
+      <h3>Prøv selv: gør fase 1 tungere end de andre</h3>
+      <canvas id="cB" width="1800" height="760"></canvas>
+      <div class="sl"><span>Strøm i fase 1</span><input id="bK" type="range" min="0" max="200" step="5" value="100"><output id="bKo"></output></div>
+      <div class="status good" id="bS"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Tre spændinger 120° fra hinanden. Ved ens last ophæver strømmene hinanden, og nullederen er <b class="gr">strømløs</b>. Ubalance giver strøm i nullederen.</span></div>
+</section>
+
+<!-- ============ 2 · (a) Millman ============ -->
+<section class="slide" data-title="(a) Ubalance + RN">
+  <div class="hd"><span class="tag">SPM. 8 (a) · 2/2</span><h1>Når nullederen har en modstand<small>stjernepunktet flytter sig</small></h1></div>
+  <div class="body" style="grid-template-columns:640px 1fr">
+    <div class="card steps tight" style="padding:4px 22px">
+      <div class="step"><span class="n">1</span><div class="t"><b>Ideel nulleder</b> (<span data-tex="R_N=0"></span>): hver fase er sit eget kredsløb, <span data-tex="\mathbf I_k=\mathbf V_k/Z_k"></span></div></div>
+      <div class="step"><span class="n">2</span><div class="t"><b>Nulleder med R<sub>N</sub></b>: lastens stjernepunkt N′ får en spænding <span data-tex="\mathbf V_{N'}"></span>. Find den med KCL i N′ (Millman):
+        <span class="m" data-tex="\mathbf V_{N'}=\dfrac{\sum\mathbf V_k/Z_k}{\sum1/Z_k+1/R_N}"></span></div></div>
+      <div class="step"><span class="n">3</span><div class="t"><b>Fasestrømme</b>: <span data-tex="\mathbf I_k=\dfrac{\mathbf V_k-\mathbf V_{N'}}{Z_k}"></span> og <span data-tex="\mathbf I_N=\dfrac{\mathbf V_{N'}}{R_N}"></span></div></div>
+      <div class="step"><span class="n">4</span><div class="t"><b>Effekt</b>: læg faserne sammen, <span data-tex="\mathbf S=\sum\mathbf V_k\mathbf I_k^*"></span>. <span data-tex="P=\text{Re}\,\mathbf S,\ Q=\text{Im}\,\mathbf S,\ PF=P/|S|"></span></div></div>
+    </div>
+    <div class="card fl">
+      <h3>Opgavens last: skru på R<sub>N</sub></h3>
+      <canvas id="cM" width="1700" height="740"></canvas>
+      <div class="sl"><span>R<sub>N</sub></span><input id="mR" type="range" min="-1" max="3" step="0.02" value="0.301"><output id="mRo"></output></div>
+      <div class="status mid" id="mS"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Med en ideel nulleder er hver fase uafhængig. Med R<sub>N</sub> flytter stjernepunktet sig, og det finder man med Millman. Her er R<sub>N</sub> kun 2 Ω, så flytningen er lille: <b>3,9 V</b>.</span></div>
+</section>
+
+<!-- ============ 3 · (b) Fasestrømme ============ -->
+<section class="slide" data-title="(b) Fasestrømme">
+  <div class="hd"><span class="tag b">SPM. 8 (b) · 1/2</span><h1>Fasestrømmene</h1></div>
+  <div class="chips">
+    <span class="chip">V = 220 V RMS<small>V₂∠+120°, V₃∠−120°</small></span><span class="chip">Z₁ = R₁ + C₁<small>100 Ω, 120 µF</small></span><span class="chip">Z₂ = R₂<small>200 Ω</small></span><span class="chip">Z₃ = R₃ + L₃<small>50 Ω, 50 mH</small></span><span class="chip or">R<sub>N</sub> = 2 Ω</span>
+  </div>
+  <div class="body" style="grid-template-columns:840px 1fr">
+    <div class="card steps tight" style="padding:4px 24px">
+      <div class="step"><span class="n">1</span><div class="t"><b>Fasernes impedanser</b> (ω = 314,16)
+        <span class="m" data-tex="Z_1=100-j26{,}5,\quad Z_2=200,\quad Z_3=50+j15{,}7\ \ [\Omega]"></span></div></div>
+      <div class="step"><span class="n">2</span><div class="t"><b>Millman: stjernepunktets spænding</b>
+        <span class="m" data-tex="\mathbf V_{N'}=\frac{2{,}078\angle{-139{,}8^\circ}}{0{,}533\angle{-0{,}35^\circ}}=3{,}90\angle{-139{,}4^\circ}\ \text{V}"></span>
+        <span class="note">tælleren <span data-tex="\sum\mathbf V_k/Z_k"></span> er nulleder-strømmen, man ville få med ideel nulleder</span></div></div>
+      <div class="step"><span class="n">3</span><div class="t"><b>Fasestrømme</b> <span data-tex="\mathbf I_k=(\mathbf V_k-\mathbf V_{N'})/Z_k"></span>
+        <span class="m" data-tex="\boxed{\mathbf I_1=2{,}16\angle15{,}5^\circ,\ \ \mathbf I_2=1{,}10\angle119{,}0^\circ,\ \ \mathbf I_3=4{,}13\angle{-137{,}1^\circ}\ \text{A}}"></span>
+        <span class="note">Fase 3 har mindst impedans og får mest strøm. Fase 1 ligger foran (C), og fase 3 bagefter (L)</span></div></div>
+    </div>
+    <div class="card fl">
+      <h3>Y-lasten (aflæst af figuren)</h3>
+      <div id="ckW" style="flex:1;display:flex;align-items:center"></div>
+      <table class="tb"><tr><th>fase</th><th>Z</th><th style="text-align:right">|I|</th><th style="text-align:right">vinkel</th></tr>
+        <tr><td>1 (C₁ + R₁)</td><td>103,5∠−14,9° Ω</td><td class="num">2,16 A</td><td class="num">+15,5°</td></tr>
+        <tr><td>2 (R₂)</td><td>200∠0° Ω</td><td class="num">1,10 A</td><td class="num">+119,0°</td></tr>
+        <tr><td>3 (R₃ + L₃)</td><td>52,4∠17,4° Ω</td><td class="num">4,13 A</td><td class="num">−137,1°</td></tr></table>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Lasten er ubalanceret, så stjernepunktet flytter sig 3,9 V. Fasestrømmene er <b class="cy">2,16 A, 1,10 A og 4,13 A</b>. Fase 3 har lavest impedans og får mest.</span></div>
+</section>
+
+<!-- ============ 4 · (b) I_N og effekt ============ -->
+<section class="slide" data-title="(b) IN og effekt">
+  <div class="hd"><span class="tag b">SPM. 8 (b) · 2/2</span><h1>Nulleder-strøm, S, P, Q og PF</h1></div>
+  <div class="body" style="grid-template-columns:660px 1fr">
+    <div class="card steps tight" style="padding:4px 22px">
+      <div class="step"><span class="n">4</span><div class="t"><b>Nullederen</b>
+        <span class="m" data-tex="\boxed{\mathbf I_N=\frac{\mathbf V_{N'}}{R_N}=1{,}95\angle{-139{,}4^\circ}\ \text{A}}"></span>
+        <span class="note">Kontrol: <span data-tex="\mathbf I_1+\mathbf I_2+\mathbf I_3"></span> giver det samme</span></div></div>
+      <div class="step"><span class="n">5</span><div class="t"><b>Effekt pr. fase</b> <span data-tex="\mathbf S_k=\mathbf V_k\mathbf I_k^*"></span>
+        <table class="tb" style="margin-top:6px"><tr><th>del</th><th style="text-align:right">P [W]</th><th style="text-align:right">Q [var]</th></tr>
+          <tr><td>fase 1</td><td class="num">464,5</td><td class="num">−123,2</td></tr><tr><td>fase 2</td><td class="num">243,6</td><td class="num">0</td></tr>
+          <tr><td>fase 3</td><td class="num">851,9</td><td class="num">+267,6</td></tr><tr><td>R<sub>N</sub></td><td class="num">7,6</td><td class="num">0</td></tr></table></div></div>
+      <div class="step"><span class="n">6</span><div class="t"><b>Hele lasten</b>
+        <span class="m" data-tex="\boxed{\mathbf S=1568+j144\ \text{VA},\ \ |S|=1574\ \text{VA},\ \ PF=0{,}996}"></span>
+        <span class="note">Q &gt; 0: lidt induktiv samlet. C₁ og L₃ udligner næsten hinanden</span></div></div>
+    </div>
+    <div class="card fl">
+      <h3>Strømmenes visere og I<sub>N</sub></h3>
+      <canvas id="cI" width="1300" height="1000"></canvas>
+      <div class="row"><button class="btn on" data-n="0">Opgaven (R<sub>N</sub> = 2 Ω)</button><button class="btn" data-n="1">Ideel nulleder</button><button class="btn" data-n="2">Balanceret: alle 200 Ω</button></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Nullederen fører <b>1,95 A</b>. Lasten bruger <b class="gr">P = 1568 W</b> og <b class="or">Q = 144 var</b>. Kondensatoren og spolen udligner næsten hinanden, så PF = 0,996.</span></div>
+</section>
+
+</div></div>
+<script src="../assets/deck.js"></script>
+<script src="../assets/ele.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = Deck.$, fmt = Deck.fmt, PI = Math.PI;
+var CY = '#0a7fc2', OR = '#d97a00', RD = '#d63a3a', GR = '#0a9a5c', INK = '#14202d', MUT = '#5a6b7d', VI = '#7a4fc2';
+var PC = ['#0a7fc2', '#d97a00', '#0a9a5c'];
+var V = [Cx.pol(220, 0), Cx.pol(220, 120), Cx.pol(220, -120)];
+var ZEX = [Cx.add(100, Cx.ZC(120e-6, 50)), Cx(200, 0), Cx.add(50, Cx.ZL(0.05, 50))];
+function solve(Z, RN) {
+  var n = Cx(0, 0), d = Cx(RN > 1e8 ? 0 : (RN < 1e-9 ? 1e12 : 1 / RN), 0);
+  V.forEach(function (v, i) { n = Cx.add(n, Cx.div(v, Z[i])); d = Cx.add(d, Cx.inv(Z[i])); });
+  var VN = Cx.div(n, d), I = V.map(function (v, i) { return Cx.div(Cx.sub(v, VN), Z[i]); });
+  return { VN: VN, I: I, IN: Cx.add(I[0], I[1], I[2]) };
+}
+
+/* ===== (a) 1/2: balance ===== */
+Deck.range('bK', function () { drawB(); }, function (v) { return v + ' %'; });
+function drawB() {
+  var g = Deck.cv('cB'); g.clear();
+  var k = +$('bK').value / 100, amp = [k, 1, 1], ph = [0, 120, -120];
+  var F = Wave.axes(g, { l: 100, r: 1100, t: 40, b: 680, x0: 0, x1: 720, y0: -2.2, y1: 2.2, xt: [0, 180, 360, 540, 720], yt: [-2, -1, 0, 1, 2], xf: function (v) { return v + '°'; }, yf: function () { return ''; }, xl: 'ωt', fs: 24 });
+  ph.forEach(function (p, i) { g.fn(F, function (a) { return amp[i] * Math.cos((a + p) * PI / 180); }, 0, 720, PC[i], 4, null, 300); });
+  g.fn(F, function (a) { var s = 0; ph.forEach(function (p, i) { s += amp[i] * Math.cos((a + p) * PI / 180); }); return s; }, 0, 720, RD, 8, null, 300);
+  g.txt('I_N = summen', F.X(20), F.Y(2.0), 28, RD, 'left', 'middle', 800);
+  var I = ph.map(function (p, i) { return Cx.pol(amp[i] * 120, p); }), N = Cx.add(I[0], I[1], I[2]);
+  var cx = 1460, cy = 380;
+  Wave.phasors(g, cx, cy, 1, [{ z: I[0], col: PC[0], lab: 'I₁' }, { z: I[1], col: PC[1], lab: 'I₂', from: I[0] }, { z: I[2], col: PC[2], lab: 'I₃', from: Cx.add(I[0], I[1]) }, { z: N, col: RD, w: 8 }], { R: 300 });
+  g.txt('pilene sat efter hinanden', cx, 730, 24, MUT, 'center', 'middle', 700);
+  var s = $('bS'), n = Cx.abs(N) / 120;
+  s.className = 'status ' + (n < 0.01 ? 'good' : 'mid');
+  s.innerHTML = n < 0.01 ? '<b>Balance</b>: pilene lukker trekanten, så I<sub>N</sub> = 0.' : 'Ubalance: trekanten lukker ikke. I<sub>N</sub> = <b>' + fmt(n * 100, 0) + ' %</b> af en fasestrøm.';
+}
+drawB();
+
+/* ===== (a) 2/2: R_N ===== */
+Deck.range('mR', function () { drawM(); }, function (v) { var r = Math.pow(10, v); return r >= 999 ? '≈ ∞' : fmt(r, r < 10 ? 1 : 0) + ' Ω'; });
+function drawM() {
+  var g = Deck.cv('cM'); g.clear();
+  var u = +$('mR').value, RN = u >= 2.999 ? 1e9 : Math.pow(10, u), s = solve(ZEX, RN), sc = 1.3, cx = 380, cy = 380;
+  V.forEach(function (v, i) { g.arrow(cx, cy, cx + v.re * sc, cy - v.im * sc, PC[i], 5); g.txt('V' + '₁₂₃'[i], cx + v.re * sc * 1.12, cy - v.im * sc * 1.12, 28, PC[i], 'center', 'middle', 800); });
+  var nx = cx + s.VN.re * sc, ny = cy - s.VN.im * sc;
+  V.forEach(function (v, i) { g.line([[nx, ny], [cx + v.re * sc, cy - v.im * sc]], PC[i], 2, [6, 6]); });
+  g.dot(cx, cy, 9, INK); g.dot(nx, ny, 13, RD); g.txt("N′", nx - 18, ny + 30, 28, RD, 'right', 'middle', 800);
+  g.txt('stiplet = spændingen over hver fases last', cx, 740, 24, MUT, 'center', 'middle', 700);
+  /* søjler: |V_k - V_N| */
+  var bx = 900, by = 640;
+  g.txt('spænding over lasten pr. fase', bx, 60, 28, INK, 'left', 'middle', 800);
+  V.forEach(function (v, i) {
+    var m = Cx.abs(Cx.sub(v, s.VN)), h = m * 2;
+    g.rect(bx + i * 230, by - h, 160, h, PC[i]); g.txt(fmt(m, 1) + ' V', bx + i * 230 + 80, by - h - 26, 28, PC[i], 'center', 'middle', 800);
+    g.txt('fase ' + (i + 1), bx + i * 230 + 80, by + 30, 26, INK, 'center', 'middle', 700);
+  });
+  g.line([[bx - 10, by - 440], [bx + 680, by - 440]], MUT, 2, [6, 6]); g.txt('220 V', bx + 690, by - 440, 24, MUT, 'left', 'middle', 700);
+  var t = $('mS');
+  t.innerHTML = 'V<sub>N′</sub> = <b>' + fmt(Cx.abs(s.VN), 1) + ' V</b> og I<sub>N</sub> = <b>' + (RN > 1e8 ? '0 (ingen nulleder)' : fmt(Cx.abs(s.IN), 2) + ' A') + '</b>.' + (Math.abs(u - 0.301) < 0.02 ? ' Det er opgaven.' : RN > 100 ? ' Fase 2 (200 Ω) får nu for høj spænding.' : '');
+}
+drawM();
+
+/* ===== (b) 1/2: Y-figur ===== */
+$('ckW').appendChild(Ckt.make(Ckt.wye(['V₁', 'V₂', 'V₃'], ['C₁ + R₁', 'R₂ 200 Ω', 'R₃ + L₃'], 'RN 2 Ω')).el);
+
+/* ===== (b) 2/2: strømvisere ===== */
+var CASES = [{ Z: ZEX, RN: 2 }, { Z: ZEX, RN: 0 }, { Z: [Cx(200, 0), Cx(200, 0), Cx(200, 0)], RN: 2 }];
+Deck.group('[data-n]', function (v) { drawI(+v); });
+function drawI(k) {
+  var c = CASES[k], s = solve(c.Z, c.RN), g = Deck.cv('cI'); g.clear();
+  var sc = 85, cx = 560, cy = 470;
+  Wave.phasors(g, cx, cy, sc, [{ z: s.I[0], col: PC[0], lab: 'I₁' }, { z: s.I[1], col: PC[1], lab: 'I₂' }, { z: s.I[2], col: PC[2], lab: 'I₃' }, { z: s.IN, col: RD, lab: 'I_N', w: 8 }], { R: 420 });
+  var S = Cx(0, 0); V.forEach(function (v, i) { S = Cx.add(S, Cx.mul(v, Cx.conj(s.I[i]))); });
+  g.txt('|I_N| = ' + fmt(Cx.abs(s.IN), 2) + ' A', 40, 40, 34, RD, 'left', 'middle', 800);
+  g.txt('P = ' + fmt(S.re, 0) + ' W   Q = ' + fmt(S.im, 0) + ' var   PF = ' + fmt(S.re / Cx.abs(S), 3), 40, 960, 30, INK, 'left', 'middle', 800);
+}
+drawI(0);
+Deck.init();
+})();
+</script>
+</body>
+</html>

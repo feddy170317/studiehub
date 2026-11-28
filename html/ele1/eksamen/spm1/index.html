@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spm. 1 · KCL</title>
+<meta name="description" content="ELE1 eksamensspørgsmål 1: Kirchhoffs strømlov, nodespændinger og grenstrømme i DC steady state.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../assets/s7.css">
+<style>#ck2 svg text{font-size:25px}</style>
+</head>
+<body>
+<div class="home"><a href="../index.html">☰ Oversigt</a><a href="../traening/index.html#1">✎ Træn 10 opgaver</a></div>
+<div class="vp"><div class="deck">
+
+<!-- ============ 0 · FORSIDE ============ -->
+<section class="slide on" data-title="Forside">
+  <div style="flex:1;display:grid;grid-template-columns:1fr 620px;gap:40px;align-items:center;padding:0 20px">
+    <div style="display:flex;flex-direction:column;gap:30px">
+      <div>
+        <div class="tag" style="display:inline-block">ELE1 · EKSAMENSSPØRGSMÅL 1</div>
+        <h1 style="font-size:72px;margin-top:22px">Kirchhoffs strømlov</h1>
+        <div style="font-size:29px;color:var(--mut);margin-top:8px">Det, der løber <b class="cy">ind</b> i en knude, løber <b class="or">ud</b> igen. Med to ligninger findes alle spændinger og strømme.</div>
+      </div>
+      <div class="card qcard" id="qa"><span class="lbl cy">(a) FORKLAR · 2 SLIDES</span>
+        Hvad KCL siger, og hvorfor det gælder. Nodespændingsmetoden trin for trin, og hvorfor spolerne er <b>ledninger</b> i DC steady state.</div>
+      <div class="card qcard" id="qb"><span class="lbl or">(b) BEREGN · 2 SLIDES</span>
+        Kredsløbet til højre: find alle knudespændinger og grenstrømme. Antag steady state og kun DC.</div>
+    </div>
+    <div class="card fl"><h3>Opgavens kredsløb</h3><img class="exfig" src="fig.png" alt="Kredsløb fra eksamenssættet: I1 48 mA, R1 og R4 3 kΩ, R2 10 kΩ, R3 5 kΩ, L1 og L2 0,5 H, I2 8 mA"></div>
+  </div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm</div>
+</section>
+
+<!-- ============ 1 · (a) KCL ============ -->
+<section class="slide" data-title="(a) KCL">
+  <div class="hd"><span class="tag">SPM. 1 (a) · 1/2</span><h1>Strøm er som vand i rør<small>en knude kan ikke gemme noget</small></h1></div>
+  <div class="body" style="grid-template-columns:380px 560px 1fr">
+    <div class="card fl">
+      <h3>Rørkrydset</h3>
+      <svg viewBox="0 0 340 430" style="width:100%;flex:1">
+        <defs><marker id="aC" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M0 0L10 5L0 10z" fill="#0a7fc2"/></marker>
+          <marker id="aO" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M0 0L10 5L0 10z" fill="#d97a00"/></marker></defs>
+        <path d="M20 170 H150 V40 M190 40 V170 H320 M320 210 H190 V400 M150 400 V210 H20" fill="none" stroke="#7d8fa3" stroke-width="5"/>
+        <rect x="150" y="170" width="40" height="40" fill="#cfe5f5"/>
+        <path d="M20 170 H150 V210 H20 Z" fill="#cfe5f5"/><path d="M150 40 H190 V170 H150 Z" fill="#cfe5f5"/><path d="M190 170 H320 V210 H190Z" fill="#cfe5f5"/><path d="M150 210 H190 V400 H150Z" fill="#cfe5f5"/>
+        <line x1="40" y1="190" x2="120" y2="190" stroke="#0a7fc2" stroke-width="8" marker-end="url(#aC)"/>
+        <text x="70" y="150" fill="#0a7fc2" font-size="24" font-weight="800" text-anchor="middle">5 L/min</text>
+        <line x1="170" y1="150" x2="170" y2="70" stroke="#d97a00" stroke-width="8" marker-end="url(#aO)"/>
+        <text x="210" y="100" fill="#d97a00" font-size="24" font-weight="800">2</text>
+        <line x1="215" y1="190" x2="295" y2="190" stroke="#d97a00" stroke-width="8" marker-end="url(#aO)"/>
+        <text x="260" y="240" fill="#d97a00" font-size="24" font-weight="800" text-anchor="middle">1</text>
+        <line x1="170" y1="230" x2="170" y2="370" stroke="#d97a00" stroke-width="8" marker-end="url(#aO)"/>
+        <text x="210" y="320" fill="#d97a00" font-size="24" font-weight="800">2</text>
+      </svg>
+      <div class="txt" style="text-align:center">5 ind = 2 + 1 + 2 ud. Vand hober sig ikke op i krydset, og <b>ladning hober sig ikke op i en knude</b>.</div>
+    </div>
+    <div class="card">
+      <h3>Kirchhoffs strømlov</h3>
+      <div class="big" data-tex="\color{#0a7fc2}{\sum I_{ind}}=\color{#d97a00}{\sum I_{ud}}"></div>
+      <div class="sub">eller: alle strømme ud af knuden summer til nul, <span data-tex="\sum I=0"></span></div>
+      <div class="terms">
+        <div class="term"><span class="s">knude</span><span><b>Et samlingspunkt</b>, hvor to eller flere ledninger mødes. Alt, der er forbundet med ren ledning, er <em>samme</em> knude.</span></div>
+        <div class="term"><span class="s cy" data-tex="I_{ind}"></span><span><b>Strøm ind.</b> Du vælger selv pilens retning. Er svaret negativt, løber strømmen bare den anden vej.</span></div>
+        <div class="term"><span class="s or" data-tex="I_{ud}"></span><span><b>Strøm ud.</b> Gennem en modstand fra knude a til b er den <span data-tex="(V_a-V_b)/R"></span> (Ohm).</span></div>
+        <div class="term"><span class="s gr">hvorfor</span><span><b>Ladningsbevarelse.</b> Ladning kan hverken skabes eller forsvinde i en knude, så hvad der kommer ind pr. sekund, skal ud.</span></div>
+      </div>
+    </div>
+    <div class="card fl">
+      <h3>Prøv selv: hvad skal ud gennem den fjerde ledning?</h3>
+      <canvas id="cK" width="1100" height="740"></canvas>
+      <div class="sl"><span>Gren 1 <span class="mut">(ind +)</span></span><input id="k1" type="range" min="-40" max="60" step="1" value="48"><output id="k1o"></output></div>
+      <div class="sl"><span>Gren 2</span><input id="k2" type="range" min="-40" max="40" step="1" value="-30"><output id="k2o"></output></div>
+      <div class="sl"><span>Gren 3</span><input id="k3" type="range" min="-40" max="40" step="1" value="-12"><output id="k3o"></output></div>
+      <div class="status good" id="kS"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>En knude kan ikke gemme ladning. Derfor er summen af strømme <b class="cy">ind</b> lig summen <b class="or">ud</b>. Det er KCL.</span></div>
+</section>
+
+<!-- ============ 2 · (a) Metoden ============ -->
+<section class="slide" data-title="(a) Metode + DC">
+  <div class="hd"><span class="tag">SPM. 1 (a) · 2/2</span><h1>Nodespændingsmetoden<small>og hvorfor spolen er en ledning i DC</small></h1></div>
+  <div class="body" style="grid-template-columns:640px 1fr">
+    <div class="card steps" style="padding:6px 22px">
+      <div class="step"><span class="n">1</span><div class="t"><b>Vælg jord</b> (0 V). Opgaven har allerede jordsymbolet i bunden.</div></div>
+      <div class="step"><span class="n">2</span><div class="t"><b>Giv de ukendte knuder navne</b>: <span data-tex="V_A"></span> og <span data-tex="V_B"></span>. To ubekendte kræver to ligninger.</div></div>
+      <div class="step"><span class="n">3</span><div class="t"><b>Forenkl for DC steady state</b>
+        <span class="m" data-tex="v_L=L\dfrac{di}{dt}=0\ \Rightarrow\ \text{spole}=\text{ledning}"></span>
+        <span class="note">og en kondensator ville være en afbrydelse (<span data-tex="i_C=C\,dv/dt=0"></span>)</span></div></div>
+      <div class="step"><span class="n">4</span><div class="t"><b>KCL i hver knude</b>, hver gren skrevet med Ohm:
+        <span class="m" data-tex="\sum I_{ind}=\sum\frac{V_{knude}-V_{nabo}}{R}"></span></div></div>
+      <div class="step"><span class="n">5</span><div class="t"><b>Løs</b> ligningerne, og find bagefter hver grenstrøm med Ohm. <b>Kontrollér</b> med KCL.</div></div>
+    </div>
+    <div class="card fl">
+      <h3>Hvad sker der, når strømmen slås til? (gren med L₁ = 0,5 H og R₁ = 3 kΩ)</h3>
+      <canvas id="cL" width="1700" height="900"></canvas>
+      <div class="sl"><span>Tid efter tænd</span><input id="tL" type="range" min="0" max="100" step="1" value="12"><output id="tLo"></output></div>
+      <div class="status mid" id="lS"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>"Steady state" betyder, at intet ændrer sig mere. Så er <span data-tex="di/dt=0"></span>, og spolen har <b>0 V</b> over sig. Den er bare en ledning. Her sker det på under 1 ms.</span></div>
+</section>
+
+<!-- ============ 3 · (b) Ligningerne ============ -->
+<section class="slide" data-title="(b) Ligninger">
+  <div class="hd"><span class="tag b">SPM. 1 (b) · 1/2</span><h1>To knuder, to KCL-ligninger</h1></div>
+  <div class="chips">
+    <span class="chip">I₁ = 48 mA<small>ind i A</small></span><span class="chip">I₂ = 8 mA<small>ud af B</small></span><span class="chip">R₁ = R₄ = 3 kΩ</span>
+    <span class="chip">R₂ = 10 kΩ</span><span class="chip">R₃ = 5 kΩ</span><span class="chip or">L₁ = L₂ = 0,5 H<small>→ ledning i DC</small></span>
+  </div>
+  <div class="body" style="grid-template-columns:800px 1fr">
+    <div class="card steps tight" style="padding:4px 24px">
+      <div class="step"><span class="n">1</span><div class="t"><b>Forenkl:</b> spolerne bliver til ledninger, og <span data-tex="R_2\parallel R_3"></span> bliver én modstand
+        <span class="m" data-tex="R_{23}=\frac{10\cdot5}{10+5}=3{,}33\ \text{k}\Omega"></span></div></div>
+      <div class="step"><span class="n">2</span><div class="t"><b>KCL i A</b> (48 mA ind, ud gennem R₁ og R₂₃)
+        <span class="m" data-tex="0{,}048=\frac{V_A}{3000}+\frac{V_A-V_B}{3333}"></span></div></div>
+      <div class="step"><span class="n">3</span><div class="t"><b>KCL i B</b> (ind fra A, ud gennem R₄ og I₂)
+        <span class="m" data-tex="\frac{V_A-V_B}{3333}=\frac{V_B}{3000}+0{,}008"></span></div></div>
+      <div class="step"><span class="n">4</span><div class="t"><b>Gang med 30 000 og løs</b>
+        <span class="m" data-tex="19V_A-9V_B=1440,\qquad 9V_A-19V_B=240"></span>
+        <span class="m" data-tex="\boxed{V_A=90\ \text{V}},\qquad\boxed{V_B=30\ \text{V}}"></span></div></div>
+    </div>
+    <div class="card fl">
+      <h3>Kredsløbet <span id="vTitle">efter forenkling</span></h3>
+      <div class="row"><button class="btn" data-v="0">Som i opgaven</button><button class="btn on" data-v="1">DC: spoler = ledninger</button></div>
+      <div id="ck1" style="flex:1;display:flex;align-items:center"></div>
+      <div class="status good">Den store kilde (48 mA) løfter A højest. B ligger lavere, så strømmen mellem dem løber fra A mod B.</div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Spolerne forsvinder i DC, og R₂ og R₃ bliver én modstand. Det giver to ligninger med to ubekendte: <b class="cy">V<sub>A</sub> = 90 V</b> og <b class="cy">V<sub>B</sub> = 30 V</b>.</span></div>
+</section>
+
+<!-- ============ 4 · (b) Grenstrømme ============ -->
+<section class="slide" data-title="(b) Grenstrømme">
+  <div class="hd"><span class="tag b">SPM. 1 (b) · 2/2</span><h1>Grenstrømme og kontrol med KCL</h1></div>
+  <div class="body" style="grid-template-columns:600px 1fr">
+    <div class="card steps tight" style="padding:4px 24px">
+      <div class="step"><span class="n">5</span><div class="t"><b>Ohm på hver gren</b>
+        <span class="m" data-tex="I_{R1}=I_{L1}=\tfrac{90}{3000}=30\ \text{mA}"></span>
+        <span class="m" data-tex="I_{R4}=I_{L2}=\tfrac{30}{3000}=10\ \text{mA}"></span>
+        <span class="m" data-tex="I_{R2}=\tfrac{90-30}{10\,000}=6\ \text{mA}"></span>
+        <span class="m" data-tex="I_{R3}=\tfrac{90-30}{5000}=12\ \text{mA}"></span></div></div>
+      <div class="step"><span class="n">6</span><div class="t"><b>Kontrol med KCL</b>
+        <span class="m" data-tex="A:\ 48=30+6+12\ \checkmark"></span>
+        <span class="m" data-tex="B:\ 6+12=10+8\ \checkmark"></span></div></div>
+    </div>
+    <div class="card fl">
+      <div style="display:grid;grid-template-columns:1fr 300px;gap:16px;flex:1;min-height:0">
+        <div style="display:flex;flex-direction:column;gap:10px;min-height:0">
+          <div id="ck2"></div>
+          <canvas id="cB" width="760" height="300"></canvas>
+        </div>
+        <div class="col2">
+          <h3 style="margin:0">Hvad nu hvis …</h3>
+          <button class="btn on" data-h="0">Opgaven</button>
+          <button class="btn" data-h="1">I₂ = 0 (ingen træk i B)</button>
+          <button class="btn" data-h="2">R₂ fjernet</button>
+          <button class="btn" data-h="3">I₂ = 40 mA</button>
+          <div class="sl" style="grid-template-columns:60px 1fr 86px;font-size:16px"><span>I₁</span><input id="hI1" type="range" min="0" max="100" step="1" value="48"><output id="hI1o"></output></div>
+          <div class="sl" style="grid-template-columns:60px 1fr 86px;font-size:16px"><span>I₂</span><input id="hI2" type="range" min="0" max="60" step="1" value="8"><output id="hI2o"></output></div>
+        </div>
+      </div>
+      <div class="ro r4">
+        <div><span>V<sub>A</sub></span><b class="cy" id="oA">90</b><i id="oAr"></i></div>
+        <div><span>V<sub>B</sub></span><b class="cy" id="oB">30</b><i id="oBr"></i></div>
+        <div><span>I gennem R₁</span><b id="o1">30</b></div>
+        <div><span>A → B i alt</span><b id="oAB">18</b></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Kontrollen er KCL igen: i A går 48 mA ind og 30 + 6 + 12 ud. Spolernes 0,5 H betyder intet i DC. De bestemmer kun, hvor hurtigt det sker.</span></div>
+</section>
+
+</div></div>
+<script src="../assets/deck.js"></script>
+<script src="../assets/ele.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = Deck.$, fmt = Deck.fmt;
+var CY = '#0a7fc2', OR = '#d97a00', RD = '#d63a3a', GR = '#0a9a5c', INK = '#14202d', MUT = '#5a6b7d', P2 = '#ebf1f7';
+
+/* ===== (a) 1/2: knude med fire grene ===== */
+var K = [48, -30, -12];
+['k1', 'k2', 'k3'].forEach(function (id, i) { Deck.range(id, function (v) { K[i] = v; drawK(); }, function (v) { return (v > 0 ? '+' : '') + v + ' mA'; }); });
+function drawK() {
+  var g = Deck.cv('cK'); g.clear();
+  var cx = 330, cy = 360, L = 270, dirs = [[-1, 0], [0, -1], [1, 0], [0, 1]], k4 = -(K[0] + K[1] + K[2]);
+  var vals = [K[0], K[1], K[2], k4];
+  dirs.forEach(function (d, i) {
+    var x1 = cx + d[0] * L, y1 = cy + d[1] * L;
+    g.line([[cx, cy], [x1, y1]], '#9fb0c2', 10);
+    var v = vals[i], col = i === 3 ? GR : (v >= 0 ? CY : OR), mx = cx + d[0] * L * 0.55, my = cy + d[1] * L * 0.55, s = Math.max(30, Math.min(70, Math.abs(v) * 1.4));
+    if (Math.abs(v) > 0.5) {
+      var inward = v > 0, ax = inward ? -d[0] : d[0], ay = inward ? -d[1] : d[1];
+      g.arrow(mx - ax * s, my - ay * s, mx + ax * s, my + ay * s, col, 9);
+    }
+    var lab = (i === 3 ? '? = ' : '') + Math.abs(v) + ' mA ' + (v > 0 ? 'ind' : v < 0 ? 'ud' : '');
+    if (d[0]) g.txt(lab, x1, cy - 52, 38, col, d[0] < 0 ? 'left' : 'right', 'middle', 800);
+    else g.txt(lab, cx + 26, y1 + (d[1] < 0 ? 10 : -10), 38, col, 'left', 'middle', 800);
+  });
+  g.dot(cx, cy, 22, INK);
+  /* balance-søjler */
+  var ind = 0, ud = 0; vals.forEach(function (v) { if (v > 0) ind += v; else ud -= v; });
+  var bx = 720, by = 640, sc = 4.2;
+  g.txt('ind', bx + 60, by + 40, 30, CY, 'center', 'middle', 800); g.txt('ud', bx + 230, by + 40, 30, OR, 'center', 'middle', 800);
+  g.rect(bx, by - ind * sc, 120, ind * sc, CY); g.rect(bx + 170, by - ud * sc, 120, ud * sc, OR);
+  g.txt(ind + ' mA', bx + 60, by - ind * sc - 26, 30, CY, 'center', 'middle', 800); g.txt(ud + ' mA', bx + 230, by - ud * sc - 26, 30, OR, 'center', 'middle', 800);
+  g.line([[bx - 20, by], [bx + 310, by]], INK, 3);
+  var s = $('kS'); s.innerHTML = 'Fjerde gren: <b>' + Math.abs(k4) + ' mA ' + (k4 > 0 ? 'IND' : k4 < 0 ? 'UD' : '') + '</b>. Ind = ud = ' + ind + ' mA.' + (K[0] === 48 && K[1] === -30 && K[2] === -12 ? ' (Det er knude A i opgaven: 48 ind, 30 + 12 + 6 ud.)' : '');
+}
+drawK();
+
+/* ===== (a) 2/2: spolen i et RL-led ===== */
+var tau = 0.5 / 3000 * 1000; /* ms */
+Deck.range('tL', function () { drawL(); }, function (v) { return fmt(v / 100 * 1.2, 2) + ' ms'; });
+function drawL() {
+  var g = Deck.cv('cL'); g.clear();
+  var t = +$('tL').value / 100 * 1.2;
+  var F = Wave.axes(g, { l: 140, r: 1640, t: 70, b: 790, x0: 0, x1: 1.2, y0: 0, y1: 1.1, xt: [0, 0.2, 0.4, 0.6, 0.8, 1, 1.2], yt: [0, 0.5, 1], xf: function (v) { return fmt(v, 1); }, yf: function (v) { return Math.round(v * 100) + ' %'; }, xl: 'tid [ms]', yl: 'i og v i % af slutværdien', fs: 26 });
+  g.fn(F, function (x) { return 1 - Math.exp(-x / tau); }, 0, 1.2, CY, 7, null, 200);
+  g.fn(F, function (x) { return Math.exp(-x / tau); }, 0, 1.2, RD, 7, null, 200);
+  [1, 5].forEach(function (k) { g.line([[F.X(k * tau), F.Y(0)], [F.X(k * tau), F.Y(1.1)]], MUT, 2, [6, 8]); g.txt(k + 'τ', F.X(k * tau) + 8, F.Y(1.06), 26, MUT, 'left', 'middle', 700); });
+  g.txt('strøm i spolen', F.X(0.62), F.Y(0.9), 30, CY, 'left', 'middle', 800);
+  g.txt('spænding over spolen  v = L·di/dt', F.X(0.13), F.Y(0.22), 30, RD, 'left', 'middle', 800);
+  var i = 1 - Math.exp(-t / tau), v = Math.exp(-t / tau);
+  g.line([[F.X(t), F.Y(0)], [F.X(t), F.Y(1.1)]], INK, 3);
+  g.dot(F.X(t), F.Y(i), 12, CY); g.dot(F.X(t), F.Y(v), 12, RD);
+  var s = $('lS'); s.className = 'status ' + (v < 0.01 ? 'good' : 'mid');
+  s.innerHTML = 'τ = L/R = 0,5/3000 = <b>0,17 ms</b>. Nu: strøm ' + fmt(i * 100, 0) + ' %, spænding over spolen ' + fmt(v * 100, 0) + ' %. ' + (v < 0.01 ? '<b>Steady state: spolen er en ledning.</b>' : 'Spolen bremser endnu.');
+}
+drawL();
+
+/* ===== (b) 1/2: kredsløb før/efter ===== */
+function circuit(dc, ids) {
+  var items = [{ p: 'I:I₁\n48 mA' }, { p: dc ? ['R:R₁ 3k'] : ['L:L₁', 'R:R₁ 3k'] }, { n: 'A', id: ids && 'nA' }, { s: { par: ['R:R₃ 5k', 'R:R₂ 10k'] } }, { n: 'B', id: ids && 'nB' }, { p: dc ? ['R:R₄ 3k'] : ['L:L₂', 'R:R₄ 3k'] }, { p: 'Id:I₂\n8 mA' }];
+  if (dc) { items[1].p = ['w', 'R:R₁ 3k']; items[5].p = ['w', 'R:R₄ 3k']; }
+  var L = Ckt.ladder(items.map(function (it) { if (it.p && it.p[0] === 'w') return { p: it.p[1] }; return it; }));
+  return Ckt.svg(L.parts, L.vb);
+}
+var host1 = $('ck1');
+Deck.group('[data-v]', function (v) { host1.innerHTML = ''; host1.appendChild(circuit(v === '1').el); $('vTitle').textContent = v === '1' ? 'efter forenkling' : 'som i opgaven'; });
+host1.appendChild(circuit(true).el);
+
+/* ===== (b) 2/2: hvad nu hvis ===== */
+var H = { I1: 48, I2: 8, R2: 10000 }, HV = [{ I1: 48, I2: 8, R2: 10000 }, { I1: 48, I2: 0, R2: 10000 }, { I1: 48, I2: 8, R2: 1e12 }, { I1: 48, I2: 40, R2: 10000 }];
+var ck2 = Ckt.make(Ckt.ladder([{ p: 'I:I₁#lI1' }, { p: 'R:R₁ 3k#l1' }, { n: 'A', id: 'nA' }, { s: { par: ['R:R₃ 5k#l3', 'R:R₂ 10k#l2'] } }, { n: 'B', id: 'nB' }, { p: 'R:R₄ 3k#l4' }, { p: 'Id:I₂#lI2' }], { gap: 175, sl: 190 }));
+$('ck2').appendChild(ck2.el);
+function solveH(h) {
+  var R23 = 1 / (1 / h.R2 + 1 / 5000), g = 1 / 3000 + 1 / R23, m = 1 / R23, det = g * g - m * m;
+  var VA = (h.I1 / 1000 * g - h.I2 / 1000 * m) / det, VB = (g * -h.I2 / 1000 + m * h.I1 / 1000) / det;
+  return { VA: VA, VB: VB, i1: VA / 3, i4: VB / 3, i2: (VA - VB) / h.R2 * 1000, i3: (VA - VB) / 5, iab: (VA - VB) / R23 * 1000 };
+}
+var H0 = solveH(H);
+var rI1 = Deck.range('hI1', function (v) { H.I1 = v; updH(); }, function (v) { return v + ' mA'; });
+var rI2 = Deck.range('hI2', function (v) { H.I2 = v; updH(); }, function (v) { return v + ' mA'; });
+Deck.group('[data-h]', function (v) { var o = HV[+v]; H.I1 = o.I1; H.I2 = o.I2; H.R2 = o.R2; rI1.set(o.I1); rI2.set(o.I2); updH(); });
+function updH() {
+  var s = solveH(H);
+  ck2.set('nA', 'A: ' + fmt(s.VA, 1) + ' V'); ck2.set('nB', 'B: ' + fmt(s.VB, 1) + ' V');
+  ck2.set('lI1', 'I₁ ' + H.I1 + ' mA'); ck2.set('lI2', 'I₂ ' + H.I2 + ' mA');
+  ck2.set('l1', 'R₁: ' + fmt(s.i1, 1) + ' mA'); ck2.set('l4', 'R₄: ' + fmt(s.i4, 1) + ' mA');
+  ck2.set('l3', 'R₃: ' + fmt(s.i3, 1) + ' mA'); ck2.set('l2', H.R2 > 1e9 ? 'R₂ fjernet' : 'R₂: ' + fmt(s.i2, 1) + ' mA');
+  $('oA').textContent = fmt(s.VA, 1) + ' V'; Deck.rel('oAr', s.VA, H0.VA);
+  $('oB').textContent = fmt(s.VB, 1) + ' V'; Deck.rel('oBr', Math.abs(s.VB) + 1e-9, H0.VB);
+  $('o1').textContent = fmt(s.i1, 1) + ' mA'; $('oAB').textContent = fmt(s.iab, 1) + ' mA';
+  /* KCL-balance i A og B */
+  var g = Deck.cv('cB'); g.clear();
+  function bar(y, label, parts, total) {
+    g.txt(label, 10, y + 30, 28, INK, 'left', 'middle', 800);
+    var x = 150, sc = 470 / Math.max(60, H.I1 + H.I2);
+    g.rect(x, y, total * sc, 26, CY); g.txt('ind ' + fmt(total, 1), x + total * sc + 10, y + 13, 22, CY, 'left', 'middle', 700);
+    parts.forEach(function (p) { var w = Math.max(0, p[0]) * sc; g.rect(x, y + 34, w, 26, p[1]); if (w > 70) g.txt(p[2] + ' ' + fmt(p[0], 1), x + 8, y + 47, 20, '#fff', 'left', 'middle', 800); x += w; });
+  }
+  bar(20, 'Knude A', [[s.i1, '#5f7d99', 'R₁'], [s.i2, OR, 'R₂'], [s.i3, '#b86a00', 'R₃']], H.I1);
+  if (s.iab >= 0) bar(150, 'Knude B', [[s.i4, '#5f7d99', 'R₄'], [H.I2, RD, 'I₂']], s.iab);
+  else g.txt('B: strømmen løber nu fra B mod A (I₂ trækker mere, end A kan levere)', 10, 200, 26, RD, 'left', 'middle', 700);
+  g.txt('Søjlerne er lige lange: ind = ud i hver knude', 10, 275, 24, MUT, 'left', 'middle', 600);
+}
+updH();
+Deck.init();
+})();
+</script>
+</body>
+</html>

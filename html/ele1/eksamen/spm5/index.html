@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spm. 5 · Impedans</title>
+<meta name="description" content="ELE1 eksamensspørgsmål 5: impedans af R, C og L, ZEQ ved 5 kHz, induktiv eller kapacitiv, og plot af spænding og strøm.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../assets/s7.css">
+</head>
+<body>
+<div class="home"><a href="../index.html">☰ Oversigt</a><a href="../traening/index.html#5">✎ Træn 10 opgaver</a></div>
+<div class="vp"><div class="deck">
+
+<!-- ============ 0 · FORSIDE ============ -->
+<section class="slide on" data-title="Forside">
+  <div style="flex:1;display:grid;grid-template-columns:1fr 620px;gap:40px;align-items:center;padding:0 20px">
+    <div style="display:flex;flex-direction:column;gap:30px">
+      <div>
+        <div class="tag" style="display:inline-block">ELE1 · EKSAMENSSPØRGSMÅL 5</div>
+        <h1 style="font-size:72px;margin-top:22px">Impedans</h1>
+        <div style="font-size:29px;color:var(--mut);margin-top:8px">Modstand, der afhænger af frekvensen. Et komplekst tal: <b>realdelen</b> bruger energi, og <b class="cy">imaginærdelen</b> flytter strømmen i tid.</div>
+      </div>
+      <div class="card qcard"><span class="lbl cy">(a) FORKLAR · 2 SLIDES</span>
+        Impedansen af en modstand, en kondensator og en spole. Hvad "induktiv" og "kapacitiv" betyder.</div>
+      <div class="card qcard"><span class="lbl or">(b) BEREGN · 2 SLIDES</span>
+        Find <span data-tex="Z_{EQ}"></span> ved 5 kHz. Induktiv eller kapacitiv? Plot spænding og strøm for <span data-tex="V_1(t)=120\sin(\omega t)"></span>.</div>
+    </div>
+    <div class="card fl"><h3>Opgavens kredsløb</h3><img class="exfig" src="fig.png" alt="V1(t) over L1 100 mH parallelt med R1 50 ohm, i serie med C1 2 µF"></div>
+  </div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm</div>
+</section>
+
+<!-- ============ 1 · (a) Z for R, L, C ============ -->
+<section class="slide" data-title="(a) R, L og C">
+  <div class="hd"><span class="tag">SPM. 5 (a) · 1/2</span><h1>Modstand, der afhænger af frekvensen<small>R, L og C</small></h1></div>
+  <div class="body" style="grid-template-columns:380px 540px 1fr">
+    <div class="card fl">
+      <h3>Hverdagsbilleder</h3>
+      <div class="term" style="grid-template-columns:70px 1fr"><span class="s">🚪</span><span><b>Spolen er en tung dør.</b> Langsomt kan du skubbe den frem og tilbage. Hurtigt er den næsten umulig. <b class="or">Høj f giver stor Z.</b></span></div>
+      <div class="term" style="grid-template-columns:70px 1fr"><span class="s">🎈</span><span><b>Kondensatoren er en ballon i røret.</b> Konstant tryk (DC) kommer ikke igennem. Hurtigt frem og tilbage går fint. <b class="cy">Høj f giver lille Z.</b></span></div>
+      <div class="term" style="grid-template-columns:70px 1fr"><span class="s">〰</span><span><b>Modstanden er et smalt rør.</b> Den er ligeglad med frekvensen.</span></div>
+    </div>
+    <div class="card">
+      <h3>Impedans: Ohms lov med komplekse tal</h3>
+      <div class="big" data-tex="\mathbf V=Z\,\mathbf I"></div>
+      <div class="terms">
+        <div class="term"><span class="s" data-tex="Z_R=R"></span><span><b>Modstand.</b> Reel. Strøm og spænding er i fase.</span></div>
+        <div class="term"><span class="s or" data-tex="Z_L=j\omega L"></span><span><b>Spole.</b> Vokser med f. Strømmen kommer <b>90° efter</b> spændingen.</span></div>
+        <div class="term"><span class="s cy" data-tex="Z_C=\tfrac{1}{j\omega C}"></span><span><b>Kondensator.</b> <span data-tex="=-j/(\omega C)"></span>. Falder med f. Strømmen kommer <b>90° før</b>.</span></div>
+        <div class="term"><span class="s gr" data-tex="j"></span><span><b>j = 90° drejning.</b> <span data-tex="j=1\angle90^\circ"></span>, og <span data-tex="1/j=-j"></span>. Derfor peger L op og C ned i den komplekse plan.</span></div>
+      </div>
+    </div>
+    <div class="card fl">
+      <h3>Prøv selv: |Z| mod frekvens (opgavens R, L og C)</h3>
+      <canvas id="cF" width="1100" height="700"></canvas>
+      <div class="sl"><span>Frekvens</span><input id="fF" type="range" min="1" max="5" step="0.01" value="3.699"><output id="fFo"></output></div>
+      <div class="ro">
+        <div><span>Z<sub>R</sub></span><b>50 Ω</b></div>
+        <div><span>Z<sub>L</sub></span><b class="or" id="fL"></b></div>
+        <div><span>Z<sub>C</sub></span><b class="cy" id="fC"></b></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Impedans er modstand for vekselstrøm. <b class="or">Spolen</b> vokser med frekvensen, og <b class="cy">kondensatoren</b> falder. Ved 5 kHz er spolen 3142 Ω, og kondensatoren kun 16 Ω.</span></div>
+</section>
+
+<!-- ============ 2 · (a) Induktiv/kapacitiv ============ -->
+<section class="slide" data-title="(a) Induktiv/kapacitiv">
+  <div class="hd"><span class="tag">SPM. 5 (a) · 2/2</span><h1>Induktiv eller kapacitiv?<small>fortegnet på imaginærdelen afgør det</small></h1></div>
+  <div class="body" style="grid-template-columns:600px 1fr">
+    <div class="card">
+      <h3>Regneregler</h3>
+      <div class="big" style="font-size:38px" data-tex="Z=\color{#14202d}{R}+j\color{#7a4fc2}{X}=|Z|\angle\theta"></div>
+      <div class="terms">
+        <div class="term"><span class="s or" data-tex="X>0"></span><span><b>Induktiv.</b> Strømmen kommer <b>efter</b> spændingen. Typisk for motorer.</span></div>
+        <div class="term"><span class="s cy" data-tex="X<0"></span><span><b>Kapacitiv.</b> Strømmen kommer <b>før</b> spændingen.</span></div>
+        <div class="term"><span class="s">serie</span><span>Læg impedanserne sammen: <span data-tex="Z_1+Z_2"></span></span></div>
+        <div class="term"><span class="s">parallel</span><span><span data-tex="\dfrac{Z_1Z_2}{Z_1+Z_2}"></span>. Gang med den konjugerede for at få nævneren reel.</span></div>
+        <div class="term"><span class="s gr" data-tex="\mathbf I"></span><span><span data-tex="I_m=V_m/|Z|"></span> og <span data-tex="\theta_i=\theta_v-\theta"></span></span></div>
+      </div>
+    </div>
+    <div class="card fl">
+      <h3>Prøv selv: drej impedansen</h3>
+      <canvas id="cZ" width="1700" height="760"></canvas>
+      <div class="sl"><span>Vinkel θ</span><input id="zA" type="range" min="-90" max="90" step="1" value="-17"><output id="zAo"></output></div>
+      <div class="status mid" id="zS"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Er imaginærdelen positiv, er kredsløbet <b class="or">induktivt</b>, og strømmen kommer efter. Er den negativ, er det <b class="cy">kapacitivt</b>, og strømmen kommer før.</span></div>
+</section>
+
+<!-- ============ 3 · (b) Z_EQ ============ -->
+<section class="slide" data-title="(b) ZEQ">
+  <div class="hd"><span class="tag b">SPM. 5 (b) · 1/2</span><h1>Z<sub>EQ</sub> ved 5 kHz</h1></div>
+  <div class="chips">
+    <span class="chip">f = 5 kHz<small>ω = 31 416 rad/s</small></span><span class="chip">L₁ = 100 mH</span><span class="chip">R₁ = 50 Ω</span><span class="chip">C₁ = 2 µF</span><span class="chip or">(L₁ ∥ R₁) i serie med C₁</span>
+  </div>
+  <div class="body" style="grid-template-columns:820px 1fr">
+    <div class="card steps tight" style="padding:4px 24px">
+      <div class="step"><span class="n">1</span><div class="t"><b>Hver komponent for sig</b>
+        <span class="m" data-tex="Z_L=j\,31\,416\cdot0{,}1=j3142\ \Omega,\quad Z_C=\frac{-j}{31\,416\cdot2\cdot10^{-6}}=-j15{,}92\ \Omega"></span></div></div>
+      <div class="step"><span class="n">2</span><div class="t"><b>L₁ parallelt med R₁</b>
+        <span class="m" data-tex="Z_{p}=\frac{j3142\cdot50}{50+j3142}=49{,}99+j0{,}80\ \Omega"></span>
+        <span class="note">Spolen er næsten en afbrydelse ved 5 kHz (3142 ≫ 50), så parallellen er næsten bare R₁</span></div></div>
+      <div class="step"><span class="n">3</span><div class="t"><b>I serie med C₁</b>
+        <span class="m" data-tex="Z_{EQ}=49{,}99+j0{,}80-j15{,}92=49{,}99-j15{,}12\ \Omega"></span>
+        <span class="m" data-tex="\boxed{Z_{EQ}=52{,}2\angle{-16{,}8^\circ}\ \Omega}"></span></div></div>
+      <div class="step"><span class="n">4</span><div class="t"><b>Fortegn:</b> <span data-tex="X=-15{,}12<0"></span>, så kredsløbet er <b class="cy">kapacitivt</b>.</div></div>
+    </div>
+    <div class="card fl">
+      <h3>I den komplekse plan</h3>
+      <canvas id="cP" width="1100" height="900"></canvas>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Ved 5 kHz er spolen næsten en afbrydelse, så parallellen er næsten 50 Ω. Kondensatoren trækker 15 Ω ned: <b class="cy">Z = 52,2 Ω ∠ −16,8°</b>, og det er kapacitivt.</span></div>
+</section>
+
+<!-- ============ 4 · (b) Plot ============ -->
+<section class="slide" data-title="(b) Spænding og strøm">
+  <div class="hd"><span class="tag b">SPM. 5 (b) · 2/2</span><h1>Kapacitiv: strømmen kommer før spændingen</h1></div>
+  <div class="body" style="grid-template-columns:560px 1fr">
+    <div class="card steps tight" style="padding:4px 24px">
+      <div class="step"><span class="n">5</span><div class="t"><b>Strømmens amplitude</b>
+        <span class="m" data-tex="I_m=\frac{120}{52{,}2}=2{,}30\ \text{A}"></span></div></div>
+      <div class="step"><span class="n">6</span><div class="t"><b>Strømmens fase</b>
+        <span class="m" data-tex="\theta_i=0^\circ-(-16{,}8^\circ)=+16{,}8^\circ"></span>
+        <span class="m" data-tex="i(t)=2{,}30\sin(\omega t+16{,}8^\circ)\ \text{A}"></span></div></div>
+      <div class="step"><span class="n">7</span><div class="t"><b>Hvad betyder det?</b>
+        <span class="note">Strømmen når sin top 16,8° (9,3 µs) før spændingen. Kondensatoren "trækker" strømmen frem. Kredsløbet sender reaktiv effekt tilbage til nettet.</span></div></div>
+    </div>
+    <div class="card fl">
+      <canvas id="cT" width="1900" height="640"></canvas>
+      <div class="sl"><span>C₁ (hvad nu hvis)</span><input id="tC" type="range" min="0.5" max="100" step="0.5" value="2"><output id="tCo"></output></div>
+      <div class="sl"><span>Frekvens</span><input id="tF" type="range" min="2" max="4.5" step="0.01" value="3.699"><output id="tFo"></output></div>
+      <div class="ro r4">
+        <div><span>|Z<sub>EQ</sub>|</span><b id="oZ"></b></div>
+        <div><span>VINKEL θ</span><b id="oA"></b></div>
+        <div><span>I<sub>m</sub></span><b class="gr" id="oI"></b></div>
+        <div><span>TYPE</span><b id="oT" style="font-size:22px"></b></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Strømmen er 2,30 A og topper 16,8° før spændingen. Det er kapacitivt ved alle frekvenser, fordi <span data-tex="R^2C<L"></span>. Først over C ≈ 40 µF bliver det induktivt.</span></div>
+</section>
+
+</div></div>
+<script src="../assets/deck.js"></script>
+<script src="../assets/ele.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = Deck.$, fmt = Deck.fmt, PI = Math.PI;
+var CY = '#0a7fc2', OR = '#d97a00', RD = '#d63a3a', GR = '#0a9a5c', INK = '#14202d', MUT = '#5a6b7d', VI = '#7a4fc2';
+function fHz(v) { var f = Math.pow(10, v); return f >= 1000 ? fmt(f / 1000, f < 1e4 ? 2 : 1) + ' kHz' : fmt(f, 0) + ' Hz'; }
+
+/* ===== (a) 1/2: |Z| mod f ===== */
+Deck.range('fF', function () { drawF(); }, fHz);
+function drawF() {
+  var g = Deck.cv('cF'); g.clear();
+  var F = g.frame({ l: 130, r: 1060, t: 40, b: 600, x0: 1, x1: 5, y0: 0, y1: 5 });
+  [0, 1, 2, 3, 4, 5].forEach(function (v) { g.line([[F.X(1), F.Y(v)], [F.X(5), F.Y(v)]], '#e6ecf2', 2); g.txt(['1', '10', '100', '1k', '10k', '100k'][v] + ' Ω', 120, F.Y(v), 24, MUT, 'right', 'middle', 600); });
+  [1, 2, 3, 4, 5].forEach(function (v) { g.txt(['10 Hz', '100 Hz', '1 kHz', '10 kHz', '100 kHz'][v - 1], F.X(v), 630, 24, MUT, 'center', 'middle', 600); });
+  g.line([[F.X(1), F.Y(0)], [F.X(1), F.Y(5)]], '#9fb0c2', 3); g.line([[F.X(1), F.Y(0)], [F.X(5), F.Y(0)]], '#9fb0c2', 3);
+  function lg(z) { return Math.log10(z); }
+  g.fn(F, function () { return lg(50); }, 1, 5, INK, 6);
+  g.fn(F, function (u) { return lg(2 * PI * Math.pow(10, u) * 0.1); }, 1, 5, OR, 6);
+  g.fn(F, function (u) { return lg(1 / (2 * PI * Math.pow(10, u) * 2e-6)); }, 1, 5, CY, 6);
+  g.txt('R', F.X(1.15), F.Y(lg(50)) - 22, 30, INK, 'left', 'middle', 800);
+  g.txt('spole', F.X(4.35), F.Y(4.6), 30, OR, 'left', 'middle', 800);
+  g.txt('kondensator', F.X(1.1), F.Y(3.7), 30, CY, 'left', 'middle', 800);
+  var u = +$('fF').value, f = Math.pow(10, u), zl = 2 * PI * f * 0.1, zc = 1 / (2 * PI * f * 2e-6);
+  g.line([[F.X(u), F.Y(0)], [F.X(u), F.Y(5)]], INK, 3, [8, 6]);
+  g.dot(F.X(u), F.Y(lg(zl)), 12, OR); g.dot(F.X(u), F.Y(lg(zc)), 12, CY);
+  g.line([[F.X(3.699), F.Y(0)], [F.X(3.699), F.Y(0.25)]], RD, 5); g.txt('5 kHz', F.X(3.699), F.Y(0.45), 24, RD, 'center', 'middle', 800);
+  $('fL').textContent = 'j' + fmt(zl, zl < 100 ? 1 : 0) + ' Ω'; $('fC').textContent = '−j' + fmt(zc, zc < 100 ? 1 : 0) + ' Ω';
+}
+drawF();
+
+/* ===== (a) 2/2: drej Z ===== */
+Deck.range('zA', function () { drawZ(); }, function (v) { return (v > 0 ? '+' : '') + v + '°'; });
+function drawZ() {
+  var g = Deck.cv('cZ'); g.clear();
+  var th = +$('zA').value, cx = 300, cy = 380, r = 260;
+  g.line([[cx - 40, cy], [cx + r + 40, cy]], '#d3dde8', 2); g.line([[cx, cy - r - 40], [cx, cy + r + 40]], '#d3dde8', 2);
+  g.txt('R', cx + r + 50, cy, 26, MUT, 'left', 'middle', 700); g.txt('+jX  induktiv', cx + 14, cy - r - 30, 26, OR, 'left', 'middle', 800); g.txt('−jX  kapacitiv', cx + 14, cy + r + 30, 26, CY, 'left', 'middle', 800);
+  var px = cx + r * Math.cos(th * PI / 180), py = cy - r * Math.sin(th * PI / 180), col = th > 0 ? OR : th < 0 ? CY : INK;
+  g.line([[px, py], [px, cy]], VI, 3, [6, 6]); g.arrow(cx, cy, px, py, col, 8); g.txt('Z', px + 26, py, 34, col, 'left', 'middle', 800);
+  var F = Wave.axes(g, { l: 740, r: 1680, t: 80, b: 680, x0: 0, x1: 720, y0: -1.2, y1: 1.2, xt: [0, 180, 360, 540, 720], yt: [-1, 0, 1], xf: function (v) { return v + '°'; }, yf: function () { return ''; }, xl: 'ωt', fs: 26 });
+  g.fn(F, function (a) { return Math.sin(a * PI / 180); }, 0, 720, INK, 5, null, 300);
+  g.fn(F, function (a) { return 0.75 * Math.sin((a - th) * PI / 180); }, 0, 720, GR, 6, null, 300);
+  g.txt('v(t)', F.X(85), F.Y(1.12), 28, INK, 'center', 'middle', 800); g.txt('i(t)', F.X(90 + th), F.Y(0.88), 28, GR, 'center', 'middle', 800);
+  g.line([[F.X(90), F.Y(-1.2)], [F.X(90), F.Y(1.2)]], INK, 2, [4, 6]); g.line([[F.X(90 + th), F.Y(-1.2)], [F.X(90 + th), F.Y(1.2)]], GR, 2, [4, 6]);
+  var s = $('zS');
+  s.className = 'status ' + (th > 0 ? 'mid' : th < 0 ? 'good' : '');
+  s.innerHTML = th > 0 ? '<b>Induktiv</b>: strømmen topper ' + th + '° <b>efter</b> spændingen.' : th < 0 ? '<b>Kapacitiv</b>: strømmen topper ' + (-th) + '° <b>før</b> spændingen.' + (th === -17 ? ' (som opgaven)' : '') : '<b>Ren modstand</b>: i fase.';
+}
+drawZ();
+
+/* ===== (b) 1/2: kompleks plan ===== */
+(function () {
+  var g = Deck.cv('cP'); g.clear();
+  var sc = 15, cx = 150, cy = 330, zp = Cx(49.99, 0.80), zc = Cx(0, -15.92), z = Cx.add(zp, zc);
+  g.line([[cx - 30, cy], [cx + 860, cy]], '#d3dde8', 2); g.line([[cx, cy - 280], [cx, cy + 420]], '#d3dde8', 2);
+  g.txt('Re [Ω]', cx + 860, cy - 26, 26, MUT, 'right', 'middle', 700); g.txt('Im [Ω]', cx + 14, cy - 270, 26, MUT, 'left', 'middle', 700);
+  Wave.phasors(g, cx, cy, sc, [{ z: zp, col: INK, lab: '' }, { z: zc, col: CY, lab: '', from: zp }, { z: z, col: VI, w: 8 }]);
+  g.txt('L ∥ R = 49,99 + j0,80', cx + 380, cy - 40, 30, INK, 'center', 'middle', 800);
+  g.txt('Z_C = −j15,92', cx + zp.re * sc + 20, cy + 120, 30, CY, 'left', 'middle', 800);
+  g.txt('Z_EQ = 52,2∠−16,8°', cx + 330, cy + 210, 34, VI, 'center', 'middle', 800);
+  g.txt('(spolen alene ville være j3142 Ω, langt over grafen)', 550, 800, 26, MUT, 'center', 'middle', 600);
+})();
+
+/* ===== (b) 2/2: v og i ===== */
+var T = { C: 2, u: 3.699 };
+Deck.range('tC', function (v) { T.C = v; drawT(); }, function (v) { return fmt(v, 1) + ' µF'; });
+Deck.range('tF', function (v) { T.u = v; drawT(); }, fHz);
+function zeq(f, C) { return Cx.add(Cx.par(Cx.ZL(0.1, f), 50), Cx.ZC(C * 1e-6, f)); }
+function drawT() {
+  var f = Math.pow(10, T.u), z = zeq(f, T.C), th = Cx.arg(z), Im = 120 / Cx.abs(z), g = Deck.cv('cT'); g.clear();
+  var ym = Math.max(2.5, Im * 1.15);
+  var F = Wave.axes(g, { l: 130, r: 1720, t: 40, b: 560, x0: 0, x1: 720, y0: -1.2, y1: 1.2, xt: [0, 90, 180, 270, 360, 450, 540, 630, 720], yt: [-1, 0, 1], xf: function (v) { return v + '°'; }, yf: function (v) { return v ? (v > 0 ? '+' : '−') : '0'; }, xl: 'ωt', fs: 24 });
+  g.fn(F, function (a) { return Math.sin(a * PI / 180); }, 0, 720, INK, 6, null, 300);
+  g.fn(F, function (a) { return Im / ym * Math.sin((a - th) * PI / 180); }, 0, 720, GR, 6, null, 300);
+  g.txt('v(t) = 120 sin ωt  [V]', 1740, F.Y(1.12), 26, INK, 'right', 'middle', 800);
+  g.txt('i(t) = ' + fmt(Im, 2) + ' sin(ωt ' + (th < 0 ? '+ ' : '− ') + fmt(Math.abs(th), 1) + '°)  [A]', 1740, F.Y(-1.12), 26, GR, 'right', 'middle', 800);
+  g.line([[F.X(90), F.Y(-1.2)], [F.X(90), F.Y(1.2)]], INK, 2, [4, 6]); g.line([[F.X(90 + th), F.Y(-1.2)], [F.X(90 + th), F.Y(1.2)]], GR, 2, [4, 6]);
+  $('oZ').textContent = fmt(Cx.abs(z), 1) + ' Ω'; $('oA').textContent = fmt(th, 1) + '°'; $('oI').textContent = fmt(Im, 2) + ' A';
+  var t = $('oT'); t.textContent = th < -0.05 ? 'kapacitiv' : th > 0.05 ? 'induktiv' : 'resistiv'; t.className = th < 0 ? 'cy' : 'or';
+}
+drawT();
+Deck.init();
+})();
+</script>
+</body>
+</html>

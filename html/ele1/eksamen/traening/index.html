@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ELE1 eksamenstræning</title>
+<meta name="description" content="80 progressive regneopgaver (let → mellem → svær) til de 8 ELE1-eksamensspørgsmål, med tjek af svar, hint og løsning trin for trin.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<style>
+:root{--bg:#ffffff;--panel:#f6f9fc;--panel2:#ebf1f7;--line:#d3dde8;--ink:#14202d;--mut:#5a6b7d;
+  --cy:#0a7fc2;--or:#d97a00;--rd:#d63a3a;--gr:#0a9a5c;--ye:#a86b00;--vi:#7a4fc2;
+  --l1:#0a9a5c;--l2:#d97a00;--l3:#d63a3a}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5;
+  background-image:radial-gradient(1200px 500px at 90% -10%,#e6f1fa 0%,transparent 60%);background-repeat:no-repeat}
+.wrap{max-width:980px;margin:0 auto;padding:22px 16px 80px}
+a{color:var(--cy)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.top .crumb{font:700 13px ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--mut);text-decoration:none}
+.tag{font:700 13px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:#fff;background:var(--cy);padding:6px 9px;border-radius:6px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 18px}
+.tabs a{text-decoration:none;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:14px;font-weight:600;white-space:nowrap}
+.tabs a.on{background:var(--cy);color:#fff;border-color:var(--cy)}
+.tabs a .dn{font:700 11px ui-monospace,monospace;margin-left:4px;opacity:.75}
+h1{font-size:34px;line-height:1.15;letter-spacing:-.01em}
+h1 small{display:block;font-size:17px;color:var(--mut);font-weight:500;margin-top:6px}
+.intro{display:grid;grid-template-columns:1fr 290px;gap:16px;margin:16px 0 22px}
+@media (max-width:760px){.intro{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:0 1px 3px rgba(20,32,45,.05)}
+.card h3{font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin-bottom:10px}
+.fk{display:grid;gap:7px}
+.fk div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:9px;padding:7px 10px;font-size:14.5px}
+.fk div>span:last-child{color:var(--mut)}
+@media (max-width:560px){.fk div{grid-template-columns:1fr}}
+.prog .bar{display:flex;gap:5px;margin:4px 0 10px}
+.prog .bar i{flex:1;height:12px;border-radius:4px;background:var(--panel2);border:2px solid transparent;cursor:pointer}
+.prog .bar i.l1{border-color:#bfe3d2}.prog .bar i.l2{border-color:#f1d3a8}.prog .bar i.l3{border-color:#f2c0c0}
+.prog .bar i.ok.l1{background:var(--l1)}.prog .bar i.ok.l2{background:var(--l2)}.prog .bar i.ok.l3{background:var(--l3)}
+.prog .cnt{font:800 30px ui-monospace,Consolas,monospace}
+.prog .lg{font-size:13px;color:var(--mut);display:flex;gap:12px;flex-wrap:wrap}
+.prog .lg b{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:middle}
+.prog a.deck{display:block;margin-top:12px;font-weight:700;font-size:15px}
+.sec{font:700 12.5px ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--mut);margin:26px 0 10px;display:flex;align-items:center;gap:10px}
+.sec:after{content:"";flex:1;height:1px;background:var(--line)}
+.opg{background:#fff;border:1px solid var(--line);border-left:6px solid var(--l1);border-radius:14px;padding:16px 18px 14px;margin-bottom:14px;scroll-margin-top:12px}
+.opg.l2{border-left-color:var(--l2)}.opg.l3{border-left-color:var(--l3)}
+.opg.solved{background:linear-gradient(90deg,#f1faf5,#fff 40%)}
+.oh{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.oh .nr{font:800 15px ui-monospace,Consolas,monospace;color:var(--mut)}
+.lv{font:800 11.5px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:#fff;padding:5px 8px;border-radius:5px;background:var(--l1)}
+.lv.l2{background:var(--l2)}.lv.l3{background:var(--l3)}
+.oh h2{font-size:19px;flex:1;min-width:200px}
+.oh .done{color:var(--gr);font-weight:800;font-size:14px}
+.ex{font:700 11px/1 ui-monospace,monospace;letter-spacing:.08em;color:var(--vi);border:1px solid var(--vi);padding:4px 6px;border-radius:5px}
+.txt{font-size:16.5px}
+.txt p+p{margin-top:8px}
+.fig{margin:12px 0 4px;display:flex;justify-content:center}
+.fig svg{width:100%;max-width:560px;height:auto}
+.ans{display:grid;gap:8px;margin:14px 0 8px}
+.arow{display:grid;grid-template-columns:minmax(110px,auto) 160px 70px 1fr;gap:10px;align-items:center;font-size:16px}
+@media (max-width:560px){.arow{grid-template-columns:auto 1fr auto;}.arow .fb{grid-column:1/-1}}
+.arow input{font:600 16px ui-monospace,Consolas,monospace;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;width:100%;background:var(--panel)}
+.arow input:focus{outline:none;border-color:var(--cy);background:#fff}
+.arow input.ok{border-color:var(--gr);background:#ecf8f2}.arow input.no{border-color:var(--rd);background:#fdf0f0}
+.arow .u{color:var(--mut);font-weight:600}
+.fb{font-size:14px;font-weight:600}.fb.ok{color:var(--gr)}.fb.no{color:var(--rd)}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+button{font:650 14.5px system-ui,sans-serif;border:1px solid var(--line);background:var(--panel2);color:var(--ink);padding:8px 13px;border-radius:9px;cursor:pointer}
+button:hover{border-color:var(--cy)}
+button.pri{background:var(--cy);border-color:var(--cy);color:#fff}
+.hint{display:none;margin-top:10px;background:#fff8e8;border:1px solid #f0d9a8;border-radius:10px;padding:10px 12px;font-size:15.5px}
+.hint b.k{font:800 11px ui-monospace,monospace;letter-spacing:.1em;color:var(--ye);margin-right:6px}
+.los{display:none;margin-top:12px;border-top:1px dashed var(--line);padding-top:10px}
+.st{display:none;grid-template-columns:30px 1fr;gap:10px;padding:8px 0;font-size:16px}
+.st.vis{display:grid}
+.st .n{width:26px;height:26px;border-radius:50%;background:var(--cy);color:#fff;font:800 13px/26px system-ui;text-align:center}
+.st .m{display:block;margin-top:2px;overflow-x:auto;overflow-y:hidden}
+.st .katex-display{margin:.35em 0}
+.lb{display:flex;gap:8px;margin-top:6px}
+.tip{font-size:13px;color:var(--mut);margin-top:30px;text-align:center}
+.katex{font-size:1.06em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a class="crumb" href="../index.html">← ELE1 · EKSAMENSOVERBLIK</a><span class="tag">TRÆNING · 80 OPGAVER</span></div>
+  <nav class="tabs" id="tabs"></nav>
+  <h1 id="h1"></h1>
+  <div class="intro">
+    <div class="card"><h3>Formelkort til temaet</h3><div class="fk" id="fk"></div></div>
+    <div class="card prog"><h3>Din fremgang</h3><div class="cnt" id="cnt">0/10</div><div class="bar" id="bar"></div>
+      <div class="lg"><span><b style="background:var(--l1)"></b>let</span><span><b style="background:var(--l2)"></b>mellem</span><span><b style="background:var(--l3)"></b>svær</span></div>
+      <a class="deck" id="deck" href="#">▶ Se præsentationen til spørgsmålet</a></div>
+  </div>
+  <div id="list"></div>
+  <p class="tip">Skriv decimaltal med komma eller punktum. Svaret godkendes inden for ±1,5 % (vinkler ±1°). Fremgangen gemmes kun i denne browser.</p>
+</div>
+<script src="../assets/ele.js"></script>
+<script src="opgaver.js"></script>
+<script>
+(function () {
+'use strict';
+var TEMA = window.TEMA, UNIT = { '': 1, 'V': 1, 'A': 1, 'Ω': 1, 'W': 1, 'VA': 1, 'var': 1, 'F': 1, 'H': 1, 's': 1, 'C': 1, 'J': 1, 'Hz': 1, '°': 1, 'rad': 1, 'rad/s': 1,
+  'mA': 1e-3, 'µA': 1e-6, 'mV': 1e-3, 'kΩ': 1e3, 'MΩ': 1e6, 'µF': 1e-6, 'nF': 1e-9, 'mF': 1e-3, 'mH': 1e-3, 'ms': 1e-3, 'µs': 1e-6, 'mC': 1e-3, 'µC': 1e-6, 'mJ': 1e-3,
+  'kW': 1e3, 'kVA': 1e3, 'kvar': 1e3, 'kHz': 1e3 };
+var LV = ['', 'LET', 'MELLEM', 'SVÆR'];
+var store = {}; try { store = JSON.parse(localStorage.getItem('ele1eks_v1') || '{}'); } catch (e) {}
+function save() { try { localStorage.setItem('ele1eks_v1', JSON.stringify(store)); } catch (e) {} }
+var ti = Math.max(1, Math.min(TEMA.length, parseInt((location.hash.match(/\d+/) || [1])[0], 10)));
+var T = TEMA[ti - 1];
+
+/* faneblade */
+document.getElementById('tabs').innerHTML = TEMA.map(function (t, i) {
+  var n = Object.keys(store['t' + (i + 1)] || {}).length;
+  return '<a href="#' + (i + 1) + '" class="' + (i + 1 === ti ? 'on' : '') + '">' + (i + 1) + '. ' + t.kort + (n ? '<span class="dn">' + n + '/10</span>' : '') + '</a>';
+}).join('');
+addEventListener('hashchange', function () { location.reload(); });
+document.getElementById('h1').innerHTML = 'Spm. ' + ti + ' · ' + T.titel + '<small>' + T.under + '</small>';
+document.title = 'ELE1 træning · ' + T.kort;
+document.getElementById('deck').href = '../spm' + ti + '/index.html';
+
+/* tekst med $matematik$ og «pladsholdere» */
+function fill(s, R, math) {
+  return s.replace(/«([\w]+)(?:\|([^»]*))?»/g, function (_, k, u) {
+    var v = R[k]; if (v == null) return '??' + k;
+    if (typeof v === 'string') return v;
+    var sc = 1, sig = 4;
+    if (u) { var p = u.split(':'); if (p[0] in UNIT) sc = UNIT[p[0]]; if (p[1]) sig = +p[1]; }
+    var t = num(v / sc, sig);
+    return math ? t.replace(/,/g, '{,}').replace(/ /g, '\\,').replace('−', '-') : t;
+  });
+}
+function rich(s, R) {
+  var parts = String(s).split(/(\$\$[^$]+\$\$|\$[^$]+\$)/);
+  return parts.map(function (p) {
+    if (/^\$\$/.test(p)) return '<span class="m">' + tex(fill(p.slice(2, -2), R, true), true) + '</span>';
+    if (/^\$/.test(p)) return tex(fill(p.slice(1, -1), R, true), false);
+    return fill(p, R, false);
+  }).join('');
+}
+function tex(s, disp) { try { return katex.renderToString(s, { throwOnError: false, displayMode: disp }); } catch (e) { return s; } }
+
+/* formelkort */
+document.getElementById('fk').innerHTML = T.formler.map(function (f) { return '<div><span>' + tex(f[0]) + '</span><span>' + rich(f[1], {}) + '</span></div>'; }).join('');
+
+/* opgaver */
+var list = document.getElementById('list'), done = store['t' + ti] = store['t' + ti] || {};
+var lastLv = 0;
+T.opg.forEach(function (o, i) {
+  var R = o.calc ? o.calc() : {};
+  if (o.lvl !== lastLv) { var h = document.createElement('div'); h.className = 'sec'; h.textContent = ['', 'LET · KOM I GANG', 'MELLEM · BYG OVENPÅ', 'SVÆR · SOM TIL EKSAMEN'][o.lvl]; list.appendChild(h); lastLv = o.lvl; }
+  var el = document.createElement('section'); el.className = 'opg l' + o.lvl + (done[i + 1] ? ' solved' : ''); el.id = 'o' + (i + 1);
+  var html = '<div class="oh"><span class="nr">' + (i + 1) + '/10</span><span class="lv l' + o.lvl + '">' + LV[o.lvl] + '</span><h2>' + rich(o.titel, R) + '</h2>' +
+    (o.eks ? '<span class="ex">EKSAMENS-TVILLING</span>' : '') + '<span class="done">' + (done[i + 1] ? '✓ løst' : '') + '</span></div>';
+  html += '<div class="txt">' + [].concat(o.tekst).map(function (p) { return '<p>' + rich(p, R) + '</p>'; }).join('') + '</div>';
+  if (o.fig) html += '<div class="fig"></div>';
+  html += '<div class="ans">' + o.svar.map(function (a, j) {
+    return '<div class="arow"><span>' + rich(a.lbl, R) + ' =</span><input inputmode="decimal" autocomplete="off" data-j="' + j + '" aria-label="svar"><span class="u">' + (a.u || '') + '</span><span class="fb"></span></div>';
+  }).join('') + '</div>';
+  html += '<div class="btns"><button class="pri" data-a="chk">Tjek svar</button><button data-a="hint">Hint</button><button data-a="los">Vis løsning</button></div>';
+  html += '<div class="hint"><b class="k">HINT</b>' + rich(o.hint, R) + '</div>';
+  html += '<div class="los">' + o.los.map(function (s, j) { return '<div class="st"><span class="n">' + (j + 1) + '</span><div>' + rich(s, R) + '</div></div>'; }).join('') +
+    '<div class="lb"><button data-a="next">Næste trin ▸</button><button data-a="all">Vis alle trin</button></div></div>';
+  el.innerHTML = html;
+  if (o.fig) { var f = typeof o.fig === 'function' ? o.fig(R) : o.fig; el.querySelector('.fig').appendChild(Ckt.make(f, o.figH || 260).el); }
+  list.appendChild(el);
+  var steps = el.querySelectorAll('.st'), shown = 0;
+  function next() { if (shown < steps.length) steps[shown++].classList.add('vis'); if (shown >= steps.length) el.querySelector('.lb').style.display = 'none'; }
+  el.addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    var a = b.dataset.a;
+    if (a === 'hint') { var hd = el.querySelector('.hint'); hd.style.display = hd.style.display === 'block' ? 'none' : 'block'; }
+    if (a === 'los') { el.querySelector('.los').style.display = 'block'; if (!shown) next(); }
+    if (a === 'next') next();
+    if (a === 'all') while (shown < steps.length) next();
+    if (a === 'chk') check();
+  });
+  el.querySelectorAll('input').forEach(function (inp) { inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); }); });
+  function check() {
+    var all = true;
+    o.svar.forEach(function (a, j) {
+      var inp = el.querySelector('input[data-j="' + j + '"]'), fb = inp.parentNode.querySelector('.fb');
+      var s = inp.value.trim().replace(/\s/g, '').replace(/−/g, '-').replace(',', '.');
+      var want = R[a.k] / (UNIT[a.u] || 1), got = parseFloat(s);
+      if (s === '' || isNaN(got)) { inp.className = 'no'; fb.className = 'fb no'; fb.textContent = 'skriv et tal'; all = false; return; }
+      var ok = a.u === '°' ? Math.abs(((got - want + 540) % 360) - 180) <= (a.tol || 1) : Math.abs(got - want) <= Math.max(Math.abs(want) * (a.rel || 0.015), a.abs || 1e-9);
+      inp.className = ok ? 'ok' : 'no'; fb.className = 'fb ' + (ok ? 'ok' : 'no');
+      if (ok) fb.textContent = '✓ rigtigt';
+      else {
+        var r = Math.abs(want) > 0 ? got / want : 0, msg = '✗ ikke helt';
+        if (Math.abs(r - 1e3) / 1e3 < 0.02 || Math.abs(r - 1e-3) / 1e-3 < 0.02) msg = '✗ tjek enheden (faktor 1000)';
+        else if (Math.abs(r + 1) < 0.02) msg = '✗ fortegnet er forkert';
+        else if (Math.abs(r - Math.SQRT2) < 0.02 || Math.abs(r - Math.SQRT1_2) < 0.02) msg = '✗ amplitude eller RMS? (faktor √2)';
+        else if (Math.abs(r - 2) < 0.02 || Math.abs(r - 0.5) < 0.01) msg = '✗ en faktor 2 for meget eller for lidt';
+        fb.textContent = msg; all = false;
+      }
+    });
+    if (all) { done[i + 1] = 1; save(); el.classList.add('solved'); el.querySelector('.done').textContent = '✓ løst'; bar(); }
+  }
+});
+function bar() {
+  var b = document.getElementById('bar'), n = 0;
+  b.innerHTML = T.opg.map(function (o, i) { if (done[i + 1]) n++; return '<i class="l' + o.lvl + (done[i + 1] ? ' ok' : '') + '" title="Opgave ' + (i + 1) + '" data-i="' + (i + 1) + '"></i>'; }).join('');
+  document.getElementById('cnt').textContent = n + '/10';
+}
+document.getElementById('bar').addEventListener('click', function (e) { var i = e.target.dataset && e.target.dataset.i; if (i) document.getElementById('o' + i).scrollIntoView({ behavior: 'smooth' }); });
+bar();
+})();
+</script>
+</body>
+</html>

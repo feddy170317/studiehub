@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spm. 4 · Visere</title>
+<meta name="description" content="ELE1 eksamensspørgsmål 4: visere og sinussignaler. Vs(t) beregnet med visere, og V1, V2 og Vs plottet i samme diagram.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../assets/s7.css">
+</head>
+<body>
+<div class="home"><a href="../index.html">☰ Oversigt</a><a href="../traening/index.html#4">✎ Træn 10 opgaver</a></div>
+<div class="vp"><div class="deck">
+
+<!-- ============ 0 · FORSIDE ============ -->
+<section class="slide on" data-title="Forside">
+  <div style="flex:1;display:grid;grid-template-columns:1fr 560px;gap:40px;align-items:center;padding:0 20px">
+    <div style="display:flex;flex-direction:column;gap:30px">
+      <div>
+        <div class="tag" style="display:inline-block">ELE1 · EKSAMENSSPØRGSMÅL 4</div>
+        <h1 style="font-size:72px;margin-top:22px">Visere og sinussignaler</h1>
+        <div style="font-size:29px;color:var(--mut);margin-top:8px">En sinus er en <b class="cy">roterende pil</b> set fra siden. To sinusser med samme frekvens lægges sammen som pile.</div>
+      </div>
+      <div class="card qcard"><span class="lbl cy">(a) FORKLAR · 2 SLIDES</span>
+        Hvad en viser er, og hvorfor den gør AC-regning til almindelig vektor-regning.</div>
+      <div class="card qcard"><span class="lbl or">(b) BEREGN · 2 SLIDES</span>
+        <span data-tex="f=50\text{ Hz},\ V_1=12\cos(\omega t),\ V_2=12\cos(\omega t-\pi/2)"></span>. Find <span data-tex="V_s(t)"></span> med visere, og plot <span data-tex="V_1,V_2,V_s"></span> i samme diagram.</div>
+    </div>
+    <div class="card fl"><h3>Opgavens kredsløb</h3><img class="exfig" src="fig.png" alt="To spændingskilder V1 og V2 i serie med R1 100 MΩ"></div>
+  </div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm</div>
+</section>
+
+<!-- ============ 1 · (a) Viseren ============ -->
+<section class="slide" data-title="(a) Viseren">
+  <div class="hd"><span class="tag">SPM. 4 (a) · 1/2</span><h1>En sinus er et hjul set fra siden<small>viseren er pilen, der drejer</small></h1></div>
+  <div class="body" style="grid-template-columns:540px 1fr">
+    <div class="card">
+      <h3>Fra tid til viser</h3>
+      <div class="big" data-tex="v(t)=\color{#d97a00}{V_m}\cos(\color{#0a7fc2}{\omega}t+\color{#0a9a5c}{\phi})\ \leftrightarrow\ \mathbf V=\color{#d97a00}{V_m}\angle\color{#0a9a5c}{\phi}"></div>
+      <div class="terms">
+        <div class="term"><span class="s or" data-tex="V_m"></span><span><b>Amplitude</b> = pilens længde. Den største værdi, sinussen når.</span></div>
+        <div class="term"><span class="s cy" data-tex="\omega"></span><span><b>Omdrejningshastighed</b> <span data-tex="\omega=2\pi f"></span>. Ved 50 Hz drejer pilen 50 gange i sekundet. Alle signaler har samme ω, så den skrives ikke med i viseren.</span></div>
+        <div class="term"><span class="s gr" data-tex="\phi"></span><span><b>Startvinkel</b>: hvor pilen peger til <span data-tex="t=0"></span>. Den fortæller, hvem der kommer først.</span></div>
+        <div class="term"><span class="s">hvorfor</span><span><b>Regning bliver let.</b> At lægge to sinusser sammen kræver trigonometri. To pile lægges bare sammen som vektorer.</span></div>
+      </div>
+    </div>
+    <div class="card fl">
+      <h3>Pilen drejer. Dens vandrette skygge (realdelen) er signalets værdi, og kurven viser den over tid</h3>
+      <canvas id="cR" width="1800" height="760"></canvas>
+      <div class="row"><button class="btn on" id="play">⏸ Pause</button>
+        <div class="sl" style="flex:1;grid-template-columns:150px 1fr 90px"><span>Startvinkel φ</span><input id="rP" type="range" min="-180" max="180" step="5" value="0"><output id="rPo"></output></div></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>En viser er en pil med længden <b class="or">V<sub>m</sub></b> og vinklen <b class="gr">φ</b>. Den drejer med ω, og projektionen af den er selve sinussignalet.</span></div>
+</section>
+
+<!-- ============ 2 · (a) Addition ============ -->
+<section class="slide" data-title="(a) Læg sammen">
+  <div class="hd"><span class="tag">SPM. 4 (a) · 2/2</span><h1>To sinusser lægges sammen som pile<small>kun når frekvensen er den samme</small></h1></div>
+  <div class="body" style="grid-template-columns:600px 1fr">
+    <div class="card steps tight" style="padding:4px 22px">
+      <div class="step"><span class="n">1</span><div class="t"><b>Skriv alt som cos.</b> <span data-tex="\sin x=\cos(x-90^\circ)"></span></div></div>
+      <div class="step"><span class="n">2</span><div class="t"><b>Aflæs viseren</b> <span data-tex="V_m\angle\phi"></span></div></div>
+      <div class="step"><span class="n">3</span><div class="t"><b>Over på rektangulær form</b>
+        <span class="m" data-tex="V_m\angle\phi=V_m\cos\phi+j\,V_m\sin\phi"></span></div></div>
+      <div class="step"><span class="n">4</span><div class="t"><b>Læg realdele og imaginærdele sammen</b> hver for sig.</div></div>
+      <div class="step"><span class="n">5</span><div class="t"><b>Tilbage til polær</b>
+        <span class="m" data-tex="|V|=\sqrt{a^2+b^2},\quad\phi=\arctan\tfrac ba"></span></div></div>
+      <div class="step"><span class="n">6</span><div class="t"><b>Tilbage til tid:</b> <span data-tex="v(t)=|V|\cos(\omega t+\phi)"></span></div></div>
+    </div>
+    <div class="card fl">
+      <h3>Prøv selv: 12 V + 12 V med vinkel imellem</h3>
+      <canvas id="cA" width="1700" height="740"></canvas>
+      <div class="sl"><span>Fase på V₂</span><input id="aP" type="range" min="-180" max="180" step="5" value="-90"><output id="aPo"></output></div>
+      <div class="status good" id="aS"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Samme frekvens: læg pilene sammen. 12 + 12 giver kun 24 V, når de er i fase. Står de 90° fra hinanden, giver det <b class="cy">17 V</b>.</span></div>
+</section>
+
+<!-- ============ 3 · (b) Beregning ============ -->
+<section class="slide" data-title="(b) Vs med visere">
+  <div class="hd"><span class="tag b">SPM. 4 (b) · 1/2</span><h1>V<sub>s</sub> med visere</h1></div>
+  <div class="chips">
+    <span class="chip">f = 50 Hz<small>ω = 314,16 rad/s</small></span><span class="chip">V₁ = 12 cos(ωt)</span><span class="chip">V₂ = 12 cos(ωt − π/2)</span><span class="chip or">R₁ = 100 MΩ<small>≈ voltmeter, ingen strøm</small></span>
+  </div>
+  <div class="body" style="grid-template-columns:780px 1fr">
+    <div class="card steps tight" style="padding:4px 24px">
+      <div class="step"><span class="n">1</span><div class="t"><b>KVL:</b> kilderne sidder i serie, og der løber ingen strøm i R₁
+        <span class="m" data-tex="\mathbf V_s=\mathbf V_1+\mathbf V_2"></span></div></div>
+      <div class="step"><span class="n">2</span><div class="t"><b>Visere</b>
+        <span class="m" data-tex="\mathbf V_1=12\angle0^\circ=12,\qquad\mathbf V_2=12\angle{-90^\circ}=-j12"></span></div></div>
+      <div class="step"><span class="n">3</span><div class="t"><b>Læg sammen og omregn</b>
+        <span class="m" data-tex="\mathbf V_s=12-j12=\sqrt{12^2+12^2}\ \angle\arctan\tfrac{-12}{12}=16{,}97\angle{-45^\circ}"></span></div></div>
+      <div class="step"><span class="n">4</span><div class="t"><b>Tilbage til tid</b>
+        <span class="m" data-tex="\boxed{V_s(t)=16{,}97\cos\!\left(314{,}16\,t-\tfrac{\pi}{4}\right)\ \text{V}}"></span>
+        <span class="note">amplituden er <span data-tex="12\sqrt2"></span>, og Vs ligger midt mellem V₁ og V₂</span></div></div>
+    </div>
+    <div class="card fl">
+      <h3>Viserdiagrammet</h3>
+      <canvas id="cD" width="1100" height="900"></canvas>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>V₂ er 90° efter V₁. Pilene står vinkelret, så summen er <b class="cy">12√2 = 16,97 V</b> ved <b>−45°</b>, præcis midt imellem.</span></div>
+</section>
+
+<!-- ============ 4 · (b) Plot ============ -->
+<section class="slide" data-title="(b) Plot">
+  <div class="hd"><span class="tag b">SPM. 4 (b) · 2/2</span><h1>V<sub>1</sub>, V<sub>2</sub> og V<sub>s</sub> i samme diagram</h1></div>
+  <div class="body" style="grid-template-columns:1fr 480px">
+    <div class="card fl">
+      <canvas id="cT" width="2000" height="900"></canvas>
+      <div class="sl"><span>Tid t</span><input id="tT" type="range" min="0" max="40" step="0.25" value="2.5"><output id="tTo"></output></div>
+    </div>
+    <div class="card fl">
+      <h3>Viserne til tiden t</h3>
+      <canvas id="cS" width="900" height="760"></canvas>
+      <div class="ro">
+        <div><span>V<sub>1</sub>(t)</span><b class="cy" id="v1"></b></div>
+        <div><span>V<sub>2</sub>(t)</span><b class="or" id="v2"></b></div>
+        <div><span>V<sub>s</sub>(t)</span><b class="gr" id="vs"></b></div>
+      </div>
+      <div class="row"><button class="btn" data-t="0">t = 0</button><button class="btn on" data-t="2.5">t = 2,5 ms</button><button class="btn" data-t="5">t = 5 ms</button></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>V<sub>s</sub> topper ved 2,5 ms, midt mellem V₁'s top (0 ms) og V₂'s top (5 ms). I hvert øjeblik er V<sub>s</sub> = V₁ + V₂.</span></div>
+</section>
+
+</div></div>
+<script src="../assets/deck.js"></script>
+<script src="../assets/ele.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = Deck.$, fmt = Deck.fmt, PI = Math.PI;
+var CY = '#0a7fc2', OR = '#d97a00', RD = '#d63a3a', GR = '#0a9a5c', INK = '#14202d', MUT = '#5a6b7d';
+
+/* ===== (a) 1/2: roterende viser ===== */
+var R = { phi: 0, t: 0, run: true, last: 0 };
+Deck.range('rP', function (v) { R.phi = v; drawR(); }, function (v) { return v + '°'; });
+$('play').onclick = function () { R.run = !R.run; this.textContent = R.run ? '⏸ Pause' : '▶ Afspil'; this.classList.toggle('on', R.run); };
+function drawR() {
+  var g = Deck.cv('cR'); g.clear();
+  var cx = 320, cy = 380, r = 250, a = R.t + R.phi * PI / 180;
+  g.line([[cx - r - 30, cy], [cx + r + 30, cy]], '#d3dde8', 2); g.line([[cx, cy - r - 30], [cx, cy + r + 30]], '#d3dde8', 2);
+  g.x.strokeStyle = '#d3dde8'; g.x.lineWidth = 3; g.x.beginPath(); g.x.arc(cx, cy, r, 0, 7); g.x.stroke();
+  var px = cx + r * Math.cos(a), py = cy - r * Math.sin(a);
+  g.arrow(cx, cy, px, py, OR, 8);
+  g.line([[px, py], [px, cy]], MUT, 2, [6, 6]); g.dot(px, cy, 12, CY);
+  g.txt('V_m', (cx + px) / 2 - 20, (cy + py) / 2 - 24, 32, OR, 'center', 'middle', 800);
+  g.txt('ωt + φ = ' + fmt(((a * 180 / PI) % 360 + 360) % 360, 0) + '°', cx, cy + r + 60, 30, GR, 'center', 'middle', 800);
+  /* tidskurve: vandret akse = projektion (cos), lodret = tid nedad? brug klassisk: kurve til højre med cos-værdi lodret */
+  var x0 = 680, x1 = 1760, F = g.frame({ l: x0, r: x1, t: cy - r, b: cy + r, x0: 0, x1: 4 * PI, y0: -1, y1: 1 });
+  g.line([[x0, cy], [x1, cy]], '#9fb0c2', 2); g.line([[x0, cy - r], [x0, cy + r]], '#9fb0c2', 2);
+  g.txt('cos-værdi (skyggen)', x0 + 10, cy - r - 24, 26, MUT, 'left', 'middle', 700);
+  g.fn(F, function (s) { return Math.cos(-s + a); }, 0, 4 * PI, CY, 6, null, 240);
+  var yv = cy - r * Math.cos(a);
+  g.dot(x0, yv, 12, CY);
+  g.line([[px, cy], [px, cy + 0]], CY, 1);
+  g.txt('nu', x0 + 14, yv - 26, 24, CY, 'left', 'middle', 800);
+  g.txt('tidligere →', x1 - 10, cy + r + 30, 24, MUT, 'right', 'middle', 700);
+  g.txt('v = V_m · cos(ωt + φ)', 1220, cy - r - 24, 28, CY, 'center', 'middle', 800);
+  /* forbind projektion til kurvens start */
+  g.line([[px, cy], [px, yv], [x0, yv]], CY, 2, [4, 6]);
+}
+function tick(ts) { if (R.run && Deck.cur === 1) { R.t += 0.025; drawR(); } requestAnimationFrame(tick); }
+drawR();
+
+/* ===== (a) 2/2: addition ===== */
+var A = { p: -90 };
+Deck.range('aP', function (v) { A.p = v; drawA(); }, function (v) { return v + '°'; });
+function drawA() {
+  var g = Deck.cv('cA'); g.clear();
+  var v1 = Cx(12, 0), v2 = Cx.pol(12, A.p), s = Cx.add(v1, v2), sc = 13;
+  Wave.phasors(g, 330, 380, sc, [{ z: v1, col: CY, lab: 'V₁' }, { z: v2, col: OR, lab: 'V₂', from: v1 }, { z: v2, col: OR, dash: true }, { z: s, col: GR, lab: 'Vₛ', w: 7 }], { R: 330 });
+  var F = Wave.axes(g, { l: 760, r: 1680, t: 80, b: 680, x0: 0, x1: 40, y0: -25, y1: 25, xt: [0, 10, 20, 30, 40], yt: [-24, -12, 0, 12, 24], xl: 't [ms]', fs: 26 });
+  var w = 2 * PI * 50 / 1000;
+  g.fn(F, function (t) { return 12 * Math.cos(w * t); }, 0, 40, CY, 4);
+  g.fn(F, function (t) { return 12 * Math.cos(w * t + A.p * PI / 180); }, 0, 40, OR, 4);
+  g.fn(F, function (t) { return Cx.abs(s) * Math.cos(w * t + Cx.arg(s) * PI / 180); }, 0, 40, GR, 7);
+  $('aS').innerHTML = 'V<sub>s</sub> = <b>' + fmt(Cx.abs(s), 2) + ' V ∠ ' + fmt(Cx.arg(s), 1) + '°</b>' + (A.p === 0 ? '. I fase: 12 + 12 = 24.' : Math.abs(A.p) === 180 ? '. Modfase: de udligner hinanden.' : A.p === -90 ? '. Det er opgavens tilfælde.' : '');
+}
+drawA();
+
+/* ===== (b) 1/2: viserdiagram ===== */
+(function () {
+  var g = Deck.cv('cD'); g.clear();
+  var sc = 26, cx = 330, cy = 300;
+  Wave.phasors(g, cx, cy, sc, [{ z: Cx(12, 0), col: CY, lab: 'V₁ = 12∠0°', dx: 40, dy: -26 }, { z: Cx(0, -12), col: OR, lab: 'V₂ = 12∠−90°', from: Cx(12, 0), dx: 70 },
+    { z: Cx(0, -12), col: OR, dash: true }, { z: Cx(12, -12), col: GR, w: 8 }], { R: 330 });
+  g.txt('Vₛ = 16,97∠−45°', cx + 12 * sc / 2 - 190, cy + 12 * sc / 2 + 30, 32, GR, 'center', 'middle', 800);
+  g.x.strokeStyle = GR; g.x.lineWidth = 3; g.x.beginPath(); g.x.arc(cx, cy, 110, 0, PI / 4); g.x.stroke();
+  g.txt('−45°', cx + 140, cy + 55, 28, GR, 'left', 'middle', 800);
+  g.txt('Re = 12,  Im = −12', 550, 800, 34, INK, 'center', 'middle', 800);
+  g.txt('|Vₛ| = √(12² + 12²) = 16,97 V', 550, 855, 32, MUT, 'center', 'middle', 700);
+})();
+
+/* ===== (b) 2/2: plot + roterende visere ===== */
+var T = { t: 2.5 }, w = 2 * PI * 50 / 1000, VS = 12 * Math.SQRT2;
+var rT = Deck.range('tT', function (v) { T.t = v; drawT(); }, function (v) { return fmt(v, 2) + ' ms'; });
+Deck.group('[data-t]', function (v) { T.t = +v; rT.set(T.t); drawT(); });
+function drawT() {
+  var g = Deck.cv('cT'); g.clear();
+  var F = Wave.axes(g, { l: 130, r: 1950, t: 50, b: 800, x0: 0, x1: 40, y0: -20, y1: 20, xt: [0, 5, 10, 15, 20, 25, 30, 35, 40], yt: [-17, -12, 0, 12, 17], xl: 't [ms]', yl: 'spænding [V]', fs: 26 });
+  g.fn(F, function (t) { return 12 * Math.cos(w * t); }, 0, 40, CY, 5, null, 400);
+  g.fn(F, function (t) { return 12 * Math.cos(w * t - PI / 2); }, 0, 40, OR, 5, null, 400);
+  g.fn(F, function (t) { return VS * Math.cos(w * t - PI / 4); }, 0, 40, GR, 8, null, 400);
+  g.txt('V₁', F.X(0.6), F.Y(13.5), 32, CY, 'left', 'middle', 800); g.txt('V₂', F.X(5.6), F.Y(13.5), 32, OR, 'left', 'middle', 800); g.txt('Vₛ', F.X(3), F.Y(18.6), 32, GR, 'left', 'middle', 800);
+  g.line([[F.X(T.t), F.Y(-20)], [F.X(T.t), F.Y(20)]], INK, 3);
+  var a = 12 * Math.cos(w * T.t), b = 12 * Math.cos(w * T.t - PI / 2), c = a + b;
+  g.dot(F.X(T.t), F.Y(a), 11, CY); g.dot(F.X(T.t), F.Y(b), 11, OR); g.dot(F.X(T.t), F.Y(c), 14, GR);
+  $('v1').textContent = fmt(a, 2); $('v2').textContent = fmt(b, 2); $('vs').textContent = fmt(c, 2);
+  var h = Deck.cv('cS'); h.clear();
+  var rot = Cx.pol(1, w * T.t * 180 / PI), v1 = Cx.mul(Cx(12, 0), rot), v2 = Cx.mul(Cx(0, -12), rot), s = Cx.add(v1, v2);
+  Wave.phasors(h, 450, 380, 13, [{ z: v1, col: CY, lab: 'V₁' }, { z: v2, col: OR, lab: 'V₂', from: v1 }, { z: s, col: GR, lab: 'Vₛ', w: 7 }], { R: 330 });
+  h.line([[450 + s.re * 13, 380 - s.im * 13], [450 + s.re * 13, 380]], GR, 2, [5, 6]);
+  h.txt('skyggen på Re-aksen = værdien lige nu', 450, 740, 26, MUT, 'center', 'middle', 700);
+}
+drawT();
+Deck.cur = 0;
+Deck.onSlide(function (i) { Deck.cur = i; });
+Deck.init();
+requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

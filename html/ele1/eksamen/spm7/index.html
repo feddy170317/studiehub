@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spm. 7 · Kompleks effekt</title>
+<meta name="description" content="ELE1 eksamensspørgsmål 7: kompleks effekt S, aktiv effekt P, reaktiv effekt Q og effektfaktor for lasten bag en seriemodstand.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../assets/s7.css">
+</head>
+<body>
+<div class="home"><a href="../index.html">☰ Oversigt</a><a href="../traening/index.html#7">✎ Træn 10 opgaver</a></div>
+<div class="vp"><div class="deck">
+
+<!-- ============ 0 · FORSIDE ============ -->
+<section class="slide on" data-title="Forside">
+  <div style="flex:1;display:grid;grid-template-columns:1fr 560px;gap:40px;align-items:center;padding:0 20px">
+    <div style="display:flex;flex-direction:column;gap:30px">
+      <div>
+        <div class="tag" style="display:inline-block">ELE1 · EKSAMENSSPØRGSMÅL 7</div>
+        <h1 style="font-size:72px;margin-top:22px">Kompleks effekt</h1>
+        <div style="font-size:29px;color:var(--mut);margin-top:8px">Et ølglas: <b class="gr">P</b> er øllet, <b class="or">Q</b> er skummet, og <b class="vi">S</b> er hele glasset, du betaler for at fylde.</div>
+      </div>
+      <div class="card qcard"><span class="lbl cy">(a) FORKLAR · 2 SLIDES</span>
+        Tilsyneladende effekt S, aktiv effekt P og reaktiv effekt Q. Effekttrekanten og effektfaktoren.</div>
+      <div class="card qcard"><span class="lbl or">(b) BEREGN · 2 SLIDES</span>
+        Find S, P, Q og PF for lasten (R<sub>L</sub> + C) bag R<sub>S</sub>. <span data-tex="V_s=220\sin(\omega t)"></span>, 50 Hz, og alle visere i RMS.</div>
+    </div>
+    <div class="card fl"><h3>Opgavens kredsløb</h3><img class="exfig" src="fig.png" alt="Vs(t) med RS 5 ohm i serie med lasten RL 20 ohm og C 500 µF"></div>
+  </div>
+  <div class="ft" style="color:var(--mut)">→ / mellemrum: næste &nbsp;·&nbsp; ←: forrige &nbsp;·&nbsp; F: fuld skærm</div>
+</section>
+
+<!-- ============ 1 · (a) S, P, Q ============ -->
+<section class="slide" data-title="(a) S, P og Q">
+  <div class="hd"><span class="tag">SPM. 7 (a) · 1/2</span><h1>Ølglasset: P, Q og S<small>tre slags effekt</small></h1></div>
+  <div class="body" style="grid-template-columns:330px 600px 1fr">
+    <div class="card fl">
+      <h3>Hvad betaler du for?</h3>
+      <svg viewBox="0 0 300 430" style="width:100%;flex:1">
+        <path d="M60 40 L80 400 H220 L240 40" fill="none" stroke="#44586e" stroke-width="5"/>
+        <path d="M74 150 L80 397 H220 L226 150Z" fill="#f2b84b"/>
+        <path d="M63 60 L74 150 H226 L237 60Z" fill="#fff8ec" stroke="#e8d9b8" stroke-width="2"/>
+        <text x="150" y="110" text-anchor="middle" font-size="26" font-weight="800" fill="#d97a00">Q skum</text>
+        <text x="150" y="290" text-anchor="middle" font-size="28" font-weight="800" fill="#0a9a5c">P øl</text>
+        <path d="M262 45 V400" stroke="#7a4fc2" stroke-width="4"/><text x="270" y="230" font-size="24" font-weight="800" fill="#7a4fc2">S</text>
+      </svg>
+      <div class="txt" style="text-align:center">Glasset (<b class="vi">S</b>) skal være stort nok til både øl og skum. Kun øllet (<b class="gr">P</b>) slukker tørsten.</div>
+    </div>
+    <div class="card">
+      <h3>Kompleks effekt</h3>
+      <div class="big" data-tex="\color{#7a4fc2}{\mathbf S}=\mathbf V\,\mathbf I^{*}=\color{#0a9a5c}{P}+j\color{#d97a00}{Q}"></div>
+      <div class="terms">
+        <div class="term"><span class="s gr" data-tex="P"></span><span><b>Aktiv effekt</b> [W] <span data-tex="=I^2R"></span>. Varme og arbejde. Det samme som <span data-tex="P_{av}"></span>.</span></div>
+        <div class="term"><span class="s or" data-tex="Q"></span><span><b>Reaktiv effekt</b> [var] <span data-tex="=I^2X"></span>. Energi, der pendler frem og tilbage i L og C. Q &gt; 0 er induktiv, og Q &lt; 0 er kapacitiv.</span></div>
+        <div class="term"><span class="s vi" data-tex="|S|"></span><span><b>Tilsyneladende effekt</b> [VA] <span data-tex="=V_{rms}I_{rms}"></span>. Bestemmer, hvor tykke ledninger og hvor stor en transformer der skal til.</span></div>
+        <div class="term"><span class="s" data-tex="\mathbf I^{*}"></span><span><b>Konjugeret strøm</b>: samme længde, modsat vinkel. Så bliver vinklen på S lig <span data-tex="\theta_v-\theta_i=\theta"></span>.</span></div>
+      </div>
+    </div>
+    <div class="card fl">
+      <h3>Prøv selv: effekttrekanten</h3>
+      <canvas id="cS" width="1100" height="720"></canvas>
+      <div class="sl"><span>Vinkel θ</span><input id="sA" type="range" min="-80" max="80" step="1" value="-18"><output id="sAo"></output></div>
+      <div class="ro"><div><span>P</span><b class="gr" id="sP"></b></div><div><span>Q</span><b class="or" id="sQ"></b></div><div><span>PF</span><b id="sF"></b></div></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span><b class="vi">S</b> = <b class="gr">P</b> + j<b class="or">Q</b>. P er det nyttige, Q pendler frem og tilbage, og S er det, ledningerne skal kunne bære. PF = P/|S|.</span></div>
+</section>
+
+<!-- ============ 2 · (a) RMS + fortegn ============ -->
+<section class="slide" data-title="(a) Metode">
+  <div class="hd"><span class="tag">SPM. 7 (a) · 2/2</span><h1>Sådan regnes S<small>i RMS, med den konjugerede strøm</small></h1></div>
+  <div class="body" style="grid-template-columns:620px 1fr">
+    <div class="card steps tight" style="padding:4px 22px">
+      <div class="step"><span class="n">1</span><div class="t"><b>RMS først.</b> Opgaven giver en amplitude:
+        <span class="m" data-tex="V_{rms}=\frac{V_m}{\sqrt2}=\frac{220}{\sqrt2}=155{,}6\ \text{V}"></span></div></div>
+      <div class="step"><span class="n">2</span><div class="t"><b>Find strømmen</b> fra hele kredsløbet: <span data-tex="\mathbf I=\mathbf V_s/Z_{tot}"></span></div></div>
+      <div class="step"><span class="n">3</span><div class="t"><b>Spændingen over lasten</b>: <span data-tex="\mathbf V_L=\mathbf I\,Z_L"></span></div></div>
+      <div class="step"><span class="n">4</span><div class="t"><b>Effekten i lasten</b>
+        <span class="m" data-tex="\mathbf S_L=\mathbf V_L\mathbf I^*\quad\text{eller}\quad P=I^2R_L,\ Q=I^2X_L"></span></div></div>
+      <div class="step"><span class="n">5</span><div class="t"><b>PF</b> <span data-tex="=P/|S|"></span>, med "foranløbende" (C) eller "bagudrettet" (L).</div></div>
+    </div>
+    <div class="card fl">
+      <h3>Lasttype og trekantens retning</h3>
+      <div class="row"><button class="btn" data-t="0">Ren R</button><button class="btn" data-t="1">R + L (motor)</button><button class="btn on" data-t="2">R + C (opgaven)</button></div>
+      <canvas id="cT" width="1700" height="700"></canvas>
+      <div class="status mid" id="tS"></div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Altid RMS i effektformler, ellers bliver alt dobbelt så stort. <b class="or">Q</b> har fortegn: positiv for en spole, og negativ for en kondensator.</span></div>
+</section>
+
+<!-- ============ 3 · (b) Strøm og V_L ============ -->
+<section class="slide" data-title="(b) Strøm og VL">
+  <div class="hd"><span class="tag b">SPM. 7 (b) · 1/2</span><h1>Strømmen og spændingen over lasten</h1></div>
+  <div class="chips">
+    <span class="chip">V<sub>s</sub> = 220 sin(ωt)<small>→ 155,6 V RMS</small></span><span class="chip">f = 50 Hz</span><span class="chip">R<sub>S</sub> = 5 Ω</span><span class="chip">R<sub>L</sub> = 20 Ω</span><span class="chip or">C = 500 µF</span>
+  </div>
+  <div class="body" style="grid-template-columns:800px 1fr">
+    <div class="card steps tight" style="padding:4px 24px">
+      <div class="step"><span class="n">1</span><div class="t"><b>Impedanser</b>
+        <span class="m" data-tex="Z_C=\frac{-j}{314{,}16\cdot500\cdot10^{-6}}=-j6{,}37\ \Omega,\quad Z_L=20-j6{,}37\ \Omega"></span></div></div>
+      <div class="step"><span class="n">2</span><div class="t"><b>Hele kredsløbet</b>
+        <span class="m" data-tex="Z_{tot}=5+20-j6{,}37=25{,}80\angle{-14{,}3^\circ}\ \Omega"></span></div></div>
+      <div class="step"><span class="n">3</span><div class="t"><b>Strømmen (RMS)</b>
+        <span class="m" data-tex="\mathbf I=\frac{155{,}6\angle0^\circ}{25{,}80\angle{-14{,}3^\circ}}=6{,}03\angle14{,}3^\circ\ \text{A}"></span></div></div>
+      <div class="step"><span class="n">4</span><div class="t"><b>Spænding over lasten</b>
+        <span class="m" data-tex="\mathbf V_L=\mathbf I\,Z_L=6{,}03\angle14{,}3^\circ\cdot20{,}99\angle{-17{,}7^\circ}=126{,}6\angle{-3{,}4^\circ}\ \text{V}"></span></div></div>
+    </div>
+    <div class="card fl">
+      <h3>Viserne (RMS)</h3>
+      <canvas id="cV" width="1100" height="860"></canvas>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Amplituden 220 V er 155,6 V RMS. Strømmen er <b class="cy">6,03 A</b> og ligger 14° foran. Lasten får <b>126,6 V</b>, fordi R<sub>S</sub> tager resten.</span></div>
+</section>
+
+<!-- ============ 4 · (b) S, P, Q, PF ============ -->
+<section class="slide" data-title="(b) S, P, Q, PF">
+  <div class="hd"><span class="tag b">SPM. 7 (b) · 2/2</span><h1>S, P, Q og PF for lasten</h1></div>
+  <div class="body" style="grid-template-columns:620px 1fr">
+    <div class="card steps tight" style="padding:4px 22px">
+      <div class="step"><span class="n">5</span><div class="t"><b>Kompleks effekt</b>
+        <span class="m" data-tex="\mathbf S_L=\mathbf V_L\mathbf I^*=126{,}6\angle{-3{,}4^\circ}\cdot6{,}03\angle{-14{,}3^\circ}"></span>
+        <span class="m" data-tex="\boxed{\mathbf S_L=763\angle{-17{,}7^\circ}=727-j232\ \text{VA}}"></span></div></div>
+      <div class="step"><span class="n">6</span><div class="t"><b>Aflæs</b>
+        <span class="m" data-tex="P=727\ \text{W},\quad Q=-232\ \text{var},\quad|S|=763\ \text{VA}"></span>
+        <span class="note">Kontrol: <span data-tex="I^2R_L=6{,}03^2\cdot20=727"></span> og <span data-tex="I^2X_C=-232"></span> ✓</span></div></div>
+      <div class="step"><span class="n">7</span><div class="t"><b>Effektfaktor</b>
+        <span class="m" data-tex="\boxed{PF=\frac{727}{763}=0{,}953}\ \text{foranløbende}"></span>
+        <span class="note">Læses 220 V som RMS, bliver alle effekter dobbelt så store (1454 W og −463 var), men PF er den samme</span></div></div>
+    </div>
+    <div class="card fl">
+      <div style="display:grid;grid-template-columns:1fr 300px;gap:14px;flex:1;min-height:0">
+        <canvas id="cB" width="1100" height="760"></canvas>
+        <div class="col2">
+          <h3 style="margin:0">Hvad nu hvis …</h3>
+          <div class="sl" style="grid-template-columns:44px 1fr 90px;font-size:16px"><span>C</span><input id="bC" type="range" min="50" max="2000" step="10" value="500"><output id="bCo"></output></div>
+          <div class="sl" style="grid-template-columns:44px 1fr 90px;font-size:16px"><span>R<sub>L</sub></span><input id="bR" type="range" min="1" max="60" step="1" value="20"><output id="bRo"></output></div>
+          <div class="sl" style="grid-template-columns:44px 1fr 90px;font-size:16px"><span>R<sub>S</sub></span><input id="bS" type="range" min="0" max="20" step="0.5" value="5"><output id="bSo"></output></div>
+          <div class="status good" id="bSt" style="font-size:16px"></div>
+        </div>
+      </div>
+      <div class="ro r4">
+        <div><span>P</span><b class="gr" id="oP"></b></div><div><span>Q</span><b class="or" id="oQ"></b></div><div><span>|S|</span><b class="vi" id="oS"></b></div><div><span>PF</span><b id="oF"></b></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b class="say">SIG</b><span>Lasten bruger <b class="gr">727 W</b> og "leverer" 232 var. Den er kapacitiv, så Q er negativ. PF er <b>0,95</b> foranløbende.</span></div>
+</section>
+
+</div></div>
+<script src="../assets/deck.js"></script>
+<script src="../assets/ele.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = Deck.$, fmt = Deck.fmt, PI = Math.PI;
+var CY = '#0a7fc2', OR = '#d97a00', RD = '#d63a3a', GR = '#0a9a5c', INK = '#14202d', MUT = '#5a6b7d', VI = '#7a4fc2';
+
+function triangle(g, ox, oy, sc, P, Q, big) {
+  var px = ox + P * sc, py = oy - Q * sc, fs = big || 30;
+  g.poly([[ox, oy], [px, oy], [px, py]], 'rgba(122,79,194,.08)');
+  g.arrow(ox, oy, px, oy, GR, 7); g.arrow(px, oy, px, py, OR, 7); g.arrow(ox, oy, px, py, VI, 8);
+  g.txt('P', (ox + px) / 2, oy + (Q >= 0 ? 34 : -30), fs, GR, 'center', 'middle', 800);
+  g.txt('Q', px + 26, (oy + py) / 2, fs, OR, 'left', 'middle', 800);
+  g.txt('S', (ox + px) / 2 - 24, (oy + py) / 2 + (Q >= 0 ? -24 : 24), fs, VI, 'right', 'middle', 800);
+  var th = Math.atan2(Q, P);
+  if (Math.abs(th) > 0.03) { g.x.strokeStyle = MUT; g.x.lineWidth = 3; g.x.beginPath(); g.x.arc(ox, oy, 90, Math.min(0, -th), Math.max(0, -th)); g.x.stroke(); g.txt('θ', ox + 110, oy - Math.sin(th / 2) * 110, 28, MUT, 'left', 'middle', 800); }
+}
+
+/* ===== (a) 1/2 ===== */
+Deck.range('sA', function () { drawS(); }, function (v) { return (v > 0 ? '+' : '') + v + '°'; });
+function drawS() {
+  var g = Deck.cv('cS'); g.clear();
+  var th = +$('sA').value * PI / 180, S = 1000, P = S * Math.cos(th), Q = S * Math.sin(th);
+  g.txt('|S| = 1000 VA', 550, 40, 30, VI, 'center', 'middle', 800);
+  triangle(g, 140, 360, 0.75, P, Q);
+  $('sP').textContent = fmt(P, 0) + ' W'; $('sQ').textContent = fmt(Q, 0) + ' var'; $('sF').textContent = fmt(Math.cos(th), 2);
+  g.txt(th > 0.01 ? 'induktiv: Q > 0, trekanten op' : th < -0.01 ? 'kapacitiv: Q < 0, trekanten ned' : 'ren modstand: Q = 0', 550, 690, 28, th > 0 ? OR : th < 0 ? CY : INK, 'center', 'middle', 800);
+}
+drawS();
+
+/* ===== (a) 2/2 ===== */
+var TY = [{ z: Cx(20, 0), t: 'Ren modstand: Q = 0, og PF = 1. Strøm og spænding er i fase.' }, { z: Cx(20, 12), t: 'Motor (R + L): Q > 0, og strømmen kommer efter. PF er bagudrettet.' }, { z: Cx(20, -6.37), t: 'Opgavens last (R + C): Q < 0, og strømmen kommer før. PF er foranløbende.' }];
+Deck.group('[data-t]', function (v) { drawT(+v); });
+function drawT(k) {
+  var g = Deck.cv('cT'); g.clear();
+  var z = TY[k].z, I = Cx.div(126.6, z), S = Cx.mul(126.6, Cx.conj(I));
+  triangle(g, 120, 350, 0.75, S.re, S.im);
+  Wave.phasors(g, 1300, 350, 28, [{ z: Cx(126.6 / 10, 0), col: INK, lab: 'V' }, { z: Cx.mul(I, 2), col: CY, lab: 'I' }], { R: 300 });
+  g.txt('viser (I forstørret)', 1300, 680, 24, MUT, 'center', 'middle', 700);
+  $('tS').innerHTML = TY[k].t;
+}
+drawT(2);
+
+/* ===== (b) 1/2: visere ===== */
+(function () {
+  var g = Deck.cv('cV'); g.clear();
+  var Vs = Cx(155.6, 0), Zl = Cx(20, -6.366), I = Cx.div(Vs, Cx.add(5, Zl)), VRS = Cx.mul(I, 5), VL = Cx.mul(I, Zl), sc = 5.2, cx = 120, cy = 470;
+  g.line([[cx - 40, cy], [cx + 900, cy]], '#d3dde8', 2); g.line([[cx, cy - 330], [cx, cy + 200]], '#d3dde8', 2);
+  Wave.phasors(g, cx, cy, sc, [{ z: VL, col: VI, w: 7 }, { z: VRS, col: OR, from: VL, w: 6 }, { z: Vs, col: INK, w: 4, dash: true }, { z: Cx.mul(I, 20), col: CY, w: 7 }]);
+  g.txt('Vₛ = 155,6∠0°', cx + Vs.re * sc + 10, cy + 70, 28, INK, 'right', 'middle', 800);
+  g.txt('V_L = 126,6∠−3,4°', cx + VL.re * sc / 2 - 60, cy + 80, 28, VI, 'center', 'middle', 800);
+  g.txt('V_RS = I·5', cx + VL.re * sc - 20, cy - 70, 26, OR, 'left', 'middle', 800);
+  g.txt('I = 6,03∠+14,3° (×20)', cx + I.re * 20 * sc - 140, cy - I.im * 20 * sc - 40, 28, CY, 'center', 'middle', 800);
+  g.txt('Vₛ = V_RS + V_L (KVL med visere)', 550, 800, 28, MUT, 'center', 'middle', 700);
+})();
+
+/* ===== (b) 2/2 ===== */
+var B = { C: 500, R: 20, S: 5 };
+Deck.range('bC', function (v) { B.C = v; drawB(); }, function (v) { return v + ' µF'; });
+Deck.range('bR', function (v) { B.R = v; drawB(); }, function (v) { return v + ' Ω'; });
+Deck.range('bS', function (v) { B.S = v; drawB(); }, function (v) { return fmt(v, 1) + ' Ω'; });
+function drawB() {
+  var Zl = Cx.add(B.R, Cx.ZC(B.C * 1e-6, 50)), I = Cx.div(220 / Math.SQRT2, Cx.add(B.S, Zl)), Ia = Cx.abs(I), P = Ia * Ia * Zl.re, Q = Ia * Ia * Zl.im, S = Math.hypot(P, Q);
+  var g = Deck.cv('cB'); g.clear();
+  var sc = Math.min(1.1, 850 / Math.max(P, 1), 300 / Math.max(Math.abs(Q), 1));
+  triangle(g, 120, 300, sc, P, Q, 32);
+  g.txt('skala: ' + fmt(1 / sc, 2) + ' W pr. pixel', 1080, 740, 22, MUT, 'right', 'middle', 600);
+  $('oP').textContent = fmt(P, 0) + ' W'; $('oQ').textContent = fmt(Q, 0) + ' var'; $('oS').textContent = fmt(S, 0) + ' VA'; $('oF').textContent = fmt(P / S, 3);
+  $('bSt').innerHTML = 'I = <b>' + fmt(Ia, 2) + ' A</b>. ' + (B.C >= 1500 ? 'Stor C: kondensatoren er næsten en kortslutning, så Q → 0.' : B.C <= 150 ? 'Lille C: stor reaktans, så Q dominerer.' : 'Mindre R<sub>S</sub> giver mere effekt til lasten.');
+}
+drawB();
+Deck.init();
+})();
+</script>
+</body>
+</html>
